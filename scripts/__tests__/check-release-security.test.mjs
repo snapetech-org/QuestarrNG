@@ -33,6 +33,63 @@ describe("release security gate", () => {
     }
   });
 
+  it("scans every Trivy severity and rescans the verified release digest during recovery", () => {
+    const vulnerabilityWorkflow = load(
+      readFileSync(resolve(cwd(), ".github/workflows/vulnerability-scan.yml"), "utf8")
+    );
+    const trivyScan = vulnerabilityWorkflow.jobs["image-scan"].steps.find(
+      (step) => step.id === "trivy"
+    );
+    expect(trivyScan.with.severity.split(",")).toEqual([
+      "UNKNOWN",
+      "LOW",
+      "MEDIUM",
+      "HIGH",
+      "CRITICAL",
+    ]);
+    expect(trivyScan.with.cache).toBe("${{ github.ref_type != 'tag' }}");
+
+    const workflow = load(readFileSync(resolve(cwd(), ".github/workflows/fork-image.yml"), "utf8"));
+    const steps = workflow.jobs["finalize-release"].steps;
+    const verifyIndex = steps.findIndex((step) => step.id === "verify-image");
+    const rescanSteps = steps.filter((step) => step.name?.startsWith("Rescan the verified linux/"));
+    const gateIndex = steps.findIndex((step) =>
+      step.run?.includes("node scripts/check-release-security.mjs")
+    );
+    expect(verifyIndex).toBeGreaterThanOrEqual(0);
+    expect(rescanSteps).toHaveLength(2);
+    const rescanIndices = rescanSteps.map((step) => steps.indexOf(step));
+    expect(rescanIndices.every((index) => index > verifyIndex && index < gateIndex)).toBe(true);
+    const rescanByPlatform = Object.fromEntries(
+      rescanSteps.map((step) => [step.name.match(/linux\/(amd64|arm64)/)[1], step])
+    );
+    expect(rescanByPlatform.amd64.with["image-ref"]).toBe(
+      "${{ steps.verify-image.outputs.amd64_image }}"
+    );
+    expect(rescanByPlatform.arm64.with["image-ref"]).toBe(
+      "${{ steps.verify-image.outputs.arm64_image }}"
+    );
+    for (const rescan of rescanSteps) {
+      expect(rescan.uses).toMatch(/^aquasecurity\/trivy-action@/);
+      expect(rescan.env.TRIVY_VEX).toBe("security/vex/questarr.openvex.json");
+      expect(rescan.with).toMatchObject({
+        severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL",
+        scanners: "vuln",
+        "exit-code": "1",
+        cache: "false",
+      });
+    }
+    const verifyStep = steps[verifyIndex];
+    expect(verifyStep.run).toContain(
+      'select(.platform.os == "linux" and .platform.architecture == "amd64")'
+    );
+    expect(verifyStep.run).toContain(
+      'select(.platform.os == "linux" and .platform.architecture == "arm64")'
+    );
+    expect(verifyStep.run).toContain("amd64_image=${image}@${amd64_digest}");
+    expect(verifyStep.run).toContain("arm64_image=${image}@${arm64_digest}");
+  });
+
   it("permits a clean source commit only after every required scan succeeds", () => {
     expect(securityBlockers([], [], successfulChecks())).toEqual([]);
   });
