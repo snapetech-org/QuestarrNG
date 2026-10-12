@@ -1,1 +1,0 @@
-QuestarrNG uses its own first-run account setup and authentication; it does not use YunoHost SSO. The package restricts access to YunoHost administrators by default and installs at the root of a dedicated domain. URL subpaths are not supported.
