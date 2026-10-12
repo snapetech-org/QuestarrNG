@@ -16,6 +16,7 @@ describe("Config Module", () => {
     delete process.env.HOST;
     delete process.env.NODE_ENV;
     delete process.env.QUESTARR_BASE_PATH;
+    delete process.env.JWT_SECRET;
   });
 
   afterEach(() => {
@@ -30,6 +31,28 @@ describe("Config Module", () => {
       expect(config.database.url).toBe("sqlite.db");
       expect(config.server.port).toBe(5000);
       expect(config.server.host).toBe("0.0.0.0");
+    });
+  });
+
+  describe("JWT secret strength", () => {
+    it.each(["", "short", "a".repeat(31), "questarr-default-secret-change-me"])(
+      "rejects an insecure override without logging its value",
+      async (secret) => {
+        process.env.JWT_SECRET = secret;
+        vi.spyOn(process, "exit").mockImplementation(() => {
+          throw new Error("invalid configuration");
+        });
+        const errors = vi.spyOn(console, "error").mockImplementation(() => {});
+        await expect(import("../config.js")).rejects.toThrow("invalid configuration");
+        expect(errors.mock.calls.flat().join("\n")).toContain("at least 32 bytes");
+        if (secret) expect(errors.mock.calls.flat().join("\n")).not.toContain(secret);
+      }
+    );
+
+    it("accepts a 32-byte override", async () => {
+      process.env.JWT_SECRET = "0123456789abcdef".repeat(2);
+      const { config } = await import("../config.js");
+      expect(config.auth.jwtSecret).toBe(process.env.JWT_SECRET);
     });
   });
 

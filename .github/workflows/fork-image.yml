@@ -29,6 +29,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      security-events: read
     outputs:
       image: ${{ steps.image.outputs.name }}
       digest: ${{ steps.build-image.outputs.digest }}
@@ -59,6 +60,19 @@ jobs:
             echo "Release tag $TAG is not on main."
             exit 1
           }
+
+      - name: Set up Node.js for release security checks
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 26.x
+          package-manager-cache: false
+
+      - name: Require clean security before publishing a versioned image
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ secrets.SECURITY_READ_TOKEN || github.token }}
+        run: node scripts/check-release-security.mjs
 
       - name: Set image name
         id: image
@@ -220,6 +234,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      security-events: read
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -236,6 +251,11 @@ jobs:
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22.x
+
+      - name: Require clean security findings and completed source scans
+        env:
+          GH_TOKEN: ${{ secrets.SECURITY_READ_TOKEN || github.token }}
+        run: node scripts/check-release-security.mjs
 
       - name: Add curated release-note fragments
         shell: bash
@@ -356,6 +376,7 @@ jobs:
       actions: read
       contents: write
       packages: read
+      security-events: read
     outputs:
       release_sha: ${{ steps.validate.outputs.release_sha }}
       previous_tag: ${{ steps.validate.outputs.previous_tag }}
@@ -484,6 +505,12 @@ jobs:
           diff -u \
             <(jq -Sc . version-image.json) \
             <(jq -Sc . source-image.json)
+
+      - name: Require clean security findings and completed source scans
+        env:
+          GH_TOKEN: ${{ secrets.SECURITY_READ_TOKEN || github.token }}
+          RELEASE_SHA: ${{ steps.validate.outputs.release_sha }}
+        run: node scripts/check-release-security.mjs
 
       - name: Assemble release body
         shell: bash

@@ -7,6 +7,7 @@ import { type User } from "@shared/schema";
 import crypto from "crypto";
 import { logger } from "./logger.js";
 import { AUTH_COOKIE_NAME, getCookie } from "./security.js";
+import { isStrongJwtSecret } from "./jwt-secret.js";
 
 const SALT_ROUNDS = 10;
 
@@ -36,10 +37,15 @@ async function getJwtSecret(): Promise<string> {
   // Check DB
   try {
     const dbSecret = await storage.getSystemConfig("jwt_secret");
-    if (dbSecret) {
+    if (dbSecret && isStrongJwtSecret(dbSecret)) {
       logger.info("Loaded JWT secret from database");
       cachedJwtSecret = dbSecret;
       return cachedJwtSecret;
+    }
+    if (dbSecret) {
+      logger.warn(
+        "Replacing an insecure stored JWT secret; existing sessions will be invalidated."
+      );
     }
   } catch (error) {
     logger.warn("Failed to load JWT secret from database, generating new one: %s", error);
