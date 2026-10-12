@@ -105,6 +105,12 @@ jobs:
       - name: Audit all dependencies (Critical/High blocks build)
         run: npm audit --audit-level=high
 
+      - name: Audit the locked CI npm runtime (all severities block build)
+        run: npm audit --prefix .github/npm-runtime --audit-level=low
+
+      - name: Audit the tracked npm CLI source (all severities block build)
+        run: npm audit --prefix .github/npm-source --audit-level=low
+
       # Policy: docs/VULNERABILITY_MANAGEMENT.md §1.4 — production dependency
       # licenses must be on the allow-list.
       - name: Check dependency licenses
@@ -195,7 +201,7 @@ jobs:
 
       - name: Install the locked npm runtime
         run: |
-          npm ci --prefix .github/npm-runtime --ignore-scripts --no-audit --no-fund
+          node scripts/install-npm-runtime.mjs
           echo "$GITHUB_WORKSPACE/.github/npm-runtime/node_modules/.bin" >> "$GITHUB_PATH"
 
       - name: Run source-bound test plan
@@ -257,7 +263,7 @@ jobs:
 
       - name: Install the locked npm runtime
         run: |
-          npm ci --prefix .github/npm-runtime --ignore-scripts --no-audit --no-fund
+          node scripts/install-npm-runtime.mjs
           echo "$GITHUB_WORKSPACE/.github/npm-runtime/node_modules/.bin" >> "$GITHUB_PATH"
 
       # The registered task owns dependency installation, lint, formatting,

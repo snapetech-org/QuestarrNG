@@ -4,7 +4,10 @@ version: 2
 updates:
   # Enable version updates for npm
   - package-ecosystem: "npm"
-    directory: "/"
+    directories:
+      - "/"
+      - "/.github/npm-runtime"
+      - "/.github/npm-source"
     schedule:
       interval: "weekly"
       day: "monday"

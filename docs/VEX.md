@@ -53,15 +53,22 @@ the published container image), with a `status` of one of:
 
 ## How the feed gates CI
 
-The blocking merge and release gates run `npm audit --audit-level=high` over
-all direct and transitive dependencies, including development tooling. A
-Critical or High finding blocks CI and image publication, even if a VEX entry
-exists. This keeps the full-tree policy in `docs/VULNERABILITY_MANAGEMENT.md`.
+The required merge gate runs `npm audit --audit-level=high` over all direct
+and transitive dependencies, including development tooling. A Critical or
+High finding blocks CI even if a VEX entry exists. Before publication, the
+QuestarrNG fork release gate runs `npm audit --audit-level=low` against the
+application, locked CI npm runtime, and tracked npm CLI source lockfiles. It
+also blocks on open security alerts, so a finding still reported by these raw
+audits or alert feeds blocks publication at any severity, even if a VEX entry
+exists.
 
-The VEX-aware `scripts/audit-prod.mjs` is used by the scheduled vulnerability
-report to filter production-dependency advisories for SARIF triage. It does not
-replace the full-tree merge/release checks. VEX statements still require code-
-path evidence and review before they are added.
+The vulnerability-scan workflow passes its npm audit report through the
+VEX-aware `scripts/audit-prod.mjs` before failing the npm-audit job. Separately,
+the image scan passes the feed to Trivy, which applies it to the image results
+before producing SARIF. These uses do not replace the full-tree merge audit or
+the stricter raw release audits and alert checks. A VEX statement records the
+assessment and informs triage; it does not waive those publication checks. VEX
+statements still require code-path evidence and review before they are added.
 
 ## How the feed is generated and kept current
 

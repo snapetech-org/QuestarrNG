@@ -3,6 +3,7 @@ name: CodeQL
 on:
   push:
     branches: [main, release/*]
+    tags: [v*]
   pull_request:
     branches: [main, release/*]
   schedule:

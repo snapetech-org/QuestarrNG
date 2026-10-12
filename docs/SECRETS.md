@@ -27,8 +27,8 @@ rather than starting with an invalid configuration.
 | `NODE_ENV`                              | `development` \| `production` \| `test`                       | No (defaults to `production`)                                                                                                                                                                                                 |
 | `SQLITE_DB_PATH`                        | Path to the SQLite database file                              | No (default `sqlite.db`)                                                                                                                                                                                                      |
 | `CREDENTIALS_ENCRYPTION_KEY`            | AES-256 key encrypting indexer/downloader credentials at rest | No — auto-generated (32 random bytes) and persisted to the DB if unset; must be a 64-char hex string if provided (§4)                                                                                                         |
-| `ARCHIVE_MAX_ENTRIES`                   | Max entries an archive may list before import extraction      | No (default `50000`). Archives listing more entries are refused before extraction. See [Archive extraction limits](#archive-extraction-limits) |
-| `ARCHIVE_MAX_EXPANDED_BYTES`            | Max total declared uncompressed size of an archive, in bytes  | No (default `268435456000`, 250 GiB). Archives declaring more are refused before extraction. See [Archive extraction limits](#archive-extraction-limits) |
+| `ARCHIVE_MAX_ENTRIES`                   | Max entries an archive may list before import extraction      | No (default `50000`). Archives listing more entries are refused before extraction. See [Archive extraction limits](#archive-extraction-limits)                                                                                |
+| `ARCHIVE_MAX_EXPANDED_BYTES`            | Max total declared uncompressed size of an archive, in bytes  | No (default `268435456000`, 250 GiB). Archives declaring more are refused before extraction. See [Archive extraction limits](#archive-extraction-limits)                                                                      |
 
 For the optional PostgreSQL backend, set `DB_DIALECT=postgres` and supply
 `DATABASE_URL`. That connection string contains the database username and
@@ -51,14 +51,14 @@ archives are listed with `unrar lt -v`; other formats use 7-Zip. Questarr
 refuses the archive, and the import fails with an error, if any of these is
 true:
 
-| Check                                                                                         | Error message                                                         |
-| --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| More entries than `ARCHIVE_MAX_ENTRIES`                                                       | `Archive contains too many entries (limit: N).`                       |
-| Total declared uncompressed size above `ARCHIVE_MAX_EXPANDED_BYTES`                           | `Archive expands beyond the configured size limit (N bytes).`         |
-| An entry with an absolute path, a drive letter (`C:`), a `..` segment, or more than 64 levels | `Archive contains an unsafe file path.`                               |
-| An entry that would resolve outside the extraction directory                                  | `Archive contains a file path outside the extraction directory.`      |
-| A symbolic link or hard link                                                                  | `Archive contains a symbolic or hard link, which is not extracted.`   |
-| An entry with a missing or invalid uncompressed size                                          | `Archive contains an entry with an invalid uncompressed size.`        |
+| Check                                                                                         | Error message                                                       |
+| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| More entries than `ARCHIVE_MAX_ENTRIES`                                                       | `Archive contains too many entries (limit: N).`                     |
+| Total declared uncompressed size above `ARCHIVE_MAX_EXPANDED_BYTES`                           | `Archive expands beyond the configured size limit (N bytes).`       |
+| An entry with an absolute path, a drive letter (`C:`), a `..` segment, or more than 64 levels | `Archive contains an unsafe file path.`                             |
+| An entry that would resolve outside the extraction directory                                  | `Archive contains a file path outside the extraction directory.`    |
+| A symbolic link or hard link                                                                  | `Archive contains a symbolic or hard link, which is not extracted.` |
+| An entry with a missing or invalid uncompressed size                                          | `Archive contains an entry with an invalid uncompressed size.`      |
 
 The path and link checks always apply. If a legitimate release is refused
 for size or entry count, raise the matching limit and restart the server:
@@ -76,6 +76,13 @@ See [`docs/SECURITY_ASSESSMENT.md`](SECURITY_ASSESSMENT.md) for why these
 checks exist.
 
 ## 2. Authentication secret (`JWT_SECRET`)
+
+`JWT_SECRET`, when set, must contain at least 32 UTF-8 bytes and must not
+be the legacy default. Invalid overrides stop startup without logging the
+secret. Use a random value, for example `openssl rand -hex 32`, or leave
+the variable unset to generate one. Weak secrets found in `system_config`
+are replaced with 64 random bytes on first use; this invalidates sessions
+signed with the old weak secret. Strong persisted secrets are preserved.
 
 Session tokens are signed HS256 JWTs (`jsonwebtoken`), 7-day expiry
 (`server/auth.ts:77-82`), verified on every authenticated request by
