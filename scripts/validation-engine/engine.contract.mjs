@@ -27,6 +27,7 @@ import {
   main as runEngine,
   releaseRunLock,
 } from './engine.mjs';
+import { validation } from './config.mjs';
 
 const temporaryRoots = [];
 
@@ -87,6 +88,15 @@ function fixture() {
 
 after(() => {
   for (const root of temporaryRoots) rmSync(root, { recursive: true, force: true });
+});
+
+test('Playwright installation and execution share the package-local browser cache', () => {
+  const install = validation.tasks.find((task) => task.id === 'playwright-browser-install');
+  const e2e = validation.tasks.find((task) => task.id === 'playwright-e2e');
+  assert.ok(install);
+  assert.ok(e2e);
+  assert.equal(install.env?.PLAYWRIGHT_BROWSERS_PATH, '0');
+  assert.equal(e2e.env?.PLAYWRIGHT_BROWSERS_PATH, '0');
 });
 
 test('glob matching covers root and nested files without crossing sibling names', () => {
