@@ -526,13 +526,14 @@ export function formatValidationProgress(repository, tasks, results, currentTask
   const receipts = tasks.map((task) => results.get(task.id)).filter(Boolean);
   const passed = receipts.filter((receipt) => receipt.status === 'passed').length;
   const failed = receipts.filter((receipt) => ['failed', 'incomplete'].includes(receipt.status)).length;
-  const blocked = receipts.filter((receipt) => ['blocked', 'not-run'].includes(receipt.status)).length;
+  const blocked = receipts.filter((receipt) => receipt.status === 'blocked').length;
+  const notRun = receipts.filter((receipt) => receipt.status === 'not-run').length;
   const completed = passed + failed;
-  const pending = Math.max(0, tasks.length - completed - blocked);
+  const pending = Math.max(0, tasks.length - completed - blocked - notRun);
   const active = currentTask
     ? `; running ${currentTask.name ?? currentTask.id} (${formatElapsed(elapsedMs)})`
     : '';
-  return `[validation] ${repository}: ${completed}/${tasks.length} selected tasks complete (${passed} passed, ${failed} failed, ${blocked} blocked, ${pending} pending)${active}`;
+  return `[validation] ${repository}: ${completed}/${tasks.length} selected tasks complete (${passed} passed, ${failed} failed, ${blocked} blocked, ${notRun} not-run, ${pending} pending)${active}`;
 }
 
 function terminate(child) {

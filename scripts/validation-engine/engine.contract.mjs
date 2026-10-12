@@ -251,22 +251,24 @@ test('live progress reports task start, heartbeat, and completion', async () => 
   assert.ok(messages.some((summary) => summary.includes('running Unit tests (0m00s)')));
   assert.ok(messages.some((summary) => summary.includes('running Unit tests (0m01s)')));
   assert.equal(messages.at(-1),
-    '[validation] fixture: 1/1 selected tasks complete (1 passed, 0 failed, 0 blocked, 0 pending)');
+    '[validation] fixture: 1/1 selected tasks complete (1 passed, 0 failed, 0 blocked, 0 not-run, 0 pending)');
 });
 
 test('progress formatter reports completed, blocked, pending, and active tasks', () => {
   const tasks = [
     { id: 'passed', name: 'Passed task' },
     { id: 'blocked', name: 'Blocked task' },
+    { id: 'not-run', name: 'Not-run task' },
     { id: 'running', name: 'Long task' },
   ];
   const results = new Map([
     ['passed', { status: 'passed' }],
     ['blocked', { status: 'blocked' }],
+    ['not-run', { status: 'not-run' }],
   ]);
   assert.equal(
-    formatValidationProgress('sample', tasks, results, tasks[2], 65_000),
-    '[validation] sample: 1/3 selected tasks complete (1 passed, 0 failed, 1 blocked, 1 pending); running Long task (1m05s)',
+    formatValidationProgress('sample', tasks, results, tasks[3], 65_000),
+    '[validation] sample: 1/4 selected tasks complete (1 passed, 0 failed, 1 blocked, 1 not-run, 1 pending); running Long task (1m05s)',
   );
 });
 
@@ -443,10 +445,19 @@ test('plan and executor reject dependency cycles and report missing tools', asyn
     requiredCommands: ['command-that-is-not-installed-validation-test'],
   });
   const plan = createPlan(missingRoot, missingConfig);
-  const result = await executePlan(missingRoot, missingConfig, plan);
+  const progress = [];
+  const result = await executePlan(missingRoot, missingConfig, plan, {
+    onProgress: (summary) => progress.push(summary),
+  });
   assert.equal(result.receipt.status, 'incomplete');
+  assert.equal(result.receipt.tasks[0].status, 'not-run');
   assert.equal(result.receipt.totals.executed, 0);
+  assert.equal(result.receipt.totals.blocked, 0);
   assert.equal(result.receipt.prerequisites.some((item) => !item.available), true);
+  assert.equal(
+    progress.at(-1),
+    '[validation] fixture: 0/1 selected tasks complete (0 passed, 0 failed, 0 blocked, 1 not-run, 0 pending)',
+  );
 });
 
 test('candidate digests change after tracked source edits', () => {
