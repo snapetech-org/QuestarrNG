@@ -44,8 +44,12 @@ const IGNORED_DIRS = new Set([
   '_tests',
   'TestResults',
 ]);
-const SECRET_ENV = /(?:TOKEN|PASSWORD|SECRET|API[_-]?KEY|CREDENTIAL|COOKIE|AUTH|IDENTITY|DENYLIST|DATABASE_URL|DB_PASS|AWS_|AZURE_|GCP_)/i;
-const TEST_HARNESS_ENV = new Set(['NODE_TEST_CONTEXT', 'VALIDATION_RECEIPT_EXPORT']);
+const INHERITED_ENVIRONMENT_KEYS = new Set([
+  'ASDF_DATA_DIR', 'ASDF_DIR', 'COMSPEC', 'LANG', 'LC_ALL', 'LC_CTYPE',
+  'MISE_DATA_DIR', 'MISE_HOME', 'NVM_DIR', 'PATH', 'PATHEXT',
+  'VOLTA_HOME', 'SYSTEMROOT', 'TZ', 'WINDIR',
+]);
+const APPROVED_TASK_PASS_ENVIRONMENT = new Map();
 
 function fail(message) {
   throw new Error(message);
@@ -270,6 +274,16 @@ function commandAvailable(command) {
   });
 }
 
+function sanitizedEnvironment(inherited = process.env) {
+  const values = new Map();
+  for (const [key, value] of Object.entries(inherited)) {
+    const normalized = key.toUpperCase();
+    if (!INHERITED_ENVIRONMENT_KEYS.has(normalized) || typeof value !== 'string') continue;
+    if (!values.has(normalized) || key === normalized) values.set(normalized, value);
+  }
+  return Object.fromEntries(values);
+}
+
 function inspectRuntime(root, runtime) {
   const available = commandAvailable(runtime.command);
   if (!available) return { ...runtime, available, version: null, exitCode: null };
@@ -316,6 +330,10 @@ function validateConfig(config) {
     }
     if (!Array.isArray(task.passEnv ?? [])) {
       fail('Explicitly inherited environment variables must be listed by task: ' + task.id);
+    }
+    if ((task.passEnv ?? []).some((name) => typeof name !== 'string' ||
+        !APPROVED_TASK_PASS_ENVIRONMENT.get(task.id)?.has(name))) {
+      fail('Task requests an unapproved inherited environment variable: ' + task.id);
     }
   }
   const laneIds = new Set(config.inventory.map((rule) => rule.id));
@@ -455,17 +473,39 @@ export function createPlan(root, config, options = {}) {
   return plan;
 }
 
-function sanitizedEnvironment(additional = {}, passEnv = []) {
-  const env = {};
-  const allowed = new Set(passEnv);
-  for (const [key, value] of Object.entries(process.env)) {
-    if ((!SECRET_ENV.test(key) || allowed.has(key)) && !TEST_HARNESS_ENV.has(key)) {
-      env[key] = value;
-    }
+export function isolatedTaskEnvironment(task, runRoot, inherited = process.env) {
+  const env = sanitizedEnvironment(inherited);
+  const approvedPassEnv = APPROVED_TASK_PASS_ENVIRONMENT.get(task.id) ?? new Set();
+  for (const name of task.passEnv ?? []) {
+    if (!approvedPassEnv.has(name)) continue;
+    const match = Object.entries(inherited).find(([key]) => key.toUpperCase() === name.toUpperCase());
+    if (match && typeof match[1] === 'string') env[name] = match[1];
   }
-  env.NO_COLOR = '1';
-  env.CI = env.CI ?? 'true';
-  return { ...env, ...additional };
+  for (const [key, value] of Object.entries(task.env ?? {})) {
+    if (typeof value === 'string') env[key] = value;
+  }
+
+  const environmentRoot = path.join(runRoot, `${task.id}-environment`);
+  const directories = {
+    HOME: path.join(environmentRoot, 'home'),
+    USERPROFILE: path.join(environmentRoot, 'home'),
+    TMPDIR: path.join(environmentRoot, 'tmp'),
+    TMP: path.join(environmentRoot, 'tmp'),
+    TEMP: path.join(environmentRoot, 'tmp'),
+    XDG_CONFIG_HOME: path.join(environmentRoot, 'xdg-config'),
+    XDG_CACHE_HOME: path.join(environmentRoot, 'xdg-cache'),
+    APPDATA: path.join(environmentRoot, 'AppData', 'Roaming'),
+    LOCALAPPDATA: path.join(environmentRoot, 'AppData', 'Local'),
+  };
+  for (const directory of new Set(Object.values(directories))) {
+    mkdirSync(directory, { recursive: true, mode: 0o700 });
+  }
+  Object.assign(env, directories, {
+    CI: 'true',
+    NO_COLOR: '1',
+  });
+  if (task.kind === 'test') env.NODE_ENV = 'test';
+  return env;
 }
 
 function formatElapsed(milliseconds) {
@@ -514,7 +554,7 @@ export async function runCommand(task, root, logPath) {
   let timedOut = false;
   const child = spawn(command, args, {
     cwd,
-    env: sanitizedEnvironment(task.env, task.passEnv),
+    env: isolatedTaskEnvironment(task, path.dirname(logPath)),
     stdio: ['ignore', 'pipe', 'pipe'],
     detached: process.platform !== 'win32',
     windowsHide: true,

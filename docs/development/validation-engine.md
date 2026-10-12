@@ -28,6 +28,14 @@ executed, passed, failed, blocked, excluded, and active-case totals. A workspace
 lock prevents two engine runs from competing over the same checkout. A stale
 lock is reported and left for an operator to inspect.
 
+Runtime probes and child commands inherit only the executable path, platform
+process variables, locale, and timezone. Each task receives run-owned home,
+temporary, and XDG configuration/cache directories; registered task settings
+remain task-scoped. Unapproved `passEnv` requests fail during planning. `CI` is
+forced to `true`, and test tasks use
+`NODE_ENV=test` so ambient credentials, proxy settings, loader options, and
+workflow context do not leak into test processes.
+
 During a run, the engine writes a task summary to stderr when each task starts
 and finishes, and repeats it every minute while a task is still running. This
 keeps progress visible in a terminal or live GitHub Actions log without mixing
