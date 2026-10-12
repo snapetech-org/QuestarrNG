@@ -8,6 +8,7 @@ export const validation = {
     'vitest.config.ts',
     'playwright.config.ts',
     'release-notes/README.md',
+    'release-notes/20261012-validation-environment-isolation.md',
     'docs/development/validation-engine.md',
     '.github/workflows/ci.yml',
     'scripts/validation-engine/engine.mjs',
