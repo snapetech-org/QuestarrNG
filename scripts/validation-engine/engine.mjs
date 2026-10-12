@@ -474,10 +474,17 @@ export function createPlan(root, config, options = {}) {
 }
 
 export function isolatedTaskEnvironment(task, runRoot, inherited = process.env) {
+  if (typeof task?.id !== 'string' || !/^[a-z0-9][a-z0-9-]*$/.test(task.id)) {
+    fail('Validation task ID must be a safe lowercase identifier.');
+  }
   const env = sanitizedEnvironment(inherited);
   const approvedPassEnv = APPROVED_TASK_PASS_ENVIRONMENT.get(task.id) ?? new Set();
-  for (const name of task.passEnv ?? []) {
-    if (!approvedPassEnv.has(name)) continue;
+  const passEnv = task.passEnv ?? [];
+  if (!Array.isArray(passEnv) || passEnv.some((name) =>
+    typeof name !== 'string' || !approvedPassEnv.has(name))) {
+    fail('Task requests an unapproved inherited environment variable: ' + task.id);
+  }
+  for (const name of passEnv) {
     const match = Object.entries(inherited).find(([key]) => key.toUpperCase() === name.toUpperCase());
     if (match && typeof match[1] === 'string') env[name] = match[1];
   }

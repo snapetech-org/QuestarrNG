@@ -23,6 +23,7 @@ import {
   executePlan,
   formatValidationProgress,
   globRegex,
+  isolatedTaskEnvironment,
   main as runEngine,
   releaseRunLock,
 } from './engine.mjs';
@@ -329,6 +330,10 @@ test('child environments hide inherited secrets and reject unapproved passEnv re
   const { root, config } = fixture();
   const runRoot = mkdtempSync(path.join(os.tmpdir(), 'questarrng-isolated-environment-'));
   temporaryRoots.push(runRoot);
+  assert.throws(
+    () => isolatedTaskEnvironment({ id: '../outside' }, runRoot),
+    /safe lowercase identifier/,
+  );
   const key = 'VALIDATION_ENGINE_TEST_SECRET';
   const injected = {
     [key]: 'do-not-log-me',
@@ -364,6 +369,10 @@ test('child environments hide inherited secrets and reject unapproved passEnv re
 
     config.tasks[0].passEnv = [key];
     assert.throws(() => createPlan(root, config), /unapproved inherited environment variable/);
+    assert.throws(
+      () => isolatedTaskEnvironment(config.tasks[0], runRoot, process.env),
+      /unapproved inherited environment variable/,
+    );
   } finally {
     for (const [name, value] of previous) {
       if (value === undefined) delete process.env[name];
