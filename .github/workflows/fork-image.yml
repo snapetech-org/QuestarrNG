@@ -81,6 +81,8 @@ jobs:
         shell: bash
         run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
 
+      # Push only the immutable source tag first. Attach latest or the version tag
+      # after both platform scans and the smoke test below pass.
       - name: Set image tags
         id: tags
         shell: bash
@@ -91,13 +93,13 @@ jobs:
           {
             echo 'tags<<EOF'
             echo "$IMAGE:sha-${GITHUB_SHA}"
-            if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
-              echo "$IMAGE:${GITHUB_REF_NAME#v}"
-            else
-              echo "$IMAGE:latest"
-            fi
             echo EOF
           } >> "$GITHUB_OUTPUT"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "release_tag=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          else
+            echo 'release_tag=latest' >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Set up QEMU for ARM64 release images
         uses: step-security/setup-qemu-action@1d653f731ddc90c553742100d15205c94b792314 # v4.2.0
@@ -112,7 +114,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and publish fork image
+      - name: Build and push immutable source image
         id: build-image
         uses: step-security/docker-build-push-action@144392094f7fc3199dda455efe3b70dbea4b72a0 # v7.3.0
         with:
@@ -125,6 +127,45 @@ jobs:
           provenance: mode=max
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Verify the published multi-platform source image
+        id: verify-image
+        shell: bash
+        env:
+          IMAGE: ${{ steps.image.outputs.name }}
+          BUILD_DIGEST: ${{ steps.build-image.outputs.digest }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$BUILD_DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]; then
+            echo "Build returned an invalid image digest: $BUILD_DIGEST" >&2
+            exit 1
+          fi
+          docker buildx imagetools inspect --raw "${IMAGE}@${BUILD_DIGEST}" > source-image.json
+          node scripts/verify-release-image-manifest.mjs source-image.json
+
+      - name: Scan the verified linux/amd64 image with Trivy
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        env:
+          TRIVY_VEX: security/vex/questarr.openvex.json
+        with:
+          image-ref: ${{ steps.verify-image.outputs.amd64_image }}
+          format: table
+          severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+          scanners: "vuln"
+          exit-code: "1"
+          cache: "false"
+
+      - name: Scan the verified linux/arm64 image with Trivy
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        env:
+          TRIVY_VEX: security/vex/questarr.openvex.json
+        with:
+          image-ref: ${{ steps.verify-image.outputs.arm64_image }}
+          format: table
+          severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+          scanners: "vuln"
+          exit-code: "1"
+          cache: "false"
 
       - name: Smoke test published image and SeerrNG route
         shell: bash
@@ -179,6 +220,18 @@ jobs:
           done
           curl -fsS http://127.0.0.1:15001/api/health >/dev/null
           test "$(docker exec questarrng-rootless-smoke id -u)" = "1000"
+
+      - name: Attach publish tag after scans and smoke test pass
+        shell: bash
+        env:
+          IMAGE: ${{ steps.image.outputs.name }}
+          RELEASE_TAG: ${{ steps.tags.outputs.release_tag }}
+          BUILD_DIGEST: ${{ steps.build-image.outputs.digest }}
+        run: |
+          set -euo pipefail
+          docker buildx imagetools create \
+            --tag "${IMAGE}:${RELEASE_TAG}" \
+            "${IMAGE}@${BUILD_DIGEST}"
 
   addon-smoke:
     if: github.repository == 'snapetech/QuestarrNG'
