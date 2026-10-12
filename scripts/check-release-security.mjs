@@ -45,7 +45,7 @@ function isBlockingCodeAlert(alert, releaseRef) {
   if (releaseRef && instance?.ref !== releaseRef) {
     // Scorecard is checked against the default branch below; the source tag
     // scans are CodeQL and Semgrep, and must fail closed if their ref differs.
-    return alert.tool?.name !== "Scorecard" && alert.state === "open";
+    return alert.tool?.name !== "Scorecard";
   }
   const state = instance?.state ?? alert.state;
   if (state !== "open") return false;
@@ -201,7 +201,9 @@ export async function checkReleaseSecurity(repository, sha, releaseRef) {
     "repos/" + repository + "/code-scanning/alerts?state=open&per_page=100"
   );
   const codeOnReleaseSource = flattenedPages(
-    "repos/" + repository + "/code-scanning/alerts?state=open&ref=" + encodedRef + "&per_page=100"
+    // The top-level alert state may be fixed on main while this tag's instance
+    // is still open. Fetch every tag alert and assess its ref-specific instance.
+    "repos/" + repository + "/code-scanning/alerts?ref=" + encodedRef + "&per_page=100"
   );
   const dependencies = flattenedPages(
     "repos/" + repository + "/dependabot/alerts?state=open&per_page=100"

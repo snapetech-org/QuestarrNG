@@ -67,6 +67,9 @@ describe("release security gate", () => {
     expect(securityBlockers([mismatchedRef], [], successfulChecks(), releaseRef)).toEqual([
       "Open CodeQL alert #51: release-source-alert",
     ]);
+    expect(
+      securityBlockers([{ ...mismatchedRef, state: "fixed" }], [], successfulChecks(), releaseRef)
+    ).toEqual(["Open CodeQL alert #51: release-source-alert"]);
   });
 
   it("checks release alerts without treating omitted check runs as missing checks", () => {
