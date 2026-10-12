@@ -29,6 +29,21 @@ describe("stored JWT secret migration", () => {
     expect(() => jwt.verify(token, weakSecret)).toThrow();
   });
 
+  it("shares one weak-secret replacement across concurrent first requests", async () => {
+    mocks.getSystemConfig.mockResolvedValue(randomBytes(8).toString("hex"));
+    const { generateToken } = await import("../auth.js");
+    const user = { id: "user", username: "operator" } as User;
+
+    const tokens = await Promise.all([generateToken(user), generateToken(user)]);
+
+    expect(mocks.getSystemConfig).toHaveBeenCalledTimes(1);
+    expect(mocks.setSystemConfig).toHaveBeenCalledTimes(1);
+    const replacement = mocks.setSystemConfig.mock.calls[0]?.[1] as string;
+    for (const token of tokens) {
+      expect(jwt.verify(token, replacement)).toMatchObject({ id: "user" });
+    }
+  });
+
   it("preserves a strong stored secret and existing sessions", async () => {
     const secret = "0123456789abcdef".repeat(4);
     mocks.getSystemConfig.mockResolvedValue(secret);

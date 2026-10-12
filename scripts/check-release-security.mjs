@@ -89,15 +89,28 @@ export function sourceAnalysisBlockers(analyses, releaseRef, releaseSha) {
   const sourceAnalyses = analyses.filter(
     (analysis) => analysis.ref === releaseRef && analysis.commit_sha === releaseSha
   );
-  return REQUIRED_CODE_ANALYSES.filter(
-    (required) =>
-      !sourceAnalyses.some(
-        (analysis) =>
-          !analysis.error &&
-          analysis.tool?.name?.toLowerCase() === required.tool.toLowerCase() &&
-          (required.category === undefined || analysis.category === required.category)
-      )
-  ).map((required) => {
+  return REQUIRED_CODE_ANALYSES.filter((required) => {
+    const matchingAnalyses = sourceAnalyses.filter(
+      (analysis) =>
+        analysis.tool?.name?.toLowerCase() === required.tool.toLowerCase() &&
+        (required.category === undefined || analysis.category === required.category)
+    );
+    // A rerun can leave an older success, so require the newest exact-source analysis.
+    if (
+      matchingAnalyses.some((analysis) => !Number.isFinite(Date.parse(analysis.created_at ?? "")))
+    ) {
+      return true;
+    }
+    const latestAnalysis = matchingAnalyses.reduce((latest, analysis) => {
+      const latestCreated = Date.parse(latest.created_at ?? "");
+      const analysisCreated = Date.parse(analysis.created_at ?? "");
+      if (analysisCreated !== latestCreated) {
+        return analysisCreated > latestCreated ? analysis : latest;
+      }
+      return Number(analysis.id) > Number(latest.id) ? analysis : latest;
+    }, matchingAnalyses[0]);
+    return !latestAnalysis || latestAnalysis.error !== "";
+  }).map((required) => {
     const category = required.category ? " " + required.category : "";
     return required.tool + category + " analysis is missing for " + releaseRef + "@" + releaseSha;
   });
