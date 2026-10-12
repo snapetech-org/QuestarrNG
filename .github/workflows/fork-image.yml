@@ -494,6 +494,7 @@ jobs:
         uses: step-security/setup-buildx-action@a4709e2865773e1792246433e8eb922f9743a875 # v4.2.0
 
       - name: Verify the published release image
+        id: verify-image
         shell: bash
         env:
           VERSION: ${{ steps.validate.outputs.version }}
@@ -512,6 +513,41 @@ jobs:
           diff -u \
             <(jq -Sc . version-image.json) \
             <(jq -Sc . source-image.json)
+
+          amd64_digest="$(jq -r '.manifests[] | select(.platform.os == "linux" and .platform.architecture == "amd64") | .digest' version-image.json)"
+          arm64_digest="$(jq -r '.manifests[] | select(.platform.os == "linux" and .platform.architecture == "arm64") | .digest' version-image.json)"
+          if [[ ! "$amd64_digest" =~ ^sha256:[a-f0-9]{64}$ || ! "$arm64_digest" =~ ^sha256:[a-f0-9]{64}$ ]]; then
+            echo "Could not resolve valid release image digests: amd64=$amd64_digest arm64=$arm64_digest" >&2
+            exit 1
+          fi
+          {
+            echo "amd64_image=${image}@${amd64_digest}"
+            echo "arm64_image=${image}@${arm64_digest}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Rescan the verified linux/amd64 release image with current Trivy database
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        env:
+          TRIVY_VEX: security/vex/questarr.openvex.json
+        with:
+          image-ref: ${{ steps.verify-image.outputs.amd64_image }}
+          format: table
+          severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+          scanners: "vuln"
+          exit-code: "1"
+          cache: "false"
+
+      - name: Rescan the verified linux/arm64 release image with current Trivy database
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        env:
+          TRIVY_VEX: security/vex/questarr.openvex.json
+        with:
+          image-ref: ${{ steps.verify-image.outputs.arm64_image }}
+          format: table
+          severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+          scanners: "vuln"
+          exit-code: "1"
+          cache: "false"
 
       - name: Require clean security findings and completed source scans
         env:
