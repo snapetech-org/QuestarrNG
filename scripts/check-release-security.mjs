@@ -29,7 +29,7 @@ export const REQUIRED_CODE_ANALYSES = [
   { tool: "CodeQL", category: "/language:csharp" },
   { tool: "CodeQL", category: "/language:javascript-typescript" },
   { tool: "CodeQL", category: "/language:actions" },
-  { tool: "Semgrep" },
+  { tool: "Semgrep OSS", category: ".github/workflows/sast.yml:semgrep" },
 ];
 
 const INFORMATIONAL_SCORECARD_RULES = new Set([
@@ -93,6 +93,7 @@ export function sourceAnalysisBlockers(analyses, releaseRef, releaseSha) {
     (required) =>
       !sourceAnalyses.some(
         (analysis) =>
+          !analysis.error &&
           analysis.tool?.name?.toLowerCase() === required.tool.toLowerCase() &&
           (required.category === undefined || analysis.category === required.category)
       )

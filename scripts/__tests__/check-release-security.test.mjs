@@ -109,6 +109,30 @@ describe("release security gate", () => {
     );
   });
 
+  it("recognizes GitHub's actual Semgrep OSS analysis identity and rejects failed uploads", () => {
+    const ref = "refs/tags/v1.2.3";
+    const commit_sha = "a".repeat(40);
+    const analyses = [
+      ...["csharp", "javascript-typescript", "actions"].map((language) => ({
+        ref,
+        commit_sha,
+        tool: { name: "CodeQL" },
+        category: "/language:" + language,
+        error: "",
+      })),
+      {
+        ref,
+        commit_sha,
+        tool: { name: "Semgrep OSS" },
+        category: ".github/workflows/sast.yml:semgrep",
+        error: "",
+      },
+    ];
+    expect(sourceAnalysisBlockers(analyses, ref, commit_sha)).toEqual([]);
+    analyses[3].error = "SARIF processing failed";
+    expect(sourceAnalysisBlockers(analyses, ref, commit_sha)).toHaveLength(1);
+  });
+
   it("blocks CodeQL, Scorecard vulnerability, and low-severity dependency alerts", () => {
     const code = [
       {
