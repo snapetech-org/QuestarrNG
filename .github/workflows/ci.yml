@@ -195,17 +195,22 @@ jobs:
 
       - name: Setup Node.js 26.x
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        env:
+          NPM_CONFIG_CACHE: ${{ runner.temp }}/questarrng-npm-cache
         with:
           node-version: 26.x
           cache: "npm" # zizmor: ignore[cache-poisoning]
 
       - name: Install the locked npm runtime
+        env:
+          NPM_CONFIG_CACHE: ${{ runner.temp }}/questarrng-npm-cache
         run: |
           node scripts/install-npm-runtime.mjs
           echo "$GITHUB_WORKSPACE/.github/npm-runtime/node_modules/.bin" >> "$GITHUB_PATH"
 
       - name: Run source-bound test plan
         env:
+          NPM_CONFIG_CACHE: ${{ runner.temp }}/questarrng-npm-cache
           VALIDATION_RECEIPT_EXPORT: ${{ runner.temp }}/quest-validation-receipts/test.json
         run: node scripts/validate-development.mjs --tests-only
 
@@ -257,11 +262,15 @@ jobs:
 
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        env:
+          NPM_CONFIG_CACHE: ${{ runner.temp }}/questarrng-npm-cache
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm" # zizmor: ignore[cache-poisoning]
 
       - name: Install the locked npm runtime
+        env:
+          NPM_CONFIG_CACHE: ${{ runner.temp }}/questarrng-npm-cache
         run: |
           node scripts/install-npm-runtime.mjs
           echo "$GITHUB_WORKSPACE/.github/npm-runtime/node_modules/.bin" >> "$GITHUB_PATH"
@@ -270,6 +279,7 @@ jobs:
       # type checking, build output, and the receipt for this Node matrix node.
       - name: Run source-bound build plan
         env:
+          NPM_CONFIG_CACHE: ${{ runner.temp }}/questarrng-npm-cache
           VALIDATION_RECEIPT_EXPORT: ${{ runner.temp }}/quest-validation-receipts/build-node-${{ matrix.node-version }}.json
         run: node scripts/validate-development.mjs --task build-output
 

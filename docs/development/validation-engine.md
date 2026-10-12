@@ -46,7 +46,12 @@ temporary, and XDG configuration/cache directories; registered task settings
 remain task-scoped. Unapproved `passEnv` requests fail during planning. `CI` is
 forced to `true`, and test tasks use
 `NODE_ENV=test` so ambient credentials, proxy settings, loader options, and
-workflow context do not leak into test processes.
+workflow context do not leak into test processes. Task environment directories
+are removed when each command finishes, leaving logs and the receipt as the
+run's retained evidence. CI explicitly shares the runner-local npm cache
+between `setup-node` and the dependency-install task; only that task receives
+the cache path, and local runs without it use a cache under their temporary home
+that is removed with the task environment.
 
 The GitHub workflow runs the full Vitest suite once on Node 26 and checks the
 production build on Node 22 and Node 26. Each run exports a short-lived,
