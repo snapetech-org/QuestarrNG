@@ -210,6 +210,65 @@ test('runtime probes receive only the toolchain environment allowlist', () => {
   }
 });
 
+test('runtime probes keep default asdf and mise shims usable after environment sanitization', {
+  skip: process.platform === 'win32',
+}, () => {
+  const { root, config } = fixture();
+  const hostHome = mkdtempSync(path.join(os.tmpdir(), 'questarrng-runtime-shim-home-'));
+  temporaryRoots.push(hostHome);
+  const asdfDataDir = path.join(hostHome, '.asdf');
+  const asdfShimDirectory = path.join(asdfDataDir, 'shims');
+  const miseDataDir = path.join(hostHome, '.local', 'share', 'mise');
+  const miseShimDirectory = path.join(hostHome, '.local', 'share', 'mise-shims');
+  mkdirSync(asdfShimDirectory, { recursive: true });
+  mkdirSync(miseShimDirectory, { recursive: true });
+  writeFileSync(
+    path.join(asdfShimDirectory, 'node'),
+    `#!/bin/sh\nif [ "$ASDF_DATA_DIR" != '${asdfDataDir}' ]; then printf '%s\\n' 'missing asdf data directory' >&2; exit 70; fi\nprintf '%s\\n' 'asdf-shim-ok'\n`,
+    { mode: 0o755 },
+  );
+  writeFileSync(
+    path.join(miseShimDirectory, 'npm'),
+    `#!/bin/sh\nif [ "$MISE_DATA_DIR" != '${miseDataDir}' ]; then printf '%s\\n' 'missing mise data directory' >&2; exit 71; fi\nprintf '%s\\n' 'mise-shim-ok'\n`,
+    { mode: 0o755 },
+  );
+
+  const overrides = {
+    HOME: hostHome,
+    PATH: [asdfShimDirectory, miseShimDirectory, process.env.PATH].filter(Boolean).join(path.delimiter),
+    ASDF_DATA_DIR: null,
+    ASDF_DIR: null,
+    MISE_DATA_DIR: null,
+    XDG_DATA_HOME: null,
+    LOCALAPPDATA: null,
+  };
+  const previous = new Map(Object.keys(overrides).map((name) => [name, process.env[name]]));
+  for (const [name, value] of Object.entries(overrides)) {
+    if (value === null) delete process.env[name];
+    else process.env[name] = value;
+  }
+  config.runtimes = [
+    { command: 'node', args: ['--version'], versionPattern: '^asdf-shim-ok$' },
+    { command: 'npm', args: ['--version'], versionPattern: '^mise-shim-ok$' },
+  ];
+  try {
+    const plan = createPlan(root, config);
+    assert.deepEqual(plan.runtimes.map(({ available, version, versionCompatible }) => ({
+      available,
+      version,
+      versionCompatible,
+    })), [
+      { available: true, version: 'asdf-shim-ok', versionCompatible: true },
+      { available: true, version: 'mise-shim-ok', versionCompatible: true },
+    ]);
+  } finally {
+    for (const [name, value] of previous) {
+      if (value === undefined) delete process.env[name];
+      else process.env[name] = value;
+    }
+  }
+});
+
 test('executor rejects a plan whose task contract was changed after hashing', async () => {
   const { root, config } = fixture();
   const plan = createPlan(root, config);
