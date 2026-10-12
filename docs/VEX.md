@@ -62,13 +62,13 @@ also blocks on open security alerts, so a finding still reported by these raw
 audits or alert feeds blocks publication at any severity, even if a VEX entry
 exists.
 
-The VEX-aware `scripts/audit-prod.mjs` is used by the vulnerability-scan
-workflow to filter production-dependency advisories for its SARIF report, and
-the image scan passes the feed to Trivy. These uses do not replace the full-tree
-merge audit or the stricter raw release audits and alert checks. A VEX statement
-records the assessment and informs triage; it does not waive those publication
-checks. VEX statements still require code-path evidence and review before they
-are added.
+The vulnerability-scan workflow passes its npm audit report through the
+VEX-aware `scripts/audit-prod.mjs` before failing the npm-audit job. Separately,
+the image scan passes the feed to Trivy, which applies it to the image results
+before producing SARIF. These uses do not replace the full-tree merge audit or
+the stricter raw release audits and alert checks. A VEX statement records the
+assessment and informs triage; it does not waive those publication checks. VEX
+statements still require code-path evidence and review before they are added.
 
 ## How the feed is generated and kept current
 
