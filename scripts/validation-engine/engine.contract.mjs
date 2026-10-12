@@ -419,6 +419,30 @@ process.stdout.write(JSON.stringify(Object.fromEntries(keys.map((name) => [name,
   }
 });
 
+test('isolated task environments preserve default version-manager data directories', () => {
+  const runRoot = mkdtempSync(path.join(os.tmpdir(), 'questarrng-version-manager-environment-'));
+  const hostHome = mkdtempSync(path.join(os.tmpdir(), 'questarrng-version-manager-home-'));
+  temporaryRoots.push(runRoot, hostHome);
+  const asdfDataDir = path.join(hostHome, '.asdf');
+  const xdgDataHome = path.join(hostHome, 'xdg-data');
+  mkdirSync(asdfDataDir, { recursive: true });
+
+  const environment = isolatedTaskEnvironment(
+    { id: 'unit-tests' },
+    runRoot,
+    {
+      HOME: hostHome,
+      PATH: '/operator/.asdf/shims:/operator/.local/share/mise/shims',
+      XDG_DATA_HOME: xdgDataHome,
+    },
+  );
+
+  assert.equal(environment.HOME, path.join(runRoot, 'unit-tests-environment', 'home'));
+  assert.notEqual(environment.HOME, hostHome);
+  assert.equal(environment.ASDF_DATA_DIR, asdfDataDir);
+  assert.equal(environment.MISE_DATA_DIR, path.join(xdgDataHome, 'mise'));
+});
+
 test('plan and executor reject dependency cycles and report missing tools', async () => {
   const { root, config } = fixture();
   config.tasks[0].dependsOn = ['other'];

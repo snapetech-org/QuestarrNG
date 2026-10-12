@@ -495,6 +495,22 @@ export function isolatedTaskEnvironment(task, runRoot, inherited = process.env) 
   }
 
   const environmentRoot = path.join(runRoot, `${task.id}-environment`);
+  // Keep version-manager shims pointed at their host installs after HOME is isolated.
+  const originalHome = inherited.HOME || inherited.USERPROFILE;
+  if (!env.ASDF_DATA_DIR && originalHome) {
+    const defaultAsdfDataDir = path.join(originalHome, '.asdf');
+    env.ASDF_DATA_DIR = existsSync(defaultAsdfDataDir)
+      ? defaultAsdfDataDir
+      : (env.ASDF_DIR || defaultAsdfDataDir);
+  }
+  if (!env.MISE_DATA_DIR) {
+    const originalDataHome = inherited.XDG_DATA_HOME || (
+      process.platform === 'win32'
+        ? inherited.LOCALAPPDATA || (originalHome && path.join(originalHome, 'AppData', 'Local'))
+        : (originalHome && path.join(originalHome, '.local', 'share'))
+    );
+    if (originalDataHome) env.MISE_DATA_DIR = path.join(originalDataHome, 'mise');
+  }
   const directories = {
     HOME: path.join(environmentRoot, 'home'),
     USERPROFILE: path.join(environmentRoot, 'home'),
