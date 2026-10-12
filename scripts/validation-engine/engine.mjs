@@ -32,6 +32,7 @@ export const ENGINE_VERSION = 1;
 const ENGINE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_ROOT = path.resolve(ENGINE_DIR, '..', '..');
 const MAX_BUFFER = 8 * 1024 * 1024;
+const PROGRESS_INTERVAL_MS = 60_000;
 const IGNORED_DIRS = new Set([
   '.git',
   '.next',
@@ -538,6 +539,24 @@ export function isolatedTaskEnvironment(task, runRoot, inherited = process.env) 
   return env;
 }
 
+function formatElapsed(milliseconds) {
+  const seconds = Math.floor(milliseconds / 1000);
+  return `${Math.floor(seconds / 60)}m${String(seconds % 60).padStart(2, '0')}s`;
+}
+
+export function formatValidationProgress(repository, tasks, results, currentTask = null, elapsedMs = 0) {
+  const receipts = tasks.map((task) => results.get(task.id)).filter(Boolean);
+  const passed = receipts.filter((receipt) => receipt.status === 'passed').length;
+  const failed = receipts.filter((receipt) => ['failed', 'incomplete'].includes(receipt.status)).length;
+  const blocked = receipts.filter((receipt) => ['blocked', 'not-run'].includes(receipt.status)).length;
+  const completed = passed + failed;
+  const pending = Math.max(0, tasks.length - completed - blocked);
+  const active = currentTask
+    ? `; running ${currentTask.name ?? currentTask.id} (${formatElapsed(elapsedMs)})`
+    : '';
+  return `[validation] ${repository}: ${completed}/${tasks.length} selected tasks complete (${passed} passed, ${failed} failed, ${blocked} blocked, ${pending} pending)${active}`;
+}
+
 function terminate(child) {
   if (child.pid && process.platform !== 'win32') {
     try {
@@ -693,11 +712,31 @@ export async function executePlan(root, config, plan, options = {}) {
       totals: { planned: selectedIds.size, executed: 0, passed: 0, failed: 0, blocked: 0, excluded: plan.tasks.length - selectedIds.size, activeCases: 0 },
     };
     writeFileSync(path.join(runRoot, 'receipt.json'), JSON.stringify(receipt, null, 2), { mode: 0o600 });
+    options.onProgress?.(formatValidationProgress(
+      config.repository,
+      plan.tasks.filter((task) => task.selected),
+      new Map(receipt.tasks.map((task) => [task.taskId, task])),
+    ));
     return { receipt, runRoot, exitCode: 1 };
   }
 
   let sourceChanged = false;
-  for (const task of plan.tasks.filter((item) => item.selected)) {
+  const selectedTasks = plan.tasks.filter((item) => item.selected);
+  let lastProgressSummary = null;
+  const reportProgress = (currentTask = null, taskStartedAt = 0) => {
+    if (typeof options.onProgress !== 'function') return;
+    const summary = formatValidationProgress(
+      config.repository,
+      selectedTasks,
+      receiptById,
+      currentTask,
+      currentTask ? Date.now() - taskStartedAt : 0,
+    );
+    if (summary === lastProgressSummary) return;
+    lastProgressSummary = summary;
+    options.onProgress(summary);
+  };
+  for (const task of selectedTasks) {
     const dependencyReceipts = (task.dependsOn ?? []).map((id) => receiptById.get(id));
     const failedDependency = dependencyReceipts.find((item) => item?.status !== 'passed');
     if (failedDependency) {
@@ -707,6 +746,7 @@ export async function executePlan(root, config, plan, options = {}) {
         reason: 'dependency did not pass',
         required: task.required !== false,
       });
+      reportProgress();
       continue;
     }
     if (captureCandidate(root, config.inputs ?? [], {
@@ -719,10 +759,18 @@ export async function executePlan(root, config, plan, options = {}) {
         reason: 'candidate source changed after planning',
         required: task.required !== false,
       });
+      reportProgress();
       break;
     }
     const configuredTask = config.tasks.find((item) => item.id === task.id);
     if (!configuredTask) fail('Selected task is missing from the registered configuration: ' + task.id);
+    const taskStartedAt = Date.now();
+    reportProgress(task, taskStartedAt);
+    const heartbeat = setInterval(
+      () => reportProgress(task, taskStartedAt),
+      options.progressIntervalMs ?? PROGRESS_INTERVAL_MS,
+    );
+    heartbeat.unref();
     let taskReceipt;
     try {
       taskReceipt = await runCommand(
@@ -732,6 +780,7 @@ export async function executePlan(root, config, plan, options = {}) {
       );
     } finally {
       rmSync(path.join(runRoot, `${task.id}-environment`), { recursive: true, force: true });
+      clearInterval(heartbeat);
     }
     taskReceipt.inventory = (configuredTask.inventoryLanes ?? []).map((lane) => ({
       lane,
@@ -739,6 +788,7 @@ export async function executePlan(root, config, plan, options = {}) {
       inventorySha256: plan.inventoryLaneDigests[lane],
     }));
     receiptById.set(task.id, taskReceipt);
+    reportProgress();
     if (captureCandidate(root, config.inputs ?? [], {
       entries: plan.inventory,
     }).sourceSha256 !== plan.candidate.sourceSha256) {
@@ -789,6 +839,7 @@ export async function executePlan(root, config, plan, options = {}) {
     totals,
   };
   writeFileSync(path.join(runRoot, 'receipt.json'), JSON.stringify(receipt, null, 2), { mode: 0o600 });
+  reportProgress();
   return { receipt, runRoot, exitCode: status === 'passed' ? 0 : 1 };
 }
 
@@ -846,7 +897,9 @@ export async function main(argv = process.argv.slice(2), root = DEFAULT_ROOT, co
   const lock = acquireRunLock(root, loaded.repository);
   let result;
   try {
-    result = await executePlan(root, loaded, plan);
+    result = await executePlan(root, loaded, plan, {
+      onProgress: (summary) => process.stderr.write(summary + '\n'),
+    });
   } finally {
     releaseRunLock(lock);
   }
