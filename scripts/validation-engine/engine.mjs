@@ -286,6 +286,25 @@ function sanitizedEnvironment(inherited = process.env) {
   return Object.fromEntries(values);
 }
 
+function preserveVersionManagerDataDirectories(env, inherited) {
+  const originalHome = inherited.HOME || inherited.USERPROFILE;
+  if (!env.ASDF_DATA_DIR && originalHome) {
+    const defaultAsdfDataDir = path.join(originalHome, '.asdf');
+    env.ASDF_DATA_DIR = existsSync(defaultAsdfDataDir)
+      ? defaultAsdfDataDir
+      : (env.ASDF_DIR || defaultAsdfDataDir);
+  }
+  if (!env.MISE_DATA_DIR) {
+    const originalDataHome = inherited.XDG_DATA_HOME || (
+      process.platform === 'win32'
+        ? inherited.LOCALAPPDATA || (originalHome && path.join(originalHome, 'AppData', 'Local'))
+        : (originalHome && path.join(originalHome, '.local', 'share'))
+    );
+    if (originalDataHome) env.MISE_DATA_DIR = path.join(originalDataHome, 'mise');
+  }
+  return env;
+}
+
 function inspectRuntime(root, runtime) {
   const available = commandAvailable(runtime.command);
   if (!available) return { ...runtime, available, version: null, exitCode: null };
@@ -294,7 +313,7 @@ function inspectRuntime(root, runtime) {
     encoding: 'utf8',
     timeout: 10_000,
     maxBuffer: 1024 * 1024,
-    env: sanitizedEnvironment(),
+    env: preserveVersionManagerDataDirectories(sanitizedEnvironment(), process.env),
   });
   const version = (result.stdout ?? '') + (result.stderr ?? '');
   const versionLine = version.trim().split(/\r?\n/, 1)[0] ?? '';
@@ -494,23 +513,9 @@ export function isolatedTaskEnvironment(task, runRoot, inherited = process.env) 
     if (typeof value === 'string') env[key] = value;
   }
 
-  const environmentRoot = path.join(runRoot, `${task.id}-environment`);
   // Keep version-manager shims pointed at their host installs after HOME is isolated.
-  const originalHome = inherited.HOME || inherited.USERPROFILE;
-  if (!env.ASDF_DATA_DIR && originalHome) {
-    const defaultAsdfDataDir = path.join(originalHome, '.asdf');
-    env.ASDF_DATA_DIR = existsSync(defaultAsdfDataDir)
-      ? defaultAsdfDataDir
-      : (env.ASDF_DIR || defaultAsdfDataDir);
-  }
-  if (!env.MISE_DATA_DIR) {
-    const originalDataHome = inherited.XDG_DATA_HOME || (
-      process.platform === 'win32'
-        ? inherited.LOCALAPPDATA || (originalHome && path.join(originalHome, 'AppData', 'Local'))
-        : (originalHome && path.join(originalHome, '.local', 'share'))
-    );
-    if (originalDataHome) env.MISE_DATA_DIR = path.join(originalDataHome, 'mise');
-  }
+  preserveVersionManagerDataDirectories(env, inherited);
+  const environmentRoot = path.join(runRoot, `${task.id}-environment`);
   const directories = {
     HOME: path.join(environmentRoot, 'home'),
     USERPROFILE: path.join(environmentRoot, 'home'),
