@@ -255,6 +255,7 @@ jobs:
       - name: Require clean security findings and completed source scans
         env:
           GH_TOKEN: ${{ secrets.SECURITY_READ_TOKEN || github.token }}
+          RELEASE_REF: refs/tags/${{ inputs.finalize_release_tag }}
         run: node scripts/check-release-security.mjs
 
       - name: Add curated release-note fragments
@@ -510,6 +511,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.SECURITY_READ_TOKEN || github.token }}
           RELEASE_SHA: ${{ steps.validate.outputs.release_sha }}
+          RELEASE_REF: refs/tags/${{ inputs.finalize_release_tag }}
         run: node scripts/check-release-security.mjs
 
       - name: Assemble release body

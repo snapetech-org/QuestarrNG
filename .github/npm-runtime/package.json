@@ -75,10 +75,5 @@
     "ip-address": "10.7.4",
     "postcss-selector-parser": "7.1.6",
     "undici": "6.29.0"
-  },
-  "npmSource": {
-    "version": "11.21.0",
-    "url": "https://registry.npmjs.org/npm/-/npm-11.21.0.tgz",
-    "integrity": "sha512-Zov8KhamNneiLdELtj5YALtNmJW4L4fCLTzjfpzXG2w6MSHcf0UxgdlK5uloCuksWT+7mGUU7wi79cO6RqivPg=="
   }
 }

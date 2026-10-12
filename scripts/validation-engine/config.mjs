@@ -7,6 +7,8 @@ export const validation = {
     'package-lock.json',
     '.github/npm-runtime/package.json',
     '.github/npm-runtime/package-lock.json',
+    '.github/npm-source/package.json',
+    '.github/npm-source/package-lock.json',
     'scripts/install-npm-runtime.mjs',
     'vitest.config.ts',
     'playwright.config.ts',
@@ -108,6 +110,14 @@ export const validation = {
       stage: 'repository',
       kind: 'check',
       command: ['npm', 'audit', '--prefix', '.github/npm-runtime', '--audit-level=low'],
+      timeoutSeconds: 900,
+    },
+    {
+      id: 'npm-source-audit',
+      name: 'npm CLI source audit (all severities)',
+      stage: 'repository',
+      kind: 'check',
+      command: ['npm', 'audit', '--prefix', '.github/npm-source', '--audit-level=low'],
       timeoutSeconds: 900,
     },
     {

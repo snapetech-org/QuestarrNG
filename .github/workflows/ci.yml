@@ -108,6 +108,9 @@ jobs:
       - name: Audit the locked CI npm runtime (all severities block build)
         run: npm audit --prefix .github/npm-runtime --audit-level=low
 
+      - name: Audit the tracked npm CLI source (all severities block build)
+        run: npm audit --prefix .github/npm-source --audit-level=low
+
       # Policy: docs/VULNERABILITY_MANAGEMENT.md §1.4 — production dependency
       # licenses must be on the allow-list.
       - name: Check dependency licenses

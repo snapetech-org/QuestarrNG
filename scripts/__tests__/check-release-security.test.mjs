@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { REQUIRED_CHECKS, securityBlockers } from "../check-release-security.mjs";
+import {
+  REQUIRED_CHECKS,
+  REQUIRED_CODE_ANALYSES,
+  securityBlockers,
+  sourceAnalysisBlockers,
+} from "../check-release-security.mjs";
 
 const successfulChecks = () =>
   REQUIRED_CHECKS.map((name) => ({
@@ -11,6 +16,56 @@ const successfulChecks = () =>
 describe("release security gate", () => {
   it("permits a clean source commit only after every required scan succeeds", () => {
     expect(securityBlockers([], [], successfulChecks())).toEqual([]);
+  });
+
+  it("uses code alert instances for the exact release tag", () => {
+    const releaseRef = "refs/tags/v1.2.3";
+    const sourceFinding = {
+      number: 51,
+      state: "fixed",
+      tool: { name: "CodeQL" },
+      html_url: "release-source-alert",
+      most_recent_instance: { ref: releaseRef, state: "open" },
+    };
+    expect(securityBlockers([sourceFinding], [], successfulChecks(), releaseRef)).toEqual([
+      "Open CodeQL alert #51: release-source-alert",
+    ]);
+
+    const findingFixedOnRelease = {
+      ...sourceFinding,
+      state: "open",
+      most_recent_instance: { ref: releaseRef, state: "fixed" },
+    };
+    expect(securityBlockers([findingFixedOnRelease], [], successfulChecks(), releaseRef)).toEqual(
+      []
+    );
+
+    const mismatchedRef = {
+      ...sourceFinding,
+      state: "open",
+      most_recent_instance: { ref: "refs/heads/main", state: "open" },
+    };
+    expect(securityBlockers([mismatchedRef], [], successfulChecks(), releaseRef)).toEqual([
+      "Open CodeQL alert #51: release-source-alert",
+    ]);
+  });
+
+  it("requires exact-ref analyses for every release code scanner", () => {
+    const releaseRef = "refs/tags/v1.2.3";
+    const releaseSha = "a".repeat(40);
+    const analyses = REQUIRED_CODE_ANALYSES.map(({ tool, category }) => ({
+      ref: releaseRef,
+      commit_sha: releaseSha,
+      tool: { name: tool },
+      category,
+    }));
+    expect(sourceAnalysisBlockers(analyses, releaseRef, releaseSha)).toEqual([]);
+    expect(sourceAnalysisBlockers(analyses.slice(1), releaseRef, releaseSha)).toEqual([
+      "CodeQL /language:csharp analysis is missing for " + releaseRef + "@" + releaseSha,
+    ]);
+    expect(sourceAnalysisBlockers(analyses, releaseRef, "b".repeat(40))).toHaveLength(
+      REQUIRED_CODE_ANALYSES.length
+    );
   });
 
   it("blocks CodeQL, Scorecard vulnerability, and low-severity dependency alerts", () => {
