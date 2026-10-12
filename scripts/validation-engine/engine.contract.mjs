@@ -21,6 +21,7 @@ import {
   createPlan,
   discoverInventory,
   executePlan,
+  formatValidationProgress,
   globRegex,
   main as runEngine,
   releaseRunLock,
@@ -174,6 +175,41 @@ test('native execution records passing case counts, source identity and private 
   const log = path.join(runRoot, result.receipt.tasks[0].logFile);
   assert.equal(statSync(log).mode & 0o777, 0o600);
   assert.match(readFileSync(path.join(runRoot, 'receipt.json'), 'utf8'), /"status": "passed"/);
+});
+
+test('live progress reports task start, heartbeat, and completion', async () => {
+  const { root, config } = fixture();
+  config.tasks[0].command = [
+    process.execPath,
+    '-e',
+    'console.log("# pass 1"); setTimeout(() => {}, 1300);',
+  ];
+  const messages = [];
+  const result = await executePlan(root, config, createPlan(root, config), {
+    progressIntervalMs: 100,
+    onProgress: (summary) => messages.push(summary),
+  });
+  assert.equal(result.exitCode, 0);
+  assert.ok(messages.some((summary) => summary.includes('running Unit tests (0m00s)')));
+  assert.ok(messages.some((summary) => summary.includes('running Unit tests (0m01s)')));
+  assert.equal(messages.at(-1),
+    '[validation] fixture: 1/1 selected tasks complete (1 passed, 0 failed, 0 blocked, 0 pending)');
+});
+
+test('progress formatter reports completed, blocked, pending, and active tasks', () => {
+  const tasks = [
+    { id: 'passed', name: 'Passed task' },
+    { id: 'blocked', name: 'Blocked task' },
+    { id: 'running', name: 'Long task' },
+  ];
+  const results = new Map([
+    ['passed', { status: 'passed' }],
+    ['blocked', { status: 'blocked' }],
+  ]);
+  assert.equal(
+    formatValidationProgress('sample', tasks, results, tasks[2], 65_000),
+    '[validation] sample: 1/3 selected tasks complete (1 passed, 0 failed, 1 blocked, 1 pending); running Long task (1m05s)',
+  );
 });
 
 test('execution fails closed when a test reports zero active cases', async () => {

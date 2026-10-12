@@ -28,6 +28,13 @@ executed, passed, failed, blocked, excluded, and active-case totals. A workspace
 lock prevents two engine runs from competing over the same checkout. A stale
 lock is reported and left for an operator to inspect.
 
+During a run, the engine writes a task summary to stderr when each task starts
+and finishes, and repeats it every minute while a task is still running. This
+keeps progress visible in a terminal or live GitHub Actions log without mixing
+status text into the final JSON summary on stdout. Native case counts are
+authoritative when each native command finishes; the heartbeat reports task
+status and elapsed time while that command is running.
+
 The GitHub workflow runs the full Vitest suite once on Node 26 and checks the
 production build on Node 22 and Node 26. Each run exports a short-lived,
 source-bound receipt. The final reconciliation job requires one passing test
