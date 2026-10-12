@@ -30,6 +30,8 @@ jobs:
       contents: read
       packages: write
       security-events: read
+      checks: read
+      vulnerability-alerts: read
     outputs:
       image: ${{ steps.image.outputs.name }}
       digest: ${{ steps.build-image.outputs.digest }}
@@ -235,6 +237,8 @@ jobs:
     permissions:
       contents: write
       security-events: read
+      checks: read
+      vulnerability-alerts: read
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -378,6 +382,8 @@ jobs:
       contents: write
       packages: read
       security-events: read
+      checks: read
+      vulnerability-alerts: read
     outputs:
       release_sha: ${{ steps.validate.outputs.release_sha }}
       previous_tag: ${{ steps.validate.outputs.previous_tag }}

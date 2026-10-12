@@ -32,7 +32,11 @@ export const REQUIRED_CODE_ANALYSES = [
   { tool: "Semgrep" },
 ];
 
-const BLOCKING_SCORECARD_RULES = new Set(["VulnerabilitiesID", "BranchProtectionID"]);
+const INFORMATIONAL_SCORECARD_RULES = new Set([
+  "MaintainedID",
+  "CIIBestPracticesID",
+  "CodeReviewID",
+]);
 const SOURCE_SCAN_WAIT_MS = 30 * 60 * 1000;
 const SOURCE_SCAN_POLL_MS = 15 * 1000;
 
@@ -46,7 +50,7 @@ function isBlockingCodeAlert(alert, releaseRef) {
   const state = instance?.state ?? alert.state;
   if (state !== "open") return false;
   if (alert.tool?.name !== "Scorecard") return true;
-  return BLOCKING_SCORECARD_RULES.has(alert.rule?.id);
+  return !INFORMATIONAL_SCORECARD_RULES.has(alert.rule?.id);
 }
 
 export function securityBlockers(codeAlerts, dependencyAlerts, checkRuns = null, releaseRef) {

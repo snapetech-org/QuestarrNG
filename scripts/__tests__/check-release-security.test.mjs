@@ -1,4 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { cwd } from "node:process";
+import { load } from "js-yaml";
 import {
   REQUIRED_CHECKS,
   REQUIRED_CODE_ANALYSES,
@@ -14,6 +18,21 @@ const successfulChecks = () =>
   }));
 
 describe("release security gate", () => {
+  it("grants every publishing gate the fallback token's required API read permissions", () => {
+    const workflow = load(readFileSync(resolve(cwd(), ".github/workflows/fork-image.yml"), "utf8"));
+    const gates = Object.entries(workflow.jobs).filter(([, job]) =>
+      job.steps?.some((step) => step.run?.includes("node scripts/check-release-security.mjs"))
+    );
+    expect(gates.map(([name]) => name)).toEqual(["publish", "release", "finalize-release"]);
+    for (const [, job] of gates) {
+      expect(job.permissions).toMatchObject({
+        checks: "read",
+        "security-events": "read",
+        "vulnerability-alerts": "read",
+      });
+    }
+  });
+
   it("permits a clean source commit only after every required scan succeeds", () => {
     expect(securityBlockers([], [], successfulChecks())).toEqual([]);
   });
@@ -137,6 +156,21 @@ describe("release security gate", () => {
     expect(securityBlockers([alert], [], successfulChecks())).toEqual([
       "Open Scorecard alert #1: scorecard-branch-protection",
     ]);
+  });
+
+  it("fails closed for other and unknown Scorecard findings", () => {
+    for (const id of ["TokenPermissionsID", "DangerousWorkflowID", "NewCheckID", undefined]) {
+      const alert = {
+        number: 94,
+        state: "open",
+        tool: { name: "Scorecard" },
+        rule: { id },
+        html_url: "scorecard-other-finding",
+      };
+      expect(securityBlockers([alert], [], successfulChecks())).toEqual([
+        "Open Scorecard alert #94: scorecard-other-finding",
+      ]);
+    }
   });
 
   it.each(["failure", "cancelled", "skipped", "neutral", null])(
