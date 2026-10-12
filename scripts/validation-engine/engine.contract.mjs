@@ -425,14 +425,20 @@ test('isolated task environments preserve default version-manager data directori
   temporaryRoots.push(runRoot, hostHome);
   const asdfDataDir = path.join(hostHome, '.asdf');
   const xdgDataHome = path.join(hostHome, 'xdg-data');
-  mkdirSync(asdfDataDir, { recursive: true });
+  const shimDirectory = path.join(asdfDataDir, 'shims');
+  mkdirSync(shimDirectory, { recursive: true });
+  writeFileSync(
+    path.join(shimDirectory, 'node'),
+    `#!/bin/sh\nif [ "$ASDF_DATA_DIR" != '${asdfDataDir}' ]; then exit 70; fi\nprintf '%s\\n' 'asdf-shim-ok'\n`,
+    { mode: 0o755 },
+  );
 
   const environment = isolatedTaskEnvironment(
     { id: 'unit-tests' },
     runRoot,
     {
       HOME: hostHome,
-      PATH: '/operator/.asdf/shims:/operator/.local/share/mise/shims',
+      PATH: shimDirectory,
       XDG_DATA_HOME: xdgDataHome,
     },
   );
@@ -441,6 +447,30 @@ test('isolated task environments preserve default version-manager data directori
   assert.notEqual(environment.HOME, hostHome);
   assert.equal(environment.ASDF_DATA_DIR, asdfDataDir);
   assert.equal(environment.MISE_DATA_DIR, path.join(xdgDataHome, 'mise'));
+
+  if (process.platform !== 'win32') {
+    const shimResult = spawnSync('node', ['--version'], { env: environment, encoding: 'utf8' });
+    assert.equal(shimResult.status, 0, shimResult.error?.message ?? shimResult.stderr);
+    assert.equal(shimResult.stdout, 'asdf-shim-ok\n');
+  }
+});
+
+test('version-manager defaults fall back to ASDF_DIR and the host data directory', () => {
+  const runRoot = mkdtempSync(path.join(os.tmpdir(), 'questarrng-version-manager-fallback-'));
+  const hostHome = mkdtempSync(path.join(os.tmpdir(), 'questarrng-version-manager-home-'));
+  temporaryRoots.push(runRoot, hostHome);
+  const asdfInstall = path.join(hostHome, 'asdf-install');
+  const environment = isolatedTaskEnvironment(
+    { id: 'unit-tests' },
+    runRoot,
+    { HOME: hostHome, ASDF_DIR: asdfInstall, PATH: process.env.PATH },
+  );
+
+  assert.equal(environment.ASDF_DATA_DIR, asdfInstall);
+  const hostDataHome = process.platform === 'win32'
+    ? path.join(hostHome, 'AppData', 'Local')
+    : path.join(hostHome, '.local', 'share');
+  assert.equal(environment.MISE_DATA_DIR, path.join(hostDataHome, 'mise'));
 });
 
 test('plan and executor reject dependency cycles and report missing tools', async () => {
