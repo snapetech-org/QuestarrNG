@@ -20,6 +20,18 @@ node scripts/validate-development.mjs --task vitest-coverage
 node scripts/validate-development.mjs --task playwright-e2e
 ```
 
+Local execution of test tasks requires the trusted Linux bubblewrap launcher.
+When evaluating an unreviewed branch, copy `trusted-test-launcher.mjs` from a
+reviewed revision to a location outside the checkout and run:
+
+```sh
+node /path/to/trusted-test-launcher.mjs "$PWD" -- node scripts/validate-development.mjs --tests-only
+```
+
+Run planning for an unreviewed candidate through that launcher too, because
+planning imports its validation configuration. GitHub Actions remains
+responsible for hosted validation.
+
 The plan reports the repository source identity, test files and lane counts,
 task dependencies, runtime versions, and unavailable prerequisites. A plan is
 discovery evidence only. Executed runs create a private directory below the
