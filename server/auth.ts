@@ -13,6 +13,8 @@ const SALT_ROUNDS = 10;
 
 // Cache the JWT secret in memory to avoid DB hits on every request
 let cachedJwtSecret: string | null = null;
+// Keep concurrent first requests on one database read and one secret replacement.
+let jwtSecretInitialization: Promise<string> | null = null;
 
 /**
  * Get the JWT secret.
@@ -27,6 +29,15 @@ async function getJwtSecret(): Promise<string> {
     return cachedJwtSecret;
   }
 
+  if (!jwtSecretInitialization) {
+    jwtSecretInitialization = initializeJwtSecret().finally(() => {
+      jwtSecretInitialization = null;
+    });
+  }
+  return jwtSecretInitialization;
+}
+
+async function initializeJwtSecret(): Promise<string> {
   // If env var is set, use it (override).
   if (config.auth.jwtSecret) {
     logger.info("Using JWT secret from environment variable");

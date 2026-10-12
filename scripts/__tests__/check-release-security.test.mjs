@@ -159,6 +159,8 @@ describe("release security gate", () => {
       commit_sha: releaseSha,
       tool: { name: tool },
       category,
+      error: "",
+      created_at: "2026-10-12T10:00:00Z",
     }));
     expect(sourceAnalysisBlockers(analyses, releaseRef, releaseSha)).toEqual([]);
     expect(sourceAnalysisBlockers(analyses.slice(1), releaseRef, releaseSha)).toEqual([
@@ -179,6 +181,7 @@ describe("release security gate", () => {
         tool: { name: "CodeQL" },
         category: "/language:" + language,
         error: "",
+        created_at: "2026-10-12T10:00:00Z",
       })),
       {
         ref,
@@ -186,11 +189,53 @@ describe("release security gate", () => {
         tool: { name: "Semgrep OSS" },
         category: ".github/workflows/sast.yml:semgrep",
         error: "",
+        created_at: "2026-10-12T10:00:00Z",
       },
     ];
     expect(sourceAnalysisBlockers(analyses, ref, commit_sha)).toEqual([]);
     analyses[3].error = "SARIF processing failed";
     expect(sourceAnalysisBlockers(analyses, ref, commit_sha)).toHaveLength(1);
+  });
+
+  it("blocks a failed newest scan even when an older scan of the same source succeeded", () => {
+    const ref = "refs/tags/v1.2.3";
+    const commit_sha = "a".repeat(40);
+    const otherAnalyses = REQUIRED_CODE_ANALYSES.slice(1).map(({ tool, category }) => ({
+      ref,
+      commit_sha,
+      tool: { name: tool },
+      category,
+      error: "",
+      created_at: "2026-10-12T10:00:00Z",
+    }));
+    const failedLatest = {
+      ref,
+      commit_sha,
+      tool: { name: "CodeQL" },
+      category: "/language:csharp",
+      error: "SARIF processing failed",
+      created_at: "2026-10-12T12:00:00Z",
+    };
+    const successfulOlder = { ...failedLatest, error: "", created_at: "2026-10-12T11:00:00Z" };
+    const expected = ["CodeQL /language:csharp analysis is missing for " + ref + "@" + commit_sha];
+
+    expect(
+      sourceAnalysisBlockers([failedLatest, successfulOlder, ...otherAnalyses], ref, commit_sha)
+    ).toEqual(expected);
+    expect(
+      sourceAnalysisBlockers([successfulOlder, failedLatest, ...otherAnalyses], ref, commit_sha)
+    ).toEqual(expected);
+    expect(
+      sourceAnalysisBlockers(
+        [
+          { ...failedLatest, created_at: "2026-10-12T11:00:00Z" },
+          { ...successfulOlder, created_at: "2026-10-12T12:00:00Z" },
+          ...otherAnalyses,
+        ],
+        ref,
+        commit_sha
+      )
+    ).toEqual([]);
   });
 
   it("blocks CodeQL, Scorecard vulnerability, and low-severity dependency alerts", () => {
