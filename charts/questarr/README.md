@@ -80,7 +80,7 @@ in Settings → Services.
 | ------------------------------------------- | ----------------- | --------------------------------------------------------- |
 | `questarr.existingSecret`                   | `""`              | Read the secrets from this Secret instead of creating one |
 | `questarr.existingSecretKeys`               | see `values.yaml` | Secret key holding each value (the env var name is fixed) |
-| `questarr.secrets.jwtSecret`                | `""`              | `JWT_SECRET`                                              |
+| `questarr.secrets.jwtSecret`                | `""`              | `JWT_SECRET`; when set, at least 32 UTF-8 bytes           |
 | `questarr.secrets.credentialsEncryptionKey` | `""`              | `CREDENTIALS_ENCRYPTION_KEY`, 64 hex chars                |
 | `questarr.secrets.igdbClientId`             | `""`              | `IGDB_CLIENT_ID`                                          |
 | `questarr.secrets.igdbClientSecret`         | `""`              | `IGDB_CLIENT_SECRET`                                      |
@@ -89,6 +89,10 @@ in Settings → Services.
 Values under `questarr.secrets` end up in a chart-managed Secret, which means they also
 sit in the Helm release data. For anything you would rather not put in a values file,
 create the Secret yourself and point the chart at it:
+
+If you provide `JWT_SECRET` through chart values or an existing Secret, use a random
+value containing at least 32 UTF-8 bytes. For example, generate one with
+`openssl rand -hex 32`. If it is unset, Questarr generates and persists the secret.
 
 ```bash
 kubectl create secret generic questarr-secrets \

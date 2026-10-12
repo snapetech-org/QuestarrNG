@@ -50,6 +50,28 @@ describe("release security gate", () => {
     ]);
   });
 
+  it("checks release alerts without treating omitted check runs as missing checks", () => {
+    const releaseRef = "refs/tags/v1.2.3";
+    expect(securityBlockers([], [], null, releaseRef)).toEqual([]);
+    expect(
+      securityBlockers(
+        [
+          {
+            number: 51,
+            state: "open",
+            tool: { name: "CodeQL" },
+            html_url: "release-source-alert",
+            most_recent_instance: { ref: releaseRef, state: "open" },
+          },
+        ],
+        [],
+        null,
+        releaseRef
+      )
+    ).toEqual(["Open CodeQL alert #51: release-source-alert"]);
+    expect(securityBlockers([], [], [])).toHaveLength(REQUIRED_CHECKS.length);
+  });
+
   it("requires exact-ref analyses for every release code scanner", () => {
     const releaseRef = "refs/tags/v1.2.3";
     const releaseSha = "a".repeat(40);

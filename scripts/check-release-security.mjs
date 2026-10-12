@@ -49,7 +49,7 @@ function isBlockingCodeAlert(alert, releaseRef) {
   return BLOCKING_SCORECARD_RULES.has(alert.rule?.id);
 }
 
-export function securityBlockers(codeAlerts, dependencyAlerts, checkRuns, releaseRef) {
+export function securityBlockers(codeAlerts, dependencyAlerts, checkRuns = null, releaseRef) {
   const blockers = [];
   for (const alert of codeAlerts) {
     if (isBlockingCodeAlert(alert, releaseRef)) {
@@ -68,12 +68,14 @@ export function securityBlockers(codeAlerts, dependencyAlerts, checkRuns, releas
       blockers.push("Open Dependabot alert #" + alert.number + ": " + alert.html_url);
     }
   }
-  for (const name of REQUIRED_CHECKS) {
-    // GitHub returns the newest run first. A successful old rerun must not
-    // conceal a newer failed or pending run for the same source commit.
-    const check = checkRuns.find((run) => run.name === name);
-    if (!check || check.status !== "completed" || check.conclusion !== "success") {
-      blockers.push(name + ": " + (check?.conclusion ?? check?.status ?? "missing"));
+  if (checkRuns !== null) {
+    for (const name of REQUIRED_CHECKS) {
+      // GitHub returns the newest run first. A successful old rerun must not
+      // conceal a newer failed or pending run for the same source commit.
+      const check = checkRuns.find((run) => run.name === name);
+      if (!check || check.status !== "completed" || check.conclusion !== "success") {
+        blockers.push(name + ": " + (check?.conclusion ?? check?.status ?? "missing"));
+      }
     }
   }
   return blockers;
@@ -202,8 +204,8 @@ export async function checkReleaseSecurity(repository, sha, releaseRef) {
   const blockers = [
     ...new Set([
       ...securityBlockers(codeOnDefaultBranch, [], checks),
-      ...securityBlockers(codeOnReleaseSource, [], [], releaseRef),
-      ...securityBlockers([], dependencies, []),
+      ...securityBlockers(codeOnReleaseSource, [], null, releaseRef),
+      ...securityBlockers([], dependencies, null),
     ]),
   ];
   if (blockers.length) {
