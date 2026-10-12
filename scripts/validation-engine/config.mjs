@@ -67,6 +67,7 @@ export const validation = {
       stage: 'prepare',
       kind: 'setup',
       command: ['npm', 'ci', '--ignore-scripts'],
+      passEnv: ['NPM_CONFIG_CACHE'],
       timeoutSeconds: 1200,
     },
     {

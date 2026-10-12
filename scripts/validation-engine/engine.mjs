@@ -19,6 +19,7 @@ import {
   realpathSync,
   readlinkSync,
   readdirSync,
+  rmSync,
   unlinkSync,
   writeFileSync,
 } from 'node:fs';
@@ -50,6 +51,7 @@ const INHERITED_ENVIRONMENT_KEYS = new Set([
   'VOLTA_HOME', 'SYSTEMROOT', 'TZ', 'WINDIR',
 ]);
 const APPROVED_TASK_PASS_ENVIRONMENT = new Map();
+APPROVED_TASK_PASS_ENVIRONMENT.set('install-dependencies', new Set(['NPM_CONFIG_CACHE']));
 
 function fail(message) {
   throw new Error(message);
@@ -756,6 +758,7 @@ export async function executePlan(root, config, plan, options = {}) {
       );
     } finally {
       clearInterval(heartbeat);
+      rmSync(path.join(runRoot, `${task.id}-environment`), { recursive: true, force: true });
     }
     taskReceipt.inventory = (configuredTask.inventoryLanes ?? []).map((lane) => ({
       lane,

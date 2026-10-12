@@ -1,6 +1,7 @@
 // Copyright (c) QuestarrNG contributors. All rights reserved.
 import assert from 'node:assert/strict';
 import {
+  existsSync,
   mkdtempSync,
   mkdirSync,
   readFileSync,
@@ -97,6 +98,25 @@ test('Playwright installation and execution share the package-local browser cach
   assert.ok(e2e);
   assert.equal(install.env?.PLAYWRIGHT_BROWSERS_PATH, '0');
   assert.equal(e2e.env?.PLAYWRIGHT_BROWSERS_PATH, '0');
+});
+
+test('only the dependency installer receives the configured npm cache', () => {
+  const runRoot = mkdtempSync(path.join(os.tmpdir(), 'questarrng-npm-cache-contract-'));
+  temporaryRoots.push(runRoot);
+  const install = validation.tasks.find((task) => task.id === 'install-dependencies');
+  const lint = validation.tasks.find((task) => task.id === 'lint');
+  assert.ok(install);
+  assert.ok(lint);
+  assert.deepEqual(install.passEnv, ['NPM_CONFIG_CACHE']);
+  const inherited = {
+    PATH: process.env.PATH,
+    NPM_CONFIG_CACHE: path.join(runRoot, 'shared-npm-cache'),
+  };
+  assert.equal(
+    isolatedTaskEnvironment(install, runRoot, inherited).NPM_CONFIG_CACHE,
+    inherited.NPM_CONFIG_CACHE,
+  );
+  assert.equal(isolatedTaskEnvironment(lint, runRoot, inherited).NPM_CONFIG_CACHE, undefined);
 });
 
 test('glob matching covers root and nested files without crossing sibling names', () => {
@@ -362,7 +382,12 @@ test('child environments hide inherited secrets and reject unapproved passEnv re
     config.tasks[0].command = [
       process.execPath,
       '-e',
-      `const keys = ${JSON.stringify([...Object.keys(injected), 'CI'])}; process.stdout.write(JSON.stringify(Object.fromEntries(keys.map((name) => [name, process.env[name] ?? null]))))`,
+      `const fs = require('node:fs');
+const path = require('node:path');
+const keys = ${JSON.stringify([...Object.keys(injected), 'CI'])};
+fs.mkdirSync(path.join(process.env.HOME, '.npm'), { recursive: true });
+fs.writeFileSync(path.join(process.env.HOME, '.npm', 'cache'), 'temporary npm cache');
+process.stdout.write(JSON.stringify(Object.fromEntries(keys.map((name) => [name, process.env[name] ?? null]))))`,
     ];
     const result = await executePlan(root, config, createPlan(root, config), { runRoot });
     const log = path.join(result.runRoot, result.receipt.tasks[0].logFile);
@@ -376,6 +401,7 @@ test('child environments hide inherited secrets and reject unapproved passEnv re
     assert.equal(childEnvironment.TMPDIR, path.join(result.runRoot, 'unit-tests-environment', 'tmp'));
     assert.equal(childEnvironment.XDG_CONFIG_HOME, path.join(result.runRoot, 'unit-tests-environment', 'xdg-config'));
     assert.equal(childEnvironment.CI, 'true');
+    assert.equal(existsSync(path.join(result.runRoot, 'unit-tests-environment')), false);
 
     config.tasks[0].passEnv = [key];
     assert.throws(() => createPlan(root, config), /unapproved inherited environment variable/);
