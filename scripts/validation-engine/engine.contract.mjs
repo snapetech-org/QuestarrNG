@@ -119,6 +119,17 @@ test('only the dependency installer receives the configured npm cache', () => {
   assert.equal(isolatedTaskEnvironment(lint, runRoot, inherited).NPM_CONFIG_CACHE, undefined);
 });
 
+test('the Vitest task uses the runner config loader with read-only dependencies', () => {
+  const vitest = validation.tasks.find((task) => task.id === 'vitest-coverage');
+  assert.ok(vitest);
+  const separator = vitest.command.indexOf('--');
+  assert.notEqual(separator, -1);
+  assert.deepEqual(vitest.command.slice(separator + 1, separator + 3), [
+    '--configLoader',
+    'runner',
+  ]);
+});
+
 test('glob matching covers root and nested files without crossing sibling names', () => {
   const nested = globRegex('src/**/*.test.*');
   assert.equal(nested.test('src/a.test.js'), true);

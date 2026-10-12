@@ -161,6 +161,7 @@ export const validation = {
       kind: 'test',
       command: [
         'npm', 'run', 'test:coverage', '--',
+        '--configLoader', 'runner',
         '--reporter=default', '--reporter=junit', '--outputFile.junit=test-report.junit.xml',
       ],
       casePattern: '(?:^|\\n)\\s*Tests\\s+(\\d+)\\s+passed\\b',
