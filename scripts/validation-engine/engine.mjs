@@ -4,7 +4,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { Buffer } from 'node:buffer';
 import { spawn, spawnSync } from 'node:child_process';
 import process from 'node:process';
-import { clearTimeout, setTimeout } from 'node:timers';
+import { clearInterval, clearTimeout, setInterval, setTimeout } from 'node:timers';
 import {
   accessSync,
   chmodSync,
