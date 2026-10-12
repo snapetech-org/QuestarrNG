@@ -1,0 +1,8 @@
+{
+  "name": "questarr-ci-npm-runtime",
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "npm": "11.21.0"
+  }
+}

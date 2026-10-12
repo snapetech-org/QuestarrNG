@@ -193,6 +193,11 @@ jobs:
           node-version: 26.x
           cache: "npm" # zizmor: ignore[cache-poisoning]
 
+      - name: Install the locked npm runtime
+        run: |
+          npm ci --prefix .github/npm-runtime --ignore-scripts --no-audit --no-fund
+          echo "$GITHUB_WORKSPACE/.github/npm-runtime/node_modules/.bin" >> "$GITHUB_PATH"
+
       - name: Run source-bound test plan
         env:
           VALIDATION_RECEIPT_EXPORT: ${{ runner.temp }}/quest-validation-receipts/test.json
@@ -249,6 +254,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm" # zizmor: ignore[cache-poisoning]
+
+      - name: Install the locked npm runtime
+        run: |
+          npm ci --prefix .github/npm-runtime --ignore-scripts --no-audit --no-fund
+          echo "$GITHUB_WORKSPACE/.github/npm-runtime/node_modules/.bin" >> "$GITHUB_PATH"
 
       # The registered task owns dependency installation, lint, formatting,
       # type checking, build output, and the receipt for this Node matrix node.

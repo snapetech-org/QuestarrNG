@@ -24,7 +24,7 @@ export const validation = {
       args: ['--version'],
       versionPattern: '^v(?:22\\.(?:19|[2-9]\\d|\\d{3,})\\.\\d+|(?:23|24|25|26|[3-9]\\d|\\d{3,})\\.\\d+\\.\\d+)$',
     },
-    { command: 'npm', args: ['--version'], versionPattern: '^11\\.7\\.0$' },
+    { command: 'npm', args: ['--version'], versionPattern: '^11\\.21\\.0$' },
   ],
   inventory: [
     { id: 'client-vitest', glob: 'client/**/*.test.*', framework: 'vitest', owner: 'client' },
