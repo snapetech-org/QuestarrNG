@@ -193,9 +193,6 @@ jobs:
           node-version: 26.x
           cache: "npm" # zizmor: ignore[cache-poisoning]
 
-      - name: Pin the repository npm runtime
-        run: npm install --global npm@11.7.0
-
       - name: Run source-bound test plan
         env:
           VALIDATION_RECEIPT_EXPORT: ${{ runner.temp }}/quest-validation-receipts/test.json
@@ -252,9 +249,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm" # zizmor: ignore[cache-poisoning]
-
-      - name: Pin the repository npm runtime
-        run: npm install --global npm@11.7.0
 
       # The registered task owns dependency installation, lint, formatting,
       # type checking, build output, and the receipt for this Node matrix node.
