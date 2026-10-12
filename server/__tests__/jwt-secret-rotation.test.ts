@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { randomBytes } from "node:crypto";
 import jwt from "jsonwebtoken";
 import type { User } from "@shared/schema";
 
@@ -17,14 +18,15 @@ describe("stored JWT secret migration", () => {
   });
 
   it("replaces a weak stored secret and signs only with the replacement", async () => {
-    mocks.getSystemConfig.mockResolvedValue("weak");
+    const weakSecret = randomBytes(8).toString("hex");
+    mocks.getSystemConfig.mockResolvedValue(weakSecret);
     const { generateToken } = await import("../auth.js");
     const token = await generateToken({ id: "user", username: "operator" } as User);
     const replacement = mocks.setSystemConfig.mock.calls[0]?.[1] as string;
     expect(replacement).toMatch(/^[a-f0-9]{128}$/);
     expect(mocks.setSystemConfig).toHaveBeenCalledWith("jwt_secret", replacement);
     expect(jwt.verify(token, replacement)).toMatchObject({ id: "user" });
-    expect(() => jwt.verify(token, "weak")).toThrow();
+    expect(() => jwt.verify(token, weakSecret)).toThrow();
   });
 
   it("preserves a strong stored secret and existing sessions", async () => {
