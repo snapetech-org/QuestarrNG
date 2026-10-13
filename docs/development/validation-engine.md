@@ -43,11 +43,17 @@ that is removed with the task environment.
 
 The in-repository CLI imports candidate JavaScript before task subprocesses
 start. For an unreviewed checkout, do not run its CLI directly on the host.
-Copy `trusted-test-launcher.mjs` from a reviewed revision to a location outside
-the checkout, then use the trusted copy to run focused Node contract tests:
+Copy both `trusted-test-launcher.mjs` and
+`trusted-test-sandbox-policy.mjs` from the same reviewed revision to a location
+outside the checkout, keeping them together, then use the trusted copy to run
+focused Node contract tests:
 
 ```sh
-node /path/to/trusted-test-launcher.mjs "$PWD" -- node --test \
+mkdir -p /tmp/trusted-validation-launcher
+cp scripts/validation-engine/trusted-test-launcher.mjs \
+  scripts/validation-engine/trusted-test-sandbox-policy.mjs \
+  /tmp/trusted-validation-launcher/
+node /tmp/trusted-validation-launcher/trusted-test-launcher.mjs "$PWD" -- node --test \
   scripts/validation-engine/engine.contract.mjs \
   scripts/validation-engine/trusted-test-launcher.contract.mjs \
   scripts/validation-engine/workflow-security.contract.mjs
@@ -62,13 +68,14 @@ and common host data roots such as `/opt`, `/srv`, and `/usr/local`, then disabl
 network access. If the checkout is outside those standard roots, it also masks
 the checkout's parent (or the checkout itself if it sits directly under `/`),
 so candidate code cannot reach the original worktree around the filtered
-snapshot. Candidate dependencies are mounted read-only. The host root is
-otherwise visible read-only, so use this launcher only on a machine
-where other system-wide readable files do not contain secrets. It fails before
-starting candidate code if the required isolation is unavailable. Use the complete
-GitHub-hosted validation run for the full test suite. The test job does not
-receive the Codecov upload token for pull requests; coverage and test-result
-uploads run only after trusted pushes to `main`.
+snapshot. The complete `node_modules` tree is mounted read-only without filtering,
+so use only a trusted installed dependency tree that contains no credentials or
+other local secrets. The host root is otherwise visible read-only, so use this
+launcher only on a machine where other system-wide readable files do not contain
+secrets. It fails before starting candidate code if the required isolation is
+unavailable. Use the complete GitHub-hosted validation run for the full test
+suite. The test job does not receive the Codecov upload token for pull requests;
+coverage and test-result uploads run only after trusted pushes to `main`.
 
 During a run, the engine writes a task summary to stderr when each task starts
 and finishes, and repeats it every minute while a task is still running. This
