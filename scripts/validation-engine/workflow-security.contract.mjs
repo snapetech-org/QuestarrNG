@@ -194,10 +194,11 @@ test('test and build jobs execute the base-reviewed launcher with isolated depen
     assert.match(job, /--install-dependencies/u);
     assert.match(job, /node "\$RUNNER_TEMP\/questarr-trusted-validation\/launcher\/trusted-test-launcher\.mjs"/u);
     assert.match(job, /--github-actions-context/u);
-    assert.match(job, /BOOTSTRAP_LAUNCHER_REF: codex\/security-trusted-validation-20261013/u);
+    assert.match(job, /BOOTSTRAP_LAUNCHER_REF: questarr-validation-launcher-20261013/u);
     assert.match(job, /BOOTSTRAP_LAUNCHER_SHA: [a-f0-9]{40}/u);
-    assert.match(job, /git fetch --no-tags origin "refs\/heads\/\$BOOTSTRAP_LAUNCHER_REF"/u);
-    assert.match(job, /git merge-base --is-ancestor "\$launcher_sha" FETCH_HEAD/u);
+    assert.match(job, /git fetch --no-tags origin "refs\/tags\/\$BOOTSTRAP_LAUNCHER_REF"/u);
+    assert.match(job, /fetched_launcher_sha="\$\(git rev-parse 'FETCH_HEAD\^\{commit\}'\)"/u);
+    assert.match(job, /\[ "\$fetched_launcher_sha" != "\$launcher_sha" \]/u);
     assert.doesNotMatch(
       job,
       /\.bin\/npm" ci/u,

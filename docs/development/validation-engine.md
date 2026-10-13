@@ -171,6 +171,11 @@ same-repository tag runs from the exact QuestarrNG image workflow. The
 `discord-release` environment is restricted to `main`, and the tag workflow
 checks out trusted default-branch tooling.
 
+When a release branch predates the validation engine, test and build jobs use
+the permanent `questarr-validation-launcher-20261013` tag to fetch the reviewed
+bootstrap launcher. The workflow verifies that the tag resolves to its pinned
+commit, so deleting the pull-request branch does not break older release jobs.
+
 During a run, the engine writes a task summary to stderr when each task starts
 and finishes, and repeats it every minute while a task is still running. This
 keeps progress visible in a terminal or live GitHub Actions log without mixing

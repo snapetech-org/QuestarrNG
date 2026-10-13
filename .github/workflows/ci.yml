@@ -208,8 +208,8 @@ jobs:
         env:
           NPM_CONFIG_CACHE: ${{ runner.temp }}/questarrng-npm-cache
           TRUSTED_BASE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
-          BOOTSTRAP_LAUNCHER_REF: codex/security-trusted-validation-20261013
-          BOOTSTRAP_LAUNCHER_SHA: df7b9e1034975b8eb4bbee4549d9327ba0bb6d8b
+          BOOTSTRAP_LAUNCHER_REF: questarr-validation-launcher-20261013
+          BOOTSTRAP_LAUNCHER_SHA: 2d7ebb7f337398444dc13a5ce7c5fa5eb32b3538
         run: |
           set -euo pipefail
           umask 077
@@ -231,10 +231,11 @@ jobs:
               echo "The reviewed bootstrap launcher SHA is not pinned." >&2
               exit 1
             fi
-            git fetch --no-tags origin "refs/heads/$BOOTSTRAP_LAUNCHER_REF"
+            git fetch --no-tags origin "refs/tags/$BOOTSTRAP_LAUNCHER_REF"
+            fetched_launcher_sha="$(git rev-parse 'FETCH_HEAD^{commit}')"
             if ! git cat-file -e "$launcher_sha^{commit}" 2>/dev/null || \
-              ! git merge-base --is-ancestor "$launcher_sha" FETCH_HEAD; then
-              echo "The pinned bootstrap launcher is not in the fetched reviewed history." >&2
+              [ "$fetched_launcher_sha" != "$launcher_sha" ]; then
+              echo "The permanent bootstrap tag does not match the pinned trusted commit." >&2
               exit 1
             fi
           fi
@@ -349,8 +350,8 @@ jobs:
         env:
           NPM_CONFIG_CACHE: ${{ runner.temp }}/questarrng-npm-cache
           TRUSTED_BASE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
-          BOOTSTRAP_LAUNCHER_REF: codex/security-trusted-validation-20261013
-          BOOTSTRAP_LAUNCHER_SHA: df7b9e1034975b8eb4bbee4549d9327ba0bb6d8b
+          BOOTSTRAP_LAUNCHER_REF: questarr-validation-launcher-20261013
+          BOOTSTRAP_LAUNCHER_SHA: 2d7ebb7f337398444dc13a5ce7c5fa5eb32b3538
         run: |
           set -euo pipefail
           umask 077
@@ -372,10 +373,11 @@ jobs:
               echo "The reviewed bootstrap launcher SHA is not pinned." >&2
               exit 1
             fi
-            git fetch --no-tags origin "refs/heads/$BOOTSTRAP_LAUNCHER_REF"
+            git fetch --no-tags origin "refs/tags/$BOOTSTRAP_LAUNCHER_REF"
+            fetched_launcher_sha="$(git rev-parse 'FETCH_HEAD^{commit}')"
             if ! git cat-file -e "$launcher_sha^{commit}" 2>/dev/null || \
-              ! git merge-base --is-ancestor "$launcher_sha" FETCH_HEAD; then
-              echo "The pinned bootstrap launcher is not in the fetched reviewed history." >&2
+              [ "$fetched_launcher_sha" != "$launcher_sha" ]; then
+              echo "The permanent bootstrap tag does not match the pinned trusted commit." >&2
               exit 1
             fi
           fi
