@@ -690,12 +690,17 @@ symlinkSync('/etc', '/mnt/workspace/coverage');
     assert.equal(linkedCacheResult.status, 1);
     assert.match(linkedCacheResult.stderr, /cannot contain symbolic links/u);
 
-    const npmResult = spawnSync(launcherNode, [launcher, source, '--', 'npm', '--version'], {
-      encoding: 'utf8',
-      timeout: 30_000,
-    });
+    const npmResult = spawnSync(
+      launcherNode,
+      [launcher, source, '--trusted-npm-runtime', trustedNpmRuntime, '--', 'npm', '--version'],
+      {
+        encoding: 'utf8',
+        timeout: 30_000,
+      }
+    );
     assert.equal(npmResult.error, undefined, npmResult.error?.message);
     assert.equal(npmResult.status, 0, `${npmResult.stdout ?? ''}${npmResult.stderr ?? ''}`);
+    assert.equal(npmResult.stdout, 'trusted npm runtime\n');
 
     const isolatedInstallResult = spawnSync(
       launcherNode,
