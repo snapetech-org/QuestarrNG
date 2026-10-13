@@ -4,7 +4,12 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
-import { main as reconcileMain, reconcileCiReceipts, reconcileBuildReceipts } from './reconcile-ci.mjs';
+import {
+  main as reconcileMain,
+  reconcileCiReceipts,
+  reconcileBuildReceipts,
+  validateTrustedPrReceipt,
+} from './reconcile-ci.mjs';
 
 const identity = {
   repository: 'questarrng',
@@ -118,6 +123,39 @@ test('reconciles the full test job and both Node build nodes from one workflow a
   assert.equal(result.test.activeCases, 3415);
   assert.deepEqual(result.buildNodes.map((node) => node.major), [22, 26]);
   assert.equal(result.runId, identity.runId);
+});
+
+test('validates trusted PR receipts against the exact head, base, and workflow attempt', () => {
+  const baseSha = '9'.repeat(40);
+  const receipt = testReceipt();
+  receipt.candidate.snapshotCommit = 'b'.repeat(40);
+  receipt.executionContext.github.eventName = 'pull_request_target';
+  receipt.executionContext.trustedBaseSha = baseSha;
+  const result = validateTrustedPrReceipt({ receipt, ...identity, baseSha });
+  assert.equal(result.status, 'passed');
+  assert.equal(result.baseSha, baseSha);
+  assert.equal(result.test.activeCases, 3415);
+
+  const wrongBase = clone(receipt);
+  wrongBase.executionContext.trustedBaseSha = '8'.repeat(40);
+  assert.throws(
+    () => validateTrustedPrReceipt({ receipt: wrongBase, ...identity, baseSha }),
+    /does not match the base workflow/u,
+  );
+
+  const wrongEvent = clone(receipt);
+  wrongEvent.executionContext.github.eventName = 'pull_request';
+  assert.throws(
+    () => validateTrustedPrReceipt({ receipt: wrongEvent, ...identity, baseSha }),
+    /does not match the base workflow/u,
+  );
+
+  const wrongSnapshot = clone(receipt);
+  wrongSnapshot.candidate.snapshotCommit = 'not-a-commit';
+  assert.throws(
+    () => validateTrustedPrReceipt({ receipt: wrongSnapshot, ...identity, baseSha }),
+    /invalid source identity/u,
+  );
 });
 
 test('reconciles only the minimum Node build lane for pull request workflows', () => {

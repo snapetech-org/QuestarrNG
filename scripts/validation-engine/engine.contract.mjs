@@ -107,16 +107,22 @@ test('only the dependency installer receives the configured npm cache', () => {
   const lint = validation.tasks.find((task) => task.id === 'lint');
   assert.ok(install);
   assert.ok(lint);
-  assert.deepEqual(install.passEnv, ['NPM_CONFIG_CACHE']);
+  assert.deepEqual(install.passEnv, ['NPM_CONFIG_CACHE', 'NPM_CONFIG_OFFLINE']);
   const inherited = {
     PATH: process.env.PATH,
     NPM_CONFIG_CACHE: path.join(runRoot, 'shared-npm-cache'),
+    NPM_CONFIG_OFFLINE: 'true',
   };
   assert.equal(
     isolatedTaskEnvironment(install, runRoot, inherited).NPM_CONFIG_CACHE,
     inherited.NPM_CONFIG_CACHE,
   );
+  assert.equal(
+    isolatedTaskEnvironment(install, runRoot, inherited).NPM_CONFIG_OFFLINE,
+    'true',
+  );
   assert.equal(isolatedTaskEnvironment(lint, runRoot, inherited).NPM_CONFIG_CACHE, undefined);
+  assert.equal(isolatedTaskEnvironment(lint, runRoot, inherited).NPM_CONFIG_OFFLINE, undefined);
 });
 
 test('glob matching covers root and nested files without crossing sibling names', () => {

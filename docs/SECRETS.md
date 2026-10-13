@@ -298,3 +298,18 @@ points operators at is on the safe side of the fix.
       `DATABASE_URL` to your real source credentials and verify the row counts
       it reports — it continues past per-table failures and still reports
       success (see [MIGRATION.md](./MIGRATION.md)).
+
+## 10. GitHub Actions secrets
+
+Repository secrets are available to every workflow in this repository. Do not
+store integration credentials at repository or organization scope when an
+environment can restrict their use. The Codecov upload workflow uses the
+`codecov-main` environment, restricted to `main`. The release announcement job
+uses the `discord-release` environment, which should be restricted to `main`
+and `v*` tags.
+
+The existing repository-level `DISCORD_RELEASE_WEBHOOK` must be rotated into
+`discord-release` and deleted from repository settings. GitHub does not return
+stored secret values through its API, so create a replacement Discord webhook
+instead of trying to copy the old value. Until the repository-scoped secret is
+removed, any same-repository pull-request workflow could reference it.

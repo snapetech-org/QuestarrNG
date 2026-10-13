@@ -28,18 +28,22 @@ executed, passed, failed, blocked, excluded, and active-case totals. A workspace
 lock prevents two engine runs from competing over the same checkout. A stale
 lock is reported and left for an operator to inspect.
 
-Runtime probes and child commands inherit only the executable path, platform
-process variables, locale, and timezone. Each task receives run-owned home,
+Runtime probes inherit only the executable path, platform process variables,
+locale, and timezone. They use a private temporary home and separate empty npm
+configuration files, so the npm version check cannot read a project or host
+`.npmrc`. Each task receives run-owned home,
 temporary, and XDG configuration/cache directories; registered task settings
 remain task-scoped. Unapproved `passEnv` requests fail during planning. `CI` is
 forced to `true`, and test tasks use
 `NODE_ENV=test` so ambient credentials, proxy settings, loader options, and
 workflow context do not leak into test processes. Task environment directories
 are removed when each command finishes, leaving logs and the receipt as the
-run's retained evidence. CI explicitly shares the runner-local npm cache
-between `setup-node` and the dependency-install task; only that task receives
-the cache path, and local runs without it use a cache under their temporary home
-that is removed with the task environment.
+run's retained evidence. Hosted CI prewarms the runner-local npm cache with a
+trusted npm runtime and lifecycle scripts disabled, then the trusted launcher
+copies that cache into the private run directory and sets npm to offline mode.
+Only the dependency-install task receives those cache settings. Local runs
+without an explicit cache use one under their temporary home, which is removed
+with the task environment.
 
 The in-repository CLI imports candidate JavaScript before task subprocesses
 start. For an unreviewed checkout, do not run its CLI directly on the host.
@@ -93,28 +97,52 @@ hidden host root, fail closed. If a source contains the checkout itself, the
 launcher masks its mapped destination path after binding, including when a
 runtime alias such as `/bin` resolves to `/usr/bin`.
 Snapshot files are force-added to the temporary Git index so candidate ignore
-rules cannot drop tracked files. Before those paths are masked, the trusted launcher opens each workspace,
-run-data, dependency, cache, and marker source as an inherited file descriptor.
-Bubblewrap binds those pinned descriptors after applying the host masks, so source
-resolution does not depend on paths that the sandbox has already hidden. The
-complete `node_modules` tree is mounted read-only without filtering,
-so use only a trusted installed dependency tree that contains no credentials or
-other local secrets. The host root is not mounted. The sandbox adds only the
-system paths required to run Node and its tools; a versioned Node installation
-is mounted as one directory so `bin/node` and sibling `lib/node_modules/npm`
-continue to resolve together. OS-managed Node under `/usr` uses the explicit
-system-path allowlist instead. The launcher fails closed if it cannot identify
-one of these runtime layouts, if required isolation is unavailable, or if no
-candidate command is supplied. The GitHub Actions test job installs Bubblewrap
-and checks that user namespaces work before it runs the test plan; its launcher
-contract fails if that sandbox requirement is not met. On Ubuntu 24.04, the job
+rules cannot drop tracked files. Before those paths are masked, the trusted
+launcher opens each workspace, run-data, dependency, cache, and marker source as
+an inherited file descriptor. Bubblewrap binds those pinned descriptors after
+applying the host masks, so source resolution does not depend on paths that the
+sandbox has already hidden. In local launcher mode, the complete `node_modules`
+tree is mounted read-only without filtering, so use only a trusted installed
+dependency tree that contains no credentials or other local secrets. Trusted
+CI mode does not mount candidate `node_modules`; it installs from a validated
+lockfile using the trusted npm runtime and private offline cache inside the
+sandbox. The host root is not mounted. The sandbox adds only the system paths
+required to run Node and its tools; a versioned Node installation is mounted as one directory so
+`bin/node` and sibling `lib/node_modules/npm` continue to resolve together.
+OS-managed Node under `/usr` uses the explicit system-path allowlist instead.
+The launcher fails closed if it cannot identify one of these runtime layouts,
+if required isolation is unavailable, or if no candidate command is supplied.
+
+The regular CI test and build jobs use `--github-actions-context` to pass only
+the non-secret workflow identity fields into the isolated engine. The launcher
+checks that `GITHUB_SHA` matches the checked-out commit and records it as the
+candidate identity, so exact-run receipt reconciliation remains valid after the
+candidate files are copied into the disposable snapshot. GitHub tokens and
+other runner environment values remain outside the candidate sandbox.
+
+The `trusted-pr-validation` workflow is loaded from the pull-request base. It
+checks out the exact base and head commits, then runs the base revision's
+validator against a read-only candidate snapshot in Bubblewrap. Candidate
+dependency URLs are restricted to `registry.npmjs.org`; install scripts are
+disabled while dependencies are prefetched, and tests run offline with no
+GitHub token or repository secrets in the sandbox. Regular test and build jobs
+also use the reviewed launcher, install dependencies inside Bubblewrap, and
+produce source-bound receipts. Coverage and JUnit files are copied to the
+short-lived artifact with size and symlink checks. On Ubuntu 24.04, the job
 loads an ephemeral AppArmor profile attached to `/usr/bin/bwrap` so Bubblewrap
 can create its namespace while the runner-wide unprivileged-user-namespace
 restriction stays enabled. Local runs may skip the integration check when
-Bubblewrap is unavailable. Use the complete GitHub-hosted validation run for the
-full test suite. The test job does not receive the
-Codecov upload token for pull requests; coverage and test-result uploads run
-only after trusted pushes to `main`.
+Bubblewrap is unavailable. Use the complete GitHub-hosted validation run for
+the full test suite.
+
+The regular pull-request CI workflow contains no Codecov secret reference. It
+uploads reports as a short-lived artifact only on pushes to `main`; a separate
+`workflow_run` workflow loaded from the default branch uploads that artifact to
+Codecov only for a same-repository `push` to `main`, in the `codecov-main`
+environment. GitHub restricts that environment to `main`. Store
+`CODECOV_TOKEN`, if configured, as an environment secret there rather than as a
+repository or organization secret. A pull-request edit to CI therefore cannot
+make the Codecov token available to candidate tests.
 
 During a run, the engine writes a task summary to stderr when each task starts
 and finishes, and repeats it every minute while a task is still running. This
@@ -130,7 +158,8 @@ receipt and both passing build receipts from the same repository, source tree,
 test inventory, workflow run, and attempt. It also checks that every Vitest
 inventory lane ran with nonzero test cases. A retry cannot satisfy the gate
 with receipts from an earlier attempt. The test job still enforces the existing
-coverage thresholds and uploads its JUnit and coverage results to Codecov.
+coverage thresholds and uploads its JUnit and coverage results through the
+trusted Codecov workflow.
 
 Playwright E2E stays opt-in in local runs because it installs and launches a real
 browser. Select `--task playwright-e2e` to include the browser installation and

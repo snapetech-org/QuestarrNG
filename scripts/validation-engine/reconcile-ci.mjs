@@ -33,6 +33,7 @@ function sourceIdentity(candidate) {
     !/^[a-f0-9]{40}$/.test(candidate.tree ?? '') ||
     !/^[a-f0-9]{64}$/.test(candidate.sourceSha256 ?? '') ||
     !/^[a-f0-9]{64}$/.test(candidate.inventorySha256 ?? '') ||
+    (candidate.snapshotCommit !== undefined && !/^[a-f0-9]{40}$/.test(candidate.snapshotCommit)) ||
     candidate.inputDigests.some((item) => !item?.file || !/^[a-f0-9]{64}$/.test(item.sha256 ?? ''))) {
     fail('A validation receipt has an invalid source identity.');
   }
@@ -140,6 +141,43 @@ function validateVitestReceipt(receipt, workflow) {
     runId: receipt.runId,
     completedAt: receipt.completedAt,
     nodeVersion: receipt.executionContext.nodeVersion,
+  };
+}
+
+export function validateTrustedPrReceipt({
+  receipt,
+  repository = 'questarrng',
+  runId,
+  runAttempt,
+  sha,
+  baseSha,
+}) {
+  if (!/^[a-f0-9]{40}$/.test(baseSha ?? ''))
+    fail('A trusted base commit is required for pull request validation.');
+  const workflow = validateWorkflowReceipt(receipt, {
+    repository,
+    selection: 'tests-only',
+    runId,
+    runAttempt,
+    sha,
+    label: 'Trusted pull request test',
+  });
+  const github = receipt.executionContext?.github;
+  if (github?.eventName !== 'pull_request_target' ||
+    receipt.executionContext?.trustedBaseSha !== baseSha ||
+    !/^[a-f0-9]{40}$/.test(receipt.candidate?.snapshotCommit ?? '')) {
+    fail('Trusted pull request receipt does not match the base workflow and isolated source snapshot.');
+  }
+  const test = validateVitestReceipt(receipt, workflow);
+  return {
+    schemaVersion: 1,
+    repository,
+    runId: String(runId),
+    runAttempt: String(runAttempt),
+    sha,
+    baseSha,
+    status: 'passed',
+    test,
   };
 }
 
@@ -263,6 +301,10 @@ function parseArgs(argv) {
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (!arg.startsWith('--')) fail('Unexpected argument: ' + arg);
+    if (arg === '--trusted-pr') {
+      options.trustedPr = true;
+      continue;
+    }
     const key = arg.slice(2);
     const value = argv[index + 1];
     if (!value || value.startsWith('--')) fail('Missing value for --' + key + '.');
@@ -274,6 +316,20 @@ function parseArgs(argv) {
 
 export function main(argv = process.argv.slice(2)) {
   const options = parseArgs(argv);
+  if (options.trustedPr) {
+    if (!options.receipt || options.receipts)
+      fail('Trusted pull request reconciliation requires exactly one --receipt file.');
+    const receipt = JSON.parse(readFileSync(path.resolve(options.receipt), 'utf8'));
+    const summary = validateTrustedPrReceipt({
+      receipt,
+      runId: options['run-id'] ?? process.env.GITHUB_RUN_ID,
+      runAttempt: options['run-attempt'] ?? process.env.GITHUB_RUN_ATTEMPT,
+      sha: options.sha,
+      baseSha: options['base-sha'],
+    });
+    process.stdout.write(JSON.stringify(summary, null, 2) + '\n');
+    return 0;
+  }
   if (!options.receipts) fail('Pass --receipts <directory>.');
   const expectedNodeMajors = options['expected-node-majors']
     ?.split(',')

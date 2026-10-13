@@ -65,13 +65,27 @@ this lighter table format matches the pragmatic tone of the rest of `docs/`.
 
 ## CI test execution and secret boundaries
 
-Pull-request validation executes candidate code. Keep repository secrets out of
-the test step and out of later steps in the same job: a test process may remain
-on the hosted runner after its command exits and inspect a later action's
-environment. QuestarrNG's Codecov coverage and test-result uploads are gated to
-pushes to `main`, so pull-request tests do not share a job with the Codecov
-upload token. The workflow contract in
-`scripts/validation-engine/workflow-security.contract.mjs` guards this boundary.
+Pull-request validation executes candidate code, so candidate-controlled
+workflow steps must not receive repository secrets. The regular CI workflow
+contains no Codecov token reference. It uploads reports only for `main` pushes;
+a separate `workflow_run` workflow loaded from the default branch accepts only
+a same-repository push to `main` and runs in the `codecov-main` environment.
+That environment's deployment policy allows `main` only. Store
+`CODECOV_TOKEN`, if configured, as a secret in that environment; do not create a
+repository or organization secret with that name. The `trusted-pr-validation`
+workflow is also loaded from the pull-request base and runs the base validator
+against the candidate snapshot inside Bubblewrap without repository secrets.
+Contracts in `scripts/validation-engine/workflow-security.contract.mjs` guard
+the workflow structure; the environment's branch policy is configured in
+GitHub repository settings.
+
+GitHub exposes repository secrets to every workflow in the repository, so the
+release webhook must not remain repository-scoped. The announcement job now
+uses the `discord-release` environment, which should allow only `main` and
+`v*` tags. The existing repository secret must be rotated into that environment
+and removed from repository settings; GitHub does not reveal a stored secret's
+value for transfer. Until that is done, same-repository pull-request workflows
+can still reference the old repository secret.
 
 ## Optional pre-import scanning
 

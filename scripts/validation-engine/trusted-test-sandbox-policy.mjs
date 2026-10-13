@@ -81,6 +81,7 @@ export function sandboxMountOperations({
   hiddenDirectories,
   guestWorkspace,
   guestRun,
+  trustedGuest,
   markerFile,
   guestMarker,
 }) {
@@ -134,6 +135,7 @@ export function sandboxMountOperations({
   for (const directory of [...systemParents].sort(byDepth))
     if (!hiddenParents.has(directory)) operations.push({ type: 'dir', path: directory });
   operations.push({ type: 'dir', path: guestWorkspace }, { type: 'dir', path: guestRun });
+  if (trustedGuest) operations.push({ type: 'dir', path: trustedGuest });
   for (const [source, target] of systemMounts)
     operations.push({ type: 'ro-bind-fd', source, target });
   operations.push(

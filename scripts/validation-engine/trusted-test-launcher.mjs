@@ -2,36 +2,46 @@
 // Copy this file outside the checkout from a reviewed revision before using it
 // to execute a candidate tree. It runs no candidate JavaScript until bubblewrap
 // has isolated the candidate workspace, home, service sockets, and network.
+import { Buffer } from 'node:buffer';
 import { execFileSync, spawn } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import {
+  constants,
   chmodSync,
   closeSync,
   cpSync,
   existsSync,
+  fstatSync,
   lstatSync,
   mkdirSync,
   mkdtempSync,
   openSync,
+  readFileSync,
+  readSync,
   readdirSync,
   realpathSync,
   rmSync,
+  fsyncSync,
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
+import { fileURLToPath } from 'node:url';
 import {
   hostPathsToHide,
   isSensitiveCandidatePath,
   SYSTEM_PATHS_TO_MOUNT,
   sandboxMountOperations,
 } from './trusted-test-sandbox-policy.mjs';
+import { validateCandidateLockfile } from './trusted-test-source-policy.mjs';
 
 const GUEST_WORKSPACE = '/mnt/workspace';
 const GUEST_RUN = '/mnt/run-data';
+const GUEST_TRUSTED = '/mnt/trusted-validation';
 const GUEST_MARKER = '/run/validation-engine-sandbox';
 const GIT = ['/usr/bin/git', '/bin/git'].find(existsSync);
+const COMMIT_PATTERN = /^[a-f0-9]{40}$/u;
 function isSensitive(relativePath, tracked) {
   const segments = relativePath.replaceAll(String.fromCharCode(92), '/').split('/');
   if (
@@ -78,6 +88,113 @@ function isWithin(root, candidate) {
       !relative.startsWith(`..${path.sep}`) &&
       !path.isAbsolute(relative))
   );
+}
+
+function gitText(root, args, env) {
+  return execFileSync(GIT, ['-c', 'core.fsmonitor=false', '-C', root, ...args], {
+    encoding: 'utf8',
+    env,
+    maxBuffer: 64 * 1024 * 1024,
+  }).trim();
+}
+
+function githubActionsEnvironment(sourceRoot) {
+  if (process.env.GITHUB_ACTIONS !== 'true') return {};
+
+  const names = [
+    'GITHUB_EVENT_NAME',
+    'GITHUB_REPOSITORY',
+    'GITHUB_RUN_ID',
+    'GITHUB_RUN_ATTEMPT',
+    'GITHUB_WORKFLOW',
+    'GITHUB_JOB',
+    'GITHUB_SHA',
+  ];
+  const context = Object.fromEntries(names.map((name) => [name, process.env[name]]));
+  if (names.some((name) => typeof context[name] !== 'string' || context[name] === ''))
+    throw new Error('GitHub Actions validation requires complete workflow metadata.');
+  if (!COMMIT_PATTERN.test(context.GITHUB_SHA) ||
+    !/^\d+$/u.test(context.GITHUB_RUN_ID) ||
+    !/^\d+$/u.test(context.GITHUB_RUN_ATTEMPT)) {
+    throw new Error('GitHub Actions validation metadata contains an invalid run identity.');
+  }
+
+  const gitEnv = gitEnvironment(sourceRoot, sourceRoot);
+  const checkoutSha = gitText(
+    sourceRoot,
+    ['rev-parse', '--verify', 'HEAD^{commit}'],
+    gitEnv
+  );
+  if (checkoutSha !== context.GITHUB_SHA)
+    throw new Error('GitHub Actions source checkout does not match GITHUB_SHA.');
+
+  return {
+    CI: 'true',
+    GITHUB_ACTIONS: 'true',
+    ...context,
+    VALIDATION_CANDIDATE_SHA: context.GITHUB_SHA,
+  };
+}
+
+function assertCleanCheckout(root, expectedSha, label, env) {
+  if (!COMMIT_PATTERN.test(expectedSha ?? ''))
+    throw new Error(`${label} commit must be a full 40-character Git SHA.`);
+  const actualSha = gitText(root, ['rev-parse', '--verify', 'HEAD^{commit}'], env);
+  if (actualSha !== expectedSha)
+    throw new Error(`${label} checkout does not match its expected commit.`);
+  const status = gitText(root, ['status', '--porcelain=v1', '--untracked-files=all'], env);
+  if (status)
+    throw new Error(`${label} checkout must be clean before trusted validation.`);
+  return actualSha;
+}
+
+function installCandidateDependencies(sourceRoot, npmCli, runDirectory) {
+  validateCandidateLockfile(sourceRoot);
+  const cache = path.join(runDirectory, 'npm-cache');
+  const home = path.join(runDirectory, 'npm-install-home');
+  const userConfig = path.join(home, 'user.npmrc');
+  const globalConfig = path.join(home, 'global.npmrc');
+  mkdirSync(cache, { mode: 0o700 });
+  mkdirSync(home, { mode: 0o700 });
+  writeFileSync(userConfig, '', { mode: 0o600 });
+  writeFileSync(globalConfig, '', { mode: 0o600 });
+  const env = {
+    PATH: process.env.PATH ?? '',
+    HOME: home,
+    USERPROFILE: home,
+    TMPDIR: runDirectory,
+    TMP: runDirectory,
+    TEMP: runDirectory,
+    NPM_CONFIG_CACHE: cache,
+    NPM_CONFIG_USERCONFIG: userConfig,
+    NPM_CONFIG_GLOBALCONFIG: globalConfig,
+    NPM_CONFIG_REGISTRY: 'https://registry.npmjs.org/',
+    NPM_CONFIG_STRICT_SSL: 'true',
+    NPM_CONFIG_IGNORE_SCRIPTS: 'true',
+    NPM_CONFIG_AUDIT: 'false',
+    NPM_CONFIG_FUND: 'false',
+  };
+  for (const key of ['LANG', 'LC_ALL', 'LC_CTYPE', 'SYSTEMROOT'])
+    if (typeof process.env[key] === 'string') env[key] = process.env[key];
+  execFileSync(process.execPath, [
+    npmCli,
+    'ci',
+    '--ignore-scripts=true',
+    '--no-audit',
+    '--no-fund',
+    '--strict-ssl=true',
+    '--registry=https://registry.npmjs.org/',
+    '--userconfig=/dev/null',
+    '--globalconfig=/dev/null',
+    '--cache',
+    cache,
+  ], {
+    cwd: sourceRoot,
+    env,
+    stdio: 'inherit',
+    maxBuffer: 16 * 1024 * 1024,
+  });
+  return cache;
 }
 
 function copyCandidateFile(sourceRoot, workspaceRoot, relativePath, tracked) {
@@ -135,7 +252,7 @@ function copyCandidateFile(sourceRoot, workspaceRoot, relativePath, tracked) {
 }
 
 function createSyntheticGitRepository(workspace, runDirectory) {
-  const template = path.join(runDirectory, 'empty-git-template');
+  const template = path.join(runDirectory, 'synthetic-git-template');
   mkdirSync(template, { mode: 0o700 });
   const env = gitEnvironment(workspace, template);
   const git = (args) => execFileSync(GIT, ['-C', workspace, ...args], { env });
@@ -153,72 +270,287 @@ function createSyntheticGitRepository(workspace, runDirectory) {
   ]);
 }
 
-function linkDependencies(sourceRoot, workspace) {
-  const dependencyDirectories = [];
-  const pending = [{ absolute: sourceRoot, relative: '' }];
-  const skipped = new Set([
-    '.git',
-    '.next',
-    '.turbo',
-    '.cache',
-    '.venv',
-    'venv',
-    'target',
-    'dist',
-    'coverage',
-    'TestResults',
-    'bin',
-    'obj',
-  ]);
-  while (pending.length > 0) {
-    const current = pending.pop();
-    for (const entry of readdirSync(current.absolute, {
-      withFileTypes: true,
-    })) {
-      const relative = current.relative
-        ? `${current.relative}/${entry.name}`
-        : entry.name;
-      const absolute = path.join(current.absolute, entry.name);
-      if (entry.name === 'node_modules') {
-        let metadata;
-        try {
-          metadata = lstatSync(absolute);
-        } catch (error) {
-          if (error.code === 'ENOENT') continue;
-          throw error;
-        }
-        if (metadata.isSymbolicLink() || !metadata.isDirectory())
-          throw new Error(
-            `Installed dependency path must be a real directory, not a symbolic link: ${relative}`
-          );
-        const dependency = realpathSync(absolute);
-        if (!isWithin(sourceRoot, dependency))
-          throw new Error(
-            `Installed dependencies escape the candidate workspace: ${relative}`
-          );
-        if (!lstatSync(dependency).isDirectory())
-          throw new Error(
-            `Installed dependency path is not a directory: ${relative}`
-          );
-        dependencyDirectories.push({ relative, dependency });
-        continue;
+function copyNpmCache(source, destination) {
+  const rootMetadata = lstatSync(source);
+  if (rootMetadata.isSymbolicLink() || !rootMetadata.isDirectory())
+    throw new Error('The npm cache must be a real directory.');
+  mkdirSync(destination, { mode: 0o700 });
+
+  const copyDirectory = (sourceDirectory, destinationDirectory) => {
+    for (const entry of readdirSync(sourceDirectory, { withFileTypes: true })) {
+      const sourcePath = path.join(sourceDirectory, entry.name);
+      const destinationPath = path.join(destinationDirectory, entry.name);
+      const metadata = lstatSync(sourcePath);
+      if (metadata.isSymbolicLink())
+        throw new Error('The npm cache cannot contain symbolic links.');
+      if (metadata.isDirectory()) {
+        mkdirSync(destinationPath, { mode: 0o700 });
+        copyDirectory(sourcePath, destinationPath);
+      } else if (metadata.isFile()) {
+        cpSync(sourcePath, destinationPath, { preserveTimestamps: true });
+        chmodSync(destinationPath, 0o600);
+      } else {
+        throw new Error(
+          'The npm cache can contain only regular files and directories.'
+        );
       }
-      if (entry.isDirectory() && !skipped.has(entry.name))
-        pending.push({ absolute, relative });
     }
+  };
+
+  copyDirectory(source, destination);
+}
+
+function prepareReceiptOutput(requestedOutput, sourceRoot) {
+  if (!path.isAbsolute(requestedOutput))
+    throw new Error('--receipt-output must be an absolute path.');
+  if (!process.env.RUNNER_TEMP)
+    throw new Error('--receipt-output requires RUNNER_TEMP.');
+
+  const runnerTempInput = path.resolve(process.env.RUNNER_TEMP);
+  const runnerTempMetadata = lstatSync(runnerTempInput);
+  if (
+    runnerTempMetadata.isSymbolicLink() ||
+    !runnerTempMetadata.isDirectory()
+  )
+    throw new Error('RUNNER_TEMP must be a directory.');
+  const runnerTemp = realpathSync(runnerTempInput);
+  if (runnerTemp !== runnerTempInput)
+    throw new Error('RUNNER_TEMP must resolve to its real directory.');
+  const requested = path.resolve(requestedOutput);
+  const relativeOutput = path.relative(runnerTemp, requested);
+  if (
+    relativeOutput === '' ||
+    relativeOutput === '..' ||
+    relativeOutput.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(relativeOutput)
+  )
+    throw new Error('--receipt-output must be below RUNNER_TEMP.');
+
+  const output = path.join(runnerTemp, relativeOutput);
+  if (isWithin(sourceRoot, output))
+    throw new Error('--receipt-output cannot write inside the candidate checkout.');
+
+  const relativeParent = path.relative(runnerTemp, path.dirname(output));
+  let parent = runnerTemp;
+  for (const component of relativeParent.split(path.sep).filter(Boolean)) {
+    parent = path.join(parent, component);
+    try {
+      mkdirSync(parent, { mode: 0o700 });
+    } catch (error) {
+      if (error.code !== 'EEXIST') throw error;
+    }
+    const metadata = lstatSync(parent);
+    if (
+      metadata.isSymbolicLink() ||
+      !metadata.isDirectory() ||
+      !isWithin(runnerTemp, realpathSync(parent))
+    )
+      throw new Error('--receipt-output parent must remain inside RUNNER_TEMP.');
   }
-  for (const {
-    relative: relativePath,
-  } of dependencyDirectories.sort((left, right) =>
-    left.relative.localeCompare(right.relative)
-  )) {
-    const target = path.join(workspace, relativePath);
-    mkdirSync(target, { recursive: true, mode: 0o700 });
+
+  try {
+    lstatSync(output);
+    throw new Error('--receipt-output must not already exist.');
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
   }
-  return dependencyDirectories.map(({ relative, dependency }) => ({
-    relative,
-    source: dependency,
-  }));
+  return output;
+}
+
+function prepareReportsOutput(requestedOutput, sourceRoot) {
+  if (!path.isAbsolute(requestedOutput))
+    throw new Error('--reports-output must be an absolute path.');
+  if (!process.env.RUNNER_TEMP)
+    throw new Error('--reports-output requires RUNNER_TEMP.');
+
+  const runnerTempInput = path.resolve(process.env.RUNNER_TEMP);
+  const runnerTempMetadata = lstatSync(runnerTempInput);
+  if (runnerTempMetadata.isSymbolicLink() || !runnerTempMetadata.isDirectory())
+    throw new Error('RUNNER_TEMP must be a directory.');
+  const runnerTemp = realpathSync(runnerTempInput);
+  if (runnerTemp !== runnerTempInput)
+    throw new Error('RUNNER_TEMP must resolve to its real directory.');
+
+  const output = path.resolve(requestedOutput);
+  const relativeOutput = path.relative(runnerTemp, output);
+  if (
+    relativeOutput === '' ||
+    relativeOutput === '..' ||
+    relativeOutput.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(relativeOutput)
+  )
+    throw new Error('--reports-output must be below RUNNER_TEMP.');
+  if (isWithin(sourceRoot, output))
+    throw new Error('--reports-output cannot write inside the candidate checkout.');
+
+  const relativeParent = path.relative(runnerTemp, path.dirname(output));
+  let parent = runnerTemp;
+  for (const component of relativeParent.split(path.sep).filter(Boolean)) {
+    parent = path.join(parent, component);
+    try {
+      mkdirSync(parent, { mode: 0o700 });
+    } catch (error) {
+      if (error.code !== 'EEXIST') throw error;
+    }
+    const metadata = lstatSync(parent);
+    if (
+      metadata.isSymbolicLink() ||
+      !metadata.isDirectory() ||
+      !isWithin(runnerTemp, realpathSync(parent))
+    )
+      throw new Error('--reports-output parent must remain inside RUNNER_TEMP.');
+  }
+
+  try {
+    mkdirSync(output, { mode: 0o700 });
+  } catch (error) {
+    if (error.code === 'EEXIST')
+      throw new Error('--reports-output must name a new directory.');
+    throw error;
+  }
+  const metadata = lstatSync(output);
+  if (
+    metadata.isSymbolicLink() ||
+    !metadata.isDirectory() ||
+    !isWithin(runnerTemp, realpathSync(output))
+  )
+    throw new Error('--reports-output must be a real directory inside RUNNER_TEMP.');
+  return output;
+}
+
+function exportReceipt(runDirectory, output) {
+  const receipt = path.join(runDirectory, 'validation-output', 'test.json');
+  const maximumSize = 16 * 1024 * 1024;
+  const sourceDescriptor = openSync(receipt, constants.O_RDONLY | constants.O_NOFOLLOW);
+  let destinationDescriptor;
+  try {
+    const sourceMetadata = fstatSync(sourceDescriptor);
+    if (
+      !sourceMetadata.isFile() ||
+      sourceMetadata.size > maximumSize
+    )
+      throw new Error(
+        'The sandbox did not produce a regular validation receipt within the size limit.'
+      );
+    const buffer = Buffer.allocUnsafe(maximumSize + 1);
+    let bytesRead = 0;
+    while (bytesRead < buffer.length) {
+      const count = readSync(
+        sourceDescriptor,
+        buffer,
+        bytesRead,
+        buffer.length - bytesRead,
+        null
+      );
+      if (count === 0) break;
+      bytesRead += count;
+    }
+    if (bytesRead > maximumSize || fstatSync(sourceDescriptor).size > maximumSize)
+      throw new Error('The sandbox validation receipt exceeds the size limit.');
+    if (!fstatSync(sourceDescriptor).isFile())
+      throw new Error('The sandbox validation receipt is not a regular file.');
+    const contents = buffer.subarray(0, bytesRead);
+    destinationDescriptor = openSync(
+      output,
+      constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW,
+      0o600
+    );
+    writeFileSync(destinationDescriptor, contents);
+    fsyncSync(destinationDescriptor);
+  } finally {
+    closeSync(sourceDescriptor);
+    if (destinationDescriptor !== undefined) closeSync(destinationDescriptor);
+  }
+}
+
+function exportTestReports(workspace, output) {
+  const maximumFiles = 10_000;
+  const maximumBytes = 256 * 1024 * 1024;
+  const state = { files: 0, bytes: 0 };
+
+  const copyEntry = (source, destination) => {
+    const metadata = lstatSync(source);
+    if (metadata.isSymbolicLink())
+      throw new Error('Test reports cannot contain symbolic links.');
+    if (metadata.isDirectory()) {
+      mkdirSync(destination, { mode: 0o700 });
+      for (const entry of readdirSync(source, { withFileTypes: true })) {
+        const childSource = path.join(source, entry.name);
+        const childDestination = path.join(destination, entry.name);
+        if (!isWithin(output, path.resolve(childDestination)))
+          throw new Error('Test report path escaped its export directory.');
+        copyEntry(childSource, childDestination);
+      }
+      return;
+    }
+    if (!metadata.isFile())
+      throw new Error('Test reports may contain only regular files and directories.');
+    state.files += 1;
+    if (state.files > maximumFiles || metadata.size > maximumBytes - state.bytes)
+      throw new Error('Test report output exceeds its size limits.');
+
+    const sourceDescriptor = openSync(source, constants.O_RDONLY | constants.O_NOFOLLOW);
+    let destinationDescriptor;
+    try {
+      const sourceMetadata = fstatSync(sourceDescriptor);
+      if (!sourceMetadata.isFile() || sourceMetadata.size > maximumBytes - state.bytes)
+        throw new Error('Test report changed while it was being exported.');
+      const contents = readFileSync(sourceDescriptor);
+      const afterReadMetadata = fstatSync(sourceDescriptor);
+      if (!afterReadMetadata.isFile() || afterReadMetadata.size !== contents.length ||
+        contents.length > maximumBytes - state.bytes) {
+        throw new Error('Test report changed while it was being exported.');
+      }
+      destinationDescriptor = openSync(
+        destination,
+        constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW,
+        0o600
+      );
+      writeFileSync(destinationDescriptor, contents);
+      fsyncSync(destinationDescriptor);
+      state.bytes += contents.length;
+    } finally {
+      closeSync(sourceDescriptor);
+      if (destinationDescriptor !== undefined) closeSync(destinationDescriptor);
+    }
+  };
+
+  for (const relative of ['coverage', 'test-report.junit.xml']) {
+    const source = path.join(workspace, relative);
+    let metadata;
+    try {
+      metadata = lstatSync(source);
+    } catch (error) {
+      if (error.code === 'ENOENT') continue;
+      throw error;
+    }
+    if (metadata.isSymbolicLink())
+      throw new Error('Test reports cannot contain symbolic links.');
+    if (relative === 'coverage' && !metadata.isDirectory())
+      throw new Error('Coverage output must be a directory.');
+    if (relative !== 'coverage' && !metadata.isFile())
+      throw new Error('JUnit output must be a regular file.');
+    copyEntry(source, path.join(output, relative));
+  }
+}
+
+function linkDependencies(sourceRoot, workspace, installDependencies) {
+  if (installDependencies) return [];
+  const absolute = path.join(sourceRoot, 'node_modules');
+  let metadata;
+  try {
+    metadata = lstatSync(absolute);
+  } catch (error) {
+    if (error.code === 'ENOENT') return [];
+    throw error;
+  }
+  if (metadata.isSymbolicLink() || !metadata.isDirectory())
+    throw new Error('Root node_modules must be a real directory, not a symbolic link.');
+  const dependency = realpathSync(absolute);
+  if (!isWithin(sourceRoot, dependency) || !lstatSync(dependency).isDirectory())
+    throw new Error('Root node_modules must remain inside the candidate checkout.');
+  mkdirSync(path.join(workspace, 'node_modules'), { mode: 0o700 });
+  return [{ relative: 'node_modules', source: dependency }];
 }
 
 function bubblewrapPath() {
@@ -233,6 +565,13 @@ function makeSandboxCommand({
   runDirectory,
   dependencies,
   playwrightCache,
+  npmCache,
+  trustedNpmRuntime,
+  githubActionsContext,
+  receiptOutput,
+  trustedRoot,
+  candidateSha,
+  trustedBaseSha,
   targetCommand,
 }) {
   if (process.platform !== 'linux')
@@ -273,6 +612,14 @@ function makeSandboxCommand({
       externalRoots.push(playwrightCache);
     }
   }
+  let trustedNpmRuntimeIndex = -1;
+  if (trustedNpmRuntime) {
+    trustedNpmRuntimeIndex = externalRoots.indexOf(trustedNpmRuntime);
+    if (trustedNpmRuntimeIndex === -1) {
+      trustedNpmRuntimeIndex = externalRoots.length;
+      externalRoots.push(trustedNpmRuntime);
+    }
+  }
   let runtimeIndex = -1;
   if (!systemRuntime) {
     runtimeIndex = externalRoots.indexOf(runtimeRoot);
@@ -283,18 +630,27 @@ function makeSandboxCommand({
   }
   const mounts = externalRoots.map((source, index) => [
     realpathSync(source),
-    `${GUEST_RUN}/dependencies/${index}`,
+    `${GUEST_RUN}/dependencies/${index}${index === trustedNpmRuntimeIndex ? '/node_modules' : ''}`,
   ]);
+  const trustedMount = trustedRoot
+    ? [realpathSync(trustedRoot), GUEST_TRUSTED]
+    : undefined;
+  const externalMounts = trustedMount ? [...mounts, trustedMount] : mounts;
   const dependencyMounts = dependencies.map(({ relative, source }) => [
     realpathSync(source),
     path.posix.join(GUEST_WORKSPACE, relative.split(path.sep).join('/')),
   ]);
   mkdirSync(path.join(runDirectory, 'dependencies'), { recursive: true });
-  for (let index = 0; index < mounts.length; index++)
+  for (let index = 0; index < mounts.length; index++) {
     mkdirSync(path.join(runDirectory, 'dependencies', String(index)), {
       recursive: true,
       mode: 0o700,
     });
+    if (index === trustedNpmRuntimeIndex)
+      mkdirSync(path.join(runDirectory, 'dependencies', String(index), 'node_modules'), {
+        mode: 0o700,
+      });
+  }
 
   const runtimeGuest = systemRuntime ? undefined : mounts[runtimeIndex][1];
   const runtimeRelativePosix = runtimeRelativePath.split(path.sep).join('/');
@@ -304,12 +660,17 @@ function makeSandboxCommand({
   const runtimeBin = systemRuntime
     ? runtimeDirectory
     : path.posix.join(runtimeGuest, path.posix.dirname(runtimeRelativePosix));
+  const npmRuntimeBin = trustedRoot
+    ? `${GUEST_TRUSTED}/.github/npm-runtime/node_modules/.bin`
+    : trustedNpmRuntimeIndex !== -1
+      ? path.posix.join(mounts[trustedNpmRuntimeIndex][1], '.bin')
+      : `${GUEST_WORKSPACE}/.github/npm-runtime/node_modules/.bin`;
   const markerToken = randomBytes(32).toString('hex');
   const markerFile = path.join(runDirectory, 'sandbox-marker');
   writeFileSync(markerFile, markerToken, { mode: 0o600, flag: 'wx' });
 
   const env = {
-    PATH: `${GUEST_WORKSPACE}/.github/npm-runtime/node_modules/.bin:${runtimeBin}:/usr/bin:/bin:/usr/sbin:/sbin`,
+    PATH: `${npmRuntimeBin}:${runtimeBin}:/usr/bin:/bin:/usr/sbin:/sbin`,
     NODE_ENV: 'test',
     HOME: `${GUEST_RUN}/home`,
     USERPROFILE: `${GUEST_RUN}/home`,
@@ -324,6 +685,32 @@ function makeSandboxCommand({
     CONFIG_DIRECTORY: `${GUEST_RUN}/config`,
     VALIDATION_OUTER_SANDBOX_TOKEN: markerToken,
   };
+  if (npmCache) {
+    env.NPM_CONFIG_CACHE = `${GUEST_RUN}/npm-cache`;
+    env.NPM_CONFIG_OFFLINE = 'true';
+  }
+  if (receiptOutput) {
+    env.RUNNER_TEMP = `${GUEST_RUN}/validation-output`;
+    env.VALIDATION_RECEIPT_EXPORT = `${env.RUNNER_TEMP}/test.json`;
+  }
+  if (githubActionsContext) {
+    if (trustedRoot)
+      throw new Error('Do not combine --github-actions-context with --trusted-root.');
+    Object.assign(env, githubActionsEnvironment(sourceRoot));
+  }
+  if (trustedRoot) {
+    env.CI = 'true';
+    env.GITHUB_ACTIONS = 'true';
+    env.GITHUB_EVENT_NAME = 'pull_request_target';
+    env.GITHUB_SHA = candidateSha;
+    env.GITHUB_RUN_ID = process.env.GITHUB_RUN_ID;
+    env.GITHUB_RUN_ATTEMPT = process.env.GITHUB_RUN_ATTEMPT;
+    env.GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY;
+    env.GITHUB_WORKFLOW = process.env.GITHUB_WORKFLOW;
+    env.GITHUB_JOB = process.env.GITHUB_JOB;
+    env.VALIDATION_CANDIDATE_SHA = candidateSha;
+    env.VALIDATION_TRUSTED_BASE_SHA = trustedBaseSha;
+  }
   if (playwrightCacheIndex !== -1)
     env.PLAYWRIGHT_BROWSERS_PATH = mounts[playwrightCacheIndex][1];
   for (const key of ['LANG', 'LC_ALL', 'LC_CTYPE', 'TZ'])
@@ -344,12 +731,13 @@ function makeSandboxCommand({
     sourceRoot,
     workspace,
     runDirectory,
-    externalMounts: mounts,
+    externalMounts,
     dependencyMounts,
     systemMounts,
     hiddenDirectories,
     guestWorkspace: GUEST_WORKSPACE,
     guestRun: GUEST_RUN,
+    trustedGuest: trustedRoot ? GUEST_TRUSTED : undefined,
     markerFile,
     guestMarker: GUEST_MARKER,
   });
@@ -452,7 +840,29 @@ async function main() {
     ? process.cwd()
     : launcherArguments.shift() ?? process.cwd();
   let playwrightCache;
+  let npmCache;
+  let trustedNpmRuntime;
+  let receiptOutput;
+  let reportsOutput;
+  let trustedRoot;
+  let candidateSha;
+  let trustedBaseSha;
+  let npmCli;
+  let installDependencies = false;
+  let githubActionsContext = false;
   for (let index = 0; index < launcherArguments.length; index += 1) {
+    if (launcherArguments[index] === '--github-actions-context') {
+      if (githubActionsContext)
+        throw new Error('--github-actions-context may only be provided once.');
+      githubActionsContext = true;
+      continue;
+    }
+    if (launcherArguments[index] === '--install-dependencies') {
+      if (installDependencies)
+        throw new Error('--install-dependencies may only be provided once.');
+      installDependencies = true;
+      continue;
+    }
     if (launcherArguments[index] === '--playwright-cache') {
       const requestedCache = launcherArguments[index + 1];
       if (!requestedCache)
@@ -468,6 +878,88 @@ async function main() {
       index += 1;
       continue;
     }
+    if (launcherArguments[index] === '--npm-cache') {
+      const requestedCache = launcherArguments[index + 1];
+      if (!requestedCache)
+        throw new Error('--npm-cache requires a directory path.');
+      if (npmCache)
+        throw new Error('--npm-cache may only be provided once.');
+      const cacheMetadata = lstatSync(requestedCache);
+      if (cacheMetadata.isSymbolicLink() || !cacheMetadata.isDirectory())
+        throw new Error('--npm-cache must name a real directory.');
+      npmCache = realpathSync(requestedCache);
+      index += 1;
+      continue;
+    }
+    if (launcherArguments[index] === '--trusted-npm-runtime') {
+      const requestedRuntime = launcherArguments[index + 1];
+      if (!requestedRuntime)
+        throw new Error('--trusted-npm-runtime requires a directory path.');
+      if (trustedNpmRuntime)
+        throw new Error('--trusted-npm-runtime may only be provided once.');
+      const metadata = lstatSync(requestedRuntime);
+      if (metadata.isSymbolicLink() || !metadata.isDirectory())
+        throw new Error('--trusted-npm-runtime must name a real directory.');
+      trustedNpmRuntime = realpathSync(requestedRuntime);
+      index += 1;
+      continue;
+    }
+    if (launcherArguments[index] === '--receipt-output') {
+      const requestedOutput = launcherArguments[index + 1];
+      if (!requestedOutput)
+        throw new Error('--receipt-output requires a file path.');
+      if (receiptOutput)
+        throw new Error('--receipt-output may only be provided once.');
+      receiptOutput = requestedOutput;
+      index += 1;
+      continue;
+    }
+    if (launcherArguments[index] === '--reports-output') {
+      const requestedOutput = launcherArguments[index + 1];
+      if (!requestedOutput)
+        throw new Error('--reports-output requires a directory path.');
+      if (reportsOutput)
+        throw new Error('--reports-output may only be provided once.');
+      reportsOutput = requestedOutput;
+      index += 1;
+      continue;
+    }
+    if (launcherArguments[index] === '--trusted-root') {
+      const requestedTrustedRoot = launcherArguments[index + 1];
+      if (!requestedTrustedRoot)
+        throw new Error('--trusted-root requires a checkout path.');
+      if (trustedRoot)
+        throw new Error('--trusted-root may only be provided once.');
+      if (lstatSync(requestedTrustedRoot).isSymbolicLink())
+        throw new Error('--trusted-root cannot be a symbolic link.');
+      trustedRoot = realpathSync(requestedTrustedRoot);
+      index += 1;
+      continue;
+    }
+    if (launcherArguments[index] === '--candidate-sha') {
+      candidateSha = launcherArguments[index + 1];
+      if (!candidateSha)
+        throw new Error('--candidate-sha requires a commit SHA.');
+      index += 1;
+      continue;
+    }
+    if (launcherArguments[index] === '--trusted-base-sha') {
+      trustedBaseSha = launcherArguments[index + 1];
+      if (!trustedBaseSha)
+        throw new Error('--trusted-base-sha requires a commit SHA.');
+      index += 1;
+      continue;
+    }
+    if (launcherArguments[index] === '--trusted-npm-cli') {
+      const requestedCli = launcherArguments[index + 1];
+      if (!requestedCli)
+        throw new Error('--trusted-npm-cli requires a file path.');
+      if (npmCli)
+        throw new Error('--trusted-npm-cli may only be provided once.');
+      npmCli = requestedCli;
+      index += 1;
+      continue;
+    }
     throw new Error(`Unknown launcher option: ${launcherArguments[index]}`);
   }
   if (separator === -1)
@@ -475,16 +967,84 @@ async function main() {
   const targetCommand = process.argv.slice(separator + 1);
   if (targetCommand.length === 0)
     throw new Error('Pass a candidate test command after --.');
+  const trustedMode = Boolean(
+    trustedRoot || candidateSha || trustedBaseSha || npmCli
+  );
+  if (trustedMode &&
+    !(trustedRoot && candidateSha && trustedBaseSha && npmCli && installDependencies))
+    throw new Error('Trusted CI mode requires --trusted-root, --trusted-base-sha, --candidate-sha, --trusted-npm-cli, and --install-dependencies together.');
+  if (installDependencies && !trustedRoot && !(npmCache && trustedNpmRuntime))
+    throw new Error('--install-dependencies requires --npm-cache and --trusted-npm-runtime.');
   const sourceRoot = realpathSync(requestedRoot);
+  if (trustedRoot && (trustedNpmRuntime || npmCache))
+    throw new Error('Trusted-root mode manages the npm runtime and cache; do not pass external npm paths.');
+  if (githubActionsContext && process.env.GITHUB_ACTIONS !== 'true')
+    throw new Error('--github-actions-context requires a GitHub Actions runner.');
+  if (githubActionsContext && trustedRoot)
+    throw new Error('Do not combine --github-actions-context with --trusted-root.');
+  if (trustedRoot && (isWithin(sourceRoot, trustedRoot) || isWithin(trustedRoot, sourceRoot)))
+    throw new Error('Trusted and candidate checkouts must be separate sibling trees.');
+  if (trustedRoot && !COMMIT_PATTERN.test(candidateSha))
+    throw new Error('--candidate-sha must be a full 40-character Git SHA.');
+  if (trustedRoot && !COMMIT_PATTERN.test(trustedBaseSha))
+    throw new Error('--trusted-base-sha must be a full 40-character Git SHA.');
+  if (trustedRoot) {
+    if (process.env.GITHUB_EVENT_NAME !== 'pull_request_target' ||
+      !process.env.GITHUB_RUN_ID || !process.env.GITHUB_RUN_ATTEMPT ||
+      !process.env.GITHUB_REPOSITORY || !process.env.GITHUB_WORKFLOW ||
+      !process.env.GITHUB_JOB) {
+      throw new Error('Trusted CI mode requires pull_request_target workflow metadata.');
+    }
+    const launcherPath = realpathSync(fileURLToPath(import.meta.url));
+    if (!isWithin(trustedRoot, launcherPath))
+      throw new Error('The trusted launcher must run from the trusted checkout.');
+    npmCli = realpathSync(npmCli);
+    if (!isWithin(trustedRoot, npmCli) || !lstatSync(npmCli).isFile())
+      throw new Error('The trusted npm CLI must be a regular file inside the trusted checkout.');
+    const expectedCli = `${GUEST_TRUSTED}/scripts/validate-development.mjs`;
+    if (targetCommand[0] !== 'node' || targetCommand[1] !== expectedCli ||
+      targetCommand[targetCommand.indexOf('--root') + 1] !== GUEST_WORKSPACE) {
+      throw new Error('Trusted CI mode must invoke the base validator against the candidate workspace.');
+    }
+  }
+  const requestedRootMetadata = lstatSync(requestedRoot);
+  if (requestedRootMetadata.isSymbolicLink() || !requestedRootMetadata.isDirectory())
+    throw new Error('Candidate checkout must be a real directory.');
+  const receiptOutputPath = receiptOutput
+    ? prepareReceiptOutput(receiptOutput, sourceRoot)
+    : undefined;
+  const reportsOutputPath = reportsOutput
+    ? prepareReportsOutput(reportsOutput, sourceRoot)
+    : undefined;
   const runDirectory = mkdtempSync(path.join(tmpdir(), 'trusted-validation-run-'));
   const workspace = path.join(runDirectory, 'workspace');
   mkdirSync(workspace, { mode: 0o700 });
+  mkdirSync(path.join(runDirectory, 'validation-output'), { mode: 0o700 });
+  let candidateDependenciesCreated = false;
   try {
-    const hostEnv = gitEnvironment(
-      sourceRoot,
-      path.join(runDirectory, 'empty')
-    );
+    const hostTemplate = path.join(runDirectory, 'trusted-git-template');
+    const hostEnv = gitEnvironment(sourceRoot, hostTemplate);
     mkdirSync(hostEnv.GIT_TEMPLATE_DIR, { mode: 0o700 });
+    if (trustedRoot) {
+      assertCleanCheckout(trustedRoot, trustedBaseSha, 'Trusted base', hostEnv);
+      assertCleanCheckout(sourceRoot, candidateSha, 'Candidate', hostEnv);
+      const candidateDependencies = path.join(sourceRoot, 'node_modules');
+      try {
+        lstatSync(candidateDependencies);
+        throw new Error(
+          'Refusing to replace an existing candidate node_modules directory.'
+        );
+      } catch (error) {
+        if (error.code !== 'ENOENT') throw error;
+      }
+      candidateDependenciesCreated = true;
+      npmCache = installCandidateDependencies(sourceRoot, npmCli, runDirectory);
+      assertCleanCheckout(sourceRoot, candidateSha, 'Candidate after dependency prefetch', hostEnv);
+    } else if (npmCache) {
+      const cacheSource = npmCache;
+      npmCache = path.join(runDirectory, 'npm-cache');
+      copyNpmCache(cacheSource, npmCache);
+    }
     const candidateFiles = indexedFiles(sourceRoot, hostEnv);
     for (const file of candidateFiles.files)
       copyCandidateFile(
@@ -494,20 +1054,32 @@ async function main() {
         candidateFiles.tracked.has(file)
       );
     createSyntheticGitRepository(workspace, runDirectory);
-    const dependencies = linkDependencies(sourceRoot, workspace);
+    const dependencies = linkDependencies(sourceRoot, workspace, installDependencies);
     const command = makeSandboxCommand({
       sourceRoot,
       workspace,
       runDirectory,
       dependencies,
       playwrightCache,
+      npmCache,
+      trustedNpmRuntime,
+      githubActionsContext,
+      receiptOutput: receiptOutputPath,
+      trustedRoot,
+      candidateSha,
+      trustedBaseSha,
       targetCommand,
     });
     const env = {};
     if (typeof process.env.PATH === 'string') env.PATH = process.env.PATH;
     if (typeof process.env.LANG === 'string') env.LANG = process.env.LANG;
-    return await executeSandboxed(command, env);
+    const exitCode = await executeSandboxed(command, env);
+    if (receiptOutputPath) exportReceipt(runDirectory, receiptOutputPath);
+    if (reportsOutputPath) exportTestReports(workspace, reportsOutputPath);
+    return exitCode;
   } finally {
+    if (candidateDependenciesCreated)
+      rmSync(path.join(sourceRoot, 'node_modules'), { recursive: true, force: true });
     rmSync(runDirectory, { recursive: true, force: true });
   }
 }

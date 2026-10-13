@@ -9,6 +9,7 @@ import {
   readFileSync,
   rmSync,
   symlinkSync,
+  statSync,
   writeFileSync,
 } from 'node:fs';
 import { once } from 'node:events';
@@ -347,6 +348,18 @@ test(
     const hostFile = path.join(parent, 'host-canary.txt');
     const browserCache = path.join(parent, 'playwright-cache');
     const outsideDependencies = path.join(parent, 'outside-dependencies');
+    const npmCache = path.join(parent, 'npm-cache');
+    const invalidNpmCache = path.join(parent, 'npm-cache-with-link');
+    const receiptOutput = path.join(parent, 'receipt-output', 'test.json');
+    const installReceiptOutput = path.join(parent, 'install-receipt-output', 'test.json');
+    const reportsOutput = path.join(parent, 'test-reports');
+    const linkedReportsOutput = path.join(parent, 'linked-test-reports');
+    const trustedNpmRuntime = path.join(parent, 'trusted-npm-runtime');
+    const linkedRunnerTemp = path.join(parent, 'runner-temp-link');
+    const outsideReceipt = path.join(
+      path.dirname(parent),
+      `trusted-validation-outside-receipt-${process.pid}.json`
+    );
     const hostSocket = path.join(socketParent, 'host-canary.sock');
     const candidateWrite = path.join(source, 'launcher-write-canary.txt');
     const systemNode = existsSync('/usr/bin/node') ? '/usr/bin/node' : undefined;
@@ -366,10 +379,21 @@ test(
         await new Promise((resolve) => socketServer.close(resolve));
       rmSync(parent, { recursive: true, force: true });
       rmSync(socketParent, { recursive: true, force: true });
+      rmSync(outsideReceipt, { force: true });
     });
     mkdirSync(path.join(source, 'bin'), { recursive: true });
     mkdirSync(browserCache, { recursive: true });
     mkdirSync(outsideDependencies, { recursive: true });
+    mkdirSync(npmCache, { recursive: true });
+    mkdirSync(path.join(trustedNpmRuntime, '.bin'), { recursive: true });
+    writeFileSync(
+      path.join(trustedNpmRuntime, '.bin', 'npm'),
+      '#!/bin/sh\nif [ "$1" = "ci" ]; then mkdir -p node_modules; printf installed > node_modules/sandbox-install-marker; else printf "trusted npm runtime\\n"; fi\n',
+      { mode: 0o755 }
+    );
+    mkdirSync(invalidNpmCache, { recursive: true });
+    symlinkSync(path.join(npmCache, 'cache-canary.txt'), path.join(invalidNpmCache, 'linked-cache-entry'));
+    symlinkSync(parent, linkedRunnerTemp, 'dir');
     tcpServer.listen(0, '127.0.0.1');
     await once(tcpServer, 'listening');
     socketServer.listen(hostSocket);
@@ -381,6 +405,7 @@ test(
     mkdirSync(path.join(source, 'nested/config'), { recursive: true });
     writeFileSync(hostFile, 'host canary stays unchanged');
     writeFileSync(path.join(browserCache, 'browser-canary.txt'), 'read-only browser');
+    writeFileSync(path.join(npmCache, 'cache-canary.txt'), 'isolated npm cache');
     writeFileSync(path.join(source, '.gitignore'), 'node_modules/\n');
     writeFileSync(path.join(source, '.env'), 'PRIVATE_ENV_CANARY=hidden\n');
     writeFileSync(path.join(source, 'config.json'), '{"private":true}\n');
@@ -475,6 +500,12 @@ assert.throws(() => readFileSync(path.join(originalCheckout, 'auth.json')), { co
 assert.throws(() => writeFileSync(hostFile, 'escaped'));
 assert.equal(readFileSync('/run/validation-engine-sandbox', 'utf8'), process.env.VALIDATION_OUTER_SANDBOX_TOKEN);
 assert.equal(fixtureDependency, 'sibling dependency resolved');
+assert.equal(process.env.NPM_CONFIG_CACHE, '/mnt/run-data/npm-cache');
+assert.equal(process.env.NPM_CONFIG_OFFLINE, 'true');
+assert.equal(readFileSync(path.join(process.env.NPM_CONFIG_CACHE, 'cache-canary.txt'), 'utf8'), 'isolated npm cache');
+writeFileSync(path.join(process.env.NPM_CONFIG_CACHE, 'candidate-cache-write.txt'), 'candidate only');
+assert.equal(process.env.RUNNER_TEMP, '/mnt/run-data/validation-output');
+writeFileSync(process.env.VALIDATION_RECEIPT_EXPORT, JSON.stringify({ status: 'passed' }));
 const connectionResults = await Promise.all([
   new Promise((resolve) => { const socket = net.connect(hostPort, '127.0.0.1'); socket.once('connect', () => { socket.destroy(); resolve('connected'); }); socket.once('error', () => resolve('blocked')); socket.setTimeout(1000, () => { socket.destroy(); resolve('blocked'); }); }),
   new Promise((resolve) => { const socket = net.createConnection(hostSocket); socket.once('connect', () => { socket.destroy(); resolve('connected'); }); socket.once('error', () => resolve('blocked')); socket.setTimeout(1000, () => { socket.destroy(); resolve('blocked'); }); }),
@@ -485,6 +516,42 @@ assert.throws(() => writeFileSync(path.join(process.env.PLAYWRIGHT_BROWSERS_PATH
 writeFileSync('/mnt/workspace/launcher-write-canary.txt', 'candidate only');
 assert.equal(readFileSync('/mnt/workspace/node_modules/marker.txt', 'utf8'), 'read-only dependency');
 assert.throws(() => writeFileSync('/mnt/workspace/node_modules/marker.txt', 'changed'));
+`
+    );
+    writeFileSync(
+      path.join(source, 'bin/run-install-validation.mjs'),
+      `import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+assert.equal(existsSync('/mnt/workspace/node_modules/marker.txt'), false);
+assert.equal(process.env.CI, 'true');
+assert.equal(process.env.GITHUB_ACTIONS, 'true');
+assert.equal(process.env.GITHUB_EVENT_NAME, 'pull_request');
+assert.match(process.env.GITHUB_SHA, /^[a-f0-9]{40}$/u);
+assert.equal(process.env.VALIDATION_CANDIDATE_SHA, process.env.GITHUB_SHA);
+assert.equal(process.env.GITHUB_RUN_ID, '4242');
+assert.equal(process.env.GITHUB_RUN_ATTEMPT, '1');
+assert.equal(process.env.GITHUB_REPOSITORY, 'snapetech/QuestarrNG');
+assert.equal(process.env.GITHUB_WORKFLOW, 'CI');
+assert.equal(process.env.GITHUB_JOB, 'test');
+assert.equal(process.env.SECRET_CANARY, undefined);
+assert.equal(process.env.NPM_CONFIG_CACHE, '/mnt/run-data/npm-cache');
+assert.equal(process.env.NPM_CONFIG_OFFLINE, 'true');
+assert.match(readFileSync(path.join(process.env.NPM_CONFIG_CACHE, 'cache-canary.txt'), 'utf8'), /isolated npm cache/u);
+execFileSync('npm', ['ci', '--ignore-scripts', '--no-audit', '--no-fund', '--offline']);
+assert.equal(readFileSync('/mnt/workspace/node_modules/sandbox-install-marker', 'utf8'), 'installed');
+assert.equal(execFileSync('npm', ['--version'], { encoding: 'utf8' }), 'trusted npm runtime\\n');
+mkdirSync('/mnt/workspace/coverage', { recursive: true });
+writeFileSync('/mnt/workspace/coverage/summary.json', '{"total":true}');
+writeFileSync('/mnt/workspace/test-report.junit.xml', '<testsuites/>');
+writeFileSync(process.env.VALIDATION_RECEIPT_EXPORT, JSON.stringify({ status: 'passed' }));
+`
+    );
+    writeFileSync(
+      path.join(source, 'bin/run-linked-report.mjs'),
+      `import { symlinkSync } from 'node:fs';
+symlinkSync('/etc', '/mnt/workspace/coverage');
 `
     );
     execFileSync('git', ['init', '--quiet', '--initial-branch=main'], {
@@ -498,6 +565,10 @@ assert.throws(() => writeFileSync('/mnt/workspace/node_modules/marker.txt', 'cha
     execFileSync('git', ['commit', '--quiet', '-m', 'Fixture'], {
       cwd: source,
     });
+    const sourceSha = execFileSync('git', ['rev-parse', 'HEAD'], {
+      cwd: source,
+      encoding: 'utf8',
+    }).trim();
     writeFileSync(path.join(source, '.gitignore'), '*\n');
     mkdirSync(path.join(source, 'nested/config'), { recursive: true });
     writeFileSync(
@@ -506,10 +577,19 @@ assert.throws(() => writeFileSync('/mnt/workspace/node_modules/marker.txt', 'cha
     );
     const missingCommandResult = spawnSync(launcherNode, [launcher, source], {
       encoding: 'utf8',
+      env: { ...process.env, RUNNER_TEMP: parent },
       timeout: 30_000,
     });
     assert.equal(missingCommandResult.status, 1);
     assert.match(missingCommandResult.stderr, /Pass a candidate test command after --/u);
+
+    const linkedCacheResult = spawnSync(
+      launcherNode,
+      [launcher, source, '--npm-cache', invalidNpmCache, '--', '/bin/true'],
+      { encoding: 'utf8', timeout: 30_000 }
+    );
+    assert.equal(linkedCacheResult.status, 1);
+    assert.match(linkedCacheResult.stderr, /cannot contain symbolic links/u);
 
     const npmResult = spawnSync(launcherNode, [launcher, source, '--', 'npm', '--version'], {
       encoding: 'utf8',
@@ -517,6 +597,107 @@ assert.throws(() => writeFileSync('/mnt/workspace/node_modules/marker.txt', 'cha
     });
     assert.equal(npmResult.error, undefined, npmResult.error?.message);
     assert.equal(npmResult.status, 0, `${npmResult.stdout ?? ''}${npmResult.stderr ?? ''}`);
+
+    const isolatedInstallResult = spawnSync(
+      launcherNode,
+      [
+        launcher,
+        source,
+        '--npm-cache',
+        npmCache,
+        '--trusted-npm-runtime',
+        trustedNpmRuntime,
+        '--github-actions-context',
+        '--install-dependencies',
+        '--receipt-output',
+        installReceiptOutput,
+        '--reports-output',
+        reportsOutput,
+        '--',
+        launcherNode,
+        'bin/run-install-validation.mjs',
+      ],
+      {
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          CI: 'true',
+          GITHUB_ACTIONS: 'true',
+          GITHUB_EVENT_NAME: 'pull_request',
+          GITHUB_REPOSITORY: 'snapetech/QuestarrNG',
+          GITHUB_SHA: sourceSha,
+          GITHUB_RUN_ID: '4242',
+          GITHUB_RUN_ATTEMPT: '1',
+          GITHUB_WORKFLOW: 'CI',
+          GITHUB_JOB: 'test',
+          RUNNER_TEMP: parent,
+        },
+        timeout: 30_000,
+      }
+    );
+    assert.equal(isolatedInstallResult.error, undefined, isolatedInstallResult.error?.message);
+    assert.equal(
+      isolatedInstallResult.status,
+      0,
+      `${isolatedInstallResult.stdout ?? ''}${isolatedInstallResult.stderr ?? ''}`
+    );
+    assert.equal(
+      readFileSync(path.join(reportsOutput, 'coverage', 'summary.json'), 'utf8'),
+      '{"total":true}'
+    );
+    assert.equal(
+      readFileSync(path.join(reportsOutput, 'test-report.junit.xml'), 'utf8'),
+      '<testsuites/>'
+    );
+    assert.deepEqual(
+      JSON.parse(readFileSync(installReceiptOutput, 'utf8')),
+      { status: 'passed' }
+    );
+    assert.equal(existsSync(path.join(source, 'node_modules/sandbox-install-marker')), false);
+
+    const mismatchedShaResult = spawnSync(
+      launcherNode,
+      [launcher, source, '--github-actions-context', '--', '/bin/true'],
+      {
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          GITHUB_ACTIONS: 'true',
+          GITHUB_EVENT_NAME: 'pull_request',
+          GITHUB_REPOSITORY: 'snapetech/QuestarrNG',
+          GITHUB_RUN_ID: '4242',
+          GITHUB_RUN_ATTEMPT: '1',
+          GITHUB_WORKFLOW: 'CI',
+          GITHUB_JOB: 'test',
+          GITHUB_SHA: 'f'.repeat(40),
+          RUNNER_TEMP: parent,
+        },
+        timeout: 30_000,
+      }
+    );
+    assert.equal(mismatchedShaResult.status, 1);
+    assert.match(mismatchedShaResult.stderr, /source checkout does not match GITHUB_SHA/u);
+
+    const linkedReportsResult = spawnSync(
+      launcherNode,
+      [
+        launcher,
+        source,
+        '--reports-output',
+        linkedReportsOutput,
+        '--',
+        launcherNode,
+        'bin/run-linked-report.mjs',
+      ],
+      {
+        encoding: 'utf8',
+        env: { ...process.env, RUNNER_TEMP: parent },
+        timeout: 30_000,
+      }
+    );
+    assert.equal(linkedReportsResult.status, 1);
+    assert.match(linkedReportsResult.stderr, /cannot contain symbolic links/u);
+    assert.equal(existsSync(path.join(linkedReportsOutput, 'coverage')), false);
 
     if (systemNode) {
       const systemRuntimeResult = spawnSync(
@@ -539,13 +720,21 @@ assert.throws(() => writeFileSync('/mnt/workspace/node_modules/marker.txt', 'cha
         source,
         '--playwright-cache',
         browserCache,
+        '--npm-cache',
+        npmCache,
+        '--receipt-output',
+        receiptOutput,
         '--',
         launcherNode,
         'bin/run-local-validation.mjs',
       ],
       {
         encoding: 'utf8',
-        env: { ...process.env, SECRET_CANARY: 'must-not-be-inherited' },
+        env: {
+          ...process.env,
+          SECRET_CANARY: 'must-not-be-inherited',
+          RUNNER_TEMP: parent,
+        },
         timeout: 30_000,
       }
     );
@@ -557,6 +746,72 @@ assert.throws(() => writeFileSync('/mnt/workspace/node_modules/marker.txt', 'cha
     );
     assert.equal(readFileSync(hostFile, 'utf8'), 'host canary stays unchanged');
     assert.equal(existsSync(candidateWrite), false);
+    assert.equal(readFileSync(path.join(npmCache, 'cache-canary.txt'), 'utf8'), 'isolated npm cache');
+    assert.equal(existsSync(path.join(npmCache, 'candidate-cache-write.txt')), false);
+    assert.deepEqual(JSON.parse(readFileSync(receiptOutput, 'utf8')), { status: 'passed' });
+    assert.equal(statSync(receiptOutput).mode & 0o777, 0o600);
+
+    const existingReceiptResult = spawnSync(
+      launcherNode,
+      [launcher, source, '--receipt-output', receiptOutput, '--', '/bin/true'],
+      {
+        encoding: 'utf8',
+        env: { ...process.env, RUNNER_TEMP: parent },
+        timeout: 30_000,
+      }
+    );
+    assert.equal(existingReceiptResult.status, 1);
+    assert.match(existingReceiptResult.stderr, /must not already exist/u);
+
+    const outsideReceiptResult = spawnSync(
+      launcherNode,
+      [launcher, source, '--receipt-output', outsideReceipt, '--', '/bin/true'],
+      {
+        encoding: 'utf8',
+        env: { ...process.env, RUNNER_TEMP: parent },
+        timeout: 30_000,
+      }
+    );
+    assert.equal(outsideReceiptResult.status, 1);
+    assert.match(outsideReceiptResult.stderr, /must be below RUNNER_TEMP/u);
+
+    const candidateReceiptResult = spawnSync(
+      launcherNode,
+      [
+        launcher,
+        source,
+        '--receipt-output',
+        path.join(source, 'receipt.json'),
+        '--',
+        '/bin/true',
+      ],
+      {
+        encoding: 'utf8',
+        env: { ...process.env, RUNNER_TEMP: parent },
+        timeout: 30_000,
+      }
+    );
+    assert.equal(candidateReceiptResult.status, 1);
+    assert.match(candidateReceiptResult.stderr, /cannot write inside the candidate checkout/u);
+
+    const linkedRunnerTempResult = spawnSync(
+      launcherNode,
+      [
+        launcher,
+        source,
+        '--receipt-output',
+        path.join(linkedRunnerTemp, 'linked-receipt.json'),
+        '--',
+        '/bin/true',
+      ],
+      {
+        encoding: 'utf8',
+        env: { ...process.env, RUNNER_TEMP: linkedRunnerTemp },
+        timeout: 30_000,
+      }
+    );
+    assert.equal(linkedRunnerTempResult.status, 1);
+    assert.match(linkedRunnerTempResult.stderr, /RUNNER_TEMP must be a directory/u);
 
     rmSync(path.join(source, 'web/src/lib/token.js'));
     const deletedFileResult = spawnSync(
@@ -589,8 +844,183 @@ assert.throws(() => writeFileSync('/mnt/workspace/node_modules/marker.txt', 'cha
     assert.equal(linkedDependencyResult.status, 1);
     assert.match(
       linkedDependencyResult.stderr,
-      /Installed dependency path must be a real directory/u
+      /Root node_modules must be a real directory/u
     );
+  }
+);
+
+test(
+  'trusted mode installs with trusted npm and runs the base validator against the exact isolated snapshot',
+  { skip: !sandboxAvailable && 'bubblewrap user namespaces are unavailable' },
+  (t) => {
+    const parent = mkdtempSync(path.join(tmpdir(), 'trusted-pr-launcher-'));
+    const launcherNode = existsSync('/usr/bin/node') ? '/usr/bin/node' : process.execPath;
+    const candidateRoot = path.join(parent, 'candidate');
+    const trustedRoot = path.join(parent, 'trusted');
+    const gitTemplate = path.join(parent, 'git-template');
+    const runnerTemp = path.join(parent, 'runner-temp');
+    const receiptOutput = path.join(runnerTemp, 'receipts', 'test.json');
+    const npmMarker = path.join(parent, 'npm-prefetch.json');
+    const trustedLauncher = path.join(
+      trustedRoot,
+      'scripts/validation-engine/trusted-test-launcher.mjs'
+    );
+    const trustedPolicy = path.join(
+      trustedRoot,
+      'scripts/validation-engine/trusted-test-sandbox-policy.mjs'
+    );
+    const trustedSourcePolicy = path.join(
+      trustedRoot,
+      'scripts/validation-engine/trusted-test-source-policy.mjs'
+    );
+    const npmCli = path.join(
+      trustedRoot,
+      '.github/npm-runtime/node_modules/.questarr-npm-cli/bin/npm-cli.mjs'
+    );
+    const baseValidator = path.join(
+      trustedRoot,
+      'scripts/validate-development.mjs'
+    );
+    const outsideCandidateSecret = path.join(candidateRoot, '.env');
+    const sandboxPolicy = fileURLToPath(
+      new URL('./trusted-test-sandbox-policy.mjs', import.meta.url)
+    );
+    const sourcePolicy = fileURLToPath(
+      new URL('./trusted-test-source-policy.mjs', import.meta.url)
+    );
+    t.after(() => rmSync(parent, { recursive: true, force: true }));
+    mkdirSync(candidateRoot, { recursive: true });
+    mkdirSync(path.dirname(trustedLauncher), { recursive: true });
+    mkdirSync(path.dirname(npmCli), { recursive: true });
+    mkdirSync(runnerTemp, { recursive: true });
+    mkdirSync(gitTemplate);
+
+    writeFileSync(
+      path.join(candidateRoot, 'package.json'),
+      JSON.stringify({ name: 'candidate' })
+    );
+    writeFileSync(
+      path.join(candidateRoot, 'package-lock.json'),
+      JSON.stringify({
+        name: 'candidate',
+        lockfileVersion: 3,
+        requires: true,
+        packages: { '': { name: 'candidate' } },
+      })
+    );
+    writeFileSync(outsideCandidateSecret, 'CANDIDATE_SECRET_CANARY=private\n');
+    mkdirSync(path.join(candidateRoot, 'src'));
+    writeFileSync(
+      path.join(candidateRoot, 'src/app.js'),
+      'export const candidate = true;\n'
+    );
+
+    writeFileSync(trustedLauncher, launcherSource);
+    writeFileSync(trustedPolicy, readFileSync(sandboxPolicy, 'utf8'));
+    writeFileSync(trustedSourcePolicy, readFileSync(sourcePolicy, 'utf8'));
+    writeFileSync(npmCli, [
+      "import assert from 'node:assert/strict';",
+      "import { writeFileSync } from 'node:fs';",
+      "assert.equal(process.argv[2], 'ci');",
+      "assert.ok(process.argv.includes('--ignore-scripts=true'));",
+      "assert.equal(process.env.NPM_CONFIG_IGNORE_SCRIPTS, 'true');",
+      "assert.equal(process.env.NPM_CONFIG_REGISTRY, 'https://registry.npmjs.org/');",
+      "assert.notEqual(process.env.NPM_CONFIG_USERCONFIG, process.env.NPM_CONFIG_GLOBALCONFIG);",
+      `writeFileSync(${JSON.stringify(npmMarker)}, JSON.stringify({ args: process.argv.slice(2) }));`,
+    ].join('\n'));
+    writeFileSync(baseValidator, [
+      "import assert from 'node:assert/strict';",
+      "import { existsSync, readFileSync, writeFileSync } from 'node:fs';",
+      "assert.equal(process.argv[2], '--root');",
+      "assert.equal(process.argv[3], '/mnt/workspace');",
+      "assert.equal(process.argv[4], '--tests-only');",
+      "assert.equal(process.env.GITHUB_EVENT_NAME, 'pull_request_target');",
+      "assert.match(process.env.GITHUB_SHA, /^[a-f0-9]{40}$/u);",
+      "assert.equal(process.env.VALIDATION_CANDIDATE_SHA, process.env.GITHUB_SHA);",
+      "assert.match(process.env.VALIDATION_TRUSTED_BASE_SHA, /^[a-f0-9]{40}$/u);",
+      "assert.equal(process.env.GITHUB_RUN_ID, 'trusted-run-42');",
+      "assert.equal(process.env.GITHUB_RUN_ATTEMPT, '2');",
+      "assert.equal(process.env.GITHUB_REPOSITORY, 'snapetech/QuestarrNG');",
+      "assert.equal(process.env.GITHUB_WORKFLOW, 'Trusted PR validation');",
+      "assert.equal(process.env.GITHUB_JOB, 'trusted-pr-validation');",
+      'assert.equal(process.env.GITHUB_TOKEN, undefined);',
+      'assert.equal(process.env.SECRET_CANARY, undefined);',
+      "assert.equal(existsSync('/mnt/trusted-validation/scripts/validate-development.mjs'), true);",
+      "assert.equal(readFileSync('/mnt/workspace/src/app.js', 'utf8'), 'export const candidate = true;\\n');",
+      "assert.equal(existsSync('/mnt/workspace/.env'), false);",
+      `assert.throws(() => readFileSync(${JSON.stringify(outsideCandidateSecret)}, 'utf8'), { code: 'ENOENT' });`,
+      "assert.equal(existsSync('/mnt/workspace/node_modules'), false);",
+      "assert.equal(process.env.RUNNER_TEMP, '/mnt/run-data/validation-output');",
+      "assert.equal(process.env.VALIDATION_RECEIPT_EXPORT, '/mnt/run-data/validation-output/test.json');",
+      'writeFileSync(process.env.VALIDATION_RECEIPT_EXPORT, JSON.stringify({ marker: "trusted-base-validator", candidateSha: process.env.GITHUB_SHA, baseSha: process.env.VALIDATION_TRUSTED_BASE_SHA }));',
+    ].join('\n'));
+
+    const commitFixture = (root) => {
+      const env = {
+        PATH: process.env.PATH,
+        HOME: root,
+        GIT_CONFIG_NOSYSTEM: '1',
+        GIT_CONFIG_GLOBAL: '/dev/null',
+        GIT_TEMPLATE_DIR: gitTemplate,
+        GIT_TERMINAL_PROMPT: '0',
+      };
+      const git = (args) => execFileSync('git', args, { cwd: root, env });
+      git(['init', '--quiet', '--initial-branch=main']);
+      git(['config', 'user.name', 'Trusted launcher contract']);
+      git(['config', 'user.email', 'trusted-launcher@example.invalid']);
+      git(['add', '--all']);
+      git(['commit', '--quiet', '-m', 'Fixture']);
+      return execFileSync('git', ['rev-parse', 'HEAD'], {
+        cwd: root,
+        env,
+        encoding: 'utf8',
+      }).trim();
+    };
+    const baseSha = commitFixture(trustedRoot);
+    const candidateSha = commitFixture(candidateRoot);
+    const launch = spawnSync(
+      launcherNode,
+      [
+        trustedLauncher,
+        candidateRoot,
+        '--trusted-root', trustedRoot,
+        '--trusted-base-sha', baseSha,
+        '--candidate-sha', candidateSha,
+        '--trusted-npm-cli', npmCli,
+        '--install-dependencies',
+        '--receipt-output', receiptOutput,
+        '--',
+        'node', '/mnt/trusted-validation/scripts/validate-development.mjs',
+        '--root', '/mnt/workspace', '--tests-only',
+      ],
+      {
+        encoding: 'utf8',
+        timeout: 30_000,
+        env: {
+          ...process.env,
+          RUNNER_TEMP: runnerTemp,
+          GITHUB_EVENT_NAME: 'pull_request_target',
+          GITHUB_RUN_ID: 'trusted-run-42',
+          GITHUB_RUN_ATTEMPT: '2',
+          GITHUB_REPOSITORY: 'snapetech/QuestarrNG',
+          GITHUB_WORKFLOW: 'Trusted PR validation',
+          GITHUB_JOB: 'trusted-pr-validation',
+          SECRET_CANARY: 'must-not-enter-sandbox',
+        },
+      }
+    );
+    assert.equal(launch.error, undefined, launch.error?.message);
+    assert.equal(launch.status, 0, `${launch.stdout ?? ''}${launch.stderr ?? ''}`);
+    const prefetch = JSON.parse(readFileSync(npmMarker, 'utf8'));
+    assert.ok(prefetch.args.includes('--ignore-scripts=true'));
+    const receipt = JSON.parse(readFileSync(receiptOutput, 'utf8'));
+    assert.deepEqual(receipt, {
+      marker: 'trusted-base-validator',
+      candidateSha,
+      baseSha,
+    });
+    assert.equal(statSync(receiptOutput).mode & 0o777, 0o600);
+    assert.equal(existsSync(path.join(candidateRoot, 'node_modules')), false);
   }
 );
 

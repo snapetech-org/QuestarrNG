@@ -1,0 +1,102 @@
+name: Trusted PR validation
+
+on:
+  pull_request_target:
+    branches: [main]
+    types: [opened, reopened, ready_for_review, synchronize]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: trusted-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  trusted-pr-validation:
+    name: trusted-pr-validation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout trusted base
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6.2.0
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: trusted
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Checkout candidate as data
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6.2.0
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: candidate
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 26.x
+          package-manager-cache: false
+
+      - name: Install trusted npm runtime
+        working-directory: trusted
+        run: node scripts/install-npm-runtime.mjs
+
+      - name: Install Bubblewrap
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes bubblewrap
+          profile="$RUNNER_TEMP/questarr-bubblewrap.apparmor"
+          cat > "$profile" <<'APPARMOR'
+          abi <abi/4.0>,
+          include <tunables/global>
+          profile questarr_bubblewrap /usr/bin/bwrap flags=(unconfined) {
+            userns,
+          }
+          APPARMOR
+          sudo apparmor_parser --add "$profile"
+          test "$(sysctl -n kernel.apparmor_restrict_unprivileged_userns)" = 1
+          bwrap --die-with-parent --unshare-user --ro-bind / / -- /bin/true
+
+      - name: Run trusted validation against the candidate snapshot
+        env:
+          VALIDATION_PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          VALIDATION_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          GITHUB_WORKFLOW: ${{ github.workflow }}
+          GITHUB_JOB: trusted-pr-validation
+        run: |
+          set -euo pipefail
+          node trusted/scripts/validation-engine/trusted-test-launcher.mjs candidate \
+            --trusted-root trusted \
+            --trusted-base-sha "$VALIDATION_PR_BASE_SHA" \
+            --candidate-sha "$VALIDATION_PR_HEAD_SHA" \
+            --trusted-npm-cli trusted/.github/npm-runtime/node_modules/.questarr-npm-cli/bin/npm-cli.js \
+            --install-dependencies \
+            --receipt-output "$RUNNER_TEMP/quest-validation-receipts/test.json" \
+            -- \
+            node /mnt/trusted-validation/scripts/validate-development.mjs \
+              --root /mnt/workspace \
+              --tests-only
+
+      - name: Reconcile trusted receipt
+        env:
+          VALIDATION_PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          VALIDATION_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          node trusted/scripts/validation-engine/reconcile-ci.mjs \
+            --trusted-pr \
+            --receipt "$RUNNER_TEMP/quest-validation-receipts/test.json" \
+            --run-id "$GITHUB_RUN_ID" \
+            --run-attempt "$GITHUB_RUN_ATTEMPT" \
+            --sha "$VALIDATION_PR_HEAD_SHA" \
+            --base-sha "$VALIDATION_PR_BASE_SHA"

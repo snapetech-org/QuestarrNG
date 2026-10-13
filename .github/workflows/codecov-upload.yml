@@ -1,0 +1,52 @@
+name: Codecov upload
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  upload:
+    if: >-
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      github.event.workflow_run.conclusion != 'cancelled'
+    runs-on: ubuntu-latest
+    environment: codecov-main
+    permissions:
+      actions: read
+      contents: read
+
+    steps:
+      - name: Download reports from the matching CI run attempt
+        if: ${{ !cancelled() }}
+        continue-on-error: true
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ github.event.workflow_run.id }}
+          pattern: codecov-reports-attempt-${{ github.event.workflow_run.run_attempt }}
+          merge-multiple: true
+          path: .
+
+      - name: Upload coverage to Codecov
+        if: ${{ !cancelled() && github.event.workflow_run.conclusion == 'success' && hashFiles('coverage/**') != '' }}
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+          report_type: coverage
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() && hashFiles('test-report.junit.xml') != '' }}
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          report_type: test_results
