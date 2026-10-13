@@ -1040,12 +1040,17 @@ test(
       "assert.equal(existsSync('/mnt/trusted-validation/scripts/validate-development.mjs'), true);",
       "assert.equal(readFileSync('/mnt/workspace/src/app.js', 'utf8'), 'export const candidate = true;\\n');",
       "assert.equal(existsSync('/mnt/workspace/.env'), false);",
-      `assert.throws(() => readFileSync(${JSON.stringify(outsideCandidateSecret)}, 'utf8'), { code: 'ENOENT' });`,
+      "const outsideCandidateSecretPath = JSON.parse(readFileSync('/mnt/trusted-validation/scripts/outside-candidate-secret-path.json', 'utf8'));",
+      "assert.throws(() => readFileSync(outsideCandidateSecretPath, 'utf8'), { code: 'ENOENT' });",
       "assert.equal(existsSync('/mnt/workspace/node_modules'), false);",
       "assert.equal(process.env.RUNNER_TEMP, '/mnt/run-data/validation-output');",
       "assert.equal(process.env.VALIDATION_RECEIPT_EXPORT, '/mnt/run-data/validation-output/test.json');",
       'writeFileSync(process.env.VALIDATION_RECEIPT_EXPORT, JSON.stringify({ marker: "trusted-base-validator", candidateSha: process.env.GITHUB_SHA, baseSha: process.env.VALIDATION_TRUSTED_BASE_SHA, prefetch }));',
     ].join('\n'));
+    writeFileSync(
+      path.join(trustedRoot, 'scripts/outside-candidate-secret-path.json'),
+      JSON.stringify(outsideCandidateSecret)
+    );
 
     const commitFixture = (root) => {
       const env = {

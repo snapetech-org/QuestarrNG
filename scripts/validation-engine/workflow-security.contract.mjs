@@ -104,25 +104,33 @@ test('trusted PR validation runs the base validator and launcher on an exact can
   assert.match(trustedWorkflow, /pull_request_target:[\s\S]*?branches: \[main\]/u);
   assert.match(trustedWorkflow, /permissions:\n\x20{2}contents:\x20read/u);
   assert.doesNotMatch(trustedWorkflow, /\$\{\{\s*secrets\./u);
-  assert.match(trustedWorkflow, /ref: \$\{\{ github\.event\.pull_request\.base\.sha \}\}/u);
   assert.match(
     trustedWorkflow,
-    /# nosemgrep: yaml\.github-actions\.security\.pull-request-target-code-checkout\.pull-request-target-code-checkout\n\s+# This action checks out only the pull-request base SHA\.\n\s+- name: Checkout trusted base/u,
-    'the only checkout action is pinned to the trusted base commit'
+    /# nosemgrep: yaml\.github-actions\.security\.pull-request-target-code-checkout\.pull-request-target-code-checkout\n\s+# Fetches Git objects only; system\/global config, hooks, LFS smudging, and submodules are disabled\./u,
+    'the only suppressed fetch is read-only and disables Git extension points'
   );
-  assert.equal((trustedWorkflow.match(/uses: actions\/checkout@/gu) ?? []).length, 1);
-  assert.match(trustedWorkflow, /Fetch candidate as data without running checkout actions/u);
+  assert.equal((trustedWorkflow.match(/uses:\s*actions\/checkout@/gu) ?? []).length, 0);
+  assert.match(trustedWorkflow, /Fetch trusted base and candidate as data/u);
+  assert.match(trustedWorkflow, /\+refs\/heads\/main:refs\/remotes\/origin\/main/u);
+  assert.match(trustedWorkflow, /\+refs\/pull\/\$PR_NUMBER\/head:refs\/remotes\/pull\/\$PR_NUMBER\/head/u);
+  assert.match(trustedWorkflow, /merge-base --is-ancestor "\$BASE_SHA" "\$main_sha"/u);
+  assert.match(trustedWorkflow, /cat-file -e "\$BASE_SHA\^\{commit\}"/u);
+  assert.match(trustedWorkflow, /fetched_candidate_sha.*CANDIDATE_SHA/u);
   assert.match(trustedWorkflow, /refs\/pull\/\$PR_NUMBER\/head:refs\/remotes\/pull\/\$PR_NUMBER\/head/u);
-  assert.match(trustedWorkflow, /fetched_sha.*CANDIDATE_SHA/u);
   assert.equal(
     (trustedWorkflow.match(/# nosemgrep: yaml\.github-actions\.security\.pull-request-target-code-checkout\.pull-request-target-code-checkout/gu) ?? []).length,
     3,
-    'only the trusted-base checkout and audited candidate fetch/materialization suppressions are present'
+    'only the audited object fetch and two exact-commit worktree materializations suppress the checkout rule'
   );
-  assert.match(trustedWorkflow, /This stores candidate Git objects only; hooks, LFS smudging, and submodules are disabled/u);
-  assert.match(trustedWorkflow, /This materializes untrusted files as data; the trusted launcher isolates them before execution/u);
+  assert.match(trustedWorkflow, /GIT_CONFIG_NOSYSTEM=1/u);
+  assert.match(trustedWorkflow, /GIT_CONFIG_GLOBAL=\/dev\/null/u);
+  assert.match(trustedWorkflow, /GIT_LFS_SKIP_SMUDGE=1/u);
+  assert.match(trustedWorkflow, /unset GIT_CONFIG_COUNT GIT_CONFIG_KEY_0 GIT_CONFIG_VALUE_0 GH_TOKEN auth/u);
+  assert.match(trustedWorkflow, /Materializes only a base commit verified against main; no repository-provided hooks or filters run/u);
+  assert.match(trustedWorkflow, /Materializes the exact untrusted snapshot as data; the trusted launcher isolates it before execution/u);
+  assert.match(trustedWorkflow, /worktree add --detach "\$GITHUB_WORKSPACE\/trusted" "\$BASE_SHA"/u);
   assert.match(trustedWorkflow, /worktree add --detach[\s\\\S]*?\$GITHUB_WORKSPACE\/candidate[\s\\\S]*?\$CANDIDATE_SHA/u);
-  assert.equal((trustedWorkflow.match(/persist-credentials: false/gu) ?? []).length, 1);
+  assert.doesNotMatch(trustedWorkflow, /persist-credentials:/u);
   assert.match(
     trustedWorkflow,
     /node trusted\/scripts\/validation-engine\/trusted-test-launcher\.mjs candidate[\s\S]*?--trusted-root trusted[\s\S]*?--trusted-base-sha "\$VALIDATION_PR_BASE_SHA"[\s\S]*?--candidate-sha "\$VALIDATION_PR_HEAD_SHA"[\s\S]*?--install-dependencies[\s\S]*?node \/mnt\/trusted-validation\/scripts\/validate-development\.mjs[\s\S]*?--root \/mnt\/workspace[\s\S]*?--tests-only/u

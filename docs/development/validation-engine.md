@@ -51,10 +51,11 @@ one under their temporary home, which is removed with the task environment.
 The in-repository CLI imports candidate JavaScript before task subprocesses
 start. For an unreviewed checkout, do not run its CLI directly on the host.
 Use a separate clean trusted clone checked out at a reviewed commit; do not use
-the unreviewed candidate checkout as `TRUSTED_REPO`. Copy both
-`trusted-test-launcher.mjs` and `trusted-test-sandbox-policy.mjs` from that same
-revision to a location outside the candidate checkout, keeping them together,
-then use the trusted copy to run focused Node contract tests:
+the unreviewed candidate checkout as `TRUSTED_REPO`. Copy
+`trusted-test-launcher.mjs`, `trusted-test-sandbox-policy.mjs`, and
+`trusted-test-source-policy.mjs` from that same revision to a location outside
+the candidate checkout, keeping all three files together, then use the trusted
+copy to run focused Node contract tests:
 
 ```sh
 TRUSTED_REPO=/path/to/clean-trusted-checkout
@@ -67,6 +68,9 @@ git -C "$TRUSTED_REPO" show \
 git -C "$TRUSTED_REPO" show \
   "$TRUSTED_REV:scripts/validation-engine/trusted-test-sandbox-policy.mjs" \
   > /tmp/trusted-validation-launcher/trusted-test-sandbox-policy.mjs
+git -C "$TRUSTED_REPO" show \
+  "$TRUSTED_REV:scripts/validation-engine/trusted-test-source-policy.mjs" \
+  > /tmp/trusted-validation-launcher/trusted-test-source-policy.mjs
 node /tmp/trusted-validation-launcher/trusted-test-launcher.mjs "$PWD" -- node --test \
   scripts/validation-engine/engine.contract.mjs \
   scripts/validation-engine/trusted-test-launcher.contract.mjs \
@@ -127,13 +131,14 @@ candidate files are copied into the disposable snapshot. GitHub tokens and
 other runner environment values remain outside the candidate sandbox.
 
 The `trusted-pr-validation` workflow is loaded from the pull-request base. It
-checks out the exact base commit and fetches the pull-request head as data,
-verifies its SHA, then runs the base revision's validator against a read-only
-candidate snapshot in Bubblewrap. The two narrowly-scoped Semgrep suppressions
-cover only that audited data fetch and worktree materialization; workflow
-contracts enforce the disabled hooks, LFS smudging and submodules, exact SHA,
-and isolated execution. Candidate
-dependency URLs are restricted to `registry.npmjs.org`; dependency archives are
+fetches `main` and the pull-request head as Git objects, verifies that the event
+base is in `main` history and that the fetched head matches the event SHA, then
+materializes both exact commits as worktrees. It runs the base revision's
+validator against a read-only candidate snapshot in Bubblewrap. The narrowly
+scoped Semgrep suppressions cover only that audited object fetch and the two
+exact-commit worktree materializations; workflow contracts enforce disabled
+hooks, LFS smudging and submodules, exact SHAs, and isolated execution.
+Candidate dependency URLs are restricted to `registry.npmjs.org`; dependency archives are
 unpacked inside Bubblewrap with install scripts disabled, and validation runs
 offline with no GitHub token or repository secrets in the sandbox. Synthetic
 host and resolver files support local socket tests without restoring host
