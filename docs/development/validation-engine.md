@@ -41,6 +41,26 @@ between `setup-node` and the dependency-install task; only that task receives
 the cache path, and local runs without it use a cache under their temporary home
 that is removed with the task environment.
 
+The in-repository CLI imports candidate JavaScript before task subprocesses
+start. For an unreviewed checkout, do not run its CLI directly on the host.
+Copy `trusted-test-launcher.mjs` from a reviewed revision to a location outside
+the checkout, then use the trusted copy to run focused Node contract tests:
+
+```sh
+node /path/to/trusted-test-launcher.mjs "$PWD" -- node --test \
+  scripts/validation-engine/engine.contract.mjs \
+  scripts/validation-engine/trusted-test-launcher.contract.mjs \
+  scripts/validation-engine/workflow-security.contract.mjs
+```
+
+The launcher snapshots the candidate and enters bubblewrap before loading its
+JavaScript. It hides the invoking home, temporary files, common service sockets,
+and network; candidate dependencies are mounted read-only. It fails before
+starting candidate code if the required isolation is unavailable. Use the
+complete GitHub-hosted validation run for the full test suite. The test job does
+not receive the Codecov upload token for pull requests; coverage and test-result
+uploads run only after trusted pushes to `main`.
+
 During a run, the engine writes a task summary to stderr when each task starts
 and finishes, and repeats it every minute while a task is still running. This
 keeps progress visible in a terminal or live GitHub Actions log without mixing
