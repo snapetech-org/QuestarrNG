@@ -237,7 +237,14 @@ export function captureCandidate(root, inputs, inventory) {
     fail('Trusted candidate source identity must be a full Git commit SHA.');
   }
   const tree = gitText(root, ['rev-parse', 'HEAD^{tree}']);
-  const diffSha256 = hash(git(root, ['diff', '--binary', 'HEAD']));
+  const diffSha256 = hash(git(root, [
+    '-c', 'diff.external=',
+    'diff',
+    '--no-ext-diff',
+    '--no-textconv',
+    '--binary',
+    'HEAD',
+  ]));
   const untracked = untrackedDigests(root);
   const inputDigests = inputs.map((relative) => ({
     file: relative,
@@ -314,17 +321,18 @@ function preserveVersionManagerDataDirectories(env, inherited) {
   return env;
 }
 
-function runtimeProbeDirectory() {
+export function runtimeProbeDirectory(root = process.platform === 'win32'
+  ? path.join(process.env.SystemRoot || process.env.WINDIR || 'C:\\Windows', 'Temp')
+  : '/tmp') {
   // Runtime probes must not trust TMPDIR/TMP/TEMP from the invoking process.
   // The Linux sandbox exposes its own private /tmp here; on Windows use the
-  // OS temp directory instead of the caller-selected temporary path.
-  const root = process.platform === 'win32'
-    ? path.join(process.env.SystemRoot || process.env.WINDIR || 'C:\\Windows', 'Temp')
-    : '/tmp';
-  const metadata = lstatSync(root);
+  // OS temp directory instead of the caller-selected temporary path. Resolve
+  // trusted aliases such as macOS's /tmp before requiring a real directory.
+  const resolvedRoot = realpathSync(root);
+  const metadata = lstatSync(resolvedRoot);
   if (!metadata.isDirectory())
     fail('The trusted runtime probe temporary root is not a directory: ' + root);
-  return mkdtempSync(path.join(root, 'questarr-runtime-probe-'));
+  return mkdtempSync(path.join(resolvedRoot, 'questarr-runtime-probe-'));
 }
 
 function inspectRuntime(runtime) {

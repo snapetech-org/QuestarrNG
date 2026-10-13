@@ -141,6 +141,11 @@ export function sandboxMountOperations({
     operations.push({ type: 'ro-bind-fd', source, target });
   operations.push(
     { type: 'bind-fd', source: workspace, target: guestWorkspace },
+    {
+      type: 'ro-bind-fd',
+      source: path.join(workspace, '.git'),
+      target: path.join(guestWorkspace, '.git'),
+    },
     { type: 'bind-fd', source: runDirectory, target: guestRun }
   );
   for (const [source, target] of externalMounts)

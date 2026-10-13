@@ -6,6 +6,7 @@ import {
   mkdtempSync,
   mkdirSync,
   readFileSync,
+  realpathSync,
   rmSync,
   statSync,
   symlinkSync,
@@ -28,6 +29,7 @@ import {
   isolatedTaskEnvironment,
   main as runEngine,
   releaseRunLock,
+  runtimeProbeDirectory,
 } from './engine.mjs';
 import { validation } from './config.mjs';
 
@@ -609,7 +611,25 @@ test('plan and executor reject dependency cycles and report missing tools', asyn
 test('candidate digests change after tracked source edits', () => {
   const { root, config } = fixture();
   const before = captureCandidate(root, config.inputs, discoverInventory(root, config.inventory));
+  const externalDiff = spawnSync('git', ['config', 'diff.external', '/bin/true'], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+  assert.equal(externalDiff.status, 0, externalDiff.stderr);
   writeFileSync(path.join(root, 'package.json'), '{"edited":true}\n');
   const afterEdit = captureCandidate(root, config.inputs, discoverInventory(root, config.inventory));
   assert.notEqual(before.sourceSha256, afterEdit.sourceSha256);
+});
+
+test('runtime probe directories resolve trusted temporary-root symlinks', () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), 'questarrng-runtime-probe-contract-'));
+  temporaryRoots.push(root);
+  const actualRoot = path.join(root, 'actual-temp');
+  const aliasRoot = path.join(root, 'temp-alias');
+  mkdirSync(actualRoot);
+  symlinkSync(actualRoot, aliasRoot, process.platform === 'win32' ? 'junction' : 'dir');
+
+  const probe = runtimeProbeDirectory(aliasRoot);
+  assert.equal(path.dirname(probe), realpathSync(actualRoot));
+  rmSync(probe, { recursive: true, force: true });
 });

@@ -349,6 +349,12 @@ test('binds open sources only after masking their host directories', () => {
   assert.ok(operations.indexOf(workspaceBind) > finalHostMask);
   assert.equal(workspaceBind.source, '/home/runner/work/project');
   assert.equal(workspaceBind.target, '/mnt/workspace');
+  const metadataBind = operations.find(
+    (operation) => operation.type === 'ro-bind-fd' && operation.target === '/mnt/workspace/.git'
+  );
+  assert.ok(metadataBind);
+  assert.ok(operations.indexOf(metadataBind) > operations.indexOf(workspaceBind));
+  assert.equal(metadataBind.source, '/home/runner/work/project/.git');
   assert.equal(
     operations.some((operation) => operation.source === '/' && operation.target === '/'),
     false
@@ -1044,6 +1050,7 @@ test(
     ].join('\n'));
     writeFileSync(baseValidator, [
       "import assert from 'node:assert/strict';",
+      "import { spawnSync } from 'node:child_process';",
       "import { existsSync, readFileSync, writeFileSync } from 'node:fs';",
       "assert.equal(process.argv[2], '--root');",
       "assert.equal(process.argv[3], '/mnt/workspace');",
@@ -1057,6 +1064,8 @@ test(
       "assert.equal(process.env.GITHUB_REPOSITORY, 'snapetech/QuestarrNG');",
       "assert.equal(process.env.GITHUB_WORKFLOW, 'Trusted PR validation');",
       "assert.equal(process.env.GITHUB_JOB, 'trusted-pr-validation');",
+      "const gitConfigWrite = spawnSync('git', ['config', '--local', 'diff.external', '/bin/true'], { cwd: '/mnt/workspace', encoding: 'utf8' });",
+      "assert.notEqual(gitConfigWrite.status, 0, 'candidate tasks cannot change synthetic Git metadata');",
       'assert.equal(process.env.GITHUB_TOKEN, undefined);',
       'assert.equal(process.env.SECRET_CANARY, undefined);',
       "assert.equal(readFileSync('/etc/resolv.conf', 'utf8'), '# External DNS is unavailable in the validation sandbox.\\n');",

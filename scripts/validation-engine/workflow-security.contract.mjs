@@ -61,6 +61,16 @@ test('Codecov uploads run from the default-branch workflow after trusted main CI
     /pattern: codecov-reports-attempt-\$\{\{ github\.event\.workflow_run\.run_attempt \}\}/u,
     'the trusted uploader must use reports from the matching run attempt'
   );
+  assert.match(
+    codecovWorkflow,
+    /uses: actions\/checkout@[a-f0-9]{40}[\s\S]*?ref: \$\{\{ github\.event\.workflow_run\.head_sha \}\}[\s\S]*?persist-credentials: false/u,
+    'the uploader checks out the exact triggering commit without retaining a token'
+  );
+  assert.equal(
+    (codecovWorkflow.match(/override_commit: \$\{\{ github\.event\.workflow_run\.head_sha \}\}/gu) ?? []).length,
+    2,
+    'coverage and test uploads must be attributed to the triggering commit'
+  );
   assert.match(codecovWorkflow, /token: \$\{\{ secrets\.CODECOV_TOKEN \}\}/u);
   assert.doesNotMatch(
     codecovWorkflow,

@@ -24,6 +24,12 @@ jobs:
       contents: read
 
     steps:
+      - name: Check out the exact trusted CI commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
+
       - name: Download reports from the matching CI run attempt
         if: ${{ !cancelled() }}
         continue-on-error: true
@@ -43,6 +49,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
           report_type: coverage
+          override_commit: ${{ github.event.workflow_run.head_sha }}
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() && hashFiles('test-report.junit.xml') != '' }}
@@ -50,3 +57,4 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           report_type: test_results
+          override_commit: ${{ github.event.workflow_run.head_sha }}
