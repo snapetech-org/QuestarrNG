@@ -23,6 +23,12 @@ const launcher = fileURLToPath(
     import.meta.url
   )
 );
+const launcherSource = readFileSync(launcher, 'utf8');
+for (const hostPath of ['/etc', '/opt', '/srv', '/usr/local'])
+  assert.ok(
+    launcherSource.includes(`'${hostPath}'`),
+    `the sandbox must hide host path ${hostPath}`
+  );
 const bwrap = ['/usr/bin/bwrap', '/bin/bwrap'].find(existsSync);
 const sandboxAvailable = (() => {
   if (process.platform !== 'linux' || !bwrap) return false;
@@ -115,8 +121,10 @@ assert.equal(process.env.SECRET_CANARY, undefined);
 assert.equal(existsSync('/mnt/workspace/.env'), false);
 assert.equal(existsSync('/mnt/workspace/config.json'), true);
 assert.equal(existsSync('/mnt/workspace/nested/config/operator.json'), false);
+assert.equal(existsSync('/mnt/workspace/auth.json'), false);
 assert.equal(existsSync('/mnt/workspace/nested/.env.local'), false);
 assert.equal(existsSync('/mnt/workspace/nested/config/secrets.json'), false);
+assert.equal(existsSync('/etc/os-release'), false);
 assert.throws(() => writeFileSync(hostFile, 'escaped'));
 assert.equal(readFileSync('/run/validation-engine-sandbox', 'utf8'), process.env.VALIDATION_OUTER_SANDBOX_TOKEN);
 assert.equal(fixtureDependency, 'sibling dependency resolved');
@@ -148,6 +156,7 @@ assert.throws(() => writeFileSync('/mnt/workspace/node_modules/marker.txt', 'cha
       path.join(source, 'nested/config/operator.json'),
       '{"private":true}\n'
     );
+    writeFileSync(path.join(source, 'auth.json'), '{"token":"private"}\n');
 
     const result = spawnSync(
       process.execPath,

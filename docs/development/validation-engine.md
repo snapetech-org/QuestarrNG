@@ -54,11 +54,17 @@ node /path/to/trusted-test-launcher.mjs "$PWD" -- node --test \
 ```
 
 The launcher snapshots the candidate and enters bubblewrap before loading its
-JavaScript. It hides the invoking home, temporary files, common service sockets,
-and network; candidate dependencies are mounted read-only. It fails before
-starting candidate code if the required isolation is unavailable. Use the
-complete GitHub-hosted validation run for the full test suite. The test job does
-not receive the Codecov upload token for pull requests; coverage and test-result
+JavaScript. It copies only paths recorded in the Git index; untracked and
+ignored checkout files, including a local `auth.json`, never enter the snapshot.
+Stage new candidate files before using the launcher. It hides the invoking
+home, temporary files, common service sockets, host configuration under `/etc`,
+and common host data roots such as `/opt`, `/srv`, and `/usr/local`, then disables
+network access. Candidate dependencies are mounted read-only. The host root is
+otherwise visible read-only, so use this launcher only on a machine where other
+system-wide readable files do not contain secrets. It fails before starting
+candidate code if the required isolation is unavailable. Use the complete
+GitHub-hosted validation run for the full test suite. The test job does not
+receive the Codecov upload token for pull requests; coverage and test-result
 uploads run only after trusted pushes to `main`.
 
 During a run, the engine writes a task summary to stderr when each task starts

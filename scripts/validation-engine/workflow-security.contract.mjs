@@ -30,7 +30,7 @@ test('secret-bearing steps after PR tests run only on trusted main pushes', () =
   for (const step of secretSteps) {
     assert.match(
       step,
-      /^      - name:[^\n]*\n        if: \$\{\{ github\.event_name == 'push' && github\.ref == 'refs\/heads\/main' \}\}/mu,
+      /^      - name:[^\n]*\n        if: \$\{\{ (?:!cancelled\(\) && )?github\.event_name == 'push' && github\.ref == 'refs\/heads\/main' \}\}/mu,
       'secret-bearing upload steps must be gated to trusted main pushes'
     );
   }
