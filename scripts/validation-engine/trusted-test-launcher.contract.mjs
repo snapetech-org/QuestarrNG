@@ -59,6 +59,12 @@ test('preserves tracked source files with token-like names and excludes credenti
   assert.equal(isSensitiveCandidatePath('web/src/lib/token.js'), false);
   assert.equal(isSensitiveCandidatePath('vendor/mainline/src/rpc/server/tokens.rs'), false);
   assert.equal(isSensitiveCandidatePath('src/authentication.ts'), false);
+  assert.equal(isSensitiveCandidatePath('src/auth.ts'), false);
+  assert.equal(isSensitiveCandidatePath('auth'), true);
+  assert.equal(isSensitiveCandidatePath('nested/tokens'), true);
+  assert.equal(isSensitiveCandidatePath('credentials'), true);
+  assert.equal(isSensitiveCandidatePath('secrets'), true);
+  assert.equal(isSensitiveCandidatePath('nested/secrets.env'), true);
   assert.equal(isSensitiveCandidatePath('auth.json'), true);
   assert.equal(isSensitiveCandidatePath('nested/config/secrets.yaml'), true);
   assert.equal(isSensitiveCandidatePath('.env.local'), true);
@@ -141,6 +147,7 @@ test(
     );
     writeFileSync(path.join(source, 'auth.json'), '{"token":"private"}\n');
     writeFileSync(path.join(source, 'token.json'), '{"token":"private"}\n');
+    writeFileSync(path.join(source, 'credentials'), 'private credential\n');
     mkdirSync(path.join(source, 'node_modules'), { recursive: true });
     writeFileSync(
       path.join(source, 'node_modules/marker.txt'),
@@ -172,6 +179,7 @@ assert.equal(existsSync('/mnt/workspace/config.json'), true);
 assert.equal(existsSync('/mnt/workspace/nested/config/operator.json'), false);
 assert.equal(existsSync('/mnt/workspace/auth.json'), false);
 assert.equal(existsSync('/mnt/workspace/token.json'), false);
+assert.equal(existsSync('/mnt/workspace/credentials'), false);
 assert.match(readFileSync('/mnt/workspace/web/src/lib/token.js', 'utf8'), /source code/u);
 assert.match(readFileSync('/mnt/workspace/vendor/mainline/src/rpc/server/tokens.rs', 'utf8'), /pub fn tokens/u);
 assert.equal(existsSync('/mnt/workspace/nested/.env.local'), false);
