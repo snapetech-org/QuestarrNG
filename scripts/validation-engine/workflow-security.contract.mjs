@@ -21,6 +21,10 @@ const releaseWorkflow = readFileSync(
   fileURLToPath(new URL('fork-image.yml', workflowDirectory)),
   'utf8'
 );
+const trustedDiscordWorkflow = readFileSync(
+  fileURLToPath(new URL('trusted-discord-release-announcement.yml', workflowDirectory)),
+  'utf8'
+);
 
 function jobBlock(workflow, name, nextName) {
   const start = workflow.indexOf(`\n  ${name}:\n`);
@@ -49,7 +53,7 @@ test('Codecov uploads run from the default-branch workflow after trusted main CI
   );
   assert.match(
     codecovWorkflow,
-    /^    environment: codecov-main$/mu,
+    /^\x20{4}environment:\x20codecov-main$/mu,
     'Codecov credentials must come from the main-only protected environment'
   );
   assert.match(
@@ -66,20 +70,54 @@ test('Codecov uploads run from the default-branch workflow after trusted main CI
   assert.doesNotMatch(codecovWorkflow, /pull_request(?:_target)?\s*:/u);
 });
 
-test('Discord release announcements require their protected environment', () => {
+test('manual Discord release announcements require the main-only protected environment', () => {
   const announceJob = jobBlock(releaseWorkflow, 'announce-release');
+  assert.match(announceJob, /github\.event_name == 'workflow_dispatch'/u);
+  assert.match(announceJob, /github\.ref == 'refs\/heads\/main'/u);
+  assert.doesNotMatch(announceJob, /startsWith\(github\.ref, 'refs\/tags\/v'\)/u);
   assert.match(announceJob, /environment:\n\s+name: discord-release/u);
-  assert.match(announceJob, /DISCORD_WEBHOOK: \$\{\{ secrets\.DISCORD_RELEASE_WEBHOOK \}\}/u);
+  assert.match(announceJob, /DISCORD_WEBHOOK: \$\{\{ secrets\.DISCORD_WEBHOOK \}\}/u);
   assert.match(announceJob, /Discord announcement skipped because discord-release has no webhook secret/u);
+});
+
+test('tag Discord announcements use the trusted default-branch workflow', () => {
+  assert.match(
+    trustedDiscordWorkflow,
+    /workflow_run:\n\s+workflows: \["Publish QuestarrNG image"\]\n\s+types: \[completed\]/u
+  );
+  assert.match(trustedDiscordWorkflow, /workflow_id == 368554729/u);
+  assert.match(trustedDiscordWorkflow, /workflow_run\.event == 'push'/u);
+  assert.match(trustedDiscordWorkflow, /workflow_run\.head_repository\.full_name == github\.repository/u);
+  assert.match(trustedDiscordWorkflow, /startsWith\(github\.event\.workflow_run\.head_branch, 'v'\)/u);
+  assert.match(trustedDiscordWorkflow, /workflow_run\.conclusion == 'success'/u);
+  assert.match(trustedDiscordWorkflow, /environment:\n\s+name: discord-release/u);
+  assert.match(trustedDiscordWorkflow, /DISCORD_WEBHOOK: \$\{\{ secrets\.DISCORD_WEBHOOK \}\}/u);
+  assert.match(trustedDiscordWorkflow, /TAG: \$\{\{ github\.event\.workflow_run\.head_branch \}\}/u);
+  assert.match(trustedDiscordWorkflow, /ref: \$\{\{ github\.sha \}\}/u);
+  assert.match(trustedDiscordWorkflow, /persist-credentials: false/u);
+  assert.match(trustedDiscordWorkflow, /permissions:\n\x20{2}contents:\x20read/u);
+  assert.doesNotMatch(trustedDiscordWorkflow, /pull_request(?:_target)?\s*:/u);
+  assert.doesNotMatch(trustedDiscordWorkflow, /secrets\.DISCORD_RELEASE_WEBHOOK/u);
 });
 
 test('trusted PR validation runs the base validator and launcher on an exact candidate snapshot', () => {
   assert.match(trustedWorkflow, /pull_request_target:[\s\S]*?branches: \[main\]/u);
-  assert.match(trustedWorkflow, /permissions:\n  contents: read/u);
+  assert.match(trustedWorkflow, /permissions:\n\x20{2}contents:\x20read/u);
   assert.doesNotMatch(trustedWorkflow, /\$\{\{\s*secrets\./u);
   assert.match(trustedWorkflow, /ref: \$\{\{ github\.event\.pull_request\.base\.sha \}\}/u);
-  assert.match(trustedWorkflow, /ref: \$\{\{ github\.event\.pull_request\.head\.sha \}\}/u);
-  assert.equal((trustedWorkflow.match(/persist-credentials: false/gu) ?? []).length, 2);
+  assert.equal((trustedWorkflow.match(/uses: actions\/checkout@/gu) ?? []).length, 1);
+  assert.match(trustedWorkflow, /Fetch candidate as data without running checkout actions/u);
+  assert.match(trustedWorkflow, /refs\/pull\/\$PR_NUMBER\/head:refs\/remotes\/pull\/\$PR_NUMBER\/head/u);
+  assert.match(trustedWorkflow, /fetched_sha.*CANDIDATE_SHA/u);
+  assert.equal(
+    (trustedWorkflow.match(/# nosemgrep: yaml\.github-actions\.security\.pull-request-target-code-checkout\.pull-request-target-code-checkout/gu) ?? []).length,
+    2,
+    'only the audited data-only fetch and materialization lines suppress the checkout rule'
+  );
+  assert.match(trustedWorkflow, /This stores candidate Git objects only; hooks, LFS smudging, and submodules are disabled/u);
+  assert.match(trustedWorkflow, /This materializes untrusted files as data; the trusted launcher isolates them before execution/u);
+  assert.match(trustedWorkflow, /worktree add --detach[\s\\\S]*?\$GITHUB_WORKSPACE\/candidate[\s\\\S]*?\$CANDIDATE_SHA/u);
+  assert.equal((trustedWorkflow.match(/persist-credentials: false/gu) ?? []).length, 1);
   assert.match(
     trustedWorkflow,
     /node trusted\/scripts\/validation-engine\/trusted-test-launcher\.mjs candidate[\s\S]*?--trusted-root trusted[\s\S]*?--trusted-base-sha "\$VALIDATION_PR_BASE_SHA"[\s\S]*?--candidate-sha "\$VALIDATION_PR_HEAD_SHA"[\s\S]*?--install-dependencies[\s\S]*?node \/mnt\/trusted-validation\/scripts\/validate-development\.mjs[\s\S]*?--root \/mnt\/workspace[\s\S]*?--tests-only/u
@@ -100,20 +138,20 @@ test('test and build jobs execute the base-reviewed launcher with isolated depen
   for (const [name, job] of [['test', testJob], ['build', buildJob]]) {
     assert.match(job, /runs-on: ubuntu-24\.04/u);
     assert.match(job, /fetch-depth: 0/u);
-    assert.match(job, /Prepare reviewed launcher, npm runtime, and offline dependency cache/u);
+    assert.match(job, /Prepare reviewed launcher and npm runtime/u);
     assert.match(job, /git show "\$launcher_sha:scripts\/validation-engine\/trusted-test-launcher\.mjs"/u);
     assert.match(job, /--trusted-npm-runtime "\$RUNNER_TEMP\/questarr-trusted-validation\/\.github\/npm-runtime\/node_modules"/u);
     assert.match(job, /--install-dependencies/u);
     assert.match(job, /node "\$RUNNER_TEMP\/questarr-trusted-validation\/launcher\/trusted-test-launcher\.mjs"/u);
     assert.match(job, /--github-actions-context/u);
-    assert.match(job, /BOOTSTRAP_LAUNCHER_REF: codex\/trusted-validation-bootstrap-20261013/u);
+    assert.match(job, /BOOTSTRAP_LAUNCHER_REF: codex\/security-trusted-validation-20261013/u);
     assert.match(job, /BOOTSTRAP_LAUNCHER_SHA: [a-f0-9]{40}/u);
     assert.match(job, /git fetch --no-tags origin "refs\/heads\/\$BOOTSTRAP_LAUNCHER_REF"/u);
-    assert.match(job, /fetched_launcher_sha" != "\$launcher_sha"/u);
-    assert.match(
+    assert.match(job, /git merge-base --is-ancestor "\$launcher_sha" FETCH_HEAD/u);
+    assert.doesNotMatch(
       job,
-      /NPM_CONFIG_USERCONFIG="\$empty_npm_user_config"[\s\\]*NPM_CONFIG_GLOBALCONFIG="\$empty_npm_global_config"/u,
-      `${name} uses separate empty npm user and global config files`
+      /\.bin\/npm" ci/u,
+      `${name} must not unpack candidate-selected packages on the runner host`
     );
     assert.doesNotMatch(job, /run: node scripts\/validate-development\.mjs/u);
     assert.match(job, /Install Bubblewrap for isolated/u, `${name} job installs and preflights Bubblewrap`);

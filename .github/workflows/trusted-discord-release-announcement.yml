@@ -1,0 +1,113 @@
+name: Announce trusted QuestarrNG releases
+
+on:
+  workflow_run:
+    workflows: ["Publish QuestarrNG image"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  announce-release:
+    if: >-
+      github.repository == 'snapetech/QuestarrNG' &&
+      github.event.workflow_run.workflow_id == 368554729 &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      startsWith(github.event.workflow_run.head_branch, 'v') &&
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    environment:
+      name: discord-release
+    permissions:
+      contents: read
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      TAG: ${{ github.event.workflow_run.head_branch }}
+    steps:
+      - name: Checkout trusted default-branch release tooling
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 26.x
+          package-manager-cache: false
+
+      - name: Send release announcement
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo 'Release announcement tag must use vMAJOR.MINOR.PATCH.' >&2
+            exit 1
+          fi
+          if [[ -z "$DISCORD_WEBHOOK" ]]; then
+            echo '::warning::Discord announcement skipped because discord-release has no webhook secret.'
+            exit 0
+          fi
+
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --json body,isDraft,isPrerelease,tagName,url > release.json
+          jq -e --arg tag "$TAG" \
+            '.tagName == $tag and .isDraft == false and .isPrerelease == false and (.body | type == "string" and length > 0)' \
+            release.json > /dev/null
+          version="${TAG#v}"
+          printf '%s' "$(jq -r '.body' release.json)" \
+            | node scripts/discord-release-notes.mjs --split > chunks.json
+          chunk_count="$(jq 'length' chunks.json)"
+          (( chunk_count > 0 )) || {
+            echo 'The published release notes are empty.' >&2
+            exit 1
+          }
+
+          webhook_url="$DISCORD_WEBHOOK"
+          if [[ "$webhook_url" == *'?'* ]]; then
+            webhook_url+='&wait=true'
+          else
+            webhook_url+='?wait=true'
+          fi
+
+          for ((index = 0; index < chunk_count; index += 1)); do
+            description="$(jq -r --argjson index "$index" '.[$index]' chunks.json)"
+            number=$((index + 1))
+            title="QuestarrNG ${TAG} release notes (${number}/${chunk_count})"
+            jq -n \
+              --arg username 'QuestarrNG Releases' \
+              --arg title "$title" \
+              --arg url "$(jq -r '.url' release.json)" \
+              --arg description "$description" \
+              --arg image "ghcr.io/snapetech/questarrng:${version}" \
+              --arg run_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" \
+              --argjson first "$index" \
+              '{
+                username: $username,
+                embeds: [{
+                  title: $title,
+                  url: $url,
+                  description: $description,
+                  color: 5814783,
+                  fields: (if $first == 0 then [
+                    { name: "Image", value: $image, inline: false },
+                    { name: "Workflow", value: $run_url, inline: false }
+                  ] else [] end)
+                }]
+              }' > payload.json
+
+            response="$(curl --fail --silent --show-error \
+              -H 'Content-Type: application/json' \
+              -X POST \
+              --data @payload.json \
+              "$webhook_url")"
+            jq -e --arg description "$description" \
+              '.id != null and .embeds[0].description == $description' \
+              <<< "$response" > /dev/null
+            if (( number < chunk_count )); then
+              sleep 1
+            fi
+          done

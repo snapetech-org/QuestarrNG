@@ -27,6 +27,7 @@ export const validation = {
     '.github/workflows/ci.yml',
     '.github/workflows/codecov-upload.yml',
     '.github/workflows/fork-image.yml',
+    '.github/workflows/trusted-discord-release-announcement.yml',
     '.github/workflows/trusted-pr-validation.yml',
     'scripts/validation-engine/engine.mjs',
     'scripts/validation-engine/config.mjs',

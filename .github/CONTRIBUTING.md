@@ -156,8 +156,9 @@ npm run release-notes:preview -- --base origin/main --head HEAD
 ```
 
 CI validates the fragment and summarizes its release text. The tag workflow
-adds these fragments to the GitHub release notes and Discord announcement. Keep
-the versioned history in [`docs/CHANGELOG.md`](../docs/CHANGELOG.md).
+adds these fragments to the GitHub release notes. A trusted default-branch
+workflow announces successfully published tag releases to Discord. Keep the
+versioned history in [`docs/CHANGELOG.md`](../docs/CHANGELOG.md).
 
 ## Project Structure
 

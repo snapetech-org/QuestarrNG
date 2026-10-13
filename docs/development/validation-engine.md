@@ -38,12 +38,15 @@ forced to `true`, and test tasks use
 `NODE_ENV=test` so ambient credentials, proxy settings, loader options, and
 workflow context do not leak into test processes. Task environment directories
 are removed when each command finishes, leaving logs and the receipt as the
-run's retained evidence. Hosted CI prewarms the runner-local npm cache with a
-trusted npm runtime and lifecycle scripts disabled, then the trusted launcher
-copies that cache into the private run directory and sets npm to offline mode.
-Only the dependency-install task receives those cache settings. Local runs
-without an explicit cache use one under their temporary home, which is removed
-with the task environment.
+run's retained evidence. Hosted CI restores the runner-local npm cache, then the
+trusted launcher copies it into a private run directory. It validates the
+candidate lockfile and prefetches packages inside Bubblewrap with lifecycle
+scripts disabled; the actual validation run uses the private cache offline.
+Only dependency installation can reach the network. Its sandbox has no secrets
+or host data paths and uses synthetic hosts/NSS files plus a copy of the host
+resolver configuration for registry DNS. Validation runs with synthetic
+resolver settings and no network. Local runs without an explicit cache create
+one under their temporary home, which is removed with the task environment.
 
 The in-repository CLI imports candidate JavaScript before task subprocesses
 start. For an unreviewed checkout, do not run its CLI directly on the host.
@@ -84,8 +87,11 @@ are explicitly preserved because they are implementation, chart, and
 documentation files rather than stored credentials. Stage new candidate files
 before using the launcher. It hides the invoking
 home, temporary files, common service sockets, host configuration under `/etc`,
-and common host data roots such as `/opt`, `/srv`, and `/usr/local`, then disables
-network access. If the checkout is outside those standard roots, it also masks
+and common host data roots such as `/opt`, `/srv`, and `/usr/local`, then
+unshares external networking. The sandbox provides a synthetic `/etc/hosts`
+containing only `localhost` and a resolver configuration with no nameserver, so
+tests can use isolated loopback sockets while host services, host DNS settings,
+and external networks remain unavailable. If the checkout is outside those standard roots, it also masks
 the checkout's parent so candidate code cannot reach the original worktree
 around the filtered snapshot. When that parent overlaps a system runtime mount,
 it masks the checkout path itself and reapplies that mask after system binds.
@@ -121,14 +127,19 @@ candidate files are copied into the disposable snapshot. GitHub tokens and
 other runner environment values remain outside the candidate sandbox.
 
 The `trusted-pr-validation` workflow is loaded from the pull-request base. It
-checks out the exact base and head commits, then runs the base revision's
-validator against a read-only candidate snapshot in Bubblewrap. Candidate
-dependency URLs are restricted to `registry.npmjs.org`; install scripts are
-disabled while dependencies are prefetched, and tests run offline with no
-GitHub token or repository secrets in the sandbox. Regular test and build jobs
-also use the reviewed launcher, install dependencies inside Bubblewrap, and
-produce source-bound receipts. Coverage and JUnit files are copied to the
-short-lived artifact with size and symlink checks. On Ubuntu 24.04, the job
+checks out the exact base commit and fetches the pull-request head as data,
+verifies its SHA, then runs the base revision's validator against a read-only
+candidate snapshot in Bubblewrap. The two narrowly-scoped Semgrep suppressions
+cover only that audited data fetch and worktree materialization; workflow
+contracts enforce the disabled hooks, LFS smudging and submodules, exact SHA,
+and isolated execution. Candidate
+dependency URLs are restricted to `registry.npmjs.org`; dependency archives are
+unpacked inside Bubblewrap with install scripts disabled, and validation runs
+offline with no GitHub token or repository secrets in the sandbox. Synthetic
+host and resolver files support local socket tests without restoring host
+network or DNS settings. Regular test and build jobs also use the reviewed launcher, prefetch dependencies inside
+Bubblewrap, and produce source-bound receipts. Coverage and JUnit files are
+copied to the short-lived artifact with size and symlink checks. On Ubuntu 24.04, the job
 loads an ephemeral AppArmor profile attached to `/usr/bin/bwrap` so Bubblewrap
 can create its namespace while the runner-wide unprivileged-user-namespace
 restriction stays enabled. Local runs may skip the integration check when
@@ -142,7 +153,11 @@ Codecov only for a same-repository `push` to `main`, in the `codecov-main`
 environment. GitHub restricts that environment to `main`. Store
 `CODECOV_TOKEN`, if configured, as an environment secret there rather than as a
 repository or organization secret. A pull-request edit to CI therefore cannot
-make the Codecov token available to candidate tests.
+make the Codecov token available to candidate tests. Discord tag announcements
+also use a default-branch `workflow_run` workflow, gated to successful
+same-repository tag runs from the exact QuestarrNG image workflow. The
+`discord-release` environment is restricted to `main`, and the tag workflow
+checks out trusted default-branch tooling.
 
 During a run, the engine writes a task summary to stderr when each task starts
 and finishes, and repeats it every minute while a task is still running. This

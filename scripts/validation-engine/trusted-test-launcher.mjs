@@ -148,55 +148,6 @@ function assertCleanCheckout(root, expectedSha, label, env) {
   return actualSha;
 }
 
-function installCandidateDependencies(sourceRoot, npmCli, runDirectory) {
-  validateCandidateLockfile(sourceRoot);
-  const cache = path.join(runDirectory, 'npm-cache');
-  const home = path.join(runDirectory, 'npm-install-home');
-  const userConfig = path.join(home, 'user.npmrc');
-  const globalConfig = path.join(home, 'global.npmrc');
-  mkdirSync(cache, { mode: 0o700 });
-  mkdirSync(home, { mode: 0o700 });
-  writeFileSync(userConfig, '', { mode: 0o600 });
-  writeFileSync(globalConfig, '', { mode: 0o600 });
-  const env = {
-    PATH: process.env.PATH ?? '',
-    HOME: home,
-    USERPROFILE: home,
-    TMPDIR: runDirectory,
-    TMP: runDirectory,
-    TEMP: runDirectory,
-    NPM_CONFIG_CACHE: cache,
-    NPM_CONFIG_USERCONFIG: userConfig,
-    NPM_CONFIG_GLOBALCONFIG: globalConfig,
-    NPM_CONFIG_REGISTRY: 'https://registry.npmjs.org/',
-    NPM_CONFIG_STRICT_SSL: 'true',
-    NPM_CONFIG_IGNORE_SCRIPTS: 'true',
-    NPM_CONFIG_AUDIT: 'false',
-    NPM_CONFIG_FUND: 'false',
-  };
-  for (const key of ['LANG', 'LC_ALL', 'LC_CTYPE', 'SYSTEMROOT'])
-    if (typeof process.env[key] === 'string') env[key] = process.env[key];
-  execFileSync(process.execPath, [
-    npmCli,
-    'ci',
-    '--ignore-scripts=true',
-    '--no-audit',
-    '--no-fund',
-    '--strict-ssl=true',
-    '--registry=https://registry.npmjs.org/',
-    '--userconfig=/dev/null',
-    '--globalconfig=/dev/null',
-    '--cache',
-    cache,
-  ], {
-    cwd: sourceRoot,
-    env,
-    stdio: 'inherit',
-    maxBuffer: 16 * 1024 * 1024,
-  });
-  return cache;
-}
-
 function copyCandidateFile(sourceRoot, workspaceRoot, relativePath, tracked) {
   if (
     path.isAbsolute(relativePath) ||
@@ -405,7 +356,7 @@ function prepareReportsOutput(requestedOutput, sourceRoot) {
     mkdirSync(output, { mode: 0o700 });
   } catch (error) {
     if (error.code === 'EEXIST')
-      throw new Error('--reports-output must name a new directory.');
+      throw new Error('--reports-output must name a new directory.', { cause: error });
     throw error;
   }
   const metadata = lstatSync(output);
@@ -572,8 +523,12 @@ function makeSandboxCommand({
   trustedRoot,
   candidateSha,
   trustedBaseSha,
+  npmDependencyPrewarm = false,
+  networkAccess = false,
   targetCommand,
 }) {
+  if (networkAccess !== npmDependencyPrewarm)
+    throw new Error('Network access is reserved for dependency prewarming.');
   if (process.platform !== 'linux')
     throw new Error(
       'The trusted local test launcher requires Linux bubblewrap.'
@@ -603,6 +558,8 @@ function makeSandboxCommand({
   const systemMounts = SYSTEM_PATHS_TO_MOUNT.filter((directory) => existsSync(directory)).map(
     (directory) => [realpathSync(directory), directory]
   );
+  if (networkAccess && !existsSync('/etc/resolv.conf'))
+    throw new Error('Network-enabled dependency prefetch requires host DNS configuration.');
   const externalRoots = [];
   let playwrightCacheIndex = -1;
   if (playwrightCache) {
@@ -648,6 +605,7 @@ function makeSandboxCommand({
     });
     if (index === trustedNpmRuntimeIndex)
       mkdirSync(path.join(runDirectory, 'dependencies', String(index), 'node_modules'), {
+        recursive: true,
         mode: 0o700,
       });
   }
@@ -666,8 +624,30 @@ function makeSandboxCommand({
       ? path.posix.join(mounts[trustedNpmRuntimeIndex][1], '.bin')
       : `${GUEST_WORKSPACE}/.github/npm-runtime/node_modules/.bin`;
   const markerToken = randomBytes(32).toString('hex');
-  const markerFile = path.join(runDirectory, 'sandbox-marker');
+  const markerFile = path.join(runDirectory, `sandbox-marker-${markerToken}`);
   writeFileSync(markerFile, markerToken, { mode: 0o600, flag: 'wx' });
+  const sandboxHostsFile = path.join(runDirectory, `sandbox-hosts-${markerToken}`);
+  writeFileSync(
+    sandboxHostsFile,
+    '127.0.0.1 localhost\n::1 localhost ip6-localhost\n',
+    { mode: 0o444, flag: 'wx' }
+  );
+  const sandboxResolvFile = path.join(runDirectory, `sandbox-resolv-${markerToken}.conf`);
+  writeFileSync(
+    sandboxResolvFile,
+    '# External DNS is unavailable in the validation sandbox.\n',
+    { mode: 0o444, flag: 'wx' }
+  );
+  const sandboxNsswitchFile = path.join(runDirectory, `sandbox-nsswitch-${markerToken}.conf`);
+  writeFileSync(sandboxNsswitchFile, 'hosts: files dns\n', { mode: 0o444, flag: 'wx' });
+  const networkConfigFiles = [
+    { source: sandboxHostsFile, target: '/etc/hosts' },
+    { source: sandboxNsswitchFile, target: '/etc/nsswitch.conf' },
+    {
+      source: networkAccess ? realpathSync('/etc/resolv.conf') : sandboxResolvFile,
+      target: '/etc/resolv.conf',
+    },
+  ];
 
   const env = {
     PATH: `${npmRuntimeBin}:${runtimeBin}:/usr/bin:/bin:/usr/sbin:/sbin`,
@@ -685,9 +665,20 @@ function makeSandboxCommand({
     CONFIG_DIRECTORY: `${GUEST_RUN}/config`,
     VALIDATION_OUTER_SANDBOX_TOKEN: markerToken,
   };
-  if (npmCache) {
-    env.NPM_CONFIG_CACHE = `${GUEST_RUN}/npm-cache`;
+  if (npmCache)
+    env.NPM_CONFIG_CACHE = `${GUEST_RUN}/${path.basename(npmCache)}`;
+  if (npmDependencyPrewarm) {
+    env.NPM_CONFIG_USERCONFIG = `${GUEST_RUN}/npm-install-home/user.npmrc`;
+    env.NPM_CONFIG_GLOBALCONFIG = '/dev/null';
+    env.NPM_CONFIG_REGISTRY = 'https://registry.npmjs.org/';
+    env.NPM_CONFIG_STRICT_SSL = 'true';
+    env.NPM_CONFIG_IGNORE_SCRIPTS = 'true';
+    env.NPM_CONFIG_AUDIT = 'false';
+    env.NPM_CONFIG_FUND = 'false';
+  } else if (npmCache) {
     env.NPM_CONFIG_OFFLINE = 'true';
+    env.NPM_CONFIG_USERCONFIG = '/dev/null';
+    env.NPM_CONFIG_GLOBALCONFIG = '/dev/null';
   }
   if (receiptOutput) {
     env.RUNNER_TEMP = `${GUEST_RUN}/validation-output`;
@@ -723,8 +714,8 @@ function makeSandboxCommand({
     '--unshare-pid',
     '--unshare-ipc',
     '--unshare-uts',
-    '--unshare-net',
   ];
+  if (!networkAccess) args.push('--unshare-net');
   const hiddenDirectories = hostPathsToHide(sourceRoot)
     .filter((directory) => directory === '/mnt' || existsSync(directory));
   const mountOperations = sandboxMountOperations({
@@ -734,6 +725,7 @@ function makeSandboxCommand({
     externalMounts,
     dependencyMounts,
     systemMounts,
+    networkConfigFiles,
     hiddenDirectories,
     guestWorkspace: GUEST_WORKSPACE,
     guestRun: GUEST_RUN,
@@ -762,6 +754,13 @@ function makeSandboxCommand({
           '/proc/self/fd/' + childDescriptor,
           operation.target
         );
+      } else if (operation.type === 'file-fd') {
+        const descriptor = openSync(operation.source, constants.O_RDONLY | constants.O_NOFOLLOW);
+        sourceDescriptors.push(descriptor);
+        const childDescriptor = sourceDescriptors.length + 2;
+        if (!fstatSync(descriptor).isFile())
+          throw new Error('Sandbox network configuration source must be a regular file.');
+        args.push('--file', String(childDescriptor), operation.target);
       } else {
         throw new Error('Unknown sandbox mount operation: ' + operation.type);
       }
@@ -975,7 +974,10 @@ async function main() {
     throw new Error('Trusted CI mode requires --trusted-root, --trusted-base-sha, --candidate-sha, --trusted-npm-cli, and --install-dependencies together.');
   if (installDependencies && !trustedRoot && !(npmCache && trustedNpmRuntime))
     throw new Error('--install-dependencies requires --npm-cache and --trusted-npm-runtime.');
+  if (npmCache && !installDependencies)
+    throw new Error('--npm-cache requires --install-dependencies.');
   const sourceRoot = realpathSync(requestedRoot);
+  if (installDependencies) validateCandidateLockfile(sourceRoot);
   if (trustedRoot && (trustedNpmRuntime || npmCache))
     throw new Error('Trusted-root mode manages the npm runtime and cache; do not pass external npm paths.');
   if (githubActionsContext && process.env.GITHUB_ACTIONS !== 'true')
@@ -1020,7 +1022,6 @@ async function main() {
   const workspace = path.join(runDirectory, 'workspace');
   mkdirSync(workspace, { mode: 0o700 });
   mkdirSync(path.join(runDirectory, 'validation-output'), { mode: 0o700 });
-  let candidateDependenciesCreated = false;
   try {
     const hostTemplate = path.join(runDirectory, 'trusted-git-template');
     const hostEnv = gitEnvironment(sourceRoot, hostTemplate);
@@ -1028,22 +1029,6 @@ async function main() {
     if (trustedRoot) {
       assertCleanCheckout(trustedRoot, trustedBaseSha, 'Trusted base', hostEnv);
       assertCleanCheckout(sourceRoot, candidateSha, 'Candidate', hostEnv);
-      const candidateDependencies = path.join(sourceRoot, 'node_modules');
-      try {
-        lstatSync(candidateDependencies);
-        throw new Error(
-          'Refusing to replace an existing candidate node_modules directory.'
-        );
-      } catch (error) {
-        if (error.code !== 'ENOENT') throw error;
-      }
-      candidateDependenciesCreated = true;
-      npmCache = installCandidateDependencies(sourceRoot, npmCli, runDirectory);
-      assertCleanCheckout(sourceRoot, candidateSha, 'Candidate after dependency prefetch', hostEnv);
-    } else if (npmCache) {
-      const cacheSource = npmCache;
-      npmCache = path.join(runDirectory, 'npm-cache');
-      copyNpmCache(cacheSource, npmCache);
     }
     const candidateFiles = indexedFiles(sourceRoot, hostEnv);
     for (const file of candidateFiles.files)
@@ -1055,13 +1040,74 @@ async function main() {
       );
     createSyntheticGitRepository(workspace, runDirectory);
     const dependencies = linkDependencies(sourceRoot, workspace, installDependencies);
+    let sandboxNpmCache;
+    if (installDependencies) {
+      const cacheSeed = path.join(runDirectory, 'npm-cache-seed');
+      const cacheSource = npmCache;
+      if (cacheSource) copyNpmCache(cacheSource, cacheSeed);
+      else mkdirSync(cacheSeed, { mode: 0o700 });
+
+      const installHome = path.join(runDirectory, 'npm-install-home');
+      mkdirSync(installHome, { mode: 0o700 });
+      writeFileSync(path.join(installHome, 'user.npmrc'), '', { mode: 0o600 });
+
+      const npmInstallArguments = [
+        'ci',
+        '--ignore-scripts=true',
+        '--no-audit',
+        '--no-fund',
+        '--strict-ssl=true',
+        '--registry=https://registry.npmjs.org/',
+        `--userconfig=${GUEST_RUN}/npm-install-home/user.npmrc`,
+        '--globalconfig=/dev/null',
+        `--cache=${GUEST_RUN}/npm-cache-seed`,
+      ];
+      const npmInstallCommand = trustedRoot
+        ? [
+            process.execPath,
+            `${GUEST_TRUSTED}/${path.relative(trustedRoot, npmCli).split(path.sep).join('/')}`,
+            ...npmInstallArguments,
+          ]
+        : ['npm', ...npmInstallArguments];
+
+      const installCommand = makeSandboxCommand({
+        sourceRoot,
+        workspace,
+        runDirectory,
+        dependencies: [],
+        playwrightCache,
+        npmCache: cacheSeed,
+        trustedNpmRuntime,
+        githubActionsContext: false,
+        receiptOutput: undefined,
+        trustedRoot,
+        candidateSha,
+        trustedBaseSha,
+        npmDependencyPrewarm: true,
+        networkAccess: true,
+        targetCommand: npmInstallCommand,
+      });
+      const installExitCode = await executeSandboxed(installCommand, {
+        PATH: process.env.PATH ?? '',
+        ...(typeof process.env.LANG === 'string' ? { LANG: process.env.LANG } : {}),
+      });
+      if (installExitCode !== 0) return installExitCode;
+
+      sandboxNpmCache = path.join(runDirectory, 'npm-cache');
+      copyNpmCache(cacheSeed, sandboxNpmCache);
+      rmSync(cacheSeed, { recursive: true, force: true });
+      rmSync(installHome, { recursive: true, force: true });
+    } else if (npmCache) {
+      sandboxNpmCache = path.join(runDirectory, 'npm-cache');
+      copyNpmCache(npmCache, sandboxNpmCache);
+    }
     const command = makeSandboxCommand({
       sourceRoot,
       workspace,
       runDirectory,
       dependencies,
       playwrightCache,
-      npmCache,
+      npmCache: sandboxNpmCache,
       trustedNpmRuntime,
       githubActionsContext,
       receiptOutput: receiptOutputPath,
@@ -1078,8 +1124,6 @@ async function main() {
     if (reportsOutputPath) exportTestReports(workspace, reportsOutputPath);
     return exitCode;
   } finally {
-    if (candidateDependenciesCreated)
-      rmSync(path.join(sourceRoot, 'node_modules'), { recursive: true, force: true });
     rmSync(runDirectory, { recursive: true, force: true });
   }
 }

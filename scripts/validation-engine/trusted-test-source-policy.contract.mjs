@@ -76,6 +76,44 @@ test('rejects non-registry, non-HTTPS, and credential-bearing tarball URLs', (t)
   }
 });
 
+test('rejects unpinned external lock entries but accepts declared bundled packages', (t) => {
+  const unpinned = registryLock();
+  delete unpinned.packages['node_modules/example'].resolved;
+  const unpinnedRoot = fixture(t, {
+    manifest: { name: 'candidate', devDependencies: { example: '^1.2.0' } },
+    lock: unpinned,
+  });
+  assert.throws(() => validateCandidateLockfile(unpinnedRoot), /no pinned registry URL/u);
+
+  const bundled = fixture(t, {
+    manifest: { name: 'candidate' },
+    lock: {
+      lockfileVersion: 3,
+      packages: {
+        '': {},
+        'node_modules/parent': {
+          version: '1.0.0',
+          resolved: 'https://registry.npmjs.org/parent/-/parent-1.0.0.tgz',
+        },
+        'node_modules/parent/node_modules/bundled': {
+          version: '1.0.0',
+          inBundle: true,
+        },
+      },
+    },
+  });
+  assert.deepEqual(validateCandidateLockfile(bundled), { lockfileVersion: 3 });
+
+  const misplacedBundle = fixture(t, {
+    manifest: { name: 'candidate' },
+    lock: {
+      lockfileVersion: 3,
+      packages: { '': {}, bundled: { version: '1.0.0', inBundle: true } },
+    },
+  });
+  assert.throws(() => validateCandidateLockfile(misplacedBundle), /bundled dependency path/u);
+});
+
 test('accepts only declared local dependencies that resolve to real in-checkout directories', (t) => {
   const root = mkdtempSync(path.join(os.tmpdir(), 'questarr-local-dependency-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
@@ -118,4 +156,13 @@ test('rejects local dependency traversal and unmatched lockfile links', (t) => {
   mkdirSync(path.join(missingLink, 'vendor', 'helper'), { recursive: true });
   mkdirSync(path.join(missingLink, 'vendor', 'other'), { recursive: true });
   assert.throws(() => validateCandidateLockfile(missingLink), /unapproved local dependency/u);
+
+  const unresolvedLink = fixture(t, {
+    manifest: { name: 'candidate' },
+    lock: {
+      lockfileVersion: 3,
+      packages: { '': {}, 'node_modules/helper': { link: true } },
+    },
+  });
+  assert.throws(() => validateCandidateLockfile(unresolvedLink), /lock link is invalid/u);
 });

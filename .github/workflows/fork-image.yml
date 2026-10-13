@@ -727,7 +727,7 @@ jobs:
   announce-release:
     name: Announce release to Discord
     needs: [release, finalize-release]
-    if: ${{ always() && ((startsWith(github.ref, 'refs/tags/v') && needs.release.result == 'success') || (github.event_name == 'workflow_dispatch' && inputs.finalize_release_tag == '' && inputs.announce_release_tag != '') || (github.event_name == 'workflow_dispatch' && inputs.finalize_release_tag != '' && needs['finalize-release'].result == 'success')) }}
+    if: ${{ always() && github.repository == 'snapetech/QuestarrNG' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && ((inputs.finalize_release_tag == '' && inputs.announce_release_tag != '') || (inputs.finalize_release_tag != '' && needs['finalize-release'].result == 'success')) }}
     runs-on: ubuntu-latest
     environment:
       name: discord-release
@@ -735,7 +735,7 @@ jobs:
       contents: read
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      DISCORD_WEBHOOK: ${{ secrets.DISCORD_RELEASE_WEBHOOK }}
+      DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       TAG: ${{ inputs.finalize_release_tag || inputs.announce_release_tag || github.ref_name }}
     steps:
       - name: Checkout release tooling

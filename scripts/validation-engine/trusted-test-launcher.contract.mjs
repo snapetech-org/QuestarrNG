@@ -45,6 +45,36 @@ assert.match(
   'the launcher must require an explicit candidate command'
 );
 assert.doesNotMatch(launcherSource, /run-local-validation\.mjs/u);
+assert.match(
+  launcherSource,
+  /sandboxHostsFile,[\s\S]*?127\.0\.0\.1 localhost\\n::1 localhost ip6-localhost\\n[\s\S]*?sandboxNsswitchFile,[\s\S]*?hosts: files dns\\n[\s\S]*?source: networkAccess \? realpathSync\('\/etc\/resolv\.conf'\) : sandboxResolvFile/u,
+  'the sandbox must supply synthetic host lookup rules and only the resolver file needed for dependency prefetch'
+);
+assert.match(
+  launcherSource,
+  /npmDependencyPrewarm: true,[\s\S]*?networkAccess: true/u,
+  'candidate-selected packages must be prefetched with lifecycle scripts disabled inside Bubblewrap'
+);
+assert.match(
+  launcherSource,
+  /const npmInstallArguments = \[[\s\S]*?'--ignore-scripts=true'/u,
+  'dependency prefetch must disable lifecycle scripts'
+);
+assert.match(
+  launcherSource,
+  /if \(networkAccess !== npmDependencyPrewarm\)[\s\S]*?Network access is reserved for dependency prewarming/u,
+  'network access must not be enabled for candidate validation commands'
+);
+assert.match(
+  launcherSource,
+  /if \(!networkAccess\) args\.push\('--unshare-net'\)/u,
+  'network access is enabled only for the dependency prewarm command'
+);
+assert.match(
+  launcherSource,
+  /\['\/etc\/hosts', '\/etc\/nsswitch\.conf', '\/etc\/resolv\.conf'\]/u,
+  'the isolated dependency prewarm receives DNS configuration without mounting the host /etc tree'
+);
 for (const hostPath of ['/etc', '/opt', '/srv', '/usr/local'])
   assert.ok(
     HOST_PATHS_TO_HIDE.includes(hostPath),
@@ -382,6 +412,19 @@ test(
       rmSync(outsideReceipt, { force: true });
     });
     mkdirSync(path.join(source, 'bin'), { recursive: true });
+    writeFileSync(
+      path.join(source, 'package.json'),
+      JSON.stringify({ name: 'candidate' })
+    );
+    writeFileSync(
+      path.join(source, 'package-lock.json'),
+      JSON.stringify({
+        name: 'candidate',
+        lockfileVersion: 3,
+        requires: true,
+        packages: { '': { name: 'candidate' } },
+      })
+    );
     mkdirSync(browserCache, { recursive: true });
     mkdirSync(outsideDependencies, { recursive: true });
     mkdirSync(npmCache, { recursive: true });
@@ -494,16 +537,17 @@ assert.match(readFileSync('/mnt/workspace/vendor/mainline/src/rpc/server/tokens.
 assert.equal(existsSync('/mnt/workspace/nested/.env.local'), false);
 assert.equal(existsSync('/mnt/workspace/nested/config/secrets.json'), false);
 assert.equal(existsSync('/etc/os-release'), false);
+assert.equal(readFileSync('/etc/hosts', 'utf8'), '127.0.0.1 localhost\\n::1 localhost ip6-localhost\\n');
+assert.equal(readFileSync('/etc/nsswitch.conf', 'utf8'), 'hosts: files dns\\n');
+assert.equal(readFileSync('/etc/resolv.conf', 'utf8'), '# External DNS is unavailable in the validation sandbox.\\n');
 assert.equal(existsSync(${JSON.stringify(hostOnlyProbe)}), false);
 const originalCheckout = ${JSON.stringify(source)};
 assert.throws(() => readFileSync(path.join(originalCheckout, 'auth.json')), { code: 'ENOENT' });
 assert.throws(() => writeFileSync(hostFile, 'escaped'));
 assert.equal(readFileSync('/run/validation-engine-sandbox', 'utf8'), process.env.VALIDATION_OUTER_SANDBOX_TOKEN);
 assert.equal(fixtureDependency, 'sibling dependency resolved');
-assert.equal(process.env.NPM_CONFIG_CACHE, '/mnt/run-data/npm-cache');
-assert.equal(process.env.NPM_CONFIG_OFFLINE, 'true');
-assert.equal(readFileSync(path.join(process.env.NPM_CONFIG_CACHE, 'cache-canary.txt'), 'utf8'), 'isolated npm cache');
-writeFileSync(path.join(process.env.NPM_CONFIG_CACHE, 'candidate-cache-write.txt'), 'candidate only');
+assert.equal(process.env.NPM_CONFIG_CACHE, undefined);
+assert.equal(process.env.NPM_CONFIG_OFFLINE, undefined);
 assert.equal(process.env.RUNNER_TEMP, '/mnt/run-data/validation-output');
 writeFileSync(process.env.VALIDATION_RECEIPT_EXPORT, JSON.stringify({ status: 'passed' }));
 const connectionResults = await Promise.all([
@@ -511,6 +555,21 @@ const connectionResults = await Promise.all([
   new Promise((resolve) => { const socket = net.createConnection(hostSocket); socket.once('connect', () => { socket.destroy(); resolve('connected'); }); socket.once('error', () => resolve('blocked')); socket.setTimeout(1000, () => { socket.destroy(); resolve('blocked'); }); }),
 ]);
 assert.deepEqual(connectionResults, ['blocked', 'blocked']);
+const loopbackServer = net.createServer((socket) => socket.end('sandbox loopback'));
+await new Promise((resolve, reject) => {
+  loopbackServer.once('error', reject);
+  loopbackServer.listen(0, 'localhost', resolve);
+});
+const loopbackResult = await new Promise((resolve, reject) => {
+  const socket = net.connect(loopbackServer.address().port, 'localhost');
+  let response = '';
+  socket.setEncoding('utf8');
+  socket.on('data', (data) => { response += data; });
+  socket.once('end', () => resolve(response));
+  socket.once('error', reject);
+});
+await new Promise((resolve) => loopbackServer.close(resolve));
+assert.equal(loopbackResult, 'sandbox loopback');
 assert.equal(readFileSync(path.join(process.env.PLAYWRIGHT_BROWSERS_PATH, 'browser-canary.txt'), 'utf8'), 'read-only browser');
 assert.throws(() => writeFileSync(path.join(process.env.PLAYWRIGHT_BROWSERS_PATH, 'browser-canary.txt'), 'changed'));
 writeFileSync('/mnt/workspace/launcher-write-canary.txt', 'candidate only');
@@ -585,7 +644,17 @@ symlinkSync('/etc', '/mnt/workspace/coverage');
 
     const linkedCacheResult = spawnSync(
       launcherNode,
-      [launcher, source, '--npm-cache', invalidNpmCache, '--', '/bin/true'],
+      [
+        launcher,
+        source,
+        '--npm-cache',
+        invalidNpmCache,
+        '--trusted-npm-runtime',
+        trustedNpmRuntime,
+        '--install-dependencies',
+        '--',
+        '/bin/true',
+      ],
       { encoding: 'utf8', timeout: 30_000 }
     );
     assert.equal(linkedCacheResult.status, 1);
@@ -720,8 +789,6 @@ symlinkSync('/etc', '/mnt/workspace/coverage');
         source,
         '--playwright-cache',
         browserCache,
-        '--npm-cache',
-        npmCache,
         '--receipt-output',
         receiptOutput,
         '--',
@@ -750,6 +817,14 @@ symlinkSync('/etc', '/mnt/workspace/coverage');
     assert.equal(existsSync(path.join(npmCache, 'candidate-cache-write.txt')), false);
     assert.deepEqual(JSON.parse(readFileSync(receiptOutput, 'utf8')), { status: 'passed' });
     assert.equal(statSync(receiptOutput).mode & 0o777, 0o600);
+
+    const unusedCacheResult = spawnSync(
+      launcherNode,
+      [launcher, source, '--npm-cache', npmCache, '--', '/bin/true'],
+      { encoding: 'utf8', timeout: 30_000 }
+    );
+    assert.equal(unusedCacheResult.status, 1);
+    assert.match(unusedCacheResult.stderr, /--npm-cache requires --install-dependencies/u);
 
     const existingReceiptResult = spawnSync(
       launcherNode,
@@ -860,7 +935,6 @@ test(
     const gitTemplate = path.join(parent, 'git-template');
     const runnerTemp = path.join(parent, 'runner-temp');
     const receiptOutput = path.join(runnerTemp, 'receipts', 'test.json');
-    const npmMarker = path.join(parent, 'npm-prefetch.json');
     const trustedLauncher = path.join(
       trustedRoot,
       'scripts/validation-engine/trusted-test-launcher.mjs'
@@ -920,13 +994,17 @@ test(
     writeFileSync(trustedSourcePolicy, readFileSync(sourcePolicy, 'utf8'));
     writeFileSync(npmCli, [
       "import assert from 'node:assert/strict';",
-      "import { writeFileSync } from 'node:fs';",
+      "import { readFileSync, writeFileSync } from 'node:fs';",
       "assert.equal(process.argv[2], 'ci');",
       "assert.ok(process.argv.includes('--ignore-scripts=true'));",
       "assert.equal(process.env.NPM_CONFIG_IGNORE_SCRIPTS, 'true');",
       "assert.equal(process.env.NPM_CONFIG_REGISTRY, 'https://registry.npmjs.org/');",
       "assert.notEqual(process.env.NPM_CONFIG_USERCONFIG, process.env.NPM_CONFIG_GLOBALCONFIG);",
-      `writeFileSync(${JSON.stringify(npmMarker)}, JSON.stringify({ args: process.argv.slice(2) }));`,
+      "assert.equal(process.env.NPM_CONFIG_OFFLINE, undefined);",
+      "assert.equal(readFileSync('/etc/hosts', 'utf8'), '127.0.0.1 localhost\\n::1 localhost ip6-localhost\\n');",
+      "assert.equal(readFileSync('/etc/nsswitch.conf', 'utf8'), 'hosts: files dns\\n');",
+      "assert.equal(readFileSync('/etc/resolv.conf', 'utf8'), '# External DNS is unavailable in the validation sandbox.\\n');",
+      "writeFileSync('/mnt/run-data/npm-prefetch.json', JSON.stringify({ args: process.argv.slice(2), registry: process.env.NPM_CONFIG_REGISTRY, userConfig: process.env.NPM_CONFIG_USERCONFIG, globalConfig: process.env.NPM_CONFIG_GLOBALCONFIG, dnsConfigPresent: true }));",
     ].join('\n'));
     writeFileSync(baseValidator, [
       "import assert from 'node:assert/strict';",
@@ -945,6 +1023,10 @@ test(
       "assert.equal(process.env.GITHUB_JOB, 'trusted-pr-validation');",
       'assert.equal(process.env.GITHUB_TOKEN, undefined);',
       'assert.equal(process.env.SECRET_CANARY, undefined);',
+      "const prefetch = JSON.parse(readFileSync('/mnt/run-data/npm-prefetch.json', 'utf8'));",
+      "assert.ok(prefetch.args.includes('--ignore-scripts=true'));",
+      "assert.equal(prefetch.registry, 'https://registry.npmjs.org/');",
+      "assert.equal(prefetch.globalConfig, '/dev/null');",
       "assert.equal(existsSync('/mnt/trusted-validation/scripts/validate-development.mjs'), true);",
       "assert.equal(readFileSync('/mnt/workspace/src/app.js', 'utf8'), 'export const candidate = true;\\n');",
       "assert.equal(existsSync('/mnt/workspace/.env'), false);",
@@ -952,7 +1034,7 @@ test(
       "assert.equal(existsSync('/mnt/workspace/node_modules'), false);",
       "assert.equal(process.env.RUNNER_TEMP, '/mnt/run-data/validation-output');",
       "assert.equal(process.env.VALIDATION_RECEIPT_EXPORT, '/mnt/run-data/validation-output/test.json');",
-      'writeFileSync(process.env.VALIDATION_RECEIPT_EXPORT, JSON.stringify({ marker: "trusted-base-validator", candidateSha: process.env.GITHUB_SHA, baseSha: process.env.VALIDATION_TRUSTED_BASE_SHA }));',
+      'writeFileSync(process.env.VALIDATION_RECEIPT_EXPORT, JSON.stringify({ marker: "trusted-base-validator", candidateSha: process.env.GITHUB_SHA, baseSha: process.env.VALIDATION_TRUSTED_BASE_SHA, prefetch }));',
     ].join('\n'));
 
     const commitFixture = (root) => {
@@ -1011,13 +1093,28 @@ test(
     );
     assert.equal(launch.error, undefined, launch.error?.message);
     assert.equal(launch.status, 0, `${launch.stdout ?? ''}${launch.stderr ?? ''}`);
-    const prefetch = JSON.parse(readFileSync(npmMarker, 'utf8'));
-    assert.ok(prefetch.args.includes('--ignore-scripts=true'));
     const receipt = JSON.parse(readFileSync(receiptOutput, 'utf8'));
     assert.deepEqual(receipt, {
       marker: 'trusted-base-validator',
       candidateSha,
       baseSha,
+      prefetch: {
+        args: [
+          'ci',
+          '--ignore-scripts=true',
+          '--no-audit',
+          '--no-fund',
+          '--strict-ssl=true',
+          '--registry=https://registry.npmjs.org/',
+          '--userconfig=/mnt/run-data/npm-install-home/user.npmrc',
+          '--globalconfig=/dev/null',
+          '--cache=/mnt/run-data/npm-cache-seed',
+        ],
+        registry: 'https://registry.npmjs.org/',
+        userConfig: '/mnt/run-data/npm-install-home/user.npmrc',
+        globalConfig: '/dev/null',
+        dnsConfigPresent: true,
+      },
     });
     assert.equal(statSync(receiptOutput).mode & 0o777, 0o600);
     assert.equal(existsSync(path.join(candidateRoot, 'node_modules')), false);

@@ -304,12 +304,15 @@ points operators at is on the safe side of the fix.
 Repository secrets are available to every workflow in this repository. Do not
 store integration credentials at repository or organization scope when an
 environment can restrict their use. The Codecov upload workflow uses the
-`codecov-main` environment, restricted to `main`. The release announcement job
-uses the `discord-release` environment, which should be restricted to `main`
-and `v*` tags.
+`codecov-main` environment, restricted to `main`. Discord announcements use the
+`discord-release` environment, restricted to `main`. Tag announcements run
+from a separate default-branch `workflow_run` workflow after the image-release
+workflow succeeds; manual announcements run only from `main`.
 
-The existing repository-level `DISCORD_RELEASE_WEBHOOK` must be rotated into
-`discord-release` and deleted from repository settings. GitHub does not return
-stored secret values through its API, so create a replacement Discord webhook
-instead of trying to copy the old value. Until the repository-scoped secret is
-removed, any same-repository pull-request workflow could reference it.
+Create a new `DISCORD_WEBHOOK` secret in `discord-release`, then delete the
+existing repository-level `DISCORD_RELEASE_WEBHOOK`. The different name prevents
+the release workflow from silently falling back to the repository secret.
+GitHub does not return stored secret values through its API, so create a
+replacement Discord webhook instead of trying to copy the old value. Until the
+repository-scoped secret is removed, any same-repository pull-request workflow
+could still reference it.

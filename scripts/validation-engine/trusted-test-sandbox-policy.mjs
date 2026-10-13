@@ -78,6 +78,7 @@ export function sandboxMountOperations({
   externalMounts,
   dependencyMounts,
   systemMounts,
+  networkConfigFiles = [],
   hiddenDirectories,
   guestWorkspace,
   guestRun,
@@ -160,6 +161,11 @@ export function sandboxMountOperations({
         );
   for (const directory of hiddenPathsRestoredBySystemMounts)
     operations.push({ type: 'tmpfs', path: directory, hostMask: true });
+  for (const { source, target } of networkConfigFiles) {
+    if (!['/etc/resolv.conf', '/etc/hosts', '/etc/nsswitch.conf'].includes(target))
+      throw new Error(`Unsupported sandbox network configuration file: ${target}`);
+    operations.push({ type: 'file-fd', source, target });
+  }
   return operations;
 }
 

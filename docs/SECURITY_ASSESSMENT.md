@@ -75,17 +75,24 @@ That environment's deployment policy allows `main` only. Store
 repository or organization secret with that name. The `trusted-pr-validation`
 workflow is also loaded from the pull-request base and runs the base validator
 against the candidate snapshot inside Bubblewrap without repository secrets.
+The sandbox unshares external networking and supplies only synthetic `localhost`
+entries plus a resolver file with no nameserver for tests that open local sockets;
+it does not mount the host's `/etc/hosts` or resolver settings, or expose host
+services.
 Contracts in `scripts/validation-engine/workflow-security.contract.mjs` guard
 the workflow structure; the environment's branch policy is configured in
 GitHub repository settings.
 
 GitHub exposes repository secrets to every workflow in the repository, so the
-release webhook must not remain repository-scoped. The announcement job now
-uses the `discord-release` environment, which should allow only `main` and
-`v*` tags. The existing repository secret must be rotated into that environment
-and removed from repository settings; GitHub does not reveal a stored secret's
-value for transfer. Until that is done, same-repository pull-request workflows
-can still reference the old repository secret.
+release webhook must not remain repository-scoped. The announcement jobs use
+the `discord-release` environment, restricted to `main`, and read a separately
+named `DISCORD_WEBHOOK` environment secret. Tag announcements run in a
+default-branch `workflow_run` workflow only after the trusted image workflow
+succeeds. Create a replacement
+webhook in that environment, then delete the repository-level
+`DISCORD_RELEASE_WEBHOOK`; GitHub does not reveal the stored secret's value for
+transfer. Until the repository secret is removed, same-repository
+pull-request workflows can still reference it.
 
 ## Optional pre-import scanning
 
