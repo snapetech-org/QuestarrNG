@@ -15,6 +15,7 @@ import {
 } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { clearTimeout, setTimeout } from 'node:timers';
 import { spawnSync } from 'node:child_process';
 import process from 'node:process';
 import { after, test } from 'node:test';

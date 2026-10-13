@@ -983,7 +983,7 @@ export async function executePlan(root, config, plan, options = {}) {
     return { receipt, runRoot, exitCode: 1 };
   }
 
-  let sourceChanged = false;
+  let sourceChanged;
   const selectedTasks = plan.tasks.filter((item) => item.selected);
   const runningTasks = new Map();
   let lastProgressSummary = null;
