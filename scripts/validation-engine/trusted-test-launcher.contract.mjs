@@ -70,6 +70,13 @@ test('preserves tracked source files with token-like names and excludes credenti
   assert.equal(isSensitiveCandidatePath('.env.local'), true);
   assert.equal(isSensitiveCandidatePath('nested/credentials.txt'), true);
   assert.equal(isSensitiveCandidatePath('tokens.env'), true);
+  assert.equal(isSensitiveCandidatePath('.token'), true);
+  assert.equal(isSensitiveCandidatePath('.auth'), true);
+  assert.equal(isSensitiveCandidatePath('.credentials'), true);
+  assert.equal(isSensitiveCandidatePath('.secrets'), true);
+  assert.equal(isSensitiveCandidatePath('api-key.json'), true);
+  assert.equal(isSensitiveCandidatePath('nested/private-key.ts'), true);
+  assert.equal(isSensitiveCandidatePath('.private-key.ts'), true);
   assert.equal(isSensitiveCandidatePath('token.dat'), true);
   assert.equal(
     isSensitiveCandidatePath('nested/credentials/private-key'),
@@ -163,6 +170,9 @@ test(
     writeFileSync(path.join(source, 'auth.json'), '{"token":"private"}\n');
     writeFileSync(path.join(source, 'token.json'), '{"token":"private"}\n');
     writeFileSync(path.join(source, 'tokens.env'), 'PRIVATE_TOKENS_CANARY=hidden\n');
+    writeFileSync(path.join(source, '.token'), 'DOT_TOKEN_CANARY=hidden\\n');
+    writeFileSync(path.join(source, 'api-key.json'), '{"api_key":"hidden"}\\n');
+    writeFileSync(path.join(source, '.private-key.ts'), 'PRIVATE_KEY_CANARY=hidden\\n');
     mkdirSync(path.join(source, 'nested/credentials'), { recursive: true });
     writeFileSync(path.join(source, 'nested/credentials/private-key'), 'private credential\n');
     writeFileSync(path.join(source, 'nested/credentials/settings.json'), '{"secret":"hidden"}\n');
@@ -202,6 +212,9 @@ assert.equal(existsSync('/mnt/workspace/nested/config/operator.json'), false);
 assert.equal(existsSync('/mnt/workspace/auth.json'), false);
 assert.equal(existsSync('/mnt/workspace/token.json'), false);
 assert.equal(existsSync('/mnt/workspace/tokens.env'), false);
+assert.equal(existsSync('/mnt/workspace/.token'), false);
+assert.equal(existsSync('/mnt/workspace/api-key.json'), false);
+assert.equal(existsSync('/mnt/workspace/.private-key.ts'), false);
 assert.equal(existsSync('/mnt/workspace/token.dat'), false);
 assert.equal(existsSync('/mnt/workspace/nested/credentials/private-key'), false);
 assert.equal(existsSync('/mnt/workspace/nested/credentials/settings.json'), false);
