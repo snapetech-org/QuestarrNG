@@ -85,7 +85,7 @@ export function sandboxMountOperations({
   guestMarker,
 }) {
   const checkout = path.resolve(sourceRoot);
-  for (const [source, target] of systemMounts) {
+  for (const [source] of systemMounts) {
     for (const directory of hiddenDirectories) {
       if (isWithin(directory, source) || (isWithin(source, directory) && directory !== checkout))
         throw new Error(
