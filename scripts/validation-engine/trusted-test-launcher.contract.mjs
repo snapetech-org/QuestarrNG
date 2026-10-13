@@ -72,8 +72,18 @@ assert.match(
 );
 assert.match(
   launcherSource,
-  /\['\/etc\/hosts', '\/etc\/nsswitch\.conf', '\/etc\/resolv\.conf'\]/u,
-  'the isolated dependency prewarm receives DNS configuration without mounting the host /etc tree'
+  /source: sandboxHostsFile,\s*target: '\/etc\/hosts'/u,
+  'candidate validation uses a synthetic localhost hosts file'
+);
+assert.match(
+  launcherSource,
+  /source: sandboxNsswitchFile,\s*target: '\/etc\/nsswitch\.conf'/u,
+  'candidate validation uses an isolated resolver lookup order'
+);
+assert.match(
+  launcherSource,
+  /source: networkAccess \? realpathSync\('\/etc\/resolv\.conf'\) : sandboxResolvFile/u,
+  'only dependency prewarming receives resolver configuration'
 );
 for (const hostPath of ['/etc', '/opt', '/srv', '/usr/local'])
   assert.ok(

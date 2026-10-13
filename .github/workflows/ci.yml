@@ -204,12 +204,12 @@ jobs:
           node-version: 26.x
           cache: "npm" # zizmor: ignore[cache-poisoning]
 
-      - name: Prepare reviewed launcher, npm runtime, and offline dependency cache
+      - name: Prepare reviewed launcher and npm runtime
         env:
           NPM_CONFIG_CACHE: ${{ runner.temp }}/questarrng-npm-cache
           TRUSTED_BASE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
-          BOOTSTRAP_LAUNCHER_REF: codex/trusted-validation-bootstrap-20261013
-          BOOTSTRAP_LAUNCHER_SHA: 08477cafdd855a9315cc6f90a767dd6a06810b18
+          BOOTSTRAP_LAUNCHER_REF: codex/security-trusted-validation-20261013
+          BOOTSTRAP_LAUNCHER_SHA: df7b9e1034975b8eb4bbee4549d9327ba0bb6d8b
         run: |
           set -euo pipefail
           umask 077
@@ -232,9 +232,9 @@ jobs:
               exit 1
             fi
             git fetch --no-tags origin "refs/heads/$BOOTSTRAP_LAUNCHER_REF"
-            fetched_launcher_sha="$(git rev-parse 'FETCH_HEAD^{commit}')"
-            if [ "$fetched_launcher_sha" != "$launcher_sha" ]; then
-              echo "The fetched bootstrap launcher does not match its pinned SHA." >&2
+            if ! git cat-file -e "$launcher_sha^{commit}" 2>/dev/null || \
+              ! git merge-base --is-ancestor "$launcher_sha" FETCH_HEAD; then
+              echo "The pinned bootstrap launcher is not in the fetched reviewed history." >&2
               exit 1
             fi
           fi
@@ -262,36 +262,6 @@ jobs:
           const { validateCandidateLockfile } = await import(pathToFileURL(policyPath).href);
           validateCandidateLockfile(candidateRoot);
           NODE
-
-          cache_seed="$(mktemp -d "$RUNNER_TEMP/questarr-cache-seed.XXXXXX")"
-          trap 'rm -rf "$cache_seed"' EXIT
-          mkdir -p "$cache_seed/vendor"
-          for tracked_path in package.json package-lock.json vendor vendor/node-forge; do
-            if [ -L "$GITHUB_WORKSPACE/$tracked_path" ]; then
-              echo "Refusing a linked npm cache input: $tracked_path" >&2
-              exit 1
-            fi
-          done
-          while IFS= read -r -d '' tracked_path; do
-            if [ -L "$GITHUB_WORKSPACE/$tracked_path" ]; then
-              echo "Refusing a linked npm cache input: $tracked_path" >&2
-              exit 1
-            fi
-          done < <(git ls-files -z -- package.json package-lock.json vendor/node-forge)
-          cp package.json package-lock.json "$cache_seed/"
-          cp -R vendor/node-forge "$cache_seed/vendor/node-forge"
-          empty_npm_user_config="$RUNNER_TEMP/questarr-empty-user.npmrc"
-          empty_npm_global_config="$RUNNER_TEMP/questarr-empty-global.npmrc"
-          : > "$empty_npm_user_config"
-          : > "$empty_npm_global_config"
-          (
-            cd "$cache_seed"
-            NPM_CONFIG_USERCONFIG="$empty_npm_user_config" \
-              NPM_CONFIG_GLOBALCONFIG="$empty_npm_global_config" \
-              "$trusted_root/.github/npm-runtime/node_modules/.bin/npm" ci \
-                --ignore-scripts --no-audit --no-fund \
-                --strict-ssl=true --registry=https://registry.npmjs.org/
-          )
 
       - name: Install Bubblewrap for isolated tests
         run: |
@@ -375,12 +345,12 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm" # zizmor: ignore[cache-poisoning]
 
-      - name: Prepare reviewed launcher, npm runtime, and offline dependency cache
+      - name: Prepare reviewed launcher and npm runtime
         env:
           NPM_CONFIG_CACHE: ${{ runner.temp }}/questarrng-npm-cache
           TRUSTED_BASE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
-          BOOTSTRAP_LAUNCHER_REF: codex/trusted-validation-bootstrap-20261013
-          BOOTSTRAP_LAUNCHER_SHA: 08477cafdd855a9315cc6f90a767dd6a06810b18
+          BOOTSTRAP_LAUNCHER_REF: codex/security-trusted-validation-20261013
+          BOOTSTRAP_LAUNCHER_SHA: df7b9e1034975b8eb4bbee4549d9327ba0bb6d8b
         run: |
           set -euo pipefail
           umask 077
@@ -403,9 +373,9 @@ jobs:
               exit 1
             fi
             git fetch --no-tags origin "refs/heads/$BOOTSTRAP_LAUNCHER_REF"
-            fetched_launcher_sha="$(git rev-parse 'FETCH_HEAD^{commit}')"
-            if [ "$fetched_launcher_sha" != "$launcher_sha" ]; then
-              echo "The fetched bootstrap launcher does not match its pinned SHA." >&2
+            if ! git cat-file -e "$launcher_sha^{commit}" 2>/dev/null || \
+              ! git merge-base --is-ancestor "$launcher_sha" FETCH_HEAD; then
+              echo "The pinned bootstrap launcher is not in the fetched reviewed history." >&2
               exit 1
             fi
           fi
@@ -433,36 +403,6 @@ jobs:
           const { validateCandidateLockfile } = await import(pathToFileURL(policyPath).href);
           validateCandidateLockfile(candidateRoot);
           NODE
-
-          cache_seed="$(mktemp -d "$RUNNER_TEMP/questarr-cache-seed.XXXXXX")"
-          trap 'rm -rf "$cache_seed"' EXIT
-          mkdir -p "$cache_seed/vendor"
-          for tracked_path in package.json package-lock.json vendor vendor/node-forge; do
-            if [ -L "$GITHUB_WORKSPACE/$tracked_path" ]; then
-              echo "Refusing a linked npm cache input: $tracked_path" >&2
-              exit 1
-            fi
-          done
-          while IFS= read -r -d '' tracked_path; do
-            if [ -L "$GITHUB_WORKSPACE/$tracked_path" ]; then
-              echo "Refusing a linked npm cache input: $tracked_path" >&2
-              exit 1
-            fi
-          done < <(git ls-files -z -- package.json package-lock.json vendor/node-forge)
-          cp package.json package-lock.json "$cache_seed/"
-          cp -R vendor/node-forge "$cache_seed/vendor/node-forge"
-          empty_npm_user_config="$RUNNER_TEMP/questarr-empty-user.npmrc"
-          empty_npm_global_config="$RUNNER_TEMP/questarr-empty-global.npmrc"
-          : > "$empty_npm_user_config"
-          : > "$empty_npm_global_config"
-          (
-            cd "$cache_seed"
-            NPM_CONFIG_USERCONFIG="$empty_npm_user_config" \
-              NPM_CONFIG_GLOBALCONFIG="$empty_npm_global_config" \
-              "$trusted_root/.github/npm-runtime/node_modules/.bin/npm" ci \
-                --ignore-scripts --no-audit --no-fund \
-                --strict-ssl=true --registry=https://registry.npmjs.org/
-          )
 
       - name: Install Bubblewrap for isolated build
         run: |
