@@ -75,7 +75,11 @@ and common host data roots such as `/opt`, `/srv`, and `/usr/local`, then disabl
 network access. If the checkout is outside those standard roots, it also masks
 the checkout's parent (or the checkout itself if it sits directly under `/`),
 so candidate code cannot reach the original worktree around the filtered
-snapshot. The complete `node_modules` tree is mounted read-only without filtering,
+snapshot. Before those paths are masked, the trusted launcher opens each workspace,
+run-data, dependency, cache, and marker source as an inherited file descriptor.
+Bubblewrap binds those pinned descriptors after applying the host masks, so source
+resolution does not depend on paths that the sandbox has already hidden. The
+complete `node_modules` tree is mounted read-only without filtering,
 so use only a trusted installed dependency tree that contains no credentials or
 other local secrets. The host root is otherwise visible read-only, so use this
 launcher only on a machine where other system-wide readable files do not contain
