@@ -85,6 +85,13 @@ export function sandboxMountOperations({
   guestMarker,
 }) {
   const checkout = path.resolve(sourceRoot);
+  for (const [source] of externalMounts) {
+    const externalRoot = path.resolve(source);
+    if (isWithin(checkout, externalRoot) || isWithin(externalRoot, checkout))
+      throw new Error(
+        `External runtime mount source overlaps the candidate checkout: ${source}`
+      );
+  }
   for (const [source] of systemMounts) {
     for (const directory of hiddenDirectories) {
       if (isWithin(directory, source) || (isWithin(source, directory) && directory !== checkout))

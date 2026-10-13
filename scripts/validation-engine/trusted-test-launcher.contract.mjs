@@ -295,6 +295,43 @@ test('binds open sources only after masking their host directories', () => {
   assert.equal(descriptorBinds.at(-1).source, '/home/runner/work/_temp/validation-run/sandbox-marker');
 });
 
+test('rejects external runtime mounts that overlap the candidate checkout', () => {
+  const shared = {
+    sourceRoot: '/opt/node-v26/candidates/repo',
+    workspace: '/mnt/workspace',
+    runDirectory: '/mnt/run-data',
+    dependencyMounts: [],
+    systemMounts: [],
+    hiddenDirectories: ['/opt'],
+    guestWorkspace: '/mnt/workspace',
+    guestRun: '/mnt/run-data',
+    markerFile: '/run/validation-engine-sandbox',
+    guestMarker: '/run/validation-engine-sandbox',
+  };
+
+  assert.throws(
+    () =>
+      sandboxMountOperations({
+        ...shared,
+        externalMounts: [['/opt/node-v26', '/mnt/run-data/dependencies/0']],
+      }),
+    /External runtime mount source overlaps the candidate checkout/u,
+    'a runtime root containing the checkout must not restore its filtered files'
+  );
+
+  assert.throws(
+    () =>
+      sandboxMountOperations({
+        ...shared,
+        externalMounts: [
+          ['/opt/node-v26/candidates/repo/toolchain', '/mnt/run-data/dependencies/0'],
+        ],
+      }),
+    /External runtime mount source overlaps the candidate checkout/u,
+    'a runtime root within the checkout must not expose unsnapshotted files'
+  );
+});
+
 test(
   'trusted launcher contains import-time candidate code before it runs',
   { skip: !sandboxAvailable && 'bubblewrap user namespaces are unavailable' },
