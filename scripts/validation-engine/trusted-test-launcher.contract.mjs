@@ -1,4 +1,5 @@
 // Copyright (c) snapetech and SeerrNG contributors.
+import { Buffer } from 'node:buffer';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
 import {
