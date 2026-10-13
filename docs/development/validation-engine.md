@@ -43,16 +43,23 @@ that is removed with the task environment.
 
 The in-repository CLI imports candidate JavaScript before task subprocesses
 start. For an unreviewed checkout, do not run its CLI directly on the host.
-Copy both `trusted-test-launcher.mjs` and
-`trusted-test-sandbox-policy.mjs` from the same reviewed revision to a location
-outside the checkout, keeping them together, then use the trusted copy to run
-focused Node contract tests:
+Use a separate clean trusted clone checked out at a reviewed commit; do not use
+the unreviewed candidate checkout as `TRUSTED_REPO`. Copy both
+`trusted-test-launcher.mjs` and `trusted-test-sandbox-policy.mjs` from that same
+revision to a location outside the candidate checkout, keeping them together,
+then use the trusted copy to run focused Node contract tests:
 
 ```sh
+TRUSTED_REPO=/path/to/clean-trusted-checkout
+# Replace this with the full SHA of the reviewed commit in that checkout.
+TRUSTED_REV=REVIEWED_FULL_COMMIT_SHA
 mkdir -p /tmp/trusted-validation-launcher
-cp scripts/validation-engine/trusted-test-launcher.mjs \
-  scripts/validation-engine/trusted-test-sandbox-policy.mjs \
-  /tmp/trusted-validation-launcher/
+git -C "$TRUSTED_REPO" show \
+  "$TRUSTED_REV:scripts/validation-engine/trusted-test-launcher.mjs" \
+  > /tmp/trusted-validation-launcher/trusted-test-launcher.mjs
+git -C "$TRUSTED_REPO" show \
+  "$TRUSTED_REV:scripts/validation-engine/trusted-test-sandbox-policy.mjs" \
+  > /tmp/trusted-validation-launcher/trusted-test-sandbox-policy.mjs
 node /tmp/trusted-validation-launcher/trusted-test-launcher.mjs "$PWD" -- node --test \
   scripts/validation-engine/engine.contract.mjs \
   scripts/validation-engine/trusted-test-launcher.contract.mjs \
