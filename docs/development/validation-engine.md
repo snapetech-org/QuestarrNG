@@ -59,10 +59,13 @@ ignored checkout files, including a local `auth.json`, never enter the snapshot.
 Stage new candidate files before using the launcher. It hides the invoking
 home, temporary files, common service sockets, host configuration under `/etc`,
 and common host data roots such as `/opt`, `/srv`, and `/usr/local`, then disables
-network access. Candidate dependencies are mounted read-only. The host root is
-otherwise visible read-only, so use this launcher only on a machine where other
-system-wide readable files do not contain secrets. It fails before starting
-candidate code if the required isolation is unavailable. Use the complete
+network access. If the checkout is outside those standard roots, it also masks
+the checkout's parent (or the checkout itself if it sits directly under `/`),
+so candidate code cannot reach the original worktree around the filtered
+snapshot. Candidate dependencies are mounted read-only. The host root is
+otherwise visible read-only, so use this launcher only on a machine
+where other system-wide readable files do not contain secrets. It fails before
+starting candidate code if the required isolation is unavailable. Use the complete
 GitHub-hosted validation run for the full test suite. The test job does not
 receive the Codecov upload token for pull requests; coverage and test-result
 uploads run only after trusted pushes to `main`.

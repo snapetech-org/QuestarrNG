@@ -18,33 +18,12 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { hostPathsToHide } from './trusted-test-sandbox-policy.mjs';
 
 const GUEST_WORKSPACE = '/mnt/workspace';
 const GUEST_RUN = '/mnt/run-data';
 const GUEST_MARKER = '/run/validation-engine-sandbox';
 const GIT = ['/usr/bin/git', '/bin/git'].find(existsSync);
-const HOST_PATHS_TO_HIDE = [
-  '/etc',
-  '/home',
-  '/root',
-  '/run',
-  '/var',
-  '/tmp',
-  '/sys',
-  '/media',
-  '/mnt',
-  '/opt',
-  '/srv',
-  '/usr/local',
-  '/workspace',
-  '/workspaces',
-  '/data',
-  '/backup',
-  '/backups',
-  '/volumes',
-  '/secrets',
-  '/credentials',
-];
 const sensitiveName =
   /^(?:\.env(?:$|\.(?!example$)[^/]+)|\.ssh|\.aws|\.gnupg|id_(?:rsa|ed25519)|auth(?:entication)?(?:\.[^/]+)?|tokens?(?:\.[^/]+)?|credentials?(?:\.[^/]+)?|secrets?(?:\.[^/]+)?|\.git-credentials|\.npmrc|\.pypirc|\.netrc|[^/]+\.(?:pem|key))$/iu;
 
@@ -226,6 +205,7 @@ function bubblewrapPath() {
 }
 
 function makeSandboxCommand({
+  sourceRoot,
   workspace,
   runDirectory,
   dependencies,
@@ -306,7 +286,7 @@ function makeSandboxCommand({
     '/',
     '/',
   ];
-  for (const directory of HOST_PATHS_TO_HIDE)
+  for (const directory of hostPathsToHide(sourceRoot))
     if (directory === '/mnt' || existsSync(directory))
       args.push('--tmpfs', directory);
   args.push(
@@ -437,6 +417,7 @@ async function main() {
     createSyntheticGitRepository(workspace, runDirectory);
     const dependencies = linkDependencies(sourceRoot, workspace);
     const command = makeSandboxCommand({
+      sourceRoot,
       workspace,
       runDirectory,
       dependencies,
