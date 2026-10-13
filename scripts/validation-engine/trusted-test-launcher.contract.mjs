@@ -164,6 +164,7 @@ test(
     const hostSocket = path.join(parent, 'host-canary.sock');
     const candidateWrite = path.join(source, 'launcher-write-canary.txt');
     const systemNode = existsSync('/usr/bin/node') ? '/usr/bin/node' : undefined;
+    const launcherNode = systemNode ?? process.execPath;
     const hostOnlyProbe =
       ['/usr/share/doc', '/usr/share/man'].find(existsSync) ?? '/usr/share/doc';
     mkdirSync(path.join(source, 'bin'), { recursive: true });
@@ -299,14 +300,14 @@ assert.throws(() => writeFileSync('/mnt/workspace/node_modules/marker.txt', 'cha
       path.join(source, 'nested/config/operator.json'),
       '{"private":true}\n'
     );
-    const missingCommandResult = spawnSync(process.execPath, [launcher, source], {
+    const missingCommandResult = spawnSync(launcherNode, [launcher, source], {
       encoding: 'utf8',
       timeout: 30_000,
     });
     assert.equal(missingCommandResult.status, 1);
     assert.match(missingCommandResult.stderr, /Pass a candidate test command after --/u);
 
-    const npmResult = spawnSync(process.execPath, [launcher, source, '--', 'npm', '--version'], {
+    const npmResult = spawnSync(launcherNode, [launcher, source, '--', 'npm', '--version'], {
       encoding: 'utf8',
       timeout: 30_000,
     });
@@ -328,14 +329,14 @@ assert.throws(() => writeFileSync('/mnt/workspace/node_modules/marker.txt', 'cha
     }
 
     const result = spawnSync(
-      process.execPath,
+      launcherNode,
       [
         launcher,
         source,
         '--playwright-cache',
         browserCache,
         '--',
-        process.execPath,
+        launcherNode,
         'bin/run-local-validation.mjs',
       ],
       {
@@ -355,12 +356,12 @@ assert.throws(() => writeFileSync('/mnt/workspace/node_modules/marker.txt', 'cha
 
     rmSync(path.join(source, 'web/src/lib/token.js'));
     const deletedFileResult = spawnSync(
-      process.execPath,
+      launcherNode,
       [
         launcher,
         source,
         '--',
-        process.execPath,
+        launcherNode,
         '-e',
         `import assert from 'node:assert/strict'; import { existsSync } from 'node:fs'; assert.equal(existsSync('/mnt/workspace/web/src/lib/token.js'), false);`,
       ],
@@ -376,8 +377,8 @@ assert.throws(() => writeFileSync('/mnt/workspace/node_modules/marker.txt', 'cha
     rmSync(path.join(source, 'node_modules'), { recursive: true, force: true });
     symlinkSync(outsideDependencies, path.join(source, 'node_modules'), 'dir');
     const linkedDependencyResult = spawnSync(
-      process.execPath,
-      [launcher, source, '--', process.execPath, '-e', 'process.exit(99)'],
+      launcherNode,
+      [launcher, source, '--', launcherNode, '-e', 'process.exit(99)'],
       { encoding: 'utf8', timeout: 30_000 }
     );
     assert.equal(linkedDependencyResult.error, undefined);
