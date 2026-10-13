@@ -188,12 +188,21 @@ The npm runtime installer and lockfiles are archived from the same selected
 trusted revision as the launcher: the base commit when it contains the engine,
 or the pinned bootstrap commit for an older base.
 
-During a run, the engine writes a task summary to stderr when each task starts
-and finishes, and repeats it every minute while a task is still running. This
-keeps progress visible in a terminal or live GitHub Actions log without mixing
-status text into the final JSON summary on stdout. Native case counts are
-authoritative when each native command finishes; the heartbeat reports task
-status and elapsed time while that command is running.
+The engine runs up to two independent tasks together when their dependencies
+and output groups allow it. The dependency graph still determines what can
+start; coverage, type checking, production builds, and browser tests share a
+resource group so they do not compete for the runner's limited CPU and memory.
+Each receipt retains its task stage and concurrency group. The engine checks the
+candidate source before and after each concurrent batch and rejects passing
+results if the source changes while tasks are running.
+
+During a run, the engine writes a task summary to stderr when tasks start and
+finish, and repeats it every minute while work is still running. Active task
+names and elapsed times are shown together. This keeps progress visible in a
+terminal or live GitHub Actions log without mixing status text into the final
+JSON summary on stdout. Native case counts are authoritative when each native
+command finishes; the heartbeat reports task status and elapsed time while
+commands are running.
 
 The GitHub workflow runs the full Vitest suite once on Node 26 and checks the
 production build on Node 22 and Node 26. Each run exports a short-lived,
