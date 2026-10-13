@@ -70,10 +70,11 @@ The launcher snapshots the candidate and enters bubblewrap before loading its
 JavaScript. It copies only paths recorded in the Git index; untracked and
 ignored checkout files, including a local `auth.json`, never enter the snapshot.
 Dotted and extensionless credential names, private/API keys,
-access/refresh-token names, client-secret names, and credential material with
-source-like extensions are excluded. Source modules
-under credential folders remain available unless their own names identify
-credential material. Stage new
+access/refresh-token names, client-secret names, suffixed dotenv credentials
+such as \`tokens.env.local\` and \`secrets.env.production\`, and credential
+material with source-like extensions are excluded. Safe example templates such
+as \`tokens.env.example\` and source modules under credential folders remain
+available unless their own names identify credential material. Stage new
 candidate files before using the launcher. It hides the invoking
 home, temporary files, common service sockets, host configuration under `/etc`,
 and common host data roots such as `/opt`, `/srv`, and `/usr/local`, then disables

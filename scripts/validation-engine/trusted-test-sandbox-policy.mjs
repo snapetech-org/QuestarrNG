@@ -130,6 +130,8 @@ const sensitiveName =
   /^(?:[.]env(?:$|[.](?!example$)[^/]+)|[.]ssh|[.]aws|[.]gnupg|id_(?:rsa|ed25519)|[.]git-credentials|[.]npmrc|[.]pypirc|[.]netrc|[^/]+[.](?:pem|key))$/iu;
 const sensitiveCredentialName =
   /^[.]?(?:auth(?:entication)?|tokens?|credentials?|secrets?|private[-_]?keys?|api[-_]?keys?|access[-_]?tokens?|refresh[-_]?tokens?|client[-_]?secrets?)(?:[.][^/]+)?$/iu;
+const credentialEnvironmentExample =
+  /^[.]?(?:auth(?:entication)?|tokens?|credentials?|secrets?|private[-_]?keys?|api[-_]?keys?|access[-_]?tokens?|refresh[-_]?tokens?|client[-_]?secrets?)[.]env[.]example$/iu;
 const sensitiveCredentialMaterialFile =
   /^[.]?(?:private[-_]?keys?|api[-_]?keys?|access[-_]?tokens?|refresh[-_]?tokens?|client[-_]?secrets?)[.][^/]+$/iu;
 const sourceCodeFile =
@@ -143,8 +145,10 @@ export function isSensitiveCandidatePath(relativePath) {
     return true;
 
   const filename = segments.at(-1) ?? '';
-  const hasCredentialNamedSegment = segments.some((segment) =>
-    sensitiveCredentialName.test(segment)
+  const hasCredentialNamedSegment = segments.some(
+    (segment) =>
+      sensitiveCredentialName.test(segment) &&
+      !credentialEnvironmentExample.test(segment)
   );
   return (
     sensitiveCredentialMaterialFile.test(filename) ||
