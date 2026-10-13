@@ -1018,11 +1018,15 @@ async function main() {
   const reportsOutputPath = reportsOutput
     ? prepareReportsOutput(reportsOutput, sourceRoot)
     : undefined;
-  const runDirectory = mkdtempSync(path.join(tmpdir(), 'trusted-validation-run-'));
-  const workspace = path.join(runDirectory, 'workspace');
-  mkdirSync(workspace, { mode: 0o700 });
-  mkdirSync(path.join(runDirectory, 'validation-output'), { mode: 0o700 });
+  const temporaryRoot = mkdtempSync(
+    path.join(tmpdir(), 'trusted-validation-run-')
+  );
+  const runDirectory = path.join(temporaryRoot, 'run-data');
+  const workspace = path.join(temporaryRoot, 'workspace');
   try {
+    mkdirSync(runDirectory, { mode: 0o700 });
+    mkdirSync(workspace, { mode: 0o700 });
+    mkdirSync(path.join(runDirectory, 'validation-output'), { mode: 0o700 });
     const hostTemplate = path.join(runDirectory, 'trusted-git-template');
     const hostEnv = gitEnvironment(sourceRoot, hostTemplate);
     mkdirSync(hostEnv.GIT_TEMPLATE_DIR, { mode: 0o700 });
@@ -1124,7 +1128,7 @@ async function main() {
     if (reportsOutputPath) exportTestReports(workspace, reportsOutputPath);
     return exitCode;
   } finally {
-    rmSync(runDirectory, { recursive: true, force: true });
+    rmSync(temporaryRoot, { recursive: true, force: true });
   }
 }
 

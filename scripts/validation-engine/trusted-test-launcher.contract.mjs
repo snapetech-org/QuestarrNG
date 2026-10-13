@@ -362,6 +362,40 @@ test('binds open sources only after masking their host directories', () => {
   assert.equal(descriptorBinds.at(-1).source, '/home/runner/work/_temp/validation-run/sandbox-marker');
 });
 
+test('rejects run-data mounts that contain or overlap the candidate workspace', () => {
+  const shared = {
+    sourceRoot: '/home/runner/work/project',
+    externalMounts: [],
+    dependencyMounts: [],
+    systemMounts: [],
+    hiddenDirectories: ['/home'],
+    guestWorkspace: '/mnt/workspace',
+    guestRun: '/mnt/run-data',
+    markerFile: '/run/validation-engine-sandbox',
+    guestMarker: '/run/validation-engine-sandbox',
+  };
+
+  assert.throws(
+    () =>
+      sandboxMountOperations({
+        ...shared,
+        workspace: '/tmp/trusted-validation-run/workspace',
+        runDirectory: '/tmp/trusted-validation-run',
+      }),
+    /workspace and sandbox run data must use disjoint host directories/u,
+    'binding the parent run directory would expose a writable alias of workspace/.git'
+  );
+  assert.throws(
+    () =>
+      sandboxMountOperations({
+        ...shared,
+        workspace: '/tmp/trusted-validation-run',
+        runDirectory: '/tmp/trusted-validation-run/run-data',
+      }),
+    /workspace and sandbox run data must use disjoint host directories/u
+  );
+});
+
 test('rejects external runtime mounts that overlap the candidate checkout', () => {
   const shared = {
     sourceRoot: '/opt/node-v26/candidates/repo',
@@ -1064,6 +1098,7 @@ test(
       "assert.equal(process.env.GITHUB_REPOSITORY, 'snapetech/QuestarrNG');",
       "assert.equal(process.env.GITHUB_WORKFLOW, 'Trusted PR validation');",
       "assert.equal(process.env.GITHUB_JOB, 'trusted-pr-validation');",
+      "assert.equal(existsSync('/mnt/run-data/workspace/.git'), false, 'run data must not alias the candidate Git metadata');",
       "const gitConfigWrite = spawnSync('git', ['config', '--local', 'diff.external', '/bin/true'], { cwd: '/mnt/workspace', encoding: 'utf8' });",
       "assert.notEqual(gitConfigWrite.status, 0, 'candidate tasks cannot change synthetic Git metadata');",
       'assert.equal(process.env.GITHUB_TOKEN, undefined);',

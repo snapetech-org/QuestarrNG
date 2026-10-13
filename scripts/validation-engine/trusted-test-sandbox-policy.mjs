@@ -87,6 +87,12 @@ export function sandboxMountOperations({
   guestMarker,
 }) {
   const checkout = path.resolve(sourceRoot);
+  const workspaceRoot = path.resolve(workspace);
+  const runRoot = path.resolve(runDirectory);
+  if (isWithin(runRoot, workspaceRoot) || isWithin(workspaceRoot, runRoot))
+    throw new Error(
+      'Candidate workspace and sandbox run data must use disjoint host directories.'
+    );
   for (const [source] of externalMounts) {
     const externalRoot = path.resolve(source);
     if (isWithin(checkout, externalRoot) || isWithin(externalRoot, checkout))
