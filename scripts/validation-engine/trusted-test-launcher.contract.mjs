@@ -3,10 +3,13 @@ import { Buffer } from 'node:buffer';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
 import {
+  chmodSync,
+  copyFileSync,
   existsSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
+  realpathSync,
   rmSync,
   symlinkSync,
   statSync,
@@ -110,6 +113,15 @@ const sandboxAvailable = (() => {
   );
 })();
 const sandboxRequired = process.env.REQUIRE_VALIDATION_SANDBOX === '1';
+
+function createDedicatedNodeRuntime(parent) {
+  const runtimeBin = path.join(parent, `node-v${process.versions.node}`, 'bin');
+  mkdirSync(runtimeBin, { recursive: true, mode: 0o700 });
+  const runtime = path.join(runtimeBin, path.basename(process.execPath));
+  copyFileSync(process.execPath, runtime);
+  chmodSync(runtime, 0o555);
+  return runtime;
+}
 
 test(
   'requires Bubblewrap when the validation sandbox is mandatory',
@@ -402,8 +414,9 @@ test(
     );
     const hostSocket = path.join(socketParent, 'host-canary.sock');
     const candidateWrite = path.join(source, 'launcher-write-canary.txt');
-    const systemNode = existsSync('/usr/bin/node') ? '/usr/bin/node' : undefined;
-    const launcherNode = systemNode ?? process.execPath;
+    const runtimeRoot = path.dirname(path.dirname(realpathSync(process.execPath)));
+    const systemNode = runtimeRoot === '/usr' ? process.execPath : undefined;
+    const launcherNode = createDedicatedNodeRuntime(parent);
     const hostOnlyProbe =
       ['/usr/share/doc', '/usr/share/man'].find(existsSync) ?? '/usr/share/doc';
     assert.ok(
@@ -939,7 +952,7 @@ test(
   { skip: !sandboxAvailable && 'bubblewrap user namespaces are unavailable' },
   (t) => {
     const parent = mkdtempSync(path.join(tmpdir(), 'trusted-pr-launcher-'));
-    const launcherNode = existsSync('/usr/bin/node') ? '/usr/bin/node' : process.execPath;
+    const launcherNode = createDedicatedNodeRuntime(parent);
     const candidateRoot = path.join(parent, 'candidate');
     const trustedRoot = path.join(parent, 'trusted');
     const gitTemplate = path.join(parent, 'git-template');
