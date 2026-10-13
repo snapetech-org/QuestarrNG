@@ -67,6 +67,19 @@ const sandboxAvailable = (() => {
     ).status === 0
   );
 })();
+const sandboxRequired = process.env.REQUIRE_VALIDATION_SANDBOX === '1';
+
+test(
+  'requires Bubblewrap when the validation sandbox is mandatory',
+  { skip: !sandboxRequired && 'mandatory sandbox mode is not enabled' },
+  () => {
+    assert.equal(
+      sandboxAvailable,
+      true,
+      'Bubblewrap user namespaces must work when REQUIRE_VALIDATION_SANDBOX=1'
+    );
+  }
+);
 
 test('preserves tracked source files with token-like names and excludes credential files', () => {
   assert.equal(isSensitiveCandidatePath('web/src/lib/token.js'), false);
@@ -110,12 +123,141 @@ test('preserves tracked source files with token-like names and excludes credenti
     isSensitiveCandidatePath('nested/credentials/TokenStore.ts'),
     false,
   );
+  assert.equal(isSensitiveCandidatePath('server/routes/api-keys.ts'), false);
+  assert.equal(isSensitiveCandidatePath('charts/questarr/templates/secret.yaml'), false);
+  assert.equal(isSensitiveCandidatePath('docs/SECRETS.md'), false);
+  assert.equal(isSensitiveCandidatePath('docs/secrets.json'), true);
+});
+
+test('keeps system runtime directories while remasking checkouts beneath them', () => {
+  const checkout = '/usr/bin/QuestarrNG';
+  const hiddenDirectories = hostPathsToHide(checkout).filter(
+    (directory) => directory === checkout
+  );
+  assert.deepEqual(hiddenDirectories, [checkout]);
+  const operations = sandboxMountOperations({
+    sourceRoot: checkout,
+    workspace: '/mnt/workspace',
+    runDirectory: '/mnt/run-data',
+    externalMounts: [],
+    dependencyMounts: [],
+    systemMounts: [['/usr/bin', '/usr/bin']],
+    hiddenDirectories,
+    guestWorkspace: '/mnt/workspace',
+    guestRun: '/mnt/run-data',
+    markerFile: '/run/validation-engine-sandbox',
+    guestMarker: '/run/validation-engine-sandbox',
+  });
+  const systemBind = operations.findIndex(
+    (operation) => operation.type === 'ro-bind-fd' && operation.target === '/usr/bin'
+  );
+  const checkoutMask = operations.findLastIndex(
+    (operation) => operation.type === 'tmpfs' && operation.path === checkout
+  );
+  assert.ok(systemBind >= 0);
+  assert.ok(checkoutMask > systemBind);
+
+  const aliasedSystemOperations = sandboxMountOperations({
+    sourceRoot: checkout,
+    workspace: '/mnt/workspace',
+    runDirectory: '/mnt/run-data',
+    externalMounts: [],
+    dependencyMounts: [],
+    systemMounts: [['/usr/bin', '/bin']],
+    hiddenDirectories,
+    guestWorkspace: '/mnt/workspace',
+    guestRun: '/mnt/run-data',
+    markerFile: '/run/validation-engine-sandbox',
+    guestMarker: '/run/validation-engine-sandbox',
+  });
+  const aliasedSystemBind = aliasedSystemOperations.findIndex(
+    (operation) => operation.type === 'ro-bind-fd' && operation.target === '/bin'
+  );
+  const aliasedCheckoutMask = aliasedSystemOperations.findLastIndex(
+    (operation) => operation.type === 'tmpfs' && operation.path === '/bin/QuestarrNG'
+  );
+  assert.ok(aliasedCheckoutMask > aliasedSystemBind);
+
+  const nestedAliasOperations = sandboxMountOperations({
+    sourceRoot: checkout,
+    workspace: '/mnt/workspace',
+    runDirectory: '/mnt/run-data',
+    externalMounts: [],
+    dependencyMounts: [],
+    systemMounts: [['/usr', '/usr/bin']],
+    hiddenDirectories,
+    guestWorkspace: '/mnt/workspace',
+    guestRun: '/mnt/run-data',
+    markerFile: '/run/validation-engine-sandbox',
+    guestMarker: '/run/validation-engine-sandbox',
+  });
+  assert.ok(
+    nestedAliasOperations.findLastIndex(
+      (operation) =>
+        operation.type === 'tmpfs' &&
+        operation.path === '/usr/bin/bin/QuestarrNG'
+    ) >
+      nestedAliasOperations.findIndex(
+        (operation) => operation.type === 'ro-bind-fd' && operation.target === '/usr/bin'
+      )
+  );
+  assert.throws(
+    () =>
+      sandboxMountOperations({
+        sourceRoot: checkout,
+        workspace: '/mnt/workspace',
+        runDirectory: '/mnt/run-data',
+        externalMounts: [],
+        dependencyMounts: [],
+        systemMounts: [['/usr', '/usr/bin']],
+        hiddenDirectories: [checkout, '/usr/local'],
+        guestWorkspace: '/mnt/workspace',
+        guestRun: '/mnt/run-data',
+        markerFile: '/run/validation-engine-sandbox',
+        guestMarker: '/run/validation-engine-sandbox',
+      }),
+    /System runtime mount source overlaps a hidden host path/u,
+    'a broad runtime source must not restore a separate hidden host root'
+  );
+
+  const topLevelCheckout = '/usr/QuestarrNG';
+  const topLevelHidden = hostPathsToHide(topLevelCheckout);
+  assert.equal(topLevelHidden.includes('/usr'), false);
+  assert.equal(topLevelHidden.at(-1), topLevelCheckout);
+  assert.throws(
+    () => hostPathsToHide('/usr'),
+    /cannot contain a system runtime mount/u
+  );
+  assert.throws(
+    () => hostPathsToHide('/usr/share'),
+    /cannot contain a system runtime mount/u
+  );
+
+  assert.throws(
+    () =>
+      sandboxMountOperations({
+        sourceRoot: '/opt/nodejs/QuestarrNG',
+        workspace: '/mnt/workspace',
+        runDirectory: '/mnt/run-data',
+        externalMounts: [],
+        dependencyMounts: [],
+        systemMounts: [['/opt/nodejs', '/usr/share/nodejs']],
+        hiddenDirectories: ['/opt'],
+        guestWorkspace: '/mnt/workspace',
+        guestRun: '/mnt/run-data',
+        markerFile: '/run/validation-engine-sandbox',
+        guestMarker: '/run/validation-engine-sandbox',
+      }),
+    /System runtime mount source overlaps a hidden host path/u,
+    'a canonical source reached through a symlink must not expose a masked checkout'
+  );
 });
 
 test('binds open sources only after masking their host directories', () => {
   const hiddenDirectories = hostPathsToHide('/home/runner/work/project')
     .filter((directory) => ['/home', '/tmp', '/mnt'].includes(directory));
   const operations = sandboxMountOperations({
+    sourceRoot: '/home/runner/work/project',
     workspace: '/home/runner/work/project',
     runDirectory: '/home/runner/work/_temp/validation-run',
     externalMounts: [['/usr/local/bin/node', '/mnt/run-data/dependencies/0']],
@@ -240,6 +382,7 @@ test(
     writeFileSync(
       path.join(source, 'bin/run-local-validation.mjs'),
       `import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
@@ -271,6 +414,11 @@ assert.match(readFileSync('/mnt/workspace/nested/credentials/TokenStore.ts', 'ut
 assert.match(readFileSync('/mnt/workspace/src/tokens/index.ts', 'utf8'), /token directory source/u);
 assert.equal(existsSync('/mnt/workspace/credentials'), false);
 assert.match(readFileSync('/mnt/workspace/web/src/lib/token.js', 'utf8'), /source code/u);
+assert.ok(
+  execFileSync('git', ['-C', '/mnt/workspace', 'ls-files'], { encoding: 'utf8' })
+    .split(/\\r?\\n/u)
+    .includes('web/src/lib/token.js')
+);
 assert.match(readFileSync('/mnt/workspace/vendor/mainline/src/rpc/server/tokens.rs', 'utf8'), /pub fn tokens/u);
 assert.equal(existsSync('/mnt/workspace/nested/.env.local'), false);
 assert.equal(existsSync('/mnt/workspace/nested/config/secrets.json'), false);
@@ -304,6 +452,7 @@ assert.throws(() => writeFileSync('/mnt/workspace/node_modules/marker.txt', 'cha
     execFileSync('git', ['commit', '--quiet', '-m', 'Fixture'], {
       cwd: source,
     });
+    writeFileSync(path.join(source, '.gitignore'), '*\n');
     mkdirSync(path.join(source, 'nested/config'), { recursive: true });
     writeFileSync(
       path.join(source, 'nested/config/operator.json'),

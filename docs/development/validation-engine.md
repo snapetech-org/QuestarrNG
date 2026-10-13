@@ -74,14 +74,26 @@ access/refresh-token names, client-secret names, suffixed dotenv credentials
 such as \`tokens.env.local\` and \`secrets.env.production\`, and credential
 material with source-like extensions are excluded. Safe example templates such
 as \`tokens.env.example\` and source modules under credential folders remain
-available unless their own names identify credential material. Stage new
-candidate files before using the launcher. It hides the invoking
+available unless their own names identify credential material. The tracked
+`server/routes/api-keys.ts` route, Helm Secret template, and `docs/SECRETS.md`
+are explicitly preserved because they are implementation, chart, and
+documentation files rather than stored credentials. Stage new candidate files
+before using the launcher. It hides the invoking
 home, temporary files, common service sockets, host configuration under `/etc`,
 and common host data roots such as `/opt`, `/srv`, and `/usr/local`, then disables
 network access. If the checkout is outside those standard roots, it also masks
-the checkout's parent (or the checkout itself if it sits directly under `/`),
-so candidate code cannot reach the original worktree around the filtered
-snapshot. Before those paths are masked, the trusted launcher opens each workspace,
+the checkout's parent so candidate code cannot reach the original worktree
+around the filtered snapshot. When that parent overlaps a system runtime mount,
+it masks the checkout path itself and reapplies that mask after system binds.
+It rejects a checkout that contains a system runtime mount because rebinding the
+runtime would otherwise expose the original checkout again.
+Canonical system-mount sources are checked against every hidden path too.
+Sources inside a masked root, or sources broad enough to include a separate
+hidden host root, fail closed. If a source contains the checkout itself, the
+launcher masks its mapped destination path after binding, including when a
+runtime alias such as `/bin` resolves to `/usr/bin`.
+Snapshot files are force-added to the temporary Git index so candidate ignore
+rules cannot drop tracked files. Before those paths are masked, the trusted launcher opens each workspace,
 run-data, dependency, cache, and marker source as an inherited file descriptor.
 Bubblewrap binds those pinned descriptors after applying the host masks, so source
 resolution does not depend on paths that the sandbox has already hidden. The
@@ -93,10 +105,13 @@ is mounted as one directory so `bin/node` and sibling `lib/node_modules/npm`
 continue to resolve together. OS-managed Node under `/usr` uses the explicit
 system-path allowlist instead. The launcher fails closed if it cannot identify
 one of these runtime layouts, if required isolation is unavailable, or if no
-candidate command is supplied. Use the complete GitHub-hosted validation run
-for the full test suite. The test job does not receive the Codecov upload token
-for pull requests; coverage and test-result uploads run only after trusted
-pushes to `main`.
+candidate command is supplied. The GitHub Actions test job installs Bubblewrap
+and checks that user namespaces work before it runs the test plan; its launcher
+contract fails if that sandbox requirement is not met. Local runs may skip the
+integration check when Bubblewrap is unavailable. Use the complete GitHub-hosted
+validation run for the full test suite. The test job does not receive the
+Codecov upload token for pull requests; coverage and test-result uploads run
+only after trusted pushes to `main`.
 
 During a run, the engine writes a task summary to stderr when each task starts
 and finishes, and repeats it every minute while a task is still running. This

@@ -208,6 +208,12 @@ jobs:
           node scripts/install-npm-runtime.mjs
           echo "$GITHUB_WORKSPACE/.github/npm-runtime/node_modules/.bin" >> "$GITHUB_PATH"
 
+      - name: Install Bubblewrap for isolated tests
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes bubblewrap
+          bwrap --die-with-parent --unshare-user --ro-bind / / -- /bin/true
+
       - name: Run source-bound test plan
         env:
           NPM_CONFIG_CACHE: ${{ runner.temp }}/questarrng-npm-cache

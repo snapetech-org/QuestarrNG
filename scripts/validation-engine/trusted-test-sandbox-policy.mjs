@@ -53,17 +53,26 @@ export function hostPathsToHide(sourceRoot) {
   if (checkout === filesystemRoot)
     throw new Error('The candidate checkout cannot be the filesystem root.');
 
+  if (SYSTEM_PATHS_TO_MOUNT.some((directory) => isWithin(checkout, directory)))
+    throw new Error(
+      'The candidate checkout cannot contain a system runtime mount.'
+    );
+
   if (HOST_PATHS_TO_HIDE.some((directory) => isWithin(directory, checkout)))
     return [...HOST_PATHS_TO_HIDE];
 
   const parent = path.dirname(checkout);
+  const parentOverlapsSystemMount = SYSTEM_PATHS_TO_MOUNT.some(
+    (directory) => isWithin(parent, directory) || isWithin(directory, parent)
+  );
   return [
     ...HOST_PATHS_TO_HIDE,
-    parent === filesystemRoot ? checkout : parent,
+    parent === filesystemRoot || parentOverlapsSystemMount ? checkout : parent,
   ];
 }
 
 export function sandboxMountOperations({
+  sourceRoot,
   workspace,
   runDirectory,
   externalMounts,
@@ -75,6 +84,16 @@ export function sandboxMountOperations({
   markerFile,
   guestMarker,
 }) {
+  const checkout = path.resolve(sourceRoot);
+  for (const [source, target] of systemMounts) {
+    for (const directory of hiddenDirectories) {
+      if (isWithin(directory, source) || (isWithin(source, directory) && directory !== checkout))
+        throw new Error(
+          `System runtime mount source overlaps a hidden host path: ${source}`
+        );
+    }
+  }
+
   const hiddenParents = new Set();
   for (const directory of hiddenDirectories) {
     let parent = path.dirname(directory);
@@ -123,6 +142,15 @@ export function sandboxMountOperations({
     source: markerFile,
     target: guestMarker,
   });
+  const hiddenPathsRestoredBySystemMounts = new Set();
+  for (const [source, target] of systemMounts)
+    for (const directory of hiddenDirectories)
+      if (isWithin(source, directory))
+        hiddenPathsRestoredBySystemMounts.add(
+          path.join(target, path.relative(source, directory))
+        );
+  for (const directory of hiddenPathsRestoredBySystemMounts)
+    operations.push({ type: 'tmpfs', path: directory, hostMask: true });
   return operations;
 }
 
@@ -136,6 +164,12 @@ const sensitiveCredentialMaterialFile =
   /^[.]?(?:private[-_]?keys?|api[-_]?keys?|access[-_]?tokens?|refresh[-_]?tokens?|client[-_]?secrets?)[.][^/]+$/iu;
 const sourceCodeFile =
   /[.](?:c|cc|cpp|cs|css|go|h|hpp|java|js|jsx|mjs|php|py|rb|rs|sql|swift|ts|tsx|vue)$/iu;
+const credentialNamedRepositoryAssets = new Set([
+  // These tracked implementation and documentation files do not contain credentials.
+  'server/routes/api-keys.ts',
+  'charts/questarr/templates/secret.yaml',
+  'docs/SECRETS.md',
+]);
 
 export function isSensitiveCandidatePath(relativePath) {
   const segments = relativePath.replaceAll(String.fromCharCode(92), '/').split('/');
@@ -143,6 +177,7 @@ export function isSensitiveCandidatePath(relativePath) {
     return true;
   if (segments.some((segment) => sensitiveName.test(segment)))
     return true;
+  if (credentialNamedRepositoryAssets.has(segments.join('/'))) return false;
 
   const filename = segments.at(-1) ?? '';
   const hasCredentialNamedSegment = segments.some(

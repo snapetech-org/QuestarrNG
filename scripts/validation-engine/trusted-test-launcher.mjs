@@ -143,7 +143,7 @@ function createSyntheticGitRepository(workspace, runDirectory) {
   git(['config', 'user.name', 'Disposable Validation']);
   git(['config', 'user.email', 'validation@example.invalid']);
   git(['config', 'core.hooksPath', '/dev/null']);
-  git(['add', '--all']);
+  git(['add', '--force', '--all']);
   git([
     'commit',
     '--quiet',
@@ -341,6 +341,7 @@ function makeSandboxCommand({
   const hiddenDirectories = hostPathsToHide(sourceRoot)
     .filter((directory) => directory === '/mnt' || existsSync(directory));
   const mountOperations = sandboxMountOperations({
+    sourceRoot,
     workspace,
     runDirectory,
     externalMounts: mounts,

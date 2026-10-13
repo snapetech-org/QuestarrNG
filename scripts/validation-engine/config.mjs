@@ -1,4 +1,6 @@
 // Copyright (c) QuestarrNG contributors. All rights reserved.
+import process from 'node:process';
+
 export const validation = {
   repository: 'questarrng',
   inputs: [
@@ -57,7 +59,10 @@ export const validation = {
       casePattern: '(?:ℹ|#)\\s*pass\\s+(\\d+)',
       minimumCases: 1,
       inventoryLanes: ['trusted-launcher-contracts', 'workflow-security-contracts'],
-      env: { GITHUB_ACTIONS: 'false' },
+      env: {
+        GITHUB_ACTIONS: 'false',
+        REQUIRE_VALIDATION_SANDBOX: process.env.GITHUB_ACTIONS === 'true' ? '1' : '0',
+      },
       timeoutSeconds: 180,
     },
     {
