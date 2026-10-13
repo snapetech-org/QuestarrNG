@@ -7,11 +7,14 @@ import { type User } from "@shared/schema";
 import crypto from "crypto";
 import { logger } from "./logger.js";
 import { AUTH_COOKIE_NAME, getCookie } from "./security.js";
+import { isStrongJwtSecret } from "./jwt-secret.js";
 
 const SALT_ROUNDS = 10;
 
 // Cache the JWT secret in memory to avoid DB hits on every request
 let cachedJwtSecret: string | null = null;
+// Keep concurrent first requests on one database read and one secret replacement.
+let jwtSecretInitialization: Promise<string> | null = null;
 
 /**
  * Get the JWT secret.
@@ -26,6 +29,15 @@ async function getJwtSecret(): Promise<string> {
     return cachedJwtSecret;
   }
 
+  if (!jwtSecretInitialization) {
+    jwtSecretInitialization = initializeJwtSecret().finally(() => {
+      jwtSecretInitialization = null;
+    });
+  }
+  return jwtSecretInitialization;
+}
+
+async function initializeJwtSecret(): Promise<string> {
   // If env var is set, use it (override).
   if (config.auth.jwtSecret) {
     logger.info("Using JWT secret from environment variable");
@@ -36,10 +48,15 @@ async function getJwtSecret(): Promise<string> {
   // Check DB
   try {
     const dbSecret = await storage.getSystemConfig("jwt_secret");
-    if (dbSecret) {
+    if (dbSecret && isStrongJwtSecret(dbSecret)) {
       logger.info("Loaded JWT secret from database");
       cachedJwtSecret = dbSecret;
       return cachedJwtSecret;
+    }
+    if (dbSecret) {
+      logger.warn(
+        "Replacing an insecure stored JWT secret; existing sessions will be invalidated."
+      );
     }
   } catch (error) {
     logger.warn("Failed to load JWT secret from database, generating new one: %s", error);

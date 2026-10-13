@@ -29,6 +29,9 @@ jobs:
     permissions:
       contents: read
       packages: write
+      security-events: read
+      checks: read
+      vulnerability-alerts: read
     outputs:
       image: ${{ steps.image.outputs.name }}
       digest: ${{ steps.build-image.outputs.digest }}
@@ -60,11 +63,26 @@ jobs:
             exit 1
           }
 
+      - name: Set up Node.js for release security checks
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 26.x
+          package-manager-cache: false
+
+      - name: Require clean security before publishing a versioned image
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ secrets.SECURITY_READ_TOKEN || github.token }}
+        run: node scripts/check-release-security.mjs
+
       - name: Set image name
         id: image
         shell: bash
         run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
 
+      # Push only the immutable source tag first. Attach latest or the version tag
+      # after both platform scans and the smoke test below pass.
       - name: Set image tags
         id: tags
         shell: bash
@@ -75,13 +93,13 @@ jobs:
           {
             echo 'tags<<EOF'
             echo "$IMAGE:sha-${GITHUB_SHA}"
-            if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
-              echo "$IMAGE:${GITHUB_REF_NAME#v}"
-            else
-              echo "$IMAGE:latest"
-            fi
             echo EOF
           } >> "$GITHUB_OUTPUT"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "release_tag=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          else
+            echo 'release_tag=latest' >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Set up QEMU for ARM64 release images
         uses: step-security/setup-qemu-action@1d653f731ddc90c553742100d15205c94b792314 # v4.2.0
@@ -96,7 +114,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and publish fork image
+      - name: Build and push immutable source image
         id: build-image
         uses: step-security/docker-build-push-action@144392094f7fc3199dda455efe3b70dbea4b72a0 # v7.3.0
         with:
@@ -109,6 +127,45 @@ jobs:
           provenance: mode=max
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Verify the published multi-platform source image
+        id: verify-image
+        shell: bash
+        env:
+          IMAGE: ${{ steps.image.outputs.name }}
+          BUILD_DIGEST: ${{ steps.build-image.outputs.digest }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$BUILD_DIGEST" =~ ^sha256:[a-f0-9]{64}$ ]]; then
+            echo "Build returned an invalid image digest: $BUILD_DIGEST" >&2
+            exit 1
+          fi
+          docker buildx imagetools inspect --raw "${IMAGE}@${BUILD_DIGEST}" > source-image.json
+          node scripts/verify-release-image-manifest.mjs source-image.json
+
+      - name: Scan the verified linux/amd64 image with Trivy
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        env:
+          TRIVY_VEX: security/vex/questarr.openvex.json
+        with:
+          image-ref: ${{ steps.verify-image.outputs.amd64_image }}
+          format: table
+          severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+          scanners: "vuln"
+          exit-code: "1"
+          cache: "false"
+
+      - name: Scan the verified linux/arm64 image with Trivy
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        env:
+          TRIVY_VEX: security/vex/questarr.openvex.json
+        with:
+          image-ref: ${{ steps.verify-image.outputs.arm64_image }}
+          format: table
+          severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+          scanners: "vuln"
+          exit-code: "1"
+          cache: "false"
 
       - name: Smoke test published image and SeerrNG route
         shell: bash
@@ -163,6 +220,18 @@ jobs:
           done
           curl -fsS http://127.0.0.1:15001/api/health >/dev/null
           test "$(docker exec questarrng-rootless-smoke id -u)" = "1000"
+
+      - name: Attach publish tag after scans and smoke test pass
+        shell: bash
+        env:
+          IMAGE: ${{ steps.image.outputs.name }}
+          RELEASE_TAG: ${{ steps.tags.outputs.release_tag }}
+          BUILD_DIGEST: ${{ steps.build-image.outputs.digest }}
+        run: |
+          set -euo pipefail
+          docker buildx imagetools create \
+            --tag "${IMAGE}:${RELEASE_TAG}" \
+            "${IMAGE}@${BUILD_DIGEST}"
 
   addon-smoke:
     if: github.repository == 'snapetech/QuestarrNG'
@@ -220,6 +289,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      security-events: read
+      checks: read
+      vulnerability-alerts: read
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -236,6 +308,12 @@ jobs:
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22.x
+
+      - name: Require clean security findings and completed source scans
+        env:
+          GH_TOKEN: ${{ secrets.SECURITY_READ_TOKEN || github.token }}
+          RELEASE_REF: ${{ github.ref }}
+        run: node scripts/check-release-security.mjs
 
       - name: Add curated release-note fragments
         shell: bash
@@ -356,6 +434,9 @@ jobs:
       actions: read
       contents: write
       packages: read
+      security-events: read
+      checks: read
+      vulnerability-alerts: read
     outputs:
       release_sha: ${{ steps.validate.outputs.release_sha }}
       previous_tag: ${{ steps.validate.outputs.previous_tag }}
@@ -466,6 +547,7 @@ jobs:
         uses: step-security/setup-buildx-action@a4709e2865773e1792246433e8eb922f9743a875 # v4.2.0
 
       - name: Verify the published release image
+        id: verify-image
         shell: bash
         env:
           VERSION: ${{ steps.validate.outputs.version }}
@@ -484,6 +566,48 @@ jobs:
           diff -u \
             <(jq -Sc . version-image.json) \
             <(jq -Sc . source-image.json)
+
+          amd64_digest="$(jq -r '.manifests[] | select(.platform.os == "linux" and .platform.architecture == "amd64") | .digest' version-image.json)"
+          arm64_digest="$(jq -r '.manifests[] | select(.platform.os == "linux" and .platform.architecture == "arm64") | .digest' version-image.json)"
+          if [[ ! "$amd64_digest" =~ ^sha256:[a-f0-9]{64}$ || ! "$arm64_digest" =~ ^sha256:[a-f0-9]{64}$ ]]; then
+            echo "Could not resolve valid release image digests: amd64=$amd64_digest arm64=$arm64_digest" >&2
+            exit 1
+          fi
+          {
+            echo "amd64_image=${image}@${amd64_digest}"
+            echo "arm64_image=${image}@${arm64_digest}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Rescan the verified linux/amd64 release image with current Trivy database
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        env:
+          TRIVY_VEX: security/vex/questarr.openvex.json
+        with:
+          image-ref: ${{ steps.verify-image.outputs.amd64_image }}
+          format: table
+          severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+          scanners: "vuln"
+          exit-code: "1"
+          cache: "false"
+
+      - name: Rescan the verified linux/arm64 release image with current Trivy database
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        env:
+          TRIVY_VEX: security/vex/questarr.openvex.json
+        with:
+          image-ref: ${{ steps.verify-image.outputs.arm64_image }}
+          format: table
+          severity: "UNKNOWN,LOW,MEDIUM,HIGH,CRITICAL"
+          scanners: "vuln"
+          exit-code: "1"
+          cache: "false"
+
+      - name: Require clean security findings and completed source scans
+        env:
+          GH_TOKEN: ${{ secrets.SECURITY_READ_TOKEN || github.token }}
+          RELEASE_SHA: ${{ steps.validate.outputs.release_sha }}
+          RELEASE_REF: refs/tags/${{ inputs.finalize_release_tag }}
+        run: node scripts/check-release-security.mjs
 
       - name: Assemble release body
         shell: bash
