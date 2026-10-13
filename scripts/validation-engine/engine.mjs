@@ -653,17 +653,30 @@ export async function runTaskPool(tasks, {
     required: task.required !== false,
   });
   let sourceChanged = false;
+  const active = new Map();
+  const activeGroups = new Set();
+  const sourceBoundTasks = new Set();
 
-  while (pending.length) {
-    if (!checkSource()) {
-      sourceChanged = true;
-      for (const task of pending.splice(0)) {
-        block(task, 'candidate source changed before task batch started');
+  const blockPending = (reason) => {
+    for (const task of pending.splice(0)) block(task, reason);
+    onProgress();
+  };
+
+  const invalidateSourceBoundPasses = () => {
+    for (const taskId of sourceBoundTasks) {
+      const result = results.get(taskId);
+      if (result?.status === 'passed') {
+        results.set(taskId, {
+          ...result,
+          status: 'blocked',
+          reason: 'candidate source changed during concurrent execution',
+        });
       }
-      onProgress();
-      break;
     }
+  };
 
+  const blockUnavailableDependencies = () => {
+    let blockedAny = false;
     for (let index = pending.length - 1; index >= 0; index -= 1) {
       const task = pending[index];
       const unavailableDependency = (task.dependsOn ?? []).find((dependency) => {
@@ -673,34 +686,18 @@ export async function runTaskPool(tasks, {
       if (!unavailableDependency) continue;
       block(task, 'dependency did not pass');
       pending.splice(index, 1);
-      onProgress();
+      blockedAny = true;
     }
+    if (blockedAny) onProgress();
+  };
 
-    const batch = [];
-    const groups = new Set();
-    for (const task of pending) {
-      if ((task.dependsOn ?? []).some((dependency) => results.get(dependency)?.status !== 'passed')) {
-        continue;
-      }
-      const group = task.concurrencyGroup ?? task.id;
-      if (groups.has(group)) continue;
-      batch.push(task);
-      groups.add(group);
-      if (batch.length === maxConcurrentTasks) break;
-    }
-    if (batch.length === 0) {
-      for (const task of pending.splice(0)) {
-        block(task, 'required dependency did not pass or no task is runnable');
-      }
-      onProgress();
-      break;
-    }
-
-    for (const task of batch) pending.splice(pending.indexOf(task), 1);
-    const startedAt = new Map(batch.map((task) => [task.id, Date.now()]));
-    for (const task of batch) onTaskStart(task, startedAt.get(task.id));
-    onProgress();
-    await Promise.all(batch.map(async (task) => {
+  const startTask = (task) => {
+    const group = task.concurrencyGroup ?? task.id;
+    const startedAt = Date.now();
+    activeGroups.add(group);
+    sourceBoundTasks.add(task.id);
+    onTaskStart(task, startedAt);
+    const promise = (async () => {
       let result;
       try {
         result = await runTask(task);
@@ -716,28 +713,59 @@ export async function runTaskPool(tasks, {
           required: task.required !== false,
         };
       }
-      results.set(task.id, { ...result, ...metadata(task) });
-      onTaskFinish(task, results.get(task.id));
-      onProgress();
-    }));
+      return { task, group, result };
+    })();
+    active.set(task.id, { task, group, promise });
+    onProgress();
+  };
 
-    if (!checkSource()) {
-      sourceChanged = true;
-      for (const task of batch) {
-        const result = results.get(task.id);
-        if (result.status === 'passed') {
-          results.set(task.id, {
-            ...result,
-            status: 'blocked',
-            reason: 'candidate source changed during concurrent execution',
-          });
+  while (pending.length || active.size) {
+    blockUnavailableDependencies();
+
+    while (!sourceChanged && active.size < maxConcurrentTasks) {
+      const runnableIndex = pending.findIndex((task) =>
+        (task.dependsOn ?? []).every((dependency) => results.get(dependency)?.status === 'passed') &&
+        !activeGroups.has(task.concurrencyGroup ?? task.id));
+      if (runnableIndex < 0) break;
+
+      if (!checkSource()) {
+        sourceChanged = true;
+        invalidateSourceBoundPasses();
+        blockPending('candidate source changed during task execution');
+        break;
+      }
+
+      const [task] = pending.splice(runnableIndex, 1);
+      startTask(task);
+    }
+
+    if (active.size === 0) {
+      if (pending.length) {
+        for (const task of pending.splice(0)) {
+          block(task, 'required dependency did not pass or no task is runnable');
         }
+        onProgress();
       }
-      for (const task of pending.splice(0)) {
-        block(task, 'candidate source changed during task batch');
-      }
-      onProgress();
       break;
+    }
+
+    const settled = await Promise.race([...active.values()].map(({ promise }) => promise));
+    active.delete(settled.task.id);
+    activeGroups.delete(settled.group);
+    results.set(settled.task.id, { ...settled.result, ...metadata(settled.task) });
+    onTaskFinish(settled.task, results.get(settled.task.id));
+    onProgress();
+
+    if (sourceChanged) {
+      invalidateSourceBoundPasses();
+      onProgress();
+    } else if (!checkSource()) {
+      sourceChanged = true;
+      invalidateSourceBoundPasses();
+      blockPending('candidate source changed during task execution');
+    } else if (active.size === 0) {
+      // Every task in this concurrent wave completed against the same source.
+      sourceBoundTasks.clear();
     }
   }
   return { results, sourceChanged };

@@ -420,6 +420,52 @@ test('bounded task pool overlaps independent tasks without exceeding its configu
   assert.ok([...result.results.values()].every((receipt) => receipt.stage === 'repository'));
 });
 
+test('bounded task pool refills a slot while a slower peer is still running', async () => {
+  let active = 0;
+  let maximum = 0;
+  let releaseSlowTask;
+  let signalNextStarted;
+  let timeoutId;
+  const slowTaskGate = new Promise((resolve) => { releaseSlowTask = resolve; });
+  const nextStarted = new Promise((resolve) => { signalNextStarted = resolve; });
+  let nextStartedWhileSlowWasActive = false;
+  const tasks = ['slow', 'short', 'next'].map((id) => ({
+    id,
+    stage: 'repository',
+    concurrencyGroup: id,
+  }));
+
+  const running = runTaskPool(tasks, {
+    maxConcurrentTasks: 2,
+    runTask: async (task) => {
+      active += 1;
+      maximum = Math.max(maximum, active);
+      if (task.id === 'slow') await slowTaskGate;
+      if (task.id === 'next') {
+        nextStartedWhileSlowWasActive = active === 2;
+        signalNextStarted();
+      }
+      active -= 1;
+      return { taskId: task.id, status: 'passed' };
+    },
+  });
+
+  const refilledBeforeSlowFinished = await Promise.race([
+    nextStarted.then(() => true),
+    new Promise((resolve) => {
+      timeoutId = setTimeout(() => resolve(false), 250);
+    }),
+  ]);
+  clearTimeout(timeoutId);
+  releaseSlowTask();
+  const result = await running;
+
+  assert.equal(refilledBeforeSlowFinished, true);
+  assert.equal(nextStartedWhileSlowWasActive, true);
+  assert.equal(maximum, 2);
+  assert.ok([...result.results.values()].every((receipt) => receipt.status === 'passed'));
+});
+
 test('bounded task pool serializes shared output groups', async () => {
   const activeGroups = new Set();
   const started = [];
@@ -468,7 +514,7 @@ test('bounded task pool invalidates concurrent passes after source drift', async
   const tasks = ['first', 'second', 'pending'].map((id) => ({ id, stage: 'repository' }));
   const result = await runTaskPool(tasks, {
     maxConcurrentTasks: 2,
-    checkSource: () => { checks += 1; return checks === 1; },
+    checkSource: () => { checks += 1; return checks <= 2; },
     runTask: async (task) => ({ taskId: task.id, status: 'passed' }),
   });
   assert.equal(result.sourceChanged, true);
