@@ -27,6 +27,10 @@ system temporary directory containing one log per task and a JSON receipt with
 executed, passed, failed, blocked, excluded, and active-case totals. A workspace
 lock prevents two engine runs from competing over the same checkout. A stale
 lock is reported and left for an operator to inspect.
+When a native test task fails or reports no active cases, the CLI prints a
+control-character-stripped diagnostic excerpt of at most 16 KiB to standard
+error, with each output line prefixed so test output cannot issue GitHub Actions
+workflow commands. It does not upload the private task log.
 
 Runtime probes inherit only the executable path, platform process variables,
 locale, and timezone. They use a private temporary home and separate empty npm

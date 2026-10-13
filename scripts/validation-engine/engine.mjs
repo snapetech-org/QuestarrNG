@@ -31,6 +31,7 @@ export const ENGINE_VERSION = 1;
 const ENGINE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_ROOT = path.resolve(ENGINE_DIR, '..', '..');
 const MAX_BUFFER = 8 * 1024 * 1024;
+const MAX_FAILURE_DIAGNOSTIC_BYTES = 16 * 1024;
 const PROGRESS_INTERVAL_MS = 60_000;
 const IGNORED_DIRS = new Set([
   '.git',
@@ -611,7 +612,41 @@ function terminate(child) {
   child.kill('SIGTERM');
 }
 
-export async function runCommand(task, root, logPath) {
+function failureDiagnostic(output, outputBytes) {
+  const buffer = Buffer.from(output, 'utf8');
+  const truncated = outputBytes > MAX_FAILURE_DIAGNOSTIC_BYTES;
+  let excerpt = buffer.subarray(-MAX_FAILURE_DIAGNOSTIC_BYTES).toString('utf8');
+  if (truncated) {
+    const firstNewline = excerpt.indexOf('\n');
+    if (firstNewline >= 0) excerpt = excerpt.slice(firstNewline + 1);
+  }
+  excerpt = excerpt
+    .replace(/\r\n?/gu, '\n')
+    .replace(/[\u0000-\u0009\u000B-\u001F\u007F]/gu, '')
+    .trimEnd();
+  let formatted = excerpt
+    ? excerpt.split('\n').map((line) => '| ' + line).join('\n')
+    : '';
+  let outputTruncated = truncated;
+  while (Buffer.byteLength(formatted, 'utf8') > MAX_FAILURE_DIAGNOSTIC_BYTES) {
+    outputTruncated = true;
+    const firstNewline = formatted.indexOf('\n');
+    if (firstNewline >= 0) {
+      formatted = formatted.slice(firstNewline + 1);
+      continue;
+    }
+    let line = formatted.startsWith('| ') ? formatted.slice(2) : formatted;
+    line = Buffer.from(line, 'utf8')
+      .subarray(-(MAX_FAILURE_DIAGNOSTIC_BYTES - 2))
+      .toString('utf8');
+    while (Buffer.byteLength(line, 'utf8') > MAX_FAILURE_DIAGNOSTIC_BYTES - 2)
+      line = line.slice(1);
+    formatted = '| ' + line;
+  }
+  return { output: formatted, outputBytes, truncated: outputTruncated };
+}
+
+export async function runCommand(task, root, logPath, onFailure) {
   const startedAt = new Date().toISOString();
   const started = Date.now();
   const command = task.command[0];
@@ -681,6 +716,13 @@ export async function runCommand(task, root, logPath) {
     : task.kind === 'test' && activeCases < task.minimumCases
       ? 'incomplete'
       : 'passed';
+  if (task.kind === 'test' && status !== 'passed' && typeof onFailure === 'function') {
+    onFailure({
+      taskId: task.id,
+      status,
+      ...failureDiagnostic(combined, outputBytes),
+    });
+  }
   return {
     taskId: task.id,
     status,
@@ -819,6 +861,7 @@ export async function executePlan(root, config, plan, options = {}) {
         configuredTask,
         root,
         path.join(runRoot, task.id + '.log'),
+        options.onTaskFailure,
       );
     } finally {
       clearInterval(heartbeat);
@@ -950,6 +993,13 @@ export async function main(argv = process.argv.slice(2), root = DEFAULT_ROOT, co
   try {
     result = await executePlan(rootPath, loaded, plan, {
       onProgress: (summary) => process.stderr.write(summary + '\n'),
+      onTaskFailure: ({ taskId, status, output, outputBytes, truncated }) => {
+        const retainedBytes = Buffer.byteLength(output, 'utf8');
+        process.stderr.write(
+          `[validation] ${taskId} ${status}; ${retainedBytes} of ${outputBytes} output bytes retained${truncated ? ' (truncated)' : ''}:\n`
+        );
+        if (output) process.stderr.write(output + '\n');
+      },
     });
   } finally {
     releaseRunLock(lock);

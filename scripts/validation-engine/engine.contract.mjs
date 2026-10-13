@@ -300,6 +300,31 @@ test('native execution records passing case counts, source identity and private 
   assert.match(readFileSync(path.join(runRoot, 'receipt.json'), 'utf8'), /"status": "passed"/);
 });
 
+test('failed test tasks expose a bounded printable diagnostic to the caller', async () => {
+  const { root, config } = fixture();
+  config.tasks[0].command = [
+    process.execPath,
+    '-e',
+    "process.stdout.write('x'.repeat(20000)); process.stderr.write('\\u001b[31mcontract failure\\u001b[0m\\r\\n::error::forged\\n##[group]forged\\n'); process.exit(1);",
+  ];
+  const failures = [];
+  const result = await executePlan(root, config, createPlan(root, config), {
+    onTaskFailure: (failure) => failures.push(failure),
+  });
+  assert.equal(result.exitCode, 1);
+  assert.equal(failures.length, 1);
+  assert.equal(failures[0].taskId, 'unit-tests');
+  assert.equal(failures[0].status, 'failed');
+  assert.equal(failures[0].outputBytes > 16 * 1024, true);
+  assert.equal(failures[0].truncated, true);
+  assert.ok(Buffer.byteLength(failures[0].output, 'utf8') <= 16 * 1024);
+  assert.doesNotMatch(failures[0].output, /[\u0000-\u0009\u000B-\u001F\u007F]/u);
+  assert.match(failures[0].output, /contract failure/u);
+  assert.match(failures[0].output, /^\| ::error::forged$/mu);
+  assert.match(failures[0].output, /^\| ##\[group\]forged$/mu);
+  assert.doesNotMatch(failures[0].output, /^(?:::|##\[)/mu);
+});
+
 test('live progress reports task start, heartbeat, and completion', async () => {
   const { root, config } = fixture();
   config.tasks[0].command = [
