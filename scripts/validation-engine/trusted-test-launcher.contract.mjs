@@ -70,8 +70,13 @@ test('preserves tracked source files with token-like names and excludes credenti
   assert.equal(isSensitiveCandidatePath('.env.local'), true);
   assert.equal(isSensitiveCandidatePath('nested/credentials.txt'), true);
   assert.equal(isSensitiveCandidatePath('tokens.env'), true);
+  assert.equal(isSensitiveCandidatePath('token.dat'), true);
   assert.equal(
     isSensitiveCandidatePath('nested/credentials/private-key'),
+    true,
+  );
+  assert.equal(
+    isSensitiveCandidatePath('nested/credentials/settings.json'),
     true,
   );
   assert.equal(isSensitiveCandidatePath('src/tokens/index.ts'), false);
@@ -160,6 +165,8 @@ test(
     writeFileSync(path.join(source, 'tokens.env'), 'PRIVATE_TOKENS_CANARY=hidden\n');
     mkdirSync(path.join(source, 'nested/credentials'), { recursive: true });
     writeFileSync(path.join(source, 'nested/credentials/private-key'), 'private credential\n');
+    writeFileSync(path.join(source, 'nested/credentials/settings.json'), '{"secret":"hidden"}\n');
+    writeFileSync(path.join(source, 'nested/credentials/TokenStore.ts'), 'export const tokenStore = true;\n');
     mkdirSync(path.join(source, 'src/tokens'), { recursive: true });
     writeFileSync(path.join(source, 'src/tokens/index.ts'), 'export const source = "token directory source";\n');
     writeFileSync(path.join(source, 'credentials'), 'private credential\n');
@@ -195,7 +202,10 @@ assert.equal(existsSync('/mnt/workspace/nested/config/operator.json'), false);
 assert.equal(existsSync('/mnt/workspace/auth.json'), false);
 assert.equal(existsSync('/mnt/workspace/token.json'), false);
 assert.equal(existsSync('/mnt/workspace/tokens.env'), false);
+assert.equal(existsSync('/mnt/workspace/token.dat'), false);
 assert.equal(existsSync('/mnt/workspace/nested/credentials/private-key'), false);
+assert.equal(existsSync('/mnt/workspace/nested/credentials/settings.json'), false);
+assert.match(readFileSync('/mnt/workspace/nested/credentials/TokenStore.ts', 'utf8'), /tokenStore/u);
 assert.match(readFileSync('/mnt/workspace/src/tokens/index.ts', 'utf8'), /token directory source/u);
 assert.equal(existsSync('/mnt/workspace/credentials'), false);
 assert.match(readFileSync('/mnt/workspace/web/src/lib/token.js', 'utf8'), /source code/u);

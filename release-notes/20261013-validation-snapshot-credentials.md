@@ -6,4 +6,4 @@ action: none
 breaking: false
 ---
 
-Validation snapshots now omit extensionless authentication, token, credential, and secret files while retaining similarly named source code.
+Validation snapshots omit extensionless credentials and files stored in credential-named folders while retaining similarly named source code.
