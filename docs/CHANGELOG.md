@@ -8,6 +8,37 @@ Discord announcement while this file remains the chronological changelog.
 For a reader-oriented summary of the Snapetech fork's additions since the
 upstream baseline, see [What changed in QuestarrNG](FORK_CHANGES.md).
 
+## [1.11.0] - 2026-10-13
+
+### User-facing changes
+
+#### Added
+
+- **Support:** The repository funding configuration now includes Ko-fi as an option for users who want to support project maintenance.
+- **Settings:** Settings > Appearance separates interface language from regional date, time, and number formats; translated navigation, the calendar, and download dialogs honor those choices, including localized release dates and calendar week starts.
+- **Localization:** Choose a display language during initial setup or later in Settings. Navigation and language controls are translated in twelve locales; other screens continue to fall back to English.
+
+#### Changed
+
+- **Integrations:** The fork guide now records QuestarrNG's current upstream comparison, standalone and SeerrNG-specific additions, and the capabilities needed to stop maintaining the fork.
+- **Localization:** The Release Calendar and game download dialog now translate headings, controls, search filters, empty states, release categories, result guidance, and update actions where catalog entries are available. Dates and counts use the selected regional format. Missing text falls back to English; Arabic labels use local direction metadata, with full RTL review still outstanding.
+
+#### Security
+
+- **Supply Chain:** Build workflows now use an integrity-locked npm runtime, and the Home Assistant build pins its QuestarrNG base image by digest.
+- **Security:** **Breaking:** JWT secrets are validated and rotated, invalidating affected sessions; CI audits locked dependencies and npm tooling, and version tags wait for clean Trivy scans of both Linux architectures plus zero open alerts and successful CodeQL and Semgrep scans.
+  - **Action required:** Use a random JWT_SECRET containing at least 32 bytes, or unset it to generate one. Release maintainers must complete all security scans and resolve open alerts before publishing.
+- **Validation:** Validation tasks now isolate inherited credentials and configuration, keep Playwright browsers available to isolated test processes, and remove task-owned temporary files after execution.
+- **Ci:** Validation now keeps local credentials out of test snapshots while preserving legitimate source and deployment files. It also masks the original checkout under runtime mount aliases and requires sandbox verification in CI, so candidate tests cannot read private host files or silently skip isolation checks.
+- **Ci:** Pull-request test jobs no longer receive the Codecov upload token, preventing candidate test processes from reaching it through later upload steps.
+- **Validation:** Pull request tests and builds run inside an isolated sandbox with offline dependencies and source-bound receipts. The sandbox supports loopback-only tests while keeping host services, resolver settings, and external networking unavailable. Base-sourced checks validate the exact candidate snapshot, while Codecov uploads and Discord tag announcements run from trusted default-branch workflows.
+- **Ci Security:** Validation snapshots hide dotted and extensionless credentials, private/API keys, access/refresh tokens, client secrets, and non-source files beneath credential folders while retaining source modules. The local launcher isolates the host root, skips deleted indexed files, and requires an explicit command; CI receipt downloads are limited to the current workflow attempt.
+
+#### Removed
+
+- **Packaging:** **Breaking:** QuestarrNG no longer publishes a YunoHost package, so existing installations will not receive future updates through YunoHost.
+  - **Action required:** Migrate existing YunoHost installations to a supported deployment to continue receiving QuestarrNG updates.
+
 ## [1.10.0] - 2026-10-12
 
 ### User-facing changes
