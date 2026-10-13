@@ -622,6 +622,7 @@ function failureDiagnostic(output, outputBytes) {
   }
   excerpt = excerpt
     .replace(/\r\n?/gu, '\n')
+    // eslint-disable-next-line no-control-regex -- strip terminal controls from untrusted test output.
     .replace(/[\u0000-\u0009\u000B-\u001F\u007F]/gu, '')
     .trimEnd();
   let formatted = excerpt

@@ -1,4 +1,5 @@
 // Copyright (c) QuestarrNG contributors. All rights reserved.
+import { Buffer } from 'node:buffer';
 import assert from 'node:assert/strict';
 import {
   existsSync,
@@ -318,6 +319,7 @@ test('failed test tasks expose a bounded printable diagnostic to the caller', as
   assert.equal(failures[0].outputBytes > 16 * 1024, true);
   assert.equal(failures[0].truncated, true);
   assert.ok(Buffer.byteLength(failures[0].output, 'utf8') <= 16 * 1024);
+  // eslint-disable-next-line no-control-regex -- verify the terminal-control filter.
   assert.doesNotMatch(failures[0].output, /[\u0000-\u0009\u000B-\u001F\u007F]/u);
   assert.match(failures[0].output, /contract failure/u);
   assert.match(failures[0].output, /^\| ::error::forged$/mu);
