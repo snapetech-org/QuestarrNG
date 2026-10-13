@@ -972,6 +972,7 @@ test(
     const sourcePolicy = fileURLToPath(
       new URL('./trusted-test-source-policy.mjs', import.meta.url)
     );
+    const hostResolvConf = readFileSync('/etc/resolv.conf', 'utf8');
     t.after(() => rmSync(parent, { recursive: true, force: true }));
     mkdirSync(candidateRoot, { recursive: true });
     mkdirSync(path.dirname(trustedLauncher), { recursive: true });
@@ -1013,7 +1014,7 @@ test(
       "assert.equal(process.env.NPM_CONFIG_OFFLINE, undefined);",
       "assert.equal(readFileSync('/etc/hosts', 'utf8'), '127.0.0.1 localhost\\n::1 localhost ip6-localhost\\n');",
       "assert.equal(readFileSync('/etc/nsswitch.conf', 'utf8'), 'hosts: files dns\\n');",
-      "assert.equal(readFileSync('/etc/resolv.conf', 'utf8'), '# External DNS is unavailable in the validation sandbox.\\n');",
+      "assert.equal(readFileSync('/etc/resolv.conf', 'utf8'), readFileSync('/mnt/trusted-validation/scripts/expected-host-resolv.conf', 'utf8'));",
       "writeFileSync('/mnt/run-data/npm-prefetch.json', JSON.stringify({ args: process.argv.slice(2), registry: process.env.NPM_CONFIG_REGISTRY, userConfig: process.env.NPM_CONFIG_USERCONFIG, globalConfig: process.env.NPM_CONFIG_GLOBALCONFIG, dnsConfigPresent: true }));",
     ].join('\n'));
     writeFileSync(baseValidator, [
@@ -1033,6 +1034,7 @@ test(
       "assert.equal(process.env.GITHUB_JOB, 'trusted-pr-validation');",
       'assert.equal(process.env.GITHUB_TOKEN, undefined);',
       'assert.equal(process.env.SECRET_CANARY, undefined);',
+      "assert.equal(readFileSync('/etc/resolv.conf', 'utf8'), '# External DNS is unavailable in the validation sandbox.\\n');",
       "const prefetch = JSON.parse(readFileSync('/mnt/run-data/npm-prefetch.json', 'utf8'));",
       "assert.ok(prefetch.args.includes('--ignore-scripts=true'));",
       "assert.equal(prefetch.registry, 'https://registry.npmjs.org/');",
@@ -1051,6 +1053,7 @@ test(
       path.join(trustedRoot, 'scripts/outside-candidate-secret-path.json'),
       JSON.stringify(outsideCandidateSecret)
     );
+    writeFileSync(path.join(trustedRoot, 'scripts/expected-host-resolv.conf'), hostResolvConf);
 
     const commitFixture = (root) => {
       const env = {
