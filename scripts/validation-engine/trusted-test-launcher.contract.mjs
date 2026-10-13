@@ -302,32 +302,40 @@ test(
     const parent = mkdtempSync(
       path.join(tmpdir(), 'trusted-validation-launcher-')
     );
+    const socketParent = mkdtempSync(
+      path.join('/tmp', 'trusted-validation-socket-')
+    );
     const source = path.join(parent, 'candidate');
     const hostFile = path.join(parent, 'host-canary.txt');
     const browserCache = path.join(parent, 'playwright-cache');
     const outsideDependencies = path.join(parent, 'outside-dependencies');
-    const hostSocket = path.join(parent, 'host-canary.sock');
+    const hostSocket = path.join(socketParent, 'host-canary.sock');
     const candidateWrite = path.join(source, 'launcher-write-canary.txt');
     const systemNode = existsSync('/usr/bin/node') ? '/usr/bin/node' : undefined;
     const launcherNode = systemNode ?? process.execPath;
     const hostOnlyProbe =
       ['/usr/share/doc', '/usr/share/man'].find(existsSync) ?? '/usr/share/doc';
-    mkdirSync(path.join(source, 'bin'), { recursive: true });
-    mkdirSync(browserCache, { recursive: true });
-    mkdirSync(outsideDependencies, { recursive: true });
+    assert.ok(
+      Buffer.byteLength(hostSocket) < 108,
+      'the Unix socket path must fit Linux sun_path'
+    );
     const tcpServer = createServer();
-    tcpServer.listen(0, '127.0.0.1');
-    await once(tcpServer, 'listening');
     const socketServer = createServer();
-    socketServer.listen(hostSocket);
-    await once(socketServer, 'listening');
     t.after(async () => {
       if (tcpServer.listening)
         await new Promise((resolve) => tcpServer.close(resolve));
       if (socketServer.listening)
         await new Promise((resolve) => socketServer.close(resolve));
       rmSync(parent, { recursive: true, force: true });
+      rmSync(socketParent, { recursive: true, force: true });
     });
+    mkdirSync(path.join(source, 'bin'), { recursive: true });
+    mkdirSync(browserCache, { recursive: true });
+    mkdirSync(outsideDependencies, { recursive: true });
+    tcpServer.listen(0, '127.0.0.1');
+    await once(tcpServer, 'listening');
+    socketServer.listen(hostSocket);
+    await once(socketServer, 'listening');
     mkdirSync(path.join(source, 'web/src/lib'), { recursive: true });
     writeFileSync(path.join(source, 'web/src/lib/token.js'), 'export const token = "source code";\n');
     mkdirSync(path.join(source, 'vendor/mainline/src/rpc/server'), { recursive: true });
