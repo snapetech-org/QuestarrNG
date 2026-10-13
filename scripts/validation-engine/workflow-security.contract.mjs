@@ -1,7 +1,7 @@
 // Copyright (c) QuestarrNG contributors. All rights reserved.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { URL, fileURLToPath } from 'node:url';
 import test from 'node:test';
 
 const workflowPath = fileURLToPath(
@@ -24,13 +24,13 @@ test('secret-bearing steps after PR tests run only on trusted main pushes', () =
   );
 
   const postTestSteps = testJob.slice(testStep);
-  const steps = postTestSteps.split(/(?=^      - name: )/mu);
+  const steps = postTestSteps.split(/(?=^ {6}- name: )/mu);
   const secretSteps = steps.filter((step) => /\$\{\{\s*secrets\./u.test(step));
   assert.ok(secretSteps.length > 0, 'the contract covers the current upload steps');
   for (const step of secretSteps) {
     assert.match(
       step,
-      /^      - name:[^\n]*\n        if: \$\{\{ (?:!cancelled\(\) && )?github\.event_name == 'push' && github\.ref == 'refs\/heads\/main' \}\}/mu,
+      /^ {6}- name:[^\n]*\n {8}if: \$\{\{ (?:!cancelled\(\) && )?github\.event_name == 'push' && github\.ref == 'refs\/heads\/main' \}\}/mu,
       'secret-bearing upload steps must be gated to trusted main pushes'
     );
   }

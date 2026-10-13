@@ -18,6 +18,7 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import process from 'node:process';
 import { hostPathsToHide } from './trusted-test-sandbox-policy.mjs';
 
 const GUEST_WORKSPACE = '/mnt/workspace';
@@ -130,7 +131,6 @@ function createSyntheticGitRepository(workspace, runDirectory) {
 }
 
 function linkDependencies(sourceRoot, workspace) {
-  const dependencies = [];
   const dependencyDirectories = [];
   const pending = [{ absolute: sourceRoot, relative: '' }];
   const skipped = new Set([
