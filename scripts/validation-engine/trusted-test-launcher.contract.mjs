@@ -95,6 +95,8 @@ test(
       path.join(source, 'nested/config/secrets.json'),
       '{"secret":"hidden"}\n'
     );
+    writeFileSync(path.join(source, 'auth.json'), '{"token":"private"}\n');
+    writeFileSync(path.join(source, 'token.json'), '{"token":"private"}\n');
     mkdirSync(path.join(source, 'node_modules'), { recursive: true });
     writeFileSync(
       path.join(source, 'node_modules/marker.txt'),
@@ -125,6 +127,7 @@ assert.equal(existsSync('/mnt/workspace/.env'), false);
 assert.equal(existsSync('/mnt/workspace/config.json'), true);
 assert.equal(existsSync('/mnt/workspace/nested/config/operator.json'), false);
 assert.equal(existsSync('/mnt/workspace/auth.json'), false);
+assert.equal(existsSync('/mnt/workspace/token.json'), false);
 assert.equal(existsSync('/mnt/workspace/nested/.env.local'), false);
 assert.equal(existsSync('/mnt/workspace/nested/config/secrets.json'), false);
 assert.equal(existsSync('/etc/os-release'), false);
@@ -161,8 +164,6 @@ assert.throws(() => writeFileSync('/mnt/workspace/node_modules/marker.txt', 'cha
       path.join(source, 'nested/config/operator.json'),
       '{"private":true}\n'
     );
-    writeFileSync(path.join(source, 'auth.json'), '{"token":"private"}\n');
-
     const result = spawnSync(
       process.execPath,
       [
