@@ -87,7 +87,9 @@ export function sandboxMountOperations({
 const sensitiveName =
   /^(?:[.]env(?:$|[.](?!example$)[^/]+)|[.]ssh|[.]aws|[.]gnupg|id_(?:rsa|ed25519)|[.]git-credentials|[.]npmrc|[.]pypirc|[.]netrc|[^/]+[.](?:pem|key))$/iu;
 const sensitiveCredentialName =
-  /^(?:auth(?:entication)?|tokens?|credentials?|secrets?)(?:[.][^/]+)?$/iu;
+  /^[.]?(?:auth(?:entication)?|tokens?|credentials?|secrets?|private[-_]?keys?|api[-_]?keys?|access[-_]?tokens?|refresh[-_]?tokens?|client[-_]?secrets?)(?:[.][^/]+)?$/iu;
+const sensitiveCredentialMaterialFile =
+  /^[.]?(?:private[-_]?keys?|api[-_]?keys?|access[-_]?tokens?|refresh[-_]?tokens?|client[-_]?secrets?)[.][^/]+$/iu;
 const sourceCodeFile =
   /[.](?:c|cc|cpp|cs|css|go|h|hpp|java|js|jsx|mjs|php|py|rb|rs|sql|swift|ts|tsx|vue)$/iu;
 
@@ -102,5 +104,8 @@ export function isSensitiveCandidatePath(relativePath) {
   const hasCredentialNamedSegment = segments.some((segment) =>
     sensitiveCredentialName.test(segment)
   );
-  return hasCredentialNamedSegment && !sourceCodeFile.test(filename);
+  return (
+    sensitiveCredentialMaterialFile.test(filename) ||
+    (hasCredentialNamedSegment && !sourceCodeFile.test(filename))
+  );
 }
