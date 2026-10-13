@@ -16,6 +16,7 @@ export const validation = {
     'release-notes/20261012-validation-environment-isolation.md',
     'release-notes/20261013-validation-pr-secret-isolation.md',
     'docs/development/validation-engine.md',
+    'docs/SECURITY_ASSESSMENT.md',
     '.github/workflows/ci.yml',
     'scripts/validation-engine/engine.mjs',
     'scripts/validation-engine/config.mjs',
