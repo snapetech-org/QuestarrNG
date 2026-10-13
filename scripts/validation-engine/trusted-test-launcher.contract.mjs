@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
 import {
   chmodSync,
+  cpSync,
   copyFileSync,
   existsSync,
   mkdirSync,
@@ -115,10 +116,16 @@ const sandboxAvailable = (() => {
 const sandboxRequired = process.env.REQUIRE_VALIDATION_SANDBOX === '1';
 
 function createDedicatedNodeRuntime(parent) {
-  const runtimeBin = path.join(parent, `node-v${process.versions.node}`, 'bin');
-  mkdirSync(runtimeBin, { recursive: true, mode: 0o700 });
-  const runtime = path.join(runtimeBin, path.basename(process.execPath));
-  copyFileSync(process.execPath, runtime);
+  const source = realpathSync(process.execPath);
+  const sourceRoot = path.dirname(path.dirname(source));
+  const runtimeRoot = path.join(parent, `node-v${process.versions.node}`);
+  const runtime = path.join(runtimeRoot, path.relative(sourceRoot, source));
+  if (sourceRoot === '/usr') {
+    mkdirSync(path.dirname(runtime), { recursive: true, mode: 0o700 });
+    copyFileSync(source, runtime);
+  } else {
+    cpSync(sourceRoot, runtimeRoot, { recursive: true, dereference: false });
+  }
   chmodSync(runtime, 0o555);
   return runtime;
 }
