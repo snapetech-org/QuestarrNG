@@ -10,11 +10,6 @@ on:
       - ".github/ISSUE_TEMPLATE/**"
   pull_request:
     branches: [main, release/*]
-    paths-ignore:
-      - "**/*.md"
-      - "docs/**"
-      - "LICENSE"
-      - ".github/ISSUE_TEMPLATE/**"
   workflow_dispatch:
 
 concurrency:
