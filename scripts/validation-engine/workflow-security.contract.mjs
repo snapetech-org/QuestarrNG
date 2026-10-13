@@ -105,14 +105,19 @@ test('trusted PR validation runs the base validator and launcher on an exact can
   assert.match(trustedWorkflow, /permissions:\n\x20{2}contents:\x20read/u);
   assert.doesNotMatch(trustedWorkflow, /\$\{\{\s*secrets\./u);
   assert.match(trustedWorkflow, /ref: \$\{\{ github\.event\.pull_request\.base\.sha \}\}/u);
+  assert.match(
+    trustedWorkflow,
+    /# nosemgrep: yaml\.github-actions\.security\.pull-request-target-code-checkout\.pull-request-target-code-checkout\n\s+# This action checks out only the pull-request base SHA\.\n\s+- name: Checkout trusted base/u,
+    'the only checkout action is pinned to the trusted base commit'
+  );
   assert.equal((trustedWorkflow.match(/uses: actions\/checkout@/gu) ?? []).length, 1);
   assert.match(trustedWorkflow, /Fetch candidate as data without running checkout actions/u);
   assert.match(trustedWorkflow, /refs\/pull\/\$PR_NUMBER\/head:refs\/remotes\/pull\/\$PR_NUMBER\/head/u);
   assert.match(trustedWorkflow, /fetched_sha.*CANDIDATE_SHA/u);
   assert.equal(
     (trustedWorkflow.match(/# nosemgrep: yaml\.github-actions\.security\.pull-request-target-code-checkout\.pull-request-target-code-checkout/gu) ?? []).length,
-    2,
-    'only the audited data-only fetch and materialization lines suppress the checkout rule'
+    3,
+    'only the trusted-base checkout and audited candidate fetch/materialization suppressions are present'
   );
   assert.match(trustedWorkflow, /This stores candidate Git objects only; hooks, LFS smudging, and submodules are disabled/u);
   assert.match(trustedWorkflow, /This materializes untrusted files as data; the trusted launcher isolates them before execution/u);

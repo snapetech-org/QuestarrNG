@@ -21,6 +21,8 @@ jobs:
       contents: read
 
     steps:
+      # nosemgrep: yaml.github-actions.security.pull-request-target-code-checkout.pull-request-target-code-checkout
+      # This action checks out only the pull-request base SHA.
       - name: Checkout trusted base
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6.2.0
         with:
