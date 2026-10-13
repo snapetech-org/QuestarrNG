@@ -247,7 +247,12 @@ jobs:
           git show "$launcher_sha:scripts/validation-engine/trusted-test-sandbox-policy.mjs" > "$trusted_root/launcher/trusted-test-sandbox-policy.mjs"
           git show "$launcher_sha:scripts/validation-engine/trusted-test-source-policy.mjs" > "$trusted_root/launcher/trusted-test-source-policy.mjs"
 
-          git archive --format=tar "$TRUSTED_BASE_SHA" \
+          git cat-file -e "$launcher_sha:scripts/install-npm-runtime.mjs"
+          git cat-file -e "$launcher_sha:.github/npm-runtime/package.json"
+          git cat-file -e "$launcher_sha:.github/npm-runtime/package-lock.json"
+          git cat-file -e "$launcher_sha:.github/npm-source/package.json"
+          git cat-file -e "$launcher_sha:.github/npm-source/package-lock.json"
+          git archive --format=tar "$launcher_sha" \
             scripts/install-npm-runtime.mjs \
             .github/npm-runtime/package.json \
             .github/npm-runtime/package-lock.json \
@@ -389,7 +394,12 @@ jobs:
           git show "$launcher_sha:scripts/validation-engine/trusted-test-sandbox-policy.mjs" > "$trusted_root/launcher/trusted-test-sandbox-policy.mjs"
           git show "$launcher_sha:scripts/validation-engine/trusted-test-source-policy.mjs" > "$trusted_root/launcher/trusted-test-source-policy.mjs"
 
-          git archive --format=tar "$TRUSTED_BASE_SHA" \
+          git cat-file -e "$launcher_sha:scripts/install-npm-runtime.mjs"
+          git cat-file -e "$launcher_sha:.github/npm-runtime/package.json"
+          git cat-file -e "$launcher_sha:.github/npm-runtime/package-lock.json"
+          git cat-file -e "$launcher_sha:.github/npm-source/package.json"
+          git cat-file -e "$launcher_sha:.github/npm-source/package-lock.json"
+          git archive --format=tar "$launcher_sha" \
             scripts/install-npm-runtime.mjs \
             .github/npm-runtime/package.json \
             .github/npm-runtime/package-lock.json \

@@ -175,6 +175,9 @@ When a release branch predates the validation engine, test and build jobs use
 the permanent `questarr-validation-launcher-20261013` tag to fetch the reviewed
 bootstrap launcher. The workflow verifies that the tag resolves to its pinned
 commit, so deleting the pull-request branch does not break older release jobs.
+The npm runtime installer and lockfiles are archived from the same selected
+trusted revision as the launcher: the base commit when it contains the engine,
+or the pinned bootstrap commit for an older base.
 
 During a run, the engine writes a task summary to stderr when each task starts
 and finishes, and repeats it every minute while a task is still running. This

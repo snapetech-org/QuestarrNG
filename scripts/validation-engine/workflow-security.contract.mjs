@@ -199,6 +199,13 @@ test('test and build jobs execute the base-reviewed launcher with isolated depen
     assert.match(job, /git fetch --no-tags origin "refs\/tags\/\$BOOTSTRAP_LAUNCHER_REF"/u);
     assert.match(job, /fetched_launcher_sha="\$\(git rev-parse 'FETCH_HEAD\^\{commit\}'\)"/u);
     assert.match(job, /\[ "\$fetched_launcher_sha" != "\$launcher_sha" \]/u);
+    assert.match(job, /git cat-file -e "\$launcher_sha:scripts\/install-npm-runtime\.mjs"/u);
+    assert.match(job, /git archive --format=tar "\$launcher_sha"/u);
+    assert.doesNotMatch(
+      job,
+      /git archive --format=tar "\$TRUSTED_BASE_SHA"/u,
+      `${name} must load the npm runtime from the same reviewed revision as its launcher`
+    );
     assert.doesNotMatch(
       job,
       /\.bin\/npm" ci/u,
