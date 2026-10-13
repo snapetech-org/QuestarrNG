@@ -24,6 +24,19 @@ export const HOST_PATHS_TO_HIDE = Object.freeze([
   '/credentials',
 ]);
 
+export const SYSTEM_PATHS_TO_MOUNT = Object.freeze([
+  '/bin',
+  '/sbin',
+  '/lib',
+  '/lib64',
+  '/usr/bin',
+  '/usr/sbin',
+  '/usr/lib',
+  '/usr/lib64',
+  '/usr/share/nodejs',
+  '/usr/share/zoneinfo',
+]);
+
 function isWithin(root, candidate) {
   const relative = path.relative(root, candidate);
   return (
@@ -55,22 +68,51 @@ export function sandboxMountOperations({
   runDirectory,
   externalMounts,
   dependencyMounts,
+  systemMounts,
   hiddenDirectories,
   guestWorkspace,
   guestRun,
   markerFile,
   guestMarker,
 }) {
-  const operations = hiddenDirectories.map((directory) => ({
-    type: 'tmpfs',
-    path: directory,
-    hostMask: true,
-  }));
+  const hiddenParents = new Set();
+  for (const directory of hiddenDirectories) {
+    let parent = path.dirname(directory);
+    while (parent !== '/') {
+      hiddenParents.add(parent);
+      parent = path.dirname(parent);
+    }
+  }
+  const byDepth = (left, right) =>
+    left.split('/').length - right.split('/').length || left.localeCompare(right);
+  const hiddenDirectoriesToCreate = new Set([...hiddenParents, ...hiddenDirectories]);
+  const operations = [...hiddenDirectoriesToCreate]
+    .sort(byDepth)
+    .map((directory) => ({ type: 'dir', path: directory }));
   operations.push(
-    { type: 'dir', path: guestWorkspace },
-    { type: 'dir', path: guestRun },
+    ...hiddenDirectories.map((directory) => ({
+      type: 'tmpfs',
+      path: directory,
+      hostMask: true,
+    }))
+  );
+  const systemParents = new Set();
+  for (const [, target] of systemMounts) {
+    systemParents.add(target);
+    let parent = path.dirname(target);
+    while (parent !== '/') {
+      systemParents.add(parent);
+      parent = path.dirname(parent);
+    }
+  }
+  for (const directory of [...systemParents].sort(byDepth))
+    if (!hiddenParents.has(directory)) operations.push({ type: 'dir', path: directory });
+  operations.push({ type: 'dir', path: guestWorkspace }, { type: 'dir', path: guestRun });
+  for (const [source, target] of systemMounts)
+    operations.push({ type: 'ro-bind-fd', source, target });
+  operations.push(
     { type: 'bind-fd', source: workspace, target: guestWorkspace },
-    { type: 'bind-fd', source: runDirectory, target: guestRun },
+    { type: 'bind-fd', source: runDirectory, target: guestRun }
   );
   for (const [source, target] of externalMounts)
     operations.push({ type: 'ro-bind-fd', source, target });

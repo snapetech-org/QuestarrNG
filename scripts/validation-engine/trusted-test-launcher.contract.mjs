@@ -19,6 +19,7 @@ import test from 'node:test';
 import { URL, fileURLToPath } from 'node:url';
 import {
   HOST_PATHS_TO_HIDE,
+  SYSTEM_PATHS_TO_MOUNT,
   hostPathsToHide,
   isSensitiveCandidatePath,
   sandboxMountOperations,
@@ -30,6 +31,18 @@ const launcher = fileURLToPath(
     import.meta.url
   )
 );
+const launcherSource = readFileSync(launcher, 'utf8');
+assert.doesNotMatch(
+  launcherSource,
+  /['"]--ro-bind['"]\s*,\s*['"]\/['"]\s*,\s*['"]\/['"]/u,
+  'the launcher must not bind the host root into the candidate sandbox'
+);
+assert.match(
+  launcherSource,
+  /if \(separator === -1\)\s*throw new Error\('Pass a candidate test command after --\.'\)/u,
+  'the launcher must require an explicit candidate command'
+);
+assert.doesNotMatch(launcherSource, /run-local-validation\.mjs/u);
 for (const hostPath of ['/etc', '/opt', '/srv', '/usr/local'])
   assert.ok(
     HOST_PATHS_TO_HIDE.includes(hostPath),
@@ -104,6 +117,7 @@ test('binds open sources only after masking their host directories', () => {
     runDirectory: '/home/runner/work/_temp/validation-run',
     externalMounts: [['/usr/local/bin/node', '/mnt/run-data/dependencies/0']],
     dependencyMounts: [['/home/runner/work/project/node_modules/react', '/mnt/workspace/node_modules/react']],
+    systemMounts: SYSTEM_PATHS_TO_MOUNT.map((directory) => [directory, directory]),
     hiddenDirectories,
     guestWorkspace: '/mnt/workspace',
     guestRun: '/mnt/run-data',
@@ -116,10 +130,23 @@ test('binds open sources only after masking their host directories', () => {
     operation.type === 'bind-fd' || operation.type === 'ro-bind-fd');
 
   assert.equal(operations.filter((operation) => operation.hostMask).length, hiddenDirectories.length);
+  assert.ok(SYSTEM_PATHS_TO_MOUNT.includes('/usr/bin'));
+  assert.ok(SYSTEM_PATHS_TO_MOUNT.includes('/usr/lib'));
   assert.ok(descriptorBinds.length > 0);
-  assert.ok(operations.indexOf(descriptorBinds[0]) > finalHostMask);
-  assert.equal(descriptorBinds[0].source, '/home/runner/work/project');
-  assert.equal(descriptorBinds[0].target, '/mnt/workspace');
+  const systemBinBind = operations.findIndex(
+    (operation) => operation.type === 'ro-bind-fd' && operation.target === '/usr/bin'
+  );
+  const workspaceBind = operations.find(
+    (operation) => operation.type === 'bind-fd' && operation.target === '/mnt/workspace'
+  );
+  assert.ok(systemBinBind > finalHostMask);
+  assert.ok(operations.indexOf(workspaceBind) > finalHostMask);
+  assert.equal(workspaceBind.source, '/home/runner/work/project');
+  assert.equal(workspaceBind.target, '/mnt/workspace');
+  assert.equal(
+    operations.some((operation) => operation.source === '/' && operation.target === '/'),
+    false
+  );
   assert.equal(descriptorBinds.at(-1).source, '/home/runner/work/_temp/validation-run/sandbox-marker');
 });
 
@@ -136,6 +163,9 @@ test(
     const outsideDependencies = path.join(parent, 'outside-dependencies');
     const hostSocket = path.join(parent, 'host-canary.sock');
     const candidateWrite = path.join(source, 'launcher-write-canary.txt');
+    const systemNode = existsSync('/usr/bin/node') ? '/usr/bin/node' : undefined;
+    const hostOnlyProbe =
+      ['/usr/share/doc', '/usr/share/man'].find(existsSync) ?? '/usr/share/doc';
     mkdirSync(path.join(source, 'bin'), { recursive: true });
     mkdirSync(browserCache, { recursive: true });
     mkdirSync(outsideDependencies, { recursive: true });
@@ -235,6 +265,7 @@ assert.match(readFileSync('/mnt/workspace/vendor/mainline/src/rpc/server/tokens.
 assert.equal(existsSync('/mnt/workspace/nested/.env.local'), false);
 assert.equal(existsSync('/mnt/workspace/nested/config/secrets.json'), false);
 assert.equal(existsSync('/etc/os-release'), false);
+assert.equal(existsSync(${JSON.stringify(hostOnlyProbe)}), false);
 const originalCheckout = ${JSON.stringify(source)};
 assert.throws(() => readFileSync(path.join(originalCheckout, 'auth.json')), { code: 'ENOENT' });
 assert.throws(() => writeFileSync(hostFile, 'escaped'));
@@ -268,6 +299,34 @@ assert.throws(() => writeFileSync('/mnt/workspace/node_modules/marker.txt', 'cha
       path.join(source, 'nested/config/operator.json'),
       '{"private":true}\n'
     );
+    const missingCommandResult = spawnSync(process.execPath, [launcher, source], {
+      encoding: 'utf8',
+      timeout: 30_000,
+    });
+    assert.equal(missingCommandResult.status, 1);
+    assert.match(missingCommandResult.stderr, /Pass a candidate test command after --/u);
+
+    const npmResult = spawnSync(process.execPath, [launcher, source, '--', 'npm', '--version'], {
+      encoding: 'utf8',
+      timeout: 30_000,
+    });
+    assert.equal(npmResult.error, undefined, npmResult.error?.message);
+    assert.equal(npmResult.status, 0, `${npmResult.stdout ?? ''}${npmResult.stderr ?? ''}`);
+
+    if (systemNode) {
+      const systemRuntimeResult = spawnSync(
+        systemNode,
+        [launcher, source, '--', systemNode, '--version'],
+        { encoding: 'utf8', timeout: 30_000 }
+      );
+      assert.equal(systemRuntimeResult.error, undefined, systemRuntimeResult.error?.message);
+      assert.equal(
+        systemRuntimeResult.status,
+        0,
+        `${systemRuntimeResult.stdout ?? ''}${systemRuntimeResult.stderr ?? ''}`
+      );
+    }
+
     const result = spawnSync(
       process.execPath,
       [
@@ -293,6 +352,26 @@ assert.throws(() => writeFileSync('/mnt/workspace/node_modules/marker.txt', 'cha
     );
     assert.equal(readFileSync(hostFile, 'utf8'), 'host canary stays unchanged');
     assert.equal(existsSync(candidateWrite), false);
+
+    rmSync(path.join(source, 'web/src/lib/token.js'));
+    const deletedFileResult = spawnSync(
+      process.execPath,
+      [
+        launcher,
+        source,
+        '--',
+        process.execPath,
+        '-e',
+        `import assert from 'node:assert/strict'; import { existsSync } from 'node:fs'; assert.equal(existsSync('/mnt/workspace/web/src/lib/token.js'), false);`,
+      ],
+      { encoding: 'utf8', timeout: 30_000 }
+    );
+    assert.equal(deletedFileResult.error, undefined, deletedFileResult.error?.message);
+    assert.equal(
+      deletedFileResult.status,
+      0,
+      `${deletedFileResult.stdout ?? ''}${deletedFileResult.stderr ?? ''}`
+    );
 
     rmSync(path.join(source, 'node_modules'), { recursive: true, force: true });
     symlinkSync(outsideDependencies, path.join(source, 'node_modules'), 'dir');

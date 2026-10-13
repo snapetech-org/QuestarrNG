@@ -86,12 +86,16 @@ Bubblewrap binds those pinned descriptors after applying the host masks, so sour
 resolution does not depend on paths that the sandbox has already hidden. The
 complete `node_modules` tree is mounted read-only without filtering,
 so use only a trusted installed dependency tree that contains no credentials or
-other local secrets. The host root is otherwise visible read-only, so use this
-launcher only on a machine where other system-wide readable files do not contain
-secrets. It fails before starting candidate code if the required isolation is
-unavailable. Use the complete GitHub-hosted validation run for the full test
-suite. The test job does not receive the Codecov upload token for pull requests;
-coverage and test-result uploads run only after trusted pushes to `main`.
+other local secrets. The host root is not mounted. The sandbox adds only the
+system paths required to run Node and its tools; a versioned Node installation
+is mounted as one directory so `bin/node` and sibling `lib/node_modules/npm`
+continue to resolve together. OS-managed Node under `/usr` uses the explicit
+system-path allowlist instead. The launcher fails closed if it cannot identify
+one of these runtime layouts, if required isolation is unavailable, or if no
+candidate command is supplied. Use the complete GitHub-hosted validation run
+for the full test suite. The test job does not receive the Codecov upload token
+for pull requests; coverage and test-result uploads run only after trusted
+pushes to `main`.
 
 During a run, the engine writes a task summary to stderr when each task starts
 and finishes, and repeats it every minute while a task is still running. This

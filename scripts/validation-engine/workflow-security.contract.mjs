@@ -35,3 +35,12 @@ test('secret-bearing steps after PR tests run only on trusted main pushes', () =
     );
   }
 });
+
+test('receipt download is limited to the current workflow attempt', () => {
+  const workflow = readFileSync(workflowPath, 'utf8');
+  assert.match(
+    workflow,
+    /pattern: validation-receipt-\*-attempt-\$\{\{\s*github\.run_attempt\s*\}\}/u,
+    'reconciliation must not download receipts from earlier attempts'
+  );
+});

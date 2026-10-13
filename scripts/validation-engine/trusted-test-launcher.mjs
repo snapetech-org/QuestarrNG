@@ -24,6 +24,7 @@ import process from 'node:process';
 import {
   hostPathsToHide,
   isSensitiveCandidatePath,
+  SYSTEM_PATHS_TO_MOUNT,
   sandboxMountOperations,
 } from './trusted-test-sandbox-policy.mjs';
 
@@ -95,12 +96,25 @@ function copyCandidateFile(sourceRoot, workspaceRoot, relativePath, tracked) {
   const components = relativePath.split(/[\\/]/u);
   for (const component of components.slice(0, -1)) {
     ancestor = path.join(ancestor, component);
-    if (lstatSync(ancestor).isSymbolicLink())
+    let ancestorMetadata;
+    try {
+      ancestorMetadata = lstatSync(ancestor);
+    } catch (error) {
+      if (error.code === 'ENOENT') return;
+      throw error;
+    }
+    if (ancestorMetadata.isSymbolicLink())
       throw new Error(
         `Candidate source contains a linked parent: ${relativePath}`
       );
   }
-  const metadata = lstatSync(source);
+  let metadata;
+  try {
+    metadata = lstatSync(source);
+  } catch (error) {
+    if (error.code === 'ENOENT') return;
+    throw error;
+  }
   if (metadata.isSymbolicLink())
     throw new Error(
       `Candidate source contains a symbolic link: ${relativePath}`
@@ -108,7 +122,15 @@ function copyCandidateFile(sourceRoot, workspaceRoot, relativePath, tracked) {
   if (!metadata.isFile())
     throw new Error(`Candidate source is not a regular file: ${relativePath}`);
   mkdirSync(path.dirname(target), { recursive: true });
-  cpSync(source, target, { preserveTimestamps: true });
+  try {
+    cpSync(source, target, { preserveTimestamps: true });
+  } catch (error) {
+    if (error.code === 'ENOENT' && !existsSync(source)) {
+      rmSync(target, { force: true });
+      return;
+    }
+    throw error;
+  }
   chmodSync(target, metadata.mode & 0o777);
 }
 
@@ -219,6 +241,29 @@ function makeSandboxCommand({
     );
   const runtimePath = realpathSync(process.execPath);
   const runtimeDirectory = path.dirname(runtimePath);
+  if (path.basename(runtimeDirectory) !== 'bin')
+    throw new Error('The Node runtime must be inside a dedicated bin directory.');
+  const runtimeRoot = path.dirname(runtimeDirectory);
+  const systemRuntime = runtimeRoot === '/usr';
+  const runtimeRootSegments = runtimeRoot.split(path.sep).filter(Boolean);
+  const hasVersionedNodeName = runtimeRootSegments.some((segment) =>
+    /^node(?:js)?[-_]v?\d+(?:[.].*)?$/iu.test(segment)
+  );
+  const hasNodeManagerAndVersion =
+    runtimeRootSegments.some((segment) => /^node(?:js)?$/iu.test(segment)) &&
+    runtimeRootSegments.some((segment) => /^v?\d+\.\d+\.\d+(?:[-+].*)?$/u.test(segment));
+  if (!systemRuntime && !hasVersionedNodeName && !hasNodeManagerAndVersion)
+    throw new Error('The Node runtime must be inside a dedicated installation directory.');
+  const runtimeRelativePath = path.relative(runtimeRoot, runtimePath);
+  if (
+    path.isAbsolute(runtimeRelativePath) ||
+    runtimeRelativePath === '..' ||
+    runtimeRelativePath.startsWith(`..${path.sep}`)
+  )
+    throw new Error('The Node runtime must be contained by its installation directory.');
+  const systemMounts = SYSTEM_PATHS_TO_MOUNT.filter((directory) => existsSync(directory)).map(
+    (directory) => [realpathSync(directory), directory]
+  );
   const externalRoots = [];
   let playwrightCacheIndex = -1;
   if (playwrightCache) {
@@ -228,10 +273,13 @@ function makeSandboxCommand({
       externalRoots.push(playwrightCache);
     }
   }
-  let runtimeIndex = externalRoots.indexOf(runtimeDirectory);
-  if (runtimeIndex === -1) {
-    runtimeIndex = externalRoots.length;
-    externalRoots.push(runtimeDirectory);
+  let runtimeIndex = -1;
+  if (!systemRuntime) {
+    runtimeIndex = externalRoots.indexOf(runtimeRoot);
+    if (runtimeIndex === -1) {
+      runtimeIndex = externalRoots.length;
+      externalRoots.push(runtimeRoot);
+    }
   }
   const mounts = externalRoots.map((source, index) => [
     realpathSync(source),
@@ -248,14 +296,20 @@ function makeSandboxCommand({
       mode: 0o700,
     });
 
-  const runtimeGuest = mounts[runtimeIndex][1];
-  const runtimeExecutable = `${runtimeGuest}/${path.basename(runtimePath)}`;
+  const runtimeGuest = systemRuntime ? undefined : mounts[runtimeIndex][1];
+  const runtimeRelativePosix = runtimeRelativePath.split(path.sep).join('/');
+  const runtimeExecutable = systemRuntime
+    ? runtimePath
+    : path.posix.join(runtimeGuest, runtimeRelativePosix);
+  const runtimeBin = systemRuntime
+    ? runtimeDirectory
+    : path.posix.join(runtimeGuest, path.posix.dirname(runtimeRelativePosix));
   const markerToken = randomBytes(32).toString('hex');
   const markerFile = path.join(runDirectory, 'sandbox-marker');
   writeFileSync(markerFile, markerToken, { mode: 0o600, flag: 'wx' });
 
   const env = {
-    PATH: `${runtimeGuest}:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin`,
+    PATH: `${GUEST_WORKSPACE}/.github/npm-runtime/node_modules/.bin:${runtimeBin}:/usr/bin:/bin:/usr/sbin:/sbin`,
     NODE_ENV: 'test',
     HOME: `${GUEST_RUN}/home`,
     USERPROFILE: `${GUEST_RUN}/home`,
@@ -283,9 +337,6 @@ function makeSandboxCommand({
     '--unshare-ipc',
     '--unshare-uts',
     '--unshare-net',
-    '--ro-bind',
-    '/',
-    '/',
   ];
   const hiddenDirectories = hostPathsToHide(sourceRoot)
     .filter((directory) => directory === '/mnt' || existsSync(directory));
@@ -294,6 +345,7 @@ function makeSandboxCommand({
     runDirectory,
     externalMounts: mounts,
     dependencyMounts,
+    systemMounts,
     hiddenDirectories,
     guestWorkspace: GUEST_WORKSPACE,
     guestRun: GUEST_RUN,
@@ -417,15 +469,9 @@ async function main() {
     }
     throw new Error(`Unknown launcher option: ${launcherArguments[index]}`);
   }
-  const targetCommand =
-    separator === -1
-      ? [
-          process.execPath,
-          'bin/run-local-validation.mjs',
-          '--tests-only',
-          '--inside-sandbox',
-        ]
-      : process.argv.slice(separator + 1);
+  if (separator === -1)
+    throw new Error('Pass a candidate test command after --.');
+  const targetCommand = process.argv.slice(separator + 1);
   if (targetCommand.length === 0)
     throw new Error('Pass a candidate test command after --.');
   const sourceRoot = realpathSync(requestedRoot);
