@@ -36,8 +36,9 @@ Runtime probes and child commands use a sanitized environment with `PATH`,
 platform variables, locale and timezone settings, and the version-manager paths
 needed to find host-installed runtimes (`ASDF_DIR`, `ASDF_DATA_DIR`,
 `MISE_HOME`, `MISE_DATA_DIR`, `NVM_DIR`, and `VOLTA_HOME`). When these data
-directories are unset, the engine derives ASDF's from the original home and
-mise's from `XDG_DATA_HOME`, `LOCALAPPDATA`, or the original home as
+directories are unset, the engine uses the original home's `.asdf` directory
+for ASDF when it exists, otherwise `ASDF_DIR` or the same default path. It
+derives mise's from `XDG_DATA_HOME`, `LOCALAPPDATA`, or the original home as
 appropriate. Task-specific values come from that task's configuration;
 inherited values outside the base allowlist require an approved task-scoped
 `passEnv` entry. Runtime probes use a private temporary home and separate empty
