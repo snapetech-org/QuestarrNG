@@ -180,7 +180,9 @@ jobs:
   # job cost five runners and five `npm ci` for about the same wall time, and runners are
   # what the account runs out of when several PRs are pushed at once.
   test:
-    runs-on: ubuntu-latest
+    # Bubblewrap needs the Ubuntu 24.04 AppArmor profile installed below. Pin this
+    # sandbox job so the ubuntu-latest migration cannot change that runtime unreviewed.
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -212,6 +214,19 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --yes bubblewrap
+          # Ubuntu 24.04 restricts unprivileged user namespaces through AppArmor.
+          # Allow Bubblewrap itself to create the namespace it needs, without
+          # disabling the restriction globally for the runner.
+          profile="$RUNNER_TEMP/questarr-bubblewrap.apparmor"
+          cat > "$profile" <<'APPARMOR'
+          abi <abi/4.0>,
+          include <tunables/global>
+          profile questarr_bubblewrap /usr/bin/bwrap flags=(unconfined) {
+            userns,
+          }
+          APPARMOR
+          sudo apparmor_parser --add "$profile"
+          test "$(sysctl -n kernel.apparmor_restrict_unprivileged_userns)" = 1
           bwrap --die-with-parent --unshare-user --ro-bind / / -- /bin/true
 
       - name: Run source-bound test plan

@@ -107,9 +107,12 @@ system-path allowlist instead. The launcher fails closed if it cannot identify
 one of these runtime layouts, if required isolation is unavailable, or if no
 candidate command is supplied. The GitHub Actions test job installs Bubblewrap
 and checks that user namespaces work before it runs the test plan; its launcher
-contract fails if that sandbox requirement is not met. Local runs may skip the
-integration check when Bubblewrap is unavailable. Use the complete GitHub-hosted
-validation run for the full test suite. The test job does not receive the
+contract fails if that sandbox requirement is not met. On Ubuntu 24.04, the job
+loads an ephemeral AppArmor profile attached to `/usr/bin/bwrap` so Bubblewrap
+can create its namespace while the runner-wide unprivileged-user-namespace
+restriction stays enabled. Local runs may skip the integration check when
+Bubblewrap is unavailable. Use the complete GitHub-hosted validation run for the
+full test suite. The test job does not receive the
 Codecov upload token for pull requests; coverage and test-result uploads run
 only after trusted pushes to `main`.
 
