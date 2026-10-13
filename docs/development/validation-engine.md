@@ -69,7 +69,9 @@ node /tmp/trusted-validation-launcher/trusted-test-launcher.mjs "$PWD" -- node -
 The launcher snapshots the candidate and enters bubblewrap before loading its
 JavaScript. It copies only paths recorded in the Git index; untracked and
 ignored checkout files, including a local `auth.json`, never enter the snapshot.
-Stage new candidate files before using the launcher. It hides the invoking
+Credential files are filtered when extensionless or stored in credential-named
+directories, while token-named source files remain available. Stage new
+candidate files before using the launcher. It hides the invoking
 home, temporary files, common service sockets, host configuration under `/etc`,
 and common host data roots such as `/opt`, `/srv`, and `/usr/local`, then disables
 network access. If the checkout is outside those standard roots, it also masks
