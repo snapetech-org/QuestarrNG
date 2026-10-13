@@ -6,4 +6,4 @@ action: none
 breaking: false
 ---
 
-Validation snapshots omit extensionless credentials and files stored in credential-named folders while retaining similarly named source code.
+Validation snapshots exclude dotted and extensionless credential names, private/API/access-token material, and non-source files beneath credential folders while retaining source modules such as TokenStore.ts.
