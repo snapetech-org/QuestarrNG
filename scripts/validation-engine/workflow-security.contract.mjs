@@ -66,11 +66,33 @@ test('Codecov uploads run from the default-branch workflow after trusted main CI
     /uses: actions\/checkout@[a-f0-9]{40}[\s\S]*?ref: \$\{\{ github\.event\.workflow_run\.head_sha \}\}[\s\S]*?persist-credentials: false/u,
     'the uploader checks out the exact triggering commit without retaining a token'
   );
+  const checkoutIndex = codecovWorkflow.indexOf('uses: actions/checkout@');
+  const uploadActionIndices = [...codecovWorkflow.matchAll(/uses: codecov\/codecov-action@/gu)]
+    .map(({ index }) => index);
+  assert.equal(uploadActionIndices.length, 2);
+  assert.ok(uploadActionIndices.every((index) => index > checkoutIndex));
   assert.equal(
     (codecovWorkflow.match(/override_commit: \$\{\{ github\.event\.workflow_run\.head_sha \}\}/gu) ?? []).length,
     2,
     'coverage and test uploads must be attributed to the triggering commit'
   );
+  const checkoutStart = codecovWorkflow.indexOf(
+    '- name: Check out the exact trusted CI commit'
+  );
+  const coverageUploadStart = codecovWorkflow.indexOf(
+    '- name: Upload coverage to Codecov'
+  );
+  assert.ok(
+    checkoutStart >= 0 && coverageUploadStart > checkoutStart,
+    'the uploader must check out the triggering commit before invoking Codecov'
+  );
+  const checkoutStep = codecovWorkflow.slice(checkoutStart, coverageUploadStart);
+  assert.match(checkoutStep, /uses: actions\/checkout@[a-f0-9]{40}/u);
+  assert.match(
+    checkoutStep,
+    /ref: \$\{\{ github\.event\.workflow_run\.head_sha \}\}/u
+  );
+  assert.match(checkoutStep, /persist-credentials: false/u);
   assert.match(codecovWorkflow, /token: \$\{\{ secrets\.CODECOV_TOKEN \}\}/u);
   assert.doesNotMatch(
     codecovWorkflow,

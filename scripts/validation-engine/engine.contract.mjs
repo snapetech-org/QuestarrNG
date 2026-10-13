@@ -85,6 +85,7 @@ function baseConfig(overrides = {}) {
 function fixture() {
   const root = makeRoot({
     'package.json': '{"name":"validation-fixture"}\n',
+    'src/app.js': 'export const candidate = true;\n',
     'tests/example.test.mjs': "import test from 'node:test';\ntest('fixture passes', () => {});\n",
   });
   return { root, config: baseConfig() };
@@ -616,7 +617,7 @@ test('candidate digests change after tracked source edits', () => {
     encoding: 'utf8',
   });
   assert.equal(externalDiff.status, 0, externalDiff.stderr);
-  writeFileSync(path.join(root, 'package.json'), '{"edited":true}\n');
+  writeFileSync(path.join(root, 'src/app.js'), 'export const candidate = false;\n');
   const afterEdit = captureCandidate(root, config.inputs, discoverInventory(root, config.inventory));
   assert.notEqual(before.sourceSha256, afterEdit.sourceSha256);
 });
