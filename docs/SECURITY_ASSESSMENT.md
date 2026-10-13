@@ -70,7 +70,10 @@ workflow steps must not receive repository secrets. The regular CI workflow
 contains no Codecov token reference. It uploads reports only for `main` pushes;
 a separate `workflow_run` workflow loaded from the default branch accepts only
 a same-repository push to `main` and runs in the `codecov-main` environment.
-That environment's deployment policy allows `main` only. Store
+That environment's deployment policy allows `main` only. The uploader checks out
+the trusted repository default branch and uses Codecov's commit override for the
+triggering run, so the secret-bearing workflow never checks out run-provided
+source. Store
 `CODECOV_TOKEN`, if configured, as a secret in that environment; do not create a
 repository or organization secret with that name. The `trusted-pr-validation`
 workflow is also loaded from the pull-request base and runs the base validator

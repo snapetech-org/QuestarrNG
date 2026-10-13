@@ -159,7 +159,10 @@ The regular pull-request CI workflow contains no Codecov secret reference. It
 uploads reports as a short-lived artifact only on pushes to `main`; a separate
 `workflow_run` workflow loaded from the default branch uploads that artifact to
 Codecov only for a same-repository `push` to `main`, in the `codecov-main`
-environment. GitHub restricts that environment to `main`. Store
+environment. The uploader checks out trusted default-branch code and uses the
+triggering run's SHA as Codecov's `override_commit`; it does not check out the
+workflow-run source in the secret-bearing job. GitHub restricts that environment
+to `main`. Store
 `CODECOV_TOKEN`, if configured, as an environment secret there rather than as a
 repository or organization secret. A pull-request edit to CI therefore cannot
 make the Codecov token available to candidate tests. Discord tag announcements

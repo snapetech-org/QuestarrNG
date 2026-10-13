@@ -24,10 +24,13 @@ jobs:
       contents: read
 
     steps:
-      - name: Check out the exact trusted CI commit
+      # Never check out the workflow_run source commit in this secret-bearing job.
+      # The uploader runs only for trusted pushes to main; override_commit below
+      # keeps the uploaded reports associated with that exact CI commit.
+      - name: Check out the trusted default branch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ github.event.repository.default_branch }}
           persist-credentials: false
 
       - name: Download reports from the matching CI run attempt

@@ -63,8 +63,8 @@ test('Codecov uploads run from the default-branch workflow after trusted main CI
   );
   assert.match(
     codecovWorkflow,
-    /uses: actions\/checkout@[a-f0-9]{40}[\s\S]*?ref: \$\{\{ github\.event\.workflow_run\.head_sha \}\}[\s\S]*?persist-credentials: false/u,
-    'the uploader checks out the exact triggering commit without retaining a token'
+    /uses: actions\/checkout@[a-f0-9]{40}[\s\S]*?ref: \$\{\{ github\.event\.repository\.default_branch \}\}[\s\S]*?persist-credentials: false/u,
+    'the privileged uploader checks out trusted default-branch code without retaining a token'
   );
   const checkoutIndex = codecovWorkflow.indexOf('uses: actions/checkout@');
   const uploadActionIndices = [...codecovWorkflow.matchAll(/uses: codecov\/codecov-action@/gu)]
@@ -77,22 +77,27 @@ test('Codecov uploads run from the default-branch workflow after trusted main CI
     'coverage and test uploads must be attributed to the triggering commit'
   );
   const checkoutStart = codecovWorkflow.indexOf(
-    '- name: Check out the exact trusted CI commit'
+    '- name: Check out the trusted default branch'
   );
   const coverageUploadStart = codecovWorkflow.indexOf(
     '- name: Upload coverage to Codecov'
   );
   assert.ok(
     checkoutStart >= 0 && coverageUploadStart > checkoutStart,
-    'the uploader must check out the triggering commit before invoking Codecov'
+    'the uploader must check out trusted repository code before invoking Codecov'
   );
   const checkoutStep = codecovWorkflow.slice(checkoutStart, coverageUploadStart);
   assert.match(checkoutStep, /uses: actions\/checkout@[a-f0-9]{40}/u);
   assert.match(
     checkoutStep,
-    /ref: \$\{\{ github\.event\.workflow_run\.head_sha \}\}/u
+    /ref: \$\{\{ github\.event\.repository\.default_branch \}\}/u
   );
   assert.match(checkoutStep, /persist-credentials: false/u);
+  assert.doesNotMatch(
+    checkoutStep,
+    /workflow_run\.head_sha/u,
+    'the secret-bearing job must not check out code from the triggering workflow run'
+  );
   assert.match(codecovWorkflow, /token: \$\{\{ secrets\.CODECOV_TOKEN \}\}/u);
   assert.doesNotMatch(
     codecovWorkflow,
