@@ -98,7 +98,8 @@ jobs:
             userns,
           }
           APPARMOR
-              sudo apparmor_parser --add "$profile"
+              # Persistent runners may already have this profile from an earlier job.
+              sudo apparmor_parser --replace "$profile"
               test "$(sysctl -n kernel.apparmor_restrict_unprivileged_userns)" = 1
             fi
           fi

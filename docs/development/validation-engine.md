@@ -169,10 +169,11 @@ Bubblewrap, and produce source-bound receipts. Coverage and JUnit files are
 copied to the short-lived artifact with size and symlink checks. For same-repository pull requests authored by `snapetech`, the workflow can use
 the `Default` runner group when `TRUSTED_MAIN_RUNNERS_ENABLED` is `true`;
 fork and bot pull requests remain on GitHub-hosted runners. Candidate files stay
-in the read-only Bubblewrap sandbox, with no token or secrets inside it. On
-Ubuntu 24.04, the job loads an ephemeral AppArmor profile attached to
-`/usr/bin/bwrap` when the runner restricts unprivileged user namespaces. Other
-runner hosts must pass the same Bubblewrap namespace preflight. Local runs may
+in the read-only Bubblewrap sandbox, with no token or secrets inside it. When a
+runner restricts unprivileged user namespaces, the job loads or replaces the
+AppArmor profile attached to `/usr/bin/bwrap`, so repeated jobs on persistent
+runners remain usable while the restriction stays enabled. Other runner hosts
+must pass the same Bubblewrap namespace preflight. Local runs may
 skip the integration check when Bubblewrap is unavailable. Use the complete GitHub-hosted validation run for
 the full test suite.
 
