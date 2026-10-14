@@ -81,7 +81,8 @@ jobs:
       - name: Set image name
         id: image
         shell: bash
-        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+        # GHCR stays under the maintainer's account even though the repository moved to an org.
+        run: echo "name=ghcr.io/snapetech/questarrng" >> "$GITHUB_OUTPUT"
 
       # Push only the immutable source tag first. Attach latest or the version tag
       # after both platform scans and the smoke test below pass.
@@ -556,7 +557,7 @@ jobs:
           RELEASE_SHA: ${{ steps.validate.outputs.release_sha }}
         run: |
           set -euo pipefail
-          image="ghcr.io/${GITHUB_REPOSITORY,,}"
+          image="ghcr.io/snapetech/questarrng"
           docker buildx imagetools inspect --raw "${image}:${VERSION}" > version-image.json
           docker buildx imagetools inspect --raw "${image}:sha-${RELEASE_SHA}" > source-image.json
           for manifest in version-image.json source-image.json; do

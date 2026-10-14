@@ -144,7 +144,12 @@ test('release publishing and announcements are gated to QuestarrNG by stable rep
     'all five release and recovery jobs use the stable repository ID'
   );
   assert.doesNotMatch(releaseWorkflow, /github\.repository == 'snapetech\/QuestarrNG'/u);
+  assert.match(releaseWorkflow, /name=ghcr\.io\/snapetech\/questarrng/u);
+  assert.doesNotMatch(releaseWorkflow, /name=ghcr\.io\/\$\{GITHUB_REPOSITORY,,\}/u);
+  assert.match(releaseWorkflow, /image="ghcr\.io\/snapetech\/questarrng"/u);
+  assert.doesNotMatch(releaseWorkflow, /image="ghcr\.io\/\$\{GITHUB_REPOSITORY,,\}"/u);
   assert.match(trustedDiscordWorkflow, /github\.repository_id == '1388297896'/u);
+  assert.match(trustedDiscordWorkflow, /--arg image "ghcr\.io\/snapetech\/questarrng:\$\{version\}"/u);
   assert.doesNotMatch(trustedDiscordWorkflow, /github\.repository == 'snapetech\/QuestarrNG'/u);
 });
 
