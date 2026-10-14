@@ -23,6 +23,7 @@ jobs:
 
     steps:
       - name: Fetch trusted base and candidate as data
+        id: fetch
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -39,7 +40,12 @@ jobs:
           export GIT_CONFIG_GLOBAL=/dev/null
           export GIT_LFS_SKIP_SMUDGE=1
           export GIT_TERMINAL_PROMPT=0
-          trusted_repo="$GITHUB_WORKSPACE/trusted.git"
+          run_root="$(mktemp -d "$RUNNER_TEMP/questarr-trusted-pr-${PR_NUMBER}-XXXXXX")"
+          trusted_repo="$run_root/trusted.git"
+          trusted_checkout="$run_root/trusted"
+          candidate_checkout="$run_root/candidate"
+          printf 'run_root=%s\ntrusted=%s\ncandidate=%s\n' \
+            "$run_root" "$trusted_checkout" "$candidate_checkout" >> "$GITHUB_OUTPUT"
           git init --quiet --bare "$trusted_repo"
           git --git-dir="$trusted_repo" remote add origin "https://github.com/$GITHUB_REPOSITORY.git"
           auth="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 --wrap=0)"
@@ -67,11 +73,11 @@ jobs:
           # nosemgrep: yaml.github-actions.security.pull-request-target-code-checkout.pull-request-target-code-checkout
           # Materializes only a base commit verified against main; no repository-provided hooks or filters run.
           git --git-dir="$trusted_repo" -c core.hooksPath=/dev/null -c submodule.recurse=false \
-            worktree add --detach "$GITHUB_WORKSPACE/trusted" "$BASE_SHA"
+            worktree add --detach "$trusted_checkout" "$BASE_SHA"
           # nosemgrep: yaml.github-actions.security.pull-request-target-code-checkout.pull-request-target-code-checkout
           # Materializes the exact untrusted snapshot as data; the trusted launcher isolates it before execution.
           git --git-dir="$trusted_repo" -c core.hooksPath=/dev/null -c submodule.recurse=false \
-            worktree add --detach "$GITHUB_WORKSPACE/candidate" "$CANDIDATE_SHA"
+            worktree add --detach "$candidate_checkout" "$CANDIDATE_SHA"
 
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -80,7 +86,7 @@ jobs:
           package-manager-cache: false
 
       - name: Install trusted npm runtime
-        working-directory: trusted
+        working-directory: ${{ steps.fetch.outputs.trusted }}
         run: node scripts/install-npm-runtime.mjs
 
       - name: Install Bubblewrap
@@ -116,13 +122,15 @@ jobs:
           GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
           GITHUB_WORKFLOW: ${{ github.workflow }}
           GITHUB_JOB: trusted-pr-validation
+          TRUSTED_CHECKOUT: ${{ steps.fetch.outputs.trusted }}
+          CANDIDATE_CHECKOUT: ${{ steps.fetch.outputs.candidate }}
         run: |
           set -euo pipefail
-          node trusted/scripts/validation-engine/trusted-test-launcher.mjs candidate \
-            --trusted-root trusted \
+          node "$TRUSTED_CHECKOUT/scripts/validation-engine/trusted-test-launcher.mjs" "$CANDIDATE_CHECKOUT" \
+            --trusted-root "$TRUSTED_CHECKOUT" \
             --trusted-base-sha "$VALIDATION_PR_BASE_SHA" \
             --candidate-sha "$VALIDATION_PR_HEAD_SHA" \
-            --trusted-npm-cli trusted/.github/npm-runtime/node_modules/.questarr-npm-cli/bin/npm-cli.js \
+            --trusted-npm-cli "$TRUSTED_CHECKOUT/.github/npm-runtime/node_modules/.questarr-npm-cli/bin/npm-cli.js" \
             --install-dependencies \
             --receipt-output "$RUNNER_TEMP/quest-validation-receipts/test.json" \
             -- \
@@ -134,11 +142,26 @@ jobs:
         env:
           VALIDATION_PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           VALIDATION_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          TRUSTED_CHECKOUT: ${{ steps.fetch.outputs.trusted }}
         run: |
-          node trusted/scripts/validation-engine/reconcile-ci.mjs \
+          node "$TRUSTED_CHECKOUT/scripts/validation-engine/reconcile-ci.mjs" \
             --trusted-pr \
             --receipt "$RUNNER_TEMP/quest-validation-receipts/test.json" \
             --run-id "$GITHUB_RUN_ID" \
             --run-attempt "$GITHUB_RUN_ATTEMPT" \
             --sha "$VALIDATION_PR_HEAD_SHA" \
             --base-sha "$VALIDATION_PR_BASE_SHA"
+
+      - name: Clean trusted PR validation workspace
+        if: always()
+        env:
+          TRUSTED_RUN_ROOT: ${{ steps.fetch.outputs.run_root }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$TRUSTED_RUN_ROOT" ]]; then
+            exit 0
+          fi
+          case "$TRUSTED_RUN_ROOT" in
+            "$RUNNER_TEMP"/questarr-trusted-pr-*) rm -rf -- "$TRUSTED_RUN_ROOT" ;;
+            *) echo "Refusing to clean a path outside RUNNER_TEMP." >&2; exit 1 ;;
+          esac
