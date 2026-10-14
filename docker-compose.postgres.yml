@@ -13,7 +13,7 @@
 
 services:
   app:
-    image: ghcr.io/snapetech/questarrng:latest
+    image: ghcr.io/snapetech-org/questarrng:latest
     user: "${PUID:-1000}:${PGID:-1000}"
     ports:
       - "${HOST_SIDE_PORT:-5000}:${CONTAINER_INTERNAL_SIDE_PORT:-5000}"

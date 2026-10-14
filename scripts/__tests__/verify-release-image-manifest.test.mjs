@@ -69,14 +69,14 @@ describe("release image manifest verification", () => {
         {
           env: {
             ...process.env,
-            IMAGE: "ghcr.io/snapetech/questarrng",
+            IMAGE: "ghcr.io/snapetech-org/questarrng",
             GITHUB_OUTPUT: outputPath,
           },
         }
       );
       expect(readFileSync(outputPath, "utf8")).toBe(
-        `amd64_image=ghcr.io/snapetech/questarrng@${amd64Digest}\n` +
-          `arm64_image=ghcr.io/snapetech/questarrng@${arm64Digest}\n`
+        `amd64_image=ghcr.io/snapetech-org/questarrng@${amd64Digest}\n` +
+          `arm64_image=ghcr.io/snapetech-org/questarrng@${arm64Digest}\n`
       );
     } finally {
       rmSync(directory, { recursive: true, force: true });

@@ -37,7 +37,7 @@
   },
   "services": {
     "questarr": {
-      "image": "ghcr.io/snapetech/questarrng:latest",
+      "image": "ghcr.io/snapetech-org/questarrng:latest",
       "user": "{PUID}:{PGID}",
       "restart": "unless-stopped",
       "environment": [

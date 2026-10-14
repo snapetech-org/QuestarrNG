@@ -81,8 +81,7 @@ jobs:
       - name: Set image name
         id: image
         shell: bash
-        # GHCR stays under the maintainer's account even though the repository moved to an org.
-        run: echo "name=ghcr.io/snapetech/questarrng" >> "$GITHUB_OUTPUT"
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
 
       # Push only the immutable source tag first. Attach latest or the version tag
       # after both platform scans and the smoke test below pass.
@@ -352,7 +351,7 @@ jobs:
           {
             echo ""
             echo "**Container image**: \`${IMAGE}:${VERSION}\`"
-            echo "- [GitHub Container Registry](https://github.com/${{ github.repository }}/pkgs/container/questarrng)"
+            echo "- [GitHub Container Registry](https://github.com/orgs/snapetech-org/packages/container/package/questarrng)"
             echo ""
             echo "Pull with: \`docker pull ${IMAGE}:${VERSION}\`."
           } >> changelog-section.md
@@ -557,7 +556,7 @@ jobs:
           RELEASE_SHA: ${{ steps.validate.outputs.release_sha }}
         run: |
           set -euo pipefail
-          image="ghcr.io/snapetech/questarrng"
+          image="ghcr.io/${GITHUB_REPOSITORY,,}"
           docker buildx imagetools inspect --raw "${image}:${VERSION}" > version-image.json
           docker buildx imagetools inspect --raw "${image}:sha-${RELEASE_SHA}" > source-image.json
           for manifest in version-image.json source-image.json; do
@@ -636,10 +635,10 @@ jobs:
           fi
           {
             echo ""
-            echo "**Container image**: \`ghcr.io/snapetech/questarrng:${VERSION}\`"
-            echo "- [GitHub Container Registry](https://github.com/users/snapetech/packages/container/package/questarrng)"
+            echo "**Container image**: \`ghcr.io/${GITHUB_REPOSITORY,,}:${VERSION}\`"
+            echo "- [GitHub Container Registry](https://github.com/orgs/snapetech-org/packages/container/package/questarrng)"
             echo ""
-            echo "Pull with: \`docker pull ghcr.io/snapetech/questarrng:${VERSION}\`."
+            echo "Pull with: \`docker pull ghcr.io/${GITHUB_REPOSITORY,,}:${VERSION}\`."
           } >> release-body.md
 
       - name: Publish recovered GitHub release
@@ -796,7 +795,7 @@ jobs:
               --arg title "$title" \
               --arg url "$(jq -r '.url' release.json)" \
               --arg description "$description" \
-              --arg image "ghcr.io/snapetech/questarrng:${version}" \
+              --arg image "ghcr.io/${GITHUB_REPOSITORY,,}:${version}" \
               --arg run_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" \
               --argjson first "$index" \
               '{

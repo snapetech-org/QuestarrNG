@@ -4,7 +4,7 @@
 name: questarr
 services:
   questarr:
-    image: ghcr.io/snapetech/questarrng:latest
+    image: ghcr.io/snapetech-org/questarrng:latest
     container_name: questarr
     user: "${PUID:-1000}:${PGID:-1000}"
     restart: unless-stopped

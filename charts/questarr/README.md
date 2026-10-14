@@ -1,7 +1,7 @@
 # Questarr Helm chart
 
 Runs [QuestarrNG](https://github.com/snapetech/QuestarrNG) on Kubernetes from the fork's
-`ghcr.io/snapetech/questarrng` image.
+`ghcr.io/snapetech-org/questarrng` image.
 
 The chart deploys a single-replica Deployment, a Service, an optional Ingress, and a
 PersistentVolumeClaim for `/app/data` (SQLite database, `config.yaml`, and any other
@@ -44,7 +44,7 @@ above `1`, and uses the `Recreate` strategy so two pods never hold the volume at
 
 | Key                | Default                        | Description                                     |
 | ------------------ | ------------------------------ | ----------------------------------------------- |
-| `image.repository` | `ghcr.io/snapetech/questarrng` | Image repository                                |
+| `image.repository` | `ghcr.io/snapetech-org/questarrng` | Image repository                                |
 | `image.tag`        | `""`                           | Image tag; defaults to the chart's `appVersion` |
 | `image.pullPolicy` | `IfNotPresent`                 | Image pull policy                               |
 | `imagePullSecrets` | `[]`                           | Pull secrets for private registries             |

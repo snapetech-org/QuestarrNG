@@ -12,13 +12,13 @@ Every published Docker image is built with a Software Bill of Materials (SBOM), 
 Use `docker buildx imagetools inspect` to pull the SPDX JSON for a given image and tag:
 
 ```bash
-docker buildx imagetools inspect ghcr.io/snapetech/questarrng:latest --format '{{ json (index .SBOM "linux/amd64").SPDX }}'
+docker buildx imagetools inspect ghcr.io/snapetech-org/questarrng:latest --format '{{ json (index .SBOM "linux/amd64").SPDX }}'
 ```
 
 This prints the full SPDX document, which you can redirect to a file or pipe into a tool like `jq` or a vulnerability scanner:
 
 ```bash
-docker buildx imagetools inspect ghcr.io/snapetech/questarrng:latest --format '{{ json (index .SBOM "linux/amd64").SPDX }}' > sbom.spdx.json
+docker buildx imagetools inspect ghcr.io/snapetech-org/questarrng:latest --format '{{ json (index .SBOM "linux/amd64").SPDX }}' > sbom.spdx.json
 ```
 
 ## Exploitability of reported vulnerabilities

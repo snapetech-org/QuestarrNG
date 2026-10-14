@@ -2,7 +2,7 @@
 
 Questarr ships ready-made app definitions for the main self-hosting platforms, so it can be
 installed without hand-writing a Compose file. Every definition points at the same published image
-(`ghcr.io/snapetech/questarrng:latest`, `linux/amd64`) and uses the same two mounts:
+(`ghcr.io/snapetech-org/questarrng:latest`, `linux/amd64`) and uses the same two mounts:
 
 | Container path | Purpose                                                                         |
 | -------------- | ------------------------------------------------------------------------------- |

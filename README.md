@@ -11,7 +11,7 @@ PostgreSQL, and hardened multi-architecture releases. See
 [What changed in QuestarrNG](docs/FORK_CHANGES.md) for the overview and
 [the changelog](docs/CHANGELOG.md) for the release-by-release history.
 
-Use `ghcr.io/snapetech/questarrng:latest` or the Compose file in this
+Use `ghcr.io/snapetech-org/questarrng:latest` or the Compose file in this
 repository; the upstream Questarr image does not contain the SeerrNG provider
 routes. The fork image is published for `linux/amd64` and `linux/arm64` from
 `main`.
@@ -24,7 +24,7 @@ A video game management application inspired by the -Arr apps (Sonarr, Radarr, P
 
 [![Library screenshot](images/Screenshots/library.png)](images/Screenshots/library.png)
 
-[![GHCR](https://img.shields.io/badge/container-ghcr.io%2Fsnapetech%2Fquestarrng-blue?logo=github&logoColor=white)](https://github.com/users/snapetech/packages/container/package/questarrng)
+[![GHCR](https://img.shields.io/badge/container-ghcr.io%2Fsnapetech-org%2Fquestarrng-blue?logo=github&logoColor=white)](https://github.com/orgs/snapetech-org/packages/container/package/questarrng)
 [![GitHub release](https://img.shields.io/github/v/release/snapetech/QuestarrNG)](https://github.com/snapetech/QuestarrNG/releases)
 [![License](https://img.shields.io/github/license/snapetech/QuestarrNG)](https://github.com/snapetech/QuestarrNG/blob/main/COPYING)
 [![CI](https://github.com/snapetech/QuestarrNG/actions/workflows/ci.yml/badge.svg)](https://github.com/snapetech/QuestarrNG/actions/workflows/ci.yml)
@@ -155,7 +155,7 @@ a Node.js application; the installer does not require a separate .NET runtime.
 mkdir -p ./data
 docker run -d -p 5000:5000 --user "$(id -u):$(id -g)" \
   -e PUID="$(id -u)" -e PGID="$(id -g)" \
-  -v ./data:/app/data --name questarrng ghcr.io/snapetech/questarrng:latest
+  -v ./data:/app/data --name questarrng ghcr.io/snapetech-org/questarrng:latest
 ```
 
 ### Option 2: Docker Compose (more detailed)
@@ -165,7 +165,7 @@ docker run -d -p 5000:5000 --user "$(id -u):$(id -g)" \
    ```yaml
    services:
      app:
-       image: ghcr.io/snapetech/questarrng:latest
+       image: ghcr.io/snapetech-org/questarrng:latest
        user: "${PUID:-1000}:${PGID:-1000}"
        ports:
          - "5000:5000"
@@ -257,7 +257,7 @@ and troubleshooting.
 The upstream **Questarr** Community Apps entry uses the upstream image and
 does not include this fork's SeerrNG integration routes. Use the
 [QuestarrNG fork template](unraid/questarr.xml)
-for `ghcr.io/snapetech/questarrng:latest`. QuestarrNG works as a standalone
+for `ghcr.io/snapetech-org/questarrng:latest`. QuestarrNG works as a standalone
 game manager; SeerrNG integration is optional. For package or integration
 support, use the [SeerrNG issue tracker](https://github.com/snapetech/seerrng/issues).
 

@@ -115,7 +115,7 @@ To apply QuestarrNG's exploitability assessments when scanning a QuestarrNG
 image yourself:
 
 ```bash
-trivy image --vex security/vex/questarr.openvex.json ghcr.io/snapetech/questarrng:latest
+trivy image --vex security/vex/questarr.openvex.json ghcr.io/snapetech-org/questarrng:latest
 ```
 
 ## Update policy
