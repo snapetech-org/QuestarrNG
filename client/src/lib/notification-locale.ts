@@ -321,7 +321,7 @@ const LABELS: Record<NotificationLabelKey, readonly string[]> = {
     "游戏已可下载",
     "गेम उपलब्ध है",
     "Spiel verfügbar",
-    "ゲーム配信中",
+    "ダウンロード可能",
     "Jeu disponible",
     "Jogo disponível",
     "اللعبة متاحة",

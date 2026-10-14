@@ -29,7 +29,7 @@ export const API_ERROR_CODE_TO_CATALOG_KEY: Record<ApiErrorCode, ApiErrorCatalog
 
 const API_ERROR_MESSAGES: Record<ApiErrorCatalogKey, readonly string[]> = {
   requestFailed: [
-    "The request failed. Please try again.",
+    "La solicitud falló. Inténtalo de nuevo.",
     "请求失败，请重试。",
     "अनुरोध विफल हुआ। कृपया फिर से कोशिश करें।",
     "Die Anfrage ist fehlgeschlagen. Bitte versuche es erneut.",
@@ -43,7 +43,7 @@ const API_ERROR_MESSAGES: Record<ApiErrorCatalogKey, readonly string[]> = {
     "Permintaan gagal. Silakan coba lagi.",
   ],
   badRequest: [
-    "The request could not be completed.",
+    "No se pudo completar la solicitud.",
     "无法完成该请求。",
     "अनुरोध पूरा नहीं किया जा सका।",
     "Die Anfrage konnte nicht abgeschlossen werden.",
@@ -57,7 +57,7 @@ const API_ERROR_MESSAGES: Record<ApiErrorCatalogKey, readonly string[]> = {
     "Permintaan tidak dapat diselesaikan.",
   ],
   unauthorized: [
-    "Sign in is required to continue.",
+    "Inicia sesión para continuar.",
     "请登录后继续。",
     "जारी रखने के लिए साइन इन करें।",
     "Zum Fortfahren musst du dich anmelden.",
@@ -71,7 +71,7 @@ const API_ERROR_MESSAGES: Record<ApiErrorCatalogKey, readonly string[]> = {
     "Silakan masuk untuk melanjutkan.",
   ],
   forbidden: [
-    "You do not have permission to do that.",
+    "No tienes permiso para realizar esa acción.",
     "你没有权限执行此操作。",
     "आपको यह करने की अनुमति नहीं है।",
     "Du hast keine Berechtigung für diese Aktion.",
@@ -85,7 +85,7 @@ const API_ERROR_MESSAGES: Record<ApiErrorCatalogKey, readonly string[]> = {
     "Anda tidak memiliki izin untuk melakukan tindakan ini.",
   ],
   notFound: [
-    "The requested item could not be found.",
+    "No se encontró el elemento solicitado.",
     "找不到请求的项目。",
     "अनुरोधित आइटम नहीं मिला।",
     "Das angeforderte Element wurde nicht gefunden.",
@@ -99,7 +99,7 @@ const API_ERROR_MESSAGES: Record<ApiErrorCatalogKey, readonly string[]> = {
     "Item yang diminta tidak ditemukan.",
   ],
   conflict: [
-    "This request conflicts with the current state.",
+    "Esta solicitud entra en conflicto con el estado actual.",
     "该请求与当前状态冲突。",
     "यह अनुरोध मौजूदा स्थिति से मेल नहीं खाता।",
     "Diese Anfrage steht im Widerspruch zum aktuellen Status.",
@@ -113,7 +113,7 @@ const API_ERROR_MESSAGES: Record<ApiErrorCatalogKey, readonly string[]> = {
     "Permintaan ini bertentangan dengan keadaan saat ini.",
   ],
   invalidData: [
-    "Some submitted information is invalid.",
+    "Parte de la información enviada no es válida.",
     "提交的信息无效。",
     "दी गई कुछ जानकारी अमान्य है।",
     "Einige übermittelte Angaben sind ungültig.",
@@ -127,7 +127,7 @@ const API_ERROR_MESSAGES: Record<ApiErrorCatalogKey, readonly string[]> = {
     "Sebagian informasi yang dikirim tidak valid.",
   ],
   rateLimited: [
-    "Too many requests. Wait a moment and try again.",
+    "Demasiadas solicitudes. Espera un momento y vuelve a intentarlo.",
     "请求过多，请稍后再试。",
     "बहुत अधिक अनुरोध हैं। थोड़ी देर बाद फिर कोशिश करें।",
     "Zu viele Anfragen. Bitte warte kurz und versuche es erneut.",
@@ -141,7 +141,7 @@ const API_ERROR_MESSAGES: Record<ApiErrorCatalogKey, readonly string[]> = {
     "Terlalu banyak permintaan. Tunggu sebentar lalu coba lagi.",
   ],
   upstreamUnavailable: [
-    "A connected service is unavailable right now.",
+    "Un servicio conectado no está disponible en este momento.",
     "连接的服务目前不可用。",
     "कनेक्ट की गई सेवा अभी उपलब्ध नहीं है।",
     "Ein verbundener Dienst ist momentan nicht verfügbar.",
@@ -155,7 +155,7 @@ const API_ERROR_MESSAGES: Record<ApiErrorCatalogKey, readonly string[]> = {
     "Layanan yang terhubung sedang tidak tersedia.",
   ],
   serviceUnavailable: [
-    "The service is temporarily unavailable.",
+    "El servicio no está disponible temporalmente.",
     "服务暂时不可用。",
     "सेवा अस्थायी रूप से उपलब्ध नहीं है।",
     "Der Dienst ist vorübergehend nicht verfügbar.",
@@ -197,9 +197,7 @@ export function getLocalizedApiErrorMessage(
     stableCode && Object.hasOwn(API_ERROR_CODE_TO_CATALOG_KEY, stableCode)
       ? stableCode
       : apiErrorCodeForStatus(status);
-  const key = Object.hasOwn(API_ERROR_CODE_TO_CATALOG_KEY, resolvedCode)
-    ? API_ERROR_CODE_TO_CATALOG_KEY[resolvedCode]
-    : "requestFailed";
+  const key = API_ERROR_CODE_TO_CATALOG_KEY[resolvedCode];
   const message = API_ERROR_MESSAGES[key][LOCALE_ORDER.indexOf(language)];
   if (!message) return detail;
   return detail ? `${message}: \u2068${detail}\u2069` : message;
