@@ -12,6 +12,8 @@ export default defineConfig({
     environment: "jsdom",
     environmentMatchGlobs: [["server/**", "node"]],
     setupFiles: ["./tests/setup.ts"],
+    // CI jobs share the self-hosted host; cap worker fan-out to avoid flaky timeouts.
+    maxWorkers: process.env.CI ? 4 : undefined,
     testTimeout: 20000,
     coverage: {
       provider: "v8",
