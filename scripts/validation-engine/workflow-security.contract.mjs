@@ -222,3 +222,21 @@ test('test and build jobs execute the base-reviewed launcher with isolated depen
   assert.match(testJob, /--reports-output "\$RUNNER_TEMP\/quest-codecov-reports"/u);
   assert.match(testJob, /path: \$\{\{ runner\.temp \}\}\/quest-codecov-reports/u);
 });
+
+test('trusted main CI uses a readiness-gated string runner selector', () => {
+  const mainCondition =
+    "(github.event_name == 'push' || github.event_name == 'workflow_dispatch') && " +
+    "github.ref == 'refs/heads/main'";
+  const expected =
+    "$" + "{{ " + mainCondition +
+    " && vars.TRUSTED_MAIN_RUNNERS_ENABLED == 'true' && 'trusted-main' || 'ubuntu-latest' }}";
+  const selectors = ciWorkflow.split('\n').filter((line) =>
+    line.startsWith('    runs-on: ') && line.includes("'trusted-main'")
+  );
+  assert.equal(selectors.length, 2);
+  assert.deepEqual(selectors, [
+    `    runs-on: ${expected}`,
+    `    runs-on: ${expected}`
+  ]);
+  assert.ok(selectors.every((line) => !line.includes('fromJSON')));
+});
