@@ -20,6 +20,11 @@ export const INTERFACE_LANGUAGE_OPTIONS = [
 export type InterfaceLanguage = (typeof INTERFACE_LANGUAGE_OPTIONS)[number]["value"];
 const STORAGE_KEY = "questarr.interface-language";
 const listeners = new Set<() => void>();
+const LOCALIZABLE_ATTRIBUTES = ["title", "placeholder", "aria-label", "alt"] as const;
+const LOCALIZABLE_ATTRIBUTE_MARKERS = LOCALIZABLE_ATTRIBUTES.flatMap((target) => [
+  `data-i18n-${target}`,
+  `data-i18n-${target}-values`,
+]);
 
 export function getInterfaceCollator(
   language: InterfaceLanguage = "en",
@@ -122,12 +127,21 @@ function applyDocumentLanguage() {
   if (!attributeObserver && typeof MutationObserver !== "undefined") {
     attributeObserver = new MutationObserver((records) => {
       for (const record of records) {
+        if (record.type === "attributes") {
+          if (record.target instanceof Element) localizeMarkedAttributes(record.target);
+          continue;
+        }
         for (const node of record.addedNodes) {
           if (node instanceof Element) localizeMarkedAttributes(node);
         }
       }
     });
-    attributeObserver.observe(document.documentElement, { childList: true, subtree: true });
+    attributeObserver.observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: LOCALIZABLE_ATTRIBUTE_MARKERS,
+    });
   }
 }
 
@@ -140,14 +154,9 @@ function localizeMarkedAttributes(root: Element) {
       "[data-i18n-title], [data-i18n-placeholder], [data-i18n-aria-label], [data-i18n-alt]"
     ),
   ];
-  const pairs = [
-    ["title", "data-i18n-title"],
-    ["placeholder", "data-i18n-placeholder"],
-    ["aria-label", "data-i18n-aria-label"],
-    ["alt", "data-i18n-alt"],
-  ] as const;
   for (const element of elements) {
-    for (const [target, marker] of pairs) {
+    for (const target of LOCALIZABLE_ATTRIBUTES) {
+      const marker = `data-i18n-${target}`;
       const source = element.getAttribute(marker);
       if (source === null) continue;
       const rawValues = element.getAttribute(`data-i18n-${target}-values`);

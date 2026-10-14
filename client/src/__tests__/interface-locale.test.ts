@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { createElement } from "react";
 
 import {
@@ -165,6 +165,62 @@ describe("browser interface language detection", () => {
     } finally {
       button.remove();
       title.remove();
+      setInterfaceLanguage("en");
+    }
+  });
+
+  it("updates only the marked element when its source or interpolation attributes change", async () => {
+    const source = "View {value} on xREL";
+    const button = document.createElement("button");
+    button.setAttribute("data-i18n-aria-label", source);
+    button.setAttribute("data-i18n-aria-label-values", JSON.stringify({ value: "First release" }));
+    const unrelated = document.createElement("button");
+    unrelated.setAttribute("data-i18n-aria-label", "Navigation");
+    unrelated.setAttribute("aria-label", translateInterfaceLabel("Navigation", "es"));
+    document.body.append(button, unrelated);
+
+    try {
+      setInterfaceLanguage("es");
+      await waitFor(() => {
+        expect(button.getAttribute("aria-label")).toBe(
+          formatInterfaceMessage(source, { value: "First release" }, "es")
+        );
+      });
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      const unrelatedSetAttribute = vi.spyOn(unrelated, "setAttribute");
+
+      button.setAttribute(
+        "data-i18n-aria-label-values",
+        JSON.stringify({ value: "Second release" })
+      );
+      await waitFor(() => {
+        expect(button.getAttribute("aria-label")).toBe(
+          formatInterfaceMessage(source, { value: "Second release" }, "es")
+        );
+      });
+
+      button.setAttribute("data-i18n-aria-label", "View original article for {title}");
+      button.setAttribute(
+        "data-i18n-aria-label-values",
+        JSON.stringify({ title: "A new article" })
+      );
+      await waitFor(() => {
+        expect(button.getAttribute("aria-label")).toBe(
+          formatInterfaceMessage(
+            "View original article for {title}",
+            { title: "A new article" },
+            "es"
+          )
+        );
+      });
+
+      expect(unrelated.getAttribute("aria-label")).toBe(
+        translateInterfaceLabel("Navigation", "es")
+      );
+      expect(unrelatedSetAttribute).not.toHaveBeenCalled();
+    } finally {
+      button.remove();
+      unrelated.remove();
       setInterfaceLanguage("en");
     }
   });
