@@ -493,7 +493,7 @@ test.describe("Game download interface language", () => {
     );
 
     await page.goto("/search");
-    await page.getByPlaceholder("Enter game title...").fill("Localized");
+    await page.getByTestId("input-search-query").fill("Localized");
     const searchAge = page.getByText(expectedAge, { exact: true });
     await expect(searchAge).toHaveAttribute("lang", "ar");
     await expect(searchAge).toHaveAttribute("dir", "rtl");
@@ -860,13 +860,11 @@ test.describe("Game download interface language", () => {
     await bundleDialog.getByRole("button", { name: "تنزيل مع تحديثين" }).click();
 
     const regionalThree = await page.evaluate(() => new Intl.NumberFormat("ar").format(3));
-    const successToast = page.getByText(`Downloads sent: ${regionalThree} to Example Downloader`, {
-      exact: true,
-    });
-    await expect(successToast).toBeVisible();
-    await expect(
-      page.getByText(`Added ${regionalThree} of ${regionalThree} downloads`, { exact: true })
-    ).toBeVisible();
+    const successToast = page.getByRole("status").filter({ hasText: "تم إرسال" });
+    await expect(successToast).toContainText(regionalThree);
+    await expect(successToast).toContainText("Example Downloader");
+    const additionToast = page.getByRole("status").filter({ hasText: "تمت إضافة" });
+    await expect(additionToast).toContainText(regionalThree);
   });
 
   test("formats failed download toast counts regionally", async ({ page }) => {
@@ -892,7 +890,7 @@ test.describe("Game download interface language", () => {
     await bundleDialog.getByRole("button", { name: "تنزيل مع تحديثين" }).click();
 
     const regionalTwo = await page.evaluate(() => new Intl.NumberFormat("ar").format(2));
-    const failureToast = page.getByText(`Downloads failed: ${regionalTwo}`, { exact: true });
-    await expect(failureToast).toBeVisible();
+    const failureToast = page.getByRole("status").filter({ hasText: "وفشلت" });
+    await expect(failureToast).toContainText(regionalTwo);
   });
 });

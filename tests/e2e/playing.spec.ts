@@ -19,7 +19,10 @@ test.describe("Playing journey", () => {
 
     // Change the status from the card's own picker.
     await card.getByRole("button", { name: `Change status for ${title}` }).click();
-    await page.getByRole("button", { name: "Playing", exact: true }).click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "Playing", exact: true })
+      .click();
     await expect(card.getByText("Status: Playing")).toBeVisible();
 
     // The game now shows up on the Playing page.
