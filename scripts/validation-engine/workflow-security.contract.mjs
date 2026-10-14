@@ -137,6 +137,17 @@ test('tag Discord announcements use the trusted default-branch workflow', () => 
   assert.doesNotMatch(trustedDiscordWorkflow, /secrets\.DISCORD_RELEASE_WEBHOOK/u);
 });
 
+test('release publishing and announcements are gated to QuestarrNG by stable repository ID', () => {
+  assert.equal(
+    (releaseWorkflow.match(/github\.repository_id == '1388297896'/gu) ?? []).length,
+    5,
+    'all five release and recovery jobs use the stable repository ID'
+  );
+  assert.doesNotMatch(releaseWorkflow, /github\.repository == 'snapetech\/QuestarrNG'/u);
+  assert.match(trustedDiscordWorkflow, /github\.repository_id == '1388297896'/u);
+  assert.doesNotMatch(trustedDiscordWorkflow, /github\.repository == 'snapetech\/QuestarrNG'/u);
+});
+
 test('trusted PR validation runs the base validator and launcher on an exact candidate snapshot', () => {
   assert.match(trustedWorkflow, /pull_request_target:[\s\S]*?branches: \[main\]/u);
   assert.match(trustedWorkflow, /permissions:\n\x20{2}contents:\x20read/u);

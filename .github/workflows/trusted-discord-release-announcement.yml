@@ -11,7 +11,7 @@ permissions:
 jobs:
   announce-release:
     if: >-
-      github.repository == 'snapetech/QuestarrNG' &&
+      github.repository_id == '1388297896' &&
       github.event.workflow_run.workflow_id == 368554729 &&
       github.event.workflow_run.event == 'push' &&
       github.event.workflow_run.head_repository.full_name == github.repository &&
