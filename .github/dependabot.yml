@@ -80,6 +80,13 @@ updates:
       - "dependencies"
       - "automated"
     groups:
+      nuget-minor-patch:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
       security-updates:
         applies-to: security-updates
         patterns:
@@ -144,6 +151,13 @@ updates:
     cooldown:
       default-days: 7
     groups:
+      docker-minor-patch:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
       security-updates:
         applies-to: security-updates
         patterns:
@@ -155,6 +169,18 @@ updates:
       interval: daily
     cooldown:
       default-days: 7
+    groups:
+      docker-minor-patch:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+      security-updates:
+        applies-to: security-updates
+        patterns:
+          - "*"
 
   - package-ecosystem: docker
     directory: /casaos
@@ -163,6 +189,13 @@ updates:
     cooldown:
       default-days: 7
     groups:
+      docker-minor-patch:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
       security-updates:
         applies-to: security-updates
         patterns:
@@ -175,6 +208,13 @@ updates:
     cooldown:
       default-days: 7
     groups:
+      docker-minor-patch:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
       security-updates:
         applies-to: security-updates
         patterns:
