@@ -57,8 +57,10 @@ jobs:
   # Dependency and secret hygiene, in one job so `npm ci` runs once instead of three times.
   # None of these steps needs native modules built, so lifecycle scripts (arbitrary code
   # from transitive deps) are skipped.
+  # Keep GitHub-hosted runners as the default. Set TRUSTED_MAIN_RUNNERS_ENABLED=true only
+  # after the restricted trusted-main group is ready.
   sca-scan:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && vars.TRUSTED_MAIN_RUNNERS_ENABLED == 'true' && fromJSON('{"group":"trusted-main","labels":["self-hosted","Linux","X64","host"]}') || 'ubuntu-latest' }}
     permissions:
       contents: read
       pull-requests: read
@@ -117,7 +119,7 @@ jobs:
         run: npm run check:licenses
 
   windows-service:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && vars.TRUSTED_MAIN_RUNNERS_ENABLED == 'true' && fromJSON('{"group":"trusted-main","labels":["self-hosted","Linux","X64","host"]}') || 'ubuntu-latest' }}
 
     steps:
       - name: Checkout code
