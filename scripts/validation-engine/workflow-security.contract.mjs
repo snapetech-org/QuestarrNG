@@ -25,7 +25,31 @@ const trustedDiscordWorkflow = readFileSync(
   fileURLToPath(new URL('trusted-discord-release-announcement.yml', workflowDirectory)),
   'utf8'
 );
-
+const deployWorkflow = readFileSync(
+  fileURLToPath(new URL('deploy.yml', workflowDirectory)),
+  'utf8'
+);
+const readme = readFileSync(fileURLToPath(new URL('../../README.md', import.meta.url)), 'utf8');
+const imageReferenceFiles = [
+  'README.md',
+  'docker-compose.yml',
+  'docker-compose.postgres.yml',
+  'casaos/docker-compose.yml',
+  'cosmos/questarr.cosmos-compose.json',
+  'doezer-questarr/docker-compose.yml',
+  'unraid/questarr.xml',
+  'questarr/Dockerfile',
+  'charts/questarr/values.yaml',
+  'charts/questarr/README.md',
+  'docs/HOME_SERVER_APPS.md',
+  'docs/REVERSE_PROXY.md',
+  'docs/SBOM.md',
+  'docs/VEX.md',
+  'scripts/__tests__/verify-release-image-manifest.test.mjs',
+].map((file) => [
+  file,
+  readFileSync(fileURLToPath(new URL(`../../${file}`, import.meta.url)), 'utf8'),
+]);
 function jobBlock(workflow, name, nextName) {
   const start = workflow.indexOf(`\n  ${name}:\n`);
   assert.notEqual(start, -1, `${name} job is present`);
@@ -137,6 +161,60 @@ test('tag Discord announcements use the trusted default-branch workflow', () => 
   assert.doesNotMatch(trustedDiscordWorkflow, /secrets\.DISCORD_RELEASE_WEBHOOK/u);
 });
 
+test('release publishing and announcements are gated to QuestarrNG by stable repository ID', () => {
+  assert.equal(
+    (releaseWorkflow.match(/github\.repository_id == '1388297896'/gu) ?? []).length,
+    5,
+    'all five release and recovery jobs use the stable repository ID'
+  );
+  for (const [name, nextName] of [
+    ['publish', 'addon-smoke'],
+    ['addon-smoke', 'release'],
+    ['finalize-release', 'update-finalized-changelog'],
+    ['update-finalized-changelog', 'announce-release'],
+    ['announce-release', undefined],
+  ]) {
+    assert.match(
+      jobBlock(releaseWorkflow, name, nextName),
+      /github\.repository_id == '1388297896'/u,
+      `${name} is guarded by the stable repository ID`
+    );
+  }
+  assert.doesNotMatch(releaseWorkflow, /github\.repository == 'snapetech\/QuestarrNG'/u);
+  assert.match(releaseWorkflow, /name=ghcr\.io\/\$\{GITHUB_REPOSITORY,,\}/u);
+  assert.match(releaseWorkflow, /image="ghcr\.io\/\$\{GITHUB_REPOSITORY,,\}"/u);
+  assert.equal(
+    (releaseWorkflow.match(/ghcr\.io\/\$\{GITHUB_REPOSITORY,,\}:\$\{VERSION\}/gu) ?? []).length,
+    2,
+    'the recovered release notes and pull command must use the current repository image package'
+  );
+  assert.equal(
+    (releaseWorkflow.match(/https:\/\/github\.com\/orgs\/snapetech-org\/packages\/container\/package\/questarrng/gu) ?? []).length,
+    2,
+    'regular and recovered release notes must link to the organization package'
+  );
+  assert.match(releaseWorkflow, /Container image.*\$\{IMAGE\}:\$\{VERSION\}/u);
+  assert.doesNotMatch(releaseWorkflow, /ghcr\.io\/snapetech\/questarrng/u);
+  assert.match(deployWorkflow, /ghcr\.io\/\$\{\{ github\.repository \}\}/u);
+  assert.match(trustedDiscordWorkflow, /github\.repository_id == '1388297896'/u);
+  assert.match(
+    trustedDiscordWorkflow,
+    /--arg image "ghcr\.io\/\$\{GITHUB_REPOSITORY,,\}:\$\{version\}"/u
+  );
+  assert.doesNotMatch(trustedDiscordWorkflow, /github\.repository == 'snapetech\/QuestarrNG'/u);
+  assert.match(
+    readme,
+    /https:\/\/github\.com\/orgs\/snapetech-org\/packages\/container\/package\/questarrng/u
+  );
+  assert.match(readme, /ghcr\.io\/snapetech-org\/questarrng/u);
+});
+
+test('current install and deployment examples use the organization GHCR namespace', () => {
+  for (const [file, contents] of imageReferenceFiles) {
+    assert.match(contents, /ghcr\.io\/snapetech-org\/questarrng/u, `${file} uses the current image`);
+    assert.doesNotMatch(contents, /ghcr\.io\/snapetech\/questarrng/u, `${file} has no stale image path`);
+  }
+});
 test('trusted PR validation runs the base validator and launcher on an exact candidate snapshot', () => {
   assert.match(trustedWorkflow, /pull_request_target:[\s\S]*?branches: \[main\]/u);
   assert.match(trustedWorkflow, /permissions:\n\x20{2}contents:\x20read/u);

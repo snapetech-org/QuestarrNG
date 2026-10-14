@@ -1,6 +1,6 @@
 services:
   app:
-    image: ghcr.io/snapetech/questarrng:latest
+    image: ghcr.io/snapetech-org/questarrng:latest
     build: .
     user: "${PUID:-1000}:${PGID:-1000}"
     ports:

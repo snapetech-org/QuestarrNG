@@ -69,18 +69,25 @@ describe("release image manifest verification", () => {
         {
           env: {
             ...process.env,
-            IMAGE: "ghcr.io/snapetech/questarrng",
+            IMAGE: "ghcr.io/snapetech-org/questarrng",
             GITHUB_OUTPUT: outputPath,
           },
         }
       );
       expect(readFileSync(outputPath, "utf8")).toBe(
-        `amd64_image=ghcr.io/snapetech/questarrng@${amd64Digest}\n` +
-          `arm64_image=ghcr.io/snapetech/questarrng@${arm64Digest}\n`
+        `amd64_image=ghcr.io/snapetech-org/questarrng@${amd64Digest}\n` +
+          `arm64_image=ghcr.io/snapetech-org/questarrng@${arm64Digest}\n`
       );
     } finally {
       rmSync(directory, { recursive: true, force: true });
     }
+  });
+
+  it("labels the published image with the organization repository source", () => {
+    const dockerfile = readFileSync(resolve(cwd(), "Dockerfile"), "utf8");
+    const sourceLabel = dockerfile.match(/^LABEL org\.opencontainers\.image\.source="([^"]+)"$/mu);
+
+    expect(sourceLabel?.[1]).toBe("https://github.com/snapetech-org/QuestarrNG");
   });
 
   it("scans both exact platform digests before attaching the release tag", () => {

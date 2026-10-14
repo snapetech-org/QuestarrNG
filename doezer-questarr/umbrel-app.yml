@@ -18,17 +18,17 @@ description: >-
   downloads, mount the same root your download client writes into and add a matching entry under
   Settings -> Path Mappings.
 releaseNotes: >-
-  See https://github.com/snapetech/QuestarrNG/releases for the full changelog.
+  See https://github.com/snapetech-org/QuestarrNG/releases for the full changelog.
 developer: Snapetech
-website: https://github.com/snapetech/QuestarrNG
+website: https://github.com/snapetech-org/QuestarrNG
 dependencies: []
-repo: https://github.com/snapetech/QuestarrNG
-support: https://github.com/snapetech/QuestarrNG/issues
+repo: https://github.com/snapetech-org/QuestarrNG
+support: https://github.com/snapetech-org/QuestarrNG/issues
 port: 5000
 gallery:
-  - https://raw.githubusercontent.com/snapetech/QuestarrNG/main/images/Screenshots/library.png
-  - https://raw.githubusercontent.com/snapetech/QuestarrNG/main/images/Screenshots/discover.png
-  - https://raw.githubusercontent.com/snapetech/QuestarrNG/main/images/Screenshots/calendar.png
+  - https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/images/Screenshots/library.png
+  - https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/images/Screenshots/discover.png
+  - https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/images/Screenshots/calendar.png
 path: ""
 submitter: Snapetech
-submission: https://github.com/snapetech/QuestarrNG
+submission: https://github.com/snapetech-org/QuestarrNG

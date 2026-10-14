@@ -10,7 +10,7 @@ selected PC variant tracking, status readback, and authenticated delivery of
 imported files while the two apps remain separate services.
 
 For the SeerrNG-side setup, target selection, approval flow, and requester
-download behavior, see [SeerrNG's software requests guide](https://github.com/snapetech/seerrng/blob/main/docs/using-seerr/software-acquisition.md).
+download behavior, see [SeerrNG's software requests guide](https://github.com/snapetech-org/seerrng/blob/main/docs/using-seerr/software-acquisition.md).
 
 The integration extends rather than replaces the legacy
 [`/api/integration`](API.md#integration-api-external-clients) contract. Existing
@@ -68,7 +68,7 @@ individual asset stream route. Current provider behavior is defined by the
 SeerrNG v3.51.0 adds PC play-time and multi-file download behavior using
 request contract v2. QuestarrNG's v2 bundle route streams a gzip-compressed tar
 archive through the authenticated provider connection. See the
-[SeerrNG release note](https://github.com/snapetech/seerrng/blob/main/release-notes/questarr-catalog-estimates-and-bundles.md).
+[SeerrNG release note](https://github.com/snapetech-org/seerrng/blob/main/release-notes/questarr-catalog-estimates-and-bundles.md).
 
 ## Compatibility and release discipline
 

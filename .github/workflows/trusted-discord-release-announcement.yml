@@ -11,7 +11,7 @@ permissions:
 jobs:
   announce-release:
     if: >-
-      github.repository == 'snapetech/QuestarrNG' &&
+      github.repository_id == '1388297896' &&
       github.event.workflow_run.workflow_id == 368554729 &&
       github.event.workflow_run.event == 'push' &&
       github.event.workflow_run.head_repository.full_name == github.repository &&
@@ -82,7 +82,7 @@ jobs:
               --arg title "$title" \
               --arg url "$(jq -r '.url' release.json)" \
               --arg description "$description" \
-              --arg image "ghcr.io/snapetech/questarrng:${version}" \
+              --arg image "ghcr.io/${GITHUB_REPOSITORY,,}:${version}" \
               --arg run_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" \
               --argjson first "$index" \
               '{

@@ -2,7 +2,7 @@
 # See charts/questarr/README.md for the full option reference.
 
 image:
-  repository: ghcr.io/snapetech/questarrng
+  repository: ghcr.io/snapetech-org/questarrng
   # Overrides the image tag; defaults to the chart's appVersion.
   tag: ""
   pullPolicy: IfNotPresent

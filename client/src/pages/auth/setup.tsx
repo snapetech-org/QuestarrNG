@@ -157,7 +157,7 @@ export default function SetupPage() {
               )}
             </p>
             <a
-              href="https://github.com/snapetech/QuestarrNG/blob/main/docs/MIGRATION.md"
+              href="https://github.com/snapetech-org/QuestarrNG/blob/main/docs/MIGRATION.md"
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-1 font-semibold underline underline-offset-4 hover:text-amber-800 dark:hover:text-amber-300 transition-colors"
