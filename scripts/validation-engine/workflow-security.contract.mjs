@@ -167,6 +167,19 @@ test('release publishing and announcements are gated to QuestarrNG by stable rep
     5,
     'all five release and recovery jobs use the stable repository ID'
   );
+  for (const [name, nextName] of [
+    ['publish', 'addon-smoke'],
+    ['addon-smoke', 'release'],
+    ['finalize-release', 'update-finalized-changelog'],
+    ['update-finalized-changelog', 'announce-release'],
+    ['announce-release', undefined],
+  ]) {
+    assert.match(
+      jobBlock(releaseWorkflow, name, nextName),
+      /github\.repository_id == '1388297896'/u,
+      `${name} is guarded by the stable repository ID`
+    );
+  }
   assert.doesNotMatch(releaseWorkflow, /github\.repository == 'snapetech\/QuestarrNG'/u);
   assert.match(releaseWorkflow, /name=ghcr\.io\/\$\{GITHUB_REPOSITORY,,\}/u);
   assert.match(releaseWorkflow, /image="ghcr\.io\/\$\{GITHUB_REPOSITORY,,\}"/u);
