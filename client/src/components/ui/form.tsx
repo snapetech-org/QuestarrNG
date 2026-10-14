@@ -14,6 +14,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
+import { InterfaceText } from "@/components/InterfaceText";
 
 const Form = FormProvider;
 
@@ -151,7 +152,7 @@ const FormMessage = React.forwardRef<
       className={cn("text-sm font-medium text-destructive", className)}
       {...props}
     >
-      {body}
+      {typeof body === "string" ? <InterfaceText source={body} /> : body}
     </p>
   );
 });

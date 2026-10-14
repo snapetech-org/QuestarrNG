@@ -93,6 +93,7 @@ describe("send-logs utilities", () => {
       ok: false,
       status: 0,
       message: "Log upload is not configured for this build.",
+      messageKey: "Log upload is not configured for this build.",
     });
   });
 

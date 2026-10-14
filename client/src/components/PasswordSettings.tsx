@@ -97,7 +97,11 @@ export default function PasswordSettings() {
             </div>
             {form.formState.errors.currentPassword && (
               <p className="text-xs text-red-500">
-                {form.formState.errors.currentPassword.message}
+                <InterfaceText
+                  source={
+                    form.formState.errors.currentPassword.message ?? "Current password is required"
+                  }
+                />
               </p>
             )}
           </div>
@@ -131,7 +135,14 @@ export default function PasswordSettings() {
               </div>
             </div>
             {form.formState.errors.newPassword && (
-              <p className="text-xs text-red-500">{form.formState.errors.newPassword.message}</p>
+              <p className="text-xs text-red-500">
+                <InterfaceText
+                  source={
+                    form.formState.errors.newPassword.message ??
+                    "Password must be at least 8 characters"
+                  }
+                />
+              </p>
             )}
           </div>
 
@@ -165,7 +176,11 @@ export default function PasswordSettings() {
             </div>
             {form.formState.errors.confirmPassword && (
               <p className="text-xs text-red-500">
-                {form.formState.errors.confirmPassword.message}
+                <InterfaceText
+                  source={
+                    form.formState.errors.confirmPassword.message ?? "Confirm password is required"
+                  }
+                />
               </p>
             )}
           </div>

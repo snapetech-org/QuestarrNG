@@ -44,6 +44,38 @@ describe("AppSidebar translated labels", () => {
     expect(translatedLabel).toHaveAttribute("dir", "rtl");
   });
 
+  it("places the desktop sidebar on the right for Arabic and the left for English", () => {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false, staleTime: Infinity } },
+    });
+    queryClient.setQueryData(["/api/games"], []);
+    queryClient.setQueryData(["/api/downloads"], { downloads: [] });
+
+    const { unmount } = render(
+      <QueryClientProvider client={queryClient}>
+        <SidebarProvider>
+          <AppSidebar />
+        </SidebarProvider>
+      </QueryClientProvider>
+    );
+
+    expect(document.querySelector('[data-slot="sidebar"][data-side="right"]')).not.toBeNull();
+
+    unmount();
+    localStorage.setItem("questarr.interface-language", "en");
+    applyInitialInterfaceLanguage();
+
+    render(
+      <QueryClientProvider client={queryClient}>
+        <SidebarProvider>
+          <AppSidebar />
+        </SidebarProvider>
+      </QueryClientProvider>
+    );
+
+    expect(document.querySelector('[data-slot="sidebar"][data-side="left"]')).not.toBeNull();
+  });
+
   it("formats navigation badges with the current regional digits", () => {
     act(() => setRegionalPreference("es"));
     const queryClient = new QueryClient({

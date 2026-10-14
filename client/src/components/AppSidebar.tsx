@@ -28,7 +28,7 @@ import {
   type AppNavItem,
 } from "@/components/navigation-items";
 import { withBasePath } from "@/lib/app-path";
-import { useInterfaceLanguage } from "@/lib/interface-locale";
+import { getInterfaceLanguageDirection, useInterfaceLanguage } from "@/lib/interface-locale";
 import { formatRegionalNumber, useRegionalPreference } from "@/lib/regional-format";
 import { InterfaceText } from "@/components/InterfaceText";
 
@@ -43,7 +43,7 @@ const EMPTY_GAMES: Game[] = [];
 
 export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<AppSidebarProps>) {
   const { logout, user } = useAuth();
-  const { t, languageFor, directionFor } = useInterfaceLanguage();
+  const { language, t, languageFor, directionFor } = useInterfaceLanguage();
   useRegionalPreference();
 
   const handleNavigation = (url: string) => {
@@ -99,7 +99,10 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
   const navigation = primaryNavigation.map(withBadge);
 
   return (
-    <Sidebar data-testid="sidebar-main">
+    <Sidebar
+      side={getInterfaceLanguageDirection(language) === "rtl" ? "right" : "left"}
+      data-testid="sidebar-main"
+    >
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 flex items-center justify-center">

@@ -126,10 +126,7 @@ const AI_LEGITIMACY_WARNING_THRESHOLD = 0.5;
 export default function SearchPage() {
   const { toast } = useToast();
   const { language: interfaceLanguage, t } = useInterfaceLanguage();
-  const downloadSchema = useMemo(
-    () => createDownloadSchema((source) => formatInterfaceMessage(source, {}, interfaceLanguage)),
-    [interfaceLanguage]
-  );
+  const downloadSchema = useMemo(() => createDownloadSchema((source) => source), []);
   const regionalPreference = useRegionalPreference();
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 500);

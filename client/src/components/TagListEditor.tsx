@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { X, Plus } from "lucide-react";
+import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
 
 interface TagListEditorProps {
   /** Current tags. Comparison for duplicates is case-insensitive. */
@@ -15,7 +16,6 @@ interface TagListEditorProps {
   helperText: string;
   emptyText: string;
   addAriaLabel: string;
-  removeAriaLabel: (tag: string) => string;
 }
 
 /**
@@ -31,9 +31,10 @@ export default function TagListEditor({
   helperText,
   emptyText,
   addAriaLabel,
-  removeAriaLabel,
 }: Readonly<TagListEditorProps>) {
   const [inputValue, setInputValue] = useState("");
+  const { language, t, languageFor, directionFor } = useInterfaceLanguage();
+  const removeNameSource = "Remove {name}";
 
   const handleAdd = useCallback(() => {
     const trimmed = inputValue.trim();
@@ -60,7 +61,9 @@ export default function TagListEditor({
   return (
     <div className="space-y-2">
       <Label htmlFor={inputId} className="text-sm font-medium">
-        {label}
+        <span lang={languageFor(label)} dir={directionFor(label)}>
+          {t(label)}
+        </span>
       </Label>
       <div className="flex gap-2">
         <Input
@@ -68,7 +71,9 @@ export default function TagListEditor({
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={placeholder}
+          placeholder={t(placeholder)}
+          lang={inputValue ? "und" : languageFor(placeholder)}
+          dir={inputValue ? "auto" : directionFor(placeholder)}
           className="flex-1"
         />
         <Button
@@ -77,23 +82,35 @@ export default function TagListEditor({
           size="icon"
           onClick={handleAdd}
           disabled={!inputValue.trim()}
-          aria-label={addAriaLabel}
+          aria-label={t(addAriaLabel)}
+          lang={languageFor(addAriaLabel)}
+          dir={directionFor(addAriaLabel)}
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
         </Button>
       </div>
-      <p className="text-xs text-muted-foreground">{helperText}</p>
+      <p
+        className="text-xs text-muted-foreground"
+        lang={languageFor(helperText)}
+        dir={directionFor(helperText)}
+      >
+        {t(helperText)}
+      </p>
 
       {tags.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {tags.map((tag) => (
             <Badge key={tag} variant="secondary" className="gap-1 pr-1">
-              {tag}
+              <span lang="und" dir="auto">
+                {tag}
+              </span>
               <button
                 type="button"
                 onClick={() => handleRemove(tag)}
                 className="ml-1 rounded-full hover:bg-muted-foreground/20 p-0.5"
-                aria-label={removeAriaLabel(tag)}
+                aria-label={formatInterfaceMessage(removeNameSource, { name: tag }, language)}
+                lang={languageFor(removeNameSource)}
+                dir={directionFor(removeNameSource)}
               >
                 <X className="h-3 w-3" />
               </button>
@@ -102,7 +119,15 @@ export default function TagListEditor({
         </div>
       )}
 
-      {tags.length === 0 && <p className="text-xs text-muted-foreground italic">{emptyText}</p>}
+      {tags.length === 0 && (
+        <p
+          className="text-xs text-muted-foreground italic"
+          lang={languageFor(emptyText)}
+          dir={directionFor(emptyText)}
+        >
+          {t(emptyText)}
+        </p>
+      )}
     </div>
   );
 }

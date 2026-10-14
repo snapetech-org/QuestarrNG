@@ -49,7 +49,6 @@ export default function PreferredReleaseGroupsSettings({
         helperText: "Press Enter or click + to add a group. Comparison is case-insensitive.",
         emptyText: "No preferred groups configured. All groups will be considered equally.",
         addAriaLabel: "Add preferred release group",
-        removeAriaLabel: (group) => `Remove ${group}`,
       }}
       buildPayload={() => ({
         preferredReleaseGroups: JSON.stringify(groups),

@@ -56,26 +56,26 @@ export default function SetupPage() {
 
     return z
       .object({
-        username: z.string().min(3, t("Username must be at least 3 characters")),
+        username: z.string().min(3, "Username must be at least 3 characters"),
         password: z
           .string()
           .trim()
-          .min(PASSWORD_MIN_LENGTH, t("Password must be at least 8 characters"))
-          .regex(/[A-Za-z]/, t("Password must contain at least one letter"))
-          .regex(/[0-9]/, t("Password must contain at least one number")),
+          .min(PASSWORD_MIN_LENGTH, "Password must be at least 8 characters")
+          .regex(/[A-Za-z]/, "Password must contain at least one letter")
+          .regex(/[0-9]/, "Password must contain at least one number"),
         confirmPassword: z.string().trim(),
         igdbClientId: isIgdbConfigured
           ? z.string().optional()
-          : z.string().min(1, t("IGDB Client ID is required")),
+          : z.string().min(1, "IGDB Client ID is required"),
         igdbClientSecret: isIgdbConfigured
           ? z.string().optional()
-          : z.string().min(1, t("IGDB Client Secret is required")),
+          : z.string().min(1, "IGDB Client Secret is required"),
       })
       .refine((data) => data.password === data.confirmPassword, {
-        message: t("Passwords do not match"),
+        message: "Passwords do not match",
         path: ["confirmPassword"],
       });
-  }, [config, t]);
+  }, [config]);
 
   const form = useForm<SetupForm>({
     resolver: zodResolver(setupSchema),

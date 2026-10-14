@@ -1,8 +1,37 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { MultiSelect } from "@/components/ui/multi-select";
+import { setInterfaceLanguage } from "@/lib/interface-locale";
 
 describe("MultiSelect localized content", () => {
+  it("translates known default and fallback copy when callers do not supply locale metadata", () => {
+    act(() => setInterfaceLanguage("es"));
+    render(
+      <MultiSelect
+        options={[]}
+        selected={[]}
+        onChange={vi.fn()}
+        placeholder="Select categories..."
+        emptyMessage="No categories available"
+      />
+    );
+
+    const trigger = screen.getByRole("combobox");
+    expect(trigger).toHaveAttribute("lang", "es");
+    expect(trigger).toHaveAttribute("dir", "ltr");
+    expect(screen.getByText("Seleccionar categorías...")).toBeInTheDocument();
+
+    fireEvent.click(trigger);
+    const searchInput = screen.getByPlaceholderText("Buscar...");
+    expect(searchInput).toHaveAttribute("lang", "es");
+    expect(searchInput).toHaveAttribute("dir", "ltr");
+    const emptyState = screen.getByText("No hay categorías disponibles");
+    expect(emptyState).toHaveAttribute("lang", "es");
+    expect(emptyState).toHaveAttribute("dir", "ltr");
+
+    act(() => setInterfaceLanguage("en"));
+  });
+
   it("marks its trigger, search field, and empty state with the translated language and direction", () => {
     render(
       <MultiSelect

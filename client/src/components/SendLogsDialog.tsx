@@ -303,7 +303,15 @@ export default function SendLogsDialog({
             </DialogHeader>
 
             <div className="space-y-3 py-2">
-              <p className="text-sm text-muted-foreground">{result.message}</p>
+              <p className="text-sm text-muted-foreground">
+                {result.messageKey ? (
+                  <InterfaceText source={result.messageKey} values={result.messageValues} />
+                ) : (
+                  <span lang="und" dir="auto">
+                    {result.message}
+                  </span>
+                )}
+              </p>
               {result.status === 429 && (
                 <p className="text-xs text-zinc-500">
                   <InterfaceText

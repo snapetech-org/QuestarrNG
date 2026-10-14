@@ -12,6 +12,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
 
 export interface MultiSelectOption {
   label: string;
@@ -49,20 +50,38 @@ export function MultiSelect({
   searchPlaceholder = "Search...",
   lang,
   dir,
-  emptyLang = lang,
-  emptyDir = dir,
-  searchLang = lang,
-  searchDir = dir,
-  removeLabel = (label) => `Remove ${label}`,
-  removeLang = lang,
-  removeDir = dir,
+  emptyLang,
+  emptyDir,
+  searchLang,
+  searchDir,
+  removeLabel,
+  removeLang,
+  removeDir,
   className,
   disabled = false,
   ...rest
 }: MultiSelectProps) {
+  const { language, t, languageFor, directionFor } = useInterfaceLanguage();
   const [open, setOpen] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
   const removeLabelId = React.useId();
+  const placeholderText = lang ? placeholder : t(placeholder);
+  const placeholderLang = lang ?? languageFor(placeholder);
+  const placeholderDir = dir ?? directionFor(placeholder);
+  const emptyText = emptyLang ? emptyMessage : t(emptyMessage);
+  const resolvedEmptyLang = emptyLang ?? lang ?? languageFor(emptyMessage);
+  const resolvedEmptyDir = emptyDir ?? dir ?? directionFor(emptyMessage);
+  const searchText = searchLang ? searchPlaceholder : t(searchPlaceholder);
+  const resolvedSearchLang = searchLang ?? lang ?? languageFor(searchPlaceholder);
+  const resolvedSearchDir = searchDir ?? dir ?? directionFor(searchPlaceholder);
+  const removeNameSource = "Remove {name}";
+  const resolvedRemoveLabel =
+    removeLabel ??
+    ((label: string) => formatInterfaceMessage(removeNameSource, { name: label }, language));
+  const resolvedRemoveLang =
+    removeLang ?? (removeLabel ? (lang ?? "en") : languageFor(removeNameSource));
+  const resolvedRemoveDir =
+    removeDir ?? (removeLabel ? (dir ?? "ltr") : directionFor(removeNameSource));
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen) setSearchValue("");
@@ -93,14 +112,14 @@ export function MultiSelect({
           aria-expanded={open}
           className={cn("w-full justify-between", className)}
           disabled={disabled}
-          lang={lang}
-          dir={dir}
+          lang={placeholderLang}
+          dir={placeholderDir}
         >
           <div className="flex gap-1 flex-wrap">
             {selectedOptions.length > 0 ? (
               selectedOptions.map((option, index) => {
                 const optionNameMarker = "__questarr_option_name__";
-                const removeAccessibleNameTemplate = removeLabel(optionNameMarker);
+                const removeAccessibleNameTemplate = resolvedRemoveLabel(optionNameMarker);
                 const optionNamePosition = removeAccessibleNameTemplate.indexOf(optionNameMarker);
                 const actionBefore =
                   optionNamePosition < 0
@@ -141,8 +160,8 @@ export function MultiSelect({
                         <span
                           id={actionBeforeId}
                           className="sr-only"
-                          lang={removeLang}
-                          dir={removeDir}
+                          lang={resolvedRemoveLang}
+                          dir={resolvedRemoveDir}
                         >
                           {actionBefore}
                         </span>
@@ -151,8 +170,8 @@ export function MultiSelect({
                         <span
                           id={actionAfterId}
                           className="sr-only"
-                          lang={removeLang}
-                          dir={removeDir}
+                          lang={resolvedRemoveLang}
+                          dir={resolvedRemoveDir}
                         >
                           {actionAfter}
                         </span>
@@ -163,8 +182,8 @@ export function MultiSelect({
                 );
               })
             ) : (
-              <span className="text-muted-foreground" lang={lang} dir={dir}>
-                {placeholder}
+              <span className="text-muted-foreground" lang={placeholderLang} dir={placeholderDir}>
+                {placeholderText}
               </span>
             )}
           </div>
@@ -174,19 +193,19 @@ export function MultiSelect({
       <PopoverContent
         className="w-[var(--radix-popover-trigger-width)] p-0"
         align="start"
-        dir={dir}
+        dir={dir ?? placeholderDir}
       >
-        <Command dir={searchDir}>
+        <Command dir={resolvedSearchDir}>
           <CommandInput
-            placeholder={searchPlaceholder}
-            lang={searchValue ? "und" : searchLang}
-            dir={searchValue ? "auto" : searchDir}
+            placeholder={searchText}
+            lang={searchValue ? "und" : resolvedSearchLang}
+            dir={searchValue ? "auto" : resolvedSearchDir}
             value={searchValue}
             onValueChange={setSearchValue}
           />
           <CommandList>
-            <CommandEmpty lang={emptyLang} dir={emptyDir}>
-              {emptyMessage}
+            <CommandEmpty lang={resolvedEmptyLang} dir={resolvedEmptyDir}>
+              {emptyText}
             </CommandEmpty>
             <CommandGroup>
               {options.map((option) => {

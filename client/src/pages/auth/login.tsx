@@ -27,10 +27,10 @@ export default function LoginPage() {
   const loginSchema = useMemo(
     () =>
       z.object({
-        username: z.string().min(1, t("Username is required")),
-        password: z.string().min(1, t("Password is required")),
+        username: z.string().min(1, "Username is required"),
+        password: z.string().min(1, "Password is required"),
       }),
-    [t]
+    []
   );
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),

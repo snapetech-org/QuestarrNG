@@ -36,7 +36,6 @@ export default function ReleaseNameBlacklistSettings({
         helperText: "Press Enter or click + to add a term. Comparison is case-insensitive.",
         emptyText: "No blacklisted terms configured. All release names will be considered.",
         addAriaLabel: "Add blacklisted term",
-        removeAriaLabel: (term) => `Remove ${term}`,
       }}
       buildPayload={() => ({ releaseNameBlacklist: JSON.stringify(terms) })}
       successTitle="Release Name Blacklist Saved"
