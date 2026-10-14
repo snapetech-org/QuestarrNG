@@ -182,6 +182,14 @@ test('trusted PR validation runs the base validator and launcher on an exact can
     /validation_root="\$RUNNER_TEMP\/questarr-trusted-validation-\$\{GITHUB_RUN_ID\}-\$\{GITHUB_RUN_ATTEMPT\}"/u,
     'each trusted validation attempt gets an isolated runner-temp workspace'
   );
+  assert.match(trustedWorkflow, /\[\[ "\$GITHUB_RUN_ID" =~ \^\[0-9\]\+\$ \]\]/u);
+  assert.match(trustedWorkflow, /\[\[ "\$GITHUB_RUN_ATTEMPT" =~ \^\[0-9\]\+\$ \]\]/u);
+  assert.match(trustedWorkflow, /\[\[ "\$RUNNER_TEMP" == \/\* \]\]/u);
+  assert.match(
+    trustedWorkflow,
+    /mkdir -m 700 "\$validation_root"/u,
+    'the attempt workspace is created exclusively with private permissions'
+  );
   assert.match(trustedWorkflow, /trusted_repo="\$validation_root\/trusted\.git"/u);
   assert.doesNotMatch(
     trustedWorkflow,
