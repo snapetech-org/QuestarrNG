@@ -47,6 +47,30 @@ describe("UI catalog structure", () => {
 
     expect(problems).toEqual([]);
   });
+
+  it("uses archive extraction terms and reviewed repair-status translations", () => {
+    expect(labels.Unpacked?.es).toBe("Descomprimido");
+    expect(labels.Unpacked?.fr).toBe("Décompressé");
+    expect(labels.Unpacked?.["pt-BR"]).toBe("Descompactado");
+    expect(labels["Unpacking..."]?.["zh-Hans"]).toBe("正在解压...");
+    expect(labels["Unpacking..."]?.["zh-Hant"]).toBe("正在解壓...");
+    expect(labels["Unpacking..."]?.vi).toBe("Đang giải nén...");
+    expect(labels["Repair OK"]?.hi).toBe("सुधार सफल");
+    expect(labels["Repair OK"]?.["zh-Hans"]).toBe("修复成功");
+    expect(labels["Repair OK"]?.fr).toBe("Réparation réussie");
+    expect(labels["Repair OK"]?.vi).toBe("Sửa chữa thành công");
+    expect(labels["Mapping Deleted"]?.fr).toBe("Mappage supprimé");
+    expect(labels["Mapping Deleted"]?.ko).toBe("매핑 삭제됨");
+    expect(labels["Auto-Unpack Archives"]?.hi).toBe("संग्रह फ़ाइलें अपने-आप निकालें");
+    expect(labels["Auto-Unpack Archives"]?.de).toBe("Archive automatisch entpacken");
+    expect(labels["Unpack:"]?.ja).toBe("展開：");
+    expect(labels["Auto-Sync Wishlist"]?.de).toBe("Wunschliste automatisch synchronisieren");
+    expect(labels["Auto-Sync Wishlist"]?.es).toBe("Sincronizar automáticamente la lista de deseos");
+    expect(labels["Auto-Sync Wishlist"]?.fr).toBe(
+      "Synchroniser automatiquement la liste de souhaits"
+    );
+    expect(labels["Auto-Sync Wishlist"]?.id).toBe("Sinkronkan daftar keinginan secara otomatis");
+  });
 });
 
 describe("notification locale helpers", () => {
