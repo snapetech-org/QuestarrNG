@@ -60,4 +60,20 @@ describe("sendLogs error messages", () => {
       messageKey: "Network error — check your connection.",
     });
   });
+
+  it("preserves unexpected response errors as unlocalized details", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue({
+      ok: true,
+      json: vi.fn().mockRejectedValue(new Error("Unexpected response body")),
+    } as unknown as Response);
+
+    const result = await sendLogs(payload);
+
+    expect(result).toMatchObject({
+      ok: false,
+      status: 0,
+      message: "Unexpected response body",
+    });
+    expect(result).not.toHaveProperty("messageKey");
+  });
 });
