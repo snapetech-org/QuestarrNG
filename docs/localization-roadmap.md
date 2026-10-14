@@ -2,7 +2,7 @@
 
 ## Coverage
 
-Questarr's React interface has a browser-local language preference for English and twelve non-English locales: Spanish, Simplified Chinese, Hindi, German, Japanese, French, Brazilian Portuguese, Arabic, Korean, Traditional Chinese, Vietnamese, and Indonesian. The English-keyed catalog contains 1,857 app-owned source strings with a translation in every locale. English is the fallback for missing keys. Translated strings and accessible attributes carry language and direction metadata; Arabic sets the document language and direction and uses logical layout rules.
+Questarr's React interface has a browser-local language preference for English and twelve non-English locales: Spanish, Simplified Chinese, Hindi, German, Japanese, French, Brazilian Portuguese, Arabic, Korean, Traditional Chinese, Vietnamese, and Indonesian. The English-keyed catalog contains 1,904 app-owned source strings with a translation in every locale. English is the fallback for missing keys. Translated strings and accessible attributes carry language and direction metadata; Arabic sets the document language and direction and uses logical layout rules.
 
 Catalog coverage includes navigation and page copy, settings, labels and accessible names, forms, help, empty states, dynamic summaries, notifications, finite app-owned statuses, and stable API error summaries. Known API errors use stable status codes for translated summaries. Original server detail and route-specific validation payloads remain available as English detail to preserve the API contract. Known generated notification templates are translated; custom or changed notification text falls back to its original text because notification parameters are not stored separately. Unknown status values, game titles, release names, paths, user input, and raw API values remain unchanged.
 
@@ -10,7 +10,7 @@ The interface language and regional-format preference are independent. Regional 
 
 ## Review status and limits
 
-The catalog has 1,857 keys across twelve target locales (22,284 translated values), with no empty values or interpolation-placeholder mismatches. A source-reference scan found no missing static UI keys. Catalog review checked protected technical tokens and suspicious duplicate or context-mismatched translations.
+The catalog has 1,904 keys across twelve target locales (22,848 translated values), with no empty values or interpolation-placeholder mismatches. A source-reference scan found no missing static UI keys. Catalog review checked protected technical tokens and suspicious duplicate or context-mismatched translations.
 
 Production browser review used the Agentic VM at desktop and mobile widths. It checked Arabic setup, authenticated library, download empty states, settings (including the theme picker), document language and direction, and horizontal overflow. A wider Arabic route sample covered the main navigation and administration pages. The production build passed and the full test suite passed (3,772 passed, 7 skipped; one test file skipped). Populated API-backed flows, live indexer/download-client integrations, and externally supplied game or release text were not exercised; dynamic names and raw API details remain in their source language by design.
 
