@@ -9,7 +9,11 @@ import type { InfiniteData } from "@tanstack/react-query";
 import { useDebounce } from "@/hooks/use-debounce";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { formatBytes, formatAge, isUsenetItem, getDownloadTypeColor } from "@/lib/downloads-utils";
-import { getInterfaceLanguageDirection, useInterfaceLanguage } from "@/lib/interface-locale";
+import {
+  formatInterfaceMessage,
+  getInterfaceLanguageDirection,
+  useInterfaceLanguage,
+} from "@/lib/interface-locale";
 import { isTorrentDownloaderType, isUsenetDownloaderType } from "@shared/downloader-types";
 import { cleanReleaseName } from "@shared/title-utils";
 import {
@@ -54,6 +58,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
+import { InterfaceText } from "@/components/InterfaceText";
 
 interface DownloadItem {
   title: string;
@@ -91,15 +96,16 @@ interface Downloader {
   enabled: boolean;
 }
 
-const downloadSchema = z.object({
-  downloaderId: z.string().min(1, "Please select a downloader"),
-  category: z.string().optional(),
-  downloadPath: z.string().optional(),
-  priority: z.number().min(1).max(10).optional(),
-  password: z.string().max(200, "Password must be 200 characters or fewer").optional(),
-});
+const createDownloadSchema = (translate: (source: string) => string) =>
+  z.object({
+    downloaderId: z.string().min(1, translate("Please select a downloader")),
+    category: z.string().optional(),
+    downloadPath: z.string().optional(),
+    priority: z.number().min(1).max(10).optional(),
+    password: z.string().max(200, translate("Password must be 200 characters or fewer")).optional(),
+  });
 
-type DownloadForm = z.infer<typeof downloadSchema>;
+type DownloadForm = z.infer<ReturnType<typeof createDownloadSchema>>;
 
 function formatDate(dateString: string): string {
   try {
@@ -119,7 +125,11 @@ const AI_LEGITIMACY_WARNING_THRESHOLD = 0.5;
  */
 export default function SearchPage() {
   const { toast } = useToast();
-  const { language: interfaceLanguage } = useInterfaceLanguage();
+  const { language: interfaceLanguage, t } = useInterfaceLanguage();
+  const downloadSchema = useMemo(
+    () => createDownloadSchema((source) => formatInterfaceMessage(source, {}, interfaceLanguage)),
+    [interfaceLanguage]
+  );
   const regionalPreference = useRegionalPreference();
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
@@ -253,7 +263,9 @@ export default function SearchPage() {
         if (total > 0) {
           toast({
             title: "Search completed",
-            description: `Found ${total} result${total !== 1 ? "s" : ""}`,
+            description: formatInterfaceMessage("Search results: {count}", {
+              count: String(total),
+            }),
           });
         } else {
           toast({ title: "No results found", description: "Try a different search query" });
@@ -262,7 +274,9 @@ export default function SearchPage() {
         if (errors && errors.length > 0) {
           toast({
             title: "Some indexers failed",
-            description: `${errors.length} indexer(s) encountered errors`,
+            description: formatInterfaceMessage("Indexer errors: {count}", {
+              count: String(errors.length),
+            }),
             variant: "destructive",
           });
         }
@@ -334,7 +348,9 @@ export default function SearchPage() {
     if (compatibleDownloaders.length === 0) {
       toast({
         title: "No compatible downloaders",
-        description: `Please configure a ${isUsenet ? "Usenet" : "Torrent"} downloader in settings.`,
+        description: formatInterfaceMessage("Please configure a {type} downloader in settings.", {
+          type: t(isUsenet ? "Usenet" : "Torrent"),
+        }),
         variant: "destructive",
       });
       return;
@@ -372,9 +388,11 @@ export default function SearchPage() {
   return (
     <div className="h-full overflow-auto p-6">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Search</h1>
+        <h1 className="text-2xl font-bold tracking-tight">
+          <InterfaceText source={"Search"} />
+        </h1>
         <p className="text-muted-foreground text-sm mt-0.5">
-          Search for games across configured indexers
+          <InterfaceText source={"Search for games across configured indexers"} />
         </p>
       </div>
 
@@ -387,6 +405,7 @@ export default function SearchPage() {
         <div className="flex-1">
           <Input
             placeholder="Enter game title..."
+            data-i18n-placeholder={"Enter game title..."}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             data-testid="input-search-query"
@@ -396,12 +415,12 @@ export default function SearchPage() {
           {isSearching ? (
             <>
               <Search className="h-4 w-4 mr-2 animate-spin" />
-              Searching...
+              <InterfaceText source={"Searching..."} />
             </>
           ) : (
             <>
               <Search className="h-4 w-4 mr-2" />
-              Search
+              <InterfaceText source={"Search"} />
             </>
           )}
         </Button>
@@ -410,6 +429,7 @@ export default function SearchPage() {
           variant="outline"
           onClick={() => setShowFilters((v) => !v)}
           aria-label="Toggle filters"
+          data-i18n-aria-label={"Toggle filters"}
           aria-expanded={showFilters}
           data-testid="button-toggle-filters"
         >
@@ -421,11 +441,11 @@ export default function SearchPage() {
       {showFilters && (
         <div className="flex flex-wrap items-center gap-3 mb-6 p-3 rounded-md border bg-muted/30">
           <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
-            Release date:
+            <InterfaceText source={"Release date:"} />
           </span>
           <div className="flex items-center gap-2">
             <label htmlFor="date-from" className="text-sm text-muted-foreground">
-              From
+              <InterfaceText source={"From"} />
             </label>
             <Input
               id="date-from"
@@ -438,7 +458,7 @@ export default function SearchPage() {
           </div>
           <div className="flex items-center gap-2">
             <label htmlFor="date-to" className="text-sm text-muted-foreground">
-              To
+              <InterfaceText source={"To"} />
             </label>
             <Input
               id="date-to"
@@ -460,7 +480,7 @@ export default function SearchPage() {
               }}
               data-testid="button-clear-dates"
             >
-              Clear
+              <InterfaceText source={"Clear"} />
             </Button>
           )}
         </div>
@@ -471,12 +491,14 @@ export default function SearchPage() {
         <Card className="mb-6" data-testid="card-search-error">
           <CardHeader>
             <CardTitle className="text-destructive" data-testid="text-search-error-title">
-              Search Error
+              <InterfaceText source={"Search Error"} />
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p data-testid="text-search-error-message">
-              Failed to search indexers. Please check your configuration.
+              <InterfaceText
+                source={"Failed to search indexers. Please check your configuration."}
+              />
             </p>
           </CardContent>
         </Card>
@@ -486,16 +508,16 @@ export default function SearchPage() {
         <div>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-base font-semibold" data-testid="text-search-results-count">
-              {totalResults} result{totalResults !== 1 ? "s" : ""} found
+              {formatInterfaceMessage("Search results: {count}", { count: totalResults })}
               {!!(dateFrom || dateTo) && filteredAndSortedItems.length !== allItems.length && (
                 <span className="text-muted-foreground font-normal text-sm ml-2">
-                  ({filteredAndSortedItems.length} shown with filter)
+                  ({filteredAndSortedItems.length} <InterfaceText source={"shown with filter)"} />
                 </span>
               )}
             </h2>
             {!!indexerErrors && indexerErrors.length > 0 && (
               <Badge variant="destructive" data-testid="badge-indexer-errors">
-                {indexerErrors.length} indexer error(s)
+                {indexerErrors.length} <InterfaceText source={"indexer error(s)"} />
               </Badge>
             )}
           </div>
@@ -507,7 +529,7 @@ export default function SearchPage() {
                   className="text-sm text-destructive"
                   data-testid="text-indexer-errors-title"
                 >
-                  Indexer Errors
+                  <InterfaceText source={"Indexer Errors"} />
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -532,7 +554,9 @@ export default function SearchPage() {
               className="mb-4 flex flex-wrap items-center gap-2 rounded-md border border-primary/30 bg-primary/5 px-4 py-2.5"
               data-testid="banner-library-matches"
             >
-              <span className="text-xs font-medium text-muted-foreground">In your library:</span>
+              <span className="text-xs font-medium text-muted-foreground">
+                <InterfaceText source={"In your library:"} />
+              </span>
               {libraryGames.map((game) => (
                 <div
                   key={game.id}
@@ -546,7 +570,9 @@ export default function SearchPage() {
                     className="h-5 w-5 text-destructive/70 hover:text-destructive"
                     onClick={() => removeGameMutation.mutate(game.id)}
                     disabled={removeGameMutation.isPending}
-                    aria-label={`Remove ${game.title} from library`}
+                    aria-label={formatInterfaceMessage("Remove {title} from library", {
+                      title: String(game.title ?? ""),
+                    })}
                     data-testid={`button-remove-game-${game.id}`}
                   >
                     <Trash2 className="h-3 w-3" />
@@ -558,8 +584,12 @@ export default function SearchPage() {
 
           <div className="border rounded-md divide-y overflow-hidden">
             <div className="bg-muted/50 p-2 text-xs font-medium flex justify-between items-center px-4">
-              <div>Release Name</div>
-              <div className="w-[40px] text-right">Action</div>
+              <div>
+                <InterfaceText source={"Release Name"} />
+              </div>
+              <div className="w-[40px] text-right">
+                <InterfaceText source={"Action"} />
+              </div>
             </div>
             {filteredAndSortedItems.length > 0 ? (
               <>
@@ -586,12 +616,12 @@ export default function SearchPage() {
                             {isUsenet ? (
                               <>
                                 <Newspaper className="h-3 w-3 mr-1" />
-                                USENET
+                                <InterfaceText source={"USENET"} />
                               </>
                             ) : (
                               <>
                                 <Download className="h-3 w-3 mr-1" />
-                                TORRENT
+                                <InterfaceText source={"TORRENT"} />
                               </>
                             )}
                           </Badge>
@@ -605,17 +635,20 @@ export default function SearchPage() {
                                     data-testid={`badge-ai-legitimacy-warning-${index}`}
                                   >
                                     <AlertTriangle className="h-3 w-3" />
-                                    Check size
+                                    <InterfaceText source={"Check size"} />
                                   </Badge>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  AI flagged this file size as unusual for this type of release (
-                                  {formatRegionalPercent(
-                                    download.aiLegitimacyScore * 100,
-                                    { maximumFractionDigits: 0 },
-                                    regionalPreference
-                                  )}{" "}
-                                  plausible)
+                                  <InterfaceText
+                                    source="AI flagged this file size as unusual for this type of release ({percent} plausible)"
+                                    values={{
+                                      percent: formatRegionalPercent(
+                                        download.aiLegitimacyScore * 100,
+                                        { maximumFractionDigits: 0 },
+                                        regionalPreference
+                                      ),
+                                    }}
+                                  />
                                 </TooltipContent>
                               </Tooltip>
                             )}
@@ -630,7 +663,9 @@ export default function SearchPage() {
                               {download.grabs !== undefined && (
                                 <>
                                   <span className="text-primary font-medium">{download.grabs}</span>
-                                  <span>grabs</span>
+                                  <span>
+                                    <InterfaceText source={"grabs"} />
+                                  </span>
                                   {download.age !== undefined && <span>•</span>}
                                 </>
                               )}
@@ -653,7 +688,9 @@ export default function SearchPage() {
                               <span className="text-destructive font-medium">
                                 {download.leechers ?? 0}
                               </span>
-                              <span>peers</span>
+                              <span>
+                                <InterfaceText source={"peers"} />
+                              </span>
                             </div>
                           )}
                           {!!download.description && (
@@ -680,7 +717,9 @@ export default function SearchPage() {
                                 disabled={downloaders.length === 0}
                                 className="h-8 w-8"
                                 data-testid={`button-download-${index}`}
-                                aria-label={`Start download for ${download.title}`}
+                                aria-label={formatInterfaceMessage("Start download for {title}", {
+                                  title: String(download.title ?? ""),
+                                })}
                               >
                                 <Download className="h-4 w-4" />
                               </Button>
@@ -701,7 +740,9 @@ export default function SearchPage() {
               </>
             ) : (
               <div className="p-8 text-center text-muted-foreground" data-testid="card-no-results">
-                <p className="font-medium text-foreground">No Results Found</p>
+                <p className="font-medium text-foreground">
+                  <InterfaceText source={"No Results Found"} />
+                </p>
                 <p className="text-sm mt-1">
                   {dateFrom || dateTo
                     ? "No releases match the selected date range. Try adjusting the filter."
@@ -722,9 +763,13 @@ export default function SearchPage() {
       {!searchQuery && !data && (
         <Card data-testid="card-start-searching">
           <CardHeader>
-            <CardTitle data-testid="text-start-searching-title">Start Searching</CardTitle>
+            <CardTitle data-testid="text-start-searching-title">
+              <InterfaceText source={"Start Searching"} />
+            </CardTitle>
             <CardDescription data-testid="text-start-searching-description">
-              Enter a game title above to search across your configured indexers.
+              <InterfaceText
+                source={"Enter a game title above to search across your configured indexers."}
+              />
             </CardDescription>
           </CardHeader>
         </Card>
@@ -734,9 +779,12 @@ export default function SearchPage() {
       <Dialog open={isDownloadDialogOpen} onOpenChange={setIsDownloadDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Start Download</DialogTitle>
+            <DialogTitle>
+              <InterfaceText source={"Start Download"} />
+            </DialogTitle>
             <DialogDescription>
-              Configure download settings for: {selectedDownload?.title}
+              <InterfaceText source={"Configure download settings for:"} />{" "}
+              {selectedDownload?.title}
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
@@ -746,11 +794,16 @@ export default function SearchPage() {
                 name="downloaderId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Downloader</FormLabel>
+                    <FormLabel>
+                      <InterfaceText source={"Downloader"} />
+                    </FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger data-testid="select-downloader">
-                          <SelectValue placeholder="Select downloader" />
+                          <SelectValue
+                            placeholder="Select downloader"
+                            data-i18n-placeholder={"Select downloader"}
+                          />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -774,9 +827,16 @@ export default function SearchPage() {
                 name="category"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category (Optional)</FormLabel>
+                    <FormLabel>
+                      <InterfaceText source={"Category (Optional)"} />
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="games" {...field} data-testid="input-download-category" />
+                      <Input
+                        placeholder="games"
+                        {...field}
+                        data-testid="input-download-category"
+                        data-i18n-placeholder={"games"}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -787,10 +847,13 @@ export default function SearchPage() {
                 name="downloadPath"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Download Path (Optional)</FormLabel>
+                    <FormLabel>
+                      <InterfaceText source={"Download Path (Optional)"} />
+                    </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Use default path"
+                        data-i18n-placeholder={"Use default path"}
                         {...field}
                         data-testid="input-download-path"
                       />
@@ -804,7 +867,9 @@ export default function SearchPage() {
                 name="priority"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Priority (1-10)</FormLabel>
+                    <FormLabel>
+                      <InterfaceText source={"Priority (1-10)"} />
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -825,18 +890,24 @@ export default function SearchPage() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Archive Password (Optional)</FormLabel>
+                      <FormLabel>
+                        <InterfaceText source={"Archive Password (Optional)"} />
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="password"
                           placeholder="e.g. 404"
                           {...field}
                           data-testid="input-download-password"
+                          data-i18n-placeholder={"e.g. 404"}
                         />
                       </FormControl>
                       <FormDescription className="text-xs">
-                        Some usenet releases ship as password-protected archives. SABnzbd and NZBGet
-                        will use this to unpack automatically.
+                        <InterfaceText
+                          source={
+                            "Some usenet releases ship as password-protected archives. SABnzbd and NZBGet will use this to unpack automatically."
+                          }
+                        />
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -850,7 +921,7 @@ export default function SearchPage() {
                   onClick={() => setIsDownloadDialogOpen(false)}
                   data-testid="button-cancel-download"
                 >
-                  Cancel
+                  <InterfaceText source={"Cancel"} />
                 </Button>
                 <Button
                   type="submit"

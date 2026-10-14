@@ -3,6 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Users } from "lucide-react";
 import TagListSettingsCard from "@/components/TagListSettingsCard";
+import { InterfaceText } from "@/components/InterfaceText";
 
 interface PreferredReleaseGroupsSettingsProps {
   preferredGroups: string[];
@@ -61,15 +62,19 @@ export default function PreferredReleaseGroupsSettings({
         setGroups([]);
         setFilterEnabled(false);
       }}
+      data-i18n-title={"Preferred Release Groups"}
     >
       <div className="flex items-center justify-between pt-2 border-t">
         <div className="space-y-0.5">
           <Label htmlFor="filter-by-groups" className="text-sm font-medium">
-            Pre-filter Download Search
+            <InterfaceText source={"Pre-filter Download Search"} />
           </Label>
           <p className="text-xs text-muted-foreground">
-            Automatically filter the download dialog to show only preferred groups, and only send
-            availability/update notifications when a preferred group release is found
+            <InterfaceText
+              source={
+                "Automatically filter the download dialog to show only preferred groups, and only send availability/update notifications when a preferred group release is found"
+              }
+            />
           </p>
         </div>
         <Switch

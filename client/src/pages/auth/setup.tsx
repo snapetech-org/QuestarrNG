@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/form";
 import { Lock, User, ShieldCheck, Gamepad2, Info, ExternalLink } from "lucide-react";
 import { withBasePath } from "@/lib/app-path";
-import { passwordPolicySchema } from "@shared/schema";
+import { PASSWORD_MIN_LENGTH } from "@shared/schema";
 import { IgdbHelpPopover, IgdbTestConnectionButton } from "@/components/IgdbCredentialsHelper";
 import { InterfaceLanguageSelect } from "@/components/InterfaceLanguageSelect";
 import { useInterfaceLanguage } from "@/lib/interface-locale";
@@ -56,21 +56,26 @@ export default function SetupPage() {
 
     return z
       .object({
-        username: z.string().min(3, "Username must be at least 3 characters"),
-        password: passwordPolicySchema,
+        username: z.string().min(3, t("Username must be at least 3 characters")),
+        password: z
+          .string()
+          .trim()
+          .min(PASSWORD_MIN_LENGTH, t("Password must be at least 8 characters"))
+          .regex(/[A-Za-z]/, t("Password must contain at least one letter"))
+          .regex(/[0-9]/, t("Password must contain at least one number")),
         confirmPassword: z.string().trim(),
         igdbClientId: isIgdbConfigured
           ? z.string().optional()
-          : z.string().min(1, "IGDB Client ID is required"),
+          : z.string().min(1, t("IGDB Client ID is required")),
         igdbClientSecret: isIgdbConfigured
           ? z.string().optional()
-          : z.string().min(1, "IGDB Client Secret is required"),
+          : z.string().min(1, t("IGDB Client Secret is required")),
       })
       .refine((data) => data.password === data.confirmPassword, {
-        message: "Passwords do not match",
+        message: t("Passwords do not match"),
         path: ["confirmPassword"],
       });
-  }, [config]);
+  }, [config, t]);
 
   const form = useForm<SetupForm>({
     resolver: zodResolver(setupSchema),
@@ -97,13 +102,13 @@ export default function SetupPage() {
       // The server has already set the httpOnly auth cookie; nothing to
       // store client-side (see server/security.ts's setAuthCookies).
       await checkSetup();
-      toast({ title: "Setup complete! Welcome." });
+      toast({ title: t("Setup complete! Welcome.") });
       // Force reload to pick up auth state or navigate
       window.location.href = withBasePath("/");
     },
     onError: (error: Error) => {
       toast({
-        title: "Setup failed",
+        title: t("Setup failed"),
         description: error.message,
         variant: "destructive",
       });
@@ -118,16 +123,38 @@ export default function SetupPage() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 gap-6">
       <Alert className="max-w-md border-amber-500/50 bg-amber-500/10 text-amber-600 dark:text-amber-400">
         <Info className="h-4 w-4" />
-        <AlertTitle>Upgrading from v1.0?</AlertTitle>
+        <AlertTitle
+          lang={languageFor("Upgrading from v1.0?")}
+          dir={directionFor("Upgrading from v1.0?")}
+        >
+          {t("Upgrading from v1.0?")}
+        </AlertTitle>
         <AlertDescription>
           <div className="mt-2 text-sm space-y-2">
-            <p>
-              If you are upgrading from an older version (PostgreSQL),{" "}
-              <strong>do not create a new account</strong>.
+            <p
+              lang={languageFor("If you are upgrading from an older version (PostgreSQL),")}
+              dir={directionFor("If you are upgrading from an older version (PostgreSQL),")}
+            >
+              {t("If you are upgrading from an older version (PostgreSQL),")}{" "}
+              <strong
+                lang={languageFor("do not create a new account")}
+                dir={directionFor("do not create a new account")}
+              >
+                {t("do not create a new account")}
+              </strong>
+              .
             </p>
-            <p>
-              You must migrate your data to the new database format first, otherwise your library
-              will be empty.
+            <p
+              lang={languageFor(
+                "You must migrate your data to the new database format first, otherwise your library will be empty."
+              )}
+              dir={directionFor(
+                "You must migrate your data to the new database format first, otherwise your library will be empty."
+              )}
+            >
+              {t(
+                "You must migrate your data to the new database format first, otherwise your library will be empty."
+              )}
             </p>
             <a
               href="https://github.com/snapetech/QuestarrNG/blob/main/docs/MIGRATION.md"
@@ -135,7 +162,13 @@ export default function SetupPage() {
               rel="noreferrer"
               className="inline-flex items-center gap-1 font-semibold underline underline-offset-4 hover:text-amber-800 dark:hover:text-amber-300 transition-colors"
             >
-              Read Migration Guide <ExternalLink className="h-3 w-3" />
+              <span
+                lang={languageFor("Read Migration Guide")}
+                dir={directionFor("Read Migration Guide")}
+              >
+                {t("Read Migration Guide")}
+              </span>{" "}
+              <ExternalLink className="h-3 w-3" />
             </a>
           </div>
         </AlertDescription>
@@ -146,8 +179,19 @@ export default function SetupPage() {
           <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit mb-2">
             <ShieldCheck className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-bold">Initial Setup</CardTitle>
-          <CardDescription>Create your admin account to get started</CardDescription>
+          <CardTitle
+            className="text-2xl font-bold"
+            lang={languageFor("Initial Setup")}
+            dir={directionFor("Initial Setup")}
+          >
+            {t("Initial Setup")}
+          </CardTitle>
+          <CardDescription
+            lang={languageFor("Create your admin account to get started")}
+            dir={directionFor("Create your admin account to get started")}
+          >
+            {t("Create your admin account to get started")}
+          </CardDescription>
           <div className="mt-4 space-y-2 text-left">
             <label htmlFor="setup-interface-language" className="text-sm font-medium">
               <span
@@ -163,19 +207,6 @@ export default function SetupPage() {
               onValueChange={setLanguage}
               className="w-full"
             />
-            <p
-              className="text-xs text-muted-foreground"
-              lang={languageFor(
-                "Translations currently cover navigation and language settings; most other screens are still in English."
-              )}
-              dir={directionFor(
-                "Translations currently cover navigation and language settings; most other screens are still in English."
-              )}
-            >
-              {t(
-                "Translations currently cover navigation and language settings; most other screens are still in English."
-              )}
-            </p>
           </div>
         </CardHeader>
         <CardContent>
@@ -186,14 +217,25 @@ export default function SetupPage() {
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Username</FormLabel>
+                    <FormLabel lang={languageFor("Username")} dir={directionFor("Username")}>
+                      {t("Username")}
+                    </FormLabel>
                     <div className="relative">
                       <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <FormControl>
-                        <Input className="pl-9" placeholder="Choose a username" {...field} />
+                        <Input
+                          className="pl-9"
+                          placeholder={t("Choose a username")}
+                          lang={languageFor("Choose a username")}
+                          dir="auto"
+                          {...field}
+                        />
                       </FormControl>
                     </div>
-                    <FormMessage />
+                    <FormMessage
+                      lang={languageFor("Username must be at least 3 characters")}
+                      dir={directionFor("Username must be at least 3 characters")}
+                    />
                   </FormItem>
                 )}
               />
@@ -202,22 +244,36 @@ export default function SetupPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel lang={languageFor("Password")} dir={directionFor("Password")}>
+                      {t("Password")}
+                    </FormLabel>
                     <div className="relative">
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <FormControl>
                         <Input
                           type="password"
                           className="pl-9"
-                          placeholder="Choose a password"
+                          placeholder={t("Choose a password")}
+                          lang={languageFor("Choose a password")}
+                          dir={directionFor("Choose a password")}
                           {...field}
                         />
                       </FormControl>
                     </div>
-                    <FormDescription>
-                      At least 8 characters, including one letter and one number.
+                    <FormDescription
+                      lang={languageFor(
+                        "At least 8 characters, including one letter and one number."
+                      )}
+                      dir={directionFor(
+                        "At least 8 characters, including one letter and one number."
+                      )}
+                    >
+                      {t("At least 8 characters, including one letter and one number.")}
                     </FormDescription>
-                    <FormMessage />
+                    <FormMessage
+                      lang={languageFor("Password must be at least 8 characters")}
+                      dir={directionFor("Password must be at least 8 characters")}
+                    />
                   </FormItem>
                 )}
               />
@@ -226,19 +282,29 @@ export default function SetupPage() {
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
+                    <FormLabel
+                      lang={languageFor("Confirm Password")}
+                      dir={directionFor("Confirm Password")}
+                    >
+                      {t("Confirm Password")}
+                    </FormLabel>
                     <div className="relative">
                       <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <FormControl>
                         <Input
                           type="password"
                           className="pl-9"
-                          placeholder="Confirm your password"
+                          placeholder={t("Confirm your password")}
+                          lang={languageFor("Confirm your password")}
+                          dir={directionFor("Confirm your password")}
                           {...field}
                         />
                       </FormControl>
                     </div>
-                    <FormMessage />
+                    <FormMessage
+                      lang={languageFor("Passwords do not match")}
+                      dir={directionFor("Passwords do not match")}
+                    />
                   </FormItem>
                 )}
               />
@@ -247,14 +313,26 @@ export default function SetupPage() {
                 <>
                   <div className="border-t my-4 pt-4">
                     <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-medium flex items-center gap-2">
+                      <h3
+                        className="font-medium flex items-center gap-2"
+                        lang={languageFor("IGDB Configuration")}
+                        dir={directionFor("IGDB Configuration")}
+                      >
                         <Gamepad2 className="h-4 w-4" />
-                        IGDB Configuration
+                        {t("IGDB Configuration")}
                       </h3>
                       <IgdbHelpPopover />
                     </div>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      IGDB credentials are required to discover and import games.
+                    <p
+                      className="text-sm text-muted-foreground mb-4"
+                      lang={languageFor(
+                        "IGDB credentials are required to discover and import games."
+                      )}
+                      dir={directionFor(
+                        "IGDB credentials are required to discover and import games."
+                      )}
+                    >
+                      {t("IGDB credentials are required to discover and import games.")}
                     </p>
                   </div>
 
@@ -263,11 +341,21 @@ export default function SetupPage() {
                     name="igdbClientId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Client ID</FormLabel>
+                        <FormLabel lang={languageFor("Client ID")} dir={directionFor("Client ID")}>
+                          {t("Client ID")}
+                        </FormLabel>
                         <FormControl>
-                          <Input placeholder="IGDB Client ID" {...field} />
+                          <Input
+                            placeholder={t("IGDB Client ID")}
+                            lang={languageFor("IGDB Client ID")}
+                            dir="ltr"
+                            {...field}
+                          />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage
+                          lang={languageFor("IGDB Client ID is required")}
+                          dir={directionFor("IGDB Client ID is required")}
+                        />
                       </FormItem>
                     )}
                   />
@@ -277,11 +365,25 @@ export default function SetupPage() {
                     name="igdbClientSecret"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Client Secret</FormLabel>
+                        <FormLabel
+                          lang={languageFor("Client Secret")}
+                          dir={directionFor("Client Secret")}
+                        >
+                          {t("Client Secret")}
+                        </FormLabel>
                         <FormControl>
-                          <Input type="password" placeholder="IGDB Client Secret" {...field} />
+                          <Input
+                            type="password"
+                            placeholder={t("IGDB Client Secret")}
+                            lang={languageFor("IGDB Client Secret")}
+                            dir="ltr"
+                            {...field}
+                          />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage
+                          lang={languageFor("IGDB Client Secret is required")}
+                          dir={directionFor("IGDB Client Secret is required")}
+                        />
                       </FormItem>
                     )}
                   />
@@ -299,11 +401,18 @@ export default function SetupPage() {
                 className="w-full"
                 disabled={setupMutation.isPending || isLoadingConfig}
               >
-                {isLoadingConfig
-                  ? "Loading..."
-                  : setupMutation.isPending
-                    ? "Creating Account..."
-                    : "Create Account"}
+                {(() => {
+                  const label = isLoadingConfig
+                    ? "Loading..."
+                    : setupMutation.isPending
+                      ? "Creating Account..."
+                      : "Create Account";
+                  return (
+                    <span lang={languageFor(label)} dir={directionFor(label)}>
+                      {t(label)}
+                    </span>
+                  );
+                })()}
               </Button>
             </form>
           </Form>

@@ -2,6 +2,7 @@ import { FaGithub, FaArrowUp } from "react-icons/fa";
 import pkg from "../../../package.json";
 import semver from "semver";
 import { useLatestQuestarrVersion } from "@/hooks/use-latest-questarr-version";
+import { InterfaceText } from "@/components/InterfaceText";
 
 interface GitHubVersionLinkProps {
   className?: string;
@@ -23,10 +24,14 @@ export function GitHubVersionLink({ className }: Readonly<GitHubVersionLinkProps
       }
     >
       <FaGithub size={14} />
-      <span>QuestarrNG v{pkg.version}</span>
+      <span>
+        <InterfaceText source={"QuestarrNG v"} />
+        {pkg.version}
+      </span>
       {hasNewerVersion && (
         <span className="text-emerald-500/70">
-          v{latestVersion} <FaArrowUp className="inline" size={10} />
+          <InterfaceText source={"v"} />
+          {latestVersion} <FaArrowUp className="inline" size={10} />
         </span>
       )}
     </a>

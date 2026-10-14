@@ -199,7 +199,7 @@ describe("PendingImportsCard", () => {
 
     renderCard();
 
-    expect(await screen.findByText("2 Pending Manual Imports")).toBeInTheDocument();
+    expect(await screen.findByText("Pending manual imports: 2")).toBeInTheDocument();
     expect(screen.queryByText("First Game")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Show pending imports" }));

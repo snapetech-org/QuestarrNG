@@ -24,6 +24,8 @@ import { PathMappingSettings } from "./PathMappingSettings";
 import { FileBrowser } from "./FileBrowser";
 import { RootFolderDiscovery } from "./RootFolderDiscovery";
 import SecurityScanSettings from "./SecurityScanSettings";
+import { InterfaceText } from "@/components/InterfaceText";
+import { formatInterfaceMessage } from "@/lib/interface-locale";
 
 type HardlinkPairCheck = {
   sourcePath: string;
@@ -184,12 +186,24 @@ export default function ImportSettings() {
     <div className="space-y-6">
       <Tabs defaultValue="config" className="w-full">
         <TabsList>
-          <TabsTrigger value="config">General Config</TabsTrigger>
-          <TabsTrigger value="romm">RomM</TabsTrigger>
-          <TabsTrigger value="paths">Path Mappings</TabsTrigger>
-          <TabsTrigger value="security">Security & Scanning</TabsTrigger>
-          <TabsTrigger value="discover">Discover</TabsTrigger>
-          <TabsTrigger value="help">Help</TabsTrigger>
+          <TabsTrigger value="config">
+            <InterfaceText source={"General Config"} />
+          </TabsTrigger>
+          <TabsTrigger value="romm">
+            <InterfaceText source={"RomM"} />
+          </TabsTrigger>
+          <TabsTrigger value="paths">
+            <InterfaceText source={"Path Mappings"} />
+          </TabsTrigger>
+          <TabsTrigger value="security">
+            <InterfaceText source={"Security & Scanning"} />
+          </TabsTrigger>
+          <TabsTrigger value="discover">
+            <InterfaceText source={"Discover"} />
+          </TabsTrigger>
+          <TabsTrigger value="help">
+            <InterfaceText source={"Help"} />
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="config" className="space-y-4">
@@ -200,16 +214,25 @@ export default function ImportSettings() {
                   {/* Master switch — always interactive */}
                   <div className="flex items-center justify-between pb-6">
                     <div className="space-y-0.5">
-                      <Label className="text-sm font-medium">Enable Post-Processing</Label>
+                      <Label className="text-sm font-medium">
+                        <InterfaceText source={"Enable Post-Processing"} />
+                      </Label>
                       <p className="text-xs text-muted-foreground">
-                        Master switch for the import engine.
+                        <InterfaceText source={"Master switch for the import engine."} />
                       </p>
                       {localConfig.enablePostProcessing && (
                         <p className="text-xs text-muted-foreground mt-1">
-                          If your download client runs on a different machine or volume than
-                          Questarr, configure{" "}
-                          <span className="font-medium text-foreground">Path Mappings</span> so
-                          Questarr can resolve the remote paths correctly.
+                          <InterfaceText
+                            source={
+                              "If your download client runs on a different machine or volume than Questarr, configure"
+                            }
+                          />{" "}
+                          <span className="font-medium text-foreground">
+                            <InterfaceText source={"Path Mappings"} />
+                          </span>{" "}
+                          <InterfaceText
+                            source={"so Questarr can resolve the remote paths correctly."}
+                          />
                         </p>
                       )}
                     </div>
@@ -232,14 +255,20 @@ export default function ImportSettings() {
 
                     {/* ── Processing ── */}
                     <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-                      Processing
+                      <InterfaceText source={"Processing"} />
                     </p>
                     <div className="space-y-4 mb-6">
                       <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
-                          <Label>Auto-Unpack Archives</Label>
+                          <Label>
+                            <InterfaceText source={"Auto-Unpack Archives"} />
+                          </Label>
                           <p className="text-xs text-muted-foreground">
-                            Automatically extract zip, rar, and 7z archives before importing.
+                            <InterfaceText
+                              source={
+                                "Automatically extract zip, rar, and 7z archives before importing."
+                              }
+                            />
                           </p>
                         </div>
                         <Switch
@@ -249,9 +278,13 @@ export default function ImportSettings() {
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
-                          <Label>Overwrite Existing Files</Label>
+                          <Label>
+                            <InterfaceText source={"Overwrite Existing Files"} />
+                          </Label>
                           <p className="text-xs text-muted-foreground">
-                            Replace files already present at the destination.
+                            <InterfaceText
+                              source={"Replace files already present at the destination."}
+                            />
                           </p>
                         </div>
                         <Switch
@@ -267,11 +300,13 @@ export default function ImportSettings() {
 
                     {/* ── Library ── */}
                     <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-                      Library
+                      <InterfaceText source={"Library"} />
                     </p>
                     <div className="space-y-4 mb-6">
                       <div className="space-y-1.5">
-                        <Label>Library Root</Label>
+                        <Label>
+                          <InterfaceText source={"Library Root"} />
+                        </Label>
                         <div className="flex gap-2">
                           <Input
                             placeholder="/data/library"
@@ -287,16 +322,19 @@ export default function ImportSettings() {
                             size="icon"
                             onClick={() => setLibraryBrowserOpen(true)}
                             aria-label="Browse for library root folder"
+                            data-i18n-aria-label={"Browse for library root folder"}
                           >
                             <FolderOpen className="h-4 w-4" />
                           </Button>
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          Where files are placed after import.
+                          <InterfaceText source={"Where files are placed after import."} />
                         </p>
                       </div>
                       <div className="space-y-1.5">
-                        <Label>Transfer Mode</Label>
+                        <Label>
+                          <InterfaceText source={"Transfer Mode"} />
+                        </Label>
                         <Select
                           value={localConfig.transferMode}
                           onValueChange={(value) =>
@@ -310,38 +348,60 @@ export default function ImportSettings() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="hardlink">Hardlink</SelectItem>
-                            <SelectItem value="copy">Copy</SelectItem>
-                            <SelectItem value="move">Move</SelectItem>
+                            <SelectItem value="hardlink">
+                              <InterfaceText source={"Hardlink"} />
+                            </SelectItem>
+                            <SelectItem value="copy">
+                              <InterfaceText source={"Copy"} />
+                            </SelectItem>
+                            <SelectItem value="move">
+                              <InterfaceText source={"Move"} />
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                         <p className="text-xs text-muted-foreground">
-                          Hardlink keeps torrents seeding while importing.
+                          <InterfaceText
+                            source={"Hardlink keeps torrents seeding while importing."}
+                          />
                         </p>
                         {localConfig.transferMode === "hardlink" &&
                           hardlinkCapability?.generic.supportedForAll === true && (
-                            <p className="text-xs text-emerald-500">Hardlink supported.</p>
+                            <p className="text-xs text-emerald-500">
+                              <InterfaceText source={"Hardlink supported."} />
+                            </p>
                           )}
                         {localConfig.transferMode === "hardlink" &&
                           hardlinkCapability?.generic.supportedForAll === false && (
                             <p className="text-xs text-amber-500">
-                              Hardlink not available on this setup — will fall back to copy.
+                              <InterfaceText
+                                source={
+                                  "Hardlink not available on this setup — will fall back to copy."
+                                }
+                              />
                             </p>
                           )}
                         {localConfig.transferMode === "hardlink" &&
                           hardlinkCapability?.generic.supportedForAll === null && (
                             <p className="text-xs text-muted-foreground">
-                              Hardlink check unavailable: configure at least one downloader path
-                              first.
+                              <InterfaceText
+                                source={
+                                  "Hardlink check unavailable: configure at least one downloader path first."
+                                }
+                              />
                             </p>
                           )}
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
-                          <Label>Auto-delete source after import</Label>
+                          <Label>
+                            <InterfaceText source={"Auto-delete source after import"} />
+                          </Label>
                           <p className="text-xs text-muted-foreground">
-                            After a successful copy or move import, remove the download from the
-                            client and delete source files.
+                            <InterfaceText
+                              source={
+                                "After a successful copy or move import, remove the download from the client and delete source files."
+                              }
+                            />
                           </p>
                         </div>
                         <Switch
@@ -353,12 +413,22 @@ export default function ImportSettings() {
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
-                          <Label htmlFor="sort-extras">Sort add-on files into subfolders</Label>
+                          <Label htmlFor="sort-extras">
+                            <InterfaceText source={"Sort add-on files into subfolders"} />
+                          </Label>
                           <p className="text-xs text-muted-foreground">
-                            For directory imports, place detected DLC, updates, and extras in{" "}
-                            <code>dlc/</code>, <code>update/</code>, and <code>extra/</code>{" "}
-                            subfolders inside the game folder. Single-file imports keep their
-                            existing layout.
+                            <InterfaceText
+                              source={
+                                "For directory imports, place detected DLC, updates, and extras in"
+                              }
+                            />{" "}
+                            <code>dlc/</code>, <code>update/</code>
+                            <InterfaceText source={", and"} /> <code>extra/</code>{" "}
+                            <InterfaceText
+                              source={
+                                "subfolders inside the game folder. Single-file imports keep their existing layout."
+                              }
+                            />
                           </p>
                         </div>
                         <Switch
@@ -375,13 +445,21 @@ export default function ImportSettings() {
 
                     {/* ── Platform Filter ── */}
                     <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-                      Platform Filter
+                      <InterfaceText source={"Platform Filter"} />
                     </p>
                     <div className="mb-6">
                       <p className="text-xs text-muted-foreground">
-                        Imports are restricted to the platforms chosen in the{" "}
-                        <span className="font-medium text-foreground">Platforms</span> settings tab.
-                        Leave that list empty to make all platforms eligible.
+                        <InterfaceText
+                          source={"Imports are restricted to the platforms chosen in the"}
+                        />{" "}
+                        <span className="font-medium text-foreground">
+                          <InterfaceText source={"Platforms"} />
+                        </span>{" "}
+                        <InterfaceText
+                          source={
+                            "settings tab. Leave that list empty to make all platforms eligible."
+                          }
+                        />
                       </p>
                       <p className="mt-1 text-xs text-muted-foreground">
                         {platformEligibilitySummary}
@@ -392,10 +470,12 @@ export default function ImportSettings() {
 
                     {/* ── Naming ── */}
                     <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-                      Naming
+                      <InterfaceText source={"Naming"} />
                     </p>
                     <div className="space-y-1.5">
-                      <Label>Rename Pattern</Label>
+                      <Label>
+                        <InterfaceText source={"Rename Pattern"} />
+                      </Label>
                       <Input
                         value={localConfig.renamePattern}
                         onChange={(e) =>
@@ -403,7 +483,8 @@ export default function ImportSettings() {
                         }
                       />
                       <p className="text-xs text-muted-foreground">
-                        Available tokens: {"{Title}"}, {"{Region}"}, {"{Platform}"}, {"{Year}"}
+                        <InterfaceText source={"Available tokens:"} /> {"{Title}"}, {"{Region}"},{" "}
+                        {"{Platform}"}, {"{Year}"}
                       </p>
                     </div>
                   </div>
@@ -418,7 +499,7 @@ export default function ImportSettings() {
                   {updateConfigMutation.isPending && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  Save Changes
+                  <InterfaceText source={"Save Changes"} />
                 </Button>
               </div>
             </>
@@ -431,9 +512,15 @@ export default function ImportSettings() {
               <CardContent className="pt-6 space-y-6">
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
-                    <Label>Route ROM imports to RomM</Label>
+                    <Label>
+                      <InterfaceText source={"Route ROM imports to RomM"} />
+                    </Label>
                     <p className="text-xs text-muted-foreground">
-                      Games with a configured RomM platform slug are imported into this library.
+                      <InterfaceText
+                        source={
+                          "Games with a configured RomM platform slug are imported into this library."
+                        }
+                      />
                     </p>
                   </div>
                   <Switch
@@ -444,7 +531,9 @@ export default function ImportSettings() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label>RomM ROM library root</Label>
+                  <Label>
+                    <InterfaceText source={"RomM ROM library root"} />
+                  </Label>
                   <Input
                     value={localRommConfig.libraryRoot}
                     onChange={(event) =>
@@ -453,12 +542,18 @@ export default function ImportSettings() {
                     placeholder="/romm/library/roms"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Use the path as mounted inside Questarr. Platform folders are created below it.
+                    <InterfaceText
+                      source={
+                        "Use the path as mounted inside Questarr. Platform folders are created below it."
+                      }
+                    />
                   </p>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-1.5">
-                    <Label>Platform folders</Label>
+                    <Label>
+                      <InterfaceText source={"Platform folders"} />
+                    </Label>
                     <Select
                       value={localRommConfig.platformRoutingMode}
                       onValueChange={(value) =>
@@ -472,13 +567,19 @@ export default function ImportSettings() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="slug-subfolder">RomM platform slug</SelectItem>
-                        <SelectItem value="binding-map">Custom folder bindings</SelectItem>
+                        <SelectItem value="slug-subfolder">
+                          <InterfaceText source={"RomM platform slug"} />
+                        </SelectItem>
+                        <SelectItem value="binding-map">
+                          <InterfaceText source={"Custom folder bindings"} />
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-1.5">
-                    <Label>Transfer mode</Label>
+                    <Label>
+                      <InterfaceText source={"Transfer mode"} />
+                    </Label>
                     <Select
                       value={localRommConfig.moveMode}
                       onValueChange={(value) =>
@@ -492,15 +593,25 @@ export default function ImportSettings() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="move">Move</SelectItem>
-                        <SelectItem value="copy">Copy</SelectItem>
-                        <SelectItem value="hardlink">Hardlink</SelectItem>
-                        <SelectItem value="symlink">Symlink</SelectItem>
+                        <SelectItem value="move">
+                          <InterfaceText source={"Move"} />
+                        </SelectItem>
+                        <SelectItem value="copy">
+                          <InterfaceText source={"Copy"} />
+                        </SelectItem>
+                        <SelectItem value="hardlink">
+                          <InterfaceText source={"Hardlink"} />
+                        </SelectItem>
+                        <SelectItem value="symlink">
+                          <InterfaceText source={"Symlink"} />
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-1.5">
-                    <Label>Existing game policy</Label>
+                    <Label>
+                      <InterfaceText source={"Existing game policy"} />
+                    </Label>
                     <Select
                       value={localRommConfig.conflictPolicy}
                       onValueChange={(value) =>
@@ -514,15 +625,25 @@ export default function ImportSettings() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="rename">Keep both with a new name</SelectItem>
-                        <SelectItem value="skip">Skip</SelectItem>
-                        <SelectItem value="overwrite">Replace existing</SelectItem>
-                        <SelectItem value="fail">Ask for review</SelectItem>
+                        <SelectItem value="rename">
+                          <InterfaceText source={"Keep both with a new name"} />
+                        </SelectItem>
+                        <SelectItem value="skip">
+                          <InterfaceText source={"Skip"} />
+                        </SelectItem>
+                        <SelectItem value="overwrite">
+                          <InterfaceText source={"Replace existing"} />
+                        </SelectItem>
+                        <SelectItem value="fail">
+                          <InterfaceText source={"Ask for review"} />
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-1.5">
-                    <Label>Single ROM placement</Label>
+                    <Label>
+                      <InterfaceText source={"Single ROM placement"} />
+                    </Label>
                     <Select
                       value={localRommConfig.singleFilePlacement}
                       onValueChange={(value) =>
@@ -536,13 +657,19 @@ export default function ImportSettings() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="root">In the platform folder</SelectItem>
-                        <SelectItem value="subfolder">In a game folder</SelectItem>
+                        <SelectItem value="root">
+                          <InterfaceText source={"In the platform folder"} />
+                        </SelectItem>
+                        <SelectItem value="subfolder">
+                          <InterfaceText source={"In a game folder"} />
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-1.5">
-                    <Label>Unmapped platform behavior</Label>
+                    <Label>
+                      <InterfaceText source={"Unmapped platform behavior"} />
+                    </Label>
                     <Select
                       value={localRommConfig.bindingMissingBehavior}
                       onValueChange={(value) =>
@@ -556,15 +683,21 @@ export default function ImportSettings() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="fallback">Use the platform slug</SelectItem>
-                        <SelectItem value="error">Require a custom binding</SelectItem>
+                        <SelectItem value="fallback">
+                          <InterfaceText source={"Use the platform slug"} />
+                        </SelectItem>
+                        <SelectItem value="error">
+                          <InterfaceText source={"Require a custom binding"} />
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
                 {localRommConfig.platformRoutingMode === "binding-map" && (
                   <div className="space-y-1.5">
-                    <Label>Platform folder bindings (JSON)</Label>
+                    <Label>
+                      <InterfaceText source={"Platform folder bindings (JSON)"} />
+                    </Label>
                     <textarea
                       className="min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-sm"
                       value={rommBindingsText}
@@ -591,19 +724,28 @@ export default function ImportSettings() {
                         }
                       }}
                       aria-label="RomM platform folder bindings"
+                      data-i18n-aria-label={"RomM platform folder bindings"}
                     />
                     <p className="text-xs text-muted-foreground">
-                      Keys are RomM platform slugs; values are relative folders under the library
-                      root.
+                      <InterfaceText
+                        source={
+                          "Keys are RomM platform slugs; values are relative folders under the library root."
+                        }
+                      />
                     </p>
                   </div>
                 )}
                 <div className="space-y-3">
                   <div>
-                    <Label>Platform slug mappings</Label>
+                    <Label>
+                      <InterfaceText source={"Platform slug mappings"} />
+                    </Label>
                     <p className="text-xs text-muted-foreground">
-                      Set each IGDB platform's ROMarr/RomM folder slug. Blank slugs keep that system
-                      in the PC library.
+                      <InterfaceText
+                        source={
+                          "Set each IGDB platform's ROMarr/RomM folder slug. Blank slugs keep that system in the PC library."
+                        }
+                      />
                     </p>
                   </div>
                   {platformMappings.length === 0 ? (
@@ -613,7 +755,7 @@ export default function ImportSettings() {
                       disabled={initializePlatformMappingsMutation.isPending}
                       onClick={() => initializePlatformMappingsMutation.mutate()}
                     >
-                      Load default platform mappings
+                      <InterfaceText source={"Load default platform mappings"} />
                     </Button>
                   ) : (
                     <div className="max-h-64 space-y-2 overflow-y-auto rounded-md border p-3">
@@ -625,10 +767,18 @@ export default function ImportSettings() {
                           <span className="truncate text-sm">
                             {igdbPlatforms.find(
                               (platform) => platform.id === mapping.igdbPlatformId
-                            )?.name ?? `IGDB platform ${mapping.igdbPlatformId}`}
+                            )?.name ?? (
+                              <InterfaceText
+                                source={"IGDB platform {igdbPlatformId}"}
+                                values={{ igdbPlatformId: String(mapping.igdbPlatformId ?? "") }}
+                              />
+                            )}
                           </span>
                           <Input
-                            aria-label={`RomM slug for platform ${mapping.igdbPlatformId}`}
+                            aria-label={formatInterfaceMessage(
+                              "RomM slug for platform {igdbPlatformId}",
+                              { igdbPlatformId: String(mapping.igdbPlatformId ?? "") }
+                            )}
                             defaultValue={mapping.rommPlatformSlug ?? ""}
                             placeholder="e.g. ps2"
                             onBlur={(event) => {
@@ -641,6 +791,7 @@ export default function ImportSettings() {
                                 });
                               }
                             }}
+                            data-i18n-placeholder={"e.g. ps2"}
                           />
                         </div>
                       ))}
@@ -653,7 +804,11 @@ export default function ImportSettings() {
                     disabled={updateRommConfigMutation.isPending}
                     onClick={() => updateRommConfigMutation.mutate(localRommConfig)}
                   >
-                    {updateRommConfigMutation.isPending ? "Saving…" : "Save RomM settings"}
+                    {updateRommConfigMutation.isPending ? (
+                      <InterfaceText source={"Saving…"} />
+                    ) : (
+                      <InterfaceText source={"Save RomM settings"} />
+                    )}
                   </Button>
                 </div>
               </CardContent>
@@ -679,11 +834,14 @@ export default function ImportSettings() {
               {/* ── How it works ── */}
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-                  How the import pipeline works
+                  <InterfaceText source={"How the import pipeline works"} />
                 </p>
                 <p className="text-muted-foreground mb-3">
-                  When a download finishes, Questarr automatically runs through the following steps
-                  — no manual action needed unless a step requires your input.
+                  <InterfaceText
+                    source={
+                      "When a download finishes, Questarr automatically runs through the following steps — no manual action needed unless a step requires your input."
+                    }
+                  />
                 </p>
                 <ol className="space-y-2 text-muted-foreground">
                   {[
@@ -726,7 +884,7 @@ export default function ImportSettings() {
               {/* ── Transfer modes ── */}
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-                  Transfer modes
+                  <InterfaceText source={"Transfer modes"} />
                 </p>
                 <div className="space-y-3">
                   {[
@@ -762,7 +920,9 @@ export default function ImportSettings() {
                       </div>
                       <p className="text-muted-foreground pl-6">{desc}</p>
                       <p className="text-xs text-muted-foreground pl-6">
-                        <span className="font-medium text-foreground">When to use: </span>
+                        <span className="font-medium text-foreground">
+                          <InterfaceText source={"When to use:"} />{" "}
+                        </span>
                         {when}
                       </p>
                     </div>
@@ -775,7 +935,7 @@ export default function ImportSettings() {
               {/* ── General Config settings ── */}
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-                  General Config settings
+                  <InterfaceText source={"General Config settings"} />
                 </p>
                 <div className="space-y-3">
                   {[
@@ -817,32 +977,45 @@ export default function ImportSettings() {
               {/* ── Path Mappings ── */}
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-                  Path Mappings
+                  <InterfaceText source={"Path Mappings"} />
                 </p>
                 <p className="text-muted-foreground mb-2">
-                  Path mappings translate paths between what your download client reports and what
-                  Questarr can access on its own filesystem.
+                  <InterfaceText
+                    source={
+                      "Path mappings translate paths between what your download client reports and what Questarr can access on its own filesystem."
+                    }
+                  />
                 </p>
                 <div className="space-y-2">
                   <div>
-                    <p className="font-medium text-foreground">When you need this</p>
+                    <p className="font-medium text-foreground">
+                      <InterfaceText source={"When you need this"} />
+                    </p>
                     <p className="text-muted-foreground">
-                      If Questarr and your download client are in different Docker containers (or on
-                      different machines), the same physical folder appears under different paths in
-                      each. For example, the download client might report{" "}
+                      <InterfaceText
+                        source={
+                          "If Questarr and your download client are in different Docker containers (or on different machines), the same physical folder appears under different paths in each. For example, the download client might report"
+                        }
+                      />{" "}
                       <code className="text-xs bg-muted rounded px-1">/downloads/Game.iso</code>{" "}
-                      while Questarr mounts that folder at{" "}
+                      <InterfaceText source={"while Questarr mounts that folder at"} />{" "}
                       <code className="text-xs bg-muted rounded px-1">/data/torrents/Game.iso</code>
-                      . Add a mapping with Remote path{" "}
-                      <code className="text-xs bg-muted rounded px-1">/downloads</code> → Local path{" "}
+                      <InterfaceText source={". Add a mapping with Remote path"} />{" "}
+                      <code className="text-xs bg-muted rounded px-1">/downloads</code>{" "}
+                      <InterfaceText source={"→ Local path"} />{" "}
                       <code className="text-xs bg-muted rounded px-1">/data/torrents</code>.
                     </p>
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">When you do not need this</p>
+                    <p className="font-medium text-foreground">
+                      <InterfaceText source={"When you do not need this"} />
+                    </p>
                     <p className="text-muted-foreground">
-                      If everything runs on the same host (or in a single container with shared
-                      mounts), paths are already consistent and no mapping is required.
+                      <InterfaceText
+                        source={
+                          "If everything runs on the same host (or in a single container with shared mounts), paths are already consistent and no mapping is required."
+                        }
+                      />
                     </p>
                   </div>
                 </div>
@@ -853,7 +1026,7 @@ export default function ImportSettings() {
               {/* ── Common setups ── */}
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-                  Common setup examples
+                  <InterfaceText source={"Common setup examples"} />
                 </p>
                 <div className="space-y-4">
                   {[
@@ -911,6 +1084,7 @@ export default function ImportSettings() {
           root="/"
           title="Select Library Root"
           initialPath="/"
+          data-i18n-title={"Select Library Root"}
         />
       )}
     </div>

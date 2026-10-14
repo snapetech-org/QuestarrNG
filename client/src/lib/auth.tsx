@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { apiFetch, apiRequest, setBearerToken } from "./queryClient";
+import { apiFetch, apiRequest, setBearerToken, throwIfResNotOk } from "./queryClient";
 import { disconnectSocket } from "./socket";
 import { useToast } from "@/hooks/use-toast";
 
@@ -79,9 +79,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     queryKey: ["/api/auth/status"],
     queryFn: async () => {
       const res = await apiFetch("/api/auth/status");
-      if (!res.ok) {
-        throw new Error("Failed to check setup status");
-      }
+      await throwIfResNotOk(res);
       return await res.json();
     },
     retry: 3,
@@ -125,11 +123,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         return null;
       }
 
-      const error = new Error(
-        `Failed to fetch authenticated user (${res.status})`
-      ) as FetchUserError;
-      error.status = res.status;
-      throw error;
+      await throwIfResNotOk(res);
+      return null;
     },
     // Always attempt this -- a valid session may exist purely via the
     // httpOnly cookie, with nothing for the client to check beforehand.

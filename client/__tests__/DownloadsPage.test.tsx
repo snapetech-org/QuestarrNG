@@ -202,10 +202,10 @@ describe("Downloads page", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("text-no-downloads-title")).toHaveTextContent(
-        "No Active Downloads"
+        "No downloads match the current filters"
       );
       expect(screen.getByTestId("text-no-downloads-description")).toHaveTextContent(
-        "No downloads match the current filters"
+        "Try adjusting the filters."
       );
     });
   });
@@ -263,7 +263,7 @@ describe("Downloads page", () => {
       .replace(new Intl.NumberFormat("ar").format(5), new Intl.NumberFormat("es").format(5));
     const ageBadge = await screen.findByTestId("badge-age-dl-age-locale");
     expect(ageBadge).toHaveTextContent(expectedAge);
-    expect(ageBadge.querySelector('[lang="ar"][dir="rtl"]')).toHaveTextContent(expectedAge);
+    expect(ageBadge.querySelectorAll('[lang="ar"][dir="rtl"]')[1]).toHaveTextContent(expectedAge);
   });
 
   it("shows the loading skeleton before downloads resolve", async () => {

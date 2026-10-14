@@ -23,6 +23,11 @@ vi.mock("@/lib/queryClient", () => ({
   apiFetch: (...args: unknown[]) => mockApiFetch(...args),
   apiRequest: (...args: unknown[]) => mockApiRequest(...args),
   setBearerToken: (...args: unknown[]) => mockSetBearerToken(...args),
+  throwIfResNotOk: async (res: Response) => {
+    if (!res.ok) {
+      throw Object.assign(new Error(`Request failed (${res.status})`), { status: res.status });
+    }
+  },
 }));
 
 import { AuthProvider, useAuth } from "../src/lib/auth";

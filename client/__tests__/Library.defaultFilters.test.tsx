@@ -130,7 +130,7 @@ describe("Library default filtering settings", () => {
     fireEvent.click(screen.getByRole("button", { name: "Toggle filters" }));
 
     const showOwnedSwitch = await screen.findByRole("switch", {
-      name: "Show owned games in Has Results",
+      name: "Show owned games in search results",
     });
     fireEvent.click(showOwnedSwitch);
 

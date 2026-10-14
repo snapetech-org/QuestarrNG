@@ -4,6 +4,7 @@ import {
   useRegionalPreference,
 } from "@/lib/regional-format";
 import { useRef, useState } from "react";
+import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BookOpen,
@@ -70,8 +71,18 @@ function formatDate(value: string | Date | null): string {
 
 export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJournalTabProps>) {
   const { toast } = useToast();
+  const { language, t, languageFor, directionFor } = useInterfaceLanguage();
   const regionalPreference = useRegionalPreference();
   const queryClient = useQueryClient();
+  const localizedText = (source: string, values: Record<string, string | number> = {}) => {
+    const text = formatInterfaceMessage(source, values, language);
+    if (language === "en") return text;
+    return (
+      <span lang={languageFor(source)} dir={directionFor(source)}>
+        {text}
+      </span>
+    );
+  };
 
   /** Shared onSuccess/onError pair for the mutations below: invalidate the
    * given query key and, on failure, show a toast with `errorMessage`. */
@@ -84,7 +95,8 @@ export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJour
       queryClient.invalidateQueries({ queryKey: [queryKey] });
       onSuccessExtra?.();
     },
-    onError: () => toast({ description: errorMessage, variant: "destructive" as const }),
+    onError: () =>
+      toast({ description: localizedText(errorMessage), variant: "destructive" as const }),
   });
 
   const { data: steamSettings } = useQuery<{ apiKeyConfigured: boolean }>({
@@ -198,7 +210,9 @@ export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJour
           <section>
             <h3 className="font-semibold mb-2 flex items-center gap-2">
               <Trophy className="w-4 h-4" />
-              Achievements
+              <span lang={languageFor("Achievements")} dir={directionFor("Achievements")}>
+                {t("Achievements")}
+              </span>
               <span className="text-xs font-normal text-muted-foreground">
                 {achievementsData.achievements.filter((a) => a.achieved).length}/
                 {achievementsData.achievements.length}
@@ -220,20 +234,27 @@ export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJour
                       />
                     )}
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate">{achievement.displayName}</p>
+                      <p className="text-sm font-medium truncate" lang="und" dir="auto">
+                        {achievement.displayName}
+                      </p>
                       {achievement.description && (
-                        <p className="text-xs text-muted-foreground line-clamp-2">
+                        <p
+                          className="text-xs text-muted-foreground line-clamp-2"
+                          lang="und"
+                          dir="auto"
+                        >
                           {achievement.description}
                         </p>
                       )}
                       {achievement.globalPercent !== null && (
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          {formatRegionalPercent(
-                            achievement.globalPercent,
-                            { minimumFractionDigits: 1, maximumFractionDigits: 1 },
-                            regionalPreference
-                          )}{" "}
-                          of players
+                          {localizedText("{percent} of players", {
+                            percent: formatRegionalPercent(
+                              achievement.globalPercent,
+                              { minimumFractionDigits: 1, maximumFractionDigits: 1 },
+                              regionalPreference
+                            ),
+                          })}
                         </p>
                       )}
                     </div>
@@ -248,7 +269,9 @@ export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJour
         <section>
           <h3 className="font-semibold mb-2 flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4" />
-            Milestones
+            <span lang={languageFor("Milestones")} dir={directionFor("Milestones")}>
+              {t("Milestones")}
+            </span>
           </h3>
           <div className="space-y-1.5 mb-2">
             {milestones.map((milestone) => (
@@ -264,11 +287,13 @@ export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJour
                       completed: !milestone.completedAt,
                     })
                   }
-                  aria-label={
-                    milestone.completedAt
-                      ? `Mark "${milestone.label}" incomplete`
-                      : `Mark "${milestone.label}" complete`
-                  }
+                  aria-label={formatInterfaceMessage(
+                    milestone.completedAt ? 'Mark "{label}" incomplete' : 'Mark "{label}" complete',
+                    { label: milestone.label },
+                    language
+                  )}
+                  lang="und"
+                  dir="auto"
                   className="shrink-0"
                 >
                   {milestone.completedAt ? (
@@ -279,6 +304,8 @@ export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJour
                 </button>
                 <span
                   className={`flex-1 min-w-0 text-sm truncate ${milestone.completedAt ? "text-muted-foreground line-through" : ""}`}
+                  lang="und"
+                  dir="auto"
                 >
                   {milestone.label}
                 </span>
@@ -286,7 +313,13 @@ export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJour
                   variant="ghost"
                   size="icon"
                   className="h-6 w-6 shrink-0"
-                  aria-label={`Delete milestone "${milestone.label}"`}
+                  aria-label={formatInterfaceMessage(
+                    'Delete milestone "{label}"',
+                    { label: milestone.label },
+                    language
+                  )}
+                  lang="und"
+                  dir="auto"
                   onClick={() => deleteMilestoneMutation.mutate(milestone.id)}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -294,16 +327,24 @@ export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJour
               </div>
             ))}
             {milestones.length === 0 && (
-              <p className="text-sm text-muted-foreground">No milestones yet.</p>
+              <p
+                className="text-sm text-muted-foreground"
+                lang={languageFor("No milestones yet.")}
+                dir={directionFor("No milestones yet.")}
+              >
+                {t("No milestones yet.")}
+              </p>
             )}
           </div>
           <div className="flex gap-2">
             <Input
               value={milestoneDraft}
               onChange={(e) => setMilestoneDraft(e.target.value)}
-              placeholder="Add a milestone..."
+              placeholder={t("Add a milestone...")}
+              lang={languageFor("New milestone label")}
+              dir={directionFor("New milestone label")}
               maxLength={200}
-              aria-label="New milestone label"
+              aria-label={t("New milestone label")}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && milestoneDraft.trim() && !addMilestoneMutation.isPending) {
                   addMilestoneMutation.mutate(milestoneDraft.trim());
@@ -317,7 +358,9 @@ export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJour
               onClick={() =>
                 milestoneDraft.trim() && addMilestoneMutation.mutate(milestoneDraft.trim())
               }
-              aria-label="Add milestone"
+              aria-label={t("Add milestone")}
+              lang={languageFor("Add milestone")}
+              dir={directionFor("Add milestone")}
             >
               <Plus className="w-4 h-4" />
             </Button>
@@ -328,16 +371,20 @@ export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJour
         <section>
           <h3 className="font-semibold mb-2 flex items-center gap-2">
             <BookOpen className="w-4 h-4" />
-            Notes
+            <span lang={languageFor("Notes")} dir={directionFor("Notes")}>
+              {t("Notes")}
+            </span>
           </h3>
           <div className="flex gap-2 mb-3">
             <Textarea
               value={noteDraft}
               onChange={(e) => setNoteDraft(e.target.value)}
-              placeholder="Jot down a thought while you play..."
+              placeholder={t("Jot down a thought while you play...")}
+              lang={languageFor("New journal note")}
+              dir={directionFor("New journal note")}
               className="resize-none min-h-[64px] text-sm"
               maxLength={10000}
-              aria-label="New journal note"
+              aria-label={t("New journal note")}
             />
             <Button
               variant="outline"
@@ -345,21 +392,29 @@ export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJour
               onClick={() => noteDraft.trim() && addEntryMutation.mutate(noteDraft.trim())}
               className="self-end"
             >
-              Add
+              <span lang={languageFor("Add")} dir={directionFor("Add")}>
+                {t("Add")}
+              </span>
             </Button>
           </div>
           <div className="space-y-2">
             {journalEntries.map((entry) => (
               <div key={entry.id} className="rounded-md border border-border px-3 py-2">
                 <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm whitespace-pre-wrap break-words flex-1 min-w-0">
+                  <p
+                    className="text-sm whitespace-pre-wrap break-words flex-1 min-w-0"
+                    lang="und"
+                    dir="auto"
+                  >
                     {entry.note}
                   </p>
                   <Button
                     variant="ghost"
                     size="icon"
                     className="h-6 w-6 shrink-0"
-                    aria-label="Delete journal entry"
+                    aria-label={t("Delete journal entry")}
+                    lang={languageFor("Delete journal entry")}
+                    dir={directionFor("Delete journal entry")}
                     onClick={() => deleteEntryMutation.mutate(entry.id)}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -369,7 +424,13 @@ export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJour
               </div>
             ))}
             {journalEntries.length === 0 && (
-              <p className="text-sm text-muted-foreground">No journal entries yet.</p>
+              <p
+                className="text-sm text-muted-foreground"
+                lang={languageFor("No journal entries yet.")}
+                dir={directionFor("No journal entries yet.")}
+              >
+                {t("No journal entries yet.")}
+              </p>
             )}
           </div>
         </section>
@@ -379,7 +440,9 @@ export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJour
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-semibold flex items-center gap-2">
               <ImagePlus className="w-4 h-4" />
-              Screenshots
+              <span lang={languageFor("Screenshots")} dir={directionFor("Screenshots")}>
+                {t("Screenshots")}
+              </span>
             </h3>
             <Button
               variant="outline"
@@ -393,7 +456,9 @@ export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJour
               ) : (
                 <Upload className="w-3.5 h-3.5" />
               )}
-              Upload
+              <span lang={languageFor("Upload")} dir={directionFor("Upload")}>
+                {t("Upload")}
+              </span>
             </Button>
             <input
               ref={fileInputRef}
@@ -401,7 +466,9 @@ export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJour
               accept="image/jpeg,image/png,image/webp"
               className="hidden"
               onChange={handleFileSelected}
-              aria-label="Upload screenshot"
+              aria-label={t("Upload screenshot")}
+              lang={languageFor("Upload screenshot")}
+              dir={directionFor("Upload screenshot")}
             />
           </div>
           {screenshots.length > 0 ? (
@@ -412,18 +479,28 @@ export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJour
                   type="button"
                   className="relative aspect-video rounded-md overflow-hidden border border-border"
                   onClick={() => setLightboxScreenshot(screenshot)}
-                  aria-label="View screenshot"
+                  aria-label={t("View screenshot")}
+                  lang={languageFor("View screenshot")}
+                  dir={directionFor("View screenshot")}
                 >
                   <img
                     src={withBasePath(screenshot.url)}
-                    alt={screenshot.caption ?? "Game screenshot"}
+                    alt={screenshot.caption ?? t("Game screenshot")}
+                    lang={screenshot.caption ? "und" : languageFor("Game screenshot")}
+                    dir={screenshot.caption ? "auto" : directionFor("Game screenshot")}
                     className="w-full h-full object-cover"
                   />
                 </button>
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">No screenshots yet.</p>
+            <p
+              className="text-sm text-muted-foreground"
+              lang={languageFor("No screenshots yet.")}
+              dir={directionFor("No screenshots yet.")}
+            >
+              {t("No screenshots yet.")}
+            </p>
           )}
         </section>
       </div>
@@ -433,12 +510,20 @@ export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJour
         onOpenChange={(open) => !open && setLightboxScreenshot(null)}
       >
         <DialogContent className="max-w-3xl p-2">
-          <DialogTitle className="sr-only">Screenshot</DialogTitle>
+          <DialogTitle
+            className="sr-only"
+            lang={languageFor("Screenshot")}
+            dir={directionFor("Screenshot")}
+          >
+            {t("Screenshot")}
+          </DialogTitle>
           {lightboxScreenshot && (
             <div className="space-y-2">
               <img
                 src={withBasePath(lightboxScreenshot.url)}
-                alt={lightboxScreenshot.caption ?? "Game screenshot"}
+                alt={lightboxScreenshot.caption ?? t("Game screenshot")}
+                lang={lightboxScreenshot.caption ? "und" : languageFor("Game screenshot")}
+                dir={lightboxScreenshot.caption ? "auto" : directionFor("Game screenshot")}
                 className="w-full rounded-md"
               />
               <div className="flex justify-end px-1 pb-1">
@@ -450,7 +535,9 @@ export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJour
                   disabled={deleteScreenshotMutation.isPending}
                 >
                   <X className="w-3.5 h-3.5" />
-                  Delete
+                  <span lang={languageFor("Delete")} dir={directionFor("Delete")}>
+                    {t("Delete")}
+                  </span>
                 </Button>
               </div>
             </div>

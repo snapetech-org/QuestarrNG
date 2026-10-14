@@ -30,6 +30,7 @@ import {
 import { withBasePath } from "@/lib/app-path";
 import { useInterfaceLanguage } from "@/lib/interface-locale";
 import { formatRegionalNumber, useRegionalPreference } from "@/lib/regional-format";
+import { InterfaceText } from "@/components/InterfaceText";
 
 interface AppSidebarProps {
   activeItem?: string;
@@ -102,11 +103,25 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 flex items-center justify-center">
-            <img src={withBasePath("/Questarr.svg")} alt="QuestarrNG Logo" className="w-8 h-8" />
+            <img
+              src={withBasePath("/Questarr.svg")}
+              alt={t("QuestarrNG logo")}
+              lang={languageFor("QuestarrNG logo")}
+              dir={directionFor("QuestarrNG logo")}
+              className="w-8 h-8"
+            />
           </div>
           <div>
-            <span className="truncate font-semibold">QuestarrNG</span>
-            <p className="text-xs text-muted-foreground">Game Management</p>
+            <span className="truncate font-semibold">
+              <InterfaceText source={"QuestarrNG"} />
+            </span>
+            <p
+              className="text-xs text-muted-foreground"
+              lang={languageFor("Game Management")}
+              dir={directionFor("Game Management")}
+            >
+              {t("Game Management")}
+            </p>
           </div>
         </div>
       </SidebarHeader>
@@ -293,14 +308,22 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
               size="lg"
               onClick={() => logout()}
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer w-full"
-              tooltip="Log out"
+              tooltip={t("Log out")}
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                 <User className="size-4" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user?.username || "User"}</span>
-                <span className="truncate text-xs">Logged in</span>
+                <span className="truncate font-semibold" lang="und" dir="auto">
+                  {user?.username || t("User")}
+                </span>
+                <span
+                  className="truncate text-xs"
+                  lang={languageFor("Logged in")}
+                  dir={directionFor("Logged in")}
+                >
+                  {t("Logged in")}
+                </span>
               </div>
               <LogOut className="ml-auto size-4" />
             </SidebarMenuButton>

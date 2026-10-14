@@ -541,7 +541,7 @@ describe("GameDownloadDialog", () => {
 
     await waitFor(() => {
       expect(mockToast).toHaveBeenCalledWith(
-        expect.objectContaining({ title: expect.stringContaining("download(s) sent") })
+        expect.objectContaining({ title: "Downloads sent: 1 to TestDownloader" })
       );
     });
 

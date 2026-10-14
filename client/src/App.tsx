@@ -158,6 +158,10 @@ function AppShell() {
   const { t, languageFor, directionFor } = useInterfaceLanguage();
   const regionalFormat = useRegionalPreference();
 
+  useEffect(() => {
+    document.title = t("QuestarrNG - Video Game Management");
+  }, [t]);
+
   useKonamiCode(() => navigate(routePaths.play));
 
   // Apply the selected theme on load. useLayoutEffect (rather than useEffect) so the class

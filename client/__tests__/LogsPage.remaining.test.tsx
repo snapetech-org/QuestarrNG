@@ -221,7 +221,7 @@ describe("LogsPage remaining coverage", () => {
     });
     expect(await screen.findByText("error streamed")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: /Inspect log Error message/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Inspect log: Error message/i }));
     expect(await screen.findByText("Log details")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Copy raw log line" }));
@@ -367,7 +367,7 @@ describe("LogsPage remaining coverage", () => {
     expect(screen.getByText("No log lines to display.")).toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText("Search log lines"), { target: { value: "sorted" } });
-    fireEvent.click(screen.getByRole("button", { name: /Inspect log Sorted message/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Inspect log: Sorted message/i }));
     await waitFor(() => {
       expect(
         screen.getAllByText((_, element) => (element?.textContent ?? "").includes("userId")).length

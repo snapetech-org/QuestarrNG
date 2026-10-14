@@ -5,6 +5,7 @@ import { createElement } from "react";
 import {
   INTERFACE_LANGUAGE_OPTIONS,
   applyInitialInterfaceLanguage,
+  formatInterfaceMessage,
   getBrowserInterfaceLanguage,
   getInterfaceCollator,
   getInterfaceTextDirection,
@@ -103,7 +104,7 @@ describe("browser interface language detection", () => {
     }
   });
 
-  it("keeps translated two-release labels interpolatable and preserves Arabic dual form", () => {
+  it("translates the fixed two-release label and preserves Arabic dual form", () => {
     function TranslationProbe() {
       const { language, t } = useInterfaceLanguage();
       return createElement(
@@ -120,10 +121,19 @@ describe("browser interface language detection", () => {
       const text = probe.textContent ?? "";
       if (value === "en") expect(text).toBe("en:two releases");
       else if (value === "ar") expect(text).toBe("ar:إصداران");
-      else expect(text).toContain("{count}");
+      else expect(text.slice(value.length + 1)).not.toBe("two releases");
     }
 
     setInterfaceLanguage("en");
+  });
+
+  it("isolates interpolated values only in right-to-left messages", () => {
+    expect(
+      formatInterfaceMessage("Change status for {title}", { title: "Example game" }, "en")
+    ).toBe("Change status for Example game");
+    expect(
+      formatInterfaceMessage("Change status for {title}", { title: "Example game" }, "ar")
+    ).toContain("\u2068Example game\u2069");
   });
 });
 
@@ -139,13 +149,13 @@ describe("interface text language metadata", () => {
   });
 
   it("marks English fallback strings as English", () => {
-    expect(getInterfaceTextLanguage("Initial Setup", "ar")).toBe("en");
-    expect(getInterfaceTextDirection("Initial Setup", "ar")).toBe("ltr");
+    expect(getInterfaceTextLanguage("Uncatalogued label", "ar")).toBe("en");
+    expect(getInterfaceTextDirection("Uncatalogued label", "ar")).toBe("ltr");
   });
 
-  it("keeps document metadata aligned with English fallback content", () => {
-    expect(document.documentElement.lang).toBe("en");
-    expect(document.documentElement.dir).toBe("ltr");
+  it("sets document metadata to the selected interface language", () => {
+    expect(document.documentElement.lang).toBe("ar");
+    expect(document.documentElement.dir).toBe("rtl");
     expect(getInterfaceTextDirection("Navigation", "ar")).toBe("rtl");
   });
 

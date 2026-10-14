@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { updatePasswordSchema, type UpdatePassword } from "@shared/schema";
+import { InterfaceText } from "@/components/InterfaceText";
 
 export default function PasswordSettings() {
   const { toast } = useToast();
@@ -56,14 +57,20 @@ export default function PasswordSettings() {
       <CardHeader>
         <div className="flex items-center space-x-3">
           <Lock className="h-5 w-5 text-muted-foreground" />
-          <CardTitle className="text-lg">Change Password</CardTitle>
+          <CardTitle className="text-lg">
+            <InterfaceText source={"Change Password"} />
+          </CardTitle>
         </div>
-        <CardDescription>Update your account password</CardDescription>
+        <CardDescription>
+          <InterfaceText source={"Update your account password"} />
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="currentPassword">Current Password</Label>
+            <Label htmlFor="currentPassword">
+              <InterfaceText source={"Current Password"} />
+            </Label>
             <div className="relative">
               <Input
                 id="currentPassword"
@@ -96,7 +103,9 @@ export default function PasswordSettings() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="newPassword">New Password</Label>
+            <Label htmlFor="newPassword">
+              <InterfaceText source={"New Password"} />
+            </Label>
             <div className="relative">
               <Input
                 id="newPassword"
@@ -127,7 +136,9 @@ export default function PasswordSettings() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm New Password</Label>
+            <Label htmlFor="confirmPassword">
+              <InterfaceText source={"Confirm New Password"} />
+            </Label>
             <div className="relative">
               <Input
                 id="confirmPassword"
@@ -164,12 +175,12 @@ export default function PasswordSettings() {
               {updatePasswordMutation.isPending ? (
                 <>
                   <RefreshCw className="h-4 w-4 animate-spin" />
-                  Updating...
+                  <InterfaceText source={"Updating..."} />
                 </>
               ) : (
                 <>
                   <Key className="h-4 w-4" />
-                  Update Password
+                  <InterfaceText source={"Update Password"} />
                 </>
               )}
             </Button>

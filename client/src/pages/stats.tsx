@@ -1,5 +1,5 @@
 import { formatRegionalPercent, useRegionalPreference } from "@/lib/regional-format";
-import { useInterfaceLanguage } from "@/lib/interface-locale";
+import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
 import React, { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -39,7 +39,7 @@ import DiscordWebhookSettings from "@/components/DiscordWebhookSettings";
 export default function StatsPage() {
   const [shareOpen, setShareOpen] = useState(false);
   const regionalPreference = useRegionalPreference();
-  const { language: interfaceLanguage } = useInterfaceLanguage();
+  const { language, t, languageFor, directionFor } = useInterfaceLanguage();
 
   const { data: games = [], isLoading } = useQuery<Game[]>({
     queryKey: ["/api/games", "", true], // Empty search, include hidden
@@ -59,19 +59,19 @@ export default function StatsPage() {
 
   const isMobile = useIsMobile();
   const stats = useMemo(
-    () => calculateLibraryStats(games, regionalPreference, interfaceLanguage),
-    [games, regionalPreference, interfaceLanguage]
+    () => calculateLibraryStats(games, regionalPreference, language),
+    [games, regionalPreference, language]
   );
 
   const pieData = useMemo(() => {
     return [
-      { name: "Wanted", value: stats.statusBreakdown.wanted },
-      { name: "Owned", value: stats.statusBreakdown.owned },
-      { name: "Playing", value: stats.statusBreakdown.playing },
-      { name: "Completed", value: stats.statusBreakdown.completed },
-      { name: "Downloading", value: stats.statusBreakdown.downloading },
+      { key: "Wanted", name: t("Wanted"), value: stats.statusBreakdown.wanted },
+      { key: "Owned", name: t("Owned"), value: stats.statusBreakdown.owned },
+      { key: "Playing", name: t("Playing"), value: stats.statusBreakdown.playing },
+      { key: "Completed", name: t("Completed"), value: stats.statusBreakdown.completed },
+      { key: "Downloading", name: t("Downloading"), value: stats.statusBreakdown.downloading },
     ].filter((item) => item.value > 0);
-  }, [stats.statusBreakdown]);
+  }, [stats.statusBreakdown, t]);
 
   const chartColors = {
     Wanted: "#ef4444",
@@ -93,15 +93,34 @@ export default function StatsPage() {
     <div className="h-full overflow-auto p-4 md:p-6 space-y-6 md:space-y-8">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Statistics</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">
-            Detailed insights into your collection of {stats.totalGames} games.
+          <h1
+            className="text-2xl font-bold tracking-tight"
+            lang={languageFor("Statistics")}
+            dir={directionFor("Statistics")}
+          >
+            {t("Statistics")}
+          </h1>
+          <p
+            className="text-muted-foreground text-sm mt-0.5"
+            lang={languageFor("Detailed insights into your collection of {count} games.")}
+            dir={directionFor("Detailed insights into your collection of {count} games.")}
+          >
+            {formatInterfaceMessage(
+              "Detailed insights into your collection of {count} games.",
+              { count: stats.totalGames },
+              language
+            )}
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <Button variant="outline" size="sm" onClick={() => setShareOpen(true)}>
             <Share2 className="w-4 h-4 mr-2" />
-            {discordConfig?.configured ? "Share to Discord" : "Share"}
+            <span
+              lang={languageFor(discordConfig?.configured ? "Share to Discord" : "Share")}
+              dir={directionFor(discordConfig?.configured ? "Share to Discord" : "Share")}
+            >
+              {t(discordConfig?.configured ? "Share to Discord" : "Share")}
+            </span>
           </Button>
           <DiscordWebhookSettings />
         </div>
@@ -118,24 +137,28 @@ export default function StatsPage() {
       <div className="grid gap-3 grid-cols-2 md:gap-4 lg:grid-cols-3 xl:grid-cols-5">
         <StatsCard
           title="Total Games"
+          data-i18n-title={"Total Games"}
           value={stats.totalGames}
           subtitle="in library"
           icon={Package}
         />
         <StatsCard
           title="Avg. Rating"
+          data-i18n-title={"Avg. Rating"}
           value={stats.avgRating}
           subtitle="average score"
           icon={Star}
         />
         <StatsCard
           title="Avg. User Rating"
+          data-i18n-title={"Avg. User Rating"}
           value={stats.avgUserRating}
           subtitle="personal score"
           icon={UserRound}
         />
         <StatsCard
           title="Completion Rate"
+          data-i18n-title={"Completion Rate"}
           value={formatRegionalPercent(
             stats.completionRate,
             { maximumFractionDigits: 0 },
@@ -146,6 +169,7 @@ export default function StatsPage() {
         />
         <StatsCard
           title="Metadata Health"
+          data-i18n-title={"Metadata Health"}
           value={formatRegionalPercent(
             stats.metadataHealth,
             { maximumFractionDigits: 0 },
@@ -161,7 +185,9 @@ export default function StatsPage() {
           <CardHeader>
             <CardTitle className="text-lg font-medium flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-primary" />
-              Status Breakdown
+              <span lang={languageFor("Status Breakdown")} dir={directionFor("Status Breakdown")}>
+                {t("Status Breakdown")}
+              </span>
             </CardTitle>
           </CardHeader>
           <CardContent className="h-[300px]">
@@ -189,7 +215,7 @@ export default function StatsPage() {
                   {pieData.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
-                      fill={chartColors[entry.name as keyof typeof chartColors]}
+                      fill={chartColors[entry.key as keyof typeof chartColors]}
                     />
                   ))}
                 </Pie>
@@ -211,7 +237,9 @@ export default function StatsPage() {
           <CardHeader>
             <CardTitle className="text-lg font-medium flex items-center gap-2">
               <LayoutGrid className="w-5 h-5 text-primary" />
-              Quick Info
+              <span lang={languageFor("Quick Info")} dir={directionFor("Quick Info")}>
+                {t("Quick Info")}
+              </span>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -220,9 +248,21 @@ export default function StatsPage() {
                 <Tags className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 <div>
                   <p className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
-                    Top Genre
+                    <span lang={languageFor("Top Genre")} dir={directionFor("Top Genre")}>
+                      {t("Top Genre")}
+                    </span>
                   </p>
-                  <p className="font-medium">{stats.topGenre?.name || "N/A"}</p>
+                  <p className="font-medium">
+                    {stats.topGenre?.name ? (
+                      <span lang="und" dir="auto">
+                        {stats.topGenre.name}
+                      </span>
+                    ) : (
+                      <span lang={languageFor("N/A")} dir={directionFor("N/A")}>
+                        {t("N/A")}
+                      </span>
+                    )}
+                  </p>
                 </div>
               </div>
 
@@ -230,9 +270,21 @@ export default function StatsPage() {
                 <Gamepad2 className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 <div>
                   <p className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
-                    Top Platform
+                    <span lang={languageFor("Top Platform")} dir={directionFor("Top Platform")}>
+                      {t("Top Platform")}
+                    </span>
                   </p>
-                  <p className="font-medium">{stats.topPlatform?.name || "N/A"}</p>
+                  <p className="font-medium">
+                    {stats.topPlatform?.name ? (
+                      <span lang="und" dir="auto">
+                        {stats.topPlatform.name}
+                      </span>
+                    ) : (
+                      <span lang={languageFor("N/A")} dir={directionFor("N/A")}>
+                        {t("N/A")}
+                      </span>
+                    )}
+                  </p>
                 </div>
               </div>
 
@@ -240,9 +292,21 @@ export default function StatsPage() {
                 <Building2 className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 <div>
                   <p className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
-                    Top Publisher
+                    <span lang={languageFor("Top Publisher")} dir={directionFor("Top Publisher")}>
+                      {t("Top Publisher")}
+                    </span>
                   </p>
-                  <p className="font-medium">{stats.topPublisher?.name || "N/A"}</p>
+                  <p className="font-medium">
+                    {stats.topPublisher?.name ? (
+                      <span lang="und" dir="auto">
+                        {stats.topPublisher.name}
+                      </span>
+                    ) : (
+                      <span lang={languageFor("N/A")} dir={directionFor("N/A")}>
+                        {t("N/A")}
+                      </span>
+                    )}
+                  </p>
                 </div>
               </div>
 
@@ -250,7 +314,12 @@ export default function StatsPage() {
                 <Code2 className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 <div>
                   <p className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
-                    Unique Developers
+                    <span
+                      lang={languageFor("Unique Developers")}
+                      dir={directionFor("Unique Developers")}
+                    >
+                      {t("Unique Developers")}
+                    </span>
                   </p>
                   <p className="font-medium">{stats.uniqueDevelopers}</p>
                 </div>
@@ -260,7 +329,12 @@ export default function StatsPage() {
                 <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 <div>
                   <p className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
-                    Avg. Release Year
+                    <span
+                      lang={languageFor("Avg. Release Year")}
+                      dir={directionFor("Avg. Release Year")}
+                    >
+                      {t("Avg. Release Year")}
+                    </span>
                   </p>
                   <p className="font-medium">{stats.avgReleaseYear}</p>
                 </div>

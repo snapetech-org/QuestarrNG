@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { UserSettings } from "@shared/schema";
 import type { IgdbPlatform } from "@shared/platforms";
 import { PlatformPicker } from "./PlatformPicker";
+import { InterfaceText } from "@/components/InterfaceText";
 
 /**
  * Settings → Platforms.
@@ -97,11 +98,16 @@ export default function PlatformsSettings() {
       <CardHeader>
         <div className="flex items-center space-x-3">
           <Gamepad2 className="h-5 w-5 text-muted-foreground" />
-          <CardTitle className="text-lg">Platforms</CardTitle>
+          <CardTitle className="text-lg">
+            <InterfaceText source={"Platforms"} />
+          </CardTitle>
         </div>
         <CardDescription>
-          Choose the platforms you use. Only these appear in platform filters across the app, and
-          only these are eligible for import. Leave everything unchecked to show all platforms.
+          <InterfaceText
+            source={
+              "Choose the platforms you use. Only these appear in platform filters across the app, and only these are eligible for import. Leave everything unchecked to show all platforms."
+            }
+          />
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -113,11 +119,13 @@ export default function PlatformsSettings() {
         <div className="flex justify-end">
           <Button onClick={handleSave} disabled={!settings || updateSettingsMutation.isPending}>
             {updateSettingsMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Save Changes
+            <InterfaceText source={"Save Changes"} />
           </Button>
         </div>
         {platformsLoading && (
-          <p className="text-xs text-muted-foreground">Loading platform list...</p>
+          <p className="text-xs text-muted-foreground">
+            <InterfaceText source={"Loading platform list..."} />
+          </p>
         )}
       </CardContent>
     </Card>

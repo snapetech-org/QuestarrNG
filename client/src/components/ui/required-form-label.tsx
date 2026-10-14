@@ -2,6 +2,7 @@ import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
 import { FormLabel } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
+import { InterfaceText } from "@/components/InterfaceText";
 
 type RequiredFormLabelProps = ComponentPropsWithoutRef<typeof FormLabel> & {
   children: ReactNode;
@@ -24,10 +25,14 @@ export function RequiredFormLabel({
           <span aria-hidden="true" className="text-destructive">
             *
           </span>
-          <span className="sr-only">required</span>
+          <span className="sr-only">
+            <InterfaceText source={"required"} />
+          </span>
         </>
       ) : optional ? (
-        <span className="text-muted-foreground text-xs font-normal">(optional)</span>
+        <span className="text-muted-foreground text-xs font-normal">
+          <InterfaceText source={"(optional)"} />
+        </span>
       ) : null}
     </FormLabel>
   );

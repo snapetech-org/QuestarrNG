@@ -3,6 +3,7 @@ import { Copy, Check, HelpCircle, Loader2, CheckCircle2, XCircle } from "lucide-
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { apiRequest, ApiError } from "@/lib/queryClient";
+import { InterfaceText } from "@/components/InterfaceText";
 
 const IGDB_REDIRECT_URI = "http://localhost";
 
@@ -35,27 +36,32 @@ export function IgdbHelpPopover() {
       <PopoverTrigger asChild>
         <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full">
           <HelpCircle className="h-4 w-4 text-muted-foreground" />
-          <span className="sr-only">How to get credentials</span>
+          <span className="sr-only">
+            <InterfaceText source={"How to get credentials"} />
+          </span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80">
         <div className="space-y-2 text-sm">
-          <h4 className="font-bold">How to get IGDB credentials:</h4>
+          <h4 className="font-bold">
+            <InterfaceText source={"How to get IGDB credentials:"} />
+          </h4>
           <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
             <li>
-              Go to the{" "}
               <a
                 href="https://dev.twitch.tv/console"
                 target="_blank"
                 rel="noreferrer"
                 className="text-primary underline"
               >
-                Twitch Developer Portal
+                <InterfaceText source={"Open the Twitch Developer Portal"} />
               </a>
             </li>
-            <li>Register a new application (name it &apos;Questarr&apos;)</li>
             <li>
-              Set Redirect URI to:
+              <InterfaceText source={"Register a new application (name it 'Questarr')"} />
+            </li>
+            <li>
+              <InterfaceText source={"Set Redirect URI to:"} />
               <div className="mt-1 flex items-center gap-1.5 rounded border bg-muted/50 p-1 pl-2">
                 <code className="flex-1 text-foreground">{IGDB_REDIRECT_URI}</code>
                 <Button
@@ -65,33 +71,38 @@ export function IgdbHelpPopover() {
                   className="h-6 gap-1 px-2 text-xs"
                   onClick={handleCopy}
                   aria-label="Copy redirect URI"
+                  data-i18n-aria-label={"Copy redirect URI"}
                 >
                   {copied ? (
                     <>
                       <Check className="h-3 w-3 text-emerald-500" />
-                      Copied
+                      <InterfaceText source={"Copied"} />
                     </>
                   ) : (
                     <>
                       <Copy className="h-3 w-3" />
-                      Copy
+                      <InterfaceText source={"Copy"} />
                     </>
                   )}
                 </Button>
               </div>
             </li>
-            <li>Select &apos;Application Integration&apos; as category</li>
             <li>
-              Copy the <strong>Client ID</strong>
+              <InterfaceText source={"Select 'Application Integration' as category"} />
             </li>
             <li>
-              Click &apos;New Secret&apos; to get your <strong>Client Secret</strong>
+              <InterfaceText source={"Copy the Client ID"} />
+            </li>
+            <li>
+              <InterfaceText source={"Click 'New Secret' to get your Client Secret"} />
             </li>
           </ol>
           <p className="text-xs text-muted-foreground border-t pt-2 mt-2">
-            Questarr can&apos;t ship a working credential out of the box: Twitch requires every
-            application to register its own Client ID/Secret, and a secret baked into
-            Questarr&apos;s open-source code would be public the moment it&apos;s committed.
+            <InterfaceText
+              source={
+                "Questarr can't ship a working credential out of the box: Twitch requires every application to register its own Client ID/Secret, and a secret baked into Questarr's open-source code would be public the moment it's committed."
+              }
+            />
           </p>
         </div>
       </PopoverContent>
@@ -174,16 +185,16 @@ export function IgdbTestConnectionButton({
         {state === "testing" ? (
           <span role="status" className="flex items-center gap-2">
             <Loader2 className="h-4 w-4 motion-safe:animate-spin" />
-            Testing...
+            <InterfaceText source={"Testing..."} />
           </span>
         ) : (
-          "Test connection"
+          <InterfaceText source={"Test connection"} />
         )}
       </Button>
       {state === "success" && (
         <p className="flex items-center gap-1.5 text-xs text-emerald-500">
           <CheckCircle2 className="h-3.5 w-3.5" />
-          Connected successfully.
+          <InterfaceText source={"Connected successfully."} />
         </p>
       )}
       {state === "error" && (

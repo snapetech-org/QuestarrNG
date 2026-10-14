@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { compareVersions, extractVersionFromReleaseName } from "@shared/version-utils";
+import { InterfaceText } from "@/components/InterfaceText";
+import { formatInterfaceMessage } from "@/lib/interface-locale";
 
 interface InstalledVersionFieldProps {
   readonly gameId: string;
@@ -106,7 +108,7 @@ export default function InstalledVersionField({
     <div data-testid="section-installed-version">
       <label htmlFor="installed-version" className="font-semibold mb-2 flex items-center gap-2">
         <Tag className="w-4 h-4" />
-        Installed version
+        <InterfaceText source={"Installed version"} />
       </label>
       <div className="relative w-full max-w-sm">
         <Input
@@ -130,18 +132,33 @@ export default function InstalledVersionField({
             }
           }}
           data-testid="input-installed-version"
+          data-i18n-placeholder={"Unknown (e.g. v1.2.3)"}
         />
         <span
           className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-muted-foreground"
           aria-live="polite"
         >
-          {mutation.isPending && <Loader2 className="w-4 h-4 animate-spin" aria-label="Saving" />}
-          {showSaved && <Check className="w-4 h-4 text-emerald-500" aria-label="Saved" />}
+          {mutation.isPending && (
+            <Loader2
+              className="w-4 h-4 animate-spin"
+              aria-label="Saving"
+              data-i18n-aria-label={"Saving"}
+            />
+          )}
+          {showSaved && (
+            <Check
+              className="w-4 h-4 text-emerald-500"
+              aria-label="Saved"
+              data-i18n-aria-label={"Saved"}
+            />
+          )}
         </span>
       </div>
       {suggestions.length > 0 && (
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          <span className="text-xs text-muted-foreground">From your downloads:</span>
+          <span className="text-xs text-muted-foreground">
+            <InterfaceText source={"From your downloads:"} />
+          </span>
           {suggestions.map((version) => (
             <Button
               key={version}
@@ -149,7 +166,9 @@ export default function InstalledVersionField({
               variant="outline"
               size="sm"
               className="h-8 px-2.5 text-xs"
-              aria-label={`Set installed version to ${version}`}
+              aria-label={formatInterfaceMessage("Set installed version to {version}", {
+                version: String(version ?? ""),
+              })}
               disabled={mutation.isPending}
               // Keep focus in the input: its blur would otherwise save the typed draft and
               // disable these buttons before the click lands.
@@ -166,8 +185,11 @@ export default function InstalledVersionField({
         </div>
       )}
       <p className="mt-1 text-xs text-muted-foreground">
-        Detected from release names when a download finishes. Updates that are not newer than this
-        version are not notified.
+        <InterfaceText
+          source={
+            "Detected from release names when a download finishes. Updates that are not newer than this version are not notified."
+          }
+        />
       </p>
     </div>
   );

@@ -10,6 +10,8 @@ import CompactRssFeedItem from "./CompactRssFeedItem";
 import { cn, safeUrl } from "@/lib/utils";
 import { useLocalStorageState } from "@/hooks/use-local-storage-state";
 import { RegionalRelativeTime } from "./RegionalRelativeTime";
+import { InterfaceText } from "@/components/InterfaceText";
+import { formatInterfaceMessage } from "@/lib/interface-locale";
 
 export default function RssFeedList() {
   const [viewMode, setViewMode] = useLocalStorageState(
@@ -51,10 +53,14 @@ export default function RssFeedList() {
     return (
       <div className="flex flex-col justify-center items-center h-64 text-muted-foreground space-y-4">
         <AlertTriangle className="h-12 w-12 opacity-50" />
-        <p>No RSS items found. Make sure you have enabled feeds and refreshed.</p>
+        <p>
+          <InterfaceText
+            source={"No RSS items found. Make sure you have enabled feeds and refreshed."}
+          />
+        </p>
         <Button onClick={() => refreshFeeds()} disabled={isRefreshing} variant="outline">
           <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
-          Refresh Feeds
+          <InterfaceText source={"Refresh Feeds"} />
         </Button>
       </div>
     );
@@ -72,12 +78,15 @@ export default function RssFeedList() {
                 className="h-8 w-8 p-0"
                 onClick={() => setViewMode("grid")}
                 aria-label="Grid View"
+                data-i18n-aria-label={"Grid View"}
               >
                 <LayoutGrid className="h-4 w-4" aria-hidden="true" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Grid View</p>
+              <p>
+                <InterfaceText source={"Grid View"} />
+              </p>
             </TooltipContent>
           </Tooltip>
           <Tooltip>
@@ -88,19 +97,22 @@ export default function RssFeedList() {
                 className="h-8 w-8 p-0"
                 onClick={() => setViewMode("list")}
                 aria-label="List View"
+                data-i18n-aria-label={"List View"}
               >
                 <List className="h-4 w-4" aria-hidden="true" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>List View</p>
+              <p>
+                <InterfaceText source={"List View"} />
+              </p>
             </TooltipContent>
           </Tooltip>
         </div>
 
         <Button onClick={() => refreshFeeds()} disabled={isRefreshing} size="sm" variant="outline">
           <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
-          Refresh Feeds
+          <InterfaceText source={"Refresh Feeds"} />
         </Button>
       </div>
 
@@ -127,7 +139,7 @@ export default function RssFeedList() {
                   />
                   {item.igdbGameName && (
                     <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white p-2 text-xs truncate">
-                      Matched: {item.igdbGameName}
+                      <InterfaceText source={"Matched:"} /> {item.igdbGameName}
                     </div>
                   )}
                 </div>
@@ -153,10 +165,14 @@ export default function RssFeedList() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-primary hover:underline flex items-center gap-1 mt-2"
-                  aria-label={`View original article for ${item.title}`}
+                  aria-label={formatInterfaceMessage("View original article for {title}", {
+                    title: String(item.title ?? ""),
+                  })}
+                  data-i18n-aria-label={"View original article for {title}"}
+                  data-i18n-aria-label-values={JSON.stringify({ title: String(item.title ?? "") })}
                 >
                   <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                  View Original
+                  <InterfaceText source={"View Original"} />
                 </a>
               </CardContent>
             </Card>

@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { DownloadRules } from "@shared/schema";
 import type { DownloadCategory } from "@shared/download-categorizer";
+import { InterfaceText } from "@/components/InterfaceText";
 
 interface AutoDownloadRulesSettingsProps {
   rules: DownloadRules | null;
@@ -156,11 +157,16 @@ export default function AutoDownloadRulesSettings({
       <CardHeader>
         <div className="flex items-center space-x-3">
           <Filter className="h-5 w-5 text-muted-foreground" />
-          <CardTitle className="text-lg">Download Rules</CardTitle>
+          <CardTitle className="text-lg">
+            <InterfaceText source={"Download Rules"} />
+          </CardTitle>
         </div>
         <CardDescription>
-          These filters will be used as defaults when you open the manual download dialog, and
-          applied to auto-searches.
+          <InterfaceText
+            source={
+              "These filters will be used as defaults when you open the manual download dialog, and applied to auto-searches."
+            }
+          />
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -168,7 +174,7 @@ export default function AutoDownloadRulesSettings({
           {/* Min Seeders */}
           <div className="space-y-2">
             <Label htmlFor="minSeeders" className="text-sm font-medium">
-              Minimum Seeders
+              <InterfaceText source={"Minimum Seeders"} />
             </Label>
             <Input
               id="minSeeders"
@@ -181,14 +187,16 @@ export default function AutoDownloadRulesSettings({
               placeholder="0"
             />
             <p className="text-xs text-muted-foreground">
-              Only show torrents with at least this many seeders (0 = no minimum)
+              <InterfaceText
+                source={"Only show torrents with at least this many seeders (0 = no minimum)"}
+              />
             </p>
           </div>
 
           {/* Sort By */}
           <div className="space-y-2">
             <Label htmlFor="sortBy" className="text-sm font-medium">
-              Default Sort Order
+              <InterfaceText source={"Default Sort Order"} />
             </Label>
             <Select
               value={sortBy}
@@ -200,20 +208,30 @@ export default function AutoDownloadRulesSettings({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="seeders">Seeders (High to Low)</SelectItem>
-                <SelectItem value="date">Date (Newest First)</SelectItem>
-                <SelectItem value="size">Size (Largest First)</SelectItem>
-                <SelectItem value="priority">Indexer Priority</SelectItem>
+                <SelectItem value="seeders">
+                  <InterfaceText source={"Seeders (High to Low)"} />
+                </SelectItem>
+                <SelectItem value="date">
+                  <InterfaceText source={"Date (Newest First)"} />
+                </SelectItem>
+                <SelectItem value="size">
+                  <InterfaceText source={"Size (Largest First)"} />
+                </SelectItem>
+                <SelectItem value="priority">
+                  <InterfaceText source={"Indexer Priority"} />
+                </SelectItem>
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              How to sort results within each category
+              <InterfaceText source={"How to sort results within each category"} />
             </p>
           </div>
 
           {/* Categories */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Content Types to Show</Label>
+            <Label className="text-sm font-medium">
+              <InterfaceText source={"Content Types to Show"} />
+            </Label>
             <div className="space-y-2">
               {CATEGORY_DEFINITIONS.map((cat) => (
                 <div key={cat.value} className="flex items-start gap-3">
@@ -227,14 +245,21 @@ export default function AutoDownloadRulesSettings({
                     htmlFor={`cat-${cat.value}`}
                     className="flex-1 cursor-pointer text-sm leading-tight"
                   >
-                    <div className="font-medium">{cat.label}</div>
-                    <div className="text-xs text-muted-foreground">{cat.description}</div>
+                    <div className="font-medium">
+                      <InterfaceText source={cat.label} />
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      <InterfaceText source={cat.description} />
+                    </div>
                   </label>
                 </div>
               ))}
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              {visibleCategories.size} of {CATEGORY_DEFINITIONS.length} categories enabled
+              <InterfaceText
+                source={"{visible} of {total} categories enabled"}
+                values={{ visible: visibleCategories.size, total: CATEGORY_DEFINITIONS.length }}
+              />
             </p>
           </div>
         </div>
@@ -249,7 +274,7 @@ export default function AutoDownloadRulesSettings({
             className="gap-2"
           >
             <RotateCcw className="h-4 w-4" />
-            Reset to Defaults
+            <InterfaceText source={"Reset to Defaults"} />
           </Button>
           <Button
             onClick={() => {
@@ -266,12 +291,12 @@ export default function AutoDownloadRulesSettings({
             {saveRulesMutation.isPending ? (
               <>
                 <RefreshCw className="h-4 w-4 animate-spin" />
-                Saving...
+                <InterfaceText source={"Saving..."} />
               </>
             ) : (
               <>
                 <Download className="h-4 w-4" />
-                Save Rules
+                <InterfaceText source={"Save Rules"} />
               </>
             )}
           </Button>

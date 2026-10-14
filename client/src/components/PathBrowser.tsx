@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Folder, File, ArrowUp, Loader2, HardDrive, ShieldAlert } from "lucide-react";
+import { InterfaceText } from "@/components/InterfaceText";
 
 interface FileSystemEntry {
   name: string;
@@ -136,7 +137,7 @@ export function PathBrowser({
             placeholder="/path/to/directory"
           />
           <Button type="submit" variant="secondary" size="sm">
-            Go
+            <InterfaceText source={"Go"} />
           </Button>
         </form>
 
@@ -149,9 +150,11 @@ export function PathBrowser({
             ) : error ? (
               <div className="text-destructive p-8 text-center flex flex-col items-center gap-2">
                 <ShieldAlert className="h-8 w-8" />
-                <p>Failed to access directory.</p>
+                <p>
+                  <InterfaceText source={"Failed to access directory."} />
+                </p>
                 <Button variant="outline" size="sm" onClick={() => setCurrentPath("/")}>
-                  Go to Root
+                  <InterfaceText source={"Go to Root"} />
                 </Button>
               </div>
             ) : (
@@ -191,7 +194,7 @@ export function PathBrowser({
                 ))}
                 {filteredFiles?.length === 0 && (
                   <div className="text-muted-foreground text-sm p-8 text-center italic">
-                    No files found
+                    <InterfaceText source={"No files found"} />
                   </div>
                 )}
               </div>
@@ -206,10 +209,10 @@ export function PathBrowser({
             </div>
             <div className="gap-2 flex">
               <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
+                <InterfaceText source={"Cancel"} />
               </Button>
               <Button type="button" onClick={handleConfirm} disabled={!selectedPath}>
-                Select
+                <InterfaceText source={"Select"} />
               </Button>
             </div>
           </div>

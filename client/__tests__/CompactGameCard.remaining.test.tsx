@@ -191,6 +191,8 @@ vi.mock("../src/components/SearchResultsBadge", () => ({
 vi.mock("../src/components/StatusBadge", () => ({
   __esModule: true,
   default: ({ status }: { status: string }) => <span>{status}</span>,
+  getStatusSourceLabel: (status: string) => status,
+  getStatusVisual: () => ({ Icon: null, iconColorClass: "" }),
 }));
 
 vi.mock("../src/components/LazyModalFallback", () => ({

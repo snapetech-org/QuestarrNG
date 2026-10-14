@@ -18,6 +18,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, Search, Gamepad2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
 
 interface LinkGameModalProps {
   open: boolean;
@@ -34,6 +35,18 @@ export default function LinkGameModal({
 }: Readonly<LinkGameModalProps>) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { language, t, languageFor, directionFor } = useInterfaceLanguage();
+  const localizedText = (source: string, values: Record<string, string | number> = {}) => {
+    const text = formatInterfaceMessage(source, values, language);
+    // The document already identifies English. Keep English toast payloads as
+    // strings so consumers and tests don't receive redundant direction wrappers.
+    if (language === "en") return text;
+    return (
+      <span lang={languageFor(source)} dir={directionFor(source)}>
+        {text}
+      </span>
+    );
+  };
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
@@ -56,14 +69,24 @@ export default function LinkGameModal({
     },
     onSuccess: () => {
       toast({
-        title: "Game Linked",
-        description: "Continue by reviewing the import's source and destination paths.",
+        title: localizedText("Game Linked"),
+        description: localizedText(
+          "Continue by reviewing the import's source and destination paths."
+        ),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/imports/pending"] });
       onOpenChange(false);
     },
     onError: (error: Error) => {
-      toast({ title: "Failed to Link Game", description: error.message, variant: "destructive" });
+      toast({
+        title: localizedText("Failed to Link Game"),
+        description: (
+          <span lang="und" dir="auto">
+            {error.message}
+          </span>
+        ),
+        variant: "destructive",
+      });
     },
   });
 
@@ -72,13 +95,15 @@ export default function LinkGameModal({
     resultsContent = (
       <div className="flex items-center justify-center h-full text-sm text-muted-foreground">
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        Searching…
+        {localizedText("Searching…")}
       </div>
     );
   } else if (games.length === 0) {
     resultsContent = (
       <div className="flex items-center justify-center h-full text-sm text-muted-foreground px-4 text-center">
-        No games found. Try a different search, or add the game to your library first.
+        {localizedText(
+          "No games found. Try a different search, or add the game to your library first."
+        )}
       </div>
     );
   } else {
@@ -105,7 +130,9 @@ export default function LinkGameModal({
                 <Gamepad2 className="h-4 w-4 text-muted-foreground" />
               </div>
             )}
-            <span className="text-sm font-medium truncate">{game.title}</span>
+            <span className="text-sm font-medium truncate" lang="und" dir="auto">
+              {game.title}
+            </span>
           </button>
         ))}
       </div>
@@ -125,16 +152,34 @@ export default function LinkGameModal({
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Link to a Game</DialogTitle>
-          <DialogDescription>
-            The game originally linked to <strong>{downloadTitle}</strong> could no longer be found.
-            Select the correct game to continue importing this download.
+          <DialogTitle lang={languageFor("Link to a Game")} dir={directionFor("Link to a Game")}>
+            {t("Link to a Game")}
+          </DialogTitle>
+          <DialogDescription
+            lang={languageFor(
+              "The game originally linked to {title} could no longer be found. Select the correct game to continue importing this download."
+            )}
+            dir={directionFor(
+              "The game originally linked to {title} could no longer be found. Select the correct game to continue importing this download."
+            )}
+          >
+            {formatInterfaceMessage(
+              "The game originally linked to {title} could no longer be found. Select the correct game to continue importing this download.",
+              { title: downloadTitle },
+              language
+            )}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-3 py-2">
           <div className="space-y-2">
-            <Label htmlFor="link-game-search">Search your library</Label>
+            <Label
+              htmlFor="link-game-search"
+              lang={languageFor("Search your library")}
+              dir={directionFor("Search your library")}
+            >
+              {t("Search your library")}
+            </Label>
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -147,7 +192,9 @@ export default function LinkGameModal({
                   // submit silently.
                   setSelectedGameId(null);
                 }}
-                placeholder="Search by title…"
+                placeholder={t("Search by title…")}
+                lang={languageFor("Search by title…")}
+                dir={directionFor("Search by title…")}
                 className="pl-8"
                 autoFocus
               />
@@ -159,14 +206,18 @@ export default function LinkGameModal({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            <span lang={languageFor("Cancel")} dir={directionFor("Cancel")}>
+              {t("Cancel")}
+            </span>
           </Button>
           <Button
             disabled={!selectedGameId || linkMutation.isPending}
             onClick={() => selectedGameId && linkMutation.mutate(selectedGameId)}
           >
             {linkMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Link Game
+            <span lang={languageFor("Link Game")} dir={directionFor("Link Game")}>
+              {t("Link Game")}
+            </span>
           </Button>
         </DialogFooter>
       </DialogContent>

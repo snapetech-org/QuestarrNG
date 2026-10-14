@@ -14,6 +14,8 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { buildGitHubIssueUrl } from "@/lib/send-logs";
 import { copyToClipboard } from "@/lib/utils";
+import { InterfaceText } from "@/components/InterfaceText";
+import { formatInterfaceMessage } from "@/lib/interface-locale";
 
 interface SendErrorReportDialogProps {
   open: boolean;
@@ -107,7 +109,12 @@ export default function SendErrorReportDialog({
     if (!result) return;
     void copyToClipboard(result.code).then((succeeded) => {
       if (succeeded) {
-        toast({ title: "Copied", description: `Code ${result.code} copied to clipboard` });
+        toast({
+          title: "Copied",
+          description: formatInterfaceMessage("Code {code} copied to clipboard", {
+            code: String(result.code ?? ""),
+          }),
+        });
       } else {
         toast({
           title: "Copy failed",
@@ -134,16 +141,19 @@ export default function SendErrorReportDialog({
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-yellow-500" />
-                Report no longer available
+                <InterfaceText source={"Report no longer available"} />
               </DialogTitle>
               <DialogDescription>
-                This diagnostic report has expired or was already sent. You can still send fresh
-                logs from the Logs page at any time.
+                <InterfaceText
+                  source={
+                    "This diagnostic report has expired or was already sent. You can still send fresh logs from the Logs page at any time."
+                  }
+                />
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
               <Button variant="outline" onClick={() => handleOpenChange(false)}>
-                Close
+                <InterfaceText source={"Close"} />
               </Button>
             </DialogFooter>
           </>
@@ -153,19 +163,23 @@ export default function SendErrorReportDialog({
         {step === "consent" && metaLoadFailed && (
           <>
             <DialogHeader>
-              <DialogTitle className="text-destructive">Couldn't load report</DialogTitle>
+              <DialogTitle className="text-destructive">
+                <InterfaceText source={"Couldn't load report"} />
+              </DialogTitle>
               <DialogDescription>
-                {metaError instanceof ApiError
-                  ? metaError.message
-                  : "Something went wrong loading this report."}
+                {metaError instanceof ApiError ? (
+                  metaError.message
+                ) : (
+                  <InterfaceText source={"Something went wrong loading this report."} />
+                )}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
               <Button variant="outline" onClick={() => refetchMeta()}>
-                Try again
+                <InterfaceText source={"Try again"} />
               </Button>
               <Button variant="outline" onClick={() => handleOpenChange(false)}>
-                Close
+                <InterfaceText source={"Close"} />
               </Button>
             </DialogFooter>
           </>
@@ -175,8 +189,12 @@ export default function SendErrorReportDialog({
         {step === "consent" && !metaExpired && !metaLoadFailed && isLoading && (
           <>
             <DialogHeader>
-              <DialogTitle>Loading report…</DialogTitle>
-              <DialogDescription className="sr-only">Fetching report details</DialogDescription>
+              <DialogTitle>
+                <InterfaceText source={"Loading report…"} />
+              </DialogTitle>
+              <DialogDescription className="sr-only">
+                <InterfaceText source={"Fetching report details"} />
+              </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col items-center gap-4 py-8">
               <Loader2 className="h-10 w-10 animate-spin text-primary" />
@@ -190,37 +208,53 @@ export default function SendErrorReportDialog({
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Send className="h-5 w-5" />
-                An error occurred
+                <InterfaceText source={"An error occurred"} />
               </DialogTitle>
               <DialogDescription className="sr-only">
-                Review what will be shared before confirming
+                <InterfaceText source={"Review what will be shared before confirming"} />
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4 py-1 text-sm">
               <p className="text-muted-foreground">
-                Questarr detected an unexpected error. Sending a diagnostic report helps the
-                maintainer fix it. Please review what will be shared:
+                <InterfaceText
+                  source={
+                    "Questarr detected an unexpected error. Sending a diagnostic report helps the maintainer fix it. Please review what will be shared:"
+                  }
+                />
               </p>
 
               <ul className="space-y-2 text-zinc-300">
                 <li className="flex gap-2">
                   <span className="mt-0.5 text-blue-400">•</span>
                   <span>
-                    <strong>Log content</strong> — the {meta.lineCount} most recent server log lines
-                    around the error, with emails, IP addresses, and UUIDs replaced by placeholders.
+                    <strong>
+                      <InterfaceText source={"Log content"} />
+                    </strong>{" "}
+                    <InterfaceText source={"— the"} /> {meta.lineCount}{" "}
+                    <InterfaceText
+                      source={
+                        "most recent server log lines around the error, with emails, IP addresses, and UUIDs replaced by placeholders."
+                      }
+                    />
                   </span>
                 </li>
                 <li className="flex gap-2">
                   <span className="mt-0.5 text-blue-400">•</span>
                   <span>
-                    <strong>App version</strong> — {meta.appVersion}
+                    <strong>
+                      <InterfaceText source={"App version"} />
+                    </strong>{" "}
+                    — {meta.appVersion}
                   </span>
                 </li>
                 <li className="flex gap-2">
                   <span className="mt-0.5 text-blue-400">•</span>
                   <span>
-                    <strong>Timestamp</strong> — {meta.timestamp}
+                    <strong>
+                      <InterfaceText source={"Timestamp"} />
+                    </strong>{" "}
+                    — {meta.timestamp}
                   </span>
                 </li>
               </ul>
@@ -228,21 +262,26 @@ export default function SendErrorReportDialog({
               <div className="flex items-start gap-2 rounded-lg border border-yellow-800/40 bg-yellow-950/30 p-3 text-yellow-300">
                 <ShieldAlert className="mt-0.5 h-4 w-4 flex-shrink-0" />
                 <p className="text-xs leading-relaxed">
-                  Reports are stored as an issue in a <strong>private</strong> GitHub repository
-                  visible only to the Questarr maintainer, marked as an automated telemetry report
-                  so it's clearly distinguished from a manually submitted one. You will receive an
-                  issue number as your support code.
+                  <InterfaceText source={"Reports are stored as an issue in a"} />{" "}
+                  <strong>
+                    <InterfaceText source={"private"} />
+                  </strong>{" "}
+                  <InterfaceText
+                    source={
+                      "GitHub repository visible only to the Questarr maintainer, marked as an automated telemetry report so it's clearly distinguished from a manually submitted one. You will receive an issue number as your support code."
+                    }
+                  />
                 </p>
               </div>
             </div>
 
             <DialogFooter>
               <Button variant="outline" onClick={() => handleOpenChange(false)}>
-                Dismiss
+                <InterfaceText source={"Dismiss"} />
               </Button>
               <Button onClick={handleSend}>
                 <Send className="mr-2 h-4 w-4" />
-                Send report
+                <InterfaceText source={"Send report"} />
               </Button>
             </DialogFooter>
           </>
@@ -252,12 +291,18 @@ export default function SendErrorReportDialog({
         {step === "sending" && (
           <>
             <DialogHeader>
-              <DialogTitle>Sending report…</DialogTitle>
-              <DialogDescription className="sr-only">Upload in progress</DialogDescription>
+              <DialogTitle>
+                <InterfaceText source={"Sending report…"} />
+              </DialogTitle>
+              <DialogDescription className="sr-only">
+                <InterfaceText source={"Upload in progress"} />
+              </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col items-center gap-4 py-8">
               <Loader2 className="h-10 w-10 animate-spin text-primary" />
-              <p className="text-sm text-muted-foreground">Uploading diagnostic report…</p>
+              <p className="text-sm text-muted-foreground">
+                <InterfaceText source={"Uploading diagnostic report…"} />
+              </p>
             </div>
           </>
         )}
@@ -266,17 +311,27 @@ export default function SendErrorReportDialog({
         {step === "success" && result && (
           <>
             <DialogHeader>
-              <DialogTitle>Report sent</DialogTitle>
-              <DialogDescription className="sr-only">Support code ready</DialogDescription>
+              <DialogTitle>
+                <InterfaceText source={"Report sent"} />
+              </DialogTitle>
+              <DialogDescription className="sr-only">
+                <InterfaceText source={"Support code ready"} />
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4 py-2">
-              <p className="text-sm text-muted-foreground">Give this code to support:</p>
+              <p className="text-sm text-muted-foreground">
+                <InterfaceText source={"Give this code to support:"} />
+              </p>
 
               <div className="flex items-center gap-3 rounded-xl border border-border bg-zinc-900 px-4 py-3">
                 <span
                   className="flex-1 text-center font-mono text-3xl font-bold tracking-[0.3em] text-primary"
-                  aria-label={`Support code: ${result.code}`}
+                  aria-label={formatInterfaceMessage("Support code: {code}", {
+                    code: String(result.code ?? ""),
+                  })}
+                  data-i18n-aria-label={"Support code: {code}"}
+                  data-i18n-aria-label-values={JSON.stringify({ code: String(result.code ?? "") })}
                 >
                   {result.code}
                 </span>
@@ -285,6 +340,7 @@ export default function SendErrorReportDialog({
                   size="sm"
                   onClick={handleCopyCode}
                   aria-label="Copy support code"
+                  data-i18n-aria-label={"Copy support code"}
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -297,13 +353,13 @@ export default function SendErrorReportDialog({
                 onClick={() => handleOpenChange(false)}
                 className="sm:mr-auto"
               >
-                Close
+                <InterfaceText source={"Close"} />
               </Button>
               {issueUrl && (
                 <Button asChild>
                   <a href={issueUrl} target="_blank" rel="noopener noreferrer">
                     <ExternalLink className="mr-2 h-4 w-4" />
-                    Create GitHub issue
+                    <InterfaceText source={"Create GitHub issue"} />
                   </a>
                 </Button>
               )}
@@ -315,18 +371,22 @@ export default function SendErrorReportDialog({
         {step === "error" && (
           <>
             <DialogHeader>
-              <DialogTitle className="text-destructive">Send failed</DialogTitle>
-              <DialogDescription className="sr-only">Error details</DialogDescription>
+              <DialogTitle className="text-destructive">
+                <InterfaceText source={"Send failed"} />
+              </DialogTitle>
+              <DialogDescription className="sr-only">
+                <InterfaceText source={"Error details"} />
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-3 py-2">
               <p className="text-sm text-muted-foreground">{errorMessage}</p>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={reset}>
-                Try again
+                <InterfaceText source={"Try again"} />
               </Button>
               <Button variant="outline" onClick={() => handleOpenChange(false)}>
-                Close
+                <InterfaceText source={"Close"} />
               </Button>
             </DialogFooter>
           </>

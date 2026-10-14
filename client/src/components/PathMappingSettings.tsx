@@ -32,7 +32,12 @@ import { Plus, Trash2, FolderOpen, Loader2, Info, Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { Downloader, PathMapping } from "@shared/schema";
 import { FileBrowser } from "./FileBrowser";
-import { getInterfaceCollator, useInterfaceLanguage } from "@/lib/interface-locale";
+import {
+  getInterfaceCollator,
+  useInterfaceLanguage,
+  formatInterfaceMessage,
+} from "@/lib/interface-locale";
+import { InterfaceText } from "@/components/InterfaceText";
 
 const ANY_DOWNLOADER_VALUE = "__any__";
 const UNAVAILABLE_DOWNLOADER_VALUE = "__unavailable__";
@@ -204,28 +209,38 @@ export function PathMappingSettings() {
       <CardHeader>
         <div className="flex justify-between items-center">
           <div>
-            <CardTitle>Path Mappings</CardTitle>
+            <CardTitle>
+              <InterfaceText source={"Path Mappings"} />
+            </CardTitle>
             <CardDescription>
-              Translate download client paths to paths accessible by Questarr. Required when
-              Questarr and your download client run on separate machines or containers with
-              different volume mounts.
+              <InterfaceText
+                source={
+                  "Translate download client paths to paths accessible by Questarr. Required when Questarr and your download client run on separate machines or containers with different volume mounts."
+                }
+              />
             </CardDescription>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={closeDialog}>
             <DialogTrigger asChild>
               <Button size="sm" className="gap-2" onClick={openCreateDialog}>
-                <Plus className="h-4 w-4" /> Add Mapping
+                <Plus className="h-4 w-4" /> <InterfaceText source={"Add Mapping"} />
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
-                  {editingMappingId ? "Edit Path Mapping" : "Add Path Mapping"}
+                  {editingMappingId ? (
+                    <InterfaceText source={"Edit Path Mapping"} />
+                  ) : (
+                    <InterfaceText source={"Add Path Mapping"} />
+                  )}
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label>Downloader (Optional)</Label>
+                  <Label>
+                    <InterfaceText source={"Downloader (Optional)"} />
+                  </Label>
                   <Select
                     value={selectedDownloaderValue}
                     onValueChange={(value) =>
@@ -239,13 +254,18 @@ export function PathMappingSettings() {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Any downloader" />
+                      <SelectValue
+                        placeholder="Any downloader"
+                        data-i18n-placeholder={"Any downloader"}
+                      />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={ANY_DOWNLOADER_VALUE}>Any downloader</SelectItem>
+                      <SelectItem value={ANY_DOWNLOADER_VALUE}>
+                        <InterfaceText source={"Any downloader"} />
+                      </SelectItem>
                       {selectedDownloaderValue === UNAVAILABLE_DOWNLOADER_VALUE && (
                         <SelectItem value={UNAVAILABLE_DOWNLOADER_VALUE} disabled>
-                          No matching downloader
+                          <InterfaceText source={"No matching downloader"} />
                         </SelectItem>
                       )}
                       {downloaderOptions.map((option) => (
@@ -256,11 +276,15 @@ export function PathMappingSettings() {
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-muted-foreground">
-                    Limit this mapping to a configured downloader, or leave it generic.
+                    <InterfaceText
+                      source={"Limit this mapping to a configured downloader, or leave it generic."}
+                    />
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <Label>Remote Path</Label>
+                  <Label>
+                    <InterfaceText source={"Remote Path"} />
+                  </Label>
                   <Input
                     placeholder="/home/user/downloads"
                     value={formState.remotePath}
@@ -268,7 +292,9 @@ export function PathMappingSettings() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Local Path</Label>
+                  <Label>
+                    <InterfaceText source={"Local Path"} />
+                  </Label>
                   <div className="flex gap-2">
                     <Input
                       placeholder="/mnt/media/downloads"
@@ -280,6 +306,7 @@ export function PathMappingSettings() {
                       size="icon"
                       aria-label="Browse local path"
                       onClick={() => setIsFileBrowserOpen(true)}
+                      data-i18n-aria-label={"Browse local path"}
                     >
                       <FolderOpen className="h-4 w-4" />
                     </Button>
@@ -287,7 +314,11 @@ export function PathMappingSettings() {
                 </div>
                 <Button className="w-full" onClick={handleSubmit} disabled={isSaving}>
                   {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  {editingMappingId ? "Save Changes" : "Create Mapping"}
+                  {editingMappingId ? (
+                    <InterfaceText source={"Save Changes"} />
+                  ) : (
+                    <InterfaceText source={"Create Mapping"} />
+                  )}
                 </Button>
               </div>
             </DialogContent>
@@ -299,24 +330,41 @@ export function PathMappingSettings() {
           <Info className="h-4 w-4" />
           <AlertDescription className="space-y-3 text-sm">
             <p>
-              <strong>When do I need this?</strong> When your download client and Questarr are on
-              different machines or Docker containers with different volume mounts. For example, if
-              qBittorrent reports a completed file as{" "}
-              <code className="rounded bg-muted px-1">/downloads/game.zip</code> but Questarr
-              accesses that share at{" "}
-              <code className="rounded bg-muted px-1">/mnt/nas/downloads/game.zip</code>, add a
-              mapping from <code className="rounded bg-muted px-1">/downloads</code> to{" "}
-              <code className="rounded bg-muted px-1">/mnt/nas/downloads</code>.
+              <strong>
+                <InterfaceText source={"When do I need this?"} />
+              </strong>{" "}
+              <InterfaceText
+                source={
+                  "When your download client and Questarr are on different machines or Docker containers with different volume mounts. For example, if qBittorrent reports a completed file as"
+                }
+              />{" "}
+              <code className="rounded bg-muted px-1">/downloads/game.zip</code>{" "}
+              <InterfaceText source={"but Questarr accesses that share at"} />{" "}
+              <code className="rounded bg-muted px-1">/mnt/nas/downloads/game.zip</code>
+              <InterfaceText
+                source={", add a path mapping from {remote} to {local}."}
+                values={{ remote: "/downloads", local: "/mnt/nas/downloads" }}
+              />
             </p>
             <p>
-              <strong>When can I skip it?</strong> If Questarr and your download client run on the
-              same machine and use identical paths, no mapping is needed - paths pass through
-              unchanged.
+              <strong>
+                <InterfaceText source={"When can I skip it?"} />
+              </strong>{" "}
+              <InterfaceText
+                source={
+                  "If Questarr and your download client run on the same machine and use identical paths, no mapping is needed - paths pass through unchanged."
+                }
+              />
             </p>
             <p>
-              <strong>How it works:</strong> The remote path prefix is replaced with the local path.
-              If multiple mappings match, the most specific (longest) prefix wins. Downloader-scoped
-              mappings only apply to the selected configured downloader.
+              <strong>
+                <InterfaceText source={"How it works:"} />
+              </strong>{" "}
+              <InterfaceText
+                source={
+                  "The remote path prefix is replaced with the local path. If multiple mappings match, the most specific (longest) prefix wins. Downloader-scoped mappings only apply to the selected configured downloader."
+                }
+              />
             </p>
           </AlertDescription>
         </Alert>
@@ -330,9 +378,15 @@ export function PathMappingSettings() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Downloader</TableHead>
-              <TableHead>Remote Path</TableHead>
-              <TableHead>Local Path</TableHead>
+              <TableHead>
+                <InterfaceText source={"Downloader"} />
+              </TableHead>
+              <TableHead>
+                <InterfaceText source={"Remote Path"} />
+              </TableHead>
+              <TableHead>
+                <InterfaceText source={"Local Path"} />
+              </TableHead>
               <TableHead className="w-[90px]"></TableHead>
             </TableRow>
           </TableHeader>
@@ -340,7 +394,7 @@ export function PathMappingSettings() {
             {mappings?.length === 0 && (
               <TableRow>
                 <TableCell colSpan={4} className="text-center text-muted-foreground">
-                  No mappings defined
+                  <InterfaceText source={"No mappings defined"} />
                 </TableCell>
               </TableRow>
             )}
@@ -349,10 +403,14 @@ export function PathMappingSettings() {
                 <TableCell>
                   {mapping.remoteHost ? (
                     (downloaderLabelByHost.get(mapping.remoteHost) ?? (
-                      <span className="text-muted-foreground italic">No matching downloader</span>
+                      <span className="text-muted-foreground italic">
+                        <InterfaceText source={"No matching downloader"} />
+                      </span>
                     ))
                   ) : (
-                    <span className="text-muted-foreground italic">Any downloader</span>
+                    <span className="text-muted-foreground italic">
+                      <InterfaceText source={"Any downloader"} />
+                    </span>
                   )}
                 </TableCell>
                 <TableCell className="font-mono text-xs">{mapping.remotePath}</TableCell>
@@ -362,7 +420,9 @@ export function PathMappingSettings() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      aria-label={`Edit mapping for ${mapping.remotePath}`}
+                      aria-label={formatInterfaceMessage("Edit mapping for {path}", {
+                        path: String(mapping.remotePath ?? ""),
+                      })}
                       onClick={() => openEditDialog(mapping)}
                     >
                       <Pencil className="h-4 w-4" />
@@ -370,7 +430,9 @@ export function PathMappingSettings() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      aria-label={`Delete mapping for ${mapping.remotePath}`}
+                      aria-label={formatInterfaceMessage("Delete mapping for {path}", {
+                        path: String(mapping.remotePath ?? ""),
+                      })}
                       className="text-destructive hover:text-destructive"
                       onClick={() => deleteMutation.mutate(mapping.id)}
                     >

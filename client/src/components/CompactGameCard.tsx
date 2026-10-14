@@ -23,6 +23,8 @@ import LazyModalFallback from "./LazyModalFallback";
 import { getReleaseStatus } from "@/lib/game-utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
+import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
+import { InterfaceText } from "@/components/InterfaceText";
 
 const GameDetailsModal = lazy(() => import("./GameDetailsModal"));
 const GameDownloadDialog = lazy(() => import("./GameDownloadDialog"));
@@ -60,6 +62,7 @@ const CompactGameCard = ({
   useSubgrid = false,
   mobileLayout = false,
 }: CompactGameCardProps) => {
+  const { language, t, languageFor, directionFor } = useInterfaceLanguage();
   const regionalPreference = useRegionalPreference();
   const regionalLocale =
     getRegionalLocale(regionalPreference) ?? Intl.DateTimeFormat().resolvedOptions().locale;
@@ -105,7 +108,16 @@ const CompactGameCard = ({
       await apiRequest("PATCH", `/api/games/${gameId}/user-rating`, { userRating });
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["/api/games"] }),
-    onError: () => toast({ description: "Failed to save your rating", variant: "destructive" }),
+    onError: () =>
+      toast({
+        description:
+          language === "en" ? (
+            "Failed to save your rating"
+          ) : (
+            <InterfaceText source="Failed to save your rating" />
+          ),
+        variant: "destructive",
+      }),
   });
 
   const handleDetailsClick = () => {
@@ -121,7 +133,12 @@ const CompactGameCard = ({
       } catch (error) {
         console.error("Failed to add game to library before downloading:", error);
         toast({
-          description: "Failed to add game to library before downloading",
+          description:
+            language === "en" ? (
+              "Failed to add game to library before downloading"
+            ) : (
+              <InterfaceText source="Failed to add game to library before downloading" />
+            ),
           variant: "destructive",
         });
       }
@@ -134,10 +151,13 @@ const CompactGameCard = ({
     game.releaseDate,
     regionalPreference
   );
-  const ratingDisplay =
-    game.rating === null
-      ? null
-      : formatRegionalNumber(game.rating, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const hasVisibleRating = game.rating != null && Number(game.rating) > 0;
+  const ratingDisplay = hasVisibleRating
+    ? formatRegionalNumber(Number(game.rating), {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      })
+    : null;
   if (mobileLayout) {
     return (
       <>
@@ -153,11 +173,15 @@ const CompactGameCard = ({
               type="button"
               onClick={handleDetailsClick}
               className="h-24 w-[4.5rem] shrink-0 overflow-hidden rounded-lg bg-muted"
-              aria-label={`View details for ${game.title}`}
+              aria-label={formatInterfaceMessage("View details for {title}", { title: game.title })}
+              lang={languageFor("View details for {title}")}
+              dir={directionFor("View details for {title}")}
             >
               <img
                 src={coverSrc(game.coverUrl)}
-                alt={`${game.title} cover`}
+                alt={formatInterfaceMessage("Cover art for {title}", { title: game.title })}
+                lang={languageFor("Cover art for {title}")}
+                dir={directionFor("Cover art for {title}")}
                 className="h-full w-full object-cover"
                 loading="lazy"
                 data-testid={`img-cover-${game.id}`}
@@ -170,11 +194,17 @@ const CompactGameCard = ({
                   type="button"
                   onClick={handleDetailsClick}
                   className="min-w-0 text-left"
-                  aria-label={`View details for ${game.title}`}
+                  aria-label={formatInterfaceMessage("View details for {title}", {
+                    title: game.title,
+                  })}
+                  lang={languageFor("View details for {title}")}
+                  dir={directionFor("View details for {title}")}
                 >
                   <h3
                     className="truncate text-sm font-semibold"
                     data-testid={`text-title-${game.id}`}
+                    lang="und"
+                    dir="auto"
                   >
                     {game.title}
                   </h3>
@@ -193,18 +223,32 @@ const CompactGameCard = ({
                     variant={releaseStatus.variant}
                     className={cn("h-5 px-1.5 text-[10px]", releaseStatus.className)}
                   >
-                    {releaseStatus.label}
+                    <span
+                      lang={languageFor(releaseStatus.label)}
+                      dir={directionFor(releaseStatus.label)}
+                    >
+                      {t(releaseStatus.label)}
+                    </span>
                   </Badge>
                 )}
                 {game.earlyAccess && (
-                  <Badge className="h-5 bg-amber-500 px-1.5 text-[10px] text-white">EA</Badge>
+                  <Badge
+                    className="h-5 bg-amber-500 px-1.5 text-[10px] text-white"
+                    aria-label={t("Early Access")}
+                    lang={languageFor("Early Access")}
+                    dir={directionFor("Early Access")}
+                  >
+                    <InterfaceText source={"EA"} />
+                  </Badge>
                 )}
                 {game.hidden && (
                   <Badge
                     variant="secondary"
                     className="h-5 bg-gray-500 px-1.5 text-[10px] text-white"
                   >
-                    Hidden
+                    <span lang={languageFor("Hidden")} dir={directionFor("Hidden")}>
+                      {t("Hidden")}
+                    </span>
                   </Badge>
                 )}
               </div>
@@ -222,29 +266,72 @@ const CompactGameCard = ({
                     ))}
                     {game.genres.length > 2 && (
                       <span className="rounded-full bg-muted/40 px-2 py-1 text-[11px] text-muted-foreground/60">
-                        +{game.genres.length - 2} more
+                        <span
+                          lang={languageFor("+{count} more")}
+                          dir={directionFor("+{count} more")}
+                        >
+                          {formatInterfaceMessage("+{count} more", {
+                            count: game.genres.length - 2,
+                          })}
+                        </span>
                       </span>
                     )}
                   </>
                 ) : (
-                  <span className="text-xs text-muted-foreground/50">No genres</span>
+                  <span
+                    className="text-xs text-muted-foreground/50"
+                    lang={languageFor("No genres")}
+                    dir={directionFor("No genres")}
+                  >
+                    {t("No genres")}
+                  </span>
                 )}
               </div>
 
               <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                <span className="inline-flex items-center gap-1">
+                <span
+                  className="inline-flex items-center gap-1"
+                  role="img"
+                  aria-label={formatInterfaceMessage("IGDB rating: {rating} out of 10", {
+                    rating: ratingDisplay ?? t("Not rated"),
+                  })}
+                  lang={languageFor("IGDB rating: {rating} out of 10")}
+                  dir={directionFor("IGDB rating: {rating} out of 10")}
+                >
                   <Star className="h-3 w-3 text-amber-400" />
-                  {ratingDisplay ? `${ratingDisplay}/10` : "N/A"}
+                  {ratingDisplay ? `${ratingDisplay}/10` : t("Not rated")}
                 </span>
                 {!isDiscovery && (
-                  <span className="inline-flex items-center gap-1">
+                  <span
+                    className="inline-flex items-center gap-1"
+                    role="img"
+                    aria-label={
+                      game.userRating == null
+                        ? t("Not rated")
+                        : formatInterfaceMessage("My rating: {rating} out of 10", {
+                            rating: game.userRating,
+                          })
+                    }
+                    lang={languageFor(
+                      game.userRating == null ? "Not rated" : "My rating: {rating} out of 10"
+                    )}
+                    dir={directionFor(
+                      game.userRating == null ? "Not rated" : "My rating: {rating} out of 10"
+                    )}
+                  >
                     <Star className="h-3 w-3 fill-primary text-primary" />
-                    {game.userRating === null
+                    {game.userRating == null
                       ? "—"
                       : `${formatRegionalNumber(game.userRating, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}/10`}
                   </span>
                 )}
-                <span className="inline-flex items-center gap-1">
+                <span
+                  className="inline-flex items-center gap-1"
+                  role="img"
+                  aria-label={formatInterfaceMessage("Release Date: {date}", { date: releaseYear })}
+                  lang={languageFor("Release Date: {date}")}
+                  dir={directionFor("Release Date: {date}")}
+                >
                   <Calendar className="h-3 w-3" />
                   {releaseYear}
                 </span>
@@ -260,7 +347,9 @@ const CompactGameCard = ({
                 className="h-10 w-10"
                 onClick={handleDownloadClick}
                 disabled={addGameMutation.isPending}
-                aria-label={`Download ${game.title}`}
+                aria-label={formatInterfaceMessage("Download {title}", { title: game.title })}
+                lang={languageFor("Download {title}")}
+                dir={directionFor("Download {title}")}
               >
                 {addGameMutation.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -281,7 +370,9 @@ const CompactGameCard = ({
               size="icon"
               className="h-10 w-10"
               onClick={handleDetailsClick}
-              aria-label={`View details for ${game.title}`}
+              aria-label={formatInterfaceMessage("View details for {title}", { title: game.title })}
+              lang={languageFor("View details for {title}")}
+              dir={directionFor("View details for {title}")}
             >
               <Info className="h-4 w-4" />
             </Button>
@@ -292,7 +383,12 @@ const CompactGameCard = ({
                 size="icon"
                 className="h-10 w-10"
                 onClick={handleToggleHidden}
-                aria-label={game.hidden ? `Unhide ${game.title}` : `Hide ${game.title}`}
+                aria-label={formatInterfaceMessage(
+                  game.hidden ? "Unhide {title}" : "Hide {title}",
+                  { title: game.title }
+                )}
+                lang={languageFor(game.hidden ? "Unhide {title}" : "Hide {title}")}
+                dir={directionFor(game.hidden ? "Unhide {title}" : "Hide {title}")}
               >
                 {game.hidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
               </Button>
@@ -326,16 +422,7 @@ const CompactGameCard = ({
   return (
     <>
       <div
-        role="button"
-        tabIndex={0}
         onClick={handleDetailsClick}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            handleDetailsClick();
-          }
-        }}
-        aria-label={`Open ${game.title} details`}
         style={
           useSubgrid
             ? { gridColumn: "1 / -1", gridTemplateColumns: "subgrid" }
@@ -364,7 +451,9 @@ const CompactGameCard = ({
           >
             <img
               src={coverSrc(game.coverUrl)}
-              alt={`${game.title} cover`}
+              alt={formatInterfaceMessage("Cover art for {title}", { title: game.title })}
+              lang={languageFor("Cover art for {title}")}
+              dir={directionFor("Cover art for {title}")}
               className="w-full h-full object-cover"
               loading="lazy"
               data-testid={`img-cover-${game.id}`}
@@ -380,6 +469,8 @@ const CompactGameCard = ({
               density === "comfortable" ? "text-sm" : "text-xs"
             )}
             data-testid={`text-title-${game.id}`}
+            lang="und"
+            dir="auto"
           >
             {game.title}
           </h3>
@@ -443,9 +534,21 @@ const CompactGameCard = ({
                   onClick={(e) => e.stopPropagation()}
                   aria-label={
                     game.userRating == null
-                      ? "Rate this game"
-                      : `My rating: ${game.userRating}/10. Click to change.`
+                      ? t("Rate this game")
+                      : formatInterfaceMessage("My rating: {rating}/10. Click to change.", {
+                          rating: game.userRating,
+                        })
                   }
+                  lang={languageFor(
+                    game.userRating == null
+                      ? "Rate this game"
+                      : "My rating: {rating}/10. Click to change."
+                  )}
+                  dir={directionFor(
+                    game.userRating == null
+                      ? "Rate this game"
+                      : "My rating: {rating}/10. Click to change."
+                  )}
                 >
                   <Star className="w-3 h-3 fill-primary text-primary flex-shrink-0" />
                   <span className="text-xs">
@@ -462,7 +565,13 @@ const CompactGameCard = ({
               </PopoverTrigger>
               <PopoverContent className="w-64 p-4 space-y-3" onClick={(e) => e.stopPropagation()}>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">My Rating</span>
+                  <span
+                    className="text-sm font-medium"
+                    lang={languageFor("My rating")}
+                    dir={directionFor("My rating")}
+                  >
+                    {t("My rating")}
+                  </span>
                   <span className="text-sm font-bold">{popoverRating}/10</span>
                 </div>
                 <Slider
@@ -475,7 +584,9 @@ const CompactGameCard = ({
                     val !== undefined &&
                     userRatingMutation.mutate({ gameId: game.id, userRating: val })
                   }
-                  aria-label="My rating"
+                  aria-label={t("My rating")}
+                  lang={languageFor("My rating")}
+                  dir={directionFor("My rating")}
                 />
                 {game.userRating != null && (
                   <Button
@@ -487,7 +598,9 @@ const CompactGameCard = ({
                       userRatingMutation.mutate({ gameId: game.id, userRating: null });
                     }}
                   >
-                    Clear rating
+                    <span lang={languageFor("Clear rating")} dir={directionFor("Clear rating")}>
+                      {t("Clear rating")}
+                    </span>
                   </Button>
                 )}
               </PopoverContent>
@@ -541,23 +654,39 @@ const CompactGameCard = ({
               variant={releaseStatus.variant}
               className={cn("text-[9px] h-4 px-1", releaseStatus.className)}
             >
-              {releaseStatus.label}
+              <span lang={languageFor(releaseStatus.label)} dir={directionFor(releaseStatus.label)}>
+                {t(releaseStatus.label)}
+              </span>
             </Badge>
           )}
           {game.earlyAccess && (
             <Badge className="text-[9px] h-4 px-1 bg-amber-500 border-amber-600 text-white">
-              EA
+              <span
+                lang={languageFor("Early Access")}
+                dir={directionFor("Early Access")}
+                aria-label={t("Early Access")}
+              >
+                <InterfaceText source={"EA"} />
+              </span>
             </Badge>
           )}
           {game.hidden && (
             <Badge variant="secondary" className="text-[9px] h-4 px-1 bg-gray-500 text-white">
-              Hidden
+              <span lang={languageFor("Hidden")} dir={directionFor("Hidden")}>
+                {t("Hidden")}
+              </span>
             </Badge>
           )}
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-end gap-1" aria-label="Game actions">
+        <div
+          className="flex items-center justify-end gap-1"
+          role="group"
+          aria-label={t("Game actions")}
+          lang={languageFor("Game actions")}
+          dir={directionFor("Game actions")}
+        >
           {isDiscovery ? (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -573,7 +702,9 @@ const CompactGameCard = ({
                     void handleDownloadClick();
                   }}
                   disabled={addGameMutation.isPending}
-                  aria-label={`Download ${game.title}`}
+                  aria-label={formatInterfaceMessage("Download {title}", { title: game.title })}
+                  lang={languageFor("Download {title}")}
+                  dir={directionFor("Download {title}")}
                 >
                   {addGameMutation.isPending ? (
                     <Loader2 className="h-3 w-3 animate-spin" />
@@ -582,7 +713,11 @@ const CompactGameCard = ({
                   )}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Download</TooltipContent>
+              <TooltipContent>
+                <span lang={languageFor("Download")} dir={directionFor("Download")}>
+                  {t("Download")}
+                </span>
+              </TooltipContent>
             </Tooltip>
           ) : (
             <StatusPicker
@@ -598,7 +733,11 @@ const CompactGameCard = ({
                   "transition-all text-muted-foreground hover:text-foreground",
                   density === "comfortable" ? "h-7 w-7" : "h-6 w-6"
                 )}
-                aria-label={`Change status for ${game.title}`}
+                aria-label={formatInterfaceMessage("Change status for {title}", {
+                  title: game.title,
+                })}
+                lang={languageFor("Change status for {title}")}
+                dir={directionFor("Change status for {title}")}
                 onClick={(e) => e.stopPropagation()}
               >
                 {(() => {
@@ -631,12 +770,20 @@ const CompactGameCard = ({
                   e.stopPropagation();
                   handleDetailsClick();
                 }}
-                aria-label={`View details for ${game.title}`}
+                aria-label={formatInterfaceMessage("View details for {title}", {
+                  title: game.title,
+                })}
+                lang={languageFor("View details for {title}")}
+                dir={directionFor("View details for {title}")}
               >
                 <Info className="w-3 h-3" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>View Details</TooltipContent>
+            <TooltipContent>
+              <span lang={languageFor("View details")} dir={directionFor("View details")}>
+                {t("View details")}
+              </span>
+            </TooltipContent>
           </Tooltip>
 
           {!isDiscovery && (
@@ -653,12 +800,24 @@ const CompactGameCard = ({
                     e.stopPropagation();
                     handleToggleHidden();
                   }}
-                  aria-label={game.hidden ? `Unhide ${game.title}` : `Hide ${game.title}`}
+                  aria-label={formatInterfaceMessage(
+                    game.hidden ? "Unhide {title}" : "Hide {title}",
+                    { title: game.title }
+                  )}
+                  lang={languageFor(game.hidden ? "Unhide {title}" : "Hide {title}")}
+                  dir={directionFor(game.hidden ? "Unhide {title}" : "Hide {title}")}
                 >
                   {game.hidden ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{game.hidden ? "Unhide" : "Hide"}</TooltipContent>
+              <TooltipContent>
+                <span
+                  lang={languageFor(game.hidden ? "Unhide Game" : "Hide Game")}
+                  dir={directionFor(game.hidden ? "Unhide Game" : "Hide Game")}
+                >
+                  {t(game.hidden ? "Unhide Game" : "Hide Game")}
+                </span>
+              </TooltipContent>
             </Tooltip>
           )}
         </div>

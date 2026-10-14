@@ -25,6 +25,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { FileBrowser } from "./FileBrowser";
+import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
 
 interface ImportReviewModalProps {
   open: boolean;
@@ -46,6 +47,18 @@ export default function ImportReviewModal({
 }: Readonly<ImportReviewModalProps>) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { language, t, languageFor, directionFor } = useInterfaceLanguage();
+  const localizedText = (source: string, values: Record<string, string | number> = {}) => {
+    const text = formatInterfaceMessage(source, values, language);
+    // The document already identifies English. Keep English toast payloads as
+    // strings so consumers and tests don't receive redundant direction wrappers.
+    if (language === "en") return text;
+    return (
+      <span lang={languageFor(source)} dir={directionFor(source)}>
+        {text}
+      </span>
+    );
+  };
 
   const { data: importConfig } = useQuery<ImportConfig>({
     queryKey: ["/api/imports/config"],
@@ -131,12 +144,20 @@ export default function ImportReviewModal({
       await apiRequest("DELETE", `/api/imports/${downloadId}`);
     },
     onSuccess: () => {
-      toast({ description: "Import skipped" });
+      toast({ description: localizedText("Import skipped") });
       queryClient.invalidateQueries({ queryKey: ["/api/imports/pending"] });
       onOpenChange(false);
     },
     onError: (error: Error) => {
-      toast({ title: "Failed to skip import", description: error.message, variant: "destructive" });
+      toast({
+        title: localizedText("Failed to skip import"),
+        description: (
+          <span lang="und" dir="auto">
+            {error.message}
+          </span>
+        ),
+        variant: "destructive",
+      });
     },
   });
 
@@ -153,8 +174,8 @@ export default function ImportReviewModal({
     },
     onSuccess: () => {
       toast({
-        title: "Import Confirmed",
-        description: "The import has been queued for execution.",
+        title: localizedText("Import Confirmed"),
+        description: localizedText("The import has been queued for execution."),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/imports/pending"] });
       queryClient.invalidateQueries({ queryKey: ["/api/downloads"] });
@@ -163,8 +184,12 @@ export default function ImportReviewModal({
     },
     onError: (error: Error & { data?: { passwordRequired?: boolean } }) => {
       toast({
-        title: error.data?.passwordRequired ? "Incorrect Password" : "Import Failed",
-        description: error.message,
+        title: localizedText(error.data?.passwordRequired ? "Incorrect Password" : "Import Failed"),
+        description: (
+          <span lang="und" dir="auto">
+            {error.message}
+          </span>
+        ),
         variant: "destructive",
       });
     },
@@ -173,16 +198,18 @@ export default function ImportReviewModal({
   const handleConfirm = () => {
     if (!destinationPath) {
       toast({
-        title: "Validation Error",
-        description: "Destination path is required.",
+        title: localizedText("Validation Error"),
+        description: localizedText("Destination path is required."),
         variant: "destructive",
       });
       return;
     }
     if (passwordRequired && !password) {
       toast({
-        title: "Validation Error",
-        description: "This archive is password-protected — enter a password to extract it.",
+        title: localizedText("Validation Error"),
+        description: localizedText(
+          "This archive is password-protected — enter a password to extract it."
+        ),
         variant: "destructive",
       });
       return;
@@ -191,8 +218,11 @@ export default function ImportReviewModal({
       strategy === "romm" ? (rommConfig?.libraryRoot ?? "") : (importConfig?.libraryRoot ?? "");
     if (libraryRoot && destinationPath === libraryRoot) {
       toast({
-        title: "Validation Error",
-        description: `Destination must be a subfolder inside ${libraryRoot}, not the root itself.`,
+        title: localizedText("Validation Error"),
+        description: localizedText(
+          "Destination must be a subfolder inside {path}, not the root itself.",
+          { path: libraryRoot }
+        ),
         variant: "destructive",
       });
       return;
@@ -205,25 +235,47 @@ export default function ImportReviewModal({
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{passwordRequired ? "Password Required" : "Review Import"}</DialogTitle>
-            <DialogDescription>
-              {passwordRequired ? (
-                <>
-                  <strong>{downloadTitle}</strong> is a password-protected archive. Enter the
-                  password to extract and import it.
-                </>
-              ) : (
-                <>
-                  Manually configure the import for <strong>{downloadTitle}</strong>.
-                </>
+            <DialogTitle
+              lang={languageFor(passwordRequired ? "Password Required" : "Review Import")}
+              dir={directionFor(passwordRequired ? "Password Required" : "Review Import")}
+            >
+              {t(passwordRequired ? "Password Required" : "Review Import")}
+            </DialogTitle>
+            <DialogDescription
+              lang={languageFor(
+                passwordRequired
+                  ? "{title} is a password-protected archive. Enter the password to extract and import it."
+                  : "Manually configure the import for {title}."
               )}
+              dir={directionFor(
+                passwordRequired
+                  ? "{title} is a password-protected archive. Enter the password to extract and import it."
+                  : "Manually configure the import for {title}."
+              )}
+            >
+              {passwordRequired
+                ? formatInterfaceMessage(
+                    "{title} is a password-protected archive. Enter the password to extract and import it.",
+                    { title: downloadTitle },
+                    language
+                  )
+                : formatInterfaceMessage(
+                    "Manually configure the import for {title}.",
+                    { title: downloadTitle },
+                    language
+                  )}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             {rommConfig?.enabled && (
               <div className="space-y-2">
-                <Label>Import destination</Label>
+                <Label
+                  lang={languageFor("Import destination")}
+                  dir={directionFor("Import destination")}
+                >
+                  {t("Import destination")}
+                </Label>
                 <Select
                   value={strategy}
                   onValueChange={(value) => setStrategy(value as "pc" | "romm")}
@@ -232,18 +284,38 @@ export default function ImportReviewModal({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="pc">PC game library</SelectItem>
-                    <SelectItem value="romm">RomM ROM library</SelectItem>
+                    <SelectItem
+                      value="pc"
+                      lang={languageFor("PC game library")}
+                      dir={directionFor("PC game library")}
+                    >
+                      {t("PC game library")}
+                    </SelectItem>
+                    <SelectItem
+                      value="romm"
+                      lang={languageFor("RomM ROM library")}
+                      dir={directionFor("RomM ROM library")}
+                    >
+                      {t("RomM ROM library")}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             )}
             {/* Source Path */}
             <div className="space-y-2">
-              <Label htmlFor="import-review-source-path">
-                Source Path{" "}
-                <span className="text-xs text-muted-foreground font-normal">
-                  (optional — auto-resolved from download client)
+              <Label
+                htmlFor="import-review-source-path"
+                lang={languageFor("Source Path")}
+                dir={directionFor("Source Path")}
+              >
+                {t("Source Path")}{" "}
+                <span
+                  className="text-xs text-muted-foreground font-normal"
+                  lang={languageFor("(optional — auto-resolved from download client)")}
+                  dir={directionFor("(optional — auto-resolved from download client)")}
+                >
+                  {t("(optional — auto-resolved from download client)")}
                 </span>
               </Label>
               <div className="flex gap-2">
@@ -251,12 +323,16 @@ export default function ImportReviewModal({
                   id="import-review-source-path"
                   value={sourcePath}
                   onChange={(e) => setSourcePath(e.target.value)}
-                  placeholder="Auto-resolved from download client"
+                  placeholder={t("Auto-resolved from download client")}
+                  lang="und"
+                  dir="auto"
                 />
                 <Button
                   variant="outline"
                   size="icon"
-                  aria-label="Browse source directories"
+                  aria-label={t("Browse source directories")}
+                  lang={languageFor("Browse source directories")}
+                  dir={directionFor("Browse source directories")}
                   onClick={() => setIsSourceBrowserOpen(true)}
                 >
                   <FolderOpen className="h-4 w-4" />
@@ -266,18 +342,28 @@ export default function ImportReviewModal({
 
             {/* Destination Path */}
             <div className="space-y-2">
-              <Label htmlFor="import-review-destination-path">Destination Path</Label>
+              <Label
+                htmlFor="import-review-destination-path"
+                lang={languageFor("Destination Path")}
+                dir={directionFor("Destination Path")}
+              >
+                {t("Destination Path")}
+              </Label>
               <div className="flex gap-2">
                 <Input
                   id="import-review-destination-path"
                   value={destinationPath}
                   onChange={(e) => setDestinationPath(e.target.value)}
                   placeholder="/path/to/library"
+                  lang="und"
+                  dir="auto"
                 />
                 <Button
                   variant="outline"
                   size="icon"
-                  aria-label="Browse destination directories"
+                  aria-label={t("Browse destination directories")}
+                  lang={languageFor("Browse destination directories")}
+                  dir={directionFor("Browse destination directories")}
                   onClick={() => setIsDestBrowserOpen(true)}
                 >
                   <FolderOpen className="h-4 w-4" />
@@ -287,7 +373,12 @@ export default function ImportReviewModal({
 
             {planData?.files && planData.files.length > 0 && (
               <div className="space-y-1.5">
-                <Label>Download Contents</Label>
+                <Label
+                  lang={languageFor("Download Contents")}
+                  dir={directionFor("Download Contents")}
+                >
+                  {t("Download Contents")}
+                </Label>
                 <ScrollArea className="h-32 rounded-md border p-2">
                   <div className="space-y-0.5">
                     {planData.files.map((f) => (
@@ -297,29 +388,64 @@ export default function ImportReviewModal({
                         ) : (
                           <File className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                         )}
-                        <span className={f.isArchive ? "text-amber-400" : "text-muted-foreground"}>
+                        <span
+                          className={f.isArchive ? "text-amber-400" : "text-muted-foreground"}
+                          lang="und"
+                          dir="auto"
+                        >
                           {f.name}
                         </span>
                       </div>
                     ))}
                     {planData.totalCount > planData.files.length && (
-                      <p className="text-xs text-muted-foreground pt-0.5">
-                        …and {planData.totalCount - planData.files.length} more file
-                        {planData.totalCount - planData.files.length === 1 ? "" : "s"} not shown
+                      <p
+                        className="text-xs text-muted-foreground pt-0.5"
+                        lang={languageFor(
+                          planData.totalCount - planData.files.length === 1
+                            ? "…and {count} more file not shown"
+                            : "…and {count} more files not shown"
+                        )}
+                        dir={directionFor(
+                          planData.totalCount - planData.files.length === 1
+                            ? "…and {count} more file not shown"
+                            : "…and {count} more files not shown"
+                        )}
+                      >
+                        {planData.totalCount - planData.files.length === 1
+                          ? formatInterfaceMessage(
+                              "…and {count} more file not shown",
+                              { count: 1 },
+                              language
+                            )
+                          : formatInterfaceMessage(
+                              "…and {count} more files not shown",
+                              { count: planData.totalCount - planData.files.length },
+                              language
+                            )}
                       </p>
                     )}
                   </div>
                 </ScrollArea>
                 {planData.hasArchive && (
-                  <p className="text-xs text-amber-400/80">
-                    Archive files detected — consider enabling Unpack Archive below.
+                  <p
+                    className="text-xs text-amber-400/80"
+                    lang={languageFor(
+                      "Archive files detected — consider enabling Unpack Archive below."
+                    )}
+                    dir={directionFor(
+                      "Archive files detected — consider enabling Unpack Archive below."
+                    )}
+                  >
+                    {t("Archive files detected — consider enabling Unpack Archive below.")}
                   </p>
                 )}
               </div>
             )}
 
             <div className="space-y-2">
-              <Label>Transfer Mode</Label>
+              <Label lang={languageFor("Transfer Mode")} dir={directionFor("Transfer Mode")}>
+                {t("Transfer Mode")}
+              </Label>
               <Select
                 value={transferMode}
                 onValueChange={(value) =>
@@ -330,31 +456,71 @@ export default function ImportReviewModal({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="move">Move</SelectItem>
-                  <SelectItem value="copy">Copy</SelectItem>
-                  <SelectItem value="hardlink">Hardlink</SelectItem>
-                  <SelectItem value="symlink">Symlink</SelectItem>
+                  <SelectItem value="move" lang={languageFor("Move")} dir={directionFor("Move")}>
+                    {t("Move")}
+                  </SelectItem>
+                  <SelectItem value="copy" lang={languageFor("Copy")} dir={directionFor("Copy")}>
+                    {t("Copy")}
+                  </SelectItem>
+                  <SelectItem
+                    value="hardlink"
+                    lang={languageFor("Hardlink")}
+                    dir={directionFor("Hardlink")}
+                  >
+                    {t("Hardlink")}
+                  </SelectItem>
+                  <SelectItem
+                    value="symlink"
+                    lang={languageFor("Symlink")}
+                    dir={directionFor("Symlink")}
+                  >
+                    {t("Symlink")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
               {transferMode === "hardlink" && (
-                <p className="text-xs text-muted-foreground">
-                  Uses a hardlink when both folders are on the same volume and falls back to a copy
-                  otherwise. The imported file survives later source removal.
+                <p
+                  className="text-xs text-muted-foreground"
+                  lang={languageFor(
+                    "Uses a hardlink when both folders are on the same volume and falls back to a copy otherwise. The imported file survives later source removal."
+                  )}
+                  dir={directionFor(
+                    "Uses a hardlink when both folders are on the same volume and falls back to a copy otherwise. The imported file survives later source removal."
+                  )}
+                >
+                  {t(
+                    "Uses a hardlink when both folders are on the same volume and falls back to a copy otherwise. The imported file survives later source removal."
+                  )}
                 </p>
               )}
               {transferMode === "symlink" && (
-                <p className="text-xs text-muted-foreground">
-                  Works across different volumes, but the link breaks if the source file is later
-                  removed or moved.
+                <p
+                  className="text-xs text-muted-foreground"
+                  lang={languageFor(
+                    "Works across different volumes, but the link breaks if the source file is later removed or moved."
+                  )}
+                  dir={directionFor(
+                    "Works across different volumes, but the link breaks if the source file is later removed or moved."
+                  )}
+                >
+                  {t(
+                    "Works across different volumes, but the link breaks if the source file is later removed or moved."
+                  )}
                 </p>
               )}
             </div>
 
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label>Unpack Archive</Label>
-                <p className="text-xs text-muted-foreground">
-                  Extract .zip, .rar, .7z before placing files.
+                <Label lang={languageFor("Unpack Archive")} dir={directionFor("Unpack Archive")}>
+                  {t("Unpack Archive")}
+                </Label>
+                <p
+                  className="text-xs text-muted-foreground"
+                  lang={languageFor("Extract .zip, .rar, .7z before placing files.")}
+                  dir={directionFor("Extract .zip, .rar, .7z before placing files.")}
+                >
+                  {t("Extract .zip, .rar, .7z before placing files.")}
                 </p>
               </div>
               <Switch
@@ -366,15 +532,20 @@ export default function ImportReviewModal({
 
             {unpackArchive && (
               <div className="space-y-2">
-                <Label htmlFor="import-review-password">
-                  Archive Password{passwordRequired ? "" : " (optional)"}
+                <Label
+                  htmlFor="import-review-password"
+                  lang={languageFor("Archive Password")}
+                  dir={directionFor("Archive Password")}
+                >
+                  {t("Archive Password")}
+                  {!passwordRequired && t(" (optional)")}
                 </Label>
                 <Input
                   id="import-review-password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password"
+                  placeholder={t("Password")}
                   autoComplete="off"
                 />
               </div>
@@ -383,7 +554,9 @@ export default function ImportReviewModal({
 
           <DialogFooter>
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              <span lang={languageFor("Cancel")} dir={directionFor("Cancel")}>
+                {t("Cancel")}
+              </span>
             </Button>
             <Button
               variant="ghost"
@@ -392,14 +565,18 @@ export default function ImportReviewModal({
               disabled={skipMutation.isPending || confirmMutation.isPending}
             >
               {skipMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Skip Import
+              <span lang={languageFor("Skip Import")} dir={directionFor("Skip Import")}>
+                {t("Skip Import")}
+              </span>
             </Button>
             <Button
               onClick={handleConfirm}
               disabled={confirmMutation.isPending || skipMutation.isPending}
             >
               {confirmMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Confirm Import
+              <span lang={languageFor("Confirm Import")} dir={directionFor("Confirm Import")}>
+                {t("Confirm Import")}
+              </span>
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -409,7 +586,7 @@ export default function ImportReviewModal({
         onOpenChange={setIsSourceBrowserOpen}
         onSelect={(path) => setSourcePath(path)}
         initialPath="/"
-        title="Select Source"
+        title={t("Select Source")}
         root="/"
       />
       <FileBrowser
@@ -417,7 +594,7 @@ export default function ImportReviewModal({
         onOpenChange={setIsDestBrowserOpen}
         onSelect={(path) => setDestinationPath(path)}
         initialPath="/"
-        title="Select Destination"
+        title={t("Select Destination")}
         root={strategy === "romm" ? (rommConfig?.libraryRoot ?? "/") : "/"}
       />
     </>

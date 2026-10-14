@@ -93,6 +93,18 @@ describe("CompactGameCard", () => {
     expect(screen.getByText("Adventure")).toBeInTheDocument();
   });
 
+  it("keeps card details clickable without nesting its action buttons in a button", () => {
+    const onViewDetails = vi.fn();
+    renderWithProviders(<CompactGameCard game={mockGame} onViewDetails={onViewDetails} />);
+
+    const card = screen.getByTestId("card-game-compact-1");
+    expect(card).not.toHaveAttribute("role", "button");
+    expect(screen.getByRole("group", { name: "Game actions" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("Test Game"));
+    expect(onViewDetails).toHaveBeenCalledWith("1");
+  });
+
   it("shows full release dates in the selected regional format", async () => {
     setRegionalPreference("ja");
     renderWithProviders(
@@ -120,8 +132,8 @@ describe("CompactGameCard", () => {
     const trigger = screen.getByLabelText(`Change status for ${mockGame.title}`);
     fireEvent.click(trigger);
 
-    // Select "owned" from the chips
-    const ownedChip = await screen.findByRole("button", { name: "owned" });
+    // Select "Owned" from the chips
+    const ownedChip = await screen.findByRole("button", { name: "Owned" });
     fireEvent.click(ownedChip);
 
     expect(onStatusChange).toHaveBeenCalledWith("1", "owned");
@@ -151,13 +163,13 @@ describe("CompactGameCard", () => {
     });
   });
 
-  it("shows a loading fallback when opening details", async () => {
+  it("opens game details from the info button", async () => {
     renderWithProviders(<CompactGameCard game={mockGame} />);
 
     const infoButton = screen.getByLabelText(`View details for ${mockGame.title}`);
     fireEvent.click(infoButton);
 
-    expect(await screen.findByText("Loading game details...")).toBeInTheDocument();
+    expect(await screen.findByTestId("text-game-title-1")).toHaveTextContent(mockGame.title);
   });
 
   it("shows Early Access badge when earlyAccess is true", () => {

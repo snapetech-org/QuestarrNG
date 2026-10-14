@@ -13,6 +13,15 @@ import { useLocation } from "wouter";
 import GameDownloadDialog from "./GameDownloadDialog";
 import SendErrorReportDialog from "./SendErrorReportDialog";
 import { getSocket } from "@/lib/socket";
+import { useInterfaceLanguage } from "@/lib/interface-locale";
+import {
+  formatUnreadNotificationsLabel,
+  getNotificationLabel,
+  getNotificationTextDirection,
+  getNotificationTitle,
+  getNotificationTitleLanguage,
+} from "@/lib/notification-locale";
+import { localizeNotificationMessage } from "@/lib/notification-messages";
 
 export function NotificationCenter() {
   const [open, setOpen] = useState(false);
@@ -24,6 +33,7 @@ export function NotificationCenter() {
   const [_, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { language } = useInterfaceLanguage();
 
   const { data: notifications = [] } = useQuery<Notification[]>({
     queryKey: ["/api/notifications"],
@@ -49,9 +59,23 @@ export function NotificationCenter() {
   useEffect(() => {
     const socket = getSocket();
     const handleNotification = (notification: Notification) => {
+      const titleLanguage = getNotificationTitleLanguage(notification.title, language);
+      const localizedMessage = localizeNotificationMessage(
+        notification.title,
+        notification.message,
+        language
+      );
       toast({
-        title: notification.title,
-        description: notification.message,
+        title: (
+          <span lang={titleLanguage} dir={getNotificationTextDirection(titleLanguage)}>
+            {getNotificationTitle(notification.title, language)}
+          </span>
+        ),
+        description: (
+          <span lang={localizedMessage.language} dir={localizedMessage.direction}>
+            {localizedMessage.content}
+          </span>
+        ),
         variant: notification.type === "error" ? "destructive" : "default",
       });
 
@@ -65,7 +89,7 @@ export function NotificationCenter() {
     return () => {
       socket.off("notification", handleNotification);
     };
-  }, [queryClient, toast]);
+  }, [language, queryClient, toast]);
 
   const markAsReadMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -164,7 +188,13 @@ export function NotificationCenter() {
             variant="ghost"
             size="icon"
             className="relative"
-            aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : "Notifications"}
+            lang={language}
+            dir={getNotificationTextDirection(language)}
+            aria-label={
+              unreadCount > 0
+                ? formatUnreadNotificationsLabel(unreadCount, language)
+                : getNotificationLabel("Notifications", language)
+            }
           >
             <Bell className="h-5 w-5" />
             {unreadCount > 0 && (
@@ -174,7 +204,13 @@ export function NotificationCenter() {
         </PopoverTrigger>
         <PopoverContent className="w-[640px] p-0" align="end">
           <div className="flex items-center justify-between p-4 border-b">
-            <h4 className="font-semibold leading-none">Notifications</h4>
+            <h4
+              className="font-semibold leading-none"
+              lang={language}
+              dir={getNotificationTextDirection(language)}
+            >
+              {getNotificationLabel("Notifications", language)}
+            </h4>
             <div className="flex gap-1">
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -183,7 +219,9 @@ export function NotificationCenter() {
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8"
-                      aria-label="Mark all notifications as read"
+                      lang={language}
+                      dir={getNotificationTextDirection(language)}
+                      aria-label={getNotificationLabel("Mark all notifications as read", language)}
                       onClick={() => markAllAsReadMutation.mutate()}
                       disabled={unreadCount === 0}
                     >
@@ -192,7 +230,9 @@ export function NotificationCenter() {
                   </span>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Mark all as read</p>
+                  <p lang={language} dir={getNotificationTextDirection(language)}>
+                    {getNotificationLabel("Mark all as read", language)}
+                  </p>
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
@@ -205,7 +245,9 @@ export function NotificationCenter() {
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 text-destructive hover:text-destructive"
-                      aria-label="Clear all notifications"
+                      lang={language}
+                      dir={getNotificationTextDirection(language)}
+                      aria-label={getNotificationLabel("Clear all notifications", language)}
                       onClick={() => clearAllMutation.mutate()}
                       disabled={notifications.length === 0}
                     >
@@ -214,7 +256,9 @@ export function NotificationCenter() {
                   </span>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Clear all</p>
+                  <p lang={language} dir={getNotificationTextDirection(language)}>
+                    {getNotificationLabel("Clear all", language)}
+                  </p>
                 </TooltipContent>
               </Tooltip>
             </div>
@@ -223,7 +267,9 @@ export function NotificationCenter() {
             {notifications.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-[400px] text-muted-foreground">
                 <Bell className="h-16 w-16 mb-2 opacity-50" />
-                <p className="text-sm">No notifications</p>
+                <p className="text-sm" lang={language} dir={getNotificationTextDirection(language)}>
+                  {getNotificationLabel("No notifications", language)}
+                </p>
               </div>
             ) : (
               <div className="flex flex-col">

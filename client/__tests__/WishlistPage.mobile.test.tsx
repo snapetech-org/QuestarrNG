@@ -99,12 +99,29 @@ vi.mock("@/components/GameFilterPills", () => ({
 }));
 
 vi.mock("@/components/EmptyState", () => ({
-  default: ({ title, description }: { title: string; description: string }) => (
-    <div>
-      <h2>{title}</h2>
-      <p>{description}</p>
-    </div>
-  ),
+  default: ({
+    title,
+    description,
+    titleValues,
+    descriptionValues,
+  }: {
+    title: string;
+    description: string;
+    titleValues?: Record<string, string | number>;
+    descriptionValues?: Record<string, string | number>;
+  }) => {
+    const interpolate = (source: string, values?: Record<string, string | number>) =>
+      source.replace(/\{([A-Za-z][A-Za-z0-9_]*)\}/g, (placeholder, name: string) =>
+        values?.[name] === undefined ? placeholder : String(values[name])
+      );
+
+    return (
+      <div>
+        <h2>{interpolate(title, titleValues)}</h2>
+        <p>{interpolate(description, descriptionValues)}</p>
+      </div>
+    );
+  },
 }));
 
 vi.mock("@/components/GameGrid", () => ({
@@ -288,6 +305,6 @@ describe("WishlistPage mobile sections", () => {
     });
 
     expect(await screen.findByText("No games match your search")).toBeInTheDocument();
-    expect(screen.getByText('No wishlist games found for "Metroid".')).toBeInTheDocument();
+    expect(screen.getByText("No wishlist games found for “Metroid”.")).toBeInTheDocument();
   });
 });

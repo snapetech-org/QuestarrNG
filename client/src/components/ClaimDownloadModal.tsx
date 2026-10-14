@@ -33,6 +33,7 @@ import {
 } from "@/lib/regional-format";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { parseReleaseDate } from "@/lib/utils";
+import { InterfaceText } from "@/components/InterfaceText";
 
 interface ClaimDownload {
   id: string;
@@ -182,22 +183,36 @@ export default function ClaimDownloadModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Link to Game</DialogTitle>
+          <DialogTitle>
+            <InterfaceText source={"Link to Game"} />
+          </DialogTitle>
           <DialogDescription className="truncate">{download.name}</DialogDescription>
         </DialogHeader>
 
         <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground">Category:</span>
+          <span className="text-sm text-muted-foreground">
+            <InterfaceText source={"Category:"} />
+          </span>
           <Select value={category} onValueChange={(v) => setCategory(v as DownloadCategory)}>
             <SelectTrigger className="w-36">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="main">Main</SelectItem>
-              <SelectItem value="update">Update</SelectItem>
-              <SelectItem value="dlc">DLC</SelectItem>
-              <SelectItem value="packs">Packs/Addons</SelectItem>
-              <SelectItem value="extra">Extra</SelectItem>
+              <SelectItem value="main">
+                <InterfaceText source={"Main"} />
+              </SelectItem>
+              <SelectItem value="update">
+                <InterfaceText source={"Update"} />
+              </SelectItem>
+              <SelectItem value="dlc">
+                <InterfaceText source={"DLC"} />
+              </SelectItem>
+              <SelectItem value="packs">
+                <InterfaceText source={"Packs/Addons"} />
+              </SelectItem>
+              <SelectItem value="extra">
+                <InterfaceText source={"Extra"} />
+              </SelectItem>
             </SelectContent>
           </Select>
           <Badge variant="outline" className="text-xs">
@@ -206,14 +221,18 @@ export default function ClaimDownloadModal({
               { maximumFractionDigits: 0 },
               regionalPreference
             )}{" "}
-            confidence
+            <InterfaceText source={"confidence"} />
           </Badge>
         </div>
 
         <Tabs defaultValue="library" className="flex-1 flex flex-col min-h-0">
           <TabsList>
-            <TabsTrigger value="library">Library</TabsTrigger>
-            <TabsTrigger value="igdb">IGDB Search</TabsTrigger>
+            <TabsTrigger value="library">
+              <InterfaceText source={"Library"} />
+            </TabsTrigger>
+            <TabsTrigger value="igdb">
+              <InterfaceText source={"IGDB Search"} />
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="library" className="flex-1 flex flex-col gap-2 min-h-0">
@@ -224,14 +243,17 @@ export default function ClaimDownloadModal({
                 className="pl-8"
                 value={librarySearch}
                 onChange={(e) => setLibrarySearch(e.target.value)}
+                data-i18n-placeholder={"Search your library…"}
               />
             </div>
             <div className="overflow-y-auto flex-1 space-y-1 pr-1">
               {libraryMatches.length === 0 ? (
                 <p className="text-sm text-muted-foreground py-4 text-center">
-                  {librarySearch
-                    ? "No games match your search"
-                    : "No library matches found — try IGDB Search"}
+                  {librarySearch ? (
+                    "No games match your search"
+                  ) : (
+                    <InterfaceText source={"No library matches found — try IGDB Search"} />
+                  )}
                 </p>
               ) : (
                 libraryMatches.map((g) => {
@@ -268,26 +290,37 @@ export default function ClaimDownloadModal({
                 className="pl-8"
                 value={igdbQuery}
                 onChange={(e) => setIgdbQuery(e.target.value)}
+                data-i18n-placeholder={"Search IGDB…"}
               />
             </div>
             <div className="flex items-center justify-between gap-3 rounded-md border px-3 py-2">
               <div className="space-y-1">
-                <p className="text-sm font-medium">Show undated games first</p>
+                <p className="text-sm font-medium">
+                  <InterfaceText source={"Show undated games first"} />
+                </p>
                 <p className="text-xs text-muted-foreground">
-                  Include titles without a release date and place them before dated results.
+                  <InterfaceText
+                    source={
+                      "Include titles without a release date and place them before dated results."
+                    }
+                  />
                 </p>
               </div>
               <Switch checked={showUndatedGames} onCheckedChange={setShowUndatedGames} />
             </div>
             <div className="overflow-y-auto flex-1 space-y-1 pr-1">
               {isSearchingIgdb ? (
-                <p className="text-sm text-muted-foreground py-4 text-center">Searching…</p>
+                <p className="text-sm text-muted-foreground py-4 text-center">
+                  <InterfaceText source={"Searching…"} />
+                </p>
               ) : igdbSearchFailed ? (
                 <p className="text-sm text-muted-foreground py-4 text-center">
-                  Search failed. Try again.
+                  <InterfaceText source={"Search failed. Try again."} />
                 </p>
               ) : displayedIgdbResults.length === 0 && debouncedIgdbQuery.trim().length > 2 ? (
-                <p className="text-sm text-muted-foreground py-4 text-center">No results found</p>
+                <p className="text-sm text-muted-foreground py-4 text-center">
+                  <InterfaceText source={"No results found"} />
+                </p>
               ) : (
                 displayedIgdbResults.map((g) => {
                   const isSelected =
@@ -321,21 +354,25 @@ export default function ClaimDownloadModal({
             <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
             <span className="truncate font-medium">{selectedGame.title}</span>
             <Badge variant="secondary" className="ml-auto shrink-0 text-xs">
-              {selectedGame.source === "library" ? "Library" : "IGDB"}
+              {selectedGame.source === "library" ? "Library" : <InterfaceText source={"IGDB"} />}
             </Badge>
           </div>
         )}
 
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            <InterfaceText source={"Cancel"} />
           </Button>
           <Button
             onClick={() => claimMutation.mutate()}
             disabled={!selectedGame || claimMutation.isPending}
           >
             <Link2 className="h-4 w-4 mr-2" />
-            {claimMutation.isPending ? "Linking…" : "Link Download"}
+            {claimMutation.isPending ? (
+              <InterfaceText source={"Linking…"} />
+            ) : (
+              <InterfaceText source={"Link Download"} />
+            )}
           </Button>
         </div>
       </DialogContent>

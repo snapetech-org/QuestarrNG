@@ -54,6 +54,7 @@ function json(data: unknown, status = 200): Response {
     ok: status >= 200 && status < 300,
     status,
     json: async () => data,
+    text: async () => JSON.stringify(data),
   } as Response;
 }
 
