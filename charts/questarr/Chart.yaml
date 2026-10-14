@@ -7,10 +7,10 @@ version: 0.1.12
 # Version of Questarr shipped by default (the image tag when image.tag is empty).
 appVersion: "1.11.0"
 kubeVersion: ">=1.23.0-0"
-home: https://github.com/snapetech/QuestarrNG
-icon: https://raw.githubusercontent.com/snapetech/QuestarrNG/main/images/Questarr_icon.png
+home: https://github.com/snapetech-org/QuestarrNG
+icon: https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/images/Questarr_icon.png
 sources:
-  - https://github.com/snapetech/QuestarrNG
+  - https://github.com/snapetech-org/QuestarrNG
 keywords:
   - questarr
   - games

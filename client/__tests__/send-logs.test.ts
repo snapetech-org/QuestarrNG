@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const supportConfigState = vi.hoisted(() => ({
   workerUrl: "https://support.example/workers/logs",
-  issuesUrl: "https://github.com/snapetech/QuestarrNG/issues/new",
+  issuesUrl: "https://github.com/snapetech-org/QuestarrNG/issues/new",
 }));
 
 vi.mock("../src/lib/support-config", () => ({
@@ -30,7 +30,7 @@ describe("send-logs utilities", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     supportConfigState.workerUrl = "https://support.example/workers/logs";
-    supportConfigState.issuesUrl = "https://github.com/snapetech/QuestarrNG/issues/new";
+    supportConfigState.issuesUrl = "https://github.com/snapetech-org/QuestarrNG/issues/new";
   });
 
   afterEach(() => {
@@ -191,7 +191,7 @@ describe("send-logs utilities", () => {
   it("builds a prefilled GitHub issue URL", () => {
     const issueUrl = buildGitHubIssueUrl("ABCD", "1.4.0", 123);
 
-    expect(issueUrl).toContain("https://github.com/snapetech/QuestarrNG/issues/new?");
+    expect(issueUrl).toContain("https://github.com/snapetech-org/QuestarrNG/issues/new?");
     expect(decodeURIComponent(issueUrl)).toContain("[Support] Issue with Questarr v1.4.0");
     expect(decodeURIComponent(issueUrl)).toContain("**App version:** 1.4.0");
     expect(decodeURIComponent(issueUrl)).toContain(

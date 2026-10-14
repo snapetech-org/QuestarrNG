@@ -1,6 +1,6 @@
 # CasaOS AppFile for Questarr
 # Install via CasaOS: App Store -> Custom Install -> Import (paste the raw URL of this file)
-# https://raw.githubusercontent.com/snapetech/QuestarrNG/main/casaos/docker-compose.yml
+# https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/casaos/docker-compose.yml
 name: questarr
 services:
   questarr:
@@ -70,12 +70,12 @@ x-casaos:
   author: Snapetech
   developer: Snapetech
   category: Media
-  icon: https://raw.githubusercontent.com/snapetech/QuestarrNG/main/images/Questarr_icon.png
-  thumbnail: https://raw.githubusercontent.com/snapetech/QuestarrNG/main/images/Questarr_Logo-nobg.png
+  icon: https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/images/Questarr_icon.png
+  thumbnail: https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/images/Questarr_Logo-nobg.png
   screenshot_link:
-    - https://raw.githubusercontent.com/snapetech/QuestarrNG/main/images/Screenshots/library.png
-    - https://raw.githubusercontent.com/snapetech/QuestarrNG/main/images/Screenshots/discover.png
-    - https://raw.githubusercontent.com/snapetech/QuestarrNG/main/images/Screenshots/calendar.png
+    - https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/images/Screenshots/library.png
+    - https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/images/Screenshots/discover.png
+    - https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/images/Screenshots/calendar.png
   title:
     en_us: QuestarrNG
   tagline:
@@ -93,5 +93,5 @@ x-casaos:
   port_map: "5000"
   scheme: http
   index: /
-  project_url: https://github.com/snapetech/QuestarrNG
+  project_url: https://github.com/snapetech-org/QuestarrNG
   store_app_id: questarr

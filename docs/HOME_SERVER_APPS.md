@@ -31,7 +31,7 @@ CasaOS installs custom apps from an AppFile — a Compose file carrying `x-casao
 
 1. Open the **App Store** and click **Custom Install**.
 2. Click the **import** icon (top right) and paste:
-   `https://raw.githubusercontent.com/snapetech/QuestarrNG/main/casaos/docker-compose.yml`
+   `https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/casaos/docker-compose.yml`
 3. Adjust the mounts if needed. The defaults are `/DATA/AppData/questarr` → `/app/data` and
    `/DATA/Downloads` → `/data`.
 4. Click **Install**, then open Questarr from the CasaOS dashboard (port `5000`).
@@ -50,7 +50,7 @@ so existing Umbrel installs keep receiving updates.
 
 1. In umbrelOS, open the **App Store**.
 2. Click the **⋮** menu (top right) → **Community App Stores**.
-3. Add `https://github.com/snapetech/QuestarrNG` and open the **Snapetech** store.
+3. Add `https://github.com/snapetech-org/QuestarrNG` and open the **Snapetech** store.
 4. Install **QuestarrNG** (`doezer-questarr`). Umbrel routes it through its own `app_proxy`, so it
    appears on your dashboard and is reachable at `http://umbrel.local:5000`.
 
@@ -64,14 +64,14 @@ Cosmos installs apps as _ServApps_ from a `cosmos-compose.json`.
 
 1. Open **Market Place → Custom Install** (or **Servapps → Add**).
 2. Paste:
-   `https://raw.githubusercontent.com/snapetech/QuestarrNG/main/cosmos/questarr.cosmos-compose.json`
+   `https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/cosmos/questarr.cosmos-compose.json`
 3. Fill in the install form: **Data folder**, optional **Library folder**, and `PUID`/`PGID`.
    Ensure the data folder is writable by those IDs.
 4. Install. Cosmos creates a route at `questarr.<your-server-hostname>` with SmartShield and bot
    blocking enabled, and handles HTTPS for you.
 
 To browse Questarr from the Cosmos market list instead, add
-`https://raw.githubusercontent.com/snapetech/QuestarrNG/main/cosmos/index.json` as a custom market source.
+`https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/cosmos/index.json` as a custom market source.
 
 ## Keeping definitions in sync
 

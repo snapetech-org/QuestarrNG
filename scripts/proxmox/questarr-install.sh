@@ -7,10 +7,10 @@
 # Ubuntu LXC container (see questarr-lxc.sh), but it works just as well on any
 # bare Debian/Ubuntu VM or host.
 #
-#   bash -c "$(curl -fsSL https://raw.githubusercontent.com/snapetech/QuestarrNG/main/scripts/proxmox/questarr-install.sh)"
+#   bash -c "$(curl -fsSL https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/scripts/proxmox/questarr-install.sh)"
 #
 # Environment overrides:
-#   QUESTARR_REPO    GitHub repository            (default: snapetech/QuestarrNG)
+#   QUESTARR_REPO    GitHub repository            (default: snapetech-org/QuestarrNG)
 #   QUESTARR_REF     Tag/branch to install        (default: latest release, else main)
 #   QUESTARR_PORT    HTTP port                    (default: 5000)
 #   QUESTARR_HOST    Bind address                 (default: 0.0.0.0)
@@ -20,7 +20,7 @@
 
 set -euo pipefail
 
-QUESTARR_REPO="${QUESTARR_REPO:-snapetech/QuestarrNG}"
+QUESTARR_REPO="${QUESTARR_REPO:-snapetech-org/QuestarrNG}"
 QUESTARR_REF="${QUESTARR_REF:-}"
 QUESTARR_PORT="${QUESTARR_PORT:-5000}"
 QUESTARR_HOST="${QUESTARR_HOST:-0.0.0.0}"

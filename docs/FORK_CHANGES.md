@@ -43,7 +43,7 @@ the contract changes.
 
 The Snapetech fork was created in September 2026. The v1.5.0 release was not
 published; its completed work shipped in v1.6.0. Fork releases from v1.6.0
-through [v1.11.0](https://github.com/snapetech/QuestarrNG/releases/tag/v1.11.0)
+through [v1.11.0](https://github.com/snapetech-org/QuestarrNG/releases/tag/v1.11.0)
 added the capabilities below.
 
 ## Product capabilities
@@ -128,7 +128,7 @@ added the capabilities below.
 
 For every released change, including fixes and action-required upgrade notes, use
 the [full changelog](CHANGELOG.md) and the
-[GitHub releases](https://github.com/snapetech/QuestarrNG/releases).
+[GitHub releases](https://github.com/snapetech-org/QuestarrNG/releases).
 
 ## Current SeerrNG provider compatibility
 
@@ -138,5 +138,5 @@ request retry/cancel, single-file streaming, and request-scoped `.tar.gz`
 bundles for multi-file imports, plus exact request identity and Steam ownership
 estimates. Real-Debrid downloads can be staged locally before import. The
 handshake reports emulation acquisition as unsupported. See the
-[SeerrNG release note](https://github.com/snapetech/seerrng/blob/main/release-notes/questarr-catalog-estimates-and-bundles.md)
+[SeerrNG release note](https://github.com/snapetech-org/seerrng/blob/main/release-notes/questarr-catalog-estimates-and-bundles.md)
 and the current [QuestarrNG provider contract](contracts/seerrng-v2.openapi.yaml).

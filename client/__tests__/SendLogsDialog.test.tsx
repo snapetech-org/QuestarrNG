@@ -11,7 +11,7 @@ const { toastMock, scrubLogLinesMock, detectPlatformMock, sendLogsMock, buildGit
     detectPlatformMock: vi.fn(() => "Windows"),
     sendLogsMock: vi.fn(),
     buildGitHubIssueUrlMock: vi.fn(
-      () => "https://github.com/snapetech/QuestarrNG/issues/new?title=test"
+      () => "https://github.com/snapetech-org/QuestarrNG/issues/new?title=test"
     ),
   }));
 
@@ -128,7 +128,7 @@ describe("SendLogsDialog", () => {
 
     expect(screen.getByRole("link", { name: "Create GitHub issue" })).toHaveAttribute(
       "href",
-      "https://github.com/snapetech/QuestarrNG/issues/new?title=test"
+      "https://github.com/snapetech-org/QuestarrNG/issues/new?title=test"
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Close" }));

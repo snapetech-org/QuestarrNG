@@ -1,6 +1,6 @@
 # Questarr Helm chart
 
-Runs [QuestarrNG](https://github.com/snapetech/QuestarrNG) on Kubernetes from the fork's
+Runs [QuestarrNG](https://github.com/snapetech-org/QuestarrNG) on Kubernetes from the fork's
 `ghcr.io/snapetech-org/questarrng` image.
 
 The chart deploys a single-replica Deployment, a Service, an optional Ingress, and a
@@ -19,7 +19,7 @@ The chart is not published to a Helm repository yet — install it from a clone 
 repository:
 
 ```bash
-git clone https://github.com/snapetech/QuestarrNG.git
+git clone https://github.com/snapetech-org/QuestarrNG.git
 cd questarr
 helm install questarr charts/questarr --namespace questarr --create-namespace
 ```

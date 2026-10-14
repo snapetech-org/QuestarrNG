@@ -6,14 +6,14 @@
   <Network>bridge</Network>
   <Shell>sh</Shell>
   <Privileged>false</Privileged>
-  <Icon>https://raw.githubusercontent.com/snapetech/QuestarrNG/main/images/Questarr_icon.png</Icon>
+  <Icon>https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/images/Questarr_icon.png</Icon>
   <WebUI>http://[IP]:[PORT:5000]/</WebUI>
   <Overview>Standalone NG fork of Questarr for PC game discovery and acquisition, with optional SeerrNG integration.</Overview>
   <Description>QuestarrNG runs independently for PC game collection and downloads; SeerrNG is optional. This Snapetech NG fork includes the SeerrNG catalog, request, and library API contract that the upstream Questarr listing lacks. Configure QuestarrNG and its download client first, then enter its API key in SeerrNG if desired.</Description>
-  <Support>https://github.com/snapetech/QuestarrNG/issues</Support>
-  <Project>https://github.com/snapetech/QuestarrNG</Project>
-  <TemplateURL>https://raw.githubusercontent.com/snapetech/QuestarrNG/main/unraid/questarr.xml</TemplateURL>
-  <ReadMe>https://github.com/snapetech/QuestarrNG/blob/main/README.md</ReadMe>
+  <Support>https://github.com/snapetech-org/QuestarrNG/issues</Support>
+  <Project>https://github.com/snapetech-org/QuestarrNG</Project>
+  <TemplateURL>https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/unraid/questarr.xml</TemplateURL>
+  <ReadMe>https://github.com/snapetech-org/QuestarrNG/blob/main/README.md</ReadMe>
   <Category>MediaApp:Other</Category>
   <ExtraSearchTerms>questarrng questarr pc game igdb seerrng</ExtraSearchTerms>
   <Changes>1.11.0: Browser-local interface language, regional date and number formatting, and RTL-safe rendering of upstream values. 1.10.0: Real-Debrid OAuth and local staging, verified Steam ownership and play-time estimates, and multi-file SeerrNG acquisition. 1.9.2: SeerrNG request-contract v2 with authenticated bundles for multi-file imports.</Changes>

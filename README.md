@@ -25,16 +25,16 @@ A video game management application inspired by the -Arr apps (Sonarr, Radarr, P
 [![Library screenshot](images/Screenshots/library.png)](images/Screenshots/library.png)
 
 [![GHCR](https://img.shields.io/badge/container-ghcr.io%2Fsnapetech-org%2Fquestarrng-blue?logo=github&logoColor=white)](https://github.com/orgs/snapetech-org/packages/container/package/questarrng)
-[![GitHub release](https://img.shields.io/github/v/release/snapetech/QuestarrNG)](https://github.com/snapetech/QuestarrNG/releases)
-[![License](https://img.shields.io/github/license/snapetech/QuestarrNG)](https://github.com/snapetech/QuestarrNG/blob/main/COPYING)
-[![CI](https://github.com/snapetech/QuestarrNG/actions/workflows/ci.yml/badge.svg)](https://github.com/snapetech/QuestarrNG/actions/workflows/ci.yml)
-[![Code Scanning](https://github.com/snapetech/QuestarrNG/actions/workflows/sast.yml/badge.svg)](https://github.com/snapetech/QuestarrNG/security/code-scanning)
-[![Last commit](https://img.shields.io/github/last-commit/snapetech/QuestarrNG)](https://github.com/snapetech/QuestarrNG/commits/main)
+[![GitHub release](https://img.shields.io/github/v/release/snapetech/QuestarrNG)](https://github.com/snapetech-org/QuestarrNG/releases)
+[![License](https://img.shields.io/github/license/snapetech/QuestarrNG)](https://github.com/snapetech-org/QuestarrNG/blob/main/COPYING)
+[![CI](https://github.com/snapetech-org/QuestarrNG/actions/workflows/ci.yml/badge.svg)](https://github.com/snapetech-org/QuestarrNG/actions/workflows/ci.yml)
+[![Code Scanning](https://github.com/snapetech-org/QuestarrNG/actions/workflows/sast.yml/badge.svg)](https://github.com/snapetech-org/QuestarrNG/security/code-scanning)
+[![Last commit](https://img.shields.io/github/last-commit/snapetech/QuestarrNG)](https://github.com/snapetech-org/QuestarrNG/commits/main)
 
 ⭐ Star us on GitHub — your support motivates us a lot! 🙏😊
 
 [![Discord](https://img.shields.io/badge/Discord-Join%20Us-7289da?logo=discord&logoColor=white)](https://discord.gg/STkp86wP9F)
-[![Share](https://img.shields.io/badge/share-000000?logo=x&logoColor=white)](https://x.com/intent/tweet?text=Check%20out%20QuestarrNG%20on%20GitHub:%20https://github.com/snapetech/QuestarrNG%20%23gaming%20%23selfhosted)
+[![Share](https://img.shields.io/badge/share-000000?logo=x&logoColor=white)](https://x.com/intent/tweet?text=Check%20out%20QuestarrNG%20on%20GitHub:%20https://github.com/snapetech-org/QuestarrNG%20%23gaming%20%23selfhosted)
 
 ## Table of Contents
 
@@ -160,7 +160,7 @@ docker run -d -p 5000:5000 --user "$(id -u):$(id -g)" \
 
 ### Option 2: Docker Compose (more detailed)
 
-1. **Use the [`docker-compose.yml`](https://github.com/snapetech/QuestarrNG/blob/main/docker-compose.yml) file from the repo or create a minimal one:**
+1. **Use the [`docker-compose.yml`](https://github.com/snapetech-org/QuestarrNG/blob/main/docker-compose.yml) file from the repo or create a minimal one:**
 
    ```yaml
    services:
@@ -219,7 +219,7 @@ the app as the configured `PUID:PGID` directly, so prepare the bind-mounted
 
 Prefer running Questarr as a native Windows service instead of Docker? Download
 `QuestarrSetup-<version>-windows-x64.exe` from the
-[latest QuestarrNG release](https://github.com/snapetech/QuestarrNG/releases/latest) and
+[latest QuestarrNG release](https://github.com/snapetech-org/QuestarrNG/releases/latest) and
 run it. The installer bundles Node.js, installs Questarr as a Windows service
 (`Questarr.Service.exe`), and starts it automatically — open
 `http://localhost:5000` once it finishes.
@@ -296,7 +296,7 @@ PUID/PGID, update the template's **Extra Parameters** `--user` value to match.
 
 1. In umbrelOS, open the **App Store**.
 2. Click the **⋮** menu (top right) → **Community App Stores**.
-3. Add this repository URL: `https://github.com/snapetech/QuestarrNG`
+3. Add this repository URL: `https://github.com/snapetech-org/QuestarrNG`
 4. Open the **Snapetech** store and install **QuestarrNG** (app ID `doezer-questarr`, retained for existing installs), then open it from
    your dashboard (`http://umbrel.local:5000`).
 
@@ -325,7 +325,7 @@ A Helm chart lives in [`charts/questarr`](charts/questarr). It is not published 
 repository yet, so install it from a clone:
 
 ```bash
-git clone https://github.com/snapetech/QuestarrNG.git
+git clone https://github.com/snapetech-org/QuestarrNG.git
 cd QuestarrNG
 helm install questarr charts/questarr --namespace questarr --create-namespace
 ```
@@ -352,7 +352,7 @@ You can install Questarr as a Home Assistant add-on from this repository:
 
 1. In Home Assistant, open **Settings → Add-ons → Add-on Store**.
 2. Click the menu (⋮) and choose **Repositories**.
-3. Add this repository URL: `https://github.com/snapetech/QuestarrNG`
+3. Add this repository URL: `https://github.com/snapetech-org/QuestarrNG`
 4. Install the **Questarr** add-on and start it.
 5. Open `http://<home-assistant-host>:5000` to access the UI.
 
@@ -505,7 +505,7 @@ This is mainly for users who want the latest commit (e.g when trying out fixes f
 1. **Clone the repository:**
 
 ```bash
-git clone https://github.com/snapetech/QuestarrNG.git
+git clone https://github.com/snapetech-org/QuestarrNG.git
 cd QuestarrNG
 ```
 
@@ -561,8 +561,8 @@ If you run into an issue, go to the **Logs** page and click **Send Logs** before
 
 ### Getting Help
 
-- **Issues**: [GitHub Issues](https://github.com/snapetech/QuestarrNG/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/snapetech/QuestarrNG/discussions)
+- **Issues**: [GitHub Issues](https://github.com/snapetech-org/QuestarrNG/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/snapetech-org/QuestarrNG/discussions)
 - **Discord**: [Join our Server](https://discord.gg/STkp86wP9F)
 
 ## Project Security & Documentation
@@ -578,7 +578,7 @@ If you run into an issue, go to the **Logs** page and click **Send Logs** before
 
 ### Contributors
 
-<a href="https://github.com/snapetech/QuestarrNG/graphs/contributors">
+<a href="https://github.com/snapetech-org/QuestarrNG/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=snapetech/QuestarrNG" />
 </a>
 

@@ -72,7 +72,7 @@
         "start_period": "40s"
       },
       "labels": {
-        "cosmos-icon": "https://raw.githubusercontent.com/snapetech/QuestarrNG/main/images/Questarr_icon.png"
+        "cosmos-icon": "https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/images/Questarr_icon.png"
       },
       "routes": [
         {
