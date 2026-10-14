@@ -70,10 +70,10 @@ The current list of project members holding escalated access is maintained in [M
 
 ### Requirement: Review Before Grant
 
-No contributor may be granted an escalated permission listed above without prior review and explicit approval by an existing repository admin/maintainer. This includes:
+No contributor may be granted an escalated permission listed above without a recorded review and approval by a repository admin/maintainer. If the repository has only one maintainer, that maintainer may approve the grant directly after recording its justification and checking least privilege. This includes:
 
 1. **Request & record** — The requested role/access and its justification are recorded (e.g., in an issue, PR, or admin log) before being granted, not after.
-2. **Independent approval** — The grant must be approved by an admin/maintainer other than the requester. A contributor cannot self-approve their own escalation.
+2. **Maintainer approval** — A second human approval is optional, not required. The approving maintainer records the request and rationale; AI review may support the decision but is not represented as independent human approval.
 3. **Least privilege** — Grant the minimum role/access needed for the contributor's actual responsibilities (e.g., prefer Write over Maintain, avoid org-wide secrets access for repo-scoped work).
 4. **Time-bound where practical** — Temporary or contract contributors should have access scoped to the duration of their engagement and reviewed/revoked on completion.
 
