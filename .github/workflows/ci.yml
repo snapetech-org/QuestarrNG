@@ -461,7 +461,7 @@ jobs:
     name: Reconcile test and build node receipts
     runs-on: ubuntu-latest
     needs: [test, build]
-    if: always()
+    if: always() && !cancelled()
 
     steps:
       - name: Harden the runner (Audit all outbound calls)

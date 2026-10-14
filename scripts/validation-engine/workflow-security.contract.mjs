@@ -182,6 +182,11 @@ test('CI receipt reconciliation downloads only artifacts from the current attemp
   );
 });
 
+test('cancelled superseded pull-request runs release the CI concurrency slot', () => {
+  const reconcileJob = jobBlock(ciWorkflow, 'reconcile-validation', 'docker-build');
+  assert.match(reconcileJob, /if: always\(\) && !cancelled\(\)/u);
+});
+
 test('test and build jobs execute the base-reviewed launcher with isolated dependencies', () => {
   const testJob = jobBlock(ciWorkflow, 'test', 'build');
   const buildJob = jobBlock(ciWorkflow, 'build', 'reconcile-validation');

@@ -214,6 +214,12 @@ with receipts from an earlier attempt. The test job still enforces the existing
 coverage thresholds and uploads its JUnit and coverage results through the
 trusted Codecov workflow.
 
+Pull-request CI cancels runs for superseded commits. Reconciliation still uses
+`always()` so failures produce a current-run result, and also checks
+`!cancelled()` so an obsolete canceled run releases the per-pull-request
+concurrency slot instead of holding the latest run in the queue. The current
+commit still receives full fail-closed reconciliation.
+
 Playwright E2E stays opt-in in local runs because it installs and launches a real
 browser. Select `--task playwright-e2e` to include the browser installation and
 test tasks. Do not use live external accounts or production databases for local
