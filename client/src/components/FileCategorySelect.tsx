@@ -9,6 +9,8 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { type GameFileCategory, type ScannedGameFile } from "@shared/schema";
+import { formatInterfaceMessage } from "@/lib/interface-locale";
+import { InterfaceText } from "@/components/InterfaceText";
 
 const CATEGORY_OPTIONS: Array<{ value: GameFileCategory; label: string }> = [
   { value: "main", label: "Main game" },
@@ -61,7 +63,9 @@ export default function FileCategorySelect({ gameId, file }: FileCategorySelectP
     >
       <SelectTrigger
         className="h-9 w-[7.5rem] shrink-0 text-xs"
-        aria-label={`Category for ${file.name}`}
+        aria-label={formatInterfaceMessage("Category for {name}", {
+          name: String(file.name ?? ""),
+        })}
         data-testid={`select-file-category-${file.name}`}
       >
         <SelectValue />
@@ -69,7 +73,7 @@ export default function FileCategorySelect({ gameId, file }: FileCategorySelectP
       <SelectContent>
         {CATEGORY_OPTIONS.map((option) => (
           <SelectItem key={option.value} value={option.value}>
-            {option.label}
+            <InterfaceText source={option.label} />
           </SelectItem>
         ))}
       </SelectContent>

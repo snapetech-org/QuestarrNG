@@ -18,6 +18,8 @@ import {
   type SendLogsResult,
 } from "@/lib/send-logs";
 import { copyToClipboard } from "@/lib/utils";
+import { InterfaceText } from "@/components/InterfaceText";
+import { formatInterfaceMessage } from "@/lib/interface-locale";
 
 interface SendLogsDialogProps {
   open: boolean;
@@ -78,7 +80,12 @@ export default function SendLogsDialog({
     if (!result?.ok) return;
     void copyToClipboard(result.code).then((succeeded) => {
       if (succeeded) {
-        toast({ title: "Copied", description: `Code ${result.code} copied to clipboard` });
+        toast({
+          title: "Copied",
+          description: formatInterfaceMessage("Code {code} copied to clipboard", {
+            code: String(result.code ?? ""),
+          }),
+        });
       } else {
         toast({
           title: "Copy failed",
@@ -102,44 +109,62 @@ export default function SendLogsDialog({
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <Send className="h-5 w-5" />
-                Send logs to support
+                <InterfaceText source={"Send logs to support"} />
               </DialogTitle>
               <DialogDescription className="sr-only">
-                Review what will be shared before confirming
+                <InterfaceText source={"Review what will be shared before confirming"} />
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4 py-1 text-sm">
               <p className="text-muted-foreground">
-                This will upload your current server logs so the Questarr maintainer can diagnose
-                your issue. Please review what will be shared:
+                <InterfaceText
+                  source={
+                    "This will upload your current server logs so the Questarr maintainer can diagnose your issue. Please review what will be shared:"
+                  }
+                />
               </p>
 
               <ul className="space-y-2 text-zinc-300">
                 <li className="flex gap-2">
                   <span className="mt-0.5 text-blue-400">•</span>
                   <span>
-                    <strong>Log content</strong> — the {logLines.length} lines currently displayed
-                    in the log viewer, with emails, IP addresses, and UUIDs replaced by
-                    placeholders.
+                    <strong>
+                      <InterfaceText source={"Log content"} />
+                    </strong>{" "}
+                    <InterfaceText source={"— the"} /> {logLines.length}{" "}
+                    <InterfaceText
+                      source={
+                        "lines currently displayed in the log viewer, with emails, IP addresses, and UUIDs replaced by placeholders."
+                      }
+                    />
                   </span>
                 </li>
                 <li className="flex gap-2">
                   <span className="mt-0.5 text-blue-400">•</span>
                   <span>
-                    <strong>App version</strong> — {APP_VERSION}
+                    <strong>
+                      <InterfaceText source={"App version"} />
+                    </strong>{" "}
+                    — {APP_VERSION}
                   </span>
                 </li>
                 <li className="flex gap-2">
                   <span className="mt-0.5 text-blue-400">•</span>
                   <span>
-                    <strong>Platform</strong> — {detectPlatform()}
+                    <strong>
+                      <InterfaceText source={"Platform"} />
+                    </strong>{" "}
+                    — {detectPlatform()}
                   </span>
                 </li>
                 <li className="flex gap-2">
                   <span className="mt-0.5 text-blue-400">•</span>
                   <span>
-                    <strong>Timestamp</strong> — current date/time (UTC)
+                    <strong>
+                      <InterfaceText source={"Timestamp"} />
+                    </strong>{" "}
+                    <InterfaceText source={"— current date/time (UTC)"} />
                   </span>
                 </li>
               </ul>
@@ -147,16 +172,22 @@ export default function SendLogsDialog({
               <div className="flex items-start gap-2 rounded-lg border border-yellow-800/40 bg-yellow-950/30 p-3 text-yellow-300">
                 <ShieldAlert className="mt-0.5 h-4 w-4 flex-shrink-0" />
                 <p className="text-xs leading-relaxed">
-                  Logs are stored as an issue in a <strong>private</strong> GitHub repository
-                  visible only to the Questarr maintainer. You will receive an issue number as your
-                  support code — share only that number with support.
+                  <InterfaceText source={"Logs are stored as an issue in a"} />{" "}
+                  <strong>
+                    <InterfaceText source={"private"} />
+                  </strong>{" "}
+                  <InterfaceText
+                    source={
+                      "GitHub repository visible only to the Questarr maintainer. You will receive an issue number as your support code — share only that number with support."
+                    }
+                  />
                 </p>
               </div>
             </div>
 
             <DialogFooter>
               <Button variant="outline" onClick={() => handleOpenChange(false)}>
-                Cancel
+                <InterfaceText source={"Cancel"} />
               </Button>
               <Button
                 onClick={() => {
@@ -165,7 +196,7 @@ export default function SendLogsDialog({
                 disabled={logLines.length === 0}
               >
                 <Send className="mr-2 h-4 w-4" />
-                Send logs
+                <InterfaceText source={"Send logs"} />
               </Button>
             </DialogFooter>
           </>
@@ -175,12 +206,18 @@ export default function SendLogsDialog({
         {step === "sending" && (
           <>
             <DialogHeader>
-              <DialogTitle>Uploading logs…</DialogTitle>
-              <DialogDescription className="sr-only">Upload in progress</DialogDescription>
+              <DialogTitle>
+                <InterfaceText source={"Uploading logs…"} />
+              </DialogTitle>
+              <DialogDescription className="sr-only">
+                <InterfaceText source={"Upload in progress"} />
+              </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col items-center gap-4 py-8">
               <Loader2 className="h-10 w-10 animate-spin text-primary" />
-              <p className="text-sm text-muted-foreground">Scrubbing PII and uploading…</p>
+              <p className="text-sm text-muted-foreground">
+                <InterfaceText source={"Scrubbing PII and uploading…"} />
+              </p>
             </div>
           </>
         )}
@@ -189,17 +226,27 @@ export default function SendLogsDialog({
         {step === "success" && result?.ok && (
           <>
             <DialogHeader>
-              <DialogTitle>Logs uploaded</DialogTitle>
-              <DialogDescription className="sr-only">Support code ready</DialogDescription>
+              <DialogTitle>
+                <InterfaceText source={"Logs uploaded"} />
+              </DialogTitle>
+              <DialogDescription className="sr-only">
+                <InterfaceText source={"Support code ready"} />
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4 py-2">
-              <p className="text-sm text-muted-foreground">Give this code to support:</p>
+              <p className="text-sm text-muted-foreground">
+                <InterfaceText source={"Give this code to support:"} />
+              </p>
 
               <div className="flex items-center gap-3 rounded-xl border border-border bg-zinc-900 px-4 py-3">
                 <span
                   className="flex-1 text-center font-mono text-3xl font-bold tracking-[0.3em] text-primary"
-                  aria-label={`Support code: ${result.code}`}
+                  aria-label={formatInterfaceMessage("Support code: {code}", {
+                    code: String(result.code ?? ""),
+                  })}
+                  data-i18n-aria-label={"Support code: {code}"}
+                  data-i18n-aria-label-values={JSON.stringify({ code: String(result.code ?? "") })}
                 >
                   {result.code}
                 </span>
@@ -208,14 +255,18 @@ export default function SendLogsDialog({
                   size="sm"
                   onClick={handleCopyCode}
                   aria-label="Copy support code"
+                  data-i18n-aria-label={"Copy support code"}
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
 
               <p className="text-sm text-muted-foreground">
-                Or open a public GitHub issue with this number pre-filled so the maintainer can look
-                it up:
+                <InterfaceText
+                  source={
+                    "Or open a public GitHub issue with this number pre-filled so the maintainer can look it up:"
+                  }
+                />
               </p>
             </div>
 
@@ -225,13 +276,13 @@ export default function SendLogsDialog({
                 onClick={() => handleOpenChange(false)}
                 className="sm:mr-auto"
               >
-                Close
+                <InterfaceText source={"Close"} />
               </Button>
               {issueUrl && (
                 <Button asChild>
                   <a href={issueUrl} target="_blank" rel="noopener noreferrer">
                     <ExternalLink className="mr-2 h-4 w-4" />
-                    Create GitHub issue
+                    <InterfaceText source={"Create GitHub issue"} />
                   </a>
                 </Button>
               )}
@@ -243,25 +294,31 @@ export default function SendLogsDialog({
         {step === "error" && result && !result.ok && (
           <>
             <DialogHeader>
-              <DialogTitle className="text-destructive">Upload failed</DialogTitle>
-              <DialogDescription className="sr-only">Error details</DialogDescription>
+              <DialogTitle className="text-destructive">
+                <InterfaceText source={"Upload failed"} />
+              </DialogTitle>
+              <DialogDescription className="sr-only">
+                <InterfaceText source={"Error details"} />
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-3 py-2">
               <p className="text-sm text-muted-foreground">{result.message}</p>
               {result.status === 429 && (
                 <p className="text-xs text-zinc-500">
-                  You can submit up to 5 log bundles per hour per IP address.
+                  <InterfaceText
+                    source={"You can submit up to 5 log bundles per hour per IP address."}
+                  />
                 </p>
               )}
             </div>
 
             <DialogFooter>
               <Button variant="outline" onClick={reset}>
-                Try again
+                <InterfaceText source={"Try again"} />
               </Button>
               <Button variant="outline" onClick={() => handleOpenChange(false)}>
-                Close
+                <InterfaceText source={"Close"} />
               </Button>
             </DialogFooter>
           </>

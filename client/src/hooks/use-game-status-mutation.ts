@@ -1,11 +1,14 @@
+import { createElement } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { type GameStatus } from "@/components/StatusBadge";
+import { useInterfaceLanguage } from "@/lib/interface-locale";
 
 /** Mutation for PATCHing a game's status, shared by the Wishlist and Playing pages. */
 export function useGameStatusMutation() {
   const { toast } = useToast();
+  const { t, languageFor, directionFor } = useInterfaceLanguage();
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -15,10 +18,25 @@ export function useGameStatusMutation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/games"] });
-      toast({ description: "Game status updated successfully" });
+      const message = "Game status updated successfully";
+      toast({
+        description: createElement(
+          "span",
+          { lang: languageFor(message), dir: directionFor(message) },
+          t(message)
+        ),
+      });
     },
     onError: () => {
-      toast({ description: "Failed to update game status", variant: "destructive" });
+      const message = "Failed to update game status";
+      toast({
+        description: createElement(
+          "span",
+          { lang: languageFor(message), dir: directionFor(message) },
+          t(message)
+        ),
+        variant: "destructive",
+      });
     },
   });
 }

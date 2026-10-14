@@ -1,6 +1,8 @@
+import { createElement } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useInterfaceLanguage } from "@/lib/interface-locale";
 
 interface HiddenMutationResponse {
   hidden: boolean;
@@ -42,6 +44,7 @@ export function useHiddenMutation<TPayload = HiddenMutationPayload>(
   options?: DefaultHiddenMutationOptions | CustomHiddenMutationOptions<TPayload>
 ) {
   const { toast } = useToast();
+  const { language, t, languageFor, directionFor } = useInterfaceLanguage();
   const queryClient = useQueryClient();
 
   const isHiddenMutationPayload = (payload: unknown): payload is HiddenMutationPayload => {
@@ -54,15 +57,33 @@ export function useHiddenMutation<TPayload = HiddenMutationPayload>(
   const onSuccess = (data: HiddenMutationResponse) => {
     queryClient.invalidateQueries({ queryKey: ["/api/games"] });
     toast({
-      description: data.hidden
-        ? (options?.hiddenSuccessMessage ?? "Game hidden")
-        : (options?.unhiddenSuccessMessage ?? "Game unhidden"),
+      description: (() => {
+        const message = data.hidden
+          ? (options?.hiddenSuccessMessage ?? "Game hidden")
+          : (options?.unhiddenSuccessMessage ?? "Game unhidden");
+        return language === "en"
+          ? t(message)
+          : createElement(
+              "span",
+              { lang: languageFor(message), dir: directionFor(message) },
+              t(message)
+            );
+      })(),
     });
   };
 
   const onError = () => {
     toast({
-      description: options?.errorMessage ?? "Failed to update game visibility",
+      description: (() => {
+        const message = options?.errorMessage ?? "Failed to update game visibility";
+        return language === "en"
+          ? t(message)
+          : createElement(
+              "span",
+              { lang: languageFor(message), dir: directionFor(message) },
+              t(message)
+            );
+      })(),
       variant: "destructive",
     });
   };

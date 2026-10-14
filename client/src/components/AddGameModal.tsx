@@ -1,4 +1,4 @@
-import { getRegionalLocale } from "@/lib/regional-format";
+import { getRegionalDirection, getRegionalLocale } from "@/lib/regional-format";
 import { coverSrc } from "@/lib/cover";
 import React, { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -36,10 +36,11 @@ import { type Game, type InsertGame, type Config, type UserSettings } from "@sha
 import { visibleIgdbPlatforms } from "@shared/platforms";
 import { mapGameToInsertGame } from "@/lib/utils";
 import { Link } from "wouter";
-import { apiFetch, apiRequest } from "@/lib/queryClient";
+import { apiFetch, apiRequest, throwIfResNotOk } from "@/lib/queryClient";
 import { getAddGamePendingQuery, clearAddGamePendingQuery } from "@/lib/add-game-store";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { resolveTargetPlatform } from "@shared/title-utils";
+import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
 
 interface SearchResult extends Game {
   inCollection?: boolean;
@@ -57,6 +58,7 @@ interface IGDBPlatform {
 }
 
 export default function AddGameModal({ children, initialQuery }: AddGameModalProps) {
+  const { t, languageFor, directionFor } = useInterfaceLanguage();
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -67,6 +69,8 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const isMobile = useIsMobile();
+  const regionalLocale = getRegionalLocale() ?? Intl.DateTimeFormat().resolvedOptions().locale;
+  const regionalDirection = getRegionalDirection(regionalLocale);
   const parsedReleaseYear = Number.parseInt(releaseYear, 10);
   const hasValidReleaseYear =
     /^\d{4}$/.test(releaseYear) && parsedReleaseYear >= 1950 && parsedReleaseYear <= 2100;
@@ -151,7 +155,7 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
         params.set("year", releaseYear);
       }
       const response = await apiFetch(`/api/igdb/search?${params.toString()}`);
-      if (!response.ok) throw new Error("Search failed");
+      await throwIfResNotOk(response);
       const data: unknown = await response.json();
       return Array.isArray(data) ? data.slice(0, 10) : [];
     },
@@ -172,15 +176,21 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(gameData),
       });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to add game");
-      }
+      await throwIfResNotOk(response);
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/games"] });
-      toast({ description: "Game added to collection successfully" });
+      toast({
+        description: (
+          <span
+            lang={languageFor("Game added to collection successfully")}
+            dir={directionFor("Game added to collection successfully")}
+          >
+            {t("Game added to collection successfully")}
+          </span>
+        ),
+      });
     },
     onError: (error: Error) => {
       toast({
@@ -207,11 +217,21 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
     <div className={compact ? "space-y-2" : "mb-4 space-y-4"}>
       <div className="grid grid-cols-2 gap-2">
         <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
-          <SelectTrigger aria-label="Platform filter">
-            <SelectValue placeholder="All platforms" />
+          <SelectTrigger
+            aria-label={t("Platform filter")}
+            lang={languageFor("Platform filter")}
+            dir={directionFor("Platform filter")}
+          >
+            <SelectValue placeholder={t("All platforms")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All platforms</SelectItem>
+            <SelectItem
+              value="all"
+              lang={languageFor("All platforms")}
+              dir={directionFor("All platforms")}
+            >
+              {t("All platforms")}
+            </SelectItem>
             {displayPlatforms.map((platform) => (
               <SelectItem key={platform.id} value={String(platform.id)}>
                 {platform.name}
@@ -224,10 +244,12 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
           inputMode="numeric"
           min="1950"
           max="2100"
-          placeholder="Release year"
+          placeholder={t("Release year")}
           value={releaseYear}
           onChange={(event) => handleReleaseYearChange(event.target.value)}
-          aria-label="Release year filter"
+          aria-label={t("Release year filter")}
+          lang={languageFor("Release year filter")}
+          dir={directionFor("Release year filter")}
         />
       </div>
       <div
@@ -239,11 +261,25 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
       >
         <div className={compact ? undefined : "space-y-1"}>
           <p className={compact ? "text-xs text-muted-foreground" : "text-sm font-medium"}>
-            Show undated games first
+            <span
+              lang={languageFor("Show undated games first")}
+              dir={directionFor("Show undated games first")}
+            >
+              {t("Show undated games first")}
+            </span>
           </p>
           {!compact && (
             <p className="text-xs text-muted-foreground">
-              Include titles without a release date and place them before dated results.
+              <span
+                lang={languageFor(
+                  "Include titles without a release date and place them before dated results."
+                )}
+                dir={directionFor(
+                  "Include titles without a release date and place them before dated results."
+                )}
+              >
+                {t("Include titles without a release date and place them before dated results.")}
+              </span>
             </p>
           )}
         </div>
@@ -251,7 +287,9 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
           checked={showUndatedGames}
           onCheckedChange={setShowUndatedGames}
           disabled={hasValidReleaseYear}
-          aria-label="Show undated games first"
+          aria-label={t("Show undated games first")}
+          lang={languageFor("Show undated games first")}
+          dir={directionFor("Show undated games first")}
         />
       </div>
     </div>
@@ -290,12 +328,20 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
       >
         <SelectTrigger
           className="h-8 w-full max-w-64 text-xs"
-          aria-label={`Target platform for ${game.title}`}
+          aria-label={formatInterfaceMessage("Target platform for {title}", { title: game.title })}
+          lang={languageFor("Target platform for {title}")}
+          dir={directionFor("Target platform for {title}")}
         >
-          <SelectValue placeholder="Account default" />
+          <SelectValue placeholder={t("Account default")} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="default">Account default</SelectItem>
+          <SelectItem
+            value="default"
+            lang={languageFor("Account default")}
+            dir={directionFor("Account default")}
+          >
+            {t("Account default")}
+          </SelectItem>
           {supportedOptions.map((platform) => (
             <SelectItem key={platform.id} value={String(platform.id)}>
               {platform.name}
@@ -347,9 +393,20 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
         <DrawerTrigger asChild>{children}</DrawerTrigger>
         <DrawerContent className="h-[92vh] flex flex-col">
           <DrawerHeader className="pt-2 pb-0 px-4">
-            <DrawerTitle className="text-base">Add Game</DrawerTitle>
+            <DrawerTitle
+              className="text-base"
+              lang={languageFor("Add Game")}
+              dir={directionFor("Add Game")}
+            >
+              {t("Add Game")}
+            </DrawerTitle>
             <DrawerDescription className="sr-only">
-              Search for games to add to your collection
+              <span
+                lang={languageFor("Search for games to add to your collection")}
+                dir={directionFor("Search for games to add to your collection")}
+              >
+                {t("Search for games to add to your collection")}
+              </span>
             </DrawerDescription>
           </DrawerHeader>
 
@@ -358,13 +415,30 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
               <div className="bg-muted p-4 rounded-full">
                 <AlertCircle className="h-8 w-8 text-muted-foreground" />
               </div>
-              <h3 className="font-semibold text-lg">IGDB Configuration Required</h3>
+              <h3
+                className="font-semibold text-lg"
+                lang={languageFor("IGDB Configuration Required")}
+                dir={directionFor("IGDB Configuration Required")}
+              >
+                {t("IGDB Configuration Required")}
+              </h3>
               <p className="text-muted-foreground text-sm">
-                Please configure IGDB credentials in settings to search for and add games.
+                <span
+                  lang={languageFor(
+                    "Please configure IGDB credentials in settings to search for and add games."
+                  )}
+                  dir={directionFor(
+                    "Please configure IGDB credentials in settings to search for and add games."
+                  )}
+                >
+                  {t("Please configure IGDB credentials in settings to search for and add games.")}
+                </span>
               </p>
               <Link href="/settings">
                 <Button className="w-full" onClick={() => setOpen(false)}>
-                  Go to Settings
+                  <span lang={languageFor("Go to Settings")} dir={directionFor("Go to Settings")}>
+                    {t("Go to Settings")}
+                  </span>
                 </Button>
               </Link>
             </div>
@@ -376,12 +450,14 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4 pointer-events-none" />
                   <Input
                     type="search"
-                    placeholder="Search for games..."
+                    placeholder={t("Search for games...")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10 h-11"
                     data-testid="input-game-search"
-                    aria-label="Search games"
+                    aria-label={t("Search games")}
+                    lang={languageFor("Search games")}
+                    dir={directionFor("Search games")}
                   />
                 </div>
                 {renderDiscoveryFilters(true)}
@@ -394,19 +470,34 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
               >
                 {isSearching && (
                   <div className="text-center py-10 text-sm text-muted-foreground">
-                    Searching games…
+                    <span
+                      lang={languageFor("Searching games…")}
+                      dir={directionFor("Searching games…")}
+                    >
+                      {t("Searching games…")}
+                    </span>
                   </div>
                 )}
 
                 {!isSearching && !debouncedQuery && (
                   <div className="text-center py-10 text-sm text-muted-foreground">
-                    Type at least 3 characters to search.
+                    <span
+                      lang={languageFor("Type at least 3 characters to search.")}
+                      dir={directionFor("Type at least 3 characters to search.")}
+                    >
+                      {t("Type at least 3 characters to search.")}
+                    </span>
                   </div>
                 )}
 
                 {!isSearching && debouncedQuery && resultsWithCollectionStatus.length === 0 && (
                   <div className="text-center py-10 text-sm text-muted-foreground">
-                    No games found. Try a different search term.
+                    <span
+                      lang={languageFor("No games found. Try a different search term.")}
+                      dir={directionFor("No games found. Try a different search term.")}
+                    >
+                      {t("No games found. Try a different search term.")}
+                    </span>
                   </div>
                 )}
 
@@ -418,7 +509,9 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
                   >
                     <img
                       src={coverSrc(game.coverUrl)}
-                      alt={`${game.title} cover`}
+                      alt={formatInterfaceMessage("Cover art for {title}", { title: game.title })}
+                      lang={languageFor("Cover art for {title}")}
+                      dir={directionFor("Cover art for {title}")}
                       className="w-14 h-20 object-cover rounded-md flex-shrink-0"
                     />
                     <div className="flex-1 min-w-0 flex flex-col gap-1">
@@ -426,13 +519,17 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
                         <h3
                           className="font-semibold text-sm leading-snug line-clamp-2 flex-1"
                           data-testid={`text-game-title-${game.id}`}
+                          lang="und"
+                          dir="auto"
                         >
                           {game.title}
                         </h3>
                         {game.inCollection ? (
                           <Badge variant="default" className="text-xs flex-shrink-0 mt-0.5 gap-1">
                             <Check className="w-3 h-3" />
-                            Added
+                            <span lang={languageFor("Added")} dir={directionFor("Added")}>
+                              {t("Added")}
+                            </span>
                           </Badge>
                         ) : (
                           <button
@@ -441,7 +538,11 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
                             disabled={addGameMutation.isPending}
                             className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center active:scale-95 transition-transform disabled:opacity-50"
                             data-testid={`button-add-${game.id}`}
-                            aria-label={`Add ${game.title} to collection`}
+                            aria-label={formatInterfaceMessage("Add {title} to collection", {
+                              title: game.title,
+                            })}
+                            lang={languageFor("Add {title} to collection")}
+                            dir={directionFor("Add {title} to collection")}
                           >
                             {isAddingGame(game.igdbId) ? (
                               <Loader2 className="w-4 h-4 animate-spin" />
@@ -454,7 +555,11 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
 
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         {game.releaseDate && (
-                          <span className="flex items-center gap-1">
+                          <span
+                            className="flex items-center gap-1"
+                            lang={regionalLocale}
+                            dir={regionalDirection}
+                          >
                             <Calendar className="w-3 h-3" />
                             {game.releaseDate.endsWith("-12-31")
                               ? new Date(game.releaseDate).getFullYear()
@@ -473,13 +578,17 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
                       </div>
 
                       {game.genres?.[0] && (
-                        <Badge variant="secondary" className="text-xs w-fit">
+                        <Badge variant="secondary" className="text-xs w-fit" lang="und" dir="auto">
                           {game.genres[0]}
                         </Badge>
                       )}
 
                       {game.summary && (
-                        <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
+                        <p
+                          className="text-xs text-muted-foreground line-clamp-2 mt-0.5"
+                          lang="und"
+                          dir="auto"
+                        >
                           {game.summary}
                         </p>
                       )}
@@ -503,8 +612,18 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add Game to Collection</DialogTitle>
-          <DialogDescription>Search for games to add to your collection</DialogDescription>
+          <DialogTitle
+            lang={languageFor("Add Game to Collection")}
+            dir={directionFor("Add Game to Collection")}
+          >
+            {t("Add Game to Collection")}
+          </DialogTitle>
+          <DialogDescription
+            lang={languageFor("Search for games to add to your collection")}
+            dir={directionFor("Search for games to add to your collection")}
+          >
+            {t("Search for games to add to your collection")}
+          </DialogDescription>
         </DialogHeader>
 
         {igdbNotConfigured ? (
@@ -512,12 +631,31 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
             <div className="bg-muted p-4 rounded-full">
               <AlertCircle className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="font-semibold text-lg">IGDB Configuration Required</h3>
+            <h3
+              className="font-semibold text-lg"
+              lang={languageFor("IGDB Configuration Required")}
+              dir={directionFor("IGDB Configuration Required")}
+            >
+              {t("IGDB Configuration Required")}
+            </h3>
             <p className="text-muted-foreground max-w-sm">
-              Please configure IGDB credentials in settings to search for and add games.
+              <span
+                lang={languageFor(
+                  "Please configure IGDB credentials in settings to search for and add games."
+                )}
+                dir={directionFor(
+                  "Please configure IGDB credentials in settings to search for and add games."
+                )}
+              >
+                {t("Please configure IGDB credentials in settings to search for and add games.")}
+              </span>
             </p>
             <Link href="/settings">
-              <Button onClick={() => setOpen(false)}>Go to Settings</Button>
+              <Button onClick={() => setOpen(false)}>
+                <span lang={languageFor("Go to Settings")} dir={directionFor("Go to Settings")}>
+                  {t("Go to Settings")}
+                </span>
+              </Button>
             </Link>
           </div>
         ) : (
@@ -527,19 +665,23 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
                   type="search"
-                  placeholder="Search for games..."
+                  placeholder={t("Search for games...")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
                   data-testid="input-game-search"
-                  aria-label="Search games"
+                  aria-label={t("Search games")}
+                  lang={languageFor("Search games")}
+                  dir={directionFor("Search games")}
                 />
               </div>
               <Button
                 type="submit"
                 disabled={isSearching}
                 data-testid="button-search-games"
-                aria-label="Search"
+                aria-label={t("Search")}
+                lang={languageFor("Search")}
+                dir={directionFor("Search")}
               >
                 <Search className="w-4 h-4" />
               </Button>
@@ -549,12 +691,23 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
 
             <div className="space-y-4" aria-live="polite">
               {isSearching && (
-                <div className="text-center py-8 text-muted-foreground">Searching games...</div>
+                <div
+                  className="text-center py-8 text-muted-foreground"
+                  lang={languageFor("Searching games...")}
+                  dir={directionFor("Searching games...")}
+                >
+                  {t("Searching games...")}
+                </div>
               )}
 
               {!isSearching && debouncedQuery && resultsWithCollectionStatus.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
-                  No games found. Try a different search term.
+                  <span
+                    lang={languageFor("No games found. Try a different search term.")}
+                    dir={directionFor("No games found. Try a different search term.")}
+                  >
+                    {t("No games found. Try a different search term.")}
+                  </span>
                 </div>
               )}
 
@@ -568,7 +721,9 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
                     <div className="flex gap-4">
                       <img
                         src={coverSrc(game.coverUrl)}
-                        alt={`${game.title} cover`}
+                        alt={formatInterfaceMessage("Cover art for {title}", { title: game.title })}
+                        lang={languageFor("Cover art for {title}")}
+                        dir={directionFor("Cover art for {title}")}
                         className="w-16 h-24 object-cover rounded-md flex-shrink-0"
                       />
                       <div className="flex-1 min-w-0">
@@ -576,12 +731,18 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
                           <h3
                             className="font-semibold truncate"
                             data-testid={`text-game-title-${game.id}`}
+                            lang="und"
+                            dir="auto"
                           >
                             {game.title}
                           </h3>
                           <div className="flex items-center gap-2 flex-shrink-0">
                             {game.releaseDate && (
-                              <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                              <div
+                                className="flex items-center gap-1 text-sm text-muted-foreground"
+                                lang={regionalLocale}
+                                dir={regionalDirection}
+                              >
                                 <Calendar className="w-3 h-3" />
                                 {game.releaseDate.endsWith("-12-31")
                                   ? new Date(game.releaseDate).getFullYear()
@@ -605,14 +766,24 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
                         </div>
 
                         {game.summary && (
-                          <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+                          <p
+                            className="text-sm text-muted-foreground mb-2 line-clamp-2"
+                            lang="und"
+                            dir="auto"
+                          >
                             {game.summary}
                           </p>
                         )}
 
                         <div className="flex flex-wrap gap-1 mb-3">
                           {game.genres?.slice(0, 3).map((genre) => (
-                            <Badge key={genre} variant="secondary" className="text-xs">
+                            <Badge
+                              key={genre}
+                              variant="secondary"
+                              className="text-xs"
+                              lang="und"
+                              dir="auto"
+                            >
                               {genre}
                             </Badge>
                           ))}
@@ -623,7 +794,13 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
                         <div className="flex items-center justify-between">
                           <div className="flex flex-wrap gap-1">
                             {game.platforms?.slice(0, 3).map((platform) => (
-                              <Badge key={platform} variant="outline" className="text-xs">
+                              <Badge
+                                key={platform}
+                                variant="outline"
+                                className="text-xs"
+                                lang="und"
+                                dir="auto"
+                              >
                                 {platform}
                               </Badge>
                             ))}
@@ -631,7 +808,12 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
 
                           {game.inCollection ? (
                             <Badge variant="default" className="text-xs">
-                              In Collection
+                              <span
+                                lang={languageFor("In Collection")}
+                                dir={directionFor("In Collection")}
+                              >
+                                {t("In Collection")}
+                              </span>
                             </Badge>
                           ) : (
                             <Button
@@ -639,14 +821,23 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
                               onClick={() => handleAddGame(game)}
                               disabled={addGameMutation.isPending}
                               data-testid={`button-add-${game.id}`}
-                              aria-label={`Add ${game.title} to collection`}
+                              aria-label={formatInterfaceMessage("Add {title} to collection", {
+                                title: game.title,
+                              })}
+                              lang={languageFor("Add {title} to collection")}
+                              dir={directionFor("Add {title} to collection")}
                             >
                               {isAddingGame(game.igdbId) ? (
                                 <Loader2 className="w-4 h-4 mr-1 animate-spin" />
                               ) : (
                                 <Plus className="w-4 h-4 mr-1" />
                               )}
-                              {isAddingGame(game.igdbId) ? "Adding..." : "Add"}
+                              <span
+                                lang={languageFor(isAddingGame(game.igdbId) ? "Adding..." : "Add")}
+                                dir={directionFor(isAddingGame(game.igdbId) ? "Adding..." : "Add")}
+                              >
+                                {t(isAddingGame(game.igdbId) ? "Adding..." : "Add")}
+                              </span>
                             </Button>
                           )}
                         </div>

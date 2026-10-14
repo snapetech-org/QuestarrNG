@@ -9,6 +9,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { GAME_LINK_REQUIRED_STATUS, QUARANTINED_STATUS } from "@shared/schema";
 import { RegionalRelativeTime } from "./RegionalRelativeTime";
+import { InterfaceText } from "@/components/InterfaceText";
 
 interface PendingImport {
   id: string;
@@ -71,9 +72,14 @@ export default function PendingImportsCard() {
             <div className="flex items-center gap-2 text-amber-600 dark:text-amber-500">
               <AlertCircle className="h-5 w-5 shrink-0" />
               <CardTitle className="text-lg">
-                {multiple
-                  ? `${pendingImports.length} Pending Manual Imports`
-                  : "Pending Manual Import"}
+                {multiple ? (
+                  <InterfaceText
+                    source="Pending manual imports: {count}"
+                    values={{ count: pendingImports.length }}
+                  />
+                ) : (
+                  <InterfaceText source={"Pending Manual Import"} />
+                )}
               </CardTitle>
             </div>
             {multiple && (
@@ -97,9 +103,19 @@ export default function PendingImportsCard() {
             )}
           </div>
           <CardDescription>
-            {multiple
-              ? "These downloads require your attention before they can be added to your library."
-              : "This download requires your attention before it can be added to your library."}
+            {multiple ? (
+              <InterfaceText
+                source={
+                  "These downloads require your attention before they can be added to your library."
+                }
+              />
+            ) : (
+              <InterfaceText
+                source={
+                  "This download requires your attention before it can be added to your library."
+                }
+              />
+            )}
           </CardDescription>
         </CardHeader>
         {!collapsed && (
@@ -143,7 +159,11 @@ export default function PendingImportsCard() {
                       disabled={skipMutation.isPending && skipMutation.variables === item.id}
                       onClick={() => skipMutation.mutate(item.id)}
                     >
-                      {item.status === QUARANTINED_STATUS ? "Dismiss" : "Skip"}
+                      {item.status === QUARANTINED_STATUS ? (
+                        <InterfaceText source={"Dismiss"} />
+                      ) : (
+                        <InterfaceText source={"Skip"} />
+                      )}
                     </Button>
                     {item.status !== QUARANTINED_STATUS && (
                       <Button size="sm" onClick={() => setSelectedImport(item)}>

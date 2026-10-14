@@ -29,10 +29,10 @@ describe("StatusPicker", () => {
     fireEvent.click(screen.getByRole("button", { name: /Change status for Portal 2/i }));
 
     // All four user-settable statuses must appear as chips
-    expect(await screen.findByRole("button", { name: "wanted" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "owned" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "shelved" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "completed" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Wanted" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Owned" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Shelved" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Completed" })).toBeInTheDocument();
   });
 
   it("does not show downloading as a selectable chip", async () => {
@@ -41,7 +41,7 @@ describe("StatusPicker", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: /Change status for Portal 2/i }));
-    await screen.findByRole("button", { name: "wanted" }); // wait for popover
+    await screen.findByRole("button", { name: "Wanted" }); // wait for popover
 
     expect(screen.queryByRole("button", { name: "downloading" })).not.toBeInTheDocument();
   });
@@ -52,10 +52,10 @@ describe("StatusPicker", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: /Change status for Portal 2/i }));
-    const shelvedChip = await screen.findByRole("button", { name: "shelved" });
+    const shelvedChip = await screen.findByRole("button", { name: "Shelved" });
 
     expect(shelvedChip).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("button", { name: "owned" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: "Owned" })).toHaveAttribute("aria-pressed", "false");
   });
 
   it("calls onStatusChange with the selected status and closes popover", async () => {
@@ -64,14 +64,14 @@ describe("StatusPicker", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: /Change status for Portal 2/i }));
-    const completedChip = await screen.findByRole("button", { name: "completed" });
+    const completedChip = await screen.findByRole("button", { name: "Completed" });
     fireEvent.click(completedChip);
 
     expect(onStatusChange).toHaveBeenCalledOnce();
     expect(onStatusChange).toHaveBeenCalledWith("completed");
 
     // Popover should close — chips no longer visible
-    expect(screen.queryByRole("button", { name: "completed" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Completed" })).not.toBeInTheDocument();
   });
 
   it("renders as a non-interactive badge when status is downloading", () => {
@@ -104,6 +104,6 @@ describe("StatusPicker", () => {
     expect(trigger).toBeInTheDocument();
 
     fireEvent.click(trigger);
-    expect(await screen.findByRole("button", { name: "shelved" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Shelved" })).toBeInTheDocument();
   });
 });

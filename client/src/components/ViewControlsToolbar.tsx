@@ -3,6 +3,7 @@ import { LayoutGrid, List, Rows2, Rows3 } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
 
 interface ViewControlsToolbarProps {
   viewMode: "grid" | "list";
@@ -17,6 +18,7 @@ export default function ViewControlsToolbar({
   listDensity,
   onListDensityChange,
 }: ViewControlsToolbarProps) {
+  const { t, languageFor, directionFor } = useInterfaceLanguage();
   const toggleDensity = () =>
     onListDensityChange(listDensity === "comfortable" ? "compact" : "comfortable");
 
@@ -33,12 +35,24 @@ export default function ViewControlsToolbar({
                   <Rows2 className="h-3.5 w-3.5" />
                 )}
                 <span className="sr-only sm:not-sr-only sm:inline-block">
-                  {listDensity === "comfortable" ? "Comfortable" : "Compact"}
+                  <span
+                    lang={languageFor(listDensity === "comfortable" ? "Comfortable" : "Compact")}
+                    dir={directionFor(listDensity === "comfortable" ? "Comfortable" : "Compact")}
+                  >
+                    {t(listDensity === "comfortable" ? "Comfortable" : "Compact")}
+                  </span>
                 </span>
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              Switch to {listDensity === "comfortable" ? "compact" : "comfortable"}
+              <span
+                lang={languageFor("Switch to {density}")}
+                dir={directionFor("Switch to {density}")}
+              >
+                {formatInterfaceMessage("Switch to {density}", {
+                  density: t(listDensity === "comfortable" ? "Compact" : "Comfortable"),
+                })}
+              </span>
             </TooltipContent>
           </Tooltip>
         </span>
@@ -48,10 +62,20 @@ export default function ViewControlsToolbar({
         value={viewMode}
         onValueChange={(value) => value && onViewModeChange(value as "grid" | "list")}
       >
-        <ToggleGroupItem value="grid" aria-label="Grid View">
+        <ToggleGroupItem
+          value="grid"
+          aria-label={t("Grid View")}
+          lang={languageFor("Grid View")}
+          dir={directionFor("Grid View")}
+        >
           <LayoutGrid className="h-4 w-4" />
         </ToggleGroupItem>
-        <ToggleGroupItem value="list" aria-label="List View">
+        <ToggleGroupItem
+          value="list"
+          aria-label={t("List View")}
+          lang={languageFor("List View")}
+          dir={directionFor("List View")}
+        >
           <List className="h-4 w-4" />
         </ToggleGroupItem>
       </ToggleGroup>

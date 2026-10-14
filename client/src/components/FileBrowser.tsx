@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { apiRequest } from "@/lib/queryClient";
+import { InterfaceText } from "@/components/InterfaceText";
 
 interface FileStats {
   name: string;
@@ -124,7 +125,9 @@ export function FileBrowser({
     scrollContent = (
       <div className="p-1 space-y-1">
         {data?.items.length === 0 && (
-          <div className="text-center text-sm text-muted-foreground py-4">Empty directory</div>
+          <div className="text-center text-sm text-muted-foreground py-4">
+            <InterfaceText source={"Empty directory"} />
+          </div>
         )}
         {data?.items.map((item) =>
           item.isDirectory ? (
@@ -163,7 +166,9 @@ export function FileBrowser({
       <DialogContent className="max-w-2xl h-[500px] flex flex-col">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>Navigate and select a directory</DialogDescription>
+          <DialogDescription>
+            <InterfaceText source={"Navigate and select a directory"} />
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex items-center gap-2 p-2 bg-muted rounded-md mb-2">
@@ -177,6 +182,7 @@ export function FileBrowser({
             aria-label="Navigate up"
             disabled={!data?.parent || currentPath === "/"}
             onClick={handleUp}
+            data-i18n-aria-label={"Navigate up"}
           >
             <CornerLeftUp className="h-4 w-4" />
           </Button>
@@ -186,7 +192,7 @@ export function FileBrowser({
 
         <div className="flex justify-end pt-4 gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            <InterfaceText source={"Cancel"} />
           </Button>
           <Button
             onClick={() => {
@@ -198,7 +204,7 @@ export function FileBrowser({
               onOpenChange(false);
             }}
           >
-            Select Current
+            <InterfaceText source={"Select Current"} />
           </Button>
         </div>
       </DialogContent>

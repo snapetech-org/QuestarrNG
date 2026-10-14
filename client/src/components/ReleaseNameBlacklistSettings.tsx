@@ -43,6 +43,7 @@ export default function ReleaseNameBlacklistSettings({
       successDescription="Your blacklisted release name terms have been saved."
       saveLabel="Save Blacklist"
       onReset={() => setTerms([])}
+      data-i18n-title={"Release Name Blacklist"}
     />
   );
 }

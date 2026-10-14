@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Loader2, ShieldCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { InterfaceText } from "@/components/InterfaceText";
 
 const REDACTED_PLACEHOLDER = "********";
 
@@ -102,7 +103,11 @@ export default function SecurityScanSettings() {
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-5 w-5 text-muted-foreground" />
             <p className="text-sm font-medium">
-              Scans downloads for malware before they're unpacked or moved into your library.
+              <InterfaceText
+                source={
+                  "Scans downloads for malware before they're unpacked or moved into your library."
+                }
+              />
             </p>
           </div>
 
@@ -112,10 +117,15 @@ export default function SecurityScanSettings() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label className="text-sm font-medium">VirusTotal (Hash-Based)</Label>
+                <Label className="text-sm font-medium">
+                  <InterfaceText source={"VirusTotal (Hash-Based)"} />
+                </Label>
                 <p className="text-xs text-muted-foreground">
-                  Looks up the SHA-256 hash of the downloaded file against VirusTotal before import.
-                  Requires a free VirusTotal API key.
+                  <InterfaceText
+                    source={
+                      "Looks up the SHA-256 hash of the downloaded file against VirusTotal before import. Requires a free VirusTotal API key."
+                    }
+                  />
                 </p>
               </div>
               <Switch
@@ -132,7 +142,9 @@ export default function SecurityScanSettings() {
               }
             >
               <div className="space-y-1.5">
-                <Label htmlFor="vt-api-key">API Key</Label>
+                <Label htmlFor="vt-api-key">
+                  <InterfaceText source={"API Key"} />
+                </Label>
                 <div className="flex gap-2">
                   <Input
                     id="vt-api-key"
@@ -151,6 +163,7 @@ export default function SecurityScanSettings() {
                       })
                     }
                     className="flex-1"
+                    data-i18n-placeholder={"Your VirusTotal API key"}
                   />
                   <Button
                     type="button"
@@ -159,13 +172,15 @@ export default function SecurityScanSettings() {
                     title={testTitle}
                     onClick={() => testMutation.mutate("virustotal")}
                   >
-                    Test
+                    <InterfaceText source={"Test"} />
                   </Button>
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="vt-threshold">Detection Threshold</Label>
+                <Label htmlFor="vt-threshold">
+                  <InterfaceText source={"Detection Threshold"} />
+                </Label>
                 <Input
                   id="vt-threshold"
                   type="number"
@@ -183,16 +198,25 @@ export default function SecurityScanSettings() {
                   className="w-32"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Abort the import if more than this many VirusTotal engines flag the file.
+                  <InterfaceText
+                    source={
+                      "Abort the import if more than this many VirusTotal engines flag the file."
+                    }
+                  />
                 </p>
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Block Unknown Hashes</Label>
+                  <Label>
+                    <InterfaceText source={"Block Unknown Hashes"} />
+                  </Label>
                   <p className="text-xs text-muted-foreground">
-                    Block files VirusTotal has never scanned before. Disabled by default so new
-                    legitimate releases aren't blocked.
+                    <InterfaceText
+                      source={
+                        "Block files VirusTotal has never scanned before. Disabled by default so new legitimate releases aren't blocked."
+                      }
+                    />
                   </p>
                 </div>
                 <Switch
@@ -214,9 +238,15 @@ export default function SecurityScanSettings() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label className="text-sm font-medium">Local ClamAV (Deep Scan)</Label>
+                <Label className="text-sm font-medium">
+                  <InterfaceText source={"Local ClamAV (Deep Scan)"} />
+                </Label>
                 <p className="text-xs text-muted-foreground">
-                  Streams downloaded files through a ClamAV daemon for signature-based scanning.
+                  <InterfaceText
+                    source={
+                      "Streams downloaded files through a ClamAV daemon for signature-based scanning."
+                    }
+                  />
                 </p>
               </div>
               <Switch
@@ -233,7 +263,9 @@ export default function SecurityScanSettings() {
               }
             >
               <div className="space-y-1.5 flex-1">
-                <Label htmlFor="clamav-host">Host</Label>
+                <Label htmlFor="clamav-host">
+                  <InterfaceText source={"Host"} />
+                </Label>
                 <Input
                   id="clamav-host"
                   placeholder="clamav"
@@ -241,10 +273,13 @@ export default function SecurityScanSettings() {
                   onChange={(e) =>
                     setLocal({ ...local, clamav: { ...local.clamav, host: e.target.value } })
                   }
+                  data-i18n-placeholder={"clamav"}
                 />
               </div>
               <div className="space-y-1.5 w-32">
-                <Label htmlFor="clamav-port">Port</Label>
+                <Label htmlFor="clamav-port">
+                  <InterfaceText source={"Port"} />
+                </Label>
                 <Input
                   id="clamav-port"
                   type="number"
@@ -270,7 +305,7 @@ export default function SecurityScanSettings() {
                   title={testTitle}
                   onClick={() => testMutation.mutate("clamav")}
                 >
-                  Test
+                  <InterfaceText source={"Test"} />
                 </Button>
               </div>
             </div>
@@ -279,7 +314,7 @@ export default function SecurityScanSettings() {
           <div className="flex justify-end pt-2">
             <Button onClick={() => saveMutation.mutate(local)} disabled={saveMutation.isPending}>
               {saveMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-              Save Changes
+              <InterfaceText source={"Save Changes"} />
             </Button>
           </div>
         </CardContent>

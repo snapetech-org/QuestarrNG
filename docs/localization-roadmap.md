@@ -1,21 +1,22 @@
-# UI localization roadmap
+# UI localization
 
-## Existing support and verified gap
+## Coverage
 
-The `client/src` React application currently has English interface copy, with no app-level locale catalogs, language preference, or localization framework in the reachable branch and pull-request history. Date and number rendering uses browser defaults in places, but that does not translate the interface or follow a saved app language.
+Questarr's React interface has a browser-local language preference for English and twelve non-English locales: Spanish, Simplified Chinese, Hindi, German, Japanese, French, Brazilian Portuguese, Arabic, Korean, Traditional Chinese, Vietnamese, and Indonesian. The English-keyed catalog contains 1,857 app-owned source strings with a translation in every locale. English is the fallback for missing keys. Translated strings and accessible attributes carry language and direction metadata; Arabic sets the document language and direction and uses logical layout rules.
 
-## Implementation plan
+Catalog coverage includes navigation and page copy, settings, labels and accessible names, forms, help, empty states, dynamic summaries, notifications, finite app-owned statuses, and stable API error summaries. Known API errors use stable status codes for translated summaries. Original server detail and route-specific validation payloads remain available as English detail to preserve the API contract. Known generated notification templates are translated; custom or changed notification text falls back to its original text because notification parameters are not stored separately. Unknown status values, game titles, release names, paths, user input, and raw API values remain unchanged.
 
-1. Inventory and extract visible labels, help, empty states, validation, notifications, and errors from `client/src` and server-originated content rendered by the client. Include free-form API error responses and persisted notification titles/messages. Define a translation strategy for each source; prefer stable message keys with interpolation parameters for server errors and stored notifications. Preserve API values, game titles, release names, paths, and user-entered text.
-2. Keep the initial shell catalog dependency-free with English per-key fallback and native browser Intl APIs. Add a full message framework when extraction reaches dynamic messages and plural rules.
-3. Add an accessible Display Language control to the existing Settings > Appearance surface. Apply changes immediately and persist the explicit choice in browser-local preferences; on first use, try the browser's preferred locale before falling back to English.
-4. Use the regional-format preference for dates, times, numbers, and calendar week structure. Use the interface language for translated text, plural rules, and user-visible alphabetical sorting; keep the two preferences independent and reactive.
-5. Mark each translated string with its language and direction. Keep document metadata aligned with the page's primary language while only part of the interface is translated; switch the document language when the page's primary copy uses the selected locale, and derive direction separately. Expand Arabic screen coverage only after reviewing logical layout and core workflows in RTL at narrow and desktop widths.
-6. For each PR that changes `client/src`, include the required running UI screenshot at desktop and narrow widths.
+The interface language and regional-format preference are independent. Regional formatting controls dates, times, numbers, calendar weeks, and locale-aware sorting. Language choice is saved in browser-local preferences; first use follows the browser's preferred language before falling back to English.
 
-## First-pass locale order
+## Review status and limits
 
-This is a practical rollout order, not a claim about these apps' actual user base. Product-level language analytics are not available. It combines global speaker estimates with online-content usage, and keeps the requested Arabic and Asian-language coverage in the first waves:
+The catalog has 1,857 keys across twelve target locales (22,284 translated values), with no empty values or interpolation-placeholder mismatches. A source-reference scan found no missing static UI keys. Catalog review checked protected technical tokens and suspicious duplicate or context-mismatched translations.
+
+Production browser review used the Agentic VM at desktop and mobile widths. It checked Arabic setup, authenticated library, download empty states, settings (including the theme picker), document language and direction, and horizontal overflow. A wider Arabic route sample covered the main navigation and administration pages. The production build passed and the full test suite passed (3,772 passed, 7 skipped; one test file skipped). Populated API-backed flows, live indexer/download-client integrations, and externally supplied game or release text were not exercised; dynamic names and raw API details remain in their source language by design.
+
+## Locale selection
+
+This first-wave locale set was selected as a practical rollout order, not as a claim about Questarr users. Product-level language analytics are not available. The order combines global speaker estimates with online-content usage, while including requested Arabic and Asian-language coverage:
 
 1. Spanish (es; es-MX where the product already distinguishes it)
 2. Simplified Chinese (zh-Hans / zh-CN)
@@ -24,24 +25,10 @@ This is a practical rollout order, not a claim about these apps' actual user bas
 5. Japanese (ja)
 6. French (fr)
 7. Brazilian Portuguese (pt-BR)
-8. Arabic (ar; requires right-to-left layout support)
+8. Arabic (ar)
 9. Korean (ko)
 10. Traditional Chinese (zh-Hant / zh-TW)
 11. Vietnamese (vi)
 12. Indonesian (id)
 
-The World Bank's 2025 report estimates Mandarin Chinese, Hindi, and Spanish at 15%, 7.6%, and 6.9% of the global population respectively; its online-content data also places German, Chinese, and Japanese among the leading languages. [World Bank, Digital Progress and Trends Report 2025](https://documents1.worldbank.org/curated/en/099112525160536089/pdf/P505350-59c98ca8-0803-4f23-b470-17f3dab010ab.pdf). W3Techs tracks website content-language share rather than app users. [W3Techs content-language survey](https://w3techs.com/technologies/cross/content_language%20/ranking). Reorder this list if maintainers later receive reliable demand signals.
-
-## Translation boundaries and acceptance
-
-Translate interface labels, help, empty states, validation, notifications, and errors, including server-originated content shown by the client. For free-form API errors and persisted notification titles and messages, use stable translatable message keys with parameters or otherwise ensure those strings are covered by the catalogs. Keep media titles, user names, filenames and paths, commands, API identifiers, protocol values, and other user-supplied content unchanged. Mark translated text with its own `lang` and `dir`; retain English root metadata while English remains the page's primary language, then update root `lang` when the primary copy changes. Use the selected regional format for dates, times, numbers, and calendar week structure; use the interface language for translated copy, plural rules, and alphabetical collation. Every locale must fall back to English for a missing key; CI should check placeholder parity and report missing strings. Arabic ships only after logical layout properties and core workflows are verified in RTL at narrow and desktop widths.
-
-## Implemented in this PR
-
-Settings > Appearance now lets each browser choose regional date, time, and number formatting from browser defaults or the first-pass locale list: Spanish, Simplified Chinese, Hindi, German, Japanese, French, Brazilian Portuguese, Arabic, Korean, Traditional Chinese, Vietnamese, and Indonesian. Dates, times, and relative-time numbers use that choice, and calendar month and week views follow the selected locale’s first day of week. Relative-time wording follows the interface language, keeping the two preferences independent. This is a regional-format preference, not an interface-language translation; the app-wide catalog and RTL work in the roadmap remain outstanding.
-
-Initial Setup and Settings > Appearance now offer a browser-local interface-language selector for twelve first-wave locales. Desktop and mobile navigation, page titles, and the language and regional-format controls use translated labels with English fallback. Each translated string carries its own language and direction metadata; the document remains English and left-to-right while most page content is English. Full RTL layout review is still needed.
-
-## Added in this continuation
-
-The Release Calendar now translates its headings, controls, empty states, and weekday names in the first-wave catalogs, and formats its dates and counts with the selected regional preference. Regional-format changes re-render open screens and keep working in the current tab when browser storage is unavailable. The game download dialog now translates its search filters, sort controls, empty states, release categories, result metrics, relative ages, and update selection/download flow. Server-originated API errors and persisted notification text still need stable translation keys and remain English; full catalog translation and complete RTL layout review remain outstanding.
+The World Bank's 2025 report estimates Mandarin Chinese, Hindi, and Spanish at 15%, 7.6%, and 6.9% of the global population respectively; its online-content data also places German, Chinese, and Japanese among leading languages. [World Bank, Digital Progress and Trends Report 2025](https://documents1.worldbank.org/curated/en/099112525160536089/pdf/P505350-59c98ca8-0803-4f23-b470-17f3dab010ab.pdf). W3Techs tracks website content-language share rather than app users. [W3Techs content-language survey](https://w3techs.com/technologies/cross/content_language/ranking). Reorder this list if maintainers later receive reliable demand signals.

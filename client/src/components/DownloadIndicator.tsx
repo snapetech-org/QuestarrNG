@@ -2,6 +2,7 @@ import React, { memo } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { DownloadSummary } from "@shared/schema";
+import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
 
 interface DownloadIndicatorProps {
   summary: DownloadSummary | undefined;
@@ -23,12 +24,16 @@ const STATUS_LABEL: Record<DownloadSummary["topStatus"], string> = {
 };
 
 const DownloadIndicator = memo(({ summary, variant = "overlay" }: DownloadIndicatorProps) => {
+  const { language, t, languageFor, directionFor } = useInterfaceLanguage();
   if (!summary) return null;
 
   const colorClass = STATUS_COLOR[summary.topStatus];
-  const label = STATUS_LABEL[summary.topStatus];
+  const source = STATUS_LABEL[summary.topStatus];
+  const label = t(source);
   const types = summary.downloadTypes.join(", ");
-  const tooltipText = `${label} · ${summary.count} download${summary.count !== 1 ? "s" : ""} (${types})`;
+  const countSource = summary.count === 1 ? "1 download ({types})" : "{count} downloads ({types})";
+  const countLabel = formatInterfaceMessage(countSource, { count: summary.count, types }, language);
+  const tooltipText = `${label} · ${countLabel}`;
 
   return (
     <Tooltip>
@@ -41,10 +46,14 @@ const DownloadIndicator = memo(({ summary, variant = "overlay" }: DownloadIndica
             variant === "overlay" ? "absolute bottom-2 left-2" : "inline-flex"
           )}
           aria-label={tooltipText}
+          lang={languageFor(source)}
+          dir={directionFor(source)}
           role="status"
         />
       </TooltipTrigger>
-      <TooltipContent>{tooltipText}</TooltipContent>
+      <TooltipContent lang={languageFor(source)} dir={directionFor(source)}>
+        {tooltipText}
+      </TooltipContent>
     </Tooltip>
   );
 });

@@ -1,6 +1,7 @@
 import { Badge, badgeVariants } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
 
 interface TagListProps {
   items: string[];
@@ -19,13 +20,22 @@ export function TagList({
   emptyText,
   className,
 }: TagListProps) {
+  const { t, languageFor, directionFor } = useInterfaceLanguage();
   const visibleCount = maxVisible ?? items.length;
   const overflow = items.length > visibleCount ? items.length - visibleCount : 0;
   const visible = items.slice(0, visibleCount);
 
   if (items.length === 0) {
     if (!emptyText) return null;
-    return <span className="text-xs text-muted-foreground">{emptyText}</span>;
+    return (
+      <span
+        className="text-xs text-muted-foreground"
+        lang={languageFor(emptyText)}
+        dir={directionFor(emptyText)}
+      >
+        {t(emptyText)}
+      </span>
+    );
   }
 
   return (
@@ -38,7 +48,9 @@ export function TagList({
           data-testid={getTestId?.(item)}
           title={item}
         >
-          <span className="truncate">{item}</span>
+          <span className="truncate" lang="und" dir="auto">
+            {item}
+          </span>
         </Badge>
       ))}
       {overflow > 0 && (
@@ -49,15 +61,19 @@ export function TagList({
               badgeVariants({ variant: "outline" }),
               "cursor-pointer text-muted-foreground hover:text-foreground"
             )}
-            aria-label={`Show ${overflow} more items`}
+            aria-label={formatInterfaceMessage("Show {count} more items", { count: overflow })}
+            lang={languageFor("Show {count} more items")}
+            dir={directionFor("Show {count} more items")}
           >
-            +{overflow} more
+            {formatInterfaceMessage("+{count} more", { count: overflow })}
           </PopoverTrigger>
           <PopoverContent className="w-auto max-w-64 p-3">
             <div className="flex flex-wrap gap-1.5">
               {items.slice(visibleCount).map((item) => (
                 <Badge key={item} variant={variant} className="text-xs">
-                  {item}
+                  <span lang="und" dir="auto">
+                    {item}
+                  </span>
                 </Badge>
               ))}
             </div>

@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { type IgdbPlatform } from "@shared/platforms";
 import { type Config } from "@shared/schema";
+import { InterfaceText } from "@/components/InterfaceText";
 
 export interface PlatformPickerProps {
   selectedIds: number[];
@@ -56,36 +57,49 @@ export function PlatformPicker({
   return (
     <div className={`space-y-2 ${className ?? ""}`}>
       <label htmlFor={`${idPrefix}-search`} className="sr-only">
-        Search platforms
+        <InterfaceText source={"Search platforms"} />
       </label>
       <Input
         id={`${idPrefix}-search`}
         placeholder="Search platforms..."
         value={platformSearch}
         onChange={(e) => setPlatformSearch(e.target.value)}
+        data-i18n-placeholder={"Search platforms..."}
       />
       <div className="max-h-48 overflow-y-auto space-y-2 rounded-md border p-3">
-        {platformsLoading && <p className="text-xs text-muted-foreground">Loading platforms...</p>}
+        {platformsLoading && (
+          <p className="text-xs text-muted-foreground">
+            <InterfaceText source={"Loading platforms..."} />
+          </p>
+        )}
         {platformsError && (
           <div className="space-y-2">
-            <p className="text-xs text-amber-500">Could not load platform list from IGDB.</p>
+            <p className="text-xs text-amber-500">
+              <InterfaceText source={"Could not load platform list from IGDB."} />
+            </p>
             <Button type="button" variant="outline" size="sm" onClick={() => refetchPlatforms()}>
-              Retry
+              <InterfaceText source={"Retry"} />
             </Button>
           </div>
         )}
         {!platformsLoading && !platformsError && igdbPlatforms.length === 0 && (
           <p className="text-xs text-muted-foreground">
-            {appConfig?.igdb.configured
-              ? "IGDB returned no platforms. Try again in a few seconds."
-              : "IGDB is not configured yet — platform filters unavailable."}
+            {appConfig?.igdb.configured ? (
+              <InterfaceText source={"IGDB returned no platforms. Try again in a few seconds."} />
+            ) : (
+              <InterfaceText
+                source={"IGDB is not configured yet — platform filters unavailable."}
+              />
+            )}
           </p>
         )}
         {!platformsLoading &&
           !platformsError &&
           igdbPlatforms.length > 0 &&
           filteredPlatforms.length === 0 && (
-            <p className="text-xs text-muted-foreground">No platforms match your search.</p>
+            <p className="text-xs text-muted-foreground">
+              <InterfaceText source={"No platforms match your search."} />
+            </p>
           )}
         {filteredPlatforms.map((platform) => (
           <div key={platform.id} className="flex items-center gap-2.5">

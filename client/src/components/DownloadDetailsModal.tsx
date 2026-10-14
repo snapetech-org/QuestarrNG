@@ -37,6 +37,7 @@ import {
 import { formatBytes } from "@/lib/utils";
 import type { DownloadFile, DownloadTracker, DownloadDetails } from "@shared/schema";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { InterfaceText } from "@/components/InterfaceText";
 
 interface DownloadDetailsModalProps {
   downloaderId: string;
@@ -116,14 +117,16 @@ export default function DownloadDetailsModal({
           data-testid="download-details-loading"
         >
           <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent mr-2" />
-          <span>Loading download details...</span>
+          <span>
+            <InterfaceText source={"Loading download details..."} />
+          </span>
         </div>
       )}
 
       {error && (
         <div className="text-destructive py-4" data-testid="download-details-error">
-          Failed to load download details:{" "}
-          {error instanceof Error ? error.message : "Unknown error"}
+          <InterfaceText source={"Failed to load download details:"} />{" "}
+          {error instanceof Error ? error.message : <InterfaceText source={"Unknown error"} />}
         </div>
       )}
 
@@ -142,15 +145,17 @@ export default function DownloadDetailsModal({
                 <TabsList className="grid w-full grid-cols-3 flex-shrink-0">
                   <TabsTrigger value="info" data-testid="tab-info">
                     <Activity className="w-4 h-4 mr-2" />
-                    Info
+                    <InterfaceText source={"Info"} />
                   </TabsTrigger>
                   <TabsTrigger value="files" data-testid="tab-files">
                     <File className="w-4 h-4 mr-2" />
-                    Files ({filesCountLabel})
+                    <InterfaceText source={"Files ("} />
+                    {filesCountLabel})
                   </TabsTrigger>
                   <TabsTrigger value="trackers" data-testid="tab-trackers">
                     <Server className="w-4 h-4 mr-2" />
-                    Trackers ({details.trackers.length})
+                    <InterfaceText source={"Trackers ("} />
+                    {details.trackers.length})
                   </TabsTrigger>
                 </TabsList>
 
@@ -167,7 +172,9 @@ export default function DownloadDetailsModal({
                           <div className="flex items-start gap-3">
                             <Hash className="w-5 h-5 text-muted-foreground mt-0.5" />
                             <div>
-                              <p className="text-sm font-medium text-muted-foreground">Hash</p>
+                              <p className="text-sm font-medium text-muted-foreground">
+                                <InterfaceText source={"Hash"} />
+                              </p>
                               <p className="text-sm font-mono break-all" data-testid="detail-hash">
                                 {details.hash}
                               </p>
@@ -180,7 +187,7 @@ export default function DownloadDetailsModal({
                             <Folder className="w-5 h-5 text-muted-foreground mt-0.5" />
                             <div>
                               <p className="text-sm font-medium text-muted-foreground">
-                                Download Location
+                                <InterfaceText source={"Download Location"} />
                               </p>
                               <p className="text-sm break-all" data-testid="detail-download-dir">
                                 {details.downloadDir}
@@ -193,7 +200,9 @@ export default function DownloadDetailsModal({
                           <div className="flex items-start gap-3">
                             <HardDrive className="w-5 h-5 text-muted-foreground mt-0.5" />
                             <div>
-                              <p className="text-sm font-medium text-muted-foreground">Size</p>
+                              <p className="text-sm font-medium text-muted-foreground">
+                                <InterfaceText source={"Size"} />
+                              </p>
                               <p className="text-sm" data-testid="detail-size">
                                 {formatBytes(details.downloaded || 0)} / {formatBytes(details.size)}
                               </p>
@@ -205,7 +214,9 @@ export default function DownloadDetailsModal({
                           <div className="flex items-start gap-3">
                             <Calendar className="w-5 h-5 text-muted-foreground mt-0.5" />
                             <div>
-                              <p className="text-sm font-medium text-muted-foreground">Added</p>
+                              <p className="text-sm font-medium text-muted-foreground">
+                                <InterfaceText source={"Added"} />
+                              </p>
                               <p className="text-sm" data-testid="detail-added-date">
                                 {formatDate(details.addedDate)}
                               </p>
@@ -217,7 +228,9 @@ export default function DownloadDetailsModal({
                           <div className="flex items-start gap-3">
                             <Clock className="w-5 h-5 text-muted-foreground mt-0.5" />
                             <div>
-                              <p className="text-sm font-medium text-muted-foreground">Completed</p>
+                              <p className="text-sm font-medium text-muted-foreground">
+                                <InterfaceText source={"Completed"} />
+                              </p>
                               <p className="text-sm" data-testid="detail-completed-date">
                                 {formatDate(details.completedDate)}
                               </p>
@@ -230,7 +243,7 @@ export default function DownloadDetailsModal({
                             <Users className="w-5 h-5 text-muted-foreground mt-0.5" />
                             <div>
                               <p className="text-sm font-medium text-muted-foreground">
-                                Connected Peers
+                                <InterfaceText source={"Connected Peers"} />
                               </p>
                               <p className="text-sm" data-testid="detail-peers">
                                 {details.connectedPeers}
@@ -244,7 +257,9 @@ export default function DownloadDetailsModal({
 
                       <div>
                         <div className="flex justify-between text-sm mb-2">
-                          <span>Progress</span>
+                          <span>
+                            <InterfaceText source={"Progress"} />
+                          </span>
                           <span data-testid="detail-progress">
                             {formatRegionalPercent(
                               details.progress,
@@ -263,7 +278,7 @@ export default function DownloadDetailsModal({
                             {details.creator && (
                               <div>
                                 <p className="text-sm font-medium text-muted-foreground">
-                                  Created By
+                                  <InterfaceText source={"Created By"} />
                                 </p>
                                 <p className="text-sm" data-testid="detail-creator">
                                   {details.creator}
@@ -272,7 +287,9 @@ export default function DownloadDetailsModal({
                             )}
                             {details.comment && (
                               <div>
-                                <p className="text-sm font-medium text-muted-foreground">Comment</p>
+                                <p className="text-sm font-medium text-muted-foreground">
+                                  <InterfaceText source={"Comment"} />
+                                </p>
                                 <p className="text-sm" data-testid="detail-comment">
                                   {details.comment}
                                 </p>
@@ -305,7 +322,7 @@ export default function DownloadDetailsModal({
                         className="text-center text-muted-foreground py-8"
                         data-testid="no-files"
                       >
-                        No files reported yet for this download
+                        <InterfaceText source={"No files reported yet for this download"} />
                       </div>
                     ) : (
                       <div className="space-y-2">
@@ -344,7 +361,7 @@ export default function DownloadDetailsModal({
                             </div>
                             {!file.wanted && (
                               <Badge variant="outline" className="text-xs">
-                                Skipped
+                                <InterfaceText source={"Skipped"} />
                               </Badge>
                             )}
                           </div>
@@ -366,7 +383,7 @@ export default function DownloadDetailsModal({
                         className="text-center text-muted-foreground py-8"
                         data-testid="no-trackers"
                       >
-                        No tracker information available
+                        <InterfaceText source={"No tracker information available"} />
                       </div>
                     ) : (
                       <div className="space-y-3">
@@ -390,27 +407,37 @@ export default function DownloadDetailsModal({
                             </div>
 
                             <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                              <span>Tier: {tracker.tier}</span>
+                              <span>
+                                <InterfaceText source={"Tier:"} /> {tracker.tier}
+                              </span>
                               {tracker.seeders !== undefined && (
-                                <span>• Seeds: {tracker.seeders}</span>
+                                <span>
+                                  <InterfaceText source={"• Seeds:"} /> {tracker.seeders}
+                                </span>
                               )}
                               {tracker.leechers !== undefined && (
-                                <span>• Leechers: {tracker.leechers}</span>
+                                <span>
+                                  <InterfaceText source={"• Leechers:"} /> {tracker.leechers}
+                                </span>
                               )}
                             </div>
 
                             {tracker.lastAnnounce && (
                               <div className="text-xs text-muted-foreground">
-                                Last announce: {formatDate(tracker.lastAnnounce)}
+                                <InterfaceText source={"Last announce:"} />{" "}
+                                {formatDate(tracker.lastAnnounce)}
                               </div>
                             )}
                             {tracker.nextAnnounce && (
                               <div className="text-xs text-muted-foreground">
-                                Next announce: {formatDate(tracker.nextAnnounce)}
+                                <InterfaceText source={"Next announce:"} />{" "}
+                                {formatDate(tracker.nextAnnounce)}
                               </div>
                             )}
                             {tracker.error && (
-                              <div className="text-xs text-destructive">Error: {tracker.error}</div>
+                              <div className="text-xs text-destructive">
+                                <InterfaceText source={"Error:"} /> {tracker.error}
+                              </div>
                             )}
                           </div>
                         ))}
@@ -438,7 +465,7 @@ export default function DownloadDetailsModal({
               {downloadName}
             </DrawerTitle>
             <DrawerDescription className="sr-only">
-              Download details including files, trackers, and metadata
+              <InterfaceText source={"Download details including files, trackers, and metadata"} />
             </DrawerDescription>
           </DrawerHeader>
           {innerContent}
@@ -458,7 +485,7 @@ export default function DownloadDetailsModal({
             {downloadName}
           </DialogTitle>
           <DialogDescription>
-            Download details including files, trackers, and metadata
+            <InterfaceText source={"Download details including files, trackers, and metadata"} />
           </DialogDescription>
         </DialogHeader>
         {innerContent}

@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLocalStorageState } from "@/hooks/use-local-storage-state";
 import { InfiltrationGame, type ObjectiveState, type StealthState } from "@/game/infiltration-game";
 import { GHOST_UNLOCK_KEY } from "@/lib/ghost-mode";
+import { InterfaceText } from "@/components/InterfaceText";
 
 function randomSeed() {
   // A fresh procedural layout per run isn't security-sensitive, but crypto.getRandomValues
@@ -33,6 +34,9 @@ const CONTROLS: { keys: string; action: string }[] = [
   { keys: "Esc", action: "Pause" },
 ];
 
+const BRIEFING_TEXT =
+  "You start outside, on the approach. One gate is cut through the facility's wall and it is the only way in — cross the open ground and it rolls back for you. Inside are connected rooms, patrolling guards, and one console worth hacking. The door to it is locked, so find the keycard first. Stay out of the vision cones — walls and crates break line of sight.";
+
 /** Detection bar colour, so the meter reads as a threat level and not just a number. */
 function detectionColor(awareness: number): string {
   if (awareness >= 0.66) return "#ff3b3b";
@@ -42,9 +46,9 @@ function detectionColor(awareness: number): string {
 
 /** The single next step, so the HUD never asks the player to hold two goals. */
 function objectiveText({ inside, needsKeycard, hasKeycard }: ObjectiveState): string {
-  if (!inside) return "cross the approach and get through the gate";
-  if (needsKeycard && !hasKeycard) return "find the keycard, then reach the console";
-  return "reach the console and hack it unseen";
+  if (!inside) return "Cross the approach and get through the gate";
+  if (needsKeycard && !hasKeycard) return "Find the keycard, then reach the console";
+  return "Reach the console and hack it unseen";
 }
 
 export default function PlayPage() {
@@ -172,13 +176,19 @@ export default function PlayPage() {
         ref={canvasRef}
         className="h-full w-full touch-none"
         aria-label="Infiltration game. Click a tile to move, click the console to hack it, right-click to throw a distraction, Ctrl to crouch."
+        data-i18n-aria-label={
+          "Infiltration game. Click a tile to move, click the console to hack it, right-click to throw a distraction, Ctrl to crouch."
+        }
       />
 
       {/* In-game HUD, always mounted so refs update imperatively without re-render */}
       <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-6">
         <div className="flex items-center gap-2 self-start">
           <div className="rounded-md border border-white/10 bg-black/60 px-4 py-2 text-sm text-white/80">
-            <span className="text-emerald-400">Objective</span> &mdash; {objectiveText(objective)}
+            <span className="text-emerald-400">
+              <InterfaceText source={"Objective"} />
+            </span>{" "}
+            &mdash; <InterfaceText source={objectiveText(objective)} />
           </div>
           {objective.needsKeycard && (
             <div
@@ -188,7 +198,11 @@ export default function PlayPage() {
                   : "rounded-md border border-white/10 bg-black/60 px-4 py-2 text-sm text-white/40"
               }
             >
-              {objective.hasKeycard ? "Keycard acquired" : "Keycard"}
+              {objective.hasKeycard ? (
+                <InterfaceText source={"Keycard acquired"} />
+              ) : (
+                <InterfaceText source={"Keycard"} />
+              )}
             </div>
           )}
         </div>
@@ -198,7 +212,7 @@ export default function PlayPage() {
             ref={promptRef}
             className="rounded-md bg-black/70 px-4 py-2 text-sm text-white opacity-0 transition-opacity"
           >
-            Hacking &mdash; stay in range
+            <InterfaceText source="Hacking — stay in range" />
             <div className="mt-1 h-1.5 w-40 overflow-hidden rounded-full bg-white/20">
               <div ref={progressFillRef} className="h-full w-0 bg-emerald-400" />
             </div>
@@ -212,13 +226,16 @@ export default function PlayPage() {
           <div
             className="flex items-center gap-3 rounded-md border border-white/10 bg-black/60 px-4 py-2 text-xs text-white/70"
             aria-label="Stealth status"
+            data-i18n-aria-label={"Stealth status"}
           >
-            <span ref={stanceRef}>Standing</span>
+            <span ref={stanceRef}>
+              <InterfaceText source={"Standing"} />
+            </span>
             <span ref={exposureRef} className="text-white/40">
-              In the open
+              <InterfaceText source={"In the open"} />
             </span>
             <span className="flex items-center gap-2">
-              Detection
+              <InterfaceText source={"Detection"} />
               <span
                 ref={detectionBarRef}
                 role="progressbar"
@@ -227,14 +244,14 @@ export default function PlayPage() {
                 aria-valuemax={100}
                 aria-valuenow={0}
                 className="block h-1.5 w-24 overflow-hidden rounded-full bg-white/20"
+                data-i18n-aria-label={"Guard detection"}
               >
                 <span ref={detectionFillRef} className="block h-full w-0 bg-emerald-400" />
               </span>
             </span>
           </div>
           <div className="rounded-md bg-black/50 px-3 py-1 text-xs text-white/50">
-            Left click to move &middot; Ctrl to crouch &middot; right click to throw &middot; Esc to
-            pause
+            <InterfaceText source="Left click to move · Ctrl to crouch · right click to throw · Esc to pause" />
           </div>
         </div>
       </div>
@@ -249,8 +266,9 @@ export default function PlayPage() {
             size="sm"
             aria-label="Pause the infiltration"
             onClick={handlePause}
+            data-i18n-aria-label={"Pause the infiltration"}
           >
-            Pause
+            <InterfaceText source={"Pause"} />
           </Button>
         </div>
       )}
@@ -262,27 +280,29 @@ export default function PlayPage() {
         >
           <div className="max-w-md space-y-4 rounded-lg border border-white/10 bg-black/60 p-8 text-center">
             <h1 id="play-briefing-title" className="text-2xl font-bold">
-              Ghost the Terminal
+              <InterfaceText source={"Ghost the Terminal"} />
             </h1>
             <p className="text-sm text-white/70">
-              You start outside, on the approach. One gate is cut through the facility&rsquo;s wall
-              and it is the only way in &mdash; cross the open ground and it rolls back for you.
-              Inside are connected rooms, patrolling guards, and one console worth hacking. The door
-              to it is locked, so find the keycard first. Stay out of the vision cones &mdash; walls
-              and crates break line of sight.
+              <InterfaceText source={BRIEFING_TEXT} />
             </p>
             <dl className="mx-auto grid max-w-xs grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-left text-sm text-white/70">
               {CONTROLS.map(({ keys, action }) => (
                 <div key={keys} className="contents">
-                  <dt className="font-mono text-white/90">{keys}</dt>
-                  <dd>{action}</dd>
+                  <dt className="font-mono text-white/90">
+                    <InterfaceText source={keys} />
+                  </dt>
+                  <dd>
+                    <InterfaceText source={action} />
+                  </dd>
                 </div>
               ))}
             </dl>
             <div className="flex justify-center gap-2 pt-2">
-              <Button onClick={handleStart}>Begin infiltration</Button>
+              <Button onClick={handleStart}>
+                <InterfaceText source={"Begin infiltration"} />
+              </Button>
               <Button variant="outline" onClick={handleExit}>
-                Exit to Questarr
+                <InterfaceText source={"Exit to Questarr"} />
               </Button>
             </div>
           </div>
@@ -296,15 +316,17 @@ export default function PlayPage() {
         >
           <div className="max-w-md space-y-4 rounded-lg border border-emerald-400/30 bg-black/60 p-8 text-center">
             <h1 id="play-win-title" className="text-2xl font-bold text-emerald-400">
-              Terminal hacked
+              <InterfaceText source={"Terminal hacked"} />
             </h1>
             <p className="text-sm text-white/70">
-              Ghost Mode is now unlocked &mdash; find it under Settings &rarr; Appearance.
+              <InterfaceText source="Ghost Mode is now unlocked — find it under Settings → Appearance." />
             </p>
             <div className="flex justify-center gap-2 pt-2">
-              <Button onClick={handlePlayAgain}>Play again (new layout)</Button>
+              <Button onClick={handlePlayAgain}>
+                <InterfaceText source={"Play again (new layout)"} />
+              </Button>
               <Button variant="outline" onClick={handleExit}>
-                Exit to Questarr
+                <InterfaceText source={"Exit to Questarr"} />
               </Button>
             </div>
           </div>

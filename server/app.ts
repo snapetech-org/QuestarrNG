@@ -4,6 +4,7 @@ import { generalApiLimiter } from "./middleware.js";
 import { config } from "./config.js";
 import { expressLogger } from "./logger.js";
 import { truncateLogData } from "./log-response.js";
+import { attachApiErrorCode } from "./api-error-contract.js";
 
 export function createApp() {
   const app = express();
@@ -40,6 +41,9 @@ export function createApp() {
       credentials: true,
     })
   );
+  // Install before body parsing and rate limiting so their API errors receive
+  // the same stable code as route errors.
+  app.use(attachApiErrorCode);
   app.use(express.json({ limit: "5mb" }));
   app.use(express.urlencoded({ extended: false }));
 

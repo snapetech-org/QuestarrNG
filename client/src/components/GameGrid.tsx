@@ -5,6 +5,7 @@ import { type Game, type DownloadSummary } from "@shared/schema";
 import { type GameStatus } from "./StatusBadge";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useInterfaceLanguage } from "@/lib/interface-locale";
 
 interface GameGridProps {
   games: Game[];
@@ -36,6 +37,7 @@ export default function GameGrid({
   downloadSummaries,
 }: GameGridProps) {
   const isMobile = useIsMobile();
+  const { t, languageFor, directionFor } = useInterfaceLanguage();
 
   // Map column count to tailwind classes
   const gridColsClass = useMemo(() => {
@@ -92,8 +94,20 @@ export default function GameGrid({
   if (games.length === 0) {
     return (
       <div className="text-center py-12" data-testid="text-no-games">
-        <div className="text-muted-foreground text-lg mb-2">No games found</div>
-        <div className="text-sm text-muted-foreground">Try adjusting your search or filters</div>
+        <div
+          className="text-muted-foreground text-lg mb-2"
+          lang={languageFor("No games found")}
+          dir={directionFor("No games found")}
+        >
+          {t("No games found")}
+        </div>
+        <div
+          className="text-sm text-muted-foreground"
+          lang={languageFor("Try adjusting your search or filters")}
+          dir={directionFor("Try adjusting your search or filters")}
+        >
+          {t("Try adjusting your search or filters")}
+        </div>
       </div>
     );
   }
@@ -161,13 +175,55 @@ export default function GameGrid({
             style={{ gridTemplateColumns: "subgrid" }}
           >
             <div />
-            <span className={headerCellClass}>Title</span>
-            <span className={headerCellClass}>Genres</span>
-            <span className={cn(headerCellClass, "text-center")}>Score</span>
-            <span className={cn(headerCellClass, "text-center")}>My Score</span>
-            <span className={cn(headerCellClass, "text-center")}>Release</span>
-            <span className={cn(headerCellClass, "text-center")}>Status</span>
-            <span className={cn(headerCellClass, "text-center")}>Type</span>
+            <span
+              className={headerCellClass}
+              lang={languageFor("Title")}
+              dir={directionFor("Title")}
+            >
+              {t("Title")}
+            </span>
+            <span
+              className={headerCellClass}
+              lang={languageFor("Genres")}
+              dir={directionFor("Genres")}
+            >
+              {t("Genres")}
+            </span>
+            <span
+              className={cn(headerCellClass, "text-center")}
+              lang={languageFor("Score")}
+              dir={directionFor("Score")}
+            >
+              {t("Score")}
+            </span>
+            <span
+              className={cn(headerCellClass, "text-center")}
+              lang={languageFor("My Score")}
+              dir={directionFor("My Score")}
+            >
+              {t("My Score")}
+            </span>
+            <span
+              className={cn(headerCellClass, "text-center")}
+              lang={languageFor("Release")}
+              dir={directionFor("Release")}
+            >
+              {t("Release")}
+            </span>
+            <span
+              className={cn(headerCellClass, "text-center")}
+              lang={languageFor("Status")}
+              dir={directionFor("Status")}
+            >
+              {t("Status")}
+            </span>
+            <span
+              className={cn(headerCellClass, "text-center")}
+              lang={languageFor("Type")}
+              dir={directionFor("Type")}
+            >
+              {t("Type")}
+            </span>
             <div />
           </div>
           {rows}
@@ -186,13 +242,51 @@ export default function GameGrid({
           className="col-span-full grid items-center py-1 border-b border-border bg-muted/40"
           style={{ gridTemplateColumns: "subgrid" }}
         >
-          <span className={headerCellClass}>Title</span>
-          <span className={headerCellClass}>Genres</span>
-          <span className={cn(headerCellClass, "text-center")}>Score</span>
-          <span className={cn(headerCellClass, "text-center")}>My Score</span>
-          <span className={cn(headerCellClass, "text-center")}>Release</span>
-          <span className={cn(headerCellClass, "text-center")}>Status</span>
-          <span className={cn(headerCellClass, "text-center")}>Type</span>
+          <span className={headerCellClass} lang={languageFor("Title")} dir={directionFor("Title")}>
+            {t("Title")}
+          </span>
+          <span
+            className={headerCellClass}
+            lang={languageFor("Genres")}
+            dir={directionFor("Genres")}
+          >
+            {t("Genres")}
+          </span>
+          <span
+            className={cn(headerCellClass, "text-center")}
+            lang={languageFor("Score")}
+            dir={directionFor("Score")}
+          >
+            {t("Score")}
+          </span>
+          <span
+            className={cn(headerCellClass, "text-center")}
+            lang={languageFor("My Score")}
+            dir={directionFor("My Score")}
+          >
+            {t("My Score")}
+          </span>
+          <span
+            className={cn(headerCellClass, "text-center")}
+            lang={languageFor("Release")}
+            dir={directionFor("Release")}
+          >
+            {t("Release")}
+          </span>
+          <span
+            className={cn(headerCellClass, "text-center")}
+            lang={languageFor("Status")}
+            dir={directionFor("Status")}
+          >
+            {t("Status")}
+          </span>
+          <span
+            className={cn(headerCellClass, "text-center")}
+            lang={languageFor("Type")}
+            dir={directionFor("Type")}
+          >
+            {t("Type")}
+          </span>
           <div />
         </div>
         {rows}

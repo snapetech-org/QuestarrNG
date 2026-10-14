@@ -24,6 +24,8 @@ import {
   getRegionalLocale,
   useRegionalPreference,
 } from "@/lib/regional-format";
+import { InterfaceText } from "@/components/InterfaceText";
+import { formatInterfaceMessage } from "@/lib/interface-locale";
 
 interface ScanDownload {
   downloaderId: string;
@@ -199,12 +201,21 @@ export default function ClaimBatchModal({ open, onOpenChange }: ClaimBatchModalP
       const { count, hadErrors } = result ?? { count: 0, hadErrors: false };
       if (hadErrors) {
         toast({
-          title: `Linked ${count} group(s) — some groups failed`,
-          description: "One or more groups could not be claimed. Check your downloads.",
+          title: formatInterfaceMessage("Some groups failed to link ({count}).", {
+            count: String(count),
+          }),
+          description: "Check your downloads.",
           variant: "destructive",
         });
       } else {
-        toast({ title: `Linked ${count} group(s) to games` });
+        toast({
+          title:
+            count === 1
+              ? "Linked 1 group to a game"
+              : formatInterfaceMessage("Linked {count} groups to games", {
+                  count: String(count),
+                }),
+        });
       }
       queryClient.invalidateQueries({ queryKey: ["/api/downloads"] });
       queryClient.invalidateQueries({ queryKey: ["/api/games"] });
@@ -227,10 +238,15 @@ export default function ClaimBatchModal({ open, onOpenChange }: ClaimBatchModalP
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Scan Unlinked Downloads</DialogTitle>
+          <DialogTitle>
+            <InterfaceText source={"Scan Unlinked Downloads"} />
+          </DialogTitle>
           <DialogDescription>
-            Downloads not yet tracked by Questarr, grouped by game. Select a game for each to link
-            them.
+            <InterfaceText
+              source={
+                "Downloads not yet tracked by Questarr, grouped by game. Select a game for each to link them."
+              }
+            />
           </DialogDescription>
         </DialogHeader>
 
@@ -238,21 +254,21 @@ export default function ClaimBatchModal({ open, onOpenChange }: ClaimBatchModalP
           {isLoading && (
             <div className="flex items-center justify-center py-12 gap-2 text-muted-foreground">
               <Loader2 className="h-5 w-5 animate-spin" />
-              Scanning downloads…
+              <InterfaceText source={"Scanning downloads…"} />
             </div>
           )}
 
           {error && (
             <div className="flex items-center gap-2 text-destructive py-8 justify-center">
               <AlertCircle className="h-5 w-5" />
-              Failed to scan downloads
+              <InterfaceText source={"Failed to scan downloads"} />
             </div>
           )}
 
           {data && data.groups.length === 0 && (
             <div className="flex items-center gap-2 text-muted-foreground py-8 justify-center">
               <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-              All downloads are already linked to games
+              <InterfaceText source={"All downloads are already linked to games"} />
             </div>
           )}
 
@@ -273,22 +289,34 @@ export default function ClaimBatchModal({ open, onOpenChange }: ClaimBatchModalP
 
         {progress && (
           <p className="text-sm text-muted-foreground text-center">
-            Claiming {progress.done} / {progress.total}…
+            <InterfaceText source={"Claiming"} /> {progress.done} / {progress.total}…
           </p>
         )}
 
         <div className="flex items-center justify-between gap-2 pt-2 border-t">
-          <span className="text-sm text-muted-foreground">{pendingCount} group(s) ready</span>
+          <span className="text-sm text-muted-foreground">
+            <InterfaceText
+              source="Groups ready to link: {count}"
+              values={{ count: pendingCount }}
+            />
+          </span>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              <InterfaceText source={"Cancel"} />
             </Button>
             <Button
               onClick={() => claimAllMutation.mutate()}
               disabled={pendingCount === 0 || claimAllMutation.isPending}
             >
               <Link2 className="h-4 w-4 mr-2" />
-              {claimAllMutation.isPending ? "Claiming…" : `Claim ${pendingCount}`}
+              {claimAllMutation.isPending ? (
+                <InterfaceText source={"Claiming…"} />
+              ) : (
+                <InterfaceText
+                  source={"Claim {count}"}
+                  values={{ count: String(pendingCount ?? "") }}
+                />
+              )}
             </Button>
           </div>
         </div>
@@ -341,6 +369,7 @@ function GroupRow({
           onCheckedChange={(v) => onUpdate({ skip: !v })}
           aria-label="Include this group"
           className="mt-0.5"
+          data-i18n-aria-label={"Include this group"}
         />
 
         <div className="flex-1 min-w-0">
@@ -367,7 +396,11 @@ function GroupRow({
               <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
               <span className="text-sm font-medium truncate">{state.selectedGame.title}</span>
               <Badge variant="secondary" className="text-xs shrink-0">
-                {state.selectedGame.source === "library" ? "Library" : "IGDB"}
+                {state.selectedGame.source === "library" ? (
+                  "Library"
+                ) : (
+                  <InterfaceText source={"IGDB"} />
+                )}
               </Badge>
               <Button
                 variant="ghost"
@@ -378,14 +411,16 @@ function GroupRow({
                   setIgdbDebouncedQuery("");
                 }}
               >
-                Change
+                <InterfaceText source={"Change"} />
                 <ChevronDown className="h-3 w-3 ml-1" />
               </Button>
             </div>
           ) : (
             <div className="flex items-center gap-2">
               <AlertCircle className="h-4 w-4 text-yellow-500 shrink-0" />
-              <span className="text-sm text-muted-foreground">No library match found</span>
+              <span className="text-sm text-muted-foreground">
+                <InterfaceText source={"No library match found"} />
+              </span>
               <Button
                 variant="outline"
                 size="sm"
@@ -398,7 +433,7 @@ function GroupRow({
                 }
               >
                 <Search className="h-3 w-3 mr-1" />
-                Search IGDB
+                <InterfaceText source={"Search IGDB"} />
               </Button>
             </div>
           )}
@@ -414,13 +449,20 @@ function GroupRow({
                   value={state.igdbQuery}
                   onChange={(e) => onUpdate({ igdbQuery: e.target.value })}
                   autoFocus
+                  data-i18n-placeholder={"Search IGDB…"}
                 />
               </div>
               <div className="flex items-center justify-between gap-3 rounded-md border px-3 py-2">
                 <div className="space-y-1">
-                  <p className="text-sm font-medium">Show undated games first</p>
+                  <p className="text-sm font-medium">
+                    <InterfaceText source={"Show undated games first"} />
+                  </p>
                   <p className="text-xs text-muted-foreground">
-                    Include titles without a release date and place them before dated results.
+                    <InterfaceText
+                      source={
+                        "Include titles without a release date and place them before dated results."
+                      }
+                    />
                   </p>
                 </div>
                 <Switch
@@ -431,11 +473,15 @@ function GroupRow({
               <div className="max-h-36 overflow-y-auto">
                 <div className="space-y-1">
                   {searchingIgdb ? (
-                    <p className="text-xs text-muted-foreground py-1 px-1">Searching…</p>
+                    <p className="text-xs text-muted-foreground py-1 px-1">
+                      <InterfaceText source={"Searching…"} />
+                    </p>
                   ) : igdbResults.length === 0 &&
                     igdbDebouncedQuery.trim().length > 2 &&
                     !searchingIgdb ? (
-                    <p className="text-sm text-muted-foreground py-1 px-1">No results found</p>
+                    <p className="text-sm text-muted-foreground py-1 px-1">
+                      <InterfaceText source={"No results found"} />
+                    </p>
                   ) : (
                     igdbResults.map((g) => (
                       <button

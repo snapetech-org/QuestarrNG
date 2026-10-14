@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { InterfaceText } from "@/components/InterfaceText";
 
 /**
  * Discord webhook configuration, scoped to the Stats page where it's the only
@@ -64,7 +65,12 @@ export default function DiscordWebhookSettings() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="icon" aria-label="Configure Discord webhook">
+        <Button
+          variant="outline"
+          size="icon"
+          aria-label="Configure Discord webhook"
+          data-i18n-aria-label={"Configure Discord webhook"}
+        >
           <Settings2 className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
@@ -73,25 +79,34 @@ export default function DiscordWebhookSettings() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Webhook className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Discord Webhook</span>
+              <span className="text-sm font-medium">
+                <InterfaceText source={"Discord Webhook"} />
+              </span>
             </div>
             {discordSettings?.configured ? (
               <Badge
                 variant="default"
                 className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
               >
-                Configured
+                <InterfaceText source={"Configured"} />
               </Badge>
             ) : (
-              <Badge variant="outline">Not configured</Badge>
+              <Badge variant="outline">
+                <InterfaceText source={"Not configured"} />
+              </Badge>
             )}
           </div>
           <p className="text-xs text-muted-foreground">
-            Set a webhook URL to enable one-click sharing of your library stats to a Discord
-            channel.
+            <InterfaceText
+              source={
+                "Set a webhook URL to enable one-click sharing of your library stats to a Discord channel."
+              }
+            />
           </p>
           <div className="space-y-2">
-            <Label htmlFor="stats-discord-webhook">Webhook URL</Label>
+            <Label htmlFor="stats-discord-webhook">
+              <InterfaceText source={"Webhook URL"} />
+            </Label>
             <div className="relative">
               <Input
                 id="stats-discord-webhook"
@@ -117,12 +132,16 @@ export default function DiscordWebhookSettings() {
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              Create a webhook in your Discord server under Channel Settings → Integrations.
+              <InterfaceText
+                source={
+                  "Create a webhook in your Discord server under Channel Settings → Integrations."
+                }
+              />
             </p>
           </div>
           <div className="flex justify-end">
             <Button size="sm" onClick={handleSave} disabled={saveDisabled}>
-              {updateDiscordMutation.isPending ? "Saving..." : "Save"}
+              {updateDiscordMutation.isPending ? "Saving..." : <InterfaceText source={"Save"} />}
             </Button>
           </div>
         </div>

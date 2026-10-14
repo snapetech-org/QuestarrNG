@@ -32,6 +32,8 @@ import {
   type ApiKeyPublicResponse,
   type ApiKeyCreatedResponse,
 } from "@shared/schema";
+import { InterfaceText } from "@/components/InterfaceText";
+import { formatInterfaceMessage } from "@/lib/interface-locale";
 
 function formatDate(value: string | null): string {
   if (!value) return "Never";
@@ -130,11 +132,16 @@ export function ApiKeysCard() {
       <CardHeader>
         <div className="flex items-center space-x-3">
           <KeyRound className="h-5 w-5 text-muted-foreground" />
-          <CardTitle className="text-lg">API Keys</CardTitle>
+          <CardTitle className="text-lg">
+            <InterfaceText source={"API Keys"} />
+          </CardTitle>
         </div>
         <CardDescription>
-          Connect SeerrNG or another integration client with a dedicated key. New keys expire
-          automatically and can be restricted to the SeerrNG provider routes.
+          <InterfaceText
+            source={
+              "Connect SeerrNG or another integration client with a dedicated key. New keys expire automatically and can be restricted to the SeerrNG provider routes."
+            }
+          />
         </CardDescription>
       </CardHeader>
 
@@ -153,44 +160,71 @@ export function ApiKeysCard() {
           }}
         >
           <div className="space-y-2 sm:col-span-2 xl:col-span-1">
-            <Label htmlFor="api-key-name">Name</Label>
+            <Label htmlFor="api-key-name">
+              <InterfaceText source={"Name"} />
+            </Label>
             <Input
               id="api-key-name"
               placeholder="SeerrNG on my home server"
               value={newKeyName}
               maxLength={100}
               onChange={(e) => setNewKeyName(e.target.value)}
+              data-i18n-placeholder={"SeerrNG on my home server"}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="api-key-scope">Access</Label>
+            <Label htmlFor="api-key-scope">
+              <InterfaceText source={"Access"} />
+            </Label>
             <Select
               value={newKeyScope}
               onValueChange={(value) => setNewKeyScope(value as ApiKeyPublicResponse["scope"])}
             >
-              <SelectTrigger id="api-key-scope" aria-label="API key access">
+              <SelectTrigger
+                id="api-key-scope"
+                aria-label="API key access"
+                data-i18n-aria-label={"API key access"}
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="integration:seerrng">SeerrNG provider only</SelectItem>
-                <SelectItem value="integration:all">All integration routes</SelectItem>
+                <SelectItem value="integration:seerrng">
+                  <InterfaceText source={"SeerrNG provider only"} />
+                </SelectItem>
+                <SelectItem value="integration:all">
+                  <InterfaceText source={"All integration routes"} />
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="api-key-expiry">Expires after</Label>
+            <Label htmlFor="api-key-expiry">
+              <InterfaceText source={"Expires after"} />
+            </Label>
             <Select
               value={String(expiresInDays)}
               onValueChange={(value) => setExpiresInDays(Number(value))}
             >
-              <SelectTrigger id="api-key-expiry" aria-label="API key expiration">
+              <SelectTrigger
+                id="api-key-expiry"
+                aria-label="API key expiration"
+                data-i18n-aria-label={"API key expiration"}
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="30">30 days</SelectItem>
-                <SelectItem value="90">90 days</SelectItem>
-                <SelectItem value="180">180 days</SelectItem>
-                <SelectItem value="365">1 year</SelectItem>
+                <SelectItem value="30">
+                  <InterfaceText source={"30 days"} />
+                </SelectItem>
+                <SelectItem value="90">
+                  <InterfaceText source={"90 days"} />
+                </SelectItem>
+                <SelectItem value="180">
+                  <InterfaceText source={"180 days"} />
+                </SelectItem>
+                <SelectItem value="365">
+                  <InterfaceText source={"1 year"} />
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -200,21 +234,26 @@ export function ApiKeysCard() {
             disabled={!trimmedName || createMutation.isPending}
           >
             <Plus className="mr-2 h-4 w-4" />
-            {createMutation.isPending ? "Creating..." : "Create key"}
+            {createMutation.isPending ? (
+              <InterfaceText source={"Creating..."} />
+            ) : (
+              <InterfaceText source={"Create key"} />
+            )}
           </Button>
         </form>
 
         {createdKey && (
           <div className="space-y-2 rounded-md border border-primary/40 bg-primary/5 p-4">
             <p className="text-sm font-medium">
-              Copy your new key now — it will not be shown again.
+              <InterfaceText source={"Copy your new key now — it will not be shown again."} />
             </p>
             <p className="text-xs text-muted-foreground">
-              {createdKey.scope === "integration:seerrng"
-                ? "SeerrNG provider only"
-                : "All integration routes"}
-              {" · Expires "}
-              {formatDate(createdKey.expiresAt)}
+              {createdKey.scope === "integration:seerrng" ? (
+                <InterfaceText source={"SeerrNG provider only"} />
+              ) : (
+                <InterfaceText source={"All integration routes"} />
+              )}{" "}
+              <InterfaceText source={"· Expires"} /> {formatDate(createdKey.expiresAt)}
             </p>
             <div className="flex gap-2">
               <Input
@@ -222,36 +261,44 @@ export function ApiKeysCard() {
                 value={createdKey.key}
                 aria-label="New API key"
                 className="font-mono"
+                data-i18n-aria-label={"New API key"}
               />
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleCopy}
                 aria-label="Copy API key"
+                data-i18n-aria-label={"Copy API key"}
               >
                 {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               </Button>
             </div>
             <Button type="button" variant="ghost" size="sm" onClick={() => setCreatedKey(null)}>
-              Done
+              <InterfaceText source={"Done"} />
             </Button>
           </div>
         )}
 
         <section aria-labelledby="api-keys-list-heading" className="space-y-2">
           <h3 id="api-keys-list-heading" className="text-sm font-medium">
-            Active keys
+            <InterfaceText source={"Active keys"} />
           </h3>
 
           {isLoading ? (
-            <p className="text-sm text-muted-foreground">Loading...</p>
+            <p className="text-sm text-muted-foreground">
+              <InterfaceText source={"Loading..."} />
+            </p>
           ) : isError ? (
             <p className="text-sm text-destructive">
-              Could not load API keys. Refresh the page to try again.
+              <InterfaceText source={"Could not load API keys. Refresh the page to try again."} />
             </p>
           ) : keys.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              No API keys yet. Create one to connect SeerrNG or another integration client.
+              <InterfaceText
+                source={
+                  "No API keys yet. Create one to connect SeerrNG or another integration client."
+                }
+              />
             </p>
           ) : (
             <ul className="divide-y rounded-md border">
@@ -260,19 +307,25 @@ export function ApiKeysCard() {
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium">{key.name}</p>
                     <p className="truncate text-xs text-muted-foreground">
-                      <span className="font-mono">{key.prefix}…</span> · Created{" "}
-                      {formatDate(key.createdAt)} · Last used {formatDate(key.lastUsedAt)}
+                      <span className="font-mono">{key.prefix}…</span>{" "}
+                      <InterfaceText source={"· Created"} /> {formatDate(key.createdAt)}{" "}
+                      <InterfaceText source={"· Last used"} /> {formatDate(key.lastUsedAt)}
                       {" · "}
-                      {key.scope === "integration:seerrng" ? "SeerrNG only" : "All integrations"}
-                      {" · Expires "}
-                      {formatDate(key.expiresAt)}
+                      {key.scope === "integration:seerrng" ? (
+                        <InterfaceText source={"SeerrNG only"} />
+                      ) : (
+                        <InterfaceText source={"All integrations"} />
+                      )}{" "}
+                      <InterfaceText source={"· Expires"} /> {formatDate(key.expiresAt)}
                     </p>
                   </div>
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    aria-label={`Revoke API key ${key.name}`}
+                    aria-label={formatInterfaceMessage("Revoke API key {name}", {
+                      name: String(key.name ?? ""),
+                    })}
                     onClick={() => setPendingRevoke(key)}
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
@@ -290,18 +343,23 @@ export function ApiKeysCard() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Revoke this API key?</AlertDialogTitle>
+            <AlertDialogTitle>
+              <InterfaceText source={"Revoke this API key?"} />
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Any client using “{pendingRevoke?.name}” will stop working immediately. This cannot be
-              undone.
+              <InterfaceText source={"Any client using “"} />
+              {pendingRevoke?.name}
+              <InterfaceText source={"” will stop working immediately. This cannot be undone."} />
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>
+              <InterfaceText source={"Cancel"} />
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => pendingRevoke && revokeMutation.mutate(pendingRevoke.id)}
             >
-              Revoke
+              <InterfaceText source={"Revoke"} />
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

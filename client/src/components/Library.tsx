@@ -1,5 +1,10 @@
-import { getInterfaceCollator, useInterfaceLanguage } from "@/lib/interface-locale";
-import { useRegionalPreference } from "@/lib/regional-format";
+import {
+  getInterfaceCollator,
+  useInterfaceLanguage,
+  formatInterfaceMessage,
+  translateInterfaceLabel,
+} from "@/lib/interface-locale";
+import { formatRegionalNumber, useRegionalPreference } from "@/lib/regional-format";
 import React, { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -21,7 +26,7 @@ import {
 } from "lucide-react";
 import { type Game, type UserSettings } from "@shared/schema";
 import { isPlatformNameSelected, selectedPlatformNames } from "@shared/platforms";
-import { type GameStatus } from "./StatusBadge";
+import { getStatusSourceLabel, type GameStatus } from "./StatusBadge";
 import { useHiddenMutation } from "@/hooks/use-hidden-mutation";
 import { useToast } from "@/hooks/use-toast";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -48,6 +53,7 @@ import { useDownloadSummary } from "@/hooks/use-download-summary";
 import GameFilterPills from "./GameFilterPills";
 import PendingImportsCard from "./PendingImportsCard";
 import { LIBRARY_SORT_OPTIONS, sortLibraryGames, type LibrarySortOption } from "@/lib/game-sort";
+import { InterfaceText } from "@/components/InterfaceText";
 
 function LabeledSwitch({
   id,
@@ -253,35 +259,56 @@ export default function Library() {
   ]);
 
   const activeFilters = useMemo(() => {
-    const filters: { label: string; onRemove: () => void }[] = [];
+    const filters: {
+      source: string;
+      values?: Record<string, string | number>;
+      onRemove: () => void;
+    }[] = [];
     if (statusFilter !== "all")
-      filters.push({ label: `Status: ${statusFilter}`, onRemove: () => setStatusFilter("all") });
+      filters.push({
+        source: "Status: {status}",
+        values: {
+          status: translateInterfaceLabel(getStatusSourceLabel(statusFilter), interfaceLanguage),
+        },
+        onRemove: () => setStatusFilter("all"),
+      });
     if (genreFilter !== "all")
-      filters.push({ label: `Genre: ${genreFilter}`, onRemove: () => setGenreFilter("all") });
+      filters.push({
+        source: "Genre: {genre}",
+        values: { genre: genreFilter },
+        onRemove: () => setGenreFilter("all"),
+      });
     if (platformFilter !== "all")
       filters.push({
-        label: `Platform: ${platformFilter}`,
+        source: "Platform: {platform}",
+        values: { platform: platformFilter },
         onRemove: () => setPlatformFilter("all"),
       });
     if (showSearchResultsOnly)
       filters.push({
-        label: "Has Search Results",
+        source: "Has Search Results",
         onRemove: () => setShowSearchResultsOnly(false),
       });
     if (showDownloadsOnly)
-      filters.push({ label: "Has Downloads", onRemove: () => setShowDownloadsOnly(false) });
+      filters.push({ source: "Has Downloads", onRemove: () => setShowDownloadsOnly(false) });
     if (minRating !== null)
-      filters.push({ label: `Rating: ≥ ${minRating}`, onRemove: () => setMinRating(null) });
+      filters.push({
+        source: "Rating: ≥ {rating}",
+        values: {
+          rating: formatRegionalNumber(minRating, { maximumFractionDigits: 1 }, regionalPreference),
+        },
+        onRemove: () => setMinRating(null),
+      });
     if (showUnratedOnly)
-      filters.push({ label: "Unrated only", onRemove: () => setShowUnratedOnly(false) });
+      filters.push({ source: "Unrated only", onRemove: () => setShowUnratedOnly(false) });
     if (showShelvedOverride)
       filters.push({
-        label: "Shelved games shown",
+        source: "Shelved games shown",
         onRemove: () => setShowShelvedOverride(false),
       });
     if (showSearchResultsOnly && showOwnedInResultsOverride)
       filters.push({
-        label: "Owned games shown in results",
+        source: "Owned games shown in results",
         onRemove: () => setShowOwnedInResultsOverride(false),
       });
     return filters;
@@ -293,6 +320,8 @@ export default function Library() {
     showDownloadsOnly,
     minRating,
     showUnratedOnly,
+    regionalPreference,
+    interfaceLanguage,
     showShelvedOverride,
     showOwnedInResultsOverride,
   ]);
@@ -347,14 +376,26 @@ export default function Library() {
       <div className="space-y-3">
         {/* Page header */}
         <div>
-          <h1 className="text-xl font-bold tracking-tight sm:text-2xl">My Library</h1>
+          <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
+            <InterfaceText source={"My Library"} />
+          </h1>
           {stableLibStats.totalGames > 0 && (
             <div className="hidden sm:flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-sm text-muted-foreground">
               <span>
                 <span className="font-medium text-foreground">
                   {filtersActive ? filteredGames.length : stableLibStats.totalGames}
                 </span>{" "}
-                {filtersActive ? `of ${stableLibStats.totalGames} games shown` : "games"}
+                {filtersActive ? (
+                  <InterfaceText
+                    source={"{shownGames} of {totalGames} games shown"}
+                    values={{
+                      shownGames: String(filteredGames.length),
+                      totalGames: String(stableLibStats.totalGames ?? ""),
+                    }}
+                  />
+                ) : (
+                  <InterfaceText source={"games"} />
+                )}
               </span>
               <span className="opacity-30">·</span>
               <span className="flex items-center gap-1">
@@ -362,7 +403,7 @@ export default function Library() {
                 <span className="font-medium text-foreground">
                   {stableLibStats.statusBreakdown.wanted}
                 </span>{" "}
-                wanted
+                <InterfaceText source={"wanted"} />
               </span>
               <span className="opacity-30">·</span>
               <span className="flex items-center gap-1">
@@ -370,7 +411,7 @@ export default function Library() {
                 <span className="font-medium text-foreground">
                   {stableLibStats.statusBreakdown.owned}
                 </span>{" "}
-                owned
+                <InterfaceText source={"owned"} />
               </span>
               <span className="opacity-30">·</span>
               <span className="flex items-center gap-1">
@@ -378,7 +419,7 @@ export default function Library() {
                 <span className="font-medium text-foreground">
                   {stableLibStats.statusBreakdown.playing}
                 </span>{" "}
-                playing
+                <InterfaceText source={"playing"} />
               </span>
               <span className="opacity-30">·</span>
               <span className="flex items-center gap-1">
@@ -386,7 +427,7 @@ export default function Library() {
                 <span className="font-medium text-foreground">
                   {stableLibStats.statusBreakdown.shelved}
                 </span>{" "}
-                shelved
+                <InterfaceText source={"shelved"} />
               </span>
               <span className="opacity-30">·</span>
               <span className="flex items-center gap-1">
@@ -394,13 +435,13 @@ export default function Library() {
                 <span className="font-medium text-foreground">
                   {stableLibStats.statusBreakdown.completed}
                 </span>{" "}
-                completed
+                <InterfaceText source={"completed"} />
               </span>
               {stableLibStats.avgRating !== "N/A" && (
                 <>
                   <span className="opacity-30">·</span>
                   <span>
-                    avg.{" "}
+                    <InterfaceText source={"avg."} />{" "}
                     <span className="font-medium text-foreground">
                       <span aria-hidden="true">⭐</span> {stableLibStats.avgRating}
                     </span>
@@ -417,7 +458,7 @@ export default function Library() {
         <PageToolbar
           search={searchQuery}
           onSearchChange={setSearchQuery}
-          searchPlaceholder="Search your library..."
+          searchPlaceholder="Search your library…"
           filterPills={
             <div className="hidden sm:contents">
               <GameFilterPills
@@ -456,10 +497,13 @@ export default function Library() {
                     className="h-8 gap-1.5"
                     onClick={() => setShowFilters((v) => !v)}
                     aria-label="Toggle filters"
+                    data-i18n-aria-label={"Toggle filters"}
                     aria-expanded={showFilters}
                   >
                     <Filter className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">Filters</span>
+                    <span className="hidden sm:inline">
+                      <InterfaceText source={"Filters"} />
+                    </span>
                     {activeFilters.length > 0 && (
                       <span className="ml-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold w-4 h-4 flex items-center justify-center">
                         {activeFilters.length}
@@ -467,11 +511,19 @@ export default function Library() {
                     )}
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent className="sm:hidden">Filters</TooltipContent>
+                <TooltipContent className="sm:hidden">
+                  <InterfaceText source={"Filters"} />
+                </TooltipContent>
               </Tooltip>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-8" aria-label="Grid settings">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8"
+                    aria-label="Grid settings"
+                    data-i18n-aria-label={"Grid settings"}
+                  >
                     <Settings2 className="h-3.5 w-3.5" />
                   </Button>
                 </PopoverTrigger>
@@ -485,7 +537,7 @@ export default function Library() {
                         aria-disabled={viewMode === "list"}
                       >
                         <LayoutGrid className="h-4 w-4" />
-                        Grid Columns
+                        <InterfaceText source={"Grid Columns"} />
                       </Label>
                       <span className="text-sm font-bold w-4 text-center">{gridColumns}</span>
                     </div>
@@ -497,11 +549,16 @@ export default function Library() {
                       step={1}
                       disabled={viewMode === "list"}
                       aria-label="Grid columns"
+                      data-i18n-aria-label={"Grid columns"}
                     />
                     <p className="text-xs text-muted-foreground">
-                      {viewMode === "list"
-                        ? "Switch to grid view to adjust the number of columns."
-                        : "Number of columns in the game grid (2–10)."}
+                      {viewMode === "list" ? (
+                        <InterfaceText
+                          source={"Switch to grid view to adjust the number of columns."}
+                        />
+                      ) : (
+                        <InterfaceText source={"Number of columns in the game grid (2–10)."} />
+                      )}
                     </p>
                   </div>
                   <div className="flex items-center justify-between border-t pt-3">
@@ -510,7 +567,7 @@ export default function Library() {
                       className="flex items-center gap-2 text-sm font-medium cursor-pointer"
                     >
                       <EyeOff className="h-4 w-4" />
-                      Show Hidden Games
+                      <InterfaceText source={"Show Hidden Games"} />
                     </Label>
                     <Switch
                       id="show-hidden"
@@ -528,14 +585,20 @@ export default function Library() {
         {activeFilters.length > 0 && (
           <div className="flex flex-wrap items-center gap-2">
             {activeFilters.map((f) => (
-              <Badge key={f.label} variant="secondary" className="gap-1">
-                {f.label}
+              <Badge key={f.source} variant="secondary" className="gap-1">
+                <InterfaceText source={f.source} values={f.values} />
                 <Button
                   variant="ghost"
                   size="icon"
                   className="h-3 w-3 p-0 hover:bg-transparent"
                   onClick={f.onRemove}
-                  aria-label={`Remove filter: ${f.label}`}
+                  aria-label={formatInterfaceMessage(
+                    "Remove filter: {label}",
+                    {
+                      label: formatInterfaceMessage(f.source, f.values ?? {}, interfaceLanguage),
+                    },
+                    interfaceLanguage
+                  )}
                 >
                   <X className="h-3 w-3" />
                 </Button>
@@ -548,10 +611,13 @@ export default function Library() {
               onClick={clearAllFilters}
             >
               <X className="h-3 w-3" />
-              Clear all
+              <InterfaceText source={"Clear all"} />
             </Button>
             <span className="text-xs text-muted-foreground">
-              {filteredGames.length} of {games.length} shown
+              <InterfaceText
+                source={"Showing {visible} of {total}"}
+                values={{ visible: filteredGames.length, total: games.length }}
+              />
             </span>
           </div>
         )}
@@ -560,10 +626,14 @@ export default function Library() {
         {showFilters && (
           <Card>
             <CardContent className="p-4 space-y-4">
-              <Label className="text-sm font-semibold">Filters</Label>
+              <Label className="text-sm font-semibold">
+                <InterfaceText source={"Filters"} />
+              </Label>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label>Status</Label>
+                  <Label>
+                    <InterfaceText source={"Status"} />
+                  </Label>
                   <Select
                     value={statusFilter}
                     onValueChange={(v) => setStatusFilter(v as GameStatus | "all")}
@@ -572,24 +642,42 @@ export default function Library() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="wanted">Wanted</SelectItem>
-                      <SelectItem value="owned">Owned</SelectItem>
-                      <SelectItem value="playing">Playing</SelectItem>
-                      <SelectItem value="shelved">Shelved</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                      <SelectItem value="downloading">Downloading</SelectItem>
+                      <SelectItem value="all">
+                        <InterfaceText source={"All"} />
+                      </SelectItem>
+                      <SelectItem value="wanted">
+                        <InterfaceText source={"Wanted"} />
+                      </SelectItem>
+                      <SelectItem value="owned">
+                        <InterfaceText source={"Owned"} />
+                      </SelectItem>
+                      <SelectItem value="playing">
+                        <InterfaceText source={"Playing"} />
+                      </SelectItem>
+                      <SelectItem value="shelved">
+                        <InterfaceText source={"Shelved"} />
+                      </SelectItem>
+                      <SelectItem value="completed">
+                        <InterfaceText source={"Completed"} />
+                      </SelectItem>
+                      <SelectItem value="downloading">
+                        <InterfaceText source={"Downloading"} />
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Genre</Label>
+                  <Label>
+                    <InterfaceText source={"Genre"} />
+                  </Label>
                   <Select value={genreFilter} onValueChange={setGenreFilter}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Genres</SelectItem>
+                      <SelectItem value="all">
+                        <InterfaceText source={"All Genres"} />
+                      </SelectItem>
                       {uniqueGenres.map((genre) => (
                         <SelectItem key={genre} value={genre}>
                           {genre}
@@ -599,13 +687,17 @@ export default function Library() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Platform</Label>
+                  <Label>
+                    <InterfaceText source={"Platform"} />
+                  </Label>
                   <Select value={platformFilter} onValueChange={setPlatformFilter}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Platforms</SelectItem>
+                      <SelectItem value="all">
+                        <InterfaceText source={"All Platforms"} />
+                      </SelectItem>
                       {visiblePlatforms.map((platform) => (
                         <SelectItem key={platform} value={platform}>
                           {platform}
@@ -618,9 +710,11 @@ export default function Library() {
               <div className="flex flex-col sm:flex-row gap-4 items-start border-t pt-4">
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label>Min Rating</Label>
+                    <Label>
+                      <InterfaceText source={"Min Rating"} />
+                    </Label>
                     <span className="text-sm text-muted-foreground">
-                      {minRating === null ? "Any" : `≥ ${minRating}/10`}
+                      {minRating === null ? <InterfaceText source={"Any"} /> : `≥ ${minRating}/10`}
                     </span>
                   </div>
                   <Slider
@@ -635,6 +729,7 @@ export default function Library() {
                     }}
                     disabled={showUnratedOnly}
                     aria-label="Minimum rating filter"
+                    data-i18n-aria-label={"Minimum rating filter"}
                   />
                 </div>
                 <div className="flex items-center gap-2 sm:pt-7">
@@ -647,7 +742,7 @@ export default function Library() {
                     }}
                   />
                   <Label htmlFor="filter-unrated-only" className="cursor-pointer">
-                    Unrated only
+                    <InterfaceText source={"Unrated only"} />
                   </Label>
                 </div>
               </div>
@@ -662,7 +757,7 @@ export default function Library() {
                   },
                   {
                     id: "filter-show-owned-in-results",
-                    label: "Show owned games in Has Results",
+                    label: "Show owned games in search results",
                     checked: showOwnedInResultsOverride,
                     onCheckedChange: setShowOwnedInResultsOverride,
                     visible: showSearchResultsOnly && (userSettings?.hideOwnedInHasResults ?? true),
@@ -702,23 +797,28 @@ export default function Library() {
               return hasSearchQuery ? (
                 <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
                   <p className="text-lg font-medium mb-1">
-                    No results for &ldquo;{debouncedSearchQuery}&rdquo;
+                    <InterfaceText source={"No results for “"} />
+                    {debouncedSearchQuery}&rdquo;
                   </p>
                   <p className="text-sm text-muted-foreground mb-6">
-                    This game isn&apos;t in your library yet.
+                    <InterfaceText source={"This game isn't in your library yet."} />
                   </p>
                   <AddGameModal initialQuery={debouncedSearchQuery}>
                     <Button size="lg" className="gap-2" data-testid="button-add-game-from-search">
                       <Plus className="w-4 h-4" />
-                      Add &ldquo;{debouncedSearchQuery}&rdquo; to collection
+                      <InterfaceText source={"Add “"} />
+                      {debouncedSearchQuery}
+                      <InterfaceText source={"” to collection"} />
                     </Button>
                   </AddGameModal>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-                  <p className="text-lg font-medium mb-1">No games match your current filters</p>
+                  <p className="text-lg font-medium mb-1">
+                    <InterfaceText source={"No games match your current filters"} />
+                  </p>
                   <p className="text-sm text-muted-foreground">
-                    Try adjusting or clearing your filters.
+                    <InterfaceText source={"Try adjusting or clearing your filters."} />
                   </p>
                 </div>
               );
@@ -726,14 +826,16 @@ export default function Library() {
 
             return (
               <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-                <p className="text-lg font-medium mb-1">No games yet</p>
+                <p className="text-lg font-medium mb-1">
+                  <InterfaceText source={"No games yet"} />
+                </p>
                 <p className="text-sm text-muted-foreground mb-6">
-                  Start building your library by adding a game.
+                  <InterfaceText source={"Start building your library by adding a game."} />
                 </p>
                 <AddGameModal initialQuery="">
                   <Button size="lg" className="gap-2">
                     <Plus className="w-4 h-4" />
-                    Add your first game
+                    <InterfaceText source={"Add your first game"} />
                   </Button>
                 </AddGameModal>
               </div>

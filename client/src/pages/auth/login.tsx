@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useAuth } from "@/lib/auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,16 +17,21 @@ import {
 import { Lock, User } from "lucide-react";
 import { GitHubVersionLink } from "@/components/GitHubVersionLink";
 import { withBasePath } from "@/lib/app-path";
+import { useInterfaceLanguage } from "@/lib/interface-locale";
 
-const loginSchema = z.object({
-  username: z.string().min(1, "Username is required"),
-  password: z.string().min(1, "Password is required"),
-});
-
-type LoginForm = z.infer<typeof loginSchema>;
+type LoginForm = { username: string; password: string };
 
 export default function LoginPage() {
   const { login, isLoading } = useAuth();
+  const { t, languageFor, directionFor } = useInterfaceLanguage();
+  const loginSchema = useMemo(
+    () =>
+      z.object({
+        username: z.string().min(1, t("Username is required")),
+        password: z.string().min(1, t("Password is required")),
+      }),
+    [t]
+  );
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -44,11 +50,24 @@ export default function LoginPage() {
         <CardHeader className="text-center flex flex-col items-center gap-2">
           <img
             src={withBasePath("/Questarr_Logo-nobg.png")}
-            alt="QuestarrNG Logo"
+            alt={t("QuestarrNG Logo")}
+            lang={languageFor("QuestarrNG Logo")}
+            dir={directionFor("QuestarrNG Logo")}
             className="h-16 w-auto mb-2"
           />
-          <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
-          <CardDescription>Login to manage your game collection</CardDescription>
+          <CardTitle
+            className="text-2xl font-bold"
+            lang={languageFor("Welcome Back")}
+            dir={directionFor("Welcome Back")}
+          >
+            {t("Welcome Back")}
+          </CardTitle>
+          <CardDescription
+            lang={languageFor("Login to manage your game collection")}
+            dir={directionFor("Login to manage your game collection")}
+          >
+            {t("Login to manage your game collection")}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -58,14 +77,25 @@ export default function LoginPage() {
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Username</FormLabel>
+                    <FormLabel lang={languageFor("Username")} dir={directionFor("Username")}>
+                      {t("Username")}
+                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input className="pl-9" placeholder="Enter your username" {...field} />
+                        <Input
+                          className="pl-9"
+                          placeholder={t("Enter your username")}
+                          lang={languageFor("Enter your username")}
+                          dir="auto"
+                          {...field}
+                        />
                       </div>
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage
+                      lang={languageFor("Username is required")}
+                      dir={directionFor("Username is required")}
+                    />
                   </FormItem>
                 )}
               />
@@ -74,7 +104,9 @@ export default function LoginPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel lang={languageFor("Password")} dir={directionFor("Password")}>
+                      {t("Password")}
+                    </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -82,17 +114,27 @@ export default function LoginPage() {
                           type="password"
                           className="pl-9"
                           autoComplete="current-password"
-                          placeholder="Enter your password"
+                          placeholder={t("Enter your password")}
+                          lang={languageFor("Enter your password")}
+                          dir={directionFor("Enter your password")}
                           {...field}
                         />
                       </div>
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage
+                      lang={languageFor("Password is required")}
+                      dir={directionFor("Password is required")}
+                    />
                   </FormItem>
                 )}
               />
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
+                <span
+                  lang={languageFor(isLoading ? "Logging in..." : "Login")}
+                  dir={directionFor(isLoading ? "Logging in..." : "Login")}
+                >
+                  {t(isLoading ? "Logging in..." : "Login")}
+                </span>
               </Button>
             </form>
           </Form>

@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import GameCard from "./GameCard";
 import { type Game } from "@shared/schema";
 import { type GameStatus } from "./StatusBadge";
+import { useInterfaceLanguage } from "@/lib/interface-locale";
 
 interface GameCarouselSectionProps {
   title: string;
@@ -42,6 +43,8 @@ const GameCarouselSection = ({
   onToggleHidden,
   isDiscovery = true,
 }: GameCarouselSectionProps) => {
+  const { t, languageFor, directionFor } = useInterfaceLanguage();
+  const displayTitle = t(title);
   const [api, setApi] = useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
@@ -80,6 +83,8 @@ const GameCarouselSection = ({
 
   const scrollPrev = () => api?.scrollPrev();
   const scrollNext = () => api?.scrollNext();
+  const previousLabel = canScrollPrev ? "Previous page" : "First page reached";
+  const nextLabel = canScrollNext ? "Next page" : "Last page reached";
 
   if (isLoading) {
     return (
@@ -88,7 +93,9 @@ const GameCarouselSection = ({
         data-testid={`carousel-section-${title.toLowerCase().replace(/\s+/g, "-")}-loading`}
       >
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">{title}</h2>
+          <h2 className="text-xl font-semibold" lang={languageFor(title)} dir={directionFor(title)}>
+            {displayTitle}
+          </h2>
         </div>
         <div className="flex gap-4 overflow-hidden">
           {Array.from({ length: 10 }).map((_, index) => (
@@ -110,11 +117,18 @@ const GameCarouselSection = ({
         data-testid={`carousel-section-${title.toLowerCase().replace(/\s+/g, "-")}-error`}
       >
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">{title}</h2>
+          <h2 className="text-xl font-semibold" lang={languageFor(title)} dir={directionFor(title)}>
+            {displayTitle}
+          </h2>
         </div>
         <div className="flex items-center gap-2 text-muted-foreground p-4 border rounded-md">
           <AlertCircle className="h-5 w-5" />
-          <span>Failed to load games. Please try again later.</span>
+          <span
+            lang={languageFor("Failed to load games. Please try again later.")}
+            dir={directionFor("Failed to load games. Please try again later.")}
+          >
+            {t("Failed to load games. Please try again later.")}
+          </span>
         </div>
       </div>
     );
@@ -127,11 +141,15 @@ const GameCarouselSection = ({
         data-testid={`carousel-section-${title.toLowerCase().replace(/\s+/g, "-")}-empty`}
       >
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">{title}</h2>
+          <h2 className="text-xl font-semibold" lang={languageFor(title)} dir={directionFor(title)}>
+            {displayTitle}
+          </h2>
         </div>
         <div className="flex items-center gap-2 text-muted-foreground p-4 border rounded-md">
           <AlertCircle className="h-5 w-5" />
-          <span>No games found.</span>
+          <span lang={languageFor("No games found.")} dir={directionFor("No games found.")}>
+            {t("No games found.")}
+          </span>
         </div>
       </div>
     );
@@ -143,7 +161,9 @@ const GameCarouselSection = ({
       data-testid={`carousel-section-${title.toLowerCase().replace(/\s+/g, "-")}`}
     >
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">{title}</h2>
+        <h2 className="text-xl font-semibold" lang={languageFor(title)} dir={directionFor(title)}>
+          {displayTitle}
+        </h2>
         <div className="flex gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
@@ -153,19 +173,25 @@ const GameCarouselSection = ({
                 onClick={() => refetch()}
                 disabled={isFetching}
                 className="h-8 w-8"
-                aria-label="Refresh games"
+                aria-label={t("Refresh games")}
+                lang={languageFor("Refresh games")}
+                dir={directionFor("Refresh games")}
               >
                 <RefreshCw className={cn("h-4 w-4", isFetching && "animate-spin")} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Refresh</TooltipContent>
+            <TooltipContent lang={languageFor("Refresh")} dir={directionFor("Refresh")}>
+              {t("Refresh")}
+            </TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
               <div
                 className="inline-block"
                 role={canScrollPrev ? undefined : "group"}
-                aria-label={canScrollPrev ? undefined : "First page reached"}
+                aria-label={canScrollPrev ? undefined : t("First page reached")}
+                lang={languageFor(previousLabel)}
+                dir={directionFor(previousLabel)}
                 tabIndex={canScrollPrev ? undefined : 0}
               >
                 <Button
@@ -174,7 +200,9 @@ const GameCarouselSection = ({
                   className="h-8 w-8 disabled:opacity-50"
                   onClick={scrollPrev}
                   disabled={!canScrollPrev}
-                  aria-label={canScrollPrev ? "Previous page" : "First page reached"}
+                  aria-label={t(previousLabel)}
+                  lang={languageFor(previousLabel)}
+                  dir={directionFor(previousLabel)}
                   data-testid={`carousel-prev-${title.toLowerCase().replace(/\s+/g, "-")}`}
                 >
                   <ChevronLeft className="h-4 w-4" />
@@ -182,7 +210,9 @@ const GameCarouselSection = ({
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              <p>{canScrollPrev ? "Previous page" : "First page reached"}</p>
+              <p lang={languageFor(previousLabel)} dir={directionFor(previousLabel)}>
+                {t(previousLabel)}
+              </p>
             </TooltipContent>
           </Tooltip>
           <Tooltip>
@@ -190,7 +220,9 @@ const GameCarouselSection = ({
               <div
                 className="inline-block"
                 role={canScrollNext ? undefined : "group"}
-                aria-label={canScrollNext ? undefined : "Last page reached"}
+                aria-label={canScrollNext ? undefined : t("Last page reached")}
+                lang={languageFor(nextLabel)}
+                dir={directionFor(nextLabel)}
                 tabIndex={canScrollNext ? undefined : 0}
               >
                 <Button
@@ -199,7 +231,9 @@ const GameCarouselSection = ({
                   className="h-8 w-8 disabled:opacity-50"
                   onClick={scrollNext}
                   disabled={!canScrollNext}
-                  aria-label={canScrollNext ? "Next page" : "Last page reached"}
+                  aria-label={t(nextLabel)}
+                  lang={languageFor(nextLabel)}
+                  dir={directionFor(nextLabel)}
                   data-testid={`carousel-next-${title.toLowerCase().replace(/\s+/g, "-")}`}
                 >
                   <ChevronRight className="h-4 w-4" />
@@ -207,7 +241,9 @@ const GameCarouselSection = ({
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              <p>{canScrollNext ? "Next page" : "Last page reached"}</p>
+              <p lang={languageFor(nextLabel)} dir={directionFor(nextLabel)}>
+                {t(nextLabel)}
+              </p>
             </TooltipContent>
           </Tooltip>
         </div>

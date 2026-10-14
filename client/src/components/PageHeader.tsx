@@ -1,5 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import { useInterfaceLanguage } from "@/lib/interface-locale";
 
 interface PageHeaderProps {
   title: string;
@@ -19,6 +20,7 @@ export default function PageHeader({
   actions,
   className,
 }: Readonly<PageHeaderProps>) {
+  const { t, languageFor, directionFor } = useInterfaceLanguage();
   return (
     <div
       className={cn(
@@ -27,8 +29,22 @@ export default function PageHeader({
       )}
     >
       <div className="min-w-0">
-        <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
-        {description && <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>}
+        <h1
+          className="text-2xl font-bold tracking-tight"
+          lang={languageFor(title)}
+          dir={directionFor(title)}
+        >
+          {t(title)}
+        </h1>
+        {description && (
+          <p
+            className="mt-0.5 text-sm text-muted-foreground"
+            lang={languageFor(description)}
+            dir={directionFor(description)}
+          >
+            {t(description)}
+          </p>
+        )}
       </div>
       {actions && <div className="flex flex-col gap-2 sm:flex-row sm:shrink-0">{actions}</div>}
     </div>

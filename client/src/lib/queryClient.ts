@@ -1,15 +1,19 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 import { withBasePath } from "@/lib/app-path";
+import { getInterfaceLanguage } from "@/lib/interface-locale";
+import { getLocalizedApiErrorMessage } from "@/lib/api-error-locale";
 
 export class ApiError extends Error {
   status: number;
   data: unknown;
+  code: string | undefined;
 
-  constructor(status: number, message: string, data?: unknown) {
+  constructor(status: number, message: string, data?: unknown, code?: string) {
     super(message);
     this.name = "ApiError";
     this.status = status;
     this.data = data;
+    this.code = code;
   }
 }
 
@@ -23,13 +27,14 @@ export async function throwIfResNotOk(res: Response) {
       data = text;
     }
 
+    const responseData =
+      data !== null && typeof data === "object" ? (data as Record<string, unknown>) : undefined;
     const raw =
-      (data as Record<string, unknown>)?.error ||
-      (data as Record<string, unknown>)?.message ||
-      res.statusText ||
-      String(res.status);
-    const message = typeof raw === "string" ? raw : JSON.stringify(raw);
-    throw new ApiError(res.status, message, data);
+      responseData?.error || responseData?.message || res.statusText || String(res.status);
+    const detail = typeof raw === "string" ? raw : JSON.stringify(raw);
+    const code = typeof responseData?.errorCode === "string" ? responseData.errorCode : undefined;
+    const message = getLocalizedApiErrorMessage(code, res.status, detail, getInterfaceLanguage());
+    throw new ApiError(res.status, message, data, code);
   }
 }
 

@@ -5,12 +5,14 @@ import { RssFeedItem } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { safeUrl } from "@/lib/utils";
 import { RegionalRelativeTime } from "./RegionalRelativeTime";
+import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
 
 interface CompactRssFeedItemProps {
   item: RssFeedItem;
 }
 
 const CompactRssFeedItem = ({ item }: CompactRssFeedItemProps) => {
+  const { language, t, languageFor, directionFor } = useInterfaceLanguage();
   return (
     <div
       className="group flex items-center gap-4 p-3 rounded-lg border bg-card text-card-foreground shadow-sm transition-colors hover:bg-accent/50"
@@ -22,6 +24,8 @@ const CompactRssFeedItem = ({ item }: CompactRssFeedItemProps) => {
           <img
             src={item.coverUrl}
             alt={item.igdbGameName || item.title}
+            lang="und"
+            dir="auto"
             className="w-full h-full object-cover"
             loading="lazy"
           />
@@ -35,17 +39,21 @@ const CompactRssFeedItem = ({ item }: CompactRssFeedItemProps) => {
       {/* Content */}
       <div className="flex-grow min-w-0 flex flex-col gap-1">
         <div className="flex items-center gap-2 flex-wrap">
-          <h3 className="font-semibold text-base truncate" title={item.title}>
+          <h3 className="font-semibold text-base truncate" title={item.title} lang="und" dir="auto">
             {item.title}
           </h3>
-          <Badge variant="secondary" className="text-xs">
+          <Badge variant="secondary" className="text-xs" lang="und" dir="auto">
             {item.sourceName}
           </Badge>
         </div>
 
         {item.igdbGameName && (
-          <div className="text-xs text-muted-foreground truncate">
-            Matched: <span className="font-medium text-foreground">{item.igdbGameName}</span>
+          <div
+            className="text-xs text-muted-foreground truncate"
+            lang={languageFor("Matched: {title}")}
+            dir={directionFor("Matched: {title}")}
+          >
+            {formatInterfaceMessage("Matched: {title}", { title: item.igdbGameName }, language)}
           </div>
         )}
 
@@ -56,7 +64,9 @@ const CompactRssFeedItem = ({ item }: CompactRssFeedItemProps) => {
             {item.pubDate ? (
               <RegionalRelativeTime date={new Date(item.pubDate)} />
             ) : (
-              <span>Unknown date</span>
+              <span lang={languageFor("Unknown date")} dir={directionFor("Unknown date")}>
+                {t("Unknown date")}
+              </span>
             )}
           </div>
         </div>
@@ -69,10 +79,22 @@ const CompactRssFeedItem = ({ item }: CompactRssFeedItemProps) => {
             href={safeUrl(item.link)}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`View original article for ${item.title}`}
+            aria-label={formatInterfaceMessage(
+              "View original article for {title}",
+              { title: item.title },
+              language
+            )}
+            lang={languageFor("View original article for {title}")}
+            dir={directionFor("View original article for {title}")}
           >
             <ExternalLink className="w-4 h-4" aria-hidden="true" />
-            <span className="hidden sm:inline">View</span>
+            <span
+              className="hidden sm:inline"
+              lang={languageFor("View")}
+              dir={directionFor("View")}
+            >
+              {t("View")}
+            </span>
           </a>
         </Button>
       </div>

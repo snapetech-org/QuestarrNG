@@ -10,6 +10,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Filter, X } from "lucide-react";
+import { InterfaceText } from "@/components/InterfaceText";
 
 interface DiscoveryFiltersProps {
   onFiltersChange: (filters: {
@@ -56,7 +57,8 @@ export default function DiscoveryFilters({ onFiltersChange }: DiscoveryFiltersPr
           data-testid="button-toggle-filters"
         >
           <Filter className="w-4 h-4" />
-          Filters {hasActiveFilters && `(${(releaseStatus !== "all" ? 1 : 0) + (minYear ? 1 : 0)})`}
+          <InterfaceText source={"Filters"} />{" "}
+          {hasActiveFilters && `(${(releaseStatus !== "all" ? 1 : 0) + (minYear ? 1 : 0)})`}
         </Button>
 
         {hasActiveFilters && (
@@ -68,7 +70,7 @@ export default function DiscoveryFilters({ onFiltersChange }: DiscoveryFiltersPr
             data-testid="button-clear-filters"
           >
             <X className="w-4 h-4" />
-            Clear
+            <InterfaceText source={"Clear"} />
           </Button>
         )}
       </div>
@@ -77,7 +79,9 @@ export default function DiscoveryFilters({ onFiltersChange }: DiscoveryFiltersPr
         <Card>
           <CardContent className="p-4 space-y-4">
             <div className="space-y-2">
-              <Label>Release Status</Label>
+              <Label>
+                <InterfaceText source={"Release Status"} />
+              </Label>
               <Select
                 value={releaseStatus}
                 onValueChange={handleReleaseStatusChange}
@@ -87,15 +91,23 @@ export default function DiscoveryFilters({ onFiltersChange }: DiscoveryFiltersPr
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Games</SelectItem>
-                  <SelectItem value="released">Released</SelectItem>
-                  <SelectItem value="upcoming">Upcoming</SelectItem>
+                  <SelectItem value="all">
+                    <InterfaceText source={"All Games"} />
+                  </SelectItem>
+                  <SelectItem value="released">
+                    <InterfaceText source={"Released"} />
+                  </SelectItem>
+                  <SelectItem value="upcoming">
+                    <InterfaceText source={"Upcoming"} />
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label>Minimum Release Year</Label>
+              <Label>
+                <InterfaceText source={"Minimum Release Year"} />
+              </Label>
               <Select
                 value={minYear?.toString() || "any"}
                 onValueChange={handleMinYearChange}
@@ -105,7 +117,9 @@ export default function DiscoveryFilters({ onFiltersChange }: DiscoveryFiltersPr
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="any">Any Year</SelectItem>
+                  <SelectItem value="any">
+                    <InterfaceText source={"Any Year"} />
+                  </SelectItem>
                   {years.map((year) => (
                     <SelectItem key={year} value={year.toString()}>
                       {year}

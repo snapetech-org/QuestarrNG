@@ -24,6 +24,8 @@ import { Plus, Trash, Settings, CheckCircle, AlertCircle } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { InterfaceText } from "@/components/InterfaceText";
+import { formatInterfaceMessage } from "@/lib/interface-locale";
 
 export default function RssSettings() {
   const [isOpen, setIsOpen] = useState(false);
@@ -89,26 +91,33 @@ export default function RssSettings() {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="gap-2">
           <Settings className="h-4 w-4" />
-          Manage Feeds
+          <InterfaceText source={"Manage Feeds"} />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle>RSS Feed Management</DialogTitle>
+          <DialogTitle>
+            <InterfaceText source={"RSS Feed Management"} />
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           <div className="grid grid-cols-12 gap-4 items-end border-b pb-4">
             <div className="col-span-4 space-y-2">
-              <Label>Feed Name</Label>
+              <Label>
+                <InterfaceText source={"Feed Name"} />
+              </Label>
               <Input
                 value={newFeedName}
                 onChange={(e) => setNewFeedName(e.target.value)}
                 placeholder="e.g. My Custom Feed"
+                data-i18n-placeholder={"e.g. My Custom Feed"}
               />
             </div>
             <div className="col-span-6 space-y-2">
-              <Label>Feed URL</Label>
+              <Label>
+                <InterfaceText source={"Feed URL"} />
+              </Label>
               <Input
                 value={newFeedUrl}
                 onChange={(e) => setNewFeedUrl(e.target.value)}
@@ -122,7 +131,7 @@ export default function RssSettings() {
                 disabled={!newFeedName || !newFeedUrl}
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add
+                <InterfaceText source={"Add"} />
               </Button>
             </div>
           </div>
@@ -130,11 +139,21 @@ export default function RssSettings() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Status</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Enabled</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>
+                  <InterfaceText source={"Status"} />
+                </TableHead>
+                <TableHead>
+                  <InterfaceText source={"Name"} />
+                </TableHead>
+                <TableHead>
+                  <InterfaceText source={"Type"} />
+                </TableHead>
+                <TableHead>
+                  <InterfaceText source={"Enabled"} />
+                </TableHead>
+                <TableHead className="text-right">
+                  <InterfaceText source={"Actions"} />
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -174,7 +193,9 @@ export default function RssSettings() {
                       size="icon"
                       onClick={() => deleteFeedMutation.mutate(feed.id)}
                       className="text-destructive"
-                      aria-label={`Delete feed ${feed.name}`}
+                      aria-label={formatInterfaceMessage("Delete feed {name}", {
+                        name: String(feed.name ?? ""),
+                      })}
                       disabled={deleteFeedMutation.isPending}
                     >
                       <Trash className="h-4 w-4" aria-hidden="true" />
@@ -185,7 +206,7 @@ export default function RssSettings() {
               {feeds?.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center text-muted-foreground">
-                    No RSS feeds configured. Add one above!
+                    <InterfaceText source={"No RSS feeds configured. Add one above!"} />
                   </TableCell>
                 </TableRow>
               )}

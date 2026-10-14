@@ -319,6 +319,8 @@ describe("GameJournalTab", () => {
     const complete = await screen.findByRole("button", {
       name: 'Mark "Find all relics" complete',
     });
+    expect(complete).toHaveAttribute("lang", "und");
+    expect(complete).toHaveAttribute("dir", "auto");
     expect(requestsTo("POST", /\/milestones$/)[0]?.body).toEqual({ label: "Find all relics" });
     expect(input).toHaveValue("");
 
@@ -333,7 +335,10 @@ describe("GameJournalTab", () => {
     await screen.findByRole("button", { name: 'Mark "Find all relics" complete' });
     expect(requestsTo("PATCH", /\/milestones\/m1$/)[1]?.body).toEqual({ completed: false });
 
-    fireEvent.click(screen.getByRole("button", { name: 'Delete milestone "Find all relics"' }));
+    const deleteButton = screen.getByRole("button", { name: 'Delete milestone "Find all relics"' });
+    expect(deleteButton).toHaveAttribute("lang", "und");
+    expect(deleteButton).toHaveAttribute("dir", "auto");
+    fireEvent.click(deleteButton);
     expect(await screen.findByText("No milestones yet.")).toBeInTheDocument();
   });
 

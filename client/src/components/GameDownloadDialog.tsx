@@ -3,7 +3,7 @@ import {
   getRegionalLocale,
   useRegionalPreference,
 } from "@/lib/regional-format";
-import { getInterfaceCollator } from "@/lib/interface-locale";
+import { getInterfaceCollator, formatInterfaceMessage } from "@/lib/interface-locale";
 import React, { useState, useEffect, useMemo, useCallback, useRef, useId } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -153,6 +153,7 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { formatBytes, formatAge, isUsenetItem } from "@/lib/downloads-utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useInterfaceLanguage } from "@/lib/interface-locale";
+import { InterfaceText } from "@/components/InterfaceText";
 
 type ReleaseMetadataBadgesProps = Readonly<{
   metadata: ReleaseMetadata;
@@ -219,7 +220,7 @@ function ReleaseMetadataBadges({
           variant="outline"
           className="h-5 px-1.5 text-xs border-muted-foreground/30 text-muted-foreground uppercase tracking-tighter"
         >
-          Scene
+          <InterfaceText source={"Scene"} />
         </Badge>
       )}
       {!isUsenet && downloadVolumeFactor === 0 && (
@@ -227,7 +228,7 @@ function ReleaseMetadataBadges({
           variant="secondary"
           className="h-5 px-1.5 text-[10px] bg-emerald-500/15 text-emerald-500 dark:text-emerald-400 border-none uppercase tracking-tighter"
         >
-          Freeleech
+          <InterfaceText source={"Freeleech"} />
         </Badge>
       )}
     </div>
@@ -256,11 +257,17 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
       );
     return message;
   };
-  const localizedText = (source: string, values?: Record<string, string | number>) => (
-    <span lang={languageFor(source)} dir={directionFor(source)}>
-      {translateText(source, values)}
-    </span>
-  );
+  const localizedText = (source: string, values?: Record<string, string | number>) => {
+    const text = translateText(source, values);
+    // English is already declared on the document; avoid adding a span around
+    // every English label and preserve plain strings for English toast payloads.
+    if (language === "en") return text;
+    return (
+      <span lang={languageFor(source)} dir={directionFor(source)}>
+        {text}
+      </span>
+    );
+  };
   const localizedAge = (days?: number) => {
     if (days === undefined) return null;
     if (days === 0) return localizedText("Today");
@@ -620,17 +627,30 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
       const downloaderNames = Array.from(
         new Set(successfulResults.map((r) => r.downloaderName).filter(Boolean))
       );
-      const titleSuffix = downloaderNames.length === 1 ? ` to ${downloaderNames[0]}` : "";
+      const title =
+        downloaderNames.length === 1
+          ? formatInterfaceMessage("Downloads sent: {count} to {downloaderName}", {
+              count: formatNumber(successCount),
+              downloaderName: downloaderNames[0]!,
+            })
+          : formatInterfaceMessage("Downloads sent: {count}", {
+              count: formatNumber(successCount),
+            });
       toast({
-        title: `${formatNumber(successCount)} download(s) sent${titleSuffix}`,
+        title,
         description:
           results.length > 1
-            ? `Added ${formatNumber(successCount)} of ${formatNumber(results.length)} downloads`
+            ? formatInterfaceMessage("Added {count} of {total} downloads", {
+                count: formatNumber(successCount),
+                total: formatNumber(results.length),
+              })
             : undefined,
       });
       if (failedResults.length > 0) {
         toast({
-          title: `${formatNumber(failedResults.length)} download(s) failed`,
+          title: formatInterfaceMessage("Downloads failed: {count}", {
+            count: formatNumber(failedResults.length),
+          }),
           description: failedResults.map(({ download }) => download.title).join(", "),
           variant: "destructive",
         });
@@ -674,7 +694,11 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
     },
     onSuccess: (result, variables) => {
       if (result.success) {
-        toast({ title: `Download sent to ${variables.downloaderName}` });
+        toast({
+          title: formatInterfaceMessage("Download sent to {downloaderName}", {
+            downloaderName: String(variables.downloaderName ?? ""),
+          }),
+        });
         queryClient.invalidateQueries({ queryKey: ["/api/downloads"] });
         queryClient.invalidateQueries({ queryKey: ["/api/downloads/summary"] });
         if (game?.id) {
@@ -775,7 +799,9 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
         window.URL.revokeObjectURL(url);
         toast({
           title: `Bundle downloaded`,
-          description: `ZIP file with ${formatNumber(downloads.length)} item(s)`,
+          description: formatInterfaceMessage("ZIP file item count: {count}", {
+            count: formatNumber(downloads.length),
+          }),
         });
       } catch (error) {
         toast({
@@ -1199,7 +1225,13 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
                                 }}
                               >
                                 <Copy className="h-4 w-4 mr-2" />
-                                Copy {isUsenet ? "NZB" : "Torrent"} Link
+                                <InterfaceText source={"Copy"} />{" "}
+                                {isUsenet ? (
+                                  <InterfaceText source={"NZB"} />
+                                ) : (
+                                  <InterfaceText source={"Torrent"} />
+                                )}{" "}
+                                <InterfaceText source={"Link"} />
                               </DropdownMenuItem>
 
                               {(() => {
@@ -1213,7 +1245,7 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
                                   <DropdownMenuSub>
                                     <DropdownMenuSubTrigger>
                                       <Download className="h-4 w-4 mr-2" />
-                                      Send to downloader
+                                      <InterfaceText source={"Send to downloader"} />
                                     </DropdownMenuSubTrigger>
                                     <DropdownMenuPortal>
                                       <DropdownMenuSubContent>
@@ -1243,7 +1275,7 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
                                 className="text-destructive focus:text-destructive"
                               >
                                 <Ban className="h-4 w-4 mr-2" />
-                                Blacklist release
+                                <InterfaceText source={"Blacklist release"} />
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -1300,7 +1332,7 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
                                             variant="default"
                                             className="h-4 px-1 text-[8px] uppercase bg-blue-600 hover:bg-blue-600 flex-shrink-0 mt-0.5"
                                           >
-                                            NEW
+                                            <InterfaceText source={"NEW"} />
                                           </Badge>
                                         )}
                                       </div>
@@ -1400,7 +1432,11 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
                                       </div>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                      {isUsenet ? "Usenet (NZB)" : "Torrent"}
+                                      {isUsenet ? (
+                                        <InterfaceText source={"Usenet (NZB)"} />
+                                      ) : (
+                                        <InterfaceText source={"Torrent"} />
+                                      )}
                                     </TooltipContent>
                                   </Tooltip>
 
@@ -1429,7 +1465,7 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
                                       variant="default"
                                       className="h-4 px-1 text-[8px] uppercase bg-blue-600 hover:bg-blue-600"
                                     >
-                                      NEW
+                                      <InterfaceText source={"NEW"} />
                                     </Badge>
                                   )}
                                 </div>
@@ -1502,7 +1538,8 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
                                   </div>
                                   {!isUsenet && download.leechers != null && (
                                     <div className="text-[10px] text-muted-foreground/60">
-                                      {formatNumber(download.leechers)}L
+                                      {formatNumber(download.leechers)}
+                                      <InterfaceText source={"L"} />
                                     </div>
                                   )}
                                 </div>

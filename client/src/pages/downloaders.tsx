@@ -1,8 +1,12 @@
 import { useMemo, useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiFetch, queryClient } from "@/lib/queryClient";
+import { apiFetch, throwIfResNotOk, queryClient } from "@/lib/queryClient";
 import { asZodType, cn, compareEnabledPriorityName } from "@/lib/utils";
-import { getInterfaceCollator, useInterfaceLanguage } from "@/lib/interface-locale";
+import {
+  getInterfaceCollator,
+  useInterfaceLanguage,
+  formatInterfaceMessage,
+} from "@/lib/interface-locale";
 import { Plus, Edit, Trash2, Check, X, Activity, ExternalLink, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,6 +47,7 @@ import { parseJsonObject } from "@shared/json-object-utils";
 import { useToast } from "@/hooks/use-toast";
 import { getDownloadTypeColor } from "@/lib/downloads-utils";
 import PageHeader from "@/components/PageHeader";
+import { InterfaceText } from "@/components/InterfaceText";
 
 const downloaderTypes = [
   { value: "transmission", label: "Transmission", protocol: "torrent" },
@@ -151,7 +156,9 @@ interface ArchivePasswordFieldProps {
 export function ArchivePasswordField({ form }: ArchivePasswordFieldProps) {
   return (
     <FormItem>
-      <FormLabel>Default Archive Password (Optional)</FormLabel>
+      <FormLabel>
+        <InterfaceText source={"Default Archive Password (Optional)"} />
+      </FormLabel>
       <FormControl>
         <Input
           type="password"
@@ -164,12 +171,15 @@ export function ArchivePasswordField({ form }: ArchivePasswordFieldProps) {
             );
           }}
           data-testid="input-downloader-archive-password"
+          data-i18n-placeholder={"e.g. 404"}
         />
       </FormControl>
       <FormDescription className="text-xs">
-        Applied automatically to every download sent to this client. Some indexers (e.g. G4U) ship
-        releases as password-protected archives — SABnzbd and NZBGet will use this to unpack them.
-        You can still override it per-download in the search dialog.
+        <InterfaceText
+          source={
+            "Applied automatically to every download sent to this client. Some indexers (e.g. G4U) ship releases as password-protected archives — SABnzbd and NZBGet will use this to unpack them. You can still override it per-download in the search dialog."
+          }
+        />
       </FormDescription>
     </FormItem>
   );
@@ -205,12 +215,15 @@ function PriorityControl({
 
   return (
     <div className="flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold">
-      <span className="text-muted-foreground">Priority</span>
+      <span className="text-muted-foreground">
+        <InterfaceText source={"Priority"} />
+      </span>
       <button
         type="button"
         className="text-muted-foreground hover:text-foreground w-3.5 text-center leading-none"
         onClick={() => save(value - 1)}
         aria-label="Decrease priority"
+        data-i18n-aria-label={"Decrease priority"}
       >
         −
       </button>
@@ -224,12 +237,14 @@ function PriorityControl({
         onKeyDown={(e) => e.key === "Enter" && save(value)}
         className="w-7 bg-transparent text-center outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         aria-label="Priority value"
+        data-i18n-aria-label={"Priority value"}
       />
       <button
         type="button"
         className="text-muted-foreground hover:text-foreground w-3.5 text-center leading-none"
         onClick={() => save(value + 1)}
         aria-label="Increase priority"
+        data-i18n-aria-label={"Increase priority"}
       >
         +
       </button>
@@ -272,7 +287,7 @@ export default function DownloadersPage() {
         headers,
         body: JSON.stringify(data),
       });
-      if (!response.ok) throw new Error("Failed to add downloader");
+      await throwIfResNotOk(response);
       return response.json();
     },
     onSuccess: () => {
@@ -294,7 +309,7 @@ export default function DownloadersPage() {
         headers,
         body: JSON.stringify(data),
       });
-      if (!response.ok) throw new Error("Failed to update downloader");
+      await throwIfResNotOk(response);
       return response.json();
     },
     onSuccess: () => {
@@ -313,7 +328,7 @@ export default function DownloadersPage() {
       const response = await apiFetch(`/api/downloaders/${id}`, {
         method: "DELETE",
       });
-      if (!response.ok) throw new Error("Failed to delete downloader");
+      await throwIfResNotOk(response);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/downloaders"] });
@@ -332,7 +347,7 @@ export default function DownloadersPage() {
         headers,
         body: JSON.stringify({ enabled }),
       });
-      if (!response.ok) throw new Error("Failed to toggle downloader");
+      await throwIfResNotOk(response);
       return response.json();
     },
     onSuccess: () => {
@@ -348,7 +363,7 @@ export default function DownloadersPage() {
         headers,
         body: JSON.stringify({ priority }),
       });
-      if (!response.ok) throw new Error("Failed to update priority");
+      await throwIfResNotOk(response);
       return response.json();
     },
     onSuccess: () => {
@@ -365,10 +380,7 @@ export default function DownloadersPage() {
           method: "POST",
           headers,
         });
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.error || "Failed to test downloader connection");
-        }
+        await throwIfResNotOk(response);
         return response.json() as Promise<{ success: boolean; message: string }>;
       } else if (data.formData) {
         // Test with form data (new downloader)
@@ -377,10 +389,7 @@ export default function DownloadersPage() {
           headers,
           body: JSON.stringify(data.formData),
         });
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.error || "Failed to test downloader connection");
-        }
+        await throwIfResNotOk(response);
         return response.json() as Promise<{ success: boolean; message: string }>;
       } else {
         throw new Error("Either id or formData must be provided");
@@ -413,8 +422,8 @@ export default function DownloadersPage() {
       const response = await apiFetch(`/api/downloaders/${downloaderId}/realdebrid/auth/start`, {
         method: "POST",
       });
+      await throwIfResNotOk(response);
       const body = await response.json();
-      if (!response.ok) throw new Error(body.error || "Could not start account linking.");
       return { downloaderId, ...body } as {
         downloaderId: string;
         handle: string;
@@ -447,8 +456,8 @@ export default function DownloadersPage() {
             body: JSON.stringify({ handle: realDebridAuth.handle }),
           }
         );
+        await throwIfResNotOk(response);
         const body = await response.json();
-        if (!response.ok) throw new Error(body.error || "Account linking failed.");
         if (cancelled) return;
         if (body.status === "connected") {
           setConnectedRealDebridId(realDebridAuth.downloaderId);
@@ -609,6 +618,7 @@ export default function DownloadersPage() {
     <div className="h-full overflow-auto p-4 md:p-6">
       <PageHeader
         title="Downloaders"
+        data-i18n-title={"Downloaders"}
         description="Manage download clients for automated downloads. Downloads use priority order with automatic fallback; Real-Debrid files are copied back to QuestarrNG before import."
         actions={
           <Button
@@ -617,7 +627,7 @@ export default function DownloadersPage() {
             data-testid="button-add-downloader"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add Downloader
+            <InterfaceText source={"Add Downloader"} />
           </Button>
         }
       />
@@ -648,9 +658,12 @@ export default function DownloadersPage() {
                       onClick={() => testConnectionMutation.mutate({ id: downloader.id })}
                       disabled={testingDownloaderId === downloader.id}
                       title="Test connection"
-                      aria-label={`Test connection for ${downloader.name}`}
+                      aria-label={formatInterfaceMessage("Test connection for {name}", {
+                        name: String(downloader.name ?? ""),
+                      })}
                       className="h-11 w-11 md:h-9 md:w-9"
                       data-testid={`button-test-downloader-${downloader.id}`}
+                      data-i18n-title={"Test connection"}
                     >
                       <Activity className="h-4 w-4" />
                     </Button>
@@ -665,7 +678,9 @@ export default function DownloadersPage() {
                       variant="outline"
                       size="icon"
                       onClick={() => handleEdit(downloader)}
-                      aria-label={`Edit ${downloader.name}`}
+                      aria-label={formatInterfaceMessage("Edit {name}", {
+                        name: String(downloader.name ?? ""),
+                      })}
                       className="h-11 w-11 md:h-9 md:w-9"
                       data-testid={`button-edit-downloader-${downloader.id}`}
                     >
@@ -675,7 +690,9 @@ export default function DownloadersPage() {
                       variant="outline"
                       size="icon"
                       onClick={() => deleteMutation.mutate(downloader.id)}
-                      aria-label={`Delete ${downloader.name}`}
+                      aria-label={formatInterfaceMessage("Delete {name}", {
+                        name: String(downloader.name ?? ""),
+                      })}
                       className="h-11 w-11 md:h-9 md:w-9"
                       data-testid={`button-delete-downloader-${downloader.id}`}
                     >
@@ -692,7 +709,11 @@ export default function DownloadersPage() {
                   <Badge
                     className={`text-xs border-none ${getDownloadTypeColor(isUsenetDownloader(downloader.type) ? "usenet" : "torrent")}`}
                   >
-                    {isUsenetDownloader(downloader.type) ? "USENET" : "TORRENT"}
+                    {isUsenetDownloader(downloader.type) ? (
+                      <InterfaceText source={"USENET"} />
+                    ) : (
+                      <InterfaceText source={"TORRENT"} />
+                    )}
                   </Badge>
                   <Badge
                     variant={downloader.enabled ? "default" : "secondary"}
@@ -701,18 +722,22 @@ export default function DownloadersPage() {
                     {downloader.enabled ? (
                       <>
                         <Check className="h-3 w-3 mr-1" />
-                        Enabled
+                        <InterfaceText source={"Enabled"} />
                       </>
                     ) : (
                       <>
                         <X className="h-3 w-3 mr-1" />
-                        Disabled
+                        <InterfaceText source={"Disabled"} />
                       </>
                     )}
                   </Badge>
                   {downloader.type === "realdebrid" && (
                     <Badge variant={downloader.password ? "default" : "outline"}>
-                      {downloader.password ? "Account linked" : "Account needs linking"}
+                      {downloader.password ? (
+                        <InterfaceText source={"Account linked"} />
+                      ) : (
+                        <InterfaceText source={"Account needs linking"} />
+                      )}
                     </Badge>
                   )}
                   <PriorityControl
@@ -728,9 +753,16 @@ export default function DownloadersPage() {
                     !downloader.enabled && "opacity-60"
                   )}
                 >
-                  {downloader.type === "realdebrid"
-                    ? `Local staging: ${downloader.downloadPath || "not configured"}`
-                    : downloader.url}
+                  {downloader.type === "realdebrid" ? (
+                    <InterfaceText
+                      source={"Local staging: {value}"}
+                      values={{
+                        value: String((downloader.downloadPath || "not configured") ?? ""),
+                      }}
+                    />
+                  ) : (
+                    downloader.url
+                  )}
                 </p>
               </CardHeader>
               <CardContent>
@@ -738,12 +770,20 @@ export default function DownloadersPage() {
                   {!isUsenetDownloader(downloader.type) &&
                     downloader.type !== "realdebrid" &&
                     downloader.downloadPath && (
-                      <Badge variant="outline">Path: {downloader.downloadPath}</Badge>
+                      <Badge variant="outline">
+                        <InterfaceText source={"Path:"} /> {downloader.downloadPath}
+                      </Badge>
                     )}
                   {downloader.category && (
-                    <Badge variant="outline">Category: {downloader.category}</Badge>
+                    <Badge variant="outline">
+                      <InterfaceText source={"Category:"} /> {downloader.category}
+                    </Badge>
                   )}
-                  {downloader.username && <Badge variant="outline">Authenticated</Badge>}
+                  {downloader.username && (
+                    <Badge variant="outline">
+                      <InterfaceText source={"Authenticated"} />
+                    </Badge>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -751,16 +791,20 @@ export default function DownloadersPage() {
         ) : (
           <Card>
             <CardHeader>
-              <CardTitle>No Downloaders Configured</CardTitle>
+              <CardTitle>
+                <InterfaceText source={"No Downloaders Configured"} />
+              </CardTitle>
               <CardDescription>
-                Add your first downloader client to enable automated downloads. Supported clients
-                include Transmission, rTorrent, qBittorrent, Synology Download Station, Real-Debrid,
-                SABnzbd, and NZBGet.
+                <InterfaceText
+                  source={
+                    "Add your first downloader client to enable automated downloads. Supported clients include Transmission, rTorrent, qBittorrent, Synology Download Station, Real-Debrid, SABnzbd, and NZBGet."
+                  }
+                />
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Button onClick={handleAdd} data-testid="button-add-downloader-empty">
-                Add Downloader
+                <InterfaceText source={"Add Downloader"} />
               </Button>
             </CardContent>
           </Card>
@@ -776,11 +820,25 @@ export default function DownloadersPage() {
       >
         <DialogContent className="w-full md:max-w-md max-h-[90vh] flex flex-col">
           <DialogHeader>
-            <DialogTitle>{editingDownloader ? "Edit Downloader" : "Add Downloader"}</DialogTitle>
+            <DialogTitle>
+              {editingDownloader ? (
+                <InterfaceText source={"Edit Downloader"} />
+              ) : (
+                <InterfaceText source={"Add Downloader"} />
+              )}
+            </DialogTitle>
             <DialogDescription>
-              {isRealDebrid
-                ? "Link Real-Debrid with its account authorization flow, then choose a local path for QuestarrNG to stage completed files."
-                : "Configure a torrent or Usenet client for automated game downloads."}
+              {isRealDebrid ? (
+                <InterfaceText
+                  source={
+                    "Link Real-Debrid with its account authorization flow, then choose a local path for QuestarrNG to stage completed files."
+                  }
+                />
+              ) : (
+                <InterfaceText
+                  source={"Configure a torrent or Usenet client for automated game downloads."}
+                />
+              )}
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
@@ -789,13 +847,17 @@ export default function DownloadersPage() {
               className="flex flex-col gap-4 overflow-hidden"
             >
               <div className="overflow-y-auto px-1 space-y-3 max-h-[calc(90vh-12rem)]">
-                <p className="text-sm text-muted-foreground">Fields marked * are required.</p>
+                <p className="text-sm text-muted-foreground">
+                  <InterfaceText source={"Fields marked * are required."} />
+                </p>
                 <FormField
                   control={form.control}
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <RequiredFormLabel required>Name</RequiredFormLabel>
+                      <RequiredFormLabel required>
+                        <InterfaceText source={"Name"} />
+                      </RequiredFormLabel>
                       <FormControl>
                         <Input
                           placeholder={
@@ -816,7 +878,9 @@ export default function DownloadersPage() {
                   name="type"
                   render={({ field }) => (
                     <FormItem>
-                      <RequiredFormLabel required>Type</RequiredFormLabel>
+                      <RequiredFormLabel required>
+                        <InterfaceText source={"Type"} />
+                      </RequiredFormLabel>
                       <Select
                         onValueChange={(nextType) => {
                           const previousType = field.value;
@@ -868,7 +932,10 @@ export default function DownloadersPage() {
                       >
                         <FormControl>
                           <SelectTrigger aria-required="true" data-testid="select-downloader-type">
-                            <SelectValue placeholder="Select client type" />
+                            <SelectValue
+                              placeholder="Select client type"
+                              data-i18n-placeholder={"Select client type"}
+                            />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -888,7 +955,9 @@ export default function DownloadersPage() {
                   name="url"
                   render={({ field }) => (
                     <FormItem className={cn(isRealDebrid && "hidden")}>
-                      <RequiredFormLabel required={!isRealDebrid}>Host</RequiredFormLabel>
+                      <RequiredFormLabel required={!isRealDebrid}>
+                        <InterfaceText source={"Host"} />
+                      </RequiredFormLabel>
                       <FormControl>
                         <Input
                           placeholder="http://localhost or https://192.168.1.100"
@@ -908,7 +977,9 @@ export default function DownloadersPage() {
                     name="port"
                     render={({ field }) => (
                       <FormItem className={cn(isRealDebrid && "hidden")}>
-                        <FormLabel>Port</FormLabel>
+                        <FormLabel>
+                          <InterfaceText source={"Port"} />
+                        </FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -937,19 +1008,27 @@ export default function DownloadersPage() {
                         )}
                       >
                         <div className="space-y-0">
-                          <FormLabel className="text-sm">Use SSL</FormLabel>
+                          <FormLabel className="text-sm">
+                            <InterfaceText source={"Use SSL"} />
+                          </FormLabel>
                           <FormDescription className="text-xs">
-                            {form.watch("type") === "qbittorrent"
-                              ? "See Options → Web UI → 'Use HTTPS instead of HTTP' in qBittorrent"
-                              : form.watch("type") === "transmission"
-                                ? "Enable HTTPS (see Settings → Web in Transmission)"
-                                : form.watch("type") === "synology"
-                                  ? "DSM 7 commonly uses HTTPS on port 5001"
-                                  : form.watch("type") === "sabnzbd"
-                                    ? "Enable HTTPS in SABnzbd (Config → General)"
-                                    : form.watch("type") === "nzbget"
-                                      ? "Enable HTTPS in NZBGet (Settings → Security)"
-                                      : "Enable HTTPS"}
+                            {form.watch("type") === "qbittorrent" ? (
+                              <InterfaceText
+                                source={
+                                  "See Options → Web UI → 'Use HTTPS instead of HTTP' in qBittorrent"
+                                }
+                              />
+                            ) : form.watch("type") === "transmission" ? (
+                              "Enable HTTPS (see Settings → Web in Transmission)"
+                            ) : form.watch("type") === "synology" ? (
+                              "DSM 7 commonly uses HTTPS on port 5001"
+                            ) : form.watch("type") === "sabnzbd" ? (
+                              "Enable HTTPS in SABnzbd (Config → General)"
+                            ) : form.watch("type") === "nzbget" ? (
+                              "Enable HTTPS in NZBGet (Settings → Security)"
+                            ) : (
+                              "Enable HTTPS"
+                            )}
                           </FormDescription>
                         </div>
                         <FormControl>
@@ -988,8 +1067,12 @@ export default function DownloadersPage() {
                   />
                   {form.watch("type") === "sabnzbd" && (
                     <p className="text-xs text-muted-foreground">
-                      TLS certificate checks stay enabled. To trust a private certificate authority,
-                      configure the Questarr service with <code>NODE_EXTRA_CA_CERTS</code>.
+                      <InterfaceText
+                        source={
+                          "TLS certificate checks stay enabled. To trust a private certificate authority, configure the Questarr service with"
+                        }
+                      />
+                      <code>NODE_EXTRA_CA_CERTS</code>.
                     </p>
                   )}
                   {!form.watch("useSsl") && (
@@ -1000,12 +1083,14 @@ export default function DownloadersPage() {
                         <FormItem className="flex flex-row items-center justify-between rounded-lg border border-amber-600/50 bg-amber-950/20 p-2">
                           <div className="space-y-0">
                             <FormLabel className="text-sm text-amber-400">
-                              Allow insecure LAN
+                              <InterfaceText source={"Allow insecure LAN"} />
                             </FormLabel>
                             <FormDescription className="text-xs">
-                              Permits sending passwords and API keys over plain HTTP. Only enable
-                              this if the downloader is on a trusted LAN without TLS support and you
-                              accept the risk of credentials being intercepted.
+                              <InterfaceText
+                                source={
+                                  "Permits sending passwords and API keys over plain HTTP. Only enable this if the downloader is on a trusted LAN without TLS support and you accept the risk of credentials being intercepted."
+                                }
+                              />
                             </FormDescription>
                           </div>
                           <FormControl>
@@ -1025,7 +1110,9 @@ export default function DownloadersPage() {
                   name="urlPath"
                   render={({ field }) => (
                     <FormItem className={cn(isRealDebrid && "hidden")}>
-                      <FormLabel>URL Path (Optional)</FormLabel>
+                      <FormLabel>
+                        <InterfaceText source={"URL Path (Optional)"} />
+                      </FormLabel>
                       <FormControl>
                         <Input
                           placeholder={
@@ -1043,7 +1130,9 @@ export default function DownloadersPage() {
                         />
                       </FormControl>
                       <FormDescription className="text-xs">
-                        Base path or endpoint (e.g. "/sabnzbd" for reverse proxy)
+                        <InterfaceText
+                          source={'Base path or endpoint (e.g. "/sabnzbd" for reverse proxy)'}
+                        />
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -1059,14 +1148,16 @@ export default function DownloadersPage() {
                           form.watch("type") === "sabnzbd" || form.watch("type") === "synology"
                         }
                       >
-                        {form.watch("type") === "sabnzbd"
-                          ? "API Key"
-                          : form.watch("type") === "qbittorrent" ||
-                              form.watch("type") === "transmission" ||
-                              form.watch("type") === "nzbget" ||
-                              form.watch("type") === "synology"
-                            ? "Username"
-                            : "Username (Optional)"}
+                        {form.watch("type") === "sabnzbd" ? (
+                          <InterfaceText source={"API Key"} />
+                        ) : form.watch("type") === "qbittorrent" ||
+                          form.watch("type") === "transmission" ||
+                          form.watch("type") === "nzbget" ||
+                          form.watch("type") === "synology" ? (
+                          "Username"
+                        ) : (
+                          "Username (Optional)"
+                        )}
                       </RequiredFormLabel>
                       <FormControl>
                         <Input
@@ -1085,7 +1176,9 @@ export default function DownloadersPage() {
                       </FormControl>
                       {form.watch("type") === "sabnzbd" && (
                         <FormDescription className="text-xs">
-                          Required. Found in SABnzbd Config → General → API Key.
+                          <InterfaceText
+                            source={"Required. Found in SABnzbd Config → General → API Key."}
+                          />
                         </FormDescription>
                       )}
                       {(form.watch("type") === "qbittorrent" ||
@@ -1093,9 +1186,13 @@ export default function DownloadersPage() {
                         form.watch("type") === "nzbget" ||
                         form.watch("type") === "synology") && (
                         <FormDescription className="text-xs">
-                          {form.watch("type") === "synology"
-                            ? "Required for DSM login."
-                            : "Only required if this client&apos;s web UI uses authentication."}
+                          {form.watch("type") === "synology" ? (
+                            <InterfaceText source={"Required for DSM login."} />
+                          ) : (
+                            <InterfaceText
+                              source={"Only required if this client's web UI uses authentication."}
+                            />
+                          )}
                         </FormDescription>
                       )}
                       <FormMessage />
@@ -1118,9 +1215,11 @@ export default function DownloadersPage() {
                         {form.watch("type") === "qbittorrent" ||
                         form.watch("type") === "transmission" ||
                         form.watch("type") === "nzbget" ||
-                        form.watch("type") === "synology"
-                          ? "Password"
-                          : "Password (Optional)"}
+                        form.watch("type") === "synology" ? (
+                          "Password"
+                        ) : (
+                          <InterfaceText source={"Password (Optional)"} />
+                        )}
                       </RequiredFormLabel>
                       <FormControl>
                         <Input
@@ -1129,6 +1228,7 @@ export default function DownloadersPage() {
                           {...field}
                           value={field.value || ""}
                           data-testid="input-downloader-password"
+                          data-i18n-placeholder={"Enter password"}
                         />
                       </FormControl>
                       {(form.watch("type") === "qbittorrent" ||
@@ -1136,9 +1236,13 @@ export default function DownloadersPage() {
                         form.watch("type") === "nzbget" ||
                         form.watch("type") === "synology") && (
                         <FormDescription className="text-xs">
-                          {form.watch("type") === "synology"
-                            ? "Required for DSM login."
-                            : "Only required if this client&apos;s web UI uses authentication."}
+                          {form.watch("type") === "synology" ? (
+                            <InterfaceText source={"Required for DSM login."} />
+                          ) : (
+                            <InterfaceText
+                              source={"Only required if this client's web UI uses authentication."}
+                            />
+                          )}
                         </FormDescription>
                       )}
                       <FormMessage />
@@ -1152,9 +1256,11 @@ export default function DownloadersPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>
-                          {isRealDebrid
-                            ? "QuestarrNG Local Staging Path (Required)"
-                            : "Download Path (Optional)"}
+                          {isRealDebrid ? (
+                            <InterfaceText source={"QuestarrNG Local Staging Path (Required)"} />
+                          ) : (
+                            "Download Path (Optional)"
+                          )}
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -1171,16 +1277,20 @@ export default function DownloadersPage() {
                         </FormControl>
                         {isRealDebrid ? (
                           <FormDescription className="text-xs">
-                            This path is on the QuestarrNG server and must be writable by its
-                            process. Real-Debrid completes downloads in the cloud; QuestarrNG copies
-                            the selected files here before importing them. A premium account may be
-                            required for torrent downloads.
+                            <InterfaceText
+                              source={
+                                "This path is on the QuestarrNG server and must be writable by its process. Real-Debrid completes downloads in the cloud; QuestarrNG copies the selected files here before importing them. A premium account may be required for torrent downloads."
+                              }
+                            />
                           </FormDescription>
                         ) : form.watch("type") === "synology" ? (
                           <FormDescription className="text-xs">
-                            Use a shared-folder-relative destination such as{" "}
-                            <code>video/downloads</code>; avoid absolute <code>/volume1/...</code>{" "}
-                            paths.
+                            <InterfaceText
+                              source={"Use a shared-folder-relative destination such as"}
+                            />{" "}
+                            <code>video/downloads</code>
+                            <InterfaceText source={"; avoid absolute"} /> <code>/volume1/...</code>{" "}
+                            <InterfaceText source={"paths."} />
                           </FormDescription>
                         ) : null}
                         <FormMessage />
@@ -1192,11 +1302,21 @@ export default function DownloadersPage() {
                   <div className="space-y-3 rounded-lg border border-sky-800 bg-sky-950/20 p-3">
                     <div className="flex items-center justify-between gap-3">
                       <div>
-                        <p className="text-sm font-medium">Real-Debrid account</p>
+                        <p className="text-sm font-medium">
+                          <InterfaceText source={"Real-Debrid account"} />
+                        </p>
                         <p className="text-xs text-muted-foreground">
-                          {isRealDebridConnected
-                            ? "Connected. Account credentials are stored encrypted by QuestarrNG."
-                            : "Authorize QuestarrNG through Real-Debrid's device sign-in."}
+                          {isRealDebridConnected ? (
+                            <InterfaceText
+                              source={
+                                "Connected. Account credentials are stored encrypted by QuestarrNG."
+                              }
+                            />
+                          ) : (
+                            <InterfaceText
+                              source={"Authorize QuestarrNG through Real-Debrid's device sign-in."}
+                            />
+                          )}
                         </p>
                       </div>
                       {editingDownloader && (
@@ -1212,18 +1332,30 @@ export default function DownloadersPage() {
                           ) : (
                             <ExternalLink className="mr-2 h-4 w-4" />
                           )}
-                          {isRealDebridConnected ? "Reconnect" : "Connect account"}
+                          {isRealDebridConnected ? (
+                            <InterfaceText source={"Reconnect"} />
+                          ) : (
+                            <InterfaceText source={"Connect account"} />
+                          )}
                         </Button>
                       )}
                     </div>
                     {!editingDownloader && (
                       <p className="text-xs text-muted-foreground">
-                        Save this downloader first, then open it again to link the account.
+                        <InterfaceText
+                          source={
+                            "Save this downloader first, then open it again to link the account."
+                          }
+                        />
                       </p>
                     )}
                     {activeRealDebridAuth && (
                       <div className="space-y-2 rounded-md bg-background/70 p-3 text-sm">
-                        <p>Open Real-Debrid and enter this one-time code:</p>
+                        <p>
+                          <InterfaceText
+                            source={"Open Real-Debrid and enter this one-time code:"}
+                          />
+                        </p>
                         <p className="font-mono text-lg font-bold tracking-widest">
                           {activeRealDebridAuth.userCode}
                         </p>
@@ -1233,12 +1365,15 @@ export default function DownloadersPage() {
                           target="_blank"
                           rel="noreferrer"
                         >
-                          Open device authorization
+                          <InterfaceText source={"Open device authorization"} />
                           <ExternalLink className="h-3 w-3" />
                         </a>
                         <p className="text-xs text-muted-foreground">
-                          QuestarrNG checks for approval automatically. This code expires after
-                          about 30 minutes.
+                          <InterfaceText
+                            source={
+                              "QuestarrNG checks for approval automatically. This code expires after about 30 minutes."
+                            }
+                          />
                         </p>
                         <Button
                           type="button"
@@ -1246,7 +1381,7 @@ export default function DownloadersPage() {
                           variant="ghost"
                           onClick={() => setRealDebridAuth(null)}
                         >
-                          Cancel account linking
+                          <InterfaceText source={"Cancel account linking"} />
                         </Button>
                       </div>
                     )}
@@ -1257,25 +1392,32 @@ export default function DownloadersPage() {
                   name="category"
                   render={({ field }) => (
                     <FormItem className={cn(isRealDebrid && "hidden")}>
-                      <FormLabel>Category</FormLabel>
+                      <FormLabel>
+                        <InterfaceText source={"Category"} />
+                      </FormLabel>
                       <FormControl>
                         <Input
                           placeholder="games"
                           {...field}
                           value={field.value || ""}
                           data-testid="input-downloader-category"
+                          data-i18n-placeholder={"games"}
                         />
                       </FormControl>
                       <FormDescription className="text-xs">
-                        {form.watch("type") === "qbittorrent"
-                          ? "Adding a category avoids conflicts with unrelated downloads"
-                          : form.watch("type") === "transmission"
-                            ? "Creates a subdirectory in the output directory. Label for downloads in downloader"
-                            : form.watch("type") === "synology"
-                              ? "Optional Questarr label only. Synology stores downloads by destination path."
-                              : form.watch("type") === "sabnzbd" || form.watch("type") === "nzbget"
-                                ? "Category for NZBs in downloader (path is managed by category settings)"
-                                : "Label for downloads in downloader"}
+                        {form.watch("type") === "qbittorrent" ? (
+                          <InterfaceText
+                            source={"Adding a category avoids conflicts with unrelated downloads"}
+                          />
+                        ) : form.watch("type") === "transmission" ? (
+                          "Creates a subdirectory in the output directory. Label for downloads in downloader"
+                        ) : form.watch("type") === "synology" ? (
+                          "Optional Questarr label only. Synology stores downloads by destination path."
+                        ) : form.watch("type") === "sabnzbd" || form.watch("type") === "nzbget" ? (
+                          "Category for NZBs in downloader (path is managed by category settings)"
+                        ) : (
+                          "Label for downloads in downloader"
+                        )}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -1290,7 +1432,9 @@ export default function DownloadersPage() {
                     name="addStopped"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Initial State</FormLabel>
+                        <FormLabel>
+                          <InterfaceText source={"Initial State"} />
+                        </FormLabel>
                         <Select
                           onValueChange={(value) => {
                             if (value === "stopped") {
@@ -1328,17 +1472,28 @@ export default function DownloadersPage() {
                         >
                           <FormControl>
                             <SelectTrigger data-testid="select-initial-state">
-                              <SelectValue placeholder="Select initial state" />
+                              <SelectValue
+                                placeholder="Select initial state"
+                                data-i18n-placeholder={"Select initial state"}
+                              />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="started">Started</SelectItem>
-                            <SelectItem value="force-started">Force started</SelectItem>
-                            <SelectItem value="stopped">Stopped</SelectItem>
+                            <SelectItem value="started">
+                              <InterfaceText source={"Started"} />
+                            </SelectItem>
+                            <SelectItem value="force-started">
+                              <InterfaceText source={"Force started"} />
+                            </SelectItem>
+                            <SelectItem value="stopped">
+                              <InterfaceText source={"Stopped"} />
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                         <FormDescription className="text-xs">
-                          Forced downloads do not abide by seed restrictions
+                          <InterfaceText
+                            source={"Forced downloads do not abide by seed restrictions"}
+                          />
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -1350,7 +1505,9 @@ export default function DownloadersPage() {
                   name="priority"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Priority</FormLabel>
+                      <FormLabel>
+                        <InterfaceText source={"Priority"} />
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -1362,7 +1519,9 @@ export default function DownloadersPage() {
                         />
                       </FormControl>
                       <FormDescription className="text-xs">
-                        Lower = higher priority. Auto-fallback if fails.
+                        <InterfaceText
+                          source={"Lower = higher priority. Auto-fallback if fails."}
+                        />
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -1370,7 +1529,9 @@ export default function DownloadersPage() {
                 />
                 {(form.watch("type") === "rtorrent" || form.watch("type") === "transmission") && (
                   <div className="space-y-2 rounded-lg border p-3 bg-muted/30">
-                    <h3 className="text-sm font-semibold mb-2">Advanced Settings</h3>
+                    <h3 className="text-sm font-semibold mb-2">
+                      <InterfaceText source={"Advanced Settings"} />
+                    </h3>
                     {form.watch("type") === "transmission" && (
                       <FormField
                         control={form.control}
@@ -1378,9 +1539,13 @@ export default function DownloadersPage() {
                         render={({ field }) => (
                           <FormItem className="flex flex-row items-center justify-between rounded-lg border p-2 bg-background">
                             <div className="space-y-0">
-                              <FormLabel className="text-sm">Use SSL</FormLabel>
+                              <FormLabel className="text-sm">
+                                <InterfaceText source={"Use SSL"} />
+                              </FormLabel>
                               <FormDescription className="text-xs">
-                                Enable HTTPS (see Settings → Web in Transmission)
+                                <InterfaceText
+                                  source={"Enable HTTPS (see Settings → Web in Transmission)"}
+                                />
                               </FormDescription>
                             </div>
                             <FormControl>
@@ -1402,9 +1567,11 @@ export default function DownloadersPage() {
                           render={({ field }) => (
                             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-2 bg-background">
                               <div className="space-y-0">
-                                <FormLabel className="text-sm">Add Stopped</FormLabel>
+                                <FormLabel className="text-sm">
+                                  <InterfaceText source={"Add Stopped"} />
+                                </FormLabel>
                                 <FormDescription className="text-xs">
-                                  Add downloads in paused state
+                                  <InterfaceText source={"Add downloads in paused state"} />
                                 </FormDescription>
                               </div>
                               <FormControl>
@@ -1423,9 +1590,13 @@ export default function DownloadersPage() {
                           render={({ field }) => (
                             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-2 bg-background">
                               <div className="space-y-0">
-                                <FormLabel className="text-sm">Remove Completed</FormLabel>
+                                <FormLabel className="text-sm">
+                                  <InterfaceText source={"Remove Completed"} />
+                                </FormLabel>
                                 <FormDescription className="text-xs">
-                                  Remove downloads from downloader after completion
+                                  <InterfaceText
+                                    source={"Remove downloads from downloader after completion"}
+                                  />
                                 </FormDescription>
                               </div>
                               <FormControl>
@@ -1443,17 +1614,20 @@ export default function DownloadersPage() {
                           name="postImportCategory"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Post-Import Category (Optional)</FormLabel>
+                              <FormLabel>
+                                <InterfaceText source={"Post-Import Category (Optional)"} />
+                              </FormLabel>
                               <FormControl>
                                 <Input
                                   placeholder="completed-games"
                                   {...field}
                                   value={field.value || ""}
                                   data-testid="input-downloader-postimportcategory"
+                                  data-i18n-placeholder={"completed-games"}
                                 />
                               </FormControl>
                               <FormDescription className="text-xs">
-                                Category after download completes
+                                <InterfaceText source={"Category after download completes"} />
                               </FormDescription>
                               <FormMessage />
                             </FormItem>
@@ -1471,7 +1645,7 @@ export default function DownloadersPage() {
                   onClick={() => setIsDialogOpen(false)}
                   data-testid="button-cancel"
                 >
-                  Cancel
+                  <InterfaceText source={"Cancel"} />
                 </Button>
                 {!isRealDebrid ? (
                   <Button
@@ -1486,7 +1660,11 @@ export default function DownloadersPage() {
                     data-testid="button-test-connection-dialog"
                   >
                     <Activity className="h-4 w-4 mr-2" />
-                    {testingDownloaderId === "new" ? "Testing..." : "Test Connection"}
+                    {testingDownloaderId === "new" ? (
+                      <InterfaceText source={"Testing..."} />
+                    ) : (
+                      <InterfaceText source={"Test Connection"} />
+                    )}
                   </Button>
                 ) : editingDownloader && isRealDebridConnected ? (
                   <Button
@@ -1496,9 +1674,11 @@ export default function DownloadersPage() {
                     disabled={testingDownloaderId !== null}
                   >
                     <Activity className="h-4 w-4 mr-2" />
-                    {testingDownloaderId === editingDownloader.id
-                      ? "Testing..."
-                      : "Test Connection"}
+                    {testingDownloaderId === editingDownloader.id ? (
+                      <InterfaceText source={"Testing..."} />
+                    ) : (
+                      <InterfaceText source={"Test Connection"} />
+                    )}
                   </Button>
                 ) : null}
                 <Button

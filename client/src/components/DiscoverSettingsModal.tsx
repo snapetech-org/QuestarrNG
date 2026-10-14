@@ -23,6 +23,7 @@ import { Eye, BookMarked, CheckCircle2 } from "lucide-react";
 import { type Game } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { InterfaceText } from "@/components/InterfaceText";
 
 interface DiscoverSettingsModalProps {
   open: boolean;
@@ -73,10 +74,12 @@ export default function DiscoverSettingsModal({
           <div className="flex flex-col space-y-1">
             <div className="flex items-center gap-2 text-sm font-medium">
               <CheckCircle2 className="w-4 h-4 text-green-500" />
-              Hide Owned Games
+              <InterfaceText source={"Hide Owned Games"} />
             </div>
             <span className="text-xs text-muted-foreground">
-              Do not show games already in your "Owned" or "Completed" library.
+              <InterfaceText
+                source={'Do not show games already in your "Owned" or "Completed" library.'}
+              />
             </span>
           </div>
           <Switch checked={hideOwned} onCheckedChange={onHideOwnedChange} />
@@ -86,10 +89,10 @@ export default function DiscoverSettingsModal({
           <div className="flex flex-col space-y-1">
             <div className="flex items-center gap-2 text-sm font-medium">
               <BookMarked className="w-4 h-4 text-primary" />
-              Hide Wanted Games
+              <InterfaceText source={"Hide Wanted Games"} />
             </div>
             <span className="text-xs text-muted-foreground">
-              Do not show games already in your watchlist.
+              <InterfaceText source={"Do not show games already in your watchlist."} />
             </span>
           </div>
           <Switch checked={hideWanted} onCheckedChange={onHideWantedChange} />
@@ -100,13 +103,14 @@ export default function DiscoverSettingsModal({
       <div className="flex flex-col flex-1 overflow-hidden min-h-0 mt-4">
         <h3 className="font-semibold mb-2 flex items-center gap-2 flex-shrink-0">
           <Eye className="h-4 w-4" />
-          Hidden Games ({hiddenGames.length})
+          <InterfaceText source={"Hidden Games ("} />
+          {hiddenGames.length})
         </h3>
 
         <ScrollArea className="flex-1 border rounded-md p-2">
           {hiddenGames.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground text-sm">
-              No manually hidden games.
+              <InterfaceText source={"No manually hidden games."} />
             </div>
           ) : (
             <div className="space-y-2">
@@ -129,9 +133,11 @@ export default function DiscoverSettingsModal({
                     onClick={() => handleUnhide(game.id)}
                     disabled={unhideMutation.isPending}
                   >
-                    {unhideMutation.isPending && unhideMutation.variables === game.id
-                      ? "Unhiding..."
-                      : "Unhide"}
+                    {unhideMutation.isPending && unhideMutation.variables === game.id ? (
+                      <InterfaceText source={"Unhiding..."} />
+                    ) : (
+                      <InterfaceText source={"Unhide"} />
+                    )}
                   </Button>
                 </div>
               ))}
@@ -147,9 +153,11 @@ export default function DiscoverSettingsModal({
       <Drawer open={open} onOpenChange={onOpenChange} shouldScaleBackground={false}>
         <DrawerContent className="h-[80vh] flex flex-col">
           <DrawerHeader className="pt-2 pb-0 px-4 flex-shrink-0">
-            <DrawerTitle>Discovery Settings</DrawerTitle>
+            <DrawerTitle>
+              <InterfaceText source={"Discovery Settings"} />
+            </DrawerTitle>
             <DrawerDescription className="sr-only">
-              Customize your discovery experience.
+              <InterfaceText source={"Customize your discovery experience."} />
             </DrawerDescription>
           </DrawerHeader>
           {innerContent}
@@ -162,8 +170,12 @@ export default function DiscoverSettingsModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] max-h-[80vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Discovery Settings</DialogTitle>
-          <DialogDescription>Customize your discovery experience.</DialogDescription>
+          <DialogTitle>
+            <InterfaceText source={"Discovery Settings"} />
+          </DialogTitle>
+          <DialogDescription>
+            <InterfaceText source={"Customize your discovery experience."} />
+          </DialogDescription>
         </DialogHeader>
         {innerContent}
       </DialogContent>

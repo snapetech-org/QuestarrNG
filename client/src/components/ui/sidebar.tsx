@@ -7,6 +7,7 @@ import { PanelLeftIcon } from "lucide-react";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { useInterfaceLanguage } from "@/lib/interface-locale";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -155,6 +156,7 @@ function Sidebar({
   variant?: "sidebar" | "floating" | "inset";
   collapsible?: "offcanvas" | "icon" | "none";
 }) {
+  const { t, languageFor, directionFor } = useInterfaceLanguage();
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
 
   if (collapsible === "none") {
@@ -188,8 +190,15 @@ function Sidebar({
           side={side}
         >
           <SheetHeader className="sr-only">
-            <SheetTitle>Sidebar</SheetTitle>
-            <SheetDescription>Displays the mobile sidebar.</SheetDescription>
+            <SheetTitle lang={languageFor("Sidebar")} dir={directionFor("Sidebar")}>
+              {t("Sidebar")}
+            </SheetTitle>
+            <SheetDescription
+              lang={languageFor("Displays the mobile sidebar.")}
+              dir={directionFor("Displays the mobile sidebar.")}
+            >
+              {t("Displays the mobile sidebar.")}
+            </SheetDescription>
           </SheetHeader>
           <div className="flex h-full w-full flex-col">{children}</div>
         </SheetContent>
@@ -249,6 +258,7 @@ const SidebarTrigger = React.forwardRef<
   React.ElementRef<typeof Button>,
   React.ComponentProps<typeof Button>
 >(({ className, onClick, ...props }, ref) => {
+  const { t, languageFor, directionFor } = useInterfaceLanguage();
   const { toggleSidebar } = useSidebar();
 
   return (
@@ -266,23 +276,32 @@ const SidebarTrigger = React.forwardRef<
       {...props}
     >
       <PanelLeftIcon />
-      <span className="sr-only">Toggle Sidebar</span>
+      <span
+        className="sr-only"
+        lang={languageFor("Toggle Sidebar")}
+        dir={directionFor("Toggle Sidebar")}
+      >
+        {t("Toggle Sidebar")}
+      </span>
     </Button>
   );
 });
 SidebarTrigger.displayName = "SidebarTrigger";
 
 function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
+  const { t, languageFor, directionFor } = useInterfaceLanguage();
   const { toggleSidebar } = useSidebar();
 
   return (
     <button
       data-sidebar="rail"
       data-slot="sidebar-rail"
-      aria-label="Toggle Sidebar"
+      aria-label={t("Toggle Sidebar")}
+      lang={languageFor("Toggle Sidebar")}
+      dir={directionFor("Toggle Sidebar")}
       tabIndex={-1}
       onClick={toggleSidebar}
-      title="Toggle Sidebar"
+      title={t("Toggle Sidebar")}
       className={cn(
         "hover:after:bg-sidebar-border absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] sm:flex",
         "[[data-side=left]_&]:cursor-w-resize [[data-side=right]_&]:cursor-e-resize",
