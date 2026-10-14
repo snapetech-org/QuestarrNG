@@ -5,6 +5,15 @@ native test inventory it saw before execution. It runs the existing npm, Vitest,
 Playwright, TypeScript, and build commands; it does not replace their assertions
 or coverage thresholds.
 
+## GitHub runner routing
+
+The `sca-scan` and `windows-service` jobs may use the organization `trusted-main`
+runner group on pushes and manual runs targeting `main` only after
+`TRUSTED_MAIN_RUNNERS_ENABLED` is set to `true`. Until then, they use
+GitHub-hosted runners. Pull requests, release branches, and the Bubblewrap test
+and build jobs remain on GitHub-hosted runners. The organization runner group
+restricts access to the approved workflow on `refs/heads/main`.
+
 Run the default local gate with:
 
 ```sh

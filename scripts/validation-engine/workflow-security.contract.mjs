@@ -223,20 +223,22 @@ test('test and build jobs execute the base-reviewed launcher with isolated depen
   assert.match(testJob, /path: \$\{\{ runner\.temp \}\}\/quest-codecov-reports/u);
 });
 
-test('trusted main CI uses a readiness-gated string runner selector', () => {
+test('trusted main CI uses a readiness-gated runner-group object selector', () => {
   const mainCondition =
     "(github.event_name == 'push' || github.event_name == 'workflow_dispatch') && " +
     "github.ref == 'refs/heads/main'";
+  const trustedRunnerJson =
+    '{"group":"trusted-main","labels":["self-hosted","Linux","X64","host"]}';
   const expected =
     "$" + "{{ " + mainCondition +
-    " && vars.TRUSTED_MAIN_RUNNERS_ENABLED == 'true' && 'trusted-main' || 'ubuntu-latest' }}";
+    " && vars.TRUSTED_MAIN_RUNNERS_ENABLED == 'true' && fromJSON('" + trustedRunnerJson + "') || 'ubuntu-latest' }}";
   const selectors = ciWorkflow.split('\n').filter((line) =>
-    line.startsWith('    runs-on: ') && line.includes("'trusted-main'")
+    line.startsWith('    runs-on: ') && line.includes("fromJSON('" + trustedRunnerJson + "')")
   );
   assert.equal(selectors.length, 2);
   assert.deepEqual(selectors, [
     `    runs-on: ${expected}`,
     `    runs-on: ${expected}`
   ]);
-  assert.ok(selectors.every((line) => !line.includes('fromJSON')));
+  assert.ok(selectors.every((line) => line.includes("|| 'ubuntu-latest'")));
 });
