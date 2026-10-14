@@ -166,11 +166,14 @@ offline with no GitHub token or repository secrets in the sandbox. Synthetic
 host and resolver files support local socket tests without restoring host
 network or DNS settings. Regular test and build jobs also use the reviewed launcher, prefetch dependencies inside
 Bubblewrap, and produce source-bound receipts. Coverage and JUnit files are
-copied to the short-lived artifact with size and symlink checks. On Ubuntu 24.04, the job
-loads an ephemeral AppArmor profile attached to `/usr/bin/bwrap` so Bubblewrap
-can create its namespace while the runner-wide unprivileged-user-namespace
-restriction stays enabled. Local runs may skip the integration check when
-Bubblewrap is unavailable. Use the complete GitHub-hosted validation run for
+copied to the short-lived artifact with size and symlink checks. For same-repository pull requests authored by `snapetech`, the workflow can use
+the `Default` runner group when `TRUSTED_MAIN_RUNNERS_ENABLED` is `true`;
+fork and bot pull requests remain on GitHub-hosted runners. Candidate files stay
+in the read-only Bubblewrap sandbox, with no token or secrets inside it. On
+Ubuntu 24.04, the job loads an ephemeral AppArmor profile attached to
+`/usr/bin/bwrap` when the runner restricts unprivileged user namespaces. Other
+runner hosts must pass the same Bubblewrap namespace preflight. Local runs may
+skip the integration check when Bubblewrap is unavailable. Use the complete GitHub-hosted validation run for
 the full test suite.
 
 The regular pull-request CI workflow contains no Codecov secret reference. It
