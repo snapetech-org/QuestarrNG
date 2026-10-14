@@ -33,13 +33,18 @@ jobs:
           [[ "$PR_NUMBER" =~ ^[0-9]+$ ]]
           [[ "$BASE_SHA" =~ ^[0-9a-f]{40}$ ]]
           [[ "$CANDIDATE_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$GITHUB_RUN_ID" =~ ^[0-9]+$ ]]
+          [[ "$GITHUB_RUN_ATTEMPT" =~ ^[0-9]+$ ]]
+          [[ "$RUNNER_TEMP" == /* ]]
           [[ "$GITHUB_REPOSITORY" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]
           [[ -n "$GH_TOKEN" ]]
           export GIT_CONFIG_NOSYSTEM=1
           export GIT_CONFIG_GLOBAL=/dev/null
           export GIT_LFS_SKIP_SMUDGE=1
           export GIT_TERMINAL_PROMPT=0
-          trusted_repo="$GITHUB_WORKSPACE/trusted.git"
+          validation_root="$RUNNER_TEMP/questarr-trusted-validation-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          mkdir -m 700 "$validation_root"
+          trusted_repo="$validation_root/trusted.git"
           git init --quiet --bare "$trusted_repo"
           git --git-dir="$trusted_repo" remote add origin "https://github.com/$GITHUB_REPOSITORY.git"
           auth="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 --wrap=0)"
@@ -67,11 +72,11 @@ jobs:
           # nosemgrep: yaml.github-actions.security.pull-request-target-code-checkout.pull-request-target-code-checkout
           # Materializes only a base commit verified against main; no repository-provided hooks or filters run.
           git --git-dir="$trusted_repo" -c core.hooksPath=/dev/null -c submodule.recurse=false \
-            worktree add --detach "$GITHUB_WORKSPACE/trusted" "$BASE_SHA"
+            worktree add --detach "$validation_root/trusted" "$BASE_SHA"
           # nosemgrep: yaml.github-actions.security.pull-request-target-code-checkout.pull-request-target-code-checkout
           # Materializes the exact untrusted snapshot as data; the trusted launcher isolates it before execution.
           git --git-dir="$trusted_repo" -c core.hooksPath=/dev/null -c submodule.recurse=false \
-            worktree add --detach "$GITHUB_WORKSPACE/candidate" "$CANDIDATE_SHA"
+            worktree add --detach "$validation_root/candidate" "$CANDIDATE_SHA"
 
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
@@ -80,8 +85,11 @@ jobs:
           package-manager-cache: false
 
       - name: Install trusted npm runtime
-        working-directory: trusted
-        run: node scripts/install-npm-runtime.mjs
+        run: |
+          set -euo pipefail
+          validation_root="$RUNNER_TEMP/questarr-trusted-validation-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          cd "$validation_root/trusted"
+          node scripts/install-npm-runtime.mjs
 
       - name: Install Bubblewrap
         run: |
@@ -118,13 +126,19 @@ jobs:
           GITHUB_JOB: trusted-pr-validation
         run: |
           set -euo pipefail
-          node trusted/scripts/validation-engine/trusted-test-launcher.mjs candidate \
-            --trusted-root trusted \
+          [[ "$GITHUB_RUN_ID" =~ ^[0-9]+$ ]]
+          [[ "$GITHUB_RUN_ATTEMPT" =~ ^[0-9]+$ ]]
+          validation_root="$RUNNER_TEMP/questarr-trusted-validation-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          trusted_root="$validation_root/trusted"
+          candidate_root="$validation_root/candidate"
+          mkdir -m 700 "$validation_root/receipts"
+          node "$trusted_root/scripts/validation-engine/trusted-test-launcher.mjs" "$candidate_root" \
+            --trusted-root "$trusted_root" \
             --trusted-base-sha "$VALIDATION_PR_BASE_SHA" \
             --candidate-sha "$VALIDATION_PR_HEAD_SHA" \
-            --trusted-npm-cli trusted/.github/npm-runtime/node_modules/.questarr-npm-cli/bin/npm-cli.js \
+            --trusted-npm-cli "$trusted_root/.github/npm-runtime/node_modules/.questarr-npm-cli/bin/npm-cli.js" \
             --install-dependencies \
-            --receipt-output "$RUNNER_TEMP/quest-validation-receipts/test.json" \
+            --receipt-output "$validation_root/receipts/test.json" \
             -- \
             node /mnt/trusted-validation/scripts/validate-development.mjs \
               --root /mnt/workspace \
@@ -135,10 +149,28 @@ jobs:
           VALIDATION_PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           VALIDATION_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          node trusted/scripts/validation-engine/reconcile-ci.mjs \
+          set -euo pipefail
+          validation_root="$RUNNER_TEMP/questarr-trusted-validation-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          node "$validation_root/trusted/scripts/validation-engine/reconcile-ci.mjs" \
             --trusted-pr \
-            --receipt "$RUNNER_TEMP/quest-validation-receipts/test.json" \
+            --receipt "$validation_root/receipts/test.json" \
             --run-id "$GITHUB_RUN_ID" \
             --run-attempt "$GITHUB_RUN_ATTEMPT" \
             --sha "$VALIDATION_PR_HEAD_SHA" \
             --base-sha "$VALIDATION_PR_BASE_SHA"
+
+      - name: Clean trusted validation workspace
+        if: always()
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_RUN_ID" =~ ^[0-9]+$ ]]
+          [[ "$GITHUB_RUN_ATTEMPT" =~ ^[0-9]+$ ]]
+          [[ "$RUNNER_TEMP" == /* ]]
+          validation_root="$RUNNER_TEMP/questarr-trusted-validation-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          if [[ -L "$validation_root" ]]; then
+            echo "Trusted validation workspace must not be a symbolic link." >&2
+            exit 1
+          fi
+          if [[ -d "$validation_root" ]]; then
+            rm -rf -- "$validation_root"
+          fi

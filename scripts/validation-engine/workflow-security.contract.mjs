@@ -177,16 +177,35 @@ test('trusted PR validation runs the base validator and launcher on an exact can
   assert.match(trustedWorkflow, /GIT_CONFIG_GLOBAL=\/dev\/null/u);
   assert.match(trustedWorkflow, /GIT_LFS_SKIP_SMUDGE=1/u);
   assert.match(trustedWorkflow, /unset GIT_CONFIG_COUNT GIT_CONFIG_KEY_0 GIT_CONFIG_VALUE_0 GH_TOKEN auth/u);
+  assert.match(
+    trustedWorkflow,
+    /validation_root="\$RUNNER_TEMP\/questarr-trusted-validation-\$\{GITHUB_RUN_ID\}-\$\{GITHUB_RUN_ATTEMPT\}"/u,
+    'each trusted validation attempt gets an isolated runner-temp workspace'
+  );
+  assert.match(trustedWorkflow, /trusted_repo="\$validation_root\/trusted\.git"/u);
+  assert.doesNotMatch(
+    trustedWorkflow,
+    /\$GITHUB_WORKSPACE\/(?:trusted\.git|trusted|candidate)/u,
+    'persistent workspaces must not reuse fixed trusted-validation paths'
+  );
   assert.match(trustedWorkflow, /Materializes only a base commit verified against main; no repository-provided hooks or filters run/u);
   assert.match(trustedWorkflow, /Materializes the exact untrusted snapshot as data; the trusted launcher isolates it before execution/u);
-  assert.match(trustedWorkflow, /worktree add --detach "\$GITHUB_WORKSPACE\/trusted" "\$BASE_SHA"/u);
-  assert.match(trustedWorkflow, /worktree add --detach[\s\\\S]*?\$GITHUB_WORKSPACE\/candidate[\s\\\S]*?\$CANDIDATE_SHA/u);
+  assert.match(trustedWorkflow, /worktree add --detach "\$validation_root\/trusted" "\$BASE_SHA"/u);
+  assert.match(trustedWorkflow, /worktree add --detach[\s\\\S]*?\$validation_root\/candidate[\s\\\S]*?\$CANDIDATE_SHA/u);
   assert.doesNotMatch(trustedWorkflow, /persist-credentials:/u);
   assert.match(
     trustedWorkflow,
-    /node trusted\/scripts\/validation-engine\/trusted-test-launcher\.mjs candidate[\s\S]*?--trusted-root trusted[\s\S]*?--trusted-base-sha "\$VALIDATION_PR_BASE_SHA"[\s\S]*?--candidate-sha "\$VALIDATION_PR_HEAD_SHA"[\s\S]*?--install-dependencies[\s\S]*?node \/mnt\/trusted-validation\/scripts\/validate-development\.mjs[\s\S]*?--root \/mnt\/workspace[\s\S]*?--tests-only/u
+    /node "\$trusted_root\/scripts\/validation-engine\/trusted-test-launcher\.mjs" "\$candidate_root"[\s\S]*?--trusted-root "\$trusted_root"[\s\S]*?--trusted-base-sha "\$VALIDATION_PR_BASE_SHA"[\s\S]*?--candidate-sha "\$VALIDATION_PR_HEAD_SHA"[\s\S]*?--install-dependencies[\s\S]*?--receipt-output "\$validation_root\/receipts\/test\.json"[\s\S]*?node \/mnt\/trusted-validation\/scripts\/validate-development\.mjs[\s\S]*?--root \/mnt\/workspace[\s\S]*?--tests-only/u
   );
-  assert.match(trustedWorkflow, /node trusted\/scripts\/validation-engine\/reconcile-ci\.mjs/u);
+  assert.match(
+    trustedWorkflow,
+    /node "\$validation_root\/trusted\/scripts\/validation-engine\/reconcile-ci\.mjs"[\s\S]*?--receipt "\$validation_root\/receipts\/test\.json"/u
+  );
+  assert.match(
+    trustedWorkflow,
+    /Clean trusted validation workspace[\s\S]*?if: always\(\)[\s\S]*?validation_root="\$RUNNER_TEMP\/questarr-trusted-validation-\$\{GITHUB_RUN_ID\}-\$\{GITHUB_RUN_ATTEMPT\}"[\s\S]*?if \[\[ -L "\$validation_root" \]\][\s\S]*?rm -rf -- "\$validation_root"/u,
+    'the exact per-attempt workspace is removed after both success and failure'
+  );
 });
 
 test('CI receipt reconciliation downloads only artifacts from the current attempt', () => {
