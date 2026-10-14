@@ -15,7 +15,8 @@ concurrency:
 jobs:
   trusted-pr-validation:
     name: trusted-pr-validation
-    runs-on: ubuntu-24.04
+    # Same-repository owner PRs use the restricted local pool; forks and bots stay hosted.
+    runs-on: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.user.login == 'snapetech' && vars.TRUSTED_MAIN_RUNNERS_ENABLED == 'true' && fromJSON('{"group":"Default","labels":["self-hosted","Linux","X64","host"]}') || 'ubuntu-24.04' }}
     timeout-minutes: 90
     permissions:
       contents: read
@@ -84,18 +85,24 @@ jobs:
 
       - name: Install Bubblewrap
         run: |
-          sudo apt-get update
-          sudo apt-get install --yes bubblewrap
-          profile="$RUNNER_TEMP/questarr-bubblewrap.apparmor"
-          cat > "$profile" <<'APPARMOR'
+          set -euo pipefail
+          if command -v apt-get >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install --yes bubblewrap
+            if [[ "$(sysctl -n kernel.apparmor_restrict_unprivileged_userns 2>/dev/null || true)" == "1" ]]; then
+              profile="$RUNNER_TEMP/questarr-bubblewrap.apparmor"
+              cat > "$profile" <<'APPARMOR'
           abi <abi/4.0>,
           include <tunables/global>
           profile questarr_bubblewrap /usr/bin/bwrap flags=(unconfined) {
             userns,
           }
           APPARMOR
-          sudo apparmor_parser --add "$profile"
-          test "$(sysctl -n kernel.apparmor_restrict_unprivileged_userns)" = 1
+              sudo apparmor_parser --add "$profile"
+              test "$(sysctl -n kernel.apparmor_restrict_unprivileged_userns)" = 1
+            fi
+          fi
+          command -v bwrap >/dev/null
           bwrap --die-with-parent --unshare-user --ro-bind / / -- /bin/true
 
       - name: Run trusted validation against the candidate snapshot
