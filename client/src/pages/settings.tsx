@@ -1456,7 +1456,10 @@ export default function SettingsPage() {
                             <SelectItem key={theme} value={theme}>
                               <div className="flex flex-col">
                                 <span className="font-medium">
-                                  <span lang={languageFor(config.name)} dir={directionFor(config.name)}>
+                                  <span
+                                    lang={languageFor(config.name)}
+                                    dir={directionFor(config.name)}
+                                  >
                                     {t(config.name)}
                                   </span>
                                 </span>
