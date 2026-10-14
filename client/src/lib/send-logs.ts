@@ -95,11 +95,17 @@ export async function sendLogs(payload: SendLogsPayload): Promise<SendLogsResult
       ...(messageValues && messageKey ? { messageValues } : {}),
     };
   } catch (err) {
+    // Browser fetch failures are normally TypeErrors such as "Failed to fetch".
+    // Keep those implementation-specific details out of the UI so the stable
+    // network message can be localized, while preserving other unexpected
+    // errors for diagnosis.
+    const isNetworkError = err instanceof TypeError;
+    const networkMessage = "Network error — check your connection.";
     return {
       ok: false,
       status: 0,
-      message: err instanceof Error ? err.message : "Network error — check your connection.",
-      ...(err instanceof Error ? {} : { messageKey: "Network error — check your connection." }),
+      message: isNetworkError || !(err instanceof Error) ? networkMessage : err.message,
+      ...(isNetworkError || !(err instanceof Error) ? { messageKey: networkMessage } : {}),
     };
   }
 }

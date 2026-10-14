@@ -47,4 +47,17 @@ describe("sendLogs error messages", () => {
     });
     expect(result).not.toHaveProperty("messageKey");
   });
+
+  it("maps browser fetch failures to the localized network message", async () => {
+    vi.spyOn(globalThis, "fetch").mockRejectedValue(new TypeError("Failed to fetch"));
+
+    const result = await sendLogs(payload);
+
+    expect(result).toEqual({
+      ok: false,
+      status: 0,
+      message: "Network error — check your connection.",
+      messageKey: "Network error — check your connection.",
+    });
+  });
 });
