@@ -1,6 +1,7 @@
 // Copyright (c) QuestarrNG contributors. All rights reserved.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { load } from 'js-yaml';
 import { URL, fileURLToPath } from 'node:url';
 import test from 'node:test';
 
@@ -360,4 +361,50 @@ test('trusted main CI uses a readiness-gated runner-group object selector', () =
     `    runs-on: ${expected}`
   ]);
   assert.ok(selectors.every((line) => line.includes("|| 'ubuntu-latest'")));
+});
+
+test('scheduled dependency and Helm workflows cancel only superseded runs for the same PR', () => {
+  const expectedGroup = [
+    '${{ github.workflow }}',
+    '${{ github.event.pull_request.number || github.run_id }}',
+  ].join('-');
+  const expectedCancel = "${{ github.event_name == 'pull_request' }}";
+  for (const file of ['deprecated-deps.yml', 'helm-chart.yml']) {
+    const workflow = load(
+      readFileSync(fileURLToPath(new URL(file, workflowDirectory)), 'utf8')
+    );
+
+    assert.ok(workflow.on.pull_request, `${file} must retain its PR trigger`);
+    assert.deepEqual(workflow.concurrency, {
+      group: expectedGroup,
+      'cancel-in-progress': expectedCancel,
+    });
+  }
+});
+
+test('Dependabot groups NuGet and Docker minor/patch updates without grouping majors or security updates', () => {
+  const dependabot = load(
+    readFileSync(fileURLToPath(new URL('../../.github/dependabot.yml', import.meta.url)), 'utf8')
+  );
+  for (const ecosystem of ['nuget', 'docker']) {
+    const updates = dependabot.updates.filter((entry) => entry['package-ecosystem'] === ecosystem);
+    assert.ok(updates.length > 0, `${ecosystem} updates must be configured`);
+    const groupName = ecosystem === 'nuget' ? 'nuget-minor-patch' : 'docker-minor-patch';
+
+    for (const update of updates) {
+      assert.deepEqual(update.groups[groupName], {
+        'applies-to': 'version-updates',
+        patterns: ['*'],
+        'update-types': ['minor', 'patch'],
+      });
+      assert.equal(update.groups['security-updates']['applies-to'], 'security-updates');
+    }
+  }
+
+  assert.deepEqual(
+    dependabot.updates
+      .filter((entry) => entry['package-ecosystem'] === 'docker')
+      .map((entry) => entry.directory),
+    ['/', '/questarr'],
+  );
 });

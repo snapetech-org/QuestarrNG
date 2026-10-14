@@ -12,6 +12,8 @@ export default defineConfig({
     environment: "jsdom",
     environmentMatchGlobs: [["server/**", "node"]],
     setupFiles: ["./tests/setup.ts"],
+    // Bound GitHub Actions workers to avoid oversubscribing the shared runner host.
+    maxWorkers: process.env.QUESTARR_CI_VITEST_MAX_WORKERS === "4" ? 4 : undefined,
     testTimeout: 20000,
     coverage: {
       provider: "v8",

@@ -33,7 +33,7 @@ import {
   runtimeProbeDirectory,
   runTaskPool,
 } from './engine.mjs';
-import { validation } from './config.mjs';
+import { validation, vitestWorkerEnvironment } from './config.mjs';
 
 const temporaryRoots = [];
 
@@ -129,6 +129,36 @@ test('only the dependency installer receives the configured npm cache', () => {
   );
   assert.equal(isolatedTaskEnvironment(lint, runRoot, inherited).NPM_CONFIG_CACHE, undefined);
   assert.equal(isolatedTaskEnvironment(lint, runRoot, inherited).NPM_CONFIG_OFFLINE, undefined);
+});
+
+test('Vitest worker cap is enabled only for GitHub Actions validation tasks', () => {
+  assert.deepEqual(vitestWorkerEnvironment('true'), {
+    QUESTARR_CI_VITEST_MAX_WORKERS: '4',
+  });
+  for (const githubActions of [undefined, '', 'false', '1']) {
+    assert.deepEqual(vitestWorkerEnvironment(githubActions), {
+      QUESTARR_CI_VITEST_MAX_WORKERS: '0',
+    });
+  }
+
+  const runRoot = mkdtempSync(path.join(os.tmpdir(), 'questarrng-vitest-workers-contract-'));
+  temporaryRoots.push(runRoot);
+  const task = validation.tasks.find((candidate) => candidate.id === 'vitest-coverage');
+  assert.ok(task);
+  assert.deepEqual(task.env, vitestWorkerEnvironment());
+
+  for (const githubActions of ['true', 'false']) {
+    const taskEnvironment = isolatedTaskEnvironment(
+      { ...task, env: vitestWorkerEnvironment(githubActions) },
+      runRoot,
+      { PATH: process.env.PATH, GITHUB_ACTIONS: githubActions },
+    );
+    assert.equal(taskEnvironment.CI, 'true');
+    assert.equal(
+      taskEnvironment.QUESTARR_CI_VITEST_MAX_WORKERS,
+      githubActions === 'true' ? '4' : '0',
+    );
+  }
 });
 
 test('glob matching covers root and nested files without crossing sibling names', () => {
