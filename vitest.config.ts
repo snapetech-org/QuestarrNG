@@ -12,8 +12,8 @@ export default defineConfig({
     environment: "jsdom",
     environmentMatchGlobs: [["server/**", "node"]],
     setupFiles: ["./tests/setup.ts"],
-    // CI jobs share the self-hosted host; cap worker fan-out to avoid flaky timeouts.
-    maxWorkers: process.env.CI ? 4 : undefined,
+    // Bound GitHub Actions workers to avoid oversubscribing the shared runner host.
+    maxWorkers: process.env.QUESTARR_CI_VITEST_MAX_WORKERS === "4" ? 4 : undefined,
     testTimeout: 20000,
     coverage: {
       provider: "v8",

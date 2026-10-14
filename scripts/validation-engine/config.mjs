@@ -1,6 +1,12 @@
 // Copyright (c) QuestarrNG contributors. All rights reserved.
 import process from 'node:process';
 
+export function vitestWorkerEnvironment(githubActions = process.env.GITHUB_ACTIONS) {
+  return {
+    QUESTARR_CI_VITEST_MAX_WORKERS: githubActions === 'true' ? '4' : '0',
+  };
+}
+
 export const validation = {
   repository: 'questarrng',
   inputs: [
@@ -195,6 +201,7 @@ export const validation = {
       inventoryLanes: [
         'client-vitest', 'shared-vitest', 'server-vitest', 'scripts-vitest',
       ],
+      env: vitestWorkerEnvironment(),
       dependsOn: ['install-dependencies'],
       timeoutSeconds: 2400,
     },
