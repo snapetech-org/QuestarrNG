@@ -83,6 +83,13 @@ describe("release image manifest verification", () => {
     }
   });
 
+  it("labels the published image with the organization repository source", () => {
+    const dockerfile = readFileSync(resolve(cwd(), "Dockerfile"), "utf8");
+    const sourceLabel = dockerfile.match(/^LABEL org\.opencontainers\.image\.source="([^"]+)"$/mu);
+
+    expect(sourceLabel?.[1]).toBe("https://github.com/snapetech-org/QuestarrNG");
+  });
+
   it("scans both exact platform digests before attaching the release tag", () => {
     const workflow = load(readFileSync(resolve(cwd(), ".github/workflows/fork-image.yml"), "utf8"));
     const steps = workflow.jobs.publish.steps;
