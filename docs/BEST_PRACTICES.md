@@ -1,7 +1,7 @@
 # OpenSSF Best Practices Evidence for QuestarrNG
 
 This document records repository evidence for the [OpenSSF Best Practices Badge](https://www.bestpractices.dev/)
-criteria relevant to QuestarrNG. It describes the `snapetech/QuestarrNG` fork as
+criteria relevant to QuestarrNG. It describes the `snapetech-org/QuestarrNG` fork as
 it stood on **2026-10-12**. It is an evidence ledger, not a submitted OpenSSF
 profile or a claim that every criterion is met.
 
@@ -20,8 +20,8 @@ window. There are no QuestarrNG bug reports in that window from which to measure
 acknowledgement. The response statistics previously recorded for Doezer/Questarr
 are upstream-only and do not apply to this criterion for QuestarrNG.
 
-Evidence: [QuestarrNG issue tracker](https://github.com/snapetech/QuestarrNG/issues)
-and [repository](https://github.com/snapetech/QuestarrNG).
+Evidence: [QuestarrNG issue tracker](https://github.com/snapetech-org/QuestarrNG/issues)
+and [repository](https://github.com/snapetech-org/QuestarrNG).
 
 ## [enhancement_responses]
 
@@ -32,7 +32,7 @@ there are no QuestarrNG enhancement requests on which to assess responses. The
 enhancement statistics previously recorded for Doezer/Questarr are upstream-only
 and are not attributed to this fork.
 
-Evidence: [QuestarrNG issue tracker](https://github.com/snapetech/QuestarrNG/issues).
+Evidence: [QuestarrNG issue tracker](https://github.com/snapetech-org/QuestarrNG/issues).
 
 ## [warnings_strict]
 
@@ -67,7 +67,7 @@ workflow; accepted rule IDs and their rationale are recorded in
 [`.zap/rules.tsv`](../.zap/rules.tsv).
 
 The successful DAST run on the `main` commit for v1.9.1 is
-[run 37546640378](https://github.com/snapetech/QuestarrNG/actions/runs/37546640378).
+[run 37546640378](https://github.com/snapetech-org/QuestarrNG/actions/runs/37546640378).
 The v1.9.1 release was published at 23:17 UTC on 2026-10-06, and this run
 started at 23:27 UTC. It is evidence of routine scanning, not evidence that the
 scan completed before that release was published. No major release occurred in
@@ -115,11 +115,11 @@ They were open in GitHub Code Scanning at the assessment date:
 
 | Finding                                                                                     | Fork-specific evidence and status                                                                                                                                                                                                                                                                                                                                                                                                        |
 | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [BranchProtectionID #1](https://github.com/snapetech/QuestarrNG/security/code-scanning/1)   | Protection was absent at the start of the 2026-10-12 audit. It was restored through GitHub's API: one approval, approval of the latest push, stale-review dismissal, administrator enforcement, strict required checks, conversation resolution, and no force pushes or deletion. A fresh Scorecard run must confirm closure.                                                                                                            |
-| [VulnerabilitiesID #93](https://github.com/snapetech/QuestarrNG/security/code-scanning/93)  | The locked CI npm artifact bundled vulnerable dependencies even though the application lockfile audited cleanly. `install-npm-runtime.mjs` now excludes bundled copies and installs a separately locked patched graph. Both lockfiles audit with zero vulnerabilities locally. The runtime changes require merge and a fresh Scorecard scan before this finding is fixed on main.                                                        |
-| [CodeReviewID #10](https://github.com/snapetech/QuestarrNG/security/code-scanning/10)       | The scanner reports 0/16 approved changesets in the existing history. Future PRs require an independent approving review with no administrator bypass. As of 2026-10-12, GitHub lists only `snapetech` as a collaborator. Another human reviewer is needed; AI reviews and retrospective approvals do not satisfy this check.                                                                                                            |
-| [MaintainedID #11](https://github.com/snapetech/QuestarrNG/security/code-scanning/11)       | GitHub records repository creation as 2026-09-25T23:50:31Z. Scorecard requires more than 90 days of repository history, so the earliest age-based reassessment is after 2026-12-24T23:50:31Z. Releases and CI demonstrate current activity, but cannot change repository age. This finding remains open rather than claiming the maturity check was fixed.                                                                               |
-| [CIIBestPracticesID #12](https://github.com/snapetech/QuestarrNG/security/code-scanning/12) | The [OpenSSF profile](https://www.bestpractices.dev/en/projects/15269/passing) is 94% complete. The maintainer's secure-design and common-web-security-error knowledge attestations were submitted on 2026-10-12 and independently verified through the public profile JSON. The JWT minimum-key-length gap is addressed in the security PR, pending merge. Remaining time-window and cryptography criteria must be answered accurately. |
+| [BranchProtectionID #1](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/1)   | Protection was absent at the start of the 2026-10-12 audit. It was restored through GitHub's API: one approval, approval of the latest push, stale-review dismissal, administrator enforcement, strict required checks, conversation resolution, and no force pushes or deletion. A fresh Scorecard run must confirm closure.                                                                                                            |
+| [VulnerabilitiesID #93](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/93)  | The locked CI npm artifact bundled vulnerable dependencies even though the application lockfile audited cleanly. `install-npm-runtime.mjs` now excludes bundled copies and installs a separately locked patched graph. Both lockfiles audit with zero vulnerabilities locally. The runtime changes require merge and a fresh Scorecard scan before this finding is fixed on main.                                                        |
+| [CodeReviewID #10](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/10)       | The scanner reports 0/16 approved changesets in the existing history. Future PRs require an independent approving review with no administrator bypass. As of 2026-10-12, GitHub lists only `snapetech` as a collaborator. Another human reviewer is needed; AI reviews and retrospective approvals do not satisfy this check.                                                                                                            |
+| [MaintainedID #11](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/11)       | GitHub records repository creation as 2026-09-25T23:50:31Z. Scorecard requires more than 90 days of repository history, so the earliest age-based reassessment is after 2026-12-24T23:50:31Z. Releases and CI demonstrate current activity, but cannot change repository age. This finding remains open rather than claiming the maturity check was fixed.                                                                               |
+| [CIIBestPracticesID #12](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/12) | The [OpenSSF profile](https://www.bestpractices.dev/en/projects/15269/passing) is 94% complete. The maintainer's secure-design and common-web-security-error knowledge attestations were submitted on 2026-10-12 and independently verified through the public profile JSON. The JWT minimum-key-length gap is addressed in the security PR, pending merge. Remaining time-window and cryptography criteria must be answered accurately. |
 
 ### Secure development knowledge
 
@@ -147,7 +147,7 @@ The live `main` branch requires the 11 current PR checks: release notes, SCA,
 Windows service publishing, unit tests, the minimum-Node build, validation-receipt
 reconciliation, three CodeQL language jobs, Semgrep, and Playwright. Review and
 check requirements apply to administrators. See [branch protection
-settings](https://github.com/snapetech/QuestarrNG/settings/branches).
+settings](https://github.com/snapetech-org/QuestarrNG/settings/branches).
 
 The security PR also gates versioned image publication, GitHub release publication,
 and release recovery on zero open security-relevant Code Scanning and Dependabot
@@ -167,7 +167,7 @@ See [VULNERABILITY_MANAGEMENT.md](VULNERABILITY_MANAGEMENT.md#13-pre-release-gat
   [OpenAPI contract](contracts/seerrng-v1.openapi.yaml)
 - License: [COPYING](../COPYING)
 - Current release history: [CHANGELOG.md](CHANGELOG.md) and
-  [GitHub releases](https://github.com/snapetech/QuestarrNG/releases)
+  [GitHub releases](https://github.com/snapetech-org/QuestarrNG/releases)
 - CI, CodeQL, SAST, DAST, and Scorecard workflows: [workflow directory](../.github/workflows)
 
 **Update this record** when the repository's public history, CI/security gates,

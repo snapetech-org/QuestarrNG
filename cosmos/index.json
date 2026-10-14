@@ -3,15 +3,15 @@
     "name": "Questarr",
     "description": "Video game management application inspired by the *Arr apps. Discover, track and automatically download the games you want.",
     "longDescription": "Questarr is a video game management application inspired by the *Arr apps (Sonarr, Radarr, Prowlarr). Track your collection with status indicators, discover new releases through IGDB, RSS feeds and xREL, sync your Steam wishlist, search your Torznab/Newznab indexers, and send releases straight to qBittorrent, Transmission, rTorrent, Deluge, Synology Download Station, SABnzbd or NZBGet.",
-    "icon": "https://raw.githubusercontent.com/snapetech/QuestarrNG/main/images/Questarr_icon.png",
+    "icon": "https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/images/Questarr_icon.png",
     "screenshots": [
-      "https://raw.githubusercontent.com/snapetech/QuestarrNG/main/images/Screenshots/library.png",
-      "https://raw.githubusercontent.com/snapetech/QuestarrNG/main/images/Screenshots/discover.png",
-      "https://raw.githubusercontent.com/snapetech/QuestarrNG/main/images/Screenshots/calendar.png"
+      "https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/images/Screenshots/library.png",
+      "https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/images/Screenshots/discover.png",
+      "https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/images/Screenshots/calendar.png"
     ],
-    "compose": "https://raw.githubusercontent.com/snapetech/QuestarrNG/main/cosmos/questarr.cosmos-compose.json",
+    "compose": "https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/cosmos/questarr.cosmos-compose.json",
     "tags": ["media", "games", "downloader", "arr"],
-    "repository": "https://github.com/snapetech/QuestarrNG",
+    "repository": "https://github.com/snapetech-org/QuestarrNG",
     "supported_architectures": ["amd64", "arm64"]
   }
 }

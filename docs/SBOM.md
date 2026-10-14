@@ -5,20 +5,20 @@ Every published Docker image is built with a Software Bill of Materials (SBOM), 
 ## Where to find it
 
 - **Attached to the image:** the SBOM is pushed alongside the image as an attestation, so it travels with whichever tag or digest you pull.
-- **As a downloadable file:** each [Deploy Web App workflow run](https://github.com/snapetech/QuestarrNG/actions/workflows/deploy.yml) uploads the SBOM as an SPDX-JSON artifact you can download directly from the run summary.
+- **As a downloadable file:** each [Deploy Web App workflow run](https://github.com/snapetech-org/QuestarrNG/actions/workflows/deploy.yml) uploads the SBOM as an SPDX-JSON artifact you can download directly from the run summary.
 
 ## Inspecting the attached SBOM
 
 Use `docker buildx imagetools inspect` to pull the SPDX JSON for a given image and tag:
 
 ```bash
-docker buildx imagetools inspect ghcr.io/snapetech/questarrng:latest --format '{{ json (index .SBOM "linux/amd64").SPDX }}'
+docker buildx imagetools inspect ghcr.io/snapetech-org/questarrng:latest --format '{{ json (index .SBOM "linux/amd64").SPDX }}'
 ```
 
 This prints the full SPDX document, which you can redirect to a file or pipe into a tool like `jq` or a vulnerability scanner:
 
 ```bash
-docker buildx imagetools inspect ghcr.io/snapetech/questarrng:latest --format '{{ json (index .SBOM "linux/amd64").SPDX }}' > sbom.spdx.json
+docker buildx imagetools inspect ghcr.io/snapetech-org/questarrng:latest --format '{{ json (index .SBOM "linux/amd64").SPDX }}' > sbom.spdx.json
 ```
 
 ## Exploitability of reported vulnerabilities

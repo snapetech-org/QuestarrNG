@@ -1,12 +1,15 @@
 // src/lib/versionService.ts
 export async function fetchLatestQuestarrVersion(): Promise<string | null> {
   try {
-    const res = await fetch("https://api.github.com/repos/snapetech/QuestarrNG/releases/latest", {
-      headers: {
-        Accept: "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-      },
-    });
+    const res = await fetch(
+      "https://api.github.com/repos/snapetech-org/QuestarrNG/releases/latest",
+      {
+        headers: {
+          Accept: "application/vnd.github+json",
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+      }
+    );
 
     if (!res.ok) {
       if (res.status === 403) {

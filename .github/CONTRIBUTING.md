@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to QuestarrNG! We welcome contributions from the community.
 
-Report bugs and request enhancements in the [QuestarrNG issue tracker](https://github.com/snapetech/QuestarrNG/issues). Contributions are submitted as pull requests against `main`; include a clear summary, link related issues, and wait for the required checks and maintainer review before merging.
+Report bugs and request enhancements in the [QuestarrNG issue tracker](https://github.com/snapetech-org/QuestarrNG/issues). Contributions are submitted as pull requests against `main`; include a clear summary, link related issues, and wait for the required checks and maintainer review before merging.
 
 ## Getting Started
 

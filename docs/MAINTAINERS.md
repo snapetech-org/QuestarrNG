@@ -1,6 +1,6 @@
 # Maintainers
 
-QuestarrNG is maintained in the `snapetech/QuestarrNG` repository. The
+QuestarrNG is maintained in the `snapetech-org/QuestarrNG` repository. The
 repository's current collaborator and organization-team membership is the
 source of truth for individual access; this file does not duplicate a roster
 that can become stale.

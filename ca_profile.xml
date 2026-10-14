@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <CommunityApplications>
   <Profile>QuestarrNG is a standalone PC game discovery, acquisition, and library app maintained by Snapetech. It is an NG fork of Questarr with optional SeerrNG catalog, request, and library integration. For support with this Unraid package or SeerrNG integration, use the SeerrNG issue tracker.</Profile>
-  <Icon>https://raw.githubusercontent.com/snapetech/QuestarrNG/main/images/Questarr_icon.png</Icon>
-  <WebPage>https://github.com/snapetech/QuestarrNG</WebPage>
-  <Forum>https://github.com/snapetech/seerrng/issues</Forum>
+  <Icon>https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/images/Questarr_icon.png</Icon>
+  <WebPage>https://github.com/snapetech-org/QuestarrNG</WebPage>
+  <Forum>https://github.com/snapetech-org/seerrng/issues</Forum>
 </CommunityApplications>

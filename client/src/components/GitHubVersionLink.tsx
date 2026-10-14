@@ -14,7 +14,7 @@ export function GitHubVersionLink({ className }: Readonly<GitHubVersionLinkProps
 
   return (
     <a
-      href="https://github.com/snapetech/QuestarrNG"
+      href="https://github.com/snapetech-org/QuestarrNG"
       target="_blank"
       rel="noopener noreferrer"
       className={

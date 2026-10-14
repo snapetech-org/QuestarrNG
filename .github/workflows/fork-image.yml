@@ -18,13 +18,15 @@ on:
 permissions:
   contents: read
 
+# The repository ID survives owner transfers; the previous owner/name check
+# caused every release job to be skipped after QuestarrNG moved to its org.
 concurrency:
   group: fork-image-${{ inputs.finalize_release_tag || inputs.announce_release_tag || github.ref }}
   cancel-in-progress: ${{ github.event_name != 'workflow_dispatch' || (inputs.announce_release_tag == '' && inputs.finalize_release_tag == '') }}
 
 jobs:
   publish:
-    if: github.repository == 'snapetech/QuestarrNG' && (github.event_name != 'workflow_dispatch' || (github.ref == 'refs/heads/main' && inputs.announce_release_tag == '' && inputs.finalize_release_tag == ''))
+    if: github.repository_id == '1388297896' && (github.event_name != 'workflow_dispatch' || (github.ref == 'refs/heads/main' && inputs.announce_release_tag == '' && inputs.finalize_release_tag == ''))
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -234,7 +236,7 @@ jobs:
             "${IMAGE}@${BUILD_DIGEST}"
 
   addon-smoke:
-    if: github.repository == 'snapetech/QuestarrNG'
+    if: github.repository_id == '1388297896'
     needs: publish
     runs-on: ubuntu-latest
     permissions:
@@ -349,7 +351,7 @@ jobs:
           {
             echo ""
             echo "**Container image**: \`${IMAGE}:${VERSION}\`"
-            echo "- [GitHub Container Registry](https://github.com/${{ github.repository }}/pkgs/container/questarrng)"
+            echo "- [GitHub Container Registry](https://github.com/orgs/snapetech-org/packages/container/package/questarrng)"
             echo ""
             echo "Pull with: \`docker pull ${IMAGE}:${VERSION}\`."
           } >> changelog-section.md
@@ -428,7 +430,7 @@ jobs:
           fi
 
   finalize-release:
-    if: github.repository == 'snapetech/QuestarrNG' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.finalize_release_tag != ''
+    if: github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.finalize_release_tag != ''
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -634,7 +636,7 @@ jobs:
           {
             echo ""
             echo "**Container image**: \`ghcr.io/${GITHUB_REPOSITORY,,}:${VERSION}\`"
-            echo "- [GitHub Container Registry](https://github.com/${GITHUB_REPOSITORY}/pkgs/container/questarrng)"
+            echo "- [GitHub Container Registry](https://github.com/orgs/snapetech-org/packages/container/package/questarrng)"
             echo ""
             echo "Pull with: \`docker pull ghcr.io/${GITHUB_REPOSITORY,,}:${VERSION}\`."
           } >> release-body.md
@@ -661,7 +663,7 @@ jobs:
             release.json > /dev/null
 
   update-finalized-changelog:
-    if: github.repository == 'snapetech/QuestarrNG' && github.event_name == 'workflow_dispatch' && inputs.finalize_release_tag != '' && needs['finalize-release'].result == 'success'
+    if: github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && inputs.finalize_release_tag != '' && needs['finalize-release'].result == 'success'
     needs: [finalize-release]
     runs-on: ubuntu-latest
     permissions:
@@ -727,7 +729,7 @@ jobs:
   announce-release:
     name: Announce release to Discord
     needs: [release, finalize-release]
-    if: ${{ always() && github.repository == 'snapetech/QuestarrNG' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && ((inputs.finalize_release_tag == '' && inputs.announce_release_tag != '') || (inputs.finalize_release_tag != '' && needs['finalize-release'].result == 'success')) }}
+    if: ${{ always() && github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && ((inputs.finalize_release_tag == '' && inputs.announce_release_tag != '') || (inputs.finalize_release_tag != '' && needs['finalize-release'].result == 'success')) }}
     runs-on: ubuntu-latest
     environment:
       name: discord-release
@@ -793,7 +795,7 @@ jobs:
               --arg title "$title" \
               --arg url "$(jq -r '.url' release.json)" \
               --arg description "$description" \
-              --arg image "ghcr.io/snapetech/questarrng:${version}" \
+              --arg image "ghcr.io/${GITHUB_REPOSITORY,,}:${version}" \
               --arg run_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" \
               --argjson first "$index" \
               '{

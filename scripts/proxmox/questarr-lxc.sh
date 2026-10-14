@@ -5,7 +5,7 @@
 # Creates a Debian LXC container on a Proxmox VE host and installs QuestarrNG
 # into it as a systemd service. No Docker involved.
 #
-#   bash -c "$(curl -fsSL https://raw.githubusercontent.com/snapetech/QuestarrNG/main/scripts/proxmox/questarr-lxc.sh)"
+#   bash -c "$(curl -fsSL https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/scripts/proxmox/questarr-lxc.sh)"
 #
 # Run it on the Proxmox host (the node itself), as root.
 #
@@ -18,7 +18,7 @@
 
 set -Eeuo pipefail
 
-QUESTARR_REPO="${QUESTARR_REPO:-snapetech/QuestarrNG}"
+QUESTARR_REPO="${QUESTARR_REPO:-snapetech-org/QuestarrNG}"
 QUESTARR_BRANCH="${QUESTARR_BRANCH:-main}"
 QUESTARR_REF="${QUESTARR_REF:-}"
 QUESTARR_PORT="${QUESTARR_PORT:-5000}"

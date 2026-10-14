@@ -1,6 +1,6 @@
 {
   "@context": "https://openvex.dev/ns/v0.2.0",
-  "@id": "https://github.com/snapetech/QuestarrNG/blob/main/security/vex/questarr.openvex.json",
+  "@id": "https://github.com/snapetech-org/QuestarrNG/blob/main/security/vex/questarr.openvex.json",
   "author": "Doezer",
   "role": "Project maintainer",
   "timestamp": "2026-10-04T11:15:00Z",

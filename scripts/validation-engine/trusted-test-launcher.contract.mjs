@@ -661,7 +661,7 @@ assert.match(process.env.GITHUB_SHA, /^[a-f0-9]{40}$/u);
 assert.equal(process.env.VALIDATION_CANDIDATE_SHA, process.env.GITHUB_SHA);
 assert.equal(process.env.GITHUB_RUN_ID, '4242');
 assert.equal(process.env.GITHUB_RUN_ATTEMPT, '1');
-assert.equal(process.env.GITHUB_REPOSITORY, 'snapetech/QuestarrNG');
+assert.equal(process.env.GITHUB_REPOSITORY, 'snapetech-org/QuestarrNG');
 assert.equal(process.env.GITHUB_WORKFLOW, 'CI');
 assert.equal(process.env.GITHUB_JOB, 'test');
 assert.equal(process.env.SECRET_CANARY, undefined);
@@ -768,7 +768,7 @@ symlinkSync('/etc', '/mnt/workspace/coverage');
           CI: 'true',
           GITHUB_ACTIONS: 'true',
           GITHUB_EVENT_NAME: 'pull_request',
-          GITHUB_REPOSITORY: 'snapetech/QuestarrNG',
+          GITHUB_REPOSITORY: 'snapetech-org/QuestarrNG',
           GITHUB_SHA: sourceSha,
           GITHUB_RUN_ID: '4242',
           GITHUB_RUN_ATTEMPT: '1',
@@ -808,7 +808,7 @@ symlinkSync('/etc', '/mnt/workspace/coverage');
           ...process.env,
           GITHUB_ACTIONS: 'true',
           GITHUB_EVENT_NAME: 'pull_request',
-          GITHUB_REPOSITORY: 'snapetech/QuestarrNG',
+          GITHUB_REPOSITORY: 'snapetech-org/QuestarrNG',
           GITHUB_RUN_ID: '4242',
           GITHUB_RUN_ATTEMPT: '1',
           GITHUB_WORKFLOW: 'CI',
@@ -1095,7 +1095,7 @@ test(
       "assert.match(process.env.VALIDATION_TRUSTED_BASE_SHA, /^[a-f0-9]{40}$/u);",
       "assert.equal(process.env.GITHUB_RUN_ID, 'trusted-run-42');",
       "assert.equal(process.env.GITHUB_RUN_ATTEMPT, '2');",
-      "assert.equal(process.env.GITHUB_REPOSITORY, 'snapetech/QuestarrNG');",
+      "assert.equal(process.env.GITHUB_REPOSITORY, 'snapetech-org/QuestarrNG');",
       "assert.equal(process.env.GITHUB_WORKFLOW, 'Trusted PR validation');",
       "assert.equal(process.env.GITHUB_JOB, 'trusted-pr-validation');",
       "assert.equal(existsSync('/mnt/run-data/workspace/.git'), false, 'run data must not alias the candidate Git metadata');",
@@ -1171,7 +1171,7 @@ test(
           GITHUB_EVENT_NAME: 'pull_request_target',
           GITHUB_RUN_ID: 'trusted-run-42',
           GITHUB_RUN_ATTEMPT: '2',
-          GITHUB_REPOSITORY: 'snapetech/QuestarrNG',
+          GITHUB_REPOSITORY: 'snapetech-org/QuestarrNG',
           GITHUB_WORKFLOW: 'Trusted PR validation',
           GITHUB_JOB: 'trusted-pr-validation',
           SECRET_CANARY: 'must-not-enter-sandbox',
