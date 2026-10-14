@@ -146,8 +146,14 @@ test('trusted PR validation runs the base validator and launcher on an exact can
   assert.ok(trustedRunner, 'trusted PR job has a runner selector');
   assert.ok(trustedRunner.includes('github.event.pull_request.head.repo.full_name == github.repository'));
   assert.ok(trustedRunner.includes("github.event.pull_request.user.login == 'snapetech'"));
+  assert.ok(trustedRunner.includes("vars.TRUSTED_MAIN_RUNNERS_ENABLED == 'true'"));
   assert.ok(trustedRunner.includes('"group":"Default"'));
   assert.ok(trustedRunner.includes("|| 'ubuntu-24.04'"));
+  assert.match(
+    trustedWorkflow,
+    /sudo apparmor_parser --replace "\$profile"/u,
+    'trusted PR validation can rerun on a persistent host with an existing profile'
+  );
   assert.doesNotMatch(trustedWorkflow, /\$\{\{\s*secrets\./u);
   assert.match(
     trustedWorkflow,
