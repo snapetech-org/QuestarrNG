@@ -217,6 +217,19 @@ JSON summary on stdout. Native case counts are authoritative when each native
 command finishes; the heartbeat reports task status and elapsed time while
 commands are running.
 
+Runtime probes and child commands inherit only the executable path, platform
+process variables, locale, and timezone. Each task receives run-owned home,
+temporary, and XDG configuration/cache directories; registered task settings
+remain task-scoped. Unapproved `passEnv` requests fail during planning. `CI` is
+forced to `true`, and test tasks use
+`NODE_ENV=test` so ambient credentials, proxy settings, loader options, and
+workflow context do not leak into test processes. Task environment directories
+are removed when each command finishes, leaving logs and the receipt as the
+run's retained evidence. CI explicitly shares the runner-local npm cache
+between `setup-node` and the dependency-install task; only that task receives
+the cache path, and local runs without it use a cache under their temporary home
+that is removed with the task environment.
+
 The GitHub workflow runs the full Vitest suite once on Node 26 and checks the
 production build on Node 22 and Node 26. Each run exports a short-lived,
 source-bound receipt. The final reconciliation job requires one passing test
