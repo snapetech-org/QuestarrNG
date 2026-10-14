@@ -25,6 +25,7 @@ const trustedDiscordWorkflow = readFileSync(
   fileURLToPath(new URL('trusted-discord-release-announcement.yml', workflowDirectory)),
   'utf8'
 );
+const readme = readFileSync(fileURLToPath(new URL('../../README.md', import.meta.url)), 'utf8');
 
 function jobBlock(workflow, name, nextName) {
   const start = workflow.indexOf(`\n  ${name}:\n`);
@@ -148,9 +149,23 @@ test('release publishing and announcements are gated to QuestarrNG by stable rep
   assert.doesNotMatch(releaseWorkflow, /name=ghcr\.io\/\$\{GITHUB_REPOSITORY,,\}/u);
   assert.match(releaseWorkflow, /image="ghcr\.io\/snapetech\/questarrng"/u);
   assert.doesNotMatch(releaseWorkflow, /image="ghcr\.io\/\$\{GITHUB_REPOSITORY,,\}"/u);
+  assert.equal(
+    (releaseWorkflow.match(/ghcr\.io\/snapetech\/questarrng:\$\{VERSION\}/gu) ?? []).length,
+    2,
+    'the recovered release notes and pull command must use the verified image package'
+  );
+  assert.match(
+    releaseWorkflow,
+    /https:\/\/github\.com\/users\/snapetech\/packages\/container\/package\/questarrng/u
+  );
+  assert.doesNotMatch(releaseWorkflow, /ghcr\.io\/\$\{GITHUB_REPOSITORY,,\}/u);
   assert.match(trustedDiscordWorkflow, /github\.repository_id == '1388297896'/u);
   assert.match(trustedDiscordWorkflow, /--arg image "ghcr\.io\/snapetech\/questarrng:\$\{version\}"/u);
   assert.doesNotMatch(trustedDiscordWorkflow, /github\.repository == 'snapetech\/QuestarrNG'/u);
+  assert.match(
+    readme,
+    /https:\/\/github\.com\/users\/snapetech\/packages\/container\/package\/questarrng/u
+  );
 });
 
 test('trusted PR validation runs the base validator and launcher on an exact candidate snapshot', () => {

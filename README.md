@@ -24,7 +24,7 @@ A video game management application inspired by the -Arr apps (Sonarr, Radarr, P
 
 [![Library screenshot](images/Screenshots/library.png)](images/Screenshots/library.png)
 
-[![GHCR](https://img.shields.io/badge/container-ghcr.io%2Fsnapetech%2Fquestarrng-blue?logo=github&logoColor=white)](https://github.com/snapetech/QuestarrNG/pkgs/container/questarrng)
+[![GHCR](https://img.shields.io/badge/container-ghcr.io%2Fsnapetech%2Fquestarrng-blue?logo=github&logoColor=white)](https://github.com/users/snapetech/packages/container/package/questarrng)
 [![GitHub release](https://img.shields.io/github/v/release/snapetech/QuestarrNG)](https://github.com/snapetech/QuestarrNG/releases)
 [![License](https://img.shields.io/github/license/snapetech/QuestarrNG)](https://github.com/snapetech/QuestarrNG/blob/main/COPYING)
 [![CI](https://github.com/snapetech/QuestarrNG/actions/workflows/ci.yml/badge.svg)](https://github.com/snapetech/QuestarrNG/actions/workflows/ci.yml)

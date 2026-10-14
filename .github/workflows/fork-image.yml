@@ -636,10 +636,10 @@ jobs:
           fi
           {
             echo ""
-            echo "**Container image**: \`ghcr.io/${GITHUB_REPOSITORY,,}:${VERSION}\`"
-            echo "- [GitHub Container Registry](https://github.com/${GITHUB_REPOSITORY}/pkgs/container/questarrng)"
+            echo "**Container image**: \`ghcr.io/snapetech/questarrng:${VERSION}\`"
+            echo "- [GitHub Container Registry](https://github.com/users/snapetech/packages/container/package/questarrng)"
             echo ""
-            echo "Pull with: \`docker pull ghcr.io/${GITHUB_REPOSITORY,,}:${VERSION}\`."
+            echo "Pull with: \`docker pull ghcr.io/snapetech/questarrng:${VERSION}\`."
           } >> release-body.md
 
       - name: Publish recovered GitHub release
