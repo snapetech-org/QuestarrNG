@@ -7,6 +7,9 @@ test.describe("Playing journey", () => {
   test("moves a game to Playing and keeps a journal note for it", async ({ page }) => {
     const id = uniqueId();
     const title = `Journal Quest ${id}`;
+    await page.addInitScript(() => {
+      localStorage.setItem("questarr.interface-language", "en");
+    });
     await page.goto("/");
     const game = await seedGame(page, { title, igdbId: id });
 
@@ -16,7 +19,7 @@ test.describe("Playing journey", () => {
 
     // Change the status from the card's own picker.
     await card.getByRole("button", { name: `Change status for ${title}` }).click();
-    await page.getByRole("button", { name: "playing", exact: true }).click();
+    await page.getByRole("button", { name: "Playing", exact: true }).click();
     await expect(card.getByText("Status: Playing")).toBeVisible();
 
     // The game now shows up on the Playing page.
