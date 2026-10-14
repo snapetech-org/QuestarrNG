@@ -400,4 +400,11 @@ test('Dependabot groups NuGet and Docker minor/patch updates without grouping ma
       assert.equal(update.groups['security-updates']['applies-to'], 'security-updates');
     }
   }
+
+  assert.deepEqual(
+    dependabot.updates
+      .filter((entry) => entry['package-ecosystem'] === 'docker')
+      .map((entry) => entry.directory),
+    ['/', '/questarr'],
+  );
 });
