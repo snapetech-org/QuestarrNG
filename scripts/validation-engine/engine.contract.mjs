@@ -15,6 +15,7 @@ import {
 } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { clearTimeout, setTimeout } from 'node:timers';
 import { spawnSync } from 'node:child_process';
 import process from 'node:process';
 import { after, test } from 'node:test';
@@ -30,6 +31,7 @@ import {
   main as runEngine,
   releaseRunLock,
   runtimeProbeDirectory,
+  runTaskPool,
 } from './engine.mjs';
 import { validation } from './config.mjs';
 
@@ -191,6 +193,25 @@ test('plan binds the candidate and closes test selection over its dependencies',
   assert.match(plan.candidate.sourceSha256, /^[a-f0-9]{64}$/);
   assert.equal(plan.runtimes.length, 0);
   assert.match(plan.inventoryLaneDigests.unit, /^[a-f0-9]{64}$/);
+});
+
+test('plan binds its task concurrency budget and each task output group', () => {
+  const { root, config } = fixture();
+  config.maxConcurrentTasks = 2;
+  config.tasks[0].concurrencyGroup = 'unit-output';
+  const plan = createPlan(root, config);
+  assert.equal(plan.maxConcurrentTasks, 2);
+  assert.equal(plan.tasks[0].concurrencyGroup, 'unit-output');
+  assert.equal(plan.tasks[0].stage, 'repository');
+});
+
+test('validation config rejects an invalid task concurrency budget or output group', () => {
+  const { root, config } = fixture();
+  config.maxConcurrentTasks = 0;
+  assert.throws(() => createPlan(root, config), /maxConcurrentTasks/);
+  config.maxConcurrentTasks = 2;
+  config.tasks[0].concurrencyGroup = '  ';
+  assert.throws(() => createPlan(root, config), /concurrency group/);
 });
 
 test('runtime probes receive only the toolchain environment allowlist', () => {
@@ -365,6 +386,211 @@ test('progress formatter reports completed, blocked, pending, and active tasks',
     formatValidationProgress('sample', tasks, results, tasks[3], 65_000),
     '[validation] sample: 1/4 selected tasks complete (1 passed, 0 failed, 1 blocked, 1 not-run, 1 pending); running Long task (1m05s)',
   );
+});
+
+test('bounded task pool overlaps independent tasks without exceeding its configured limit', async () => {
+  let active = 0;
+  let maximum = 0;
+  let releaseBatch;
+  let signalTwoStarted;
+  const gate = new Promise((resolve) => { releaseBatch = resolve; });
+  const twoStarted = new Promise((resolve) => { signalTwoStarted = resolve; });
+  const tasks = ['first', 'second', 'third'].map((id) => ({
+    id,
+    stage: 'repository',
+    concurrencyGroup: id,
+  }));
+  const running = runTaskPool(tasks, {
+    maxConcurrentTasks: 2,
+    runTask: async (task) => {
+      active += 1;
+      maximum = Math.max(maximum, active);
+      if (active === 2) signalTwoStarted();
+      await gate;
+      active -= 1;
+      return { taskId: task.id, status: 'passed' };
+    },
+  });
+  await twoStarted;
+  assert.equal(maximum, 2);
+  releaseBatch();
+  const result = await running;
+  assert.equal(result.results.size, 3);
+  assert.equal(maximum, 2);
+  assert.ok([...result.results.values()].every((receipt) => receipt.status === 'passed'));
+  assert.ok([...result.results.values()].every((receipt) => receipt.stage === 'repository'));
+});
+
+test('bounded task pool refills a slot while a slower peer is still running', async () => {
+  let active = 0;
+  let maximum = 0;
+  let releaseSlowTask;
+  let signalNextStarted;
+  let timeoutId;
+  const slowTaskGate = new Promise((resolve) => { releaseSlowTask = resolve; });
+  const nextStarted = new Promise((resolve) => { signalNextStarted = resolve; });
+  let nextStartedWhileSlowWasActive = false;
+  const tasks = ['slow', 'short', 'next'].map((id) => ({
+    id,
+    stage: 'repository',
+    concurrencyGroup: id,
+  }));
+
+  const running = runTaskPool(tasks, {
+    maxConcurrentTasks: 2,
+    runTask: async (task) => {
+      active += 1;
+      maximum = Math.max(maximum, active);
+      if (task.id === 'slow') await slowTaskGate;
+      if (task.id === 'next') {
+        nextStartedWhileSlowWasActive = active === 2;
+        signalNextStarted();
+      }
+      active -= 1;
+      return { taskId: task.id, status: 'passed' };
+    },
+  });
+
+  const refilledBeforeSlowFinished = await Promise.race([
+    nextStarted.then(() => true),
+    new Promise((resolve) => {
+      timeoutId = setTimeout(() => resolve(false), 250);
+    }),
+  ]);
+  clearTimeout(timeoutId);
+  releaseSlowTask();
+  const result = await running;
+
+  assert.equal(refilledBeforeSlowFinished, true);
+  assert.equal(nextStartedWhileSlowWasActive, true);
+  assert.equal(maximum, 2);
+  assert.ok([...result.results.values()].every((receipt) => receipt.status === 'passed'));
+});
+
+test('bounded task pool serializes shared output groups', async () => {
+  const activeGroups = new Set();
+  const started = [];
+  const tasks = [
+    { id: 'first-coverage', stage: 'repository', concurrencyGroup: 'coverage-output' },
+    { id: 'independent', stage: 'repository', concurrencyGroup: 'other-output' },
+    { id: 'second-coverage', stage: 'repository', concurrencyGroup: 'coverage-output' },
+  ];
+  const result = await runTaskPool(tasks, {
+    maxConcurrentTasks: 2,
+    runTask: async (task) => {
+      const group = task.concurrencyGroup;
+      assert.equal(activeGroups.has(group), false);
+      activeGroups.add(group);
+      started.push(task.id);
+      await Promise.resolve();
+      activeGroups.delete(group);
+      return { taskId: task.id, status: 'passed' };
+    },
+  });
+  assert.deepEqual(started, ['first-coverage', 'independent', 'second-coverage']);
+  assert.ok([...result.results.values()].every((receipt) => receipt.status === 'passed'));
+});
+
+test('bounded task pool blocks failed dependencies and keeps independent work moving', async () => {
+  const started = [];
+  const tasks = [
+    { id: 'failed-check', stage: 'repository' },
+    { id: 'dependent-check', stage: 'repository', dependsOn: ['failed-check'] },
+    { id: 'independent-check', stage: 'repository' },
+  ];
+  const result = await runTaskPool(tasks, {
+    maxConcurrentTasks: 2,
+    runTask: async (task) => {
+      started.push(task.id);
+      return { taskId: task.id, status: task.id === 'failed-check' ? 'failed' : 'passed' };
+    },
+  });
+  assert.deepEqual(started, ['failed-check', 'independent-check']);
+  assert.equal(result.results.get('dependent-check').status, 'blocked');
+  assert.equal(result.results.get('independent-check').status, 'passed');
+});
+
+test('bounded task pool invalidates concurrent passes after source drift', async () => {
+  let checks = 0;
+  const tasks = ['first', 'second', 'pending'].map((id) => ({ id, stage: 'repository' }));
+  const result = await runTaskPool(tasks, {
+    maxConcurrentTasks: 2,
+    checkSource: () => { checks += 1; return checks <= 2; },
+    runTask: async (task) => ({ taskId: task.id, status: 'passed' }),
+  });
+  assert.equal(result.sourceChanged, true);
+  assert.equal(result.results.get('first').status, 'blocked');
+  assert.equal(result.results.get('second').status, 'blocked');
+  assert.equal(result.results.get('pending').status, 'blocked');
+});
+
+test('progress summary reports multiple active tasks', () => {
+  const tasks = [{ id: 'one', name: 'First task' }, { id: 'two', name: 'Second task' }];
+  const summary = formatValidationProgress(
+    'sample',
+    tasks,
+    new Map(),
+    new Map([['one', Date.now() - 60_000], ['two', Date.now() - 30_000]]),
+  );
+  assert.match(summary, /running First task \(\d+m\d{2}s\), Second task \(\d+m\d{2}s\)$/);
+});
+
+test('engine execution starts independent native tasks together and records stage ownership', async () => {
+  const { root, config } = fixture();
+  const runRoot = mkdtempSync(path.join(os.tmpdir(), 'questarrng-validation-pool-run-'));
+  temporaryRoots.push(runRoot);
+  const firstMarker = path.join(runRoot, 'first.started');
+  const secondMarker = path.join(runRoot, 'second.started');
+  const commandWaitingFor = (ownMarker, otherMarker) => [
+    process.execPath,
+    '-e',
+    [
+      "const fs = require('node:fs')",
+      `fs.writeFileSync(${JSON.stringify(ownMarker)}, 'started')`,
+      'const deadline = Date.now() + 2000',
+      'let peerStarted = false',
+      `while (Date.now() < deadline) { if (fs.existsSync(${JSON.stringify(otherMarker)})) { peerStarted = true; break; } Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 5); }`,
+      "if (peerStarted) console.log('# pass 1'); else { console.error('peer task did not start concurrently'); process.exitCode = 1; }",
+    ].join('; '),
+  ];
+  const secondTestFile = path.join(root, 'tests', 'other.test.mjs');
+  writeFileSync(secondTestFile, "import test from 'node:test';\ntest('peer fixture passes', () => {});\n");
+  config.maxConcurrentTasks = 2;
+  config.inventory = [
+    { id: 'unit', glob: 'tests/example.test.mjs', framework: 'node:test', owner: 'unit' },
+    { id: 'peer-unit', glob: 'tests/other.test.mjs', framework: 'node:test', owner: 'peer-unit' },
+  ];
+  config.tasks[0] = {
+    ...config.tasks[0],
+    stage: 'contracts',
+    concurrencyGroup: 'first-output',
+    inventoryLanes: ['unit'],
+    command: commandWaitingFor(firstMarker, secondMarker),
+    timeoutSeconds: 5,
+  };
+  config.tasks.push({
+    id: 'peer-tests',
+    name: 'Peer tests',
+    stage: 'contracts',
+    concurrencyGroup: 'peer-output',
+    kind: 'test',
+    command: commandWaitingFor(secondMarker, firstMarker),
+    casePattern: '(?:ℹ|#)\\s*pass\\s+(\\d+)',
+    minimumCases: 1,
+    inventoryLanes: ['peer-unit'],
+    timeoutSeconds: 5,
+  });
+  const progress = [];
+  const plan = createPlan(root, config);
+  const result = await executePlan(root, config, plan, {
+    runRoot,
+    onProgress: (summary) => progress.push(summary),
+  });
+  assert.equal(result.receipt.status, 'passed');
+  assert.equal(result.receipt.totals.executed, 2);
+  assert.ok(result.receipt.tasks.every((task) => task.status === 'passed'));
+  assert.deepEqual(result.receipt.tasks.map((task) => task.stage), ['contracts', 'contracts']);
+  assert.ok(progress.some((summary) => summary.includes('running Unit tests (') && summary.includes('Peer tests (')));
 });
 
 test('execution fails closed when a test reports zero active cases', async () => {

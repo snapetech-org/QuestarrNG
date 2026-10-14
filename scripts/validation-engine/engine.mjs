@@ -387,6 +387,10 @@ function validateConfig(config) {
   if (!Array.isArray(config.inventory) || !Array.isArray(config.tasks)) {
     fail('Validation config must declare inventory rules and native tasks.');
   }
+  const maxConcurrentTasks = config.maxConcurrentTasks ?? 1;
+  if (!Number.isInteger(maxConcurrentTasks) || maxConcurrentTasks < 1 || maxConcurrentTasks > 8) {
+    fail('Validation maxConcurrentTasks must be an integer from 1 through 8.');
+  }
   const ids = new Set();
   for (const task of config.tasks) {
     if (!/^[a-z0-9][a-z0-9-]*$/.test(task.id) || ids.has(task.id)) {
@@ -395,6 +399,10 @@ function validateConfig(config) {
     ids.add(task.id);
     if (!Array.isArray(task.command) || task.command.length === 0) {
       fail('Task must use a registered native command array: ' + task.id);
+    }
+    if (typeof (task.stage ?? 'default') !== 'string' || !(task.stage ?? 'default').trim() ||
+        typeof (task.concurrencyGroup ?? task.id) !== 'string' || !(task.concurrencyGroup ?? task.id).trim()) {
+      fail('Task stage and concurrency group must be nonempty strings: ' + task.id);
     }
     if (task.kind === 'test' && (!task.casePattern || task.minimumCases < 1)) {
       fail('Test tasks must require active-case evidence: ' + task.id);
@@ -513,6 +521,7 @@ export function createPlan(root, config, options = {}) {
     schemaVersion: ENGINE_VERSION,
     repository: config.repository,
     selection: options.task ? 'task:' + options.task : options.testsOnly ? 'tests-only' : 'full',
+    maxConcurrentTasks: config.maxConcurrentTasks ?? 1,
     candidate,
     inventory: inventory.entries,
     inventoryCounts: inventory.laneCounts,
@@ -523,7 +532,8 @@ export function createPlan(root, config, options = {}) {
     tasks: [...selectedTasks, ...config.tasks.filter((task) => !selectedIds.has(task.id))].map((task) => ({
       id: task.id,
       name: task.name,
-      stage: task.stage,
+      stage: task.stage ?? 'default',
+      concurrencyGroup: task.concurrencyGroup ?? task.id,
       kind: task.kind,
       required: task.required !== false,
       selected: selectedIds.has(task.id),
@@ -602,10 +612,163 @@ export function formatValidationProgress(repository, tasks, results, currentTask
   const notRun = receipts.filter((receipt) => receipt.status === 'not-run').length;
   const completed = passed + failed;
   const pending = Math.max(0, tasks.length - completed - blocked - notRun);
-  const active = currentTask
-    ? `; running ${currentTask.name ?? currentTask.id} (${formatElapsed(elapsedMs)})`
-    : '';
+  const activeTasks = currentTask instanceof Map
+    ? [...currentTask].map(([id, startedAt]) => {
+      const task = tasks.find((item) => item.id === id);
+      return `${task?.name ?? id} (${formatElapsed(Date.now() - startedAt)})`;
+    })
+    : currentTask ? [`${currentTask.name ?? currentTask.id} (${formatElapsed(elapsedMs)})`] : [];
+  const active = activeTasks.length ? `; running ${activeTasks.join(', ')}` : '';
   return `[validation] ${repository}: ${completed}/${tasks.length} selected tasks complete (${passed} passed, ${failed} failed, ${blocked} blocked, ${notRun} not-run, ${pending} pending)${active}`;
+}
+
+export async function runTaskPool(tasks, {
+  maxConcurrentTasks = 1,
+  results = new Map(),
+  runTask,
+  checkSource = () => true,
+  onTaskStart = () => {},
+  onTaskFinish = () => {},
+  onProgress = () => {},
+} = {}) {
+  if (!Number.isInteger(maxConcurrentTasks) || maxConcurrentTasks < 1 || maxConcurrentTasks > 8) {
+    fail('maxConcurrentTasks must be an integer from 1 through 8.');
+  }
+  if (typeof runTask !== 'function' || typeof checkSource !== 'function') {
+    fail('runTask and checkSource must be functions.');
+  }
+
+  const pending = [...tasks];
+  const selectedIds = new Set(pending.map((task) => task.id));
+  const metadata = (task) => ({
+    stage: task.stage ?? 'default',
+    concurrencyGroup: task.concurrencyGroup ?? task.id,
+    dependsOn: task.dependsOn ?? [],
+  });
+  const block = (task, reason) => results.set(task.id, {
+    taskId: task.id,
+    ...metadata(task),
+    status: 'blocked',
+    reason,
+    required: task.required !== false,
+  });
+  let sourceChanged = false;
+  const active = new Map();
+  const activeGroups = new Set();
+  const sourceBoundTasks = new Set();
+
+  const blockPending = (reason) => {
+    for (const task of pending.splice(0)) block(task, reason);
+    onProgress();
+  };
+
+  const invalidateSourceBoundPasses = () => {
+    for (const taskId of sourceBoundTasks) {
+      const result = results.get(taskId);
+      if (result?.status === 'passed') {
+        results.set(taskId, {
+          ...result,
+          status: 'blocked',
+          reason: 'candidate source changed during concurrent execution',
+        });
+      }
+    }
+  };
+
+  const blockUnavailableDependencies = () => {
+    let blockedAny = false;
+    for (let index = pending.length - 1; index >= 0; index -= 1) {
+      const task = pending[index];
+      const unavailableDependency = (task.dependsOn ?? []).find((dependency) => {
+        const result = results.get(dependency);
+        return result ? result.status !== 'passed' : !selectedIds.has(dependency);
+      });
+      if (!unavailableDependency) continue;
+      block(task, 'dependency did not pass');
+      pending.splice(index, 1);
+      blockedAny = true;
+    }
+    if (blockedAny) onProgress();
+  };
+
+  const startTask = (task) => {
+    const group = task.concurrencyGroup ?? task.id;
+    const startedAt = Date.now();
+    activeGroups.add(group);
+    sourceBoundTasks.add(task.id);
+    onTaskStart(task, startedAt);
+    const promise = (async () => {
+      let result;
+      try {
+        result = await runTask(task);
+        if (!result || result.taskId !== task.id ||
+            !['passed', 'failed', 'incomplete', 'blocked', 'not-run'].includes(result.status)) {
+          throw new Error('task runner returned an invalid receipt');
+        }
+      } catch (error) {
+        result = {
+          taskId: task.id,
+          status: 'failed',
+          error: error.message,
+          required: task.required !== false,
+        };
+      }
+      return { task, group, result };
+    })();
+    active.set(task.id, { task, group, promise });
+    onProgress();
+  };
+
+  while (pending.length || active.size) {
+    blockUnavailableDependencies();
+
+    while (!sourceChanged && active.size < maxConcurrentTasks) {
+      const runnableIndex = pending.findIndex((task) =>
+        (task.dependsOn ?? []).every((dependency) => results.get(dependency)?.status === 'passed') &&
+        !activeGroups.has(task.concurrencyGroup ?? task.id));
+      if (runnableIndex < 0) break;
+
+      if (!checkSource()) {
+        sourceChanged = true;
+        invalidateSourceBoundPasses();
+        blockPending('candidate source changed during task execution');
+        break;
+      }
+
+      const [task] = pending.splice(runnableIndex, 1);
+      startTask(task);
+    }
+
+    if (active.size === 0) {
+      if (pending.length) {
+        for (const task of pending.splice(0)) {
+          block(task, 'required dependency did not pass or no task is runnable');
+        }
+        onProgress();
+      }
+      break;
+    }
+
+    const settled = await Promise.race([...active.values()].map(({ promise }) => promise));
+    active.delete(settled.task.id);
+    activeGroups.delete(settled.group);
+    results.set(settled.task.id, { ...settled.result, ...metadata(settled.task) });
+    onTaskFinish(settled.task, results.get(settled.task.id));
+    onProgress();
+
+    if (sourceChanged) {
+      invalidateSourceBoundPasses();
+      onProgress();
+    } else if (!checkSource()) {
+      sourceChanged = true;
+      invalidateSourceBoundPasses();
+      blockPending('candidate source changed during task execution');
+    } else if (active.size === 0) {
+      // Every task in this concurrent wave completed against the same source.
+      sourceBoundTasks.clear();
+    }
+  }
+  return { results, sourceChanged };
 }
 
 function terminate(child) {
@@ -769,6 +932,9 @@ export async function executePlan(root, config, plan, options = {}) {
     if (!task.selected) {
       receiptById.set(task.id, {
         taskId: task.id,
+        stage: task.stage,
+        concurrencyGroup: task.concurrencyGroup,
+        dependsOn: task.dependsOn,
         status: 'excluded',
         reason: task.exclusionReason ?? plan.selection,
         required: task.required,
@@ -794,10 +960,14 @@ export async function executePlan(root, config, plan, options = {}) {
       planSha256: plan.planSha256,
       candidate: plan.candidate,
       executionContext: plan.executionContext,
+      maxConcurrentTasks: plan.maxConcurrentTasks,
       status: 'incomplete',
       prerequisites: missing,
       tasks: plan.tasks.map((task) => task.selected ? ({
         taskId: task.id,
+        stage: task.stage,
+        concurrencyGroup: task.concurrencyGroup,
+        dependsOn: task.dependsOn,
         status: 'not-run',
         reason: 'required command is unavailable',
         required: task.required,
@@ -813,94 +983,82 @@ export async function executePlan(root, config, plan, options = {}) {
     return { receipt, runRoot, exitCode: 1 };
   }
 
-  let sourceChanged = false;
+  let sourceChanged;
   const selectedTasks = plan.tasks.filter((item) => item.selected);
+  const runningTasks = new Map();
   let lastProgressSummary = null;
-  const reportProgress = (currentTask = null, taskStartedAt = 0) => {
+  const reportProgress = () => {
     if (typeof options.onProgress !== 'function') return;
     const summary = formatValidationProgress(
       config.repository,
       selectedTasks,
       receiptById,
-      currentTask,
-      currentTask ? Date.now() - taskStartedAt : 0,
+      runningTasks,
     );
     if (summary === lastProgressSummary) return;
     lastProgressSummary = summary;
     options.onProgress(summary);
   };
-  for (const task of selectedTasks) {
-    const dependencyReceipts = (task.dependsOn ?? []).map((id) => receiptById.get(id));
-    const failedDependency = dependencyReceipts.find((item) => item?.status !== 'passed');
-    if (failedDependency) {
-      receiptById.set(task.id, {
-        taskId: task.id,
-        status: 'blocked',
-        reason: 'dependency did not pass',
-        required: task.required !== false,
-      });
-      reportProgress();
-      continue;
-    }
-    if (captureCandidate(root, config.inputs ?? [], {
-      entries: plan.inventory,
-    }).sourceSha256 !== plan.candidate.sourceSha256) {
-      sourceChanged = true;
-      receiptById.set(task.id, {
-        taskId: task.id,
-        status: 'blocked',
-        reason: 'candidate source changed after planning',
-        required: task.required !== false,
-      });
-      reportProgress();
-      break;
-    }
-    const configuredTask = config.tasks.find((item) => item.id === task.id);
-    if (!configuredTask) fail('Selected task is missing from the registered configuration: ' + task.id);
-    const taskStartedAt = Date.now();
-    reportProgress(task, taskStartedAt);
-    const heartbeat = setInterval(
-      () => reportProgress(task, taskStartedAt),
-      options.progressIntervalMs ?? PROGRESS_INTERVAL_MS,
-    );
-    heartbeat.unref();
-    let taskReceipt;
-    try {
-      taskReceipt = await runCommand(
-        configuredTask,
-        root,
-        path.join(runRoot, task.id + '.log'),
-        options.onTaskFailure,
-      );
-    } finally {
-      clearInterval(heartbeat);
-      rmSync(path.join(runRoot, `${task.id}-environment`), { recursive: true, force: true });
-    }
-    taskReceipt.inventory = (configuredTask.inventoryLanes ?? []).map((lane) => ({
-      lane,
-      discoveredFiles: plan.inventoryCounts[lane] ?? 0,
-      inventorySha256: plan.inventoryLaneDigests[lane],
-    }));
-    receiptById.set(task.id, taskReceipt);
-    reportProgress();
-    if (captureCandidate(root, config.inputs ?? [], {
-      entries: plan.inventory,
-    }).sourceSha256 !== plan.candidate.sourceSha256) {
-      sourceChanged = true;
-      break;
-    }
+  const heartbeat = setInterval(
+    reportProgress,
+    options.progressIntervalMs ?? PROGRESS_INTERVAL_MS,
+  );
+  heartbeat.unref();
+  try {
+    const pool = await runTaskPool(selectedTasks, {
+      maxConcurrentTasks: plan.maxConcurrentTasks,
+      results: receiptById,
+      checkSource: () => captureCandidate(root, config.inputs ?? [], {
+        entries: plan.inventory,
+      }).sourceSha256 === plan.candidate.sourceSha256,
+      runTask: async (task) => {
+        const configuredTask = config.tasks.find((item) => item.id === task.id);
+        if (!configuredTask) fail('Selected task is missing from the registered configuration: ' + task.id);
+        let taskReceipt;
+        try {
+          taskReceipt = await runCommand(
+            configuredTask,
+            root,
+            path.join(runRoot, task.id + '.log'),
+            options.onTaskFailure,
+          );
+        } finally {
+          rmSync(path.join(runRoot, `${task.id}-environment`), { recursive: true, force: true });
+        }
+        taskReceipt.inventory = (configuredTask.inventoryLanes ?? []).map((lane) => ({
+          lane,
+          discoveredFiles: plan.inventoryCounts[lane] ?? 0,
+          inventorySha256: plan.inventoryLaneDigests[lane],
+        }));
+        return taskReceipt;
+      },
+      onTaskStart: (task, startedAt) => runningTasks.set(task.id, startedAt),
+      onTaskFinish: (task) => runningTasks.delete(task.id),
+      onProgress: reportProgress,
+    });
+    sourceChanged = pool.sourceChanged;
+  } finally {
+    clearInterval(heartbeat);
   }
   for (const task of plan.tasks) {
     if (!receiptById.has(task.id)) {
       receiptById.set(task.id, {
         taskId: task.id,
+        stage: task.stage,
+        concurrencyGroup: task.concurrencyGroup,
+        dependsOn: task.dependsOn,
         status: sourceChanged ? 'blocked' : 'excluded',
         reason: sourceChanged ? 'candidate source changed during execution' : 'not selected',
         required: task.required,
       });
     }
   }
-  const tasks = plan.tasks.map((task) => receiptById.get(task.id));
+  const tasks = plan.tasks.map((task) => ({
+    ...receiptById.get(task.id),
+    stage: task.stage,
+    concurrencyGroup: task.concurrencyGroup,
+    dependsOn: task.dependsOn,
+  }));
   const totals = {
     planned: selectedIds.size,
     executed: tasks.filter((task) => task.startedAt).length,
@@ -927,6 +1085,7 @@ export async function executePlan(root, config, plan, options = {}) {
     inventoryLaneDigests: plan.inventoryLaneDigests,
     executionContext: plan.executionContext,
     status,
+    maxConcurrentTasks: plan.maxConcurrentTasks,
     prerequisites: plan.prerequisites,
     runtimes: plan.runtimes,
     tasks,
@@ -992,7 +1151,7 @@ export async function main(argv = process.argv.slice(2), root = DEFAULT_ROOT, co
     process.stdout.write(json
       ? JSON.stringify(plan, null, 2) + '\n'
       : loaded.repository + ': ' + plan.inventory.length + ' test files; ' +
-        plan.tasks.length + ' planned tasks; ' +
+        plan.tasks.length + ' planned tasks; max concurrency ' + plan.maxConcurrentTasks + '; ' +
         plan.prerequisites.filter((item) => item.available).length + '/' +
         plan.prerequisites.length + ' command prerequisites available.\n');
     return 0;

@@ -140,6 +140,20 @@ test('tag Discord announcements use the trusted default-branch workflow', () => 
 test('trusted PR validation runs the base validator and launcher on an exact candidate snapshot', () => {
   assert.match(trustedWorkflow, /pull_request_target:[\s\S]*?branches: \[main\]/u);
   assert.match(trustedWorkflow, /permissions:\n\x20{2}contents:\x20read/u);
+  const trustedRunner = trustedWorkflow
+    .split('\n')
+    .find((line) => line.startsWith('    runs-on: '));
+  assert.ok(trustedRunner, 'trusted PR job has a runner selector');
+  assert.ok(trustedRunner.includes('github.event.pull_request.head.repo.full_name == github.repository'));
+  assert.ok(trustedRunner.includes("github.event.pull_request.user.login == 'snapetech'"));
+  assert.ok(trustedRunner.includes("vars.TRUSTED_MAIN_RUNNERS_ENABLED == 'true'"));
+  assert.ok(trustedRunner.includes('"group":"Default"'));
+  assert.ok(trustedRunner.includes("|| 'ubuntu-24.04'"));
+  assert.match(
+    trustedWorkflow,
+    /sudo apparmor_parser --replace "\$profile"/u,
+    'trusted PR validation can rerun on a persistent host with an existing profile'
+  );
   assert.doesNotMatch(trustedWorkflow, /\$\{\{\s*secrets\./u);
   assert.match(
     trustedWorkflow,
@@ -182,6 +196,11 @@ test('CI receipt reconciliation downloads only artifacts from the current attemp
   );
 });
 
+test('cancelled superseded pull-request runs release the CI concurrency slot', () => {
+  const reconcileJob = jobBlock(ciWorkflow, 'reconcile-validation', 'docker-build');
+  assert.match(reconcileJob, /if: always\(\) && !cancelled\(\)/u);
+});
+
 test('test and build jobs execute the base-reviewed launcher with isolated dependencies', () => {
   const testJob = jobBlock(ciWorkflow, 'test', 'build');
   const buildJob = jobBlock(ciWorkflow, 'build', 'reconcile-validation');
@@ -216,4 +235,24 @@ test('test and build jobs execute the base-reviewed launcher with isolated depen
   }
   assert.match(testJob, /--reports-output "\$RUNNER_TEMP\/quest-codecov-reports"/u);
   assert.match(testJob, /path: \$\{\{ runner\.temp \}\}\/quest-codecov-reports/u);
+});
+
+test('trusted main CI uses a readiness-gated runner-group object selector', () => {
+  const mainCondition =
+    "(github.event_name == 'push' || github.event_name == 'workflow_dispatch') && " +
+    "github.ref == 'refs/heads/main'";
+  const trustedRunnerJson =
+    '{"group":"trusted-main","labels":["self-hosted","Linux","X64","host"]}';
+  const expected =
+    "$" + "{{ " + mainCondition +
+    " && vars.TRUSTED_MAIN_RUNNERS_ENABLED == 'true' && fromJSON('" + trustedRunnerJson + "') || 'ubuntu-latest' }}";
+  const selectors = ciWorkflow.split('\n').filter((line) =>
+    line.startsWith('    runs-on: ') && line.includes("fromJSON('" + trustedRunnerJson + "')")
+  );
+  assert.equal(selectors.length, 2);
+  assert.deepEqual(selectors, [
+    `    runs-on: ${expected}`,
+    `    runs-on: ${expected}`
+  ]);
+  assert.ok(selectors.every((line) => line.includes("|| 'ubuntu-latest'")));
 });
