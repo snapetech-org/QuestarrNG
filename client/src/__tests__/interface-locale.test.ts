@@ -8,11 +8,14 @@ import {
   formatInterfaceMessage,
   getBrowserInterfaceLanguage,
   getInterfaceCollator,
+  getInterfaceLanguage,
   getInterfaceTextDirection,
   getInterfaceTextLanguage,
   setInterfaceLanguage,
+  translateInterfaceLabel,
   useInterfaceLanguage,
 } from "@/lib/interface-locale";
+import type { InterfaceLanguage } from "@/lib/interface-locale";
 
 describe("browser interface language detection", () => {
   it.each([
@@ -134,6 +137,50 @@ describe("browser interface language detection", () => {
     expect(
       formatInterfaceMessage("Change status for {title}", { title: "Example game" }, "ar")
     ).toContain("\u2068Example game\u2069");
+    expect(formatInterfaceMessage("Uncatalogued {missing}", {}, "es")).toBe(
+      "Uncatalogued {missing}"
+    );
+    expect(formatInterfaceMessage("Navigation", {}, "unsupported" as InterfaceLanguage)).toBe(
+      "Navigation"
+    );
+  });
+
+  it("localizes marked attributes and filters invalid interpolation data", () => {
+    const button = document.createElement("button");
+    button.setAttribute("data-i18n-aria-label", "Selection: {count}/{total}");
+    button.setAttribute(
+      "data-i18n-aria-label-values",
+      JSON.stringify({ count: 2, total: "4", invalid: true })
+    );
+    const title = document.createElement("span");
+    title.setAttribute("data-i18n-title", "Navigation");
+    title.setAttribute("data-i18n-title-values", "[]");
+    document.body.append(button, title);
+
+    try {
+      setInterfaceLanguage("ar");
+      expect(button.getAttribute("aria-label")).toContain("\u20682\u2069");
+      expect(button.getAttribute("aria-label")).toContain("\u20684\u2069");
+      expect(title.getAttribute("title")).toBe(translateInterfaceLabel("Navigation", "ar"));
+    } finally {
+      button.remove();
+      title.remove();
+      setInterfaceLanguage("en");
+    }
+  });
+
+  it("keeps the selected language active when browser storage is blocked", () => {
+    const setItem = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new Error("storage unavailable");
+    });
+
+    try {
+      expect(() => setInterfaceLanguage("es")).not.toThrow();
+      expect(getInterfaceLanguage()).toBe("es");
+    } finally {
+      setItem.mockRestore();
+      setInterfaceLanguage("en");
+    }
   });
 });
 
