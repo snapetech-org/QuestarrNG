@@ -134,14 +134,19 @@ jobs:
           global-json-file: global.json
 
       - name: Verify selected .NET SDK
-        run: dotnet --version
+        run: '"$RUNNER_TEMP/dotnet/dotnet" --version'
 
       - name: Restore locked Windows service dependencies
-        run: dotnet restore installer/windows/Questarr.Service/Questarr.Service.csproj --runtime win-x64 --locked-mode
+        run: >-
+          "$RUNNER_TEMP/dotnet/dotnet" restore
+          installer/windows/Questarr.Service/Questarr.Service.csproj
+          --runtime win-x64
+          --locked-mode
 
       - name: Publish self-contained Windows service host
         run: >-
-          dotnet publish installer/windows/Questarr.Service/Questarr.Service.csproj
+          "$RUNNER_TEMP/dotnet/dotnet" publish
+          installer/windows/Questarr.Service/Questarr.Service.csproj
           --configuration Release
           --no-restore
           --runtime win-x64

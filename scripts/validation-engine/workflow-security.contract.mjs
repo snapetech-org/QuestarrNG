@@ -408,17 +408,27 @@ test('Windows service builds install the SDK in the runner temp directory', () =
   const setupDotnet = load(ciWorkflow).jobs['windows-service'].steps.find(
     (step) => step.name === 'Setup .NET 10 SDK'
   );
+  const steps = load(ciWorkflow).jobs['windows-service'].steps;
+  const verifySdk = steps.find((step) => step.name === 'Verify selected .NET SDK');
+  const restore = steps.find(
+    (step) => step.name === 'Restore locked Windows service dependencies'
+  );
+  const publish = steps.find(
+    (step) => step.name === 'Publish self-contained Windows service host'
+  );
 
   assert.match(serviceJob, /uses: actions\/setup-dotnet@[a-f0-9]{40}/u);
   assert.match(serviceJob, /global-json-file: global\.json/u);
   assert.equal(setupDotnet.env.DOTNET_INSTALL_DIR, '${{ runner.temp }}/dotnet');
-  assert.match(serviceJob, /run: dotnet --version/u);
-  assert.match(
-    serviceJob,
-    /run: dotnet restore installer\/windows\/Questarr\.Service\/Questarr\.Service\.csproj --runtime win-x64 --locked-mode/u
+  assert.equal(verifySdk.run, '"$RUNNER_TEMP/dotnet/dotnet" --version');
+  assert.equal(
+    restore.run,
+    '"$RUNNER_TEMP/dotnet/dotnet" restore installer/windows/Questarr.Service/Questarr.Service.csproj --runtime win-x64 --locked-mode'
   );
-  assert.match(serviceJob, /dotnet publish installer\/windows\/Questarr\.Service\/Questarr\.Service\.csproj/u);
-  assert.doesNotMatch(serviceJob, /RUNNER_TEMP\/dotnet\/dotnet/u);
+  assert.match(
+    publish.run,
+    /^"\$RUNNER_TEMP\/dotnet\/dotnet" publish installer\/windows\/Questarr\.Service\/Questarr\.Service\.csproj/u
+  );
 });
 
 test('scheduled dependency and Helm workflows cancel only superseded runs for the same PR', () => {
