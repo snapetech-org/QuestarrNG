@@ -318,8 +318,11 @@ linked file as the source of truth.
   `.github/workflows/dependency-review.yml`
 - **SAST:** CodeQL advanced setup in `.github/workflows/codeql.yml` (JavaScript/TypeScript,
   C#, and GitHub Actions) plus Semgrep in `.github/workflows/sast.yml`
-- **Container image scanning:** Trivy in `.github/workflows/vulnerability-scan.yml`, on
-  main pushes, weekly, and pull requests that change image or dependency inputs
+- **Container image scanning:** Trivy builds a local production image in
+  `.github/workflows/vulnerability-scan.yml` on main pushes, weekly, and pull
+  requests that change image or dependency inputs. The tag-triggered
+  `.github/workflows/fork-image.yml` scan checks the exact multi-architecture
+  release digest before publishing version and `latest` tags.
 - **Supply-chain scoring:** `.github/workflows/scorecard.yml` (OpenSSF Scorecard)
 - **SBOM:** [`docs/SBOM.md`](./SBOM.md) — Syft-generated, attached to Docker releases
 - **Disclosure process / access governance:** [`docs/SECURITY.md`](SECURITY.md),

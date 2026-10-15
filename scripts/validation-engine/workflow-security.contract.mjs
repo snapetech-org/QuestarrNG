@@ -162,6 +162,46 @@ test('tag Discord announcements use the trusted default-branch workflow', () => 
   assert.doesNotMatch(trustedDiscordWorkflow, /secrets\.DISCORD_RELEASE_WEBHOOK/u);
 });
 
+test('production image releases require a version-tag push', () => {
+  const imageWorkflow = load(releaseWorkflow);
+  assert.deepEqual(imageWorkflow.on.push, { tags: ['v*'] });
+  assert.match(
+    imageWorkflow.jobs.publish.if,
+    /github\.event_name == 'push' && startsWith\(github\.ref, 'refs\/tags\/v'\)/u
+  );
+  assert.doesNotMatch(imageWorkflow.jobs.publish.if, /workflow_dispatch/u);
+  assert.match(imageWorkflow.jobs.release.if, /startsWith\(github\.ref, 'refs\/tags\/v'\)/u);
+  const publishJob = jobBlock(releaseWorkflow, 'publish', 'addon-smoke');
+  const imageTagsStart = publishJob.indexOf('- name: Set image tags');
+  const imageTagsEnd = publishJob.indexOf('- name: Set up QEMU for ARM64 release images', imageTagsStart);
+  assert.ok(imageTagsStart >= 0 && imageTagsEnd > imageTagsStart);
+  const imageTagsStep = publishJob.slice(imageTagsStart, imageTagsEnd);
+  assert.match(imageTagsStep, /refs\/tags\/v\*/u);
+  assert.match(imageTagsStep, /Production image publication requires a version tag push/u);
+  assert.doesNotMatch(imageTagsStep, /release_tag=latest/u);
+  const smokeIndex = publishJob.indexOf('Smoke test published image and SeerrNG route');
+  const attachIndex = publishJob.indexOf('Attach publish tag after scans and smoke test pass');
+  assert.ok(smokeIndex >= 0 && attachIndex > smokeIndex);
+  assert.match(publishJob.slice(attachIndex), /for tag in "\$RELEASE_TAG" latest/u);
+
+  const deployConfig = load(deployWorkflow);
+  assert.deepEqual(deployConfig.on.workflow_dispatch.inputs.environment.options, ['dev', 'test']);
+  assert.equal(
+    deployConfig.jobs['build-and-push'].environment,
+    "${{ inputs.environment == 'test' && 'test' || 'dev' }}"
+  );
+  const tagPolicy = deployConfig.jobs['build-and-push'].steps.find(
+    (step) => step.name === 'Keep production release tags on the version-tag workflow'
+  );
+  assert.ok(tagPolicy, 'manual deployments reject production release aliases');
+  assert.match(tagPolicy.run, /DEPLOY_ENVIRONMENT.*production/u);
+  assert.match(tagPolicy.run, /IMAGE_TAG.*v\*/u);
+  const metadata = deployConfig.jobs['build-and-push'].steps.find((step) => step.id === 'meta');
+  assert.ok(metadata, 'manual deployment images have an explicit metadata step');
+  assert.doesNotMatch(metadata.with.tags, /value=latest|value=production/u);
+  assert.match(metadata.with.tags, /inputs\.tag != ''/u);
+});
+
 test('release publishing and announcements are gated to QuestarrNG by stable repository ID', () => {
   assert.equal(
     (releaseWorkflow.match(/github\.repository_id == '1388297896'/gu) ?? []).length,

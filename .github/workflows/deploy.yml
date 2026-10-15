@@ -5,20 +5,19 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: "Deployment environment"
+        description: "Development or test image channel"
         required: true
         default: "test"
         type: choice
         options:
-          - production
           - dev
           - test
       tag:
-        description: "Docker image tag (leave empty for auto-generated tag)"
+        description: "Optional non-release Docker image tag"
         required: false
         default: ""
       build_arm64:
-        description: "Also build ARM64 (slows down build; always on for production)"
+        description: "Also build ARM64 for this development or test image"
         required: false
         default: false
         type: boolean
@@ -79,7 +78,7 @@ jobs:
 
   build-and-push:
     runs-on: ubuntu-latest
-    environment: ${{ github.event_name == 'schedule' && 'dev' || inputs.environment || 'dev' }}
+    environment: ${{ inputs.environment == 'test' && 'test' || 'dev' }}
     needs: sca-gate
     permissions:
       contents: read
@@ -121,6 +120,18 @@ jobs:
           REPO_LC=$(echo "$REPOSITORY" | tr '[:upper:]' '[:lower:]')
           echo "REPO_LC=$REPO_LC" >> $GITHUB_ENV
 
+      - name: Keep production release tags on the version-tag workflow
+        shell: bash
+        env:
+          DEPLOY_ENVIRONMENT: ${{ steps.env.outputs.environment }}
+          IMAGE_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          if [[ "$DEPLOY_ENVIRONMENT" == 'production' || "$IMAGE_TAG" == 'latest' || "$IMAGE_TAG" == 'production' || "$IMAGE_TAG" == v* || "$IMAGE_TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.+].*)?$ ]]; then
+            echo 'Production and version image tags are published only by a validated vMAJOR.MINOR.PATCH tag push.' >&2
+            exit 1
+          fi
+
       # Single source of truth for whether this run builds ARM64, so the
       # "Set up QEMU" condition below and the `platforms:` expression in the
       # build step can't drift out of sync with each other.
@@ -130,15 +141,14 @@ jobs:
           ENVIRONMENT: ${{ env.ENVIRONMENT }}
           BUILD_ARM64: ${{ inputs.build_arm64 }}
         run: |
-          if [ "$ENVIRONMENT" == "production" ] || [ "$BUILD_ARM64" == "true" ]; then
+          if [ "$BUILD_ARM64" == "true" ]; then
             echo "multiarch_enabled=true" >> $GITHUB_OUTPUT
           else
             echo "multiarch_enabled=false" >> $GITHUB_OUTPUT
           fi
 
-      # Production always builds ARM64 so that published release images run
-      # on Raspberry Pi and other ARM SBCs/NAS boxes; see the
-      # "Determine ARM64 build" step above for the shared predicate.
+      # Version-tagged releases always build both architectures in
+      # fork-image.yml. This workflow is limited to development and test images.
       - name: Set up QEMU
         if: steps.arch.outputs.multiarch_enabled == 'true'
         uses: step-security/setup-qemu-action@d21542abd2ae44772cf2276e75ee4ec531d598b6 # v4.4.0
@@ -170,7 +180,6 @@ jobs:
             ghcr.io/${{ github.repository }}
           tags: |
             type=raw,value=${{ inputs.tag }},enable=${{ inputs.tag != '' }}
-            type=raw,value=latest,enable=${{ env.ENVIRONMENT == 'production' }}
             type=raw,value=dev,enable=${{ env.ENVIRONMENT == 'dev' }}
             type=sha,prefix=${{ env.ENVIRONMENT }}-sha-,format=short,enable=${{ env.ENVIRONMENT != 'dev' }}
           labels: |
@@ -183,9 +192,8 @@ jobs:
         uses: step-security/docker-build-push-action@b736dc8a921e02a288f956d3dd9111e276a4cfec # v7.4.0
         with:
           context: .
-          # Production is always multi-arch; dev/test stay amd64-only (and fast)
-          # unless build_arm64 is explicitly requested. See the shared
-          # "Determine ARM64 build" step above.
+          # Dev/test stay amd64-only (and fast) unless build_arm64 is explicitly
+          # requested. Version-tagged production releases use fork-image.yml.
           platforms: ${{ steps.arch.outputs.multiarch_enabled == 'true' && 'linux/amd64,linux/arm64' || 'linux/amd64' }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
