@@ -403,7 +403,7 @@ test('trusted main CI uses a readiness-gated runner-group object selector', () =
   assert.ok(selectors.every((line) => line.includes("|| 'ubuntu-latest'")));
 });
 
-test('Windows service builds use the SDK selected by setup-dotnet on every runner', () => {
+test('Windows service builds install the SDK in the runner temp directory', () => {
   const serviceJob = jobBlock(ciWorkflow, 'windows-service', 'test');
   const setupDotnet = load(ciWorkflow).jobs['windows-service'].steps.find(
     (step) => step.name === 'Setup .NET 10 SDK'
@@ -411,14 +411,14 @@ test('Windows service builds use the SDK selected by setup-dotnet on every runne
 
   assert.match(serviceJob, /uses: actions\/setup-dotnet@[a-f0-9]{40}/u);
   assert.match(serviceJob, /global-json-file: global\.json/u);
-  assert.equal(setupDotnet.with['install-dir'], '${{ runner.temp }}/dotnet');
+  assert.equal(setupDotnet.env.DOTNET_INSTALL_DIR, '${{ runner.temp }}/dotnet');
   assert.match(serviceJob, /run: dotnet --version/u);
   assert.match(
     serviceJob,
     /run: dotnet restore installer\/windows\/Questarr\.Service\/Questarr\.Service\.csproj --runtime win-x64 --locked-mode/u
   );
   assert.match(serviceJob, /dotnet publish installer\/windows\/Questarr\.Service\/Questarr\.Service\.csproj/u);
-  assert.doesNotMatch(serviceJob, /DOTNET_INSTALL_DIR|RUNNER_TEMP\/dotnet\/dotnet/u);
+  assert.doesNotMatch(serviceJob, /RUNNER_TEMP\/dotnet\/dotnet/u);
 });
 
 test('scheduled dependency and Helm workflows cancel only superseded runs for the same PR', () => {
