@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { InterfaceText } from "@/components/InterfaceText";
 
 const FORMAT_FIELDS: FormatField[] = [
   "title",
@@ -154,7 +155,9 @@ export default function ReleaseScoringSettings({
               remain visible in manual search with the reason.
             </CardDescription>
           </div>
-          <Badge variant={enabled ? "default" : "outline"}>{enabled ? "Enabled" : "Off"}</Badge>
+          <Badge variant={enabled ? "default" : "outline"}>
+            {enabled ? <InterfaceText source={"Enabled"} /> : "Off"}
+          </Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-7">
@@ -311,7 +314,7 @@ export default function ReleaseScoringSettings({
                   {!rule.locked ? (
                     <div className="flex items-center justify-between gap-2">
                       <Label htmlFor={`enable-${rule.id}`} className="text-xs">
-                        Enabled
+                        <InterfaceText source={"Enabled"} />
                       </Label>
                       <Switch
                         id={`enable-${rule.id}`}
@@ -363,7 +366,9 @@ export default function ReleaseScoringSettings({
                 <div key={format.id} className="space-y-4 rounded-md border p-4">
                   <div className="grid items-end gap-3 sm:grid-cols-[1fr_120px_auto_auto_auto]">
                     <div className="space-y-2">
-                      <Label htmlFor={`format-name-${format.id}`}>Name</Label>
+                      <Label htmlFor={`format-name-${format.id}`}>
+                        <InterfaceText source={"Name"} />
+                      </Label>
                       <Input
                         id={`format-name-${format.id}`}
                         maxLength={100}
@@ -385,7 +390,9 @@ export default function ReleaseScoringSettings({
                       />
                     </div>
                     <div className="flex items-center gap-2 pb-2">
-                      <Label htmlFor={`format-enabled-${format.id}`}>Enabled</Label>
+                      <Label htmlFor={`format-enabled-${format.id}`}>
+                        <InterfaceText source={"Enabled"} />
+                      </Label>
                       <Switch
                         id={`format-enabled-${format.id}`}
                         checked={format.enabled}
@@ -558,7 +565,7 @@ export default function ReleaseScoringSettings({
             ) : (
               <SlidersHorizontal className="h-4 w-4" />
             )}
-            {mutation.isPending ? "Saving..." : "Save Release Scoring"}
+            {mutation.isPending ? <InterfaceText source={"Saving..."} /> : "Save Release Scoring"}
           </Button>
         </div>
       </CardContent>

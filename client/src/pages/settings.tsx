@@ -2136,7 +2136,7 @@ export default function SettingsPage() {
                     disabled={appriseSaveDisabled}
                   >
                     {updateAppriseMutation.isPending ? (
-                      "Saving..."
+                      <InterfaceText source={"Saving..."} />
                     ) : (
                       <InterfaceText source={"Save"} />
                     )}
@@ -2207,6 +2207,11 @@ export default function SettingsPage() {
                             <td className="py-3 pl-3 sm:pl-6 text-center">
                               <div
                                 title={
+                                  !appriseSettings?.configured
+                                    ? "Configure Apprise above to enable"
+                                    : undefined
+                                }
+                                data-i18n-title={
                                   !appriseSettings?.configured
                                     ? "Configure Apprise above to enable"
                                     : undefined
@@ -2307,7 +2312,7 @@ export default function SettingsPage() {
                         disabled={updateSteamIdMutation.isPending}
                       >
                         {updateSteamIdMutation.isPending ? (
-                          "Saving..."
+                          <InterfaceText source={"Saving..."} />
                         ) : (
                           <InterfaceText source={"Save ID"} />
                         )}
@@ -2445,6 +2450,11 @@ export default function SettingsPage() {
                           ? "Enter a new key to override the current one"
                           : "Enter your Nexus Mods API key"
                       }
+                      data-i18n-placeholder={
+                        nexusmodsSettings?.configured
+                          ? "Enter a new key to override the current one"
+                          : "Enter your Nexus Mods API key"
+                      }
                       value={nexusApiKey}
                       onChange={(e) => setNexusApiKey(e.target.value)}
                       className="pr-10"
@@ -2457,6 +2467,7 @@ export default function SettingsPage() {
                         className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                         onClick={() => setShowNexusApiKey(!showNexusApiKey)}
                         aria-label={showNexusApiKey ? "Hide API key" : "Show API key"}
+                        data-i18n-aria-label={showNexusApiKey ? "Hide API key" : "Show API key"}
                       >
                         {showNexusApiKey ? (
                           <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -2586,6 +2597,11 @@ export default function SettingsPage() {
                           ? "Enter a new key to override the current one"
                           : "Enter your API key"
                       }
+                      data-i18n-placeholder={
+                        typesafeSettings?.configured
+                          ? "Enter a new key to override the current one"
+                          : "Enter your API key"
+                      }
                       value={typesafeApiKey}
                       onChange={(e) => setTypesafeApiKey(e.target.value)}
                       className="pr-10"
@@ -2598,6 +2614,7 @@ export default function SettingsPage() {
                         className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                         onClick={() => setShowTypesafeApiKey(!showTypesafeApiKey)}
                         aria-label={showTypesafeApiKey ? "Hide API key" : "Show API key"}
+                        data-i18n-aria-label={showTypesafeApiKey ? "Hide API key" : "Show API key"}
                       >
                         {showTypesafeApiKey ? (
                           <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -2671,27 +2688,39 @@ export default function SettingsPage() {
               <CardHeader>
                 <div className="flex items-center gap-3">
                   <Key className="h-5 w-5 text-muted-foreground" />
-                  <CardTitle className="text-lg">RAWG Game Database</CardTitle>
+                  <CardTitle className="text-lg">
+                    <InterfaceText source="RAWG Game Database" />
+                  </CardTitle>
                 </div>
                 <CardDescription>
-                  Optional game search and discovery provider. IGDB and its SeerrNG identity remain
-                  available alongside RAWG.
+                  <InterfaceText source="Optional game search and discovery provider. IGDB and its SeerrNG identity remain available alongside RAWG." />
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Status</span>
+                  <span className="text-sm font-medium">
+                    <InterfaceText source="Status" />
+                  </span>
                   <Badge variant={rawgSettings?.configured ? "default" : "secondary"}>
-                    {rawgSettings?.configured ? "Configured" : "Not configured"}
+                    <InterfaceText
+                      source={rawgSettings?.configured ? "Configured" : "Not configured"}
+                    />
                   </Badge>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="rawg-api-key">RAWG API key</Label>
+                  <Label htmlFor="rawg-api-key">
+                    <InterfaceText source="RAWG API key" />
+                  </Label>
                   <Input
                     id="rawg-api-key"
                     type="password"
                     autoComplete="new-password"
                     placeholder={
+                      rawgSettings?.configured
+                        ? "Enter a new key to replace the saved key"
+                        : "Enter your RAWG API key"
+                    }
+                    data-i18n-placeholder={
                       rawgSettings?.configured
                         ? "Enter a new key to replace the saved key"
                         : "Enter your RAWG API key"
@@ -2706,15 +2735,15 @@ export default function SettingsPage() {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      Get a RAWG API key
+                      <InterfaceText source="Get a RAWG API key" />
                     </a>
-                    . The key is encrypted at rest. RAWG attribution appears in the app sidebar.
+                    <InterfaceText source=". The key is encrypted at rest. RAWG attribution appears in the app sidebar." />
                   </p>
                 </div>
                 <div className="flex flex-wrap justify-end gap-2 border-t pt-4">
                   {rawgSettings?.configured && (
                     <Button variant="outline" onClick={removeRawg}>
-                      Remove RAWG
+                      <InterfaceText source="Remove RAWG" />
                     </Button>
                   )}
                   <Button
@@ -2722,13 +2751,13 @@ export default function SettingsPage() {
                     onClick={testRawg}
                     disabled={!rawgApiKey.trim() && !rawgSettings?.configured}
                   >
-                    Test connection
+                    <InterfaceText source="Test connection" />
                   </Button>
                   <Button
                     onClick={saveRawg}
                     disabled={!rawgApiKey.trim() && !rawgSettings?.configured}
                   >
-                    Save RAWG key
+                    <InterfaceText source="Save RAWG key" />
                   </Button>
                 </div>
               </CardContent>
@@ -2804,6 +2833,9 @@ export default function SettingsPage() {
                         placeholder={
                           config?.igdb.configured ? "********" : "Enter your IGDB Client Secret"
                         }
+                        data-i18n-placeholder={
+                          config?.igdb.configured ? undefined : "Enter your IGDB Client Secret"
+                        }
                         value={igdbClientSecret}
                         onChange={(e) => setIgdbClientSecret(e.target.value)}
                         className="pr-10"
@@ -2816,6 +2848,9 @@ export default function SettingsPage() {
                           className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                           onClick={() => setShowClientSecret(!showClientSecret)}
                           aria-label={
+                            showClientSecret ? "Hide client secret" : "Show client secret"
+                          }
+                          data-i18n-aria-label={
                             showClientSecret ? "Hide client secret" : "Show client secret"
                           }
                         >
@@ -3658,7 +3693,7 @@ export default function SettingsPage() {
                     <div className="flex justify-end pt-4 border-t">
                       <Button onClick={handleSaveSsl} disabled={updateSslMutation.isPending}>
                         {updateSslMutation.isPending ? (
-                          "Saving..."
+                          <InterfaceText source={"Saving..."} />
                         ) : (
                           <InterfaceText source={"Save SSL Settings"} />
                         )}

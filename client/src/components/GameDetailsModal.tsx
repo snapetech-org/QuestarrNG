@@ -1229,9 +1229,9 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                   {hiddenMutation.isPending ? (
                     <InterfaceText source={"Updating..."} />
                   ) : game.hidden ? (
-                    "Unhide"
+                    <InterfaceText source="Unhide" />
                   ) : (
-                    "Hide"
+                    <InterfaceText source="Hide" />
                   )}
                 </span>
               </Button>
@@ -1262,7 +1262,7 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                     {removeGameMutation.isPending ? (
                       <InterfaceText source={"Removing..."} />
                     ) : (
-                      "Remove"
+                      <InterfaceText source="Remove" />
                     )}
                   </span>
                 </Button>
@@ -1382,7 +1382,12 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
               )}
 
               {hltbEntry && hltbTimes.length > 0 && (
-                <section data-testid="section-hltb" aria-label="HowLongToBeat estimates">
+                <section
+                  data-testid="section-hltb"
+                  aria-label={t("HowLongToBeat estimates")}
+                  lang={languageFor("HowLongToBeat estimates")}
+                  dir={directionFor("HowLongToBeat estimates")}
+                >
                   <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                     <h3 className="flex items-center gap-2 font-semibold">
                       <Clock className="h-4 w-4 text-yellow-400" aria-hidden="true" />
@@ -1394,7 +1399,16 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
                     >
-                      View {hltbEntry.name} on HLTB
+                      <span
+                        lang={languageFor("View {title} on HLTB")}
+                        dir={directionFor("View {title} on HLTB")}
+                      >
+                        {formatInterfaceMessage(
+                          "View {title} on HLTB",
+                          { title: hltbEntry.name },
+                          language
+                        )}
+                      </span>
                       <ExternalLink className="h-3 w-3" aria-hidden="true" />
                     </a>
                   </div>
@@ -1404,15 +1418,22 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                         <div className="text-xs text-muted-foreground">{label}</div>
                         <div
                           className="text-lg font-semibold"
-                          aria-label={`${label}: ${hours} hours`}
+                          aria-label={formatInterfaceMessage(
+                            "{label}: {hours} hours",
+                            { label: t(label), hours },
+                            language
+                          )}
+                          lang={languageFor("{label}: {hours} hours")}
+                          dir={directionFor("{label}: {hours} hours")}
                         >
-                          {hours}h
+                          {hours}
+                          <InterfaceText source={"h"} />
                         </div>
                       </div>
                     ))}
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Estimated play times from HowLongToBeat.
+                    <InterfaceText source="Estimated play times from HowLongToBeat." />
                   </p>
                 </section>
               )}
@@ -1874,7 +1895,9 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                   className="mb-3 flex items-start gap-2 rounded-md border bg-muted/30 px-3 py-2 text-sm text-muted-foreground"
                 >
                   <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-                  <span>Showing a partial file list because the scan reached a safety limit.</span>
+                  <span>
+                    <InterfaceText source="Showing a partial file list because the scan reached a safety limit." />
+                  </span>
                 </div>
               )}
               {filesLoading ? (

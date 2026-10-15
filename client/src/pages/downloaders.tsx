@@ -209,7 +209,7 @@ function PriorityControl({
  * Manages configured downloader clients, including creation, editing, deletion, status changes, priority updates, and connection testing.
  */
 export default function DownloadersPage() {
-  const { language: interfaceLanguage } = useInterfaceLanguage();
+  const { language: interfaceLanguage, t } = useInterfaceLanguage();
   const nameCollator = useMemo(() => getInterfaceCollator(interfaceLanguage), [interfaceLanguage]);
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -813,10 +813,12 @@ export default function DownloadersPage() {
                       </RequiredFormLabel>
                       <FormControl>
                         <Input
-                          placeholder={
-                            downloaderTypes.find((t) => t.value === form.watch("type"))?.label ??
-                            "Downloader"
-                          }
+                          placeholder={(() => {
+                            const typeLabel = downloaderTypes.find(
+                              (type) => type.value === form.watch("type")
+                            )?.label;
+                            return typeLabel ?? t("Downloader");
+                          })()}
                           required
                           {...field}
                           data-testid="input-downloader-name"
@@ -972,15 +974,15 @@ export default function DownloadersPage() {
                                 }
                               />
                             ) : form.watch("type") === "transmission" ? (
-                              "Enable HTTPS (see Settings → Web in Transmission)"
+                              <InterfaceText source="Enable HTTPS (see Settings → Web in Transmission)" />
                             ) : form.watch("type") === "synology" ? (
-                              "DSM 7 commonly uses HTTPS on port 5001"
+                              <InterfaceText source="DSM 7 commonly uses HTTPS on port 5001" />
                             ) : form.watch("type") === "sabnzbd" ? (
-                              "Enable HTTPS in SABnzbd (Config → General)"
+                              <InterfaceText source="Enable HTTPS in SABnzbd (Config → General)" />
                             ) : form.watch("type") === "nzbget" ? (
-                              "Enable HTTPS in NZBGet (Settings → Security)"
+                              <InterfaceText source="Enable HTTPS in NZBGet (Settings → Security)" />
                             ) : (
-                              "Enable HTTPS"
+                              <InterfaceText source="Enable HTTPS" />
                             )}
                           </FormDescription>
                         </div>
@@ -1077,6 +1079,15 @@ export default function DownloadersPage() {
                                   ? "downloadstation"
                                   : ""
                           }
+                          data-i18n-placeholder={
+                            form.watch("type") === "rtorrent"
+                              ? "RPC2"
+                              : form.watch("type") === "sabnzbd"
+                                ? "sabnzbd"
+                                : form.watch("type") === "synology"
+                                  ? "downloadstation"
+                                  : ""
+                          }
                           {...field}
                           value={field.value || ""}
                           data-testid="input-downloader-urlpath"
@@ -1107,14 +1118,19 @@ export default function DownloadersPage() {
                           form.watch("type") === "transmission" ||
                           form.watch("type") === "nzbget" ||
                           form.watch("type") === "synology" ? (
-                          "Username"
+                          <InterfaceText source="Username" />
                         ) : (
-                          "Username (Optional)"
+                          <InterfaceText source="Username (Optional)" />
                         )}
                       </RequiredFormLabel>
                       <FormControl>
                         <Input
                           placeholder={
+                            form.watch("type") === "sabnzbd"
+                              ? "Enter SABnzbd API key"
+                              : "Enter username"
+                          }
+                          data-i18n-placeholder={
                             form.watch("type") === "sabnzbd"
                               ? "Enter SABnzbd API key"
                               : "Enter username"
@@ -1169,7 +1185,7 @@ export default function DownloadersPage() {
                         form.watch("type") === "transmission" ||
                         form.watch("type") === "nzbget" ||
                         form.watch("type") === "synology" ? (
-                          "Password"
+                          <InterfaceText source="Password" />
                         ) : (
                           <InterfaceText source={"Password (Optional)"} />
                         )}
@@ -1212,12 +1228,17 @@ export default function DownloadersPage() {
                           {isRealDebrid ? (
                             <InterfaceText source={"QuestarrNG Local Staging Path (Required)"} />
                           ) : (
-                            "Download Path (Optional)"
+                            <InterfaceText source="Download Path (Optional)" />
                           )}
                         </FormLabel>
                         <FormControl>
                           <Input
                             placeholder={
+                              form.watch("type") === "synology"
+                                ? "video/downloads"
+                                : "/home/downloads/games"
+                            }
+                            data-i18n-placeholder={
                               form.watch("type") === "synology"
                                 ? "video/downloads"
                                 : "/home/downloads/games"
@@ -1241,7 +1262,9 @@ export default function DownloadersPage() {
                             <InterfaceText
                               source={"Use a shared-folder-relative destination such as"}
                             />{" "}
-                            <code>video/downloads</code>
+                            <code>
+                              <InterfaceText source={"video/downloads"} />
+                            </code>
                             <InterfaceText source={"; avoid absolute"} /> <code>/volume1/...</code>{" "}
                             <InterfaceText source={"paths."} />
                           </FormDescription>
@@ -1363,13 +1386,13 @@ export default function DownloadersPage() {
                             source={"Adding a category avoids conflicts with unrelated downloads"}
                           />
                         ) : form.watch("type") === "transmission" ? (
-                          "Creates a subdirectory in the output directory. Label for downloads in downloader"
+                          <InterfaceText source="Creates a subdirectory in the output directory. Label for downloads in downloader" />
                         ) : form.watch("type") === "synology" ? (
-                          "Optional Questarr label only. Synology stores downloads by destination path."
+                          <InterfaceText source="Optional Questarr label only. Synology stores downloads by destination path." />
                         ) : form.watch("type") === "sabnzbd" || form.watch("type") === "nzbget" ? (
-                          "Category for NZBs in downloader (path is managed by category settings)"
+                          <InterfaceText source="Category for NZBs in downloader (path is managed by category settings)" />
                         ) : (
-                          "Label for downloads in downloader"
+                          <InterfaceText source="Label for downloads in downloader" />
                         )}
                       </FormDescription>
                       <FormMessage />
@@ -1639,11 +1662,13 @@ export default function DownloadersPage() {
                   disabled={addMutation.isPending || updateMutation.isPending}
                   data-testid="button-save-downloader"
                 >
-                  {addMutation.isPending || updateMutation.isPending
-                    ? "Saving..."
-                    : editingDownloader
-                      ? "Update"
-                      : "Add"}
+                  {addMutation.isPending || updateMutation.isPending ? (
+                    <InterfaceText source="Saving..." />
+                  ) : editingDownloader ? (
+                    <InterfaceText source="Update" />
+                  ) : (
+                    <InterfaceText source="Add" />
+                  )}
                 </Button>
               </div>
             </form>

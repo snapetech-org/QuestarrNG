@@ -884,7 +884,7 @@ export default function DiscoverPage() {
             <TabsContent value="rawg" className="space-y-8">
               <div className="space-y-2">
                 <label htmlFor="rawg-discover-search" className="text-sm font-medium">
-                  Search RAWG games
+                  <InterfaceText source="Search RAWG games" />
                 </label>
                 <div className="relative max-w-xl">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -892,6 +892,7 @@ export default function DiscoverPage() {
                     id="rawg-discover-search"
                     className="pl-9"
                     placeholder="Search by game title"
+                    data-i18n-placeholder="Search by game title"
                     value={rawgSearch}
                     onChange={(event) => setRawgSearch(event.target.value)}
                   />

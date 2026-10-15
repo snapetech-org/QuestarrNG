@@ -86,6 +86,7 @@ export default function PasswordSettings() {
                   className="h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                   aria-label={showCurrentPassword ? "Hide password" : "Show password"}
+                  data-i18n-aria-label={showCurrentPassword ? "Hide password" : "Show password"}
                 >
                   {showCurrentPassword ? (
                     <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -125,6 +126,7 @@ export default function PasswordSettings() {
                   className="h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowNewPassword(!showNewPassword)}
                   aria-label={showNewPassword ? "Hide password" : "Show password"}
+                  data-i18n-aria-label={showNewPassword ? "Hide password" : "Show password"}
                 >
                   {showNewPassword ? (
                     <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -165,6 +167,7 @@ export default function PasswordSettings() {
                   className="h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                  data-i18n-aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                 >
                   {showConfirmPassword ? (
                     <EyeOff className="h-4 w-4 text-muted-foreground" />

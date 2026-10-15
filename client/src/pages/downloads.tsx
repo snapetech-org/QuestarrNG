@@ -636,6 +636,9 @@ export default function Downloads() {
             aria-label={
               questarrFilter === "questarr" ? "Show all downloads" : "Show Questarr downloads only"
             }
+            data-i18n-aria-label={
+              questarrFilter === "questarr" ? "Show all downloads" : "Show Questarr downloads only"
+            }
             aria-pressed={questarrFilter === "questarr"}
             data-testid="filter-source-questarr"
           >

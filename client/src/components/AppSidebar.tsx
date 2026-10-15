@@ -359,7 +359,7 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
       <SidebarFooter>
         {appConfig?.rawg?.configured && (
           <div className="px-3 pb-2 text-center text-xs text-muted-foreground">
-            Game metadata by{" "}
+            <InterfaceText source="Game metadata by" />{" "}
             <a className="underline" href="https://rawg.io" target="_blank" rel="noreferrer">
               RAWG
             </a>

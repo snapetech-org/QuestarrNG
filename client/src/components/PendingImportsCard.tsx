@@ -98,6 +98,7 @@ export default function PendingImportsCard() {
                 variant="ghost"
                 className="h-8 w-8 shrink-0 text-amber-600 dark:text-amber-500"
                 aria-label={collapsed ? "Show pending imports" : "Hide pending imports"}
+                data-i18n-aria-label={collapsed ? "Show pending imports" : "Hide pending imports"}
                 onClick={(e) => {
                   e.stopPropagation();
                   setCollapsed((c) => !c);

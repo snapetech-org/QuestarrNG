@@ -163,7 +163,10 @@ export default function RssSettings() {
                     {feed.status === "ok" ? (
                       <CheckCircle className="h-4 w-4 text-green-500" />
                     ) : (
-                      <span title={feed.errorMessage || "Error"}>
+                      <span
+                        title={feed.errorMessage || "Error"}
+                        data-i18n-title={feed.errorMessage ? undefined : "Error"}
+                      >
                         <AlertCircle className="h-4 w-4 text-red-500" />
                       </span>
                     )}

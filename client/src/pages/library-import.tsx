@@ -1,12 +1,15 @@
 import { FolderInput } from "lucide-react";
 import { RootFolderDiscovery } from "@/components/RootFolderDiscovery";
+import { InterfaceText } from "@/components/InterfaceText";
 
 export default function LibraryImportPage() {
   return (
     <div className="flex flex-col h-full min-h-0">
       <div className="flex items-center gap-3 px-6 py-5 border-b border-border">
         <FolderInput className="w-5 h-5 text-primary" aria-hidden="true" />
-        <h1 className="text-xl font-semibold text-foreground">Library Import</h1>
+        <h1 className="text-xl font-semibold text-foreground">
+          <InterfaceText source={"Library Import"} />
+        </h1>
       </div>
 
       <div className="flex-1 overflow-auto px-4 py-4">

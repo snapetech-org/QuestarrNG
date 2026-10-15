@@ -220,7 +220,7 @@ export default function Header({
                   <Button
                     variant="default"
                     size="sm"
-                    aria-label="Add Game"
+                    aria-label={t("Add Game")}
                     data-testid="button-add-game"
                     className="h-10 gap-2 px-3 sm:h-9"
                   >
@@ -239,7 +239,7 @@ export default function Header({
                   <Button
                     variant="default"
                     size="sm"
-                    aria-label="Add Game"
+                    aria-label={t("Add Game")}
                     data-testid="button-add-game"
                     className="h-10 gap-2 px-3 sm:h-9"
                   >

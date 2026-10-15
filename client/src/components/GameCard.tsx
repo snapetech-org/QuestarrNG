@@ -302,6 +302,7 @@ const GameCard = ({
               handleDetailsClick();
             }}
             aria-label={`View details for ${game.title}`}
+            data-i18n-aria-label={`View details for ${game.title}`}
             data-testid={`button-details-${game.id}`}
           >
             {game.title}

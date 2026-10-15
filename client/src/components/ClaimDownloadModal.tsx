@@ -250,7 +250,7 @@ export default function ClaimDownloadModal({
               {libraryMatches.length === 0 ? (
                 <p className="text-sm text-muted-foreground py-4 text-center">
                   {librarySearch ? (
-                    "No games match your search"
+                    <InterfaceText source="No games match your search" />
                   ) : (
                     <InterfaceText source={"No library matches found — try IGDB Search"} />
                   )}
@@ -354,7 +354,11 @@ export default function ClaimDownloadModal({
             <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
             <span className="truncate font-medium">{selectedGame.title}</span>
             <Badge variant="secondary" className="ml-auto shrink-0 text-xs">
-              {selectedGame.source === "library" ? "Library" : <InterfaceText source={"IGDB"} />}
+              {selectedGame.source === "library" ? (
+                <InterfaceText source={"Library"} />
+              ) : (
+                <InterfaceText source={"IGDB"} />
+              )}
             </Badge>
           </div>
         )}

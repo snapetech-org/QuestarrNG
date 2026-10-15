@@ -102,7 +102,7 @@ import {
 } from "@shared/title-utils";
 import { canonicalPlatformsForIgdbIds, matchesSelectedIgdbPlatform } from "@shared/platforms";
 import { isTorrentDownloaderType, isUsenetDownloaderType } from "@shared/downloader-types";
-import type { ReleaseEvaluation } from "@shared/release-scoring";
+import { BUILT_IN_RULES, type ReleaseEvaluation } from "@shared/release-scoring";
 
 interface DownloadItem {
   title: string;
@@ -163,28 +163,37 @@ type ReleaseMetadata = ReturnType<typeof parseReleaseMetadata>;
 function ReleaseScoreBadge({
   evaluation,
 }: Readonly<{ evaluation?: ReleaseEvaluation | undefined }>) {
+  const { language, t, languageFor, directionFor } = useInterfaceLanguage();
   if (!evaluation) return null;
-  const scoreLines = evaluation.lines.map(
-    (line) => `${line.label}: ${line.points >= 0 ? "+" : ""}${line.points}`
-  );
+  const scoreLines = evaluation.lines.map((line) => {
+    const rule = BUILT_IN_RULES.find((candidate) => candidate.id === line.ruleId);
+    return formatInterfaceMessage(
+      "{label}: {points}",
+      {
+        label: rule ? t(rule.label) : line.label,
+        points: `${line.points >= 0 ? "+" : ""}${Intl.NumberFormat(language).format(line.points)}`,
+      },
+      language
+    );
+  });
   const rejectionLines = evaluation.rejections.map((rejection) =>
     rejection.detail
       ? `${rejection.code.replaceAll("_", " ")}: ${rejection.detail}`
       : rejection.code.replaceAll("_", " ")
   );
-  const title = [...scoreLines, ...rejectionLines].join(" · ") || "No scoring rules matched";
+  const title = [...scoreLines, ...rejectionLines].join(" · ") || t("No scoring rules matched");
+  const scoreLabelSource = evaluation.accepted ? "Score {score}" : "Rejected · {score}";
+  const ariaLabelSource = evaluation.accepted ? "Release score {score}" : "Rejected, score {score}";
   return (
     <Badge
       variant={evaluation.accepted ? "secondary" : "destructive"}
       title={title}
-      aria-label={
-        evaluation.accepted
-          ? `Release score ${evaluation.score}`
-          : `Rejected, score ${evaluation.score}`
-      }
+      aria-label={formatInterfaceMessage(ariaLabelSource, { score: evaluation.score }, language)}
+      lang={languageFor(ariaLabelSource)}
+      dir={directionFor(ariaLabelSource)}
       className="h-5 shrink-0 px-1.5 text-[10px]"
     >
-      {evaluation.accepted ? `Score ${evaluation.score}` : `Rejected · ${evaluation.score}`}
+      {formatInterfaceMessage(scoreLabelSource, { score: evaluation.score }, language)}
     </Badge>
   );
 }
@@ -490,7 +499,11 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
       if (addedGroups.length > 0) {
         toast({
           title: "Preferred groups updated",
-          description: `Added ${addedGroups.join(", ")} to your preferred release groups.`,
+          description: formatInterfaceMessage(
+            "Added {groups} to your preferred release groups.",
+            { groups: addedGroups.join(", ") },
+            language
+          ),
         });
       } else {
         toast({
@@ -1039,8 +1052,15 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
     }
 
     if (downloadFile(download)) {
-      const fileType = isUsenetItem(download) ? "NZB" : "torrent";
-      toast({ title: "Download started", description: `${fileType} file download initiated` });
+      const fileType = isUsenetItem(download) ? "NZB" : t("Torrent");
+      toast({
+        title: "Download started",
+        description: formatInterfaceMessage(
+          "{fileType} file download initiated",
+          { fileType },
+          language
+        ),
+      });
     }
   };
 
@@ -1102,8 +1122,15 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
       }
     } else {
       if (downloadFile(selectedMainDownload)) {
-        const fileType = isUsenetItem(selectedMainDownload) ? "NZB" : "torrent";
-        toast({ title: "Download started", description: `${fileType} file download initiated` });
+        const fileType = isUsenetItem(selectedMainDownload) ? "NZB" : t("Torrent");
+        toast({
+          title: "Download started",
+          description: formatInterfaceMessage(
+            "{fileType} file download initiated",
+            { fileType },
+            language
+          ),
+        });
       } else {
         toast({
           title: "Direct download unavailable",
@@ -1635,14 +1662,25 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
                                 variant="ghost"
                                 size="icon"
                                 className="h-9 w-9"
-                                aria-label={`Download ${isUsenet ? "NZB" : "torrent"} file for ${download.title.replace(/[._]/g, " ")}`}
+                                aria-label={formatInterfaceMessage(
+                                  "Download {fileType} file for {title}",
+                                  {
+                                    fileType: isUsenet ? "NZB" : t("Torrent"),
+                                    title: download.title.replace(/[._]/g, " "),
+                                  },
+                                  language
+                                )}
                                 onClick={() => handleDirectDownload(download)}
                               >
                                 <FileDown className="h-4 w-4" />
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                              Download {isUsenet ? ".nzb" : ".torrent"} file
+                              <InterfaceText source="Download" />{" "}
+                              <InterfaceText
+                                source="{extension} file"
+                                values={{ extension: isUsenet ? ".nzb" : ".torrent" }}
+                              />
                             </TooltipContent>
                           </Tooltip>
                         ) : null;
@@ -2117,10 +2155,10 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
               {localizedText("Small extras (optional)")}
             </div>
             <div className="text-xs text-muted-foreground mb-2">
-              {localizedText("Each suggested extra is 25% or less of the")}{" "}
-              {selectedMainDownload?.size && formatBytes(selectedMainDownload.size)}{" "}
-              {localizedText("main release.")}{" "}
-              {localizedText("Nothing here is selected automatically.")}
+              {localizedText(
+                "Each suggested extra is 25% or less of the {size} main release. Nothing here is selected automatically.",
+                { size: selectedMainDownload?.size ? formatBytes(selectedMainDownload.size) : "—" }
+              )}
             </div>
             <div className="border rounded-md">
               <ScrollArea style={{ height: Math.min(160, 24 + recommendedExtras.length * 64) }}>

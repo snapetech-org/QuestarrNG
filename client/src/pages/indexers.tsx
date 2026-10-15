@@ -101,7 +101,7 @@ function PriorityControl({
 }
 
 export default function IndexersPage() {
-  const { language: interfaceLanguage } = useInterfaceLanguage();
+  const { language: interfaceLanguage, t, languageFor, directionFor } = useInterfaceLanguage();
   const nameCollator = useMemo(() => getInterfaceCollator(interfaceLanguage), [interfaceLanguage]);
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -592,7 +592,7 @@ export default function IndexersPage() {
                       className="uppercase"
                     >
                       {indexer.protocol === "json-catalog" ? (
-                        "JSON catalog"
+                        <InterfaceText source="JSON catalog" />
                       ) : indexer.protocol === "newznab" ? (
                         <InterfaceText source={"Newznab"} />
                       ) : indexer.protocol === "g4u" ? (
@@ -784,7 +784,9 @@ export default function IndexersPage() {
                         <SelectItem value="torznab">
                           <InterfaceText source={"Torznab (Torrent)"} />
                         </SelectItem>
-                        <SelectItem value="json-catalog">JSON catalog (Hydra format)</SelectItem>
+                        <SelectItem value="json-catalog">
+                          <InterfaceText source="JSON catalog (Hydra format)" />
+                        </SelectItem>
                         <SelectItem value="newznab">
                           <InterfaceText source={"Newznab (Usenet)"} />
                         </SelectItem>
@@ -799,7 +801,7 @@ export default function IndexersPage() {
                           "Torznab for torrent indexers, Newznab for Usenet indexers, g4u.to for the g4u.to VIP API"
                         }
                       />{" "}
-                      or a public HTTPS JSON catalog containing torrent links.
+                      <InterfaceText source="or a public HTTPS JSON catalog containing torrent links." />
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -812,7 +814,7 @@ export default function IndexersPage() {
                   <FormItem>
                     <RequiredFormLabel required>
                       {form.watch("protocol") === "json-catalog" ? (
-                        "Catalog HTTPS URL"
+                        <InterfaceText source="Catalog HTTPS URL" />
                       ) : form.watch("protocol") === "newznab" ? (
                         <InterfaceText source={"Newznab URL"} />
                       ) : form.watch("protocol") === "g4u" ? (
@@ -935,11 +937,25 @@ export default function IndexersPage() {
                           onChange={field.onChange}
                           placeholder={
                             loadingCategories
+                              ? t("Loading categories...")
+                              : availableCategories.length > 0
+                                ? t("Select categories...")
+                                : t("Save indexer first to load categories")
+                          }
+                          lang={languageFor(
+                            loadingCategories
                               ? "Loading categories..."
                               : availableCategories.length > 0
                                 ? "Select categories..."
                                 : "Save indexer first to load categories"
-                          }
+                          )}
+                          dir={directionFor(
+                            loadingCategories
+                              ? "Loading categories..."
+                              : availableCategories.length > 0
+                                ? "Select categories..."
+                                : "Save indexer first to load categories"
+                          )}
                           emptyMessage="No categories available"
                           disabled={
                             loadingCategories ||
@@ -1002,11 +1018,13 @@ export default function IndexersPage() {
                   disabled={addMutation.isPending || updateMutation.isPending}
                   data-testid="button-save-indexer"
                 >
-                  {addMutation.isPending || updateMutation.isPending
-                    ? "Saving..."
-                    : editingIndexer
-                      ? "Update"
-                      : "Add"}
+                  {addMutation.isPending || updateMutation.isPending ? (
+                    <InterfaceText source="Saving..." />
+                  ) : editingIndexer ? (
+                    <InterfaceText source="Update" />
+                  ) : (
+                    <InterfaceText source="Add" />
+                  )}
                 </Button>
               </div>
             </form>
@@ -1276,7 +1294,7 @@ export default function IndexersPage() {
                     <InterfaceText source={"Testing..."} />
                   </>
                 ) : (
-                  "Test indexers"
+                  <InterfaceText source="Test indexers" />
                 )}
               </Button>
               <Button
@@ -1295,7 +1313,7 @@ export default function IndexersPage() {
                     <InterfaceText source={"Syncing..."} />
                   </>
                 ) : (
-                  "Sync Indexers"
+                  <InterfaceText source="Sync Indexers" />
                 )}
               </Button>
             </div>

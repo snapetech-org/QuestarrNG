@@ -452,19 +452,18 @@ export default function SearchPage() {
       {showFilters && (
         <div className="mb-3 space-y-1">
           <label htmlFor="verified-file-types" className="text-sm font-medium">
-            Verified file types
+            <InterfaceText source="Verified file types" />
           </label>
           <Input
             id="verified-file-types"
             value={fileTypes}
             onChange={(event) => setFileTypes(event.target.value)}
             placeholder="Any type, or e.g. nsp,xci"
+            data-i18n-placeholder="Any type, or e.g. nsp,xci"
             maxLength={120}
           />
           <p className="text-xs text-muted-foreground">
-            Only releases whose torrent file list contains these extensions pass. Magnets, Usenet,
-            archives, and unavailable file lists are excluded. Checks inspect up to 20 releases per
-            page.
+            <InterfaceText source="Only releases whose torrent file list contains these extensions pass. Magnets, Usenet, archives, and unavailable file lists are excluded. Checks inspect up to 20 releases per page." />
           </p>
         </div>
       )}
@@ -758,9 +757,11 @@ export default function SearchPage() {
                           </TooltipTrigger>
                           <TooltipContent>
                             <p>
-                              {downloaders.length === 0
-                                ? "Configure a downloader first"
-                                : "Start download"}
+                              {downloaders.length === 0 ? (
+                                <InterfaceText source="Configure a downloader first" />
+                              ) : (
+                                <InterfaceText source="Start download" />
+                              )}
                             </p>
                           </TooltipContent>
                         </Tooltip>
@@ -791,7 +792,11 @@ export default function SearchPage() {
                     disabled={isFetchingNextPage}
                     data-testid="button-load-more-results"
                   >
-                    {isFetchingNextPage ? "Loading more results…" : "Load more results"}
+                    {isFetchingNextPage ? (
+                      <InterfaceText source="Loading more results…" />
+                    ) : (
+                      <InterfaceText source="Load more results" />
+                    )}
                   </Button>
                 )}
               </div>
@@ -974,7 +979,11 @@ export default function SearchPage() {
                   disabled={downloadMutation.isPending}
                   data-testid="button-start-download"
                 >
-                  {downloadMutation.isPending ? "Starting..." : "Start Download"}
+                  {downloadMutation.isPending ? (
+                    <InterfaceText source="Starting..." />
+                  ) : (
+                    <InterfaceText source="Start Download" />
+                  )}
                 </Button>
               </div>
             </form>

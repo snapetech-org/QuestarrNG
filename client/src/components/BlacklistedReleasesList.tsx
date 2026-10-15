@@ -2,7 +2,9 @@ import { useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { InterfaceText } from "@/components/InterfaceText";
 import { useToast } from "@/hooks/use-toast";
+import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
 import { apiRequest } from "@/lib/queryClient";
 import type { ReleaseBlacklist } from "@shared/schema";
 
@@ -14,6 +16,7 @@ type BlacklistEntry = ReleaseBlacklist & { gameTitle: string };
  */
 export default function BlacklistedReleasesList() {
   const { toast } = useToast();
+  const { language, languageFor, directionFor } = useInterfaceLanguage();
   const queryClient = useQueryClient();
 
   const {
@@ -47,26 +50,38 @@ export default function BlacklistedReleasesList() {
   }, [entries]);
 
   const renderBody = () => {
-    if (isLoading) return <div className="text-sm text-muted-foreground">Loading...</div>;
+    if (isLoading) {
+      return (
+        <div className="text-sm text-muted-foreground">
+          <InterfaceText source="Loading..." />
+        </div>
+      );
+    }
     if (isError) {
       return (
         <div className="flex items-center gap-3 text-sm text-destructive">
-          <span>Could not load blacklisted releases.</span>
+          <span>
+            <InterfaceText source="Could not load blacklisted releases." />
+          </span>
           <Button variant="outline" size="sm" onClick={() => refetch()}>
-            Retry
+            <InterfaceText source="Retry" />
           </Button>
         </div>
       );
     }
     if (!entries || entries.length === 0) {
-      return <div className="text-sm text-muted-foreground">No blacklisted releases.</div>;
+      return (
+        <div className="text-sm text-muted-foreground">
+          <InterfaceText source="No blacklisted releases." />
+        </div>
+      );
     }
     return (
       <div className="space-y-4">
         {Object.entries(entriesByGame).map(([gameId, gameEntries]) => (
           <div key={gameId}>
             <h4 className="text-sm font-semibold mb-2">
-              {gameEntries[0]?.gameTitle ?? "Unknown game"}
+              {gameEntries[0]?.gameTitle ?? <InterfaceText source="Unknown game" />}
             </h4>
             <div className="space-y-2">
               {gameEntries.map((entry) => (
@@ -87,7 +102,13 @@ export default function BlacklistedReleasesList() {
                     variant="ghost"
                     size="icon"
                     className="shrink-0"
-                    aria-label={`Remove ${entry.releaseTitle} from blacklist`}
+                    aria-label={formatInterfaceMessage(
+                      "Remove {title} from blacklist",
+                      { title: entry.releaseTitle },
+                      language
+                    )}
+                    lang={languageFor("Remove {title} from blacklist")}
+                    dir={directionFor("Remove {title} from blacklist")}
                     onClick={() => removeMutation.mutate({ gameId: entry.gameId, id: entry.id })}
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
@@ -105,11 +126,10 @@ export default function BlacklistedReleasesList() {
     <section aria-labelledby="blacklisted-releases-heading" className="space-y-3">
       <div className="space-y-1">
         <h3 id="blacklisted-releases-heading" className="text-sm font-medium">
-          Blacklisted Releases
+          <InterfaceText source="Blacklisted Releases" />
         </h3>
         <p className="text-xs text-muted-foreground">
-          Specific releases you blacklisted from a game&apos;s download results. Removing one takes
-          effect immediately.
+          <InterfaceText source="Specific releases you blacklisted from a game's download results. Removing one takes effect immediately." />
         </p>
       </div>
       {renderBody()}

@@ -397,7 +397,7 @@ function GroupRow({
               <span className="text-sm font-medium truncate">{state.selectedGame.title}</span>
               <Badge variant="secondary" className="text-xs shrink-0">
                 {state.selectedGame.source === "library" ? (
-                  "Library"
+                  <InterfaceText source={"Library"} />
                 ) : (
                   <InterfaceText source={"IGDB"} />
                 )}

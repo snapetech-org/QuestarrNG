@@ -15,6 +15,7 @@ import GameCard from "./GameCard";
 import { type Game } from "@shared/schema";
 import { type GameStatus } from "./StatusBadge";
 import { useInterfaceLanguage } from "@/lib/interface-locale";
+import { InterfaceText } from "@/components/InterfaceText";
 
 interface GameCarouselSectionProps {
   title: string;
@@ -248,7 +249,7 @@ const GameCarouselSection = ({
       </div>
       {isFetching && !isLoading && (
         <span role="status" aria-live="polite" className="sr-only">
-          Updating {title}…
+          <InterfaceText source="Updating {title}…" values={{ title }} />
         </span>
       )}
       <div className="relative w-full overflow-hidden" aria-busy={isFetching && !isLoading}>

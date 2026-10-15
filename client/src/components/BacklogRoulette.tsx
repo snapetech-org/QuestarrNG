@@ -2,6 +2,7 @@ import React, { lazy, Suspense, useEffect, useState } from "react";
 import { Dices, Gamepad2, Loader2 } from "lucide-react";
 import type { Game } from "@shared/schema";
 import { coverSrc } from "@/lib/cover";
+import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,15 +22,11 @@ import {
 } from "@/components/ui/select";
 import StatusBadge from "./StatusBadge";
 import LazyModalFallback from "./LazyModalFallback";
+import { InterfaceText } from "./InterfaceText";
 
 const GameDetailsModal = lazy(() => import("./GameDetailsModal"));
 type Pool = "owned" | "playing" | "all";
 
-const POOL_LABELS: Record<Pool, string> = {
-  owned: "Owned games",
-  playing: "Currently playing",
-  all: "All visible games",
-};
 const ALL_POOLS: Pool[] = ["owned", "playing", "all"];
 
 /** Draw from a filtered game list and let users inspect or mark a game as Playing. */
@@ -46,6 +43,7 @@ export default function BacklogRoulette({
   /** Pools offered in the "Pick from" select; the first one is the default draw. */
   pools?: Pool[];
 }) {
+  const { language, t, languageFor, directionFor } = useInterfaceLanguage();
   const [open, setOpen] = useState(false);
   const [pool, setPool] = useState<Pool>(pools[0] ?? "all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -112,24 +110,28 @@ export default function BacklogRoulette({
             size="sm"
             className="h-8 gap-1.5"
             disabled={loading}
-            aria-label="Pick a game"
+            aria-label={t("Pick a game")}
           >
             <Dices className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Pick a game</span>
+            <span className="hidden sm:inline">
+              <InterfaceText source="Pick a game" />
+            </span>
           </Button>
         </DialogTrigger>
         <DialogContent className="max-h-[90dvh] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Dices className="h-5 w-5 text-primary" />
-              Backlog roulette
+              <InterfaceText source="Backlog roulette" />
             </DialogTitle>
             <DialogDescription>
-              Too many games, nothing to play? Let fate choose tonight’s quest.
+              <InterfaceText source="Too many games, nothing to play? Let fate choose tonight’s quest." />
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
-            <Label htmlFor="roulette-pool">Pick from</Label>
+            <Label htmlFor="roulette-pool">
+              <InterfaceText source="Pick from" />
+            </Label>
             <Select
               value={pool}
               disabled={starting || loading}
@@ -145,26 +147,38 @@ export default function BacklogRoulette({
               <SelectContent>
                 {pools.map((value) => (
                   <SelectItem key={value} value={value}>
-                    {POOL_LABELS[value]}
+                    {value === "owned" ? (
+                      <InterfaceText source="Owned games" />
+                    ) : value === "playing" ? (
+                      <InterfaceText source="Currently playing" />
+                    ) : (
+                      <InterfaceText source="All visible games" />
+                    )}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              Your current search and filters apply. Hidden games stay out of the draw.
+              <InterfaceText source="Your current search and filters apply. Hidden games stay out of the draw." />
             </p>
           </div>
           <div aria-live="polite" aria-atomic="true">
             {selected ? (
               <div className="rounded-lg border bg-muted/30 p-4 space-y-4">
                 <p className="text-xs font-semibold uppercase tracking-widest text-primary">
-                  Tonight’s quest
+                  <InterfaceText source="Tonight’s quest" />
                 </p>
                 <div className="flex gap-4">
                   <img
                     key={selected.id}
                     src={coverSrc(selected.coverUrl)}
-                    alt={`Cover for ${selected.title}`}
+                    alt={formatInterfaceMessage(
+                      "Cover art for {title}",
+                      { title: selected.title },
+                      language
+                    )}
+                    lang={languageFor("Cover art for {title}")}
+                    dir={directionFor("Cover art for {title}")}
                     className="w-24 sm:w-28 aspect-[3/4] shrink-0 self-start rounded-md object-cover"
                   />
                   <div className="min-w-0 space-y-2">
@@ -181,20 +195,28 @@ export default function BacklogRoulette({
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Chosen from {candidates.length} matching{" "}
-                  {candidates.length === 1 ? "game" : "games"}.
+                  <InterfaceText
+                    source="Eligible options: {count}"
+                    values={{ count: Intl.NumberFormat(language).format(candidates.length) }}
+                  />
                 </p>
               </div>
             ) : (
               <div className="rounded-lg border border-dashed p-6 text-center space-y-2">
                 <Gamepad2 className="h-8 w-8 mx-auto text-muted-foreground" />
                 <p className="font-medium">
-                  {candidates.length ? "Ready for another quest?" : "No games in this draw"}
+                  {candidates.length ? (
+                    <InterfaceText source="Ready for another quest?" />
+                  ) : (
+                    <InterfaceText source="No games in this draw" />
+                  )}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {candidates.length
-                    ? "Roll again to pick from your updated list."
-                    : "Choose another pool or adjust your filters to find a game."}
+                  {candidates.length ? (
+                    <InterfaceText source="Roll again to pick from your updated list." />
+                  ) : (
+                    <InterfaceText source="Choose another pool or adjust your filters to find a game." />
+                  )}
                 </p>
               </div>
             )}
@@ -208,7 +230,7 @@ export default function BacklogRoulette({
               }
             >
               <Dices className="h-4 w-4 mr-2" />
-              Roll again
+              <InterfaceText source="Roll again" />
             </Button>
             {selected && (
               <>
@@ -220,7 +242,7 @@ export default function BacklogRoulette({
                     setOpen(false);
                   }}
                 >
-                  View game
+                  <InterfaceText source="View game" />
                 </Button>
                 {selected.status === "owned" && onStartPlaying && (
                   <Button
@@ -233,7 +255,7 @@ export default function BacklogRoulette({
                     ) : (
                       <Gamepad2 className="h-4 w-4 mr-2" />
                     )}
-                    Mark as Playing
+                    <InterfaceText source="Mark as Playing" />
                   </Button>
                 )}
               </>
