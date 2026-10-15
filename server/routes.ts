@@ -2669,8 +2669,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       throw error;
     }
   };
-  const isContained = (candidate: string, root: string) =>
-    candidate === root || candidate.startsWith(root.endsWith(path.sep) ? root : root + path.sep);
+  const isContained = (candidate: string, root: string) => {
+    const relativePath = path.relative(root, candidate);
+    return (
+      relativePath === "" ||
+      (relativePath !== ".." &&
+        !relativePath.startsWith(`..${path.sep}`) &&
+        !path.isAbsolute(relativePath))
+    );
+  };
   /**
    * Canonical library root and game folder for a game, or null when the game has no
    * folder or its folder resolves outside the configured library root.
@@ -2805,8 +2812,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         // Check containment on the resolved string before touching the filesystem, then
         // again on the real path so a symlink can't lead outside the game's folder.
-        const resolvedPath = path.resolve(roots.scanRoot, requestedPath);
-        if (!resolvedPath.startsWith(roots.scanRoot + path.sep)) {
+        // Containment is checked before filesystem access and again after realpath.
+        const resolvedPath = path.resolve(roots.scanRoot, requestedPath); // nosemgrep: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal
+        if (!isContained(resolvedPath, roots.scanRoot)) {
           return res.status(404).json({ error: "File not found in this game's folder" });
         }
         const filePath = await realpathOrNull(resolvedPath);

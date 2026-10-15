@@ -303,6 +303,22 @@ describe("Game file routes", () => {
       expect(storage.updateGameFileCategory).not.toHaveBeenCalled();
     });
 
+    it("rejects a traversal path that resolves outside the game's folder", async () => {
+      const { gameDir } = scanFixturePaths(tempRoot);
+      await setupGameFile();
+      const outside = path.join(tempRoot, "outside.bin");
+      await fs.writeFile(outside, "x");
+      const traversal = `${gameDir}${path.sep}..${path.sep}..${path.sep}..${path.sep}outside.bin`;
+
+      const response = await request(app)
+        .patch(`/api/games/${gameId}/files/category`)
+        .send({ path: traversal, category: "dlc" });
+
+      expect(response.status).toBe(404);
+      expect(storage.addGameFile).not.toHaveBeenCalled();
+      expect(storage.updateGameFileCategory).not.toHaveBeenCalled();
+    });
+
     it("rejects a symlink in the game's folder that points outside it", async () => {
       const filePath = await setupGameFile();
       const outside = path.join(tempRoot, "outside.bin");
