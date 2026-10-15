@@ -129,23 +129,23 @@ jobs:
       - name: Setup .NET 10 SDK
         uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
         env:
-          DOTNET_INSTALL_DIR: ${{ runner.temp }}/dotnet
+          DOTNET_INSTALL_DIR: ${{ runner.temp }}/questarrng-dotnet-${{ github.run_id }}-${{ github.run_attempt }}
         with:
           global-json-file: global.json
 
       - name: Verify selected .NET SDK
-        run: '"$RUNNER_TEMP/dotnet/dotnet" --version'
+        run: '"$RUNNER_TEMP/questarrng-dotnet-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/dotnet" --version'
 
       - name: Restore locked Windows service dependencies
         run: >-
-          "$RUNNER_TEMP/dotnet/dotnet" restore
+          "$RUNNER_TEMP/questarrng-dotnet-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/dotnet" restore
           installer/windows/Questarr.Service/Questarr.Service.csproj
           --runtime win-x64
           --locked-mode
 
       - name: Publish self-contained Windows service host
         run: >-
-          "$RUNNER_TEMP/dotnet/dotnet" publish
+          "$RUNNER_TEMP/questarrng-dotnet-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/dotnet" publish
           installer/windows/Questarr.Service/Questarr.Service.csproj
           --configuration Release
           --no-restore
@@ -186,6 +186,12 @@ jobs:
           else
             echo "docker=false" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Clean up temporary .NET SDK
+        if: always()
+        env:
+          DOTNET_INSTALL_DIR: ${{ runner.temp }}/questarrng-dotnet-${{ github.run_id }}-${{ github.run_attempt }}
+        run: rm -rf -- "$DOTNET_INSTALL_DIR"
 
   # One job for the whole suite (~3 min on a standard runner): four shards plus a merge
   # job cost five runners and five `npm ci` for about the same wall time, and runners are

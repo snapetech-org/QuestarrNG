@@ -405,10 +405,8 @@ test('trusted main CI uses a readiness-gated runner-group object selector', () =
 
 test('Windows service builds install the SDK in the runner temp directory', () => {
   const serviceJob = jobBlock(ciWorkflow, 'windows-service', 'test');
-  const setupDotnet = load(ciWorkflow).jobs['windows-service'].steps.find(
-    (step) => step.name === 'Setup .NET 10 SDK'
-  );
   const steps = load(ciWorkflow).jobs['windows-service'].steps;
+  const setupDotnet = steps.find((step) => step.name === 'Setup .NET 10 SDK');
   const verifySdk = steps.find((step) => step.name === 'Verify selected .NET SDK');
   const restore = steps.find(
     (step) => step.name === 'Restore locked Windows service dependencies'
@@ -416,19 +414,27 @@ test('Windows service builds install the SDK in the runner temp directory', () =
   const publish = steps.find(
     (step) => step.name === 'Publish self-contained Windows service host'
   );
+  const cleanup = steps.find((step) => step.name === 'Clean up temporary .NET SDK');
+  const installDirectory =
+    '${{ runner.temp }}/questarrng-dotnet-${{ github.run_id }}-${{ github.run_attempt }}';
+  const executable =
+    '"$RUNNER_TEMP/questarrng-dotnet-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/dotnet"';
 
   assert.match(serviceJob, /uses: actions\/setup-dotnet@[a-f0-9]{40}/u);
   assert.match(serviceJob, /global-json-file: global\.json/u);
-  assert.equal(setupDotnet.env.DOTNET_INSTALL_DIR, '${{ runner.temp }}/dotnet');
-  assert.equal(verifySdk.run, '"$RUNNER_TEMP/dotnet/dotnet" --version');
+  assert.equal(setupDotnet.env.DOTNET_INSTALL_DIR, installDirectory);
+  assert.equal(verifySdk.run, `${executable} --version`);
   assert.equal(
     restore.run,
-    '"$RUNNER_TEMP/dotnet/dotnet" restore installer/windows/Questarr.Service/Questarr.Service.csproj --runtime win-x64 --locked-mode'
+    `${executable} restore installer/windows/Questarr.Service/Questarr.Service.csproj --runtime win-x64 --locked-mode`
   );
   assert.match(
     publish.run,
-    /^"\$RUNNER_TEMP\/dotnet\/dotnet" publish installer\/windows\/Questarr\.Service\/Questarr\.Service\.csproj/u
+    /^"\$RUNNER_TEMP\/questarrng-dotnet-\$GITHUB_RUN_ID-\$GITHUB_RUN_ATTEMPT\/dotnet" publish installer\/windows\/Questarr\.Service\/Questarr\.Service\.csproj/u
   );
+  assert.equal(cleanup.if, 'always()');
+  assert.equal(cleanup.env.DOTNET_INSTALL_DIR, installDirectory);
+  assert.equal(cleanup.run, 'rm -rf -- "$DOTNET_INSTALL_DIR"');
 });
 
 test('scheduled dependency and Helm workflows cancel only superseded runs for the same PR', () => {
