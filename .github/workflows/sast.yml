@@ -39,7 +39,9 @@ jobs:
           python-version: "3.12"
 
       - name: Install Semgrep
-        run: pip install "--only-binary=:all:" --require-hashes -r .github/requirements/semgrep.txt
+        # Install the complete hash-locked dependency set as compiled, because
+        # Semgrep's metadata still pins the vulnerable MCP SDK release.
+        run: pip install --no-deps "--only-binary=:all:" --require-hashes -r .github/requirements/semgrep.txt
 
       # Blocking policy and suppression process documented in
       # docs/VULNERABILITY_MANAGEMENT.md (OSPS-VM-06.02). Scan is run
