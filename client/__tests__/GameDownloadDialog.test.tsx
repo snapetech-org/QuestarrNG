@@ -830,7 +830,7 @@ describe("GameDownloadDialog", () => {
 
       fireEvent.click(
         await screen.findByRole("button", {
-          name: "Download torrent file for Direct Torrent Release",
+          name: "Download Torrent file for Direct Torrent Release",
         })
       );
 
@@ -841,7 +841,7 @@ describe("GameDownloadDialog", () => {
       );
       expect(mockToast).toHaveBeenCalledWith({
         title: "Download started",
-        description: "torrent file download initiated",
+        description: "Torrent file download initiated",
       });
     }
   );
@@ -865,7 +865,7 @@ describe("GameDownloadDialog", () => {
     renderComponent();
 
     fireEvent.click(
-      await screen.findByRole("button", { name: "Download torrent file for Test Game SKIDROW" })
+      await screen.findByRole("button", { name: "Download Torrent file for Test Game SKIDROW" })
     );
     expect(await screen.findByText("Download with Updates?")).toBeInTheDocument();
     expect(screen.getByRole("checkbox", { name: /Test Game Update v1\.1/ })).toHaveAttribute(
@@ -881,7 +881,7 @@ describe("GameDownloadDialog", () => {
     );
     expect(mockToast).toHaveBeenCalledWith({
       title: "Download started",
-      description: "torrent file download initiated",
+      description: "Torrent file download initiated",
     });
   });
 
