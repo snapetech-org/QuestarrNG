@@ -1,5 +1,6 @@
 // Copyright (c) QuestarrNG contributors. All rights reserved.
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { load } from 'js-yaml';
 import { URL, fileURLToPath } from 'node:url';
@@ -28,6 +29,10 @@ const windowsInstallerWorkflow = readFileSync(
 );
 const trustedDiscordWorkflow = readFileSync(
   fileURLToPath(new URL('trusted-discord-release-announcement.yml', workflowDirectory)),
+  'utf8'
+);
+const releaseNotesBaseScript = readFileSync(
+  fileURLToPath(new URL('../../scripts/release-notes-base-tag.sh', import.meta.url)),
   'utf8'
 );
 const deployWorkflow = readFileSync(
@@ -190,6 +195,8 @@ test('tag Discord announcements use the trusted default-branch workflow', () => 
   assert.ok(trustedDiscordWorkflow.includes('DISCORD_WEBHOOK is required in the discord-release environment.'));
   assert.match(trustedDiscordWorkflow, /TAG: \$\{\{ github\.event\.workflow_run\.head_branch \}\}/u);
   assert.match(trustedDiscordWorkflow, /ref: \$\{\{ github\.sha \}\}/u);
+  assert.match(trustedDiscordWorkflow, /--json body,isDraft,isPrerelease,tagName,url/u);
+  assert.match(trustedDiscordWorkflow, /\.body' release\.json[\s\S]*scripts\/discord-release-notes\.mjs --split/u);
   assert.match(trustedDiscordWorkflow, /persist-credentials: false/u);
   assert.match(trustedDiscordWorkflow, /permissions:\n\x20{2}contents:\x20read/u);
   assert.doesNotMatch(trustedDiscordWorkflow, /pull_request(?:_target)?\s*:/u);
@@ -281,6 +288,11 @@ test('version-tag releases include verified Windows and Helm assets before publi
   assert.match(windowsInstallerWorkflow, /Verify existing published release before recovery build/u);
   assert.match(windowsInstallerWorkflow, /attach-release-assets:[\s\S]*?contents: write/u);
   assert.match(windowsInstallerWorkflow, /Attach installer and checksum/u);
+  assert.match(
+    windowsInstallerWorkflow,
+    /gh release view "\$TAG" --repo "\$GITHUB_REPOSITORY" --json tagName,isDraft,isPrerelease,body,assets/u,
+    'asset attachment must read and preserve the existing release body'
+  );
   assert.match(windowsInstallerWorkflow, /Package Helm chart from the release tag/u);
   assert.match(windowsInstallerWorkflow, /index\(\$chart \+ "\.sha256"\)/u);
   assert.match(windowsInstallerWorkflow, /name: Build Windows x64 installer[\s\S]*?permissions:\n\s+contents: read/u);
@@ -295,6 +307,19 @@ test('version-tag releases include verified Windows and Helm assets before publi
   assert.match(releaseWorkflow, /needs: \[release, publish\][\s\S]*?IMAGE_DIGEST: \$\{\{ needs\.publish\.outputs\.digest \}\}/u);
   assert.match(releaseWorkflow, /sync release notes and Home Assistant image/u);
   assert.match(releaseWorkflow, /release_image_digest: \$\{\{ steps\.validate\.outputs\.release_image_digest \}\}/u);
+  assert.equal(
+    (releaseWorkflow.match(/scripts\/release-notes-base-tag\.sh "\$TAG"/gu) ?? []).length,
+    3,
+    'normal, recovery, and changelog workflows must use the same release-note base'
+  );
+  assert.match(releaseNotesBaseScript, /release_tag" == "v2\.1\.0"[\s\S]*v1\.11\.0/u);
+  assert.equal(
+    execFileSync('bash', ['scripts/release-notes-base-tag.sh', 'v2.1.0'], {
+      encoding: 'utf8',
+    }).trim(),
+    'v1.11.0',
+    'v2.1.0 must replay every release note since v1.11.0'
+  );
 });
 
 test('release publishing and announcements are gated to QuestarrNG by stable repository ID', () => {

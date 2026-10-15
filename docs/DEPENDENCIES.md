@@ -4,7 +4,7 @@ This document describes how QuestarrNG selects, obtains, and tracks its dependen
 
 ## Selection
 
-Dependencies are added deliberately as part of normal development, via `npm install`, and land in `package.json` alongside the feature or fix that needs them. Preference is given to actively maintained, widely used packages already common in the Node/React ecosystem. New dependencies go through the same pull request review process as any other code change (see [`.github/CONTRIBUTING.md`](../.github/CONTRIBUTING.md)) before merging to `main`.
+Dependencies are added deliberately as part of normal development, via `npm install`, and land in `package.json` alongside the feature or fix that needs them. Preference is given to actively maintained, widely used packages already common in the Node/React ecosystem. New dependencies follow the current contribution, merge, and check requirements in [`.github/CONTRIBUTING.md`](../.github/CONTRIBUTING.md) before merging to `main`.
 
 ## Obtaining dependencies
 

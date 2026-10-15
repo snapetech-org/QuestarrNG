@@ -445,7 +445,7 @@ jobs:
           gh release upload "$TAG" "release-assets/$INSTALLER" "release-assets/$INSTALLER.sha256" \
             "release-assets/$CHART" "release-assets/$CHART.sha256" \
             --repo "$GITHUB_REPOSITORY" --clobber
-          release_json="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json tagName,isDraft,isPrerelease,assets)"
+          release_json="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json tagName,isDraft,isPrerelease,body,assets)"
           jq -e --arg tag "$TAG" --arg installer "$INSTALLER" \
             --arg chart "$CHART" \
             '.tagName == $tag and (.isDraft | not) and (.isPrerelease | not) and ([.assets[].name] | sort | index($installer)) != null and ([.assets[].name] | sort | index($installer + ".sha256")) != null and ([.assets[].name] | sort | index($chart)) != null and ([.assets[].name] | sort | index($chart + ".sha256")) != null' \

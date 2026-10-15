@@ -382,7 +382,7 @@ jobs:
           set -euo pipefail
           VERSION="${TAG#v}"
           RELEASE_DATE="$(git show -s --format=%cs "$GITHUB_SHA")"
-          previous_tag="$(scripts/latest-published-release-tag.sh "$TAG")"
+          previous_tag="$(scripts/release-notes-base-tag.sh "$TAG")"
           node scripts/assemble-release-notes.mjs \
             --previous-tag "$previous_tag" \
             --head "$GITHUB_SHA" \
@@ -528,7 +528,7 @@ jobs:
           set -euo pipefail
           VERSION="${TAG#v}"
           branch="release/changelog-${TAG}"
-          previous_tag="$(scripts/latest-published-release-tag.sh "$TAG")"
+          previous_tag="$(scripts/release-notes-base-tag.sh "$TAG")"
           release_sha="$(git rev-parse "${TAG}^{commit}")"
           release_date="$(git show -s --format=%cs "$release_sha")"
           git fetch origin main:refs/remotes/origin/main
@@ -669,7 +669,7 @@ jobs:
             exit 1
           fi
 
-          previous_tag="$(scripts/latest-published-release-tag.sh "$TAG")"
+          previous_tag="$(scripts/release-notes-base-tag.sh "$TAG")"
           runs_json="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${release_sha}&per_page=100")"
           run_id="$(jq -r --arg tag "$TAG" \
             '[.workflow_runs[] | select(.name == "Publish QuestarrNG image" and .event == "push" and .head_branch == $tag)] | sort_by(.run_number) | last | .id // empty' \

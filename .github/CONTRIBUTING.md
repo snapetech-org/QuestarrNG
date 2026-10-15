@@ -12,15 +12,15 @@ required beyond those rules.
 
 ## Getting Started
 
-1. Fork the repository
-2. Clone your fork: `git clone https://github.com/YOUR_USERNAME/QuestarrNG.git`
-3. Create a new branch: `git checkout -b feature/your-feature-name`
+1. Clone the repository, or fork it if you do not have write access
+2. Clone the repository or your fork: `git clone https://github.com/snapetech-org/QuestarrNG.git`
+3. Create a topic branch only when current GitHub rules require a pull request; otherwise work on `main`
 4. Make your changes
 5. Test your changes thoroughly
-6. Commit with clear messages and a DCO sign-off: `git commit -s -m "Add feature: description"`
-7. Push to your fork: `git push origin feature/your-feature-name`
-8. Open a Pull Request
-   Note: do not merge into your own branch if you intend to do a PR
+6. Commit with a clear message. Add a DCO sign-off to human non-merge commits in pull requests: `git commit -s -m "Add feature: description"`
+7. Push your topic branch when using the pull-request route, or push directly to `main` when current rules allow it
+8. Open a pull request only when current GitHub rules require one
+   Note: do not merge a topic branch if you intend to open a pull request
 
 ## Development Guidelines
 
@@ -137,7 +137,7 @@ The same categories of "major changes" listed above (new/changed API endpoints, 
 
 ### Dependencies
 
-See [docs/DEPENDENCIES.md](../docs/DEPENDENCIES.md) for how QuestarrNG selects, obtains, and tracks its dependencies. New dependencies are reviewed as part of the normal PR process.
+See [docs/DEPENDENCIES.md](../docs/DEPENDENCIES.md) for how QuestarrNG selects, obtains, and tracks its dependencies. New dependencies follow the current contribution, merge, and check requirements.
 
 ### Commit Messages
 
@@ -203,7 +203,7 @@ versioned history in [`docs/CHANGELOG.md`](../docs/CHANGELOG.md).
 
 ## Collaborator Access
 
-Requests for elevated repository access (merge/write permissions, secrets, or infrastructure access) are subject to review and approval per our [Collaborator Access & Escalation Policy](../docs/SECURITY.md#collaborator-access--escalation-policy). New contributors should start by submitting pull requests from a fork; escalated access is granted only after identity vetting and maintainer approval.
+Requests for elevated repository access (merge/write permissions, secrets, or infrastructure access) are subject to review and approval per our [Collaborator Access & Escalation Policy](../docs/SECURITY.md#collaborator-access--escalation-policy). Contributors without write access can use a fork and follow the current pull-request rules; escalated access is granted only after identity vetting and maintainer approval.
 
 ## Code of Conduct
 

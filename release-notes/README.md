@@ -35,6 +35,10 @@ Preview the notes added between two refs with:
 npm run release-notes:preview -- --base origin/main --head HEAD
 ```
 
+The `v2.1.0` release deliberately assembles notes from `v1.11.0` to backfill
+the notes missing from the currently published `v2.0.0` GitHub release body.
+Later releases use the latest published stable tag as their base.
+
 For internal-only work, no fragment is needed. In a pull request, either select the internal-only
 option in the template or put `release-note: none` on its own line in the description. When a
 direct push or merge check reads commit messages, put the same marker on its own line in the
