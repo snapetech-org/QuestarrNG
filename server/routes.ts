@@ -2812,8 +2812,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         // Check containment on the resolved string before touching the filesystem, then
         // again on the real path so a symlink can't lead outside the game's folder.
-        // Containment is checked before filesystem access and again after realpath.
-        const resolvedPath = path.resolve(roots.scanRoot, requestedPath); // nosemgrep: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal
+        // nosemgrep: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal -- containment is checked before filesystem access and again after realpath; route tests cover traversal and symlink escapes.
+        const resolvedPath = path.resolve(roots.scanRoot, requestedPath);
         if (!isContained(resolvedPath, roots.scanRoot)) {
           return res.status(404).json({ error: "File not found in this game's folder" });
         }
