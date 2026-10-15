@@ -405,9 +405,13 @@ test('trusted main CI uses a readiness-gated runner-group object selector', () =
 
 test('Windows service builds use the SDK selected by setup-dotnet on every runner', () => {
   const serviceJob = jobBlock(ciWorkflow, 'windows-service', 'test');
+  const setupDotnet = load(ciWorkflow).jobs['windows-service'].steps.find(
+    (step) => step.name === 'Setup .NET 10 SDK'
+  );
 
   assert.match(serviceJob, /uses: actions\/setup-dotnet@[a-f0-9]{40}/u);
   assert.match(serviceJob, /global-json-file: global\.json/u);
+  assert.equal(setupDotnet.with['install-dir'], '${{ runner.temp }}/dotnet');
   assert.match(serviceJob, /run: dotnet --version/u);
   assert.match(
     serviceJob,
