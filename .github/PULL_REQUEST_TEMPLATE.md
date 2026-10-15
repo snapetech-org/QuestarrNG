@@ -4,6 +4,14 @@
 
 Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. List any dependencies that are required for this change.
 
+## Merge
+
+Use `main` as the target. Open a pull request only when current GitHub rules require one; push directly
+when they allow it. Keep a pull request current with `main` only when those rules require it. Merge
+after the checks and approvals required by current rules are satisfied. An explicit maintainer's
+direction to merge is sufficient; no additional review or approval is required beyond those rules.
+Use any merge method enabled in GitHub.
+
 ## Verification
 
 List the automated checks you ran and their results. Describe any manual checks and attach screenshots or recordings for UI changes. If a relevant check was not run, say why.
@@ -25,13 +33,17 @@ For any UI change (`client/src/**`), include a screenshot or short recording of 
 
 ## Release notes
 
-Add one validated fragment under `release-notes/` for every user-facing
-behavior, security, operational, or documentation change. For internal-only
-changes, include `release-note: none` in this description.
+For any user-facing change, add one structured fragment under `release-notes/` describing it. A
+single fragment may cover related user-facing changes in the same pull request.
 
-- [ ] I added a release-note fragment under `release-notes/`.
-- [ ] This change is internal-only and does not need a user-facing release note.
-- [ ] I previewed the release text with `npm run release-notes:preview`.
+- [ ] I added a validated release-note fragment under `release-notes/` for this user-facing change.
+- [ ] This change is internal-only and needs no release-note fragment.
+
+For internal-only work, select the second option or put `release-note: none` on its own line in
+the PR description. For direct pushes or merge checks that read commit messages, put the same
+marker on its own line in the commit message.
+
+Preview the rendered release text with `npm run release-notes:preview` if useful.
 
 ## Checklist:
 

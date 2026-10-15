@@ -245,7 +245,10 @@ test('production image releases require a version-tag push', () => {
 test('version-tag releases include verified Windows and Helm assets before publication', () => {
   const workflow = load(releaseWorkflow);
   const installerJob = workflow.jobs['build-windows-installer'];
+  const installerWorkflow = load(windowsInstallerWorkflow);
   assert.equal(installerJob.uses, './.github/workflows/windows-installer.yml');
+  assert.deepEqual(installerJob.permissions, { actions: 'read', contents: 'write' });
+  assert.equal(installerWorkflow.jobs['attach-release-assets'].permissions.actions, 'read');
   assert.deepEqual(installerJob.needs, ['publish', 'addon-smoke']);
   assert.match(installerJob.if, /github\.event_name == 'push'.*refs\/tags\/v/u);
   assert.deepEqual(workflow.jobs.release.needs, [

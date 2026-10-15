@@ -1,6 +1,7 @@
 # Release-note fragments
 
-Add one Markdown fragment under this directory for every user-facing change.
+For any user-facing change, add one structured fragment under `release-notes/` describing it. A
+single fragment may cover related user-facing changes in the same pull request. Keep shipped fragments unchanged.
 The tag workflow adds new fragments to the versioned GitHub release notes and
 the Discord announcement. Keep `docs/CHANGELOG.md` as the chronological release
 history.
@@ -34,5 +35,7 @@ Preview the notes added between two refs with:
 npm run release-notes:preview -- --base origin/main --head HEAD
 ```
 
-For internal-only pull requests, write `release-note: none` in the PR body or
-select the internal-only release-note option in the pull request template.
+For internal-only work, no fragment is needed. In a pull request, either select the internal-only
+option in the template or put `release-note: none` on its own line in the description. When a
+direct push or merge check reads commit messages, put the same marker on its own line in the
+commit message.

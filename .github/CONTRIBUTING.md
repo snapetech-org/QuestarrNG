@@ -2,7 +2,13 @@
 
 Thank you for your interest in contributing to QuestarrNG! We welcome contributions from the community.
 
-Report bugs and request enhancements in the [QuestarrNG issue tracker](https://github.com/snapetech-org/QuestarrNG/issues). Contributions are submitted as pull requests against `main`; include a clear summary, link related issues, and wait for the required checks and maintainer review before merging.
+Report bugs and request enhancements in the [QuestarrNG issue tracker](https://github.com/snapetech-org/QuestarrNG/issues).
+
+Use `main` as the target. Open a pull request only when current GitHub rules require one; push
+directly when they allow it. Keep a pull request current with `main` only when those rules
+require it. Merge after the checks and approvals required by current rules are satisfied. An
+explicit maintainer direction to merge is sufficient; no additional review or approval is
+required beyond those rules.
 
 ## Getting Started
 
@@ -157,12 +163,15 @@ policy before merging.
 
 - Provide a clear description of what your PR does
 - Link related issues
-- Ensure all checks pass before requesting review
+- Merge after the checks and approvals required by current GitHub rules are satisfied; no additional
+  review or approval is required beyond those rules
 - Be responsive to feedback and questions
 
-Every user-facing behavior, security, operational, or documentation change
-needs one validated fragment under [`release-notes/`](../release-notes/README.md).
-For internal-only changes, include `release-note: none` in the PR description.
+Add one structured fragment under [`release-notes/`](../release-notes/README.md) for each user-facing feature, fix, security or operational change, or user-facing documentation change. Keep shipped fragments unchanged.
+
+For internal-only work, no fragment is needed. In a pull request, either select the internal-only
+option in the template or put `release-note: none` on its own line in the description. When a direct
+push or merge check reads commit messages, put the same marker on its own line in the commit message.
 Preview the release text with:
 
 ```sh
