@@ -878,6 +878,39 @@ test('candidate digests change after tracked source edits', () => {
   assert.notEqual(before.sourceSha256, afterEdit.sourceSha256);
 });
 
+test('optional validation inputs bind their presence and contents', () => {
+  const { root, config } = fixture();
+  config.inputs = [...config.inputs, { file: 'AGENTS.md', optional: true }];
+  const inventory = discoverInventory(root, config.inventory);
+  const absent = captureCandidate(root, config.inputs, inventory);
+  assert.deepEqual(absent.inputDigests.at(-1), {
+    file: 'AGENTS.md',
+    present: false,
+    sha256: null,
+  });
+
+  writeFileSync(path.join(root, 'AGENTS.md'), 'validation guidance\n');
+  const present = captureCandidate(root, config.inputs, inventory);
+  assert.equal(present.inputDigests.at(-1).file, 'AGENTS.md');
+  assert.equal(typeof present.inputDigests.at(-1).sha256, 'string');
+  assert.equal('present' in present.inputDigests.at(-1), false);
+  assert.notEqual(absent.sourceSha256, present.sourceSha256);
+
+  writeFileSync(path.join(root, 'AGENTS.md'), 'updated validation guidance\n');
+  const updated = captureCandidate(root, config.inputs, inventory);
+  assert.notEqual(present.inputDigests.at(-1).sha256, updated.inputDigests.at(-1).sha256);
+  assert.notEqual(present.sourceSha256, updated.sourceSha256);
+});
+
+test('required validation inputs still fail when missing', () => {
+  const { root, config } = fixture();
+  const inventory = discoverInventory(root, config.inventory);
+  assert.throws(
+    () => captureCandidate(root, ['missing-required-input.txt'], inventory),
+    /Required validation input is missing: missing-required-input\.txt/u,
+  );
+});
+
 test('runtime probe directories resolve trusted temporary-root symlinks', () => {
   const root = mkdtempSync(path.join(os.tmpdir(), 'questarrng-runtime-probe-contract-'));
   temporaryRoots.push(root);

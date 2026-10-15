@@ -5,6 +5,12 @@ native test inventory it saw before execution. It runs the existing npm, Vitest,
 Playwright, TypeScript, and build commands; it does not replace their assertions
 or coverage thresholds.
 
+Configured validation inputs are required by default and are hashed into the
+candidate source identity. A deliberately optional input uses an explicit
+`{ file, optional: true }` entry. The candidate digest records whether that file
+is present and hashes its contents when present, so removing an optional file
+does not remove it from the snapshot contract.
+
 ## GitHub runner routing
 
 The `sca-scan` and `windows-service` jobs may use the organization `trusted-main`

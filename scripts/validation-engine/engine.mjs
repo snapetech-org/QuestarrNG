@@ -183,6 +183,21 @@ function fileDigest(root, relative) {
   return hash(readFileSync(filePath));
 }
 
+function validationInputDigest(root, input) {
+  const file = typeof input === 'string' ? input : input?.file;
+  const optional = typeof input !== 'string' && input?.optional === true;
+  if (typeof file !== 'string' || !file) {
+    fail('Validation inputs must be file paths or explicitly optional file declarations.');
+  }
+  try {
+    return { file, sha256: fileDigest(root, file) };
+  } catch (error) {
+    if (error?.code !== 'ENOENT') throw error;
+    if (!optional) fail('Required validation input is missing: ' + file);
+    return { file, present: false, sha256: null };
+  }
+}
+
 export function discoverInventory(root, rules) {
   const files = walk(root);
   const entriesByPath = new Map();
@@ -246,10 +261,7 @@ export function captureCandidate(root, inputs, inventory) {
     'HEAD',
   ]));
   const untracked = untrackedDigests(root);
-  const inputDigests = inputs.map((relative) => ({
-    file: relative,
-    sha256: fileDigest(root, relative),
-  }));
+  const inputDigests = inputs.map((input) => validationInputDigest(root, input));
   const inventorySha256 = hash(stable(inventory.entries));
   const sourceSha256 = hash(stable({
     commit,
@@ -386,6 +398,15 @@ function validateConfig(config) {
   }
   if (!Array.isArray(config.inventory) || !Array.isArray(config.tasks)) {
     fail('Validation config must declare inventory rules and native tasks.');
+  }
+  const inputs = config.inputs ?? [];
+  if (!Array.isArray(inputs)) fail('Validation inputs must be declared as an array.');
+  for (const input of inputs) {
+    const file = typeof input === 'string' ? input : input?.file;
+    if (typeof file !== 'string' || !file ||
+        (typeof input !== 'string' && input?.optional !== true)) {
+      fail('Validation inputs must be file paths or explicitly optional file declarations.');
+    }
   }
   const maxConcurrentTasks = config.maxConcurrentTasks ?? 1;
   if (!Number.isInteger(maxConcurrentTasks) || maxConcurrentTasks < 1 || maxConcurrentTasks > 8) {

@@ -10,7 +10,7 @@ export function vitestWorkerEnvironment(githubActions = process.env.GITHUB_ACTIO
 export const validation = {
   repository: 'questarrng',
   inputs: [
-    'AGENTS.md',
+    { file: 'AGENTS.md', optional: true },
     'package.json',
     'package-lock.json',
     '.github/npm-runtime/package.json',
