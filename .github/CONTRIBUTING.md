@@ -167,16 +167,18 @@ policy before merging.
   review or approval is required beyond those rules
 - Be responsive to feedback and questions
 
-Add one structured fragment under [`release-notes/`](../release-notes/README.md) for each user-facing feature, fix, security or operational change, or user-facing documentation change. Keep shipped fragments unchanged.
+For any user-facing change, add one validated structured fragment under
+[`release-notes/`](../release-notes/README.md). A single fragment may cover
+related user-facing changes in the same pull request. Keep shipped fragments
+unchanged.
 
-For internal-only work, no fragment is needed. In a pull request, either select the internal-only
-option in the template or put `release-note: none` on its own line in the description. When a direct
-push or merge check reads commit messages, put the same marker on its own line in the commit message.
-Preview the release text with:
+For internal-only work, no fragment is needed. In a pull request, either select
+the internal-only option in the template or put `release-note: none` on its own
+line in the description. For direct pushes or merge checks that read commit
+messages, put the same marker on its own line in the commit message.
 
-```sh
-npm run release-notes:preview -- --base origin/main --head HEAD
-```
+Preview the rendered release text with
+`npm run release-notes:preview -- --base origin/main --head HEAD` if useful.
 
 CI validates the fragment and summarizes its release text. The tag workflow
 adds these fragments to the GitHub release notes. A trusted default-branch
