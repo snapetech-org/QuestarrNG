@@ -99,14 +99,17 @@ jobs:
                 }]
               }' > payload.json
 
-            response="$(curl --fail --silent --show-error \
+            http_status="$(curl --fail --silent --show-error \
+              --output /dev/null \
+              --write-out '%{http_code}' \
               -H 'Content-Type: application/json' \
               -X POST \
               --data @payload.json \
               "$webhook_url")"
-            jq -e --arg description "$description" \
-              '.id != null and .embeds[0].description == $description' \
-              <<< "$response" > /dev/null
+            if [[ ! "$http_status" =~ ^2[0-9]{2}$ ]]; then
+              echo "Discord webhook returned unexpected HTTP status $http_status." >&2
+              exit 1
+            fi
             if (( number < chunk_count )); then
               sleep 1
             fi

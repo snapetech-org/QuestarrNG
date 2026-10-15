@@ -197,6 +197,14 @@ test('tag Discord announcements use the trusted default-branch workflow', () => 
   assert.doesNotMatch(trustedDiscordWorkflow, /Discord announcement skipped because discord-release has no webhook secret/u);
 });
 
+test('Discord announcement delivery accepts successful HTTP responses without parsing response bodies', () => {
+  for (const workflow of [releaseWorkflow, trustedDiscordWorkflow]) {
+    assert.ok(workflow.includes("--write-out '%{http_code}'"));
+    assert.ok(workflow.includes('[[ ! "$http_status" =~ ^2[0-9]{2}$ ]]'));
+    assert.doesNotMatch(workflow, /\.embeds\[0\]\.description ==/u);
+  }
+});
+
 test('production image releases require a version-tag push', () => {
   const imageWorkflow = load(releaseWorkflow);
   assert.deepEqual(imageWorkflow.on.push, { tags: ['v*'] });
