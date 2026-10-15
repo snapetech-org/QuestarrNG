@@ -1283,7 +1283,9 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
                 : "Add to preferred groups"}
             </Button>
             <p className="text-xs text-muted-foreground">
-              Saves these groups in Settings without changing your automatic search filter.
+              {localizedText(
+                "Saves these groups in Settings without changing your automatic search filter."
+              )}
             </p>
           </div>
         )}
@@ -1391,7 +1393,7 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
     <div className="space-y-4">
       {downloadingGuid !== null && (
         <span className="sr-only" role="status">
-          Downloading selected release...
+          {localizedText("Downloading selected release...")}
         </span>
       )}
       {isSearching && (

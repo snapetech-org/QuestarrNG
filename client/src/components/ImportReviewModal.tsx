@@ -344,8 +344,9 @@ export default function ImportReviewModal({
                 role="note"
                 className="text-xs text-amber-400/90"
               >
-                This is the exact file or folder Questarr will transfer. Move removes the source;
-                choosing a parent downloads folder can include unrelated files.
+                {t(
+                  "This is the exact file or folder Questarr will transfer. Move removes the source; choosing a parent downloads folder can include unrelated files."
+                )}
               </p>
             </div>
 

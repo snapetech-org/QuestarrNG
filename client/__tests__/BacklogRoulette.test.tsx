@@ -4,6 +4,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-libra
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Game } from "@shared/schema";
 import BacklogRoulette from "../src/components/BacklogRoulette";
+import { setInterfaceLanguage } from "@/lib/interface-locale";
 
 vi.mock("@/components/GameDetailsModal", () => ({
   default: ({ game, onOpenChange }: { game: Game; onOpenChange: (open: boolean) => void }) => (
@@ -35,6 +36,7 @@ async function choosePool(name: string) {
 
 describe("Backlog roulette", () => {
   beforeEach(() => {
+    setInterfaceLanguage("en");
     vi.spyOn(crypto, "getRandomValues").mockImplementation((array) => {
       if (array instanceof Uint32Array) array[0] = 0;
       return array;
@@ -56,7 +58,7 @@ describe("Backlog roulette", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Pick a game" }));
     expect(screen.getByTestId("roulette-title")).toHaveTextContent("Quest a");
-    expect(screen.getByText("Chosen from 2 matching games.")).toBeVisible();
+    expect(screen.getByText("Eligible options: 2")).toBeVisible();
     fireEvent.click(screen.getByRole("button", { name: "Roll again" }));
     expect(screen.getByTestId("roulette-title")).toHaveTextContent("Quest b");
     fireEvent.click(screen.getByRole("button", { name: "Roll again" }));
@@ -80,12 +82,12 @@ describe("Backlog roulette", () => {
     expect(screen.getByRole("button", { name: "Roll again" })).toBeDisabled();
     await choosePool("Currently playing");
     expect(screen.getByTestId("roulette-title")).toHaveTextContent("Quest playing");
-    expect(screen.getByText("Chosen from 1 matching game.")).toBeVisible();
+    expect(screen.getByText("Eligible options: 1")).toBeVisible();
     expect(screen.getByRole("button", { name: "Roll again" })).toBeDisabled();
     expect(screen.queryByRole("button", { name: "Mark as Playing" })).not.toBeInTheDocument();
     await choosePool("All visible games");
     expect(screen.getByTestId("roulette-title")).toHaveTextContent("Quest wanted");
-    expect(screen.getByText("Chosen from 2 matching games.")).toBeVisible();
+    expect(screen.getByText("Eligible options: 2")).toBeVisible();
   });
 
   it("restricts the draw to the given pools and hides Mark as Playing without a handler", async () => {
@@ -98,7 +100,7 @@ describe("Backlog roulette", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Pick a game" }));
     expect(screen.getByTestId("roulette-title")).toHaveTextContent("Quest playing");
-    expect(screen.getByText("Chosen from 1 matching game.")).toBeVisible();
+    expect(screen.getByText("Eligible options: 1")).toBeVisible();
     fireEvent.keyDown(screen.getByRole("combobox", { name: "Pick from" }), { key: "ArrowDown" });
     expect(await screen.findAllByRole("option")).toHaveLength(1);
     expect(screen.queryByRole("button", { name: "Mark as Playing" })).not.toBeInTheDocument();

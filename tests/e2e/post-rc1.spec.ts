@@ -7,14 +7,14 @@ import { DEFAULT_NOTIFICATION_PREFERENCES } from "../../shared/schema";
 
 test.describe("v1.5 changes since RC1", () => {
   test("explains incomplete ClamAV scans and large-file limits", async ({ page }, testInfo) => {
+    await page.addInitScript(() => localStorage.setItem("questarr.interface-language", "en"));
     await page.goto("/settings");
     await page.getByRole("tab", { name: "Import", exact: true }).click();
     await page.getByRole("tab", { name: "Security & Scanning", exact: true }).click();
-    await expect(page.getByText(/A download ClamAV can't fully scan/)).toBeVisible();
-    await page.getByText(/A download ClamAV can't fully scan/).scrollIntoViewIfNeeded();
-    for (const limit of ["StreamMaxLength", "MaxFileSize", "MaxScanSize"]) {
-      await expect(page.getByText(limit, { exact: true })).toBeVisible();
-    }
+    const guidance = page.getByText(/Downloads ClamAV cannot fully scan/);
+    await expect(guidance).toBeVisible();
+    await guidance.scrollIntoViewIfNeeded();
+    await expect(guidance).toContainText(/StreamMaxLength.*MaxFileSize.*MaxScanSize/);
     await page.screenshot({ path: testInfo.outputPath("security-scan-guidance.png") });
   });
   test("refreshes RSS releases without losing the enabled feed configuration", async ({ page }) => {

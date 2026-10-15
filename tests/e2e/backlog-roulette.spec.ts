@@ -2,6 +2,10 @@ import { test, expect } from "@playwright/test";
 import { seedGame, uniqueId } from "./helpers";
 
 test.describe("Backlog roulette", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem("questarr.interface-language", "en"));
+  });
+
   test("draws owned games, rerolls, opens details and saves Mark as Playing", async ({
     page,
   }, testInfo) => {
@@ -22,7 +26,7 @@ test.describe("Backlog roulette", () => {
     await expect(pick).toBeEnabled();
     await pick.click();
     const dialog = page.getByRole("dialog", { name: "Backlog roulette" });
-    await expect(dialog.getByText("Chosen from 2 matching games.")).toBeVisible();
+    await expect(dialog.getByText("Eligible options: 2")).toBeVisible();
     const title = dialog.getByTestId("roulette-title");
     const initial = await title.textContent();
     expect([first.title, second.title]).toContain(initial);
@@ -85,7 +89,7 @@ test.describe("Backlog roulette", () => {
     await dialog.getByRole("combobox", { name: "Pick from" }).click();
     await page.getByRole("option", { name: "All visible games" }).click();
     await expect(dialog.getByTestId("roulette-title")).toHaveText(title);
-    await expect(dialog.getByText("Chosen from 1 matching game.")).toBeVisible();
+    await expect(dialog.getByText("Eligible options: 1")).toBeVisible();
     await expect(dialog.getByRole("button", { name: "Roll again" })).toBeDisabled();
     await expect(dialog.getByRole("button", { name: "Mark as Playing" })).toHaveCount(0);
     const bounds = await dialog.boundingBox();

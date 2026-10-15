@@ -22,6 +22,11 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { InterfaceText } from "@/components/InterfaceText";
+import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
+import {
+  RELEASE_FORMAT_FIELD_LABELS,
+  RELEASE_FORMAT_MATCH_MODE_LABELS,
+} from "@/lib/release-scoring-labels";
 
 const FORMAT_FIELDS: FormatField[] = [
   "title",
@@ -32,7 +37,6 @@ const FORMAT_FIELDS: FormatField[] = [
   "indexer",
 ];
 const MATCH_MODES: FormatMatchMode[] = ["contains", "exact", "regex"];
-
 function termsText(terms: string[]): string {
   return terms.join("\n");
 }
@@ -45,14 +49,14 @@ function parseTerms(value: string): string[] {
     .slice(0, 50);
 }
 
-function newFormat(): CustomFormat {
+function newFormat(name: string): CustomFormat {
   const id =
     typeof crypto !== "undefined" && "randomUUID" in crypto
       ? crypto.randomUUID()
       : `format-${Date.now()}`;
   return {
     id,
-    name: "New format",
+    name,
     specs: [{ field: "title", mode: "contains", value: "", required: false }],
     score: 25,
     hardReject: false,
@@ -63,6 +67,7 @@ function newFormat(): CustomFormat {
 export default function ReleaseScoringSettings({
   settings,
 }: Readonly<{ settings?: UserSettings | undefined }>) {
+  const { language, t, languageFor, directionFor } = useInterfaceLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const initialized = useRef(false);
@@ -86,7 +91,7 @@ export default function ReleaseScoringSettings({
     mutationFn: async () => {
       const releaseScoringProfile = JSON.stringify({ profile, formats });
       if (!validateSavedReleaseScoringConfig(releaseScoringProfile)) {
-        throw new Error("Check the scoring profile and custom format conditions before saving.");
+        throw new Error(t("Check the scoring profile and custom format conditions before saving."));
       }
       const response = await apiRequest("PATCH", "/api/settings", {
         releaseScoringEnabled: enabled,
@@ -97,18 +102,18 @@ export default function ReleaseScoringSettings({
     onSuccess: () => {
       setValidationMessage(null);
       toast({
-        title: "Release scoring saved",
+        title: t("Release scoring saved"),
         description: enabled
-          ? "Manual and automatic searches will use this profile."
-          : "Your profile is saved and scoring remains disabled.",
+          ? t("Manual and automatic searches will use this profile.")
+          : t("Your profile is saved and scoring remains disabled."),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/settings"] });
     },
     onError: (error: Error) => {
-      setValidationMessage(error.message);
+      setValidationMessage(t(error.message));
       toast({
-        title: "Could not save release scoring",
-        description: error.message,
+        title: t("Could not save release scoring"),
+        description: t(error.message),
         variant: "destructive",
       });
     },
@@ -149,33 +154,40 @@ export default function ReleaseScoringSettings({
         <div className="flex items-center gap-3">
           <SlidersHorizontal className="h-5 w-5 text-muted-foreground" />
           <div className="flex-1">
-            <CardTitle className="text-lg">Release Scoring</CardTitle>
+            <CardTitle className="text-lg">
+              <InterfaceText source="Release Scoring" />
+            </CardTitle>
             <CardDescription>
-              Rank releases by title match, quality, platform, and your own rules. Rejected releases
-              remain visible in manual search with the reason.
+              <InterfaceText source="Rank releases by title match, quality, platform, and your own rules. Rejected releases remain visible in manual search with the reason." />
             </CardDescription>
           </div>
           <Badge variant={enabled ? "default" : "outline"}>
-            {enabled ? <InterfaceText source={"Enabled"} /> : "Off"}
+            {enabled ? <InterfaceText source="Enabled" /> : <InterfaceText source="Off" />}
           </Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-7">
         <div className="flex items-center justify-between rounded-md border p-4">
           <div className="space-y-1">
-            <Label htmlFor="release-scoring-enabled">Use this profile</Label>
+            <Label htmlFor="release-scoring-enabled">
+              <InterfaceText source="Use this profile" />
+            </Label>
             <p className="text-xs text-muted-foreground">
-              Auto-search will only consider accepted releases while this is enabled.
+              <InterfaceText source="Auto-search will only consider accepted releases while this is enabled." />
             </p>
           </div>
           <Switch id="release-scoring-enabled" checked={enabled} onCheckedChange={setEnabled} />
         </div>
 
         <section className="space-y-4">
-          <h3 className="font-semibold">Profile limits and preferences</h3>
+          <h3 className="font-semibold">
+            <InterfaceText source="Profile limits and preferences" />
+          </h3>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="release-min-score">Minimum score</Label>
+              <Label htmlFor="release-min-score">
+                <InterfaceText source="Minimum score" />
+              </Label>
               <Input
                 id="release-min-score"
                 type="number"
@@ -186,7 +198,9 @@ export default function ReleaseScoringSettings({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="release-protocol">Preferred protocol</Label>
+              <Label htmlFor="release-protocol">
+                <InterfaceText source="Preferred protocol" />
+              </Label>
               <select
                 id="release-protocol"
                 className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
@@ -197,13 +211,15 @@ export default function ReleaseScoringSettings({
                   })
                 }
               >
-                <option value="either">Torrent or Usenet</option>
-                <option value="torrent">Torrent</option>
-                <option value="usenet">Usenet</option>
+                <option value="either">{t("Torrent or Usenet")}</option>
+                <option value="torrent">{t("Torrent")}</option>
+                <option value="usenet">{t("Usenet")}</option>
               </select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="release-min-seeders">Minimum torrent seeders</Label>
+              <Label htmlFor="release-min-seeders">
+                <InterfaceText source="Minimum torrent seeders" />
+              </Label>
               <Input
                 id="release-min-seeders"
                 type="number"
@@ -214,7 +230,9 @@ export default function ReleaseScoringSettings({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="release-max-size">Maximum size (GiB)</Label>
+              <Label htmlFor="release-max-size">
+                <InterfaceText source="Maximum size (GiB)" />
+              </Label>
               <Input
                 id="release-max-size"
                 type="number"
@@ -236,16 +254,20 @@ export default function ReleaseScoringSettings({
                   });
                 }}
               />
-              <p className="text-xs text-muted-foreground">Leave blank to allow any size.</p>
+              <p className="text-xs text-muted-foreground">
+                <InterfaceText source="Leave blank to allow any size." />
+              </p>
             </div>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="release-required-terms">Required title terms</Label>
+              <Label htmlFor="release-required-terms">
+                <InterfaceText source="Required title terms" />
+              </Label>
               <Textarea
                 id="release-required-terms"
                 rows={3}
-                placeholder={"One per line, e.g.\nGOG\n/\bportable\b/i"}
+                placeholder={`${t("One per line, e.g.")}\nGOG\n/\\bportable\\b/i`}
                 value={termsText(profile.requiredTerms)}
                 onChange={(event) =>
                   updateProfile({ requiredTerms: parseTerms(event.target.value) })
@@ -253,11 +275,13 @@ export default function ReleaseScoringSettings({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="release-ignored-terms">Ignored title terms</Label>
+              <Label htmlFor="release-ignored-terms">
+                <InterfaceText source="Ignored title terms" />
+              </Label>
               <Textarea
                 id="release-ignored-terms"
                 rows={3}
-                placeholder={"One per line, e.g.\ncrackfix\n/\bmultiplayer\b/i"}
+                placeholder={`${t("One per line, e.g.")}\ncrackfix\n/\\bmultiplayer\\b/i`}
                 value={termsText(profile.ignoredTerms)}
                 onChange={(event) =>
                   updateProfile({ ignoredTerms: parseTerms(event.target.value) })
@@ -266,15 +290,17 @@ export default function ReleaseScoringSettings({
             </div>
           </div>
           <p className="text-xs text-muted-foreground">
-            Terms are whole words. Use <code>/pattern/</code> for a bounded RE2 regular expression.
+            <InterfaceText source="Terms are whole words. Use /pattern/ for a bounded RE2 regular expression." />
           </p>
         </section>
 
         <section className="space-y-4">
           <div>
-            <h3 className="font-semibold">Built-in rule weights</h3>
+            <h3 className="font-semibold">
+              <InterfaceText source="Built-in rule weights" />
+            </h3>
             <p className="mt-1 text-xs text-muted-foreground">
-              Locked title mismatch and sequel checks always reject their matches.
+              <InterfaceText source="Locked title mismatch and sequel checks always reject their matches." />
             </p>
           </div>
           <div className="divide-y rounded-md border">
@@ -286,14 +312,18 @@ export default function ReleaseScoringSettings({
                   className="grid items-center gap-3 p-3 sm:grid-cols-[1fr_110px_130px]"
                 >
                   <div>
-                    <p className="text-sm font-medium">{rule.label}</p>
+                    <p className="text-sm font-medium">
+                      <InterfaceText source={rule.label} />
+                    </p>
                     {rule.locked && (
-                      <p className="text-xs text-muted-foreground">Always enforced</p>
+                      <p className="text-xs text-muted-foreground">
+                        <InterfaceText source="Always enforced" />
+                      </p>
                     )}
                   </div>
                   <div className="space-y-1">
                     <Label htmlFor={`score-${rule.id}`} className="text-xs">
-                      Points
+                      <InterfaceText source="Points" />
                     </Label>
                     <Input
                       id={`score-${rule.id}`}
@@ -330,7 +360,9 @@ export default function ReleaseScoringSettings({
                       />
                     </div>
                   ) : (
-                    <span className="text-right text-xs text-muted-foreground">Required</span>
+                    <span className="text-right text-xs text-muted-foreground">
+                      <InterfaceText source="Required" />
+                    </span>
                   )}
                 </div>
               );
@@ -341,9 +373,11 @@ export default function ReleaseScoringSettings({
         <section className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h3 className="font-semibold">Custom formats</h3>
+              <h3 className="font-semibold">
+                <InterfaceText source="Custom formats" />
+              </h3>
               <p className="mt-1 text-xs text-muted-foreground">
-                Each format adds points when its conditions match; hard rejects exclude the release.
+                <InterfaceText source="Each format adds points when its conditions match; hard rejects exclude the release." />
               </p>
             </div>
             <Button
@@ -351,14 +385,14 @@ export default function ReleaseScoringSettings({
               variant="outline"
               size="sm"
               disabled={formats.length >= 50}
-              onClick={() => setFormats((current) => [...current, newFormat()])}
+              onClick={() => setFormats((current) => [...current, newFormat(t("New format"))])}
             >
-              <Plus className="mr-2 h-4 w-4" /> Add format
+              <Plus className="mr-2 h-4 w-4" /> <InterfaceText source="Add format" />
             </Button>
           </div>
           {formats.length === 0 ? (
             <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-              No custom formats yet.
+              <InterfaceText source="No custom formats yet." />
             </p>
           ) : (
             <div className="space-y-3">
@@ -377,7 +411,9 @@ export default function ReleaseScoringSettings({
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor={`format-score-${format.id}`}>Points</Label>
+                      <Label htmlFor={`format-score-${format.id}`}>
+                        <InterfaceText source="Points" />
+                      </Label>
                       <Input
                         id={`format-score-${format.id}`}
                         type="number"
@@ -400,7 +436,9 @@ export default function ReleaseScoringSettings({
                       />
                     </div>
                     <div className="flex items-center gap-2 pb-2">
-                      <Label htmlFor={`format-reject-${format.id}`}>Hard reject</Label>
+                      <Label htmlFor={`format-reject-${format.id}`}>
+                        <InterfaceText source="Hard reject" />
+                      </Label>
                       <Switch
                         id={`format-reject-${format.id}`}
                         checked={format.hardReject}
@@ -413,7 +451,13 @@ export default function ReleaseScoringSettings({
                       type="button"
                       size="icon"
                       variant="ghost"
-                      aria-label={`Remove ${format.name || "custom format"}`}
+                      aria-label={formatInterfaceMessage(
+                        "Remove {name}",
+                        { name: format.name || t("Custom format") },
+                        language
+                      )}
+                      lang={languageFor("Remove {name}")}
+                      dir={directionFor("Remove {name}")}
                       onClick={() =>
                         setFormats((current) => current.filter((item) => item.id !== format.id))
                       }
@@ -429,7 +473,7 @@ export default function ReleaseScoringSettings({
                       >
                         <div className="space-y-1">
                           <Label htmlFor={`${format.id}-field-${index}`} className="text-xs">
-                            Field
+                            <InterfaceText source="Field" />
                           </Label>
                           <select
                             id={`${format.id}-field-${index}`}
@@ -443,14 +487,14 @@ export default function ReleaseScoringSettings({
                           >
                             {FORMAT_FIELDS.map((field) => (
                               <option key={field} value={field}>
-                                {field}
+                                {t(RELEASE_FORMAT_FIELD_LABELS[field])}
                               </option>
                             ))}
                           </select>
                         </div>
                         <div className="space-y-1">
                           <Label htmlFor={`${format.id}-mode-${index}`} className="text-xs">
-                            Match
+                            <InterfaceText source="Match" />
                           </Label>
                           <select
                             id={`${format.id}-mode-${index}`}
@@ -464,21 +508,21 @@ export default function ReleaseScoringSettings({
                           >
                             {MATCH_MODES.map((mode) => (
                               <option key={mode} value={mode}>
-                                {mode}
+                                {t(RELEASE_FORMAT_MATCH_MODE_LABELS[mode])}
                               </option>
                             ))}
                           </select>
                         </div>
                         <div className="space-y-1">
                           <Label htmlFor={`${format.id}-value-${index}`} className="text-xs">
-                            Value
+                            <InterfaceText source="Value" />
                           </Label>
                           <Input
                             id={`${format.id}-value-${index}`}
                             maxLength={500}
                             value={spec.value}
                             placeholder={
-                              spec.mode === "regex" ? "e.g. (GOG|DRM-free)" : "Text to match"
+                              spec.mode === "regex" ? t("e.g. (GOG|DRM-free)") : t("Text to match")
                             }
                             onChange={(event) =>
                               updateSpec(format.id, index, { value: event.target.value })
@@ -494,7 +538,7 @@ export default function ReleaseScoringSettings({
                             }
                           />
                           <Label htmlFor={`${format.id}-negate-${index}`} className="text-xs">
-                            Negate
+                            <InterfaceText source="Negate" />
                           </Label>
                         </div>
                         <div className="flex items-center gap-1 pb-2">
@@ -506,14 +550,16 @@ export default function ReleaseScoringSettings({
                             }
                           />
                           <Label htmlFor={`${format.id}-required-${index}`} className="text-xs">
-                            Required
+                            <InterfaceText source="Required" />
                           </Label>
                         </div>
                         <Button
                           type="button"
                           variant="ghost"
                           size="icon"
-                          aria-label="Remove condition"
+                          aria-label={t("Remove condition")}
+                          lang={languageFor("Remove condition")}
+                          dir={directionFor("Remove condition")}
                           disabled={format.specs.length === 1}
                           onClick={() =>
                             updateFormat(format.id, {
@@ -539,7 +585,7 @@ export default function ReleaseScoringSettings({
                         })
                       }
                     >
-                      <Plus className="mr-2 h-4 w-4" /> Add condition
+                      <Plus className="mr-2 h-4 w-4" /> <InterfaceText source="Add condition" />
                     </Button>
                   </div>
                 </div>
@@ -551,7 +597,7 @@ export default function ReleaseScoringSettings({
         {(validationMessage || !isValid) && (
           <p role="alert" className="text-sm text-destructive">
             {validationMessage ??
-              "Complete each custom format condition with a valid value before saving."}
+              t("Complete each custom format condition with a valid value before saving.")}
           </p>
         )}
         <div className="flex justify-end border-t pt-4">
@@ -565,7 +611,11 @@ export default function ReleaseScoringSettings({
             ) : (
               <SlidersHorizontal className="h-4 w-4" />
             )}
-            {mutation.isPending ? <InterfaceText source={"Saving..."} /> : "Save Release Scoring"}
+            {mutation.isPending ? (
+              <InterfaceText source="Saving..." />
+            ) : (
+              <InterfaceText source="Save Release Scoring" />
+            )}
           </Button>
         </div>
       </CardContent>

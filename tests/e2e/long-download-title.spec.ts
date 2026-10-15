@@ -3,6 +3,7 @@ import { test, expect } from "@playwright/test";
 test("long release titles leave the download action visible inside the dialog", async ({
   page,
 }, testInfo) => {
+  await page.addInitScript(() => localStorage.setItem("questarr.interface-language", "en"));
   const longTitle = `Example.Game.${"Exceptional-International-Edition-With-A-Very-Long-Release-Name-".repeat(4)}-RUNE`;
 
   await page.route("**/api/games*", async (route) => {
@@ -57,7 +58,7 @@ test("long release titles leave the download action visible inside the dialog", 
   await expect(downloadDialog.getByText(longTitle, { exact: true })).toBeVisible();
 
   const downloadAction = downloadDialog.getByRole("button", {
-    name: /Download torrent file for/,
+    name: /Download Torrent file for/,
   });
   await expect(downloadAction).toBeVisible();
 
