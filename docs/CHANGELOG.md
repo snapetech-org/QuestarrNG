@@ -8,6 +8,104 @@ Discord announcement while this file remains the chronological changelog.
 For a reader-oriented summary of the Snapetech fork's additions since the
 upstream baseline, see [What changed in QuestarrNG](FORK_CHANGES.md).
 
+## [2.1.0] - 2026-10-15
+
+### User-facing changes
+
+#### Added
+
+- **Database Migration:** Operators can copy a current PostgreSQL library into a migrated, empty SQLite database. Questarr keeps the source read-only and verifies all table contents inside one transaction; the older pre-v1.1 migration procedure remains separate.
+- **Downloads:** Download torrent and NZB files directly from search results, or send the release to a configured downloader. When updates are available, choose which ones to include with the main game.
+- **Library:** Create personal game lists for any theme, add games from your library to multiple lists, and rename or delete lists whenever plans change. Lists are private to your account and do not change a game's library status.
+- **Community:** GitHub's issue chooser now includes a question template that asks for steps, environment details, and relevant logs while reminding people to remove secrets.
+- **Games:** Game cards, Add Game search results, and details now treat a 0/10 IGDB score as a real rating, game details show HowLongToBeat estimates for close title matches, and desktop download searches use more screen width so release data is easier to read.
+- **Downloads:** Add selected release groups from the download search dialog to Preferred Release Groups in Settings. Saving these groups keeps the existing automatic search filter setting unchanged.
+- **Search:** Release Search can filter by verified torrent file extensions such as NSP or XCI. It inspects bounded torrent manifests and excludes unknown payloads instead of guessing from release names.
+- **Library:** Library cards distinguish available game updates from ordinary search results. Availability changes refresh the owning user's library even when update notifications are muted.
+- **Search:** Public HTTPS JSON catalogs in Hydra format can now supply torrent releases alongside existing indexers, with source attribution, bounded downloads, and normal search and acquisition rules.
+- **Discover:** RAWG is now an optional game discovery provider alongside IGDB, with encrypted API key settings and separate provider game IDs.
+- **Downloads:** Users can save an optional release-scoring profile to rank manual search results and limit automatic searches to releases that meet their format and quality preferences.
+
+#### Changed
+
+- **Downloads:** Long release names now wrap in the mobile download list instead of being clipped. When an indexer provides a safe comments page, the full title remains a link to that release.
+- **Library:** The Library now uses clearer empty states with a direct next step. Add your first game from an empty library, add a searched title that is not in your collection, or clear filters when they hide every game.
+- **Operations:** The operations guide now covers container health checks, log inspection, and safe SQLite or Postgres backup and recovery steps.
+- **Container:** The default Compose file pulls the published GHCR image. Main builds use dev, while versioned releases update latest and keep an exact semantic-version tag for pinning.
+  - **Action required:** Run docker compose pull and docker compose up -d to update an existing installation.
+- **Integrations:** The xREL release browser now enables the next page only when another game release is available. It no longer relies on an unreliable upstream page count or shows a guessed total.
+- **Contribution Policy:** Human contributors must sign off each non-merge commit with the Developer Certificate of Origin; GitHub-verified automation pull requests are exempt.
+- **Install:** Unraid 6.10+ setup instructions now show how to install the QuestarrNG user template and configure its container path mapping.
+- **Containers:** **Breaking:** New QuestarrNG container images are published under `ghcr.io/snapetech-org/questarrng`. Update Compose, Helm, Unraid, and other deployment configurations from `ghcr.io/snapetech/questarrng`. Existing tags in the old package remain available, but new releases will only appear in the organization package.
+  - **Action required:** Update container references to ghcr.io/snapetech-org/questarrng.
+- **Deployment:** **Breaking:** Production image releases now start only from a validated version-tag push; main merges and development/test image builds no longer publish `latest` or version tags.
+  - **Action required:** Push a validated version tag to publish production images.
+- **Interface:** More dialogs, settings, download screens, scoring, and provider controls now use the selected interface language, including status messages and file actions.
+- **Ci:** The Windows service CI job now uses the .NET SDK selected for its runner on GitHub-hosted and trusted main runners.
+- **Documentation:** New quick-start, indexer, notification, and RSS guides explain how to set up QuestarrNG and use its search and alert features.
+- **Validation:** Independent validation tasks now run together in a bounded pool, reducing idle time while preserving dependencies, isolated results, and source checks. Superseded pull-request runs also release their concurrency slot after cancellation while current-run failures still reconcile.
+- **Localization:** The interface now translates pages, settings, forms, and notifications into twelve locales alongside English. API errors show localized summaries while preserving their original details.
+- **Localization:** Release group and release-name settings, category picker fallbacks, form validation, and log upload feedback now follow the selected interface language.
+- **Repository:** QuestarrNG installation, support, and release links now use the snapetech-org repository address. Existing container image names remain unchanged.
+- **Ci:** Trusted main checks and same-repository pull requests authored by snapetech can use the restricted runner pool after the readiness setting is enabled. Fork and bot pull requests remain on GitHub-hosted runners.
+- **Api:** Questarr now translates recognized API and import diagnostic details, additional fixed labels in Custom Lists, downloader, logs, settings, indexer, and library workflows, and search empty-state guidance into the selected language. API clients continue to receive the existing English error details and stable error codes.
+- **Releases:** Each version-tag release includes the Windows x64 installer and Helm chart with SHA-256 checksums; Home Assistant, CasaOS, Umbrel, and Helm metadata track the release version.
+- **Interface:** Interface text across library, download, indexer, and settings screens now follows the selected language more consistently, including backlog roulette, download actions, file details, scoring, and provider configuration.
+
+#### Fixed
+
+- **Downloads:** Scheduled searches now include DLC and extras in the existing packs and add-ons results when those categories are enabled. Results from categories you turn off remain excluded.
+- **Calendar:** Calendar release checks now recognize IGDB's explicit delayed release statuses, retain date-shift detection as a fallback, and notify users when a game first becomes delayed.
+- **Metadata:** Manual metadata refresh now streams IGDB results in 100-game requests and saves updates in 50-game database transactions. A failed fetch no longer stops later batches, and the response reports games whose metadata could not be refreshed.
+- **Forms:** Buttons used for form actions no longer submit the form unless they are explicitly marked as submit buttons.
+- **Downloads:** When qBittorrent accepts a download but Questarr cannot confirm it yet, the app now shows that it is still checking and asks you to check qBittorrent before retrying.
+- **Imports:** When you remove a game and choose to delete its files, Questarr now also removes files inside that user's enabled RomM library root. The configured root itself remains protected.
+- **Settings:** Settings errors now explain that database migrations run at startup, show the manual migration command only for source installs, and offer a Try again action after the service is available.
+  - **Action required:** Restart the service or container; source installs can run npm run db:migrate.
+- **Library:** Add Game now handles records without IGDB IDs correctly. Mobile Add Game and preferred-release-group controls have clearer screen-reader names, and Deluge appears in the supported downloader list.
+- **Downloads:** Linking a download that's already finished in a client now queues it for the normal import flow when post-processing is enabled. This also applies to bulk claims, so existing downloads can be added to the library without downloading them again.
+- **Deployment:** Docker Compose once again accepts `PORT` from the project `.env` file as a fallback for both the host and container HTTP ports. Set `HOST_SIDE_PORT` or `CONTAINER_INTERNAL_SIDE_PORT` to override either side independently.
+- **Accessibility:** The download-results options button now has a specific accessible name, making its purpose clearer to screen-reader users.
+- **Downloads:** Manual download searches now use the game's chosen target platform before the account-wide default. If that platform is excluded by the Platforms setting, the dialog leaves its platform filter clear so results are not unexpectedly hidden.
+- **Downloads:** The qBittorrent add request stops waiting for a matching torrent after 15 seconds while leaving accepted but unconfirmed downloads tracked, so users can check the client before retrying.
+- **Downloads Logs:** Torrent errors now include qBittorrent's reported detail, and mobile logs explain when only the latest 200 entries are shown while Copy still includes every match.
+- **Imports:** RomM import settings can now be saved by older clients that still send the fixed `multiFilePlacement: "subfolder"` field. The server ignores that legacy default while continuing to reject unrelated unknown settings.
+- **Usability:** Search pagination stays available after date filtering, downloader and indexer priorities can be cleared and edited reliably, empty filtered logs disable unavailable actions, and auto-search notifications honor in-app and Apprise preferences independently.
+- **Unraid:** The Unraid template now sets `UMASK=022` alongside its Unraid-compatible `PUID=99` and `PGID=100` defaults, so files created by QuestarrNG use the expected permissions.
+- **Wishlist:** Wishlist games now move from Upcoming to Released automatically as their release time passes, including after returning to a backgrounded tab.
+- **Settings:** Settings now show an error and a retry button when the release blacklist cannot be loaded.
+- **Calendar:** Calendar month headings now expose the browser's regional language to assistive technologies when regional formatting uses system settings.
+- **Imports:** Manual import review now warns that Move removes the selected source, and confirmation rejects a parent folder when Questarr can resolve the tracked download directory.
+- **Downloads:** When qBittorrent accepts a download but its status lookup is unavailable, Questarr now returns promptly and keeps tracking the add by its correlation tag. If lookups succeed but no matching torrent appears, Questarr continues polling only within the existing 15-second limit and never resubmits an accepted add as a torrent-file upload.
+- **Release Pipeline:** Successful version-tag releases now announce through the protected Discord channel. The announcement workflow fails visibly if its required webhook secret is missing.
+- **Release Pipeline:** GitHub release bodies now keep the complete curated changelog when Windows and Helm assets are attached, so the Discord announcement can publish the same release notes.
+- **Release Pipeline:** Version-tag builds now grant the Windows and Helm asset workflow the Actions permissions it needs to start and attach the verified release artifacts.
+- **Search:** Verified file-type search now follows safe redirects from indexers before checking the torrent manifest, so redirected downloads can still be filtered by their actual extensions.
+- **Downloads:** SABnzbd downloads now use the requested category, then the saved downloader category, then `games`; register custom categories in SABnzbd to keep them out of Default.
+- **Imports:** Imports preserve existing game files during extraction, hold incomplete security scans for review, recover interrupted downloads, and recognize Wii U folders. Library import discovery, backlog roulette, Discover actions, and mobile settings also receive upstream fixes.
+- **Ci:** Self-hosted Linux runners now install the pinned .NET SDK in a writable temporary directory, avoiding failures when the system-wide SDK directory is root-owned.
+- **Releases:** Published container images now carry the version selected by the release tag, and release builds compile each architecture on native runners.
+
+#### Security
+
+- **Downloads:** Bundle downloads now block arbitrary private-network URLs while retaining access to exact origins configured for indexers, and every redirect is checked under the same rule.
+- **Imports:** Pending import recovery now keeps a download tied to its original library owner and only allows it to be linked to a game in that same library.
+- **Security:** Production 5xx responses no longer include internal error details. The server keeps the original error in its logs so operators can diagnose failures.
+  - **Action required:** Check server logs when investigating production 5xx responses.
+- **Dependencies:** Unused Passport, Steam OpenID, and session dependencies have been removed after QuestarrNG replaced the Steam sign-in flow.
+- **Archive Extraction:** ARM64 images now build a native, pinned RARLAB UnRAR 7.23 extractor, so RAR5 and split-volume game archives work on 64-bit Raspberry Pi and Apple Silicon while receiving RARLAB's 7.23 archive-safety fixes.
+- **Runtime:** Questarr's built-in HTTPS listener now explicitly requires TLS 1.2 or newer, and CI checks the Home Assistant ownership helper with address and undefined-behavior sanitizers.
+- **Integrations:** Optional RAWG search now derives cache identifiers with a process-local keyed hash, so API credentials are not exposed through unkeyed digests.
+- **Networking:** **Breaking:** Forwarded client addresses and protocol headers are trusted only when TRUST_PROXY is configured, preventing direct clients from bypassing login rate limits with forged proxy headers.
+  - **Action required:** Set TRUST_PROXY to your trusted proxy hop count or addresses when deploying behind a reverse proxy.
+- **Authentication:** Operators can reset a local account password from the host or container CLI, which follows the account password policy and never accepts the password as a command-line argument.
+- **Downloads:** **Breaking:** QuestarrNG now rejects rTorrent's legacy MD5 Digest algorithm and requires servers to advertise SHA-256 Digest.
+  - **Action required:** Upgrade rTorrent/ruTorrent to a version that advertises SHA-256 Digest before using it with QuestarrNG.
+- **Security:** Security evidence now records the latest Scorecard CI-Tests sample and notes that one historical merged pull request still lacks a detected CI test.
+- **Security:** Protected merges keep the required CI and security checks while following the maintainer-authorized single-maintainer review and access-approval policy.
+- **Security:** Security documentation now consistently reflects the authorized single-maintainer pull request policy while retaining required automated checks and conversation resolution.
+- **Security:** Validation documentation now explains how isolated task environments prevent ambient credentials and workflow settings from reaching test commands.
+
 ## [2.0.0] - 2026-10-14
 
 ### User-facing changes
