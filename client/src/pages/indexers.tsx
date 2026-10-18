@@ -705,7 +705,7 @@ export default function IndexersPage() {
               <CardDescription>
                 <InterfaceText
                   source={
-                    "Add your first Torznab indexer to start discovering games. Popular options include Jackett, Prowlarr, or direct Torznab-compatible trackers."
+                    "Without an enabled indexer, QuestarrNG cannot search for game releases. You can still browse the game catalog and import files you already have. Add an indexer or connect Prowlarr when you want release search. Popular options include Jackett, Prowlarr, or direct Torznab-compatible trackers."
                   }
                 />
               </CardDescription>

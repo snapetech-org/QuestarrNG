@@ -1,5 +1,4 @@
-import React, { useMemo } from "react";
-import { useAuth } from "@/lib/auth";
+import React, { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -22,7 +21,8 @@ import {
 } from "@/components/ui/form";
 import { Lock, User, ShieldCheck, Gamepad2, Info, ExternalLink } from "lucide-react";
 import { withBasePath } from "@/lib/app-path";
-import { PASSWORD_MIN_LENGTH } from "@shared/schema";
+import { routePaths } from "@/lib/routes";
+import { PASSWORD_MIN_LENGTH, type Downloader, type Indexer } from "@shared/schema";
 import { IgdbHelpPopover, IgdbTestConnectionButton } from "@/components/IgdbCredentialsHelper";
 import { InterfaceLanguageSelect } from "@/components/InterfaceLanguageSelect";
 import { useInterfaceLanguage } from "@/lib/interface-locale";
@@ -36,8 +36,8 @@ type SetupForm = {
 };
 
 export default function SetupPage() {
-  const { checkSetup } = useAuth();
   const { toast } = useToast();
+  const [setupComplete, setSetupComplete] = useState(false);
   const { language, setLanguage, t, languageFor, directionFor } = useInterfaceLanguage();
   // const [_, setLocation] = useLocation();
 
@@ -50,6 +50,34 @@ export default function SetupPage() {
     queryFn: () => apiRequest("GET", "/api/auth/status").then((res) => res.json()),
   });
   const config = statusData;
+
+  const {
+    data: configuredIndexers = [],
+    isError: indexersStatusFailed,
+    isLoading: isLoadingIndexers,
+  } = useQuery<Indexer[]>({
+    queryKey: ["/api/indexers"],
+    enabled: setupComplete,
+  });
+  const {
+    data: configuredDownloaders = [],
+    isError: downloadersStatusFailed,
+    isLoading: isLoadingDownloaders,
+  } = useQuery<Downloader[]>({
+    queryKey: ["/api/downloaders"],
+    enabled: setupComplete,
+  });
+  const isLoadingAcquisitionStatus = isLoadingIndexers || isLoadingDownloaders;
+  const hasEnabledIndexer =
+    Array.isArray(configuredIndexers) && configuredIndexers.some((indexer) => indexer.enabled);
+  const hasEnabledDownloader =
+    Array.isArray(configuredDownloaders) &&
+    configuredDownloaders.some((downloader) => downloader.enabled);
+  const acquisitionPath = !hasEnabledIndexer
+    ? routePaths.indexers
+    : !hasEnabledDownloader
+      ? routePaths.downloaders
+      : routePaths.search;
 
   const setupSchema = useMemo(() => {
     const isIgdbConfigured = config?.igdb?.configured;
@@ -99,12 +127,11 @@ export default function SetupPage() {
       return res.json();
     },
     onSuccess: async () => {
-      // The server has already set the httpOnly auth cookie; nothing to
-      // store client-side (see server/security.ts's setAuthCookies).
-      await checkSetup();
       toast({ title: t("Setup complete! Welcome.") });
-      // Force reload to pick up auth state or navigate
-      window.location.href = withBasePath("/");
+      // Keep this confirmation local to the current setup screen. Choosing a
+      // destination performs a full navigation so the new httpOnly session is
+      // picked up by the normal authenticated app flow.
+      setSetupComplete(true);
     },
     onError: (error: Error) => {
       toast({
@@ -118,6 +145,68 @@ export default function SetupPage() {
   const onSubmit = (data: SetupForm) => {
     setupMutation.mutate(data);
   };
+
+  const continueTo = (path: string) => {
+    window.location.href = withBasePath(path);
+  };
+
+  if (setupComplete) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <Card className="w-full max-w-2xl">
+          <CardHeader>
+            <CardTitle>{t("Your QuestarrNG setup is ready")}</CardTitle>
+            <CardDescription>
+              {t(
+                "Choose what you want to do first. You can configure the other game-management features later in Settings."
+              )}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-3 sm:grid-cols-3">
+            <Button
+              className="h-auto min-h-24 flex-col items-start whitespace-normal p-4 text-left"
+              onClick={() => continueTo(routePaths.discover)}
+            >
+              <span className="font-semibold">{t("Browse game catalog")}</span>
+              <span className="mt-1 text-xs font-normal opacity-80">
+                {t("Explore and track games without setting up downloads.")}
+              </span>
+            </Button>
+            <Button
+              className="h-auto min-h-24 flex-col items-start whitespace-normal p-4 text-left"
+              onClick={() => continueTo(acquisitionPath)}
+              disabled={isLoadingAcquisitionStatus}
+            >
+              <span className="font-semibold">{t("Acquire releases")}</span>
+              <span className="mt-1 text-xs font-normal opacity-80">
+                {isLoadingAcquisitionStatus
+                  ? t("Checking your existing acquisition setup…")
+                  : indexersStatusFailed || downloadersStatusFailed
+                    ? t(
+                        "Open the existing indexer and downloader settings to check acquisition readiness."
+                      )
+                    : !hasEnabledIndexer
+                      ? t("Add an indexer to search for game releases.")
+                      : !hasEnabledDownloader
+                        ? t("Add a downloader to send a release grab.")
+                        : t("Search for releases for games in your library.")}
+              </span>
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto min-h-24 flex-col items-start whitespace-normal p-4 text-left"
+              onClick={() => continueTo(routePaths.libraryImport)}
+            >
+              <span className="font-semibold">{t("Organize existing downloads")}</span>
+              <span className="mt-1 text-xs font-normal opacity-80">
+                {t("Configure library imports for files you already have.")}
+              </span>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 gap-6">

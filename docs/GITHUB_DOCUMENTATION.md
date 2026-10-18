@@ -7,6 +7,7 @@ documentation in this repository.
 
 - Product overview and installation: [`README.md`](../README.md)
 - First install and initial setup: [`docs/QUICKSTART.md`](./QUICKSTART.md)
+- Setup-design guidance: [`docs/development/setup-experience-contract.md`](./development/setup-experience-contract.md)
 - Selecting a main release, updates, and optional extras:
   [`docs/DOWNLOAD_RECOMMENDATIONS.md`](./DOWNLOAD_RECOMMENDATIONS.md)
 - Why QuestarrNG is maintained, how it differs from upstream, and the
