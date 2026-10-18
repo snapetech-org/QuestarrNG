@@ -750,7 +750,7 @@ export default function DownloadersPage() {
               <CardDescription>
                 <InterfaceText
                   source={
-                    "Add your first downloader client to enable automated downloads. Supported clients include Transmission, rTorrent, qBittorrent, Synology Download Station, Deluge, Real-Debrid, SABnzbd, and NZBGet."
+                    "Without an enabled downloader, QuestarrNG cannot send a release grab to a client. You can still browse the game catalog and configure library imports for files you already have. Add a downloader when you are ready to acquire releases. Supported clients include Transmission, rTorrent, qBittorrent, Synology Download Station, Deluge, Real-Debrid, SABnzbd, and NZBGet."
                   }
                 />
               </CardDescription>

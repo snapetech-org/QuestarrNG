@@ -29,17 +29,35 @@ docker stop questarrng
 docker rm questarrng
 ```
 
-## Set up your library
+## Browse and track games
 
-1. Choose a metadata provider and add games through Discover or a Steam wishlist.
-2. Add indexers or connect Prowlarr, then configure a downloader.
-3. Add games to your library and search for releases. The [release picker](DOWNLOAD_RECOMMENDATIONS.md)
-   can bundle selected updates and optional, size-qualified extras with a main game.
-   If date filters hide every result on the current page, choose **Load more
-   results** to continue through later pages. On the Logs page, Copy and Send
-   use the filtered lines, while Clear empties the whole current log buffer.
-4. Configure imports if you want QuestarrNG to organize completed downloads.
-5. Set notification preferences, add RSS feeds, or use [Backlog roulette](BACKLOG_ROULETTE.md).
+Choose a metadata provider, then browse games in Discover or add them through a
+Steam wishlist. This catalog path does not require an indexer or downloader.
+
+## Acquire game releases
+
+To search for releases, add an enabled Torznab/Newznab indexer or connect
+Prowlarr in **Settings → Indexers**. To send a grab, add and test a compatible
+client in **Settings → Downloaders**. An indexer enables release search; a
+downloader receives the selected release. Either can be added later without
+blocking catalog browsing or imports of files already on disk.
+
+Add games to your library before searching for releases. The [release picker](DOWNLOAD_RECOMMENDATIONS.md)
+can bundle selected updates and optional, size-qualified extras with a main game.
+If date filters hide every result on the current page, choose **Load more
+results** to continue through later pages. On the Logs page, Copy and Send
+use the filtered lines, while Clear empties the whole current log buffer.
+
+## Import and organize existing files
+
+Configure [library imports](IMPORTS.md) if you want QuestarrNG to organize
+completed downloads. You can use imports without configuring indexers or a
+downloader when the files already exist.
+
+## Optional game-management features
+
+Set notification preferences, add [RSS feeds](RSS.md), or use
+[Backlog roulette](BACKLOG_ROULETTE.md) when you want those features.
 
 For the details, see [Indexers and Prowlarr](INDEXERS.md),
 [download import](IMPORTS.md), [notifications](NOTIFICATIONS.md),

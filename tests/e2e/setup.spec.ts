@@ -63,25 +63,11 @@ test.describe("Initial Setup", () => {
         submitBtn.click(),
       ]);
 
-      // Wait for redirect, but if it lags, at least we know backend succeeded
-      try {
-        await expect(page).toHaveURL("/", { timeout: 15000 });
-      } catch (e) {
-        logger.info("Setup API 200 OK, but redirect timeout: %s", e);
-        const errorText = await page
-          .locator(".text-destructive")
-          .textContent()
-          .catch(() => "No UI error");
-        logger.info("UI Error: %s", errorText);
+      await expect(page.getByText("Your QuestarrNG setup is ready", { exact: true })).toBeVisible();
+      await page.getByRole("button", { name: /Browse game catalog/ }).click();
+      await expect(page).toHaveURL(/\/discover$/);
 
-        // Workaround: Manually go to / if stuck
-        if (page.url().endsWith("/setup")) {
-          logger.info("Manually navigating to / after success...");
-          await page.goto("/");
-        }
-      }
-
-      // The setup redirect must preserve the user's language choice. The Arabic
+      // The first-use choice navigates into the authenticated app. The Arabic
       // seed above only applies to the first document so it cannot overwrite
       // the selected language during this navigation.
       await expect
