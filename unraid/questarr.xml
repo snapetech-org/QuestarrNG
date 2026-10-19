@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Container version="2">
   <Name>QuestarrNG</Name>
-  <Repository>ghcr.io/snapetech-org/questarrng:main</Repository>
+  <Repository>ghcr.io/snapetech-org/questarrng:latest</Repository>
   <Registry>https://ghcr.io/snapetech-org/questarrng</Registry>
   <Network>bridge</Network>
   <Shell>sh</Shell>

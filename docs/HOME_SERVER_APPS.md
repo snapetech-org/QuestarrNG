@@ -3,7 +3,7 @@
 Questarr ships ready-made app definitions for the main self-hosting platforms, so it can be
 installed without hand-writing a Compose file. Compose, CasaOS, Umbrel, and Cosmos use the stable
 `ghcr.io/snapetech-org/questarrng:latest` alias. The Unraid template follows the moving
-`ghcr.io/snapetech-org/questarrng:main` tag, which advances after the validated main release.
+`ghcr.io/snapetech-org/questarrng:latest` tag, which follows each validated stable release.
 All definitions use the same two mounts:
 
 | Container path | Purpose                                                                         |

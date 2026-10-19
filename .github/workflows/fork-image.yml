@@ -573,6 +573,31 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Require Docker Hub publisher credentials
+        id: dockerhub-credentials
+        shell: bash
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ -n "$DOCKERHUB_USERNAME" && -n "$DOCKERHUB_TOKEN" ]]; then
+            echo 'configured=true' >> "$GITHUB_OUTPUT"
+            echo '- Docker Hub stable image mirror: credentials configured.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'Docker Hub publisher credentials are required for stable releases.' >&2
+            exit 1
+          fi
+
+      - name: Log in to Docker Hub
+        id: login-dockerhub
+        if: steps.dockerhub-credentials.outputs.configured == 'true'
+        uses: step-security/docker-login-action@8c7b695d8738c5699a679ff5254baf0f19f20a94 # v4.6.0
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Set up Buildx for release tag aliases
         uses: step-security/setup-buildx-action@e50058a0fcd8d1a7d626c905502d010a468bf238 # v4.4.1
 
@@ -592,6 +617,23 @@ jobs:
           for tag in "$VERSION" main latest; do
             docker buildx imagetools create \
               --tag "${IMAGE}:${tag}" \
+              "${IMAGE}@${BUILD_DIGEST}"
+          done
+
+      - name: Mirror verified release tags to Docker Hub
+        if: steps.dockerhub-credentials.outputs.configured == 'true' && steps.login-dockerhub.outcome == 'success'
+        shell: bash
+        env:
+          IMAGE: ${{ needs.publish.outputs.image }}
+          DOCKERHUB_IMAGE: docker.io/snapetech/questarrng
+          BUILD_DIGEST: ${{ needs.publish.outputs.digest }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          VERSION="${TAG#v}"
+          for tag in "$VERSION" main latest; do
+            docker buildx imagetools create \
+              --tag "${DOCKERHUB_IMAGE}:${tag}" \
               "${IMAGE}@${BUILD_DIGEST}"
           done
 
@@ -969,6 +1011,46 @@ jobs:
           for tag in "$VERSION" main latest; do
             docker buildx imagetools create \
               --tag "${IMAGE}:${tag}" \
+              "${IMAGE}:sha-${RELEASE_SHA}"
+          done
+
+      - name: Require Docker Hub publisher credentials
+        id: dockerhub-credentials
+        shell: bash
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ -n "$DOCKERHUB_USERNAME" && -n "$DOCKERHUB_TOKEN" ]]; then
+            echo 'configured=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'Docker Hub publisher credentials are required to finalize stable releases.' >&2
+            exit 1
+          fi
+
+      - name: Log in to Docker Hub
+        id: login-dockerhub
+        if: steps.dockerhub-credentials.outputs.configured == 'true'
+        uses: step-security/docker-login-action@8c7b695d8738c5699a679ff5254baf0f19f20a94 # v4.6.0
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Mirror recovered release tags to Docker Hub
+        if: steps.dockerhub-credentials.outputs.configured == 'true' && steps.login-dockerhub.outcome == 'success'
+        shell: bash
+        env:
+          IMAGE: ghcr.io/${{ github.repository_owner }}/questarrng
+          DOCKERHUB_IMAGE: docker.io/snapetech/questarrng
+          RELEASE_SHA: ${{ steps.validate.outputs.release_sha }}
+          VERSION: ${{ steps.validate.outputs.version }}
+        run: |
+          set -euo pipefail
+          for tag in "$VERSION" main latest; do
+            docker buildx imagetools create \
+              --tag "${DOCKERHUB_IMAGE}:${tag}" \
               "${IMAGE}:sha-${RELEASE_SHA}"
           done
 
