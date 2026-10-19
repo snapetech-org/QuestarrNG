@@ -52,6 +52,7 @@ import { setAddGamePendingQuery, clearAddGamePendingQuery } from "@/lib/add-game
 import { useDownloadSummary } from "@/hooks/use-download-summary";
 import GameFilterPills from "./GameFilterPills";
 import PendingImportsCard from "./PendingImportsCard";
+import WantedContentCard from "./WantedContentCard";
 import BacklogRoulette from "./BacklogRoulette";
 import { LIBRARY_SORT_OPTIONS, sortLibraryGames, type LibrarySortOption } from "@/lib/game-sort";
 import { InterfaceText } from "@/components/InterfaceText";
@@ -460,6 +461,7 @@ export default function Library() {
         </div>
 
         <PendingImportsCard />
+        <WantedContentCard />
 
         {/* Toolbar: search + filter pills + view controls + filter toggle + grid settings */}
         <PageToolbar

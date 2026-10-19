@@ -570,3 +570,7 @@ socket.on("downloadUpdate", (gameId) => console.log("download changed:", gameId)
 ```
 
 Rules: a selection requires `igdbId`; every id must be an expansion, add-on, or edition IGDB links to that game, otherwise the request is rejected with 400. An existing library game is linked rather than re-added, so the person's ownership is untouched. An `edition` selection is met only by releases that name that edition, and an add-on selection only by releases that name the add-on or are a complete bundle. When nothing matches, nothing is substituted. The request status stays `searching` or `downloading` while selected content is outstanding, and the response carries `content: { mode, pending, acquiredCount }`.
+
+## Requested content (UI)
+
+`GET /api/wanted-content` (authenticated) lists editions and add-ons that SeerrNG requests selected and that are not acquired yet. The Library page shows them in a **Requested editions and add-ons** card.
