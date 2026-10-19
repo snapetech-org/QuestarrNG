@@ -139,6 +139,55 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/CatalogGame" }
         "404": { $ref: "#/components/responses/Error" }
+  /catalog/games/{igdbId}/editions:
+    get:
+      operationId: getGameEditions
+      summary: Editions, included content, and add-ons for one game
+      description: >
+        Content IGDB does not describe stays unknown: storyContent is null and an
+        edition with no linked content has contentKnown false.
+      parameters:
+        - name: igdbId
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1 }
+      responses:
+        "200":
+          description: Editions and standalone add-ons
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/GameEditions" }
+        "404": { $ref: "#/components/responses/Error" }
+  /catalog/discover:
+    get:
+      operationId: discoverGames
+      summary: Find games by themes, modes, perspectives, genres, and languages
+      parameters:
+        - { name: q, in: query, schema: { type: string, maxLength: 100 } }
+        - { name: themes, in: query, schema: { type: string } }
+        - { name: gameModes, in: query, schema: { type: string } }
+        - { name: perspectives, in: query, schema: { type: string } }
+        - { name: genres, in: query, schema: { type: string } }
+        - { name: languages, in: query, schema: { type: string } }
+        - { name: excludeThemes, in: query, schema: { type: string } }
+        - { name: excludeGameModes, in: query, schema: { type: string } }
+        - { name: excludeGenres, in: query, schema: { type: string } }
+        - { name: minYear, in: query, schema: { type: integer, minimum: 1970 } }
+        - { name: maxHoursToBeat, in: query, schema: { type: number, exclusiveMinimum: 0 } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 48 } }
+        - { name: cursor, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: Matching games with their facets
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [results]
+                properties:
+                  results: { type: array, items: { type: object } }
+                  nextCursor: { type: [string, "null"] }
+        "400": { $ref: "#/components/responses/Error" }
   /library/lookup:
     get:
       operationId: lookupLibraryGames
@@ -363,6 +412,60 @@ components:
                 retry: { type: boolean }
                 cancel: { type: boolean }
             assetStreaming: { type: boolean }
+            editions: { type: boolean }
+            discover: { type: boolean }
+            wantedContent: { type: boolean }
+    GameEditions:
+      type: object
+      required: [base, editions, addons]
+      properties:
+        base:
+          type: object
+          required: [igdbId, title, owned]
+          properties:
+            igdbId: { type: integer }
+            title: { type: string }
+            owned: { type: boolean }
+            status: { type: string }
+        editions:
+          type: array
+          items:
+            type: object
+            required: [igdbId, title, includes, contentKnown, owned]
+            properties:
+              igdbId: { type: integer }
+              title: { type: string }
+              summary: { type: string }
+              releaseDate: { type: string }
+              includes: { type: array, items: { $ref: "#/components/schemas/GameContent" } }
+              contentKnown: { type: boolean }
+              owned: { type: boolean }
+        addons: { type: array, items: { $ref: "#/components/schemas/GameContent" } }
+    GameContent:
+      type: object
+      required: [igdbId, title, type, storyContent, owned]
+      properties:
+        igdbId: { type: integer }
+        title: { type: string }
+        type: { enum: [expansion, dlc, cosmetic, season-pass, bonus, soundtrack, unknown] }
+        storyContent: { type: [boolean, "null"] }
+        releaseDate: { type: string }
+        coverUrl: { type: string }
+        owned: { type: boolean }
+    ContentSelection:
+      oneOf:
+        - type: object
+          required: [kind, mode, editionId]
+          properties:
+            kind: { const: game-content }
+            mode: { const: edition }
+            editionId: { type: integer, minimum: 1 }
+        - type: object
+          required: [kind, mode, addonIds]
+          properties:
+            kind: { const: game-content }
+            mode: { const: missing-selected }
+            addonIds: { type: array, maxItems: 30, items: { type: integer, minimum: 1 } }
     Variant:
       type: object
       required: [operatingSystem, architecture]
@@ -377,6 +480,7 @@ components:
         title: { type: string, minLength: 1, maxLength: 500 }
         igdbId: { type: integer, minimum: 1 }
         variant: { $ref: "#/components/schemas/Variant" }
+        selection: { $ref: "#/components/schemas/ContentSelection" }
     RequestState:
       type: object
       required: [externalRequestId, status, deliverable, title, actions]
@@ -400,6 +504,19 @@ components:
           properties:
             catalogProvider: { const: igdb }
             catalogId: { type: integer, minimum: 1 }
+        content:
+          type: object
+          description: Present when the request selected an edition or add-ons.
+          properties:
+            mode: { enum: [edition, missing-selected] }
+            pending:
+              type: array
+              items:
+                type: object
+                properties:
+                  id: { type: integer }
+                  title: { type: string }
+            acquiredCount: { type: integer }
         actions:
           type: object
           required: [retry, cancel]

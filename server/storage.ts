@@ -104,6 +104,7 @@ import {
   and,
   not,
   inArray,
+  notInArray,
   count,
   isNull,
   isNotNull,
@@ -513,13 +514,15 @@ export interface IStorage {
     externalRequestId: string
   ): Promise<IntegrationRequest | undefined>;
   addIntegrationRequest(request: InsertIntegrationRequest): Promise<IntegrationRequest>;
+  /** Requests whose edition or add-on selection is not fully acquired yet. */
+  getOpenSelectionRequests(userId: string): Promise<IntegrationRequest[]>;
   updateIntegrationRequest(
     userId: string,
     externalRequestId: string,
     updates: Partial<
       Pick<
         IntegrationRequest,
-        "gameId" | "downloadId" | "status" | "errorMessage" | "attemptedAt" | "igdbId"
+        "gameId" | "downloadId" | "status" | "errorMessage" | "attemptedAt" | "igdbId" | "selection"
       >
     >
   ): Promise<IntegrationRequest | undefined>;
@@ -2175,6 +2178,7 @@ export class MemStorage implements IStorage {
       igdbId: request.igdbId ?? null,
       status: request.status ?? "accepted",
       errorMessage: request.errorMessage ?? null,
+      selection: request.selection ?? null,
       attemptedAt: request.attemptedAt ?? now,
       createdAt: now,
       updatedAt: now,
@@ -2183,13 +2187,23 @@ export class MemStorage implements IStorage {
     return row;
   }
 
+  async getOpenSelectionRequests(userId: string): Promise<IntegrationRequest[]> {
+    return Array.from(this.integrationRequests.values()).filter(
+      (row) =>
+        row.userId === userId &&
+        !!row.selection &&
+        row.status !== "cancelled" &&
+        row.status !== "failed"
+    );
+  }
+
   async updateIntegrationRequest(
     userId: string,
     externalRequestId: string,
     updates: Partial<
       Pick<
         IntegrationRequest,
-        "gameId" | "downloadId" | "status" | "errorMessage" | "attemptedAt" | "igdbId"
+        "gameId" | "downloadId" | "status" | "errorMessage" | "attemptedAt" | "igdbId" | "selection"
       >
     >
   ): Promise<IntegrationRequest | undefined> {
@@ -4213,13 +4227,26 @@ export class DatabaseStorage implements IStorage {
     return existing;
   }
 
+  async getOpenSelectionRequests(userId: string): Promise<IntegrationRequest[]> {
+    return db
+      .select()
+      .from(integrationRequests)
+      .where(
+        and(
+          eq(integrationRequests.userId, userId),
+          isNotNull(integrationRequests.selection),
+          notInArray(integrationRequests.status, ["cancelled", "failed"])
+        )
+      );
+  }
+
   async updateIntegrationRequest(
     userId: string,
     externalRequestId: string,
     updates: Partial<
       Pick<
         IntegrationRequest,
-        "gameId" | "downloadId" | "status" | "errorMessage" | "attemptedAt" | "igdbId"
+        "gameId" | "downloadId" | "status" | "errorMessage" | "attemptedAt" | "igdbId" | "selection"
       >
     >
   ): Promise<IntegrationRequest | undefined> {

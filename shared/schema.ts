@@ -1424,6 +1424,9 @@ export const integrationRequests = sqliteTable(
     architecture: text("architecture"),
     status: text("status").notNull().default("accepted"),
     errorMessage: text("error_message"),
+    // JSON of the edition or add-ons the requester chose beyond the base game,
+    // with the progress of acquiring each (see server/wanted-content.ts).
+    selection: text("selection"),
     attemptedAt: integer("attempted_at", { mode: "timestamp_ms" }).default(
       sql`(strftime('%s', 'now') * 1000)`
     ),

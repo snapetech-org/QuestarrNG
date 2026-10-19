@@ -41,6 +41,13 @@ import { isReleasePossiblyNewer } from "../shared/version-utils.js";
 import { recordVersionFromCompletedDownload } from "./game-version.js";
 import { rssService } from "./rss.js";
 import {
+  parseWantedContent,
+  pendingAddons,
+  releaseMatchesAddon,
+  releaseMatchesEdition,
+  type WantedContentState,
+} from "./wanted-content.js";
+import {
   releaseMatchesGame,
   normalizeTitle,
   cleanReleaseName,
@@ -1702,6 +1709,16 @@ export async function checkAutoSearch(
           ? (parseSavedReleaseScoringConfig(settings.releaseScoringProfile) ?? null)
           : undefined;
 
+        // Editions and add-ons a requester chose beyond the base game.
+        const selectionRequests = await storage.getOpenSelectionRequests(userId);
+        const editionStateByGame = new Map<string, WantedContentState>();
+        for (const request of selectionRequests) {
+          const state = parseWantedContent(request.selection);
+          if (request.gameId && state?.selection.mode === "edition" && state.targets.edition) {
+            editionStateByGame.set(request.gameId, state);
+          }
+        }
+
         for (const game of wantedGames) {
           try {
             // Skip unreleased games if configured to do so
@@ -1740,9 +1757,16 @@ export async function checkAutoSearch(
               strictPreferredGroups: settings.filterByPreferredGroups ?? false,
               indexerPriorityMap,
             };
+            // A request for a specific edition is met only by that edition. A
+            // different edition of the same game is never substituted.
+            const editionState = editionStateByGame.get(game.id);
+            const editionTarget = editionState?.targets.edition;
             const mainItems = filterAndDeduplicateAutoSearchItems(
               searchResult.mainItems,
-              filterOptions
+              filterOptions,
+              editionTarget
+                ? (item) => releaseMatchesEdition(item.title, game.title, editionTarget.title)
+                : undefined
             );
 
             // Handle main items
@@ -2043,6 +2067,14 @@ export async function checkAutoSearch(
           }
         }
 
+        await processSelectionRequests(userId, selectionRequests, {
+          settings,
+          prefs,
+          filterBase: { preferredGroups, indexerPriorityMap },
+          blacklistTerms,
+          onlyGameId: options.gameId,
+        });
+
         igdbLogger.info(
           { userId, wantedGames: wantedGames.length, gamesWithResults },
           "Completed auto-search"
@@ -2058,6 +2090,133 @@ export async function checkAutoSearch(
     }
   } catch (error) {
     igdbLogger.error({ error }, "Error in checkAutoSearch");
+  }
+}
+
+interface SelectionSearchContext {
+  settings: NonNullable<Awaited<ReturnType<typeof storage.getUserSettings>>>;
+  prefs: ReturnType<typeof resolvePrefs>;
+  filterBase: { preferredGroups: string[]; indexerPriorityMap: Map<string, number> };
+  blacklistTerms: string[];
+  onlyGameId?: string | undefined;
+}
+
+/**
+ * Acquires the add-ons (or an edition, when the base game is already owned)
+ * a requester selected. Each target is searched by name, matched strictly,
+ * and acquired once; a release that is a complete bundle satisfies every
+ * pending add-on. Nothing is substituted when no release matches.
+ */
+export async function processSelectionRequests(
+  userId: string,
+  requests: Awaited<ReturnType<typeof storage.getOpenSelectionRequests>>,
+  context: SelectionSearchContext
+): Promise<void> {
+  for (const request of requests) {
+    if (!request.gameId || (context.onlyGameId && request.gameId !== context.onlyGameId)) continue;
+    const state = parseWantedContent(request.selection);
+    if (!state) continue;
+    const game = await storage.getGame(request.gameId);
+    if (!game || game.userId !== userId || game.seerrCancelled) continue;
+
+    const baseOwned = ["owned", "playing", "completed", "downloading"].includes(game.status);
+    const wantsEdition = state.selection.mode === "edition" && !!state.targets.edition;
+    // While the base game is still wanted, the main search acquires the edition.
+    if (wantsEdition && !baseOwned) continue;
+
+    const targets = wantsEdition
+      ? state.acquiredAddonIds.includes(state.targets.edition!.id)
+        ? []
+        : [{ id: state.targets.edition!.id, title: state.targets.edition!.title, isEdition: true }]
+      : pendingAddons(state).map((addon) => ({ ...addon, isEdition: false }));
+    if (targets.length === 0) continue;
+
+    const acquired = new Set(state.acquiredAddonIds);
+    let changed = false;
+    for (const target of targets) {
+      try {
+        const query = wantsEdition ? target.title : `${game.title} ${target.title}`;
+        const { items, errors } = await searchAllIndexers({ query, limit: 50, offset: 0 });
+        logAutoSearchErrors(game.title, errors);
+        const base = filterByReleaseNameBlacklist(
+          items.filter((item) => releaseMatchesGame(item.title, game.title)),
+          context.blacklistTerms
+        );
+        const matching = base.filter((item) =>
+          target.isEdition
+            ? releaseMatchesEdition(item.title, game.title, target.title)
+            : releaseMatchesAddon(item.title, game.title, target.title).match
+        );
+        const candidates = filterAndDeduplicateAutoSearchItems(matching, {
+          preferredPlatform: resolveGamePlatformPreference(
+            game,
+            context.settings.preferredPlatform ?? null
+          ),
+          operatingSystem: game.targetOperatingSystem,
+          architecture: game.targetArchitecture,
+          preferredGroups: context.filterBase.preferredGroups,
+          strictPreferredGroups: context.settings.filterByPreferredGroups ?? false,
+          indexerPriorityMap: context.filterBase.indexerPriorityMap,
+        });
+        const item = candidates[0];
+        if (!item) continue;
+        if (!context.settings.autoDownloadEnabled) {
+          if (context.prefs.gameAvailable.inApp) {
+            const notification = await storage.addNotification({
+              userId,
+              type: "success",
+              title: "Content Available",
+              message: `${target.title} is available for ${game.title}. Review and choose.`,
+              link: `modal:game:${game.id}`,
+            });
+            notifyUser("notification", notification, notification.userId);
+          }
+          continue;
+        }
+        const downloaders = await storage.getEnabledDownloaders();
+        if (downloaders.length === 0) continue;
+        const result = await DownloaderManager.addDownloadWithFallback(downloaders, {
+          url: item.link,
+          title: item.title,
+        });
+        const rawHash = result?.id ?? result?.correlationTag;
+        const downloadHash = rawHash ? normalizeDownloadHash(rawHash) : rawHash;
+        if (result?.success && downloadHash && result.downloaderId) {
+          await storage.addGameDownload({
+            gameId: game.id,
+            downloaderId: result.downloaderId,
+            downloadHash,
+            downloadTitle: item.title,
+            status: "downloading",
+            downloadType: item.downloadType,
+            category: target.isEdition ? "main" : "dlc",
+          });
+          acquired.add(target.id);
+          changed = true;
+          // A complete bundle covers every pending add-on at once.
+          if (
+            !target.isEdition &&
+            releaseMatchesAddon(item.title, game.title, target.title).viaBundle
+          ) {
+            for (const addon of pendingAddons(state)) acquired.add(addon.id);
+          }
+          igdbLogger.info(
+            { gameTitle: game.title, content: target.title },
+            "Started selected content download"
+          );
+        }
+      } catch (error) {
+        igdbLogger.warn(
+          { gameTitle: game.title, content: target.title, error },
+          "Selected content search failed"
+        );
+      }
+    }
+    if (changed) {
+      await storage.updateIntegrationRequest(userId, request.externalRequestId, {
+        selection: JSON.stringify({ ...state, acquiredAddonIds: [...acquired] }),
+      });
+    }
   }
 }
 

@@ -516,6 +516,9 @@ export const integrationRequests = pgTable(
     architecture: text("architecture"),
     status: text("status").notNull().default("accepted"),
     errorMessage: text("error_message"),
+    // JSON of the edition or add-ons the requester chose beyond the base game,
+    // with the progress of acquiring each (see server/wanted-content.ts).
+    selection: text("selection"),
     attemptedAt: timestampMs("attempted_at").default(
       sql`(EXTRACT(EPOCH FROM now()) * 1000)::bigint`
     ),

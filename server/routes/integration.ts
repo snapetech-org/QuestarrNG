@@ -18,6 +18,13 @@ import { checkAutoSearch, withGameOperationLock } from "../cron.js";
 import { DownloaderManager } from "../downloaders/manager.js";
 import { normalizeTitle } from "../../shared/title-utils.js";
 import { quickAddGameByTitle } from "../game-quick-add.js";
+import { buildEditionsResponse, groupLanguages, hoursToBeat } from "../content-catalog.js";
+import {
+  parseWantedContent,
+  pendingAddons,
+  wantedContentSchema,
+  type WantedContentState,
+} from "../wanted-content.js";
 // Relative path, not the "@shared" alias — see the comment in
 // game-quick-add.ts.
 import { GAME_STATUSES, type Game } from "../../shared/schema.js";
@@ -346,10 +353,34 @@ const getSeerrRequest = async (userId: string, externalRequestId: string) => {
     status = "accepted";
   }
 
+  // Content the requester selected counts as outstanding until it is acquired,
+  // even when the base game is already in the library.
+  const wantedState = parseWantedContent(ledger?.selection);
+  const outstanding = wantedState
+    ? wantedState.selection.mode === "edition"
+      ? wantedState.targets.edition &&
+        !wantedState.acquiredAddonIds.includes(wantedState.targets.edition.id)
+        ? [wantedState.targets.edition]
+        : []
+      : pendingAddons(wantedState)
+    : [];
+  if (outstanding.length > 0 && status === "available") {
+    status = ["downloading", "queued", "paused"].includes(downloadStatus)
+      ? "downloading"
+      : "searching";
+  }
+
   const request = {
     externalRequestId,
     status,
     deliverable: assets.length > 0,
+    content: wantedState
+      ? {
+          mode: wantedState.selection.mode,
+          pending: outstanding.map((entry) => ({ id: entry.id, title: entry.title })),
+          acquiredCount: wantedState.acquiredAddonIds.length,
+        }
+      : undefined,
     error:
       status === "failed"
         ? game.seerrRecoveryRequired
@@ -396,6 +427,10 @@ integrationRouter.get("/seerrng/v1/ping", (_req: Request, res: Response) => {
       requestActions: { retry: true, cancel: true },
       assetStreaming: true,
       assetBundles: true,
+      // Editions and add-ons as requestable content, and attribute discovery.
+      editions: true,
+      discover: true,
+      wantedContent: true,
     },
   });
 });
@@ -563,6 +598,144 @@ integrationRouter.get("/seerrng/v1/catalog/games/:igdbId", async (req: Request, 
   }
 });
 
+const catalogFacetList = (value: unknown, max = 20): string[] | null | undefined => {
+  if (value === undefined) return undefined;
+  if (typeof value !== "string" || value.length > 1500) return null;
+  const items = value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+  if (items.length > max || items.some((item) => item.length > 80)) return null;
+  return items;
+};
+
+integrationRouter.get(
+  "/seerrng/v1/catalog/games/:igdbId/editions",
+  async (req: Request, res: Response) => {
+    const igdbId = Number(req.params.igdbId);
+    if (!Number.isSafeInteger(igdbId) || igdbId <= 0) {
+      return res.status(400).json({ error: "Invalid IGDB game ID." });
+    }
+    try {
+      const graph = await igdbClient.getEditionGraph(igdbId);
+      const ids = new Set<number>([
+        igdbId,
+        ...graph.editions.map((edition) => edition.id),
+        ...[graph.base, ...graph.editions].flatMap((game) =>
+          [
+            ...(game?.dlcs ?? []),
+            ...(game?.expansions ?? []),
+            ...(game?.standalone_expansions ?? []),
+          ].map((ref) => ref.id)
+        ),
+      ]);
+      const library = await storage.getUserGamesByIgdbIds(req.user!.id, [...ids].slice(0, 200));
+      const ownedGames = library.filter((game) =>
+        ["owned", "playing", "completed"].includes(game.status)
+      );
+      const owned = new Set(
+        ownedGames.flatMap((game) => (typeof game.igdbId === "number" ? [game.igdbId] : []))
+      );
+      const baseStatus = library.find((game) => game.igdbId === igdbId)?.status;
+      const response = buildEditionsResponse(graph, { ids: owned, baseStatus });
+      if (!response) return res.status(404).json({ error: "Game not found." });
+      return res.json(response);
+    } catch (error) {
+      logger.error({ error, igdbId }, "SeerrNG edition lookup failed");
+      return res.status(502).json({ error: "IGDB catalog is unavailable." });
+    }
+  }
+);
+
+integrationRouter.get("/seerrng/v1/catalog/discover", async (req: Request, res: Response) => {
+  const rawLists = {
+    themes: catalogFacetList(req.query.themes),
+    gameModes: catalogFacetList(req.query.gameModes),
+    perspectives: catalogFacetList(req.query.perspectives),
+    genres: catalogFacetList(req.query.genres),
+    languages: catalogFacetList(req.query.languages),
+    excludeThemes: catalogFacetList(req.query.excludeThemes),
+    excludeGameModes: catalogFacetList(req.query.excludeGameModes),
+    excludeGenres: catalogFacetList(req.query.excludeGenres),
+  };
+  if (Object.values(rawLists).some((value) => value === null)) {
+    return res.status(400).json({ error: "Invalid discovery filter." });
+  }
+  const lists = rawLists as Record<keyof typeof rawLists, string[] | undefined>;
+  const limit = Math.min(Math.max(Number(req.query.limit ?? 24) || 24, 1), 48);
+  const minYear = req.query.minYear === undefined ? undefined : Number(req.query.minYear);
+  const maxHours =
+    req.query.maxHoursToBeat === undefined ? undefined : Number(req.query.maxHoursToBeat);
+  if (
+    (minYear !== undefined &&
+      (!Number.isSafeInteger(minYear) || minYear < 1970 || minYear > 2100)) ||
+    (maxHours !== undefined && (!Number.isFinite(maxHours) || maxHours <= 0 || maxHours > 2000))
+  ) {
+    return res.status(400).json({ error: "Invalid discovery filter." });
+  }
+  const cursorValue = req.query.cursor;
+  const offset =
+    typeof cursorValue === "string" && /^\d{1,5}$/.test(cursorValue) ? Number(cursorValue) : 0;
+  const query = typeof req.query.q === "string" ? req.query.q.slice(0, 100) : undefined;
+  const hasFilter =
+    !!query ||
+    Object.values(lists).some((value) => value && value.length > 0) ||
+    minYear !== undefined ||
+    maxHours !== undefined;
+  if (!hasFilter) {
+    return res.status(400).json({ error: "Provide at least one discovery filter." });
+  }
+  try {
+    const games = await igdbClient.discoverGames(
+      {
+        query,
+        themes: lists.themes,
+        gameModes: lists.gameModes,
+        perspectives: lists.perspectives,
+        genres: lists.genres,
+        languages: lists.languages,
+        excludeThemes: lists.excludeThemes,
+        excludeGameModes: lists.excludeGameModes,
+        excludeGenres: lists.excludeGenres,
+        minYear,
+      },
+      limit,
+      offset
+    );
+    const filterFlags = await getContentFilterFlags(req.user!.id);
+    const visible = excludeFilteredContent(
+      games.map((game) => ({ ...igdbClient.formatGameData(game), __game: game })),
+      filterFlags
+    );
+    const times = await igdbClient
+      .getTimeToBeats(games.map((game) => game.id))
+      .catch(() => new Map());
+    const results = visible
+      .map(({ __game }) => {
+        const base = seerrGameSchema(__game);
+        const timeToBeat = times.get(__game.id) ?? null;
+        return {
+          ...base,
+          timeToBeat,
+          themes: __game.themes?.map((theme) => theme.name) ?? [],
+          gameModes: __game.game_modes?.map((mode) => mode.name) ?? [],
+          perspectives: __game.player_perspectives?.map((p) => p.name) ?? [],
+          languages: groupLanguages(__game),
+        };
+      })
+      .filter(
+        (game) => maxHours === undefined || (hoursToBeat(game.timeToBeat) ?? Infinity) <= maxHours
+      );
+    return res.json({
+      results,
+      nextCursor: games.length >= limit ? String(offset + limit) : null,
+    });
+  } catch (error) {
+    logger.error({ error }, "SeerrNG discovery failed");
+    return res.status(502).json({ error: "IGDB catalog is unavailable." });
+  }
+});
+
 integrationRouter.get("/seerrng/v1/library/lookup", async (req: Request, res: Response) => {
   const igdbIds = parseCatalogPlatformIds(req.query.igdbIds);
   const steamAppIds = (() => {
@@ -612,7 +785,45 @@ const seerrCreateRequestSchema = z.object({
   title: z.string().trim().min(1).max(500),
   igdbId: z.number().int().positive().optional(),
   variant: seerrVariantSchema,
+  // An edition or specific add-ons beyond the base game (contract v2).
+  selection: wantedContentSchema.optional(),
 });
+
+/**
+ * Resolves a content selection into the titles it names. Ids IGDB does not
+ * link to the game are rejected so a request cannot name unrelated content.
+ */
+const buildWantedContentState = async (
+  igdbId: number,
+  selection: z.infer<typeof wantedContentSchema>
+): Promise<WantedContentState | null> => {
+  const graph = await igdbClient.getEditionGraph(igdbId);
+  if (!graph.base) return null;
+  const refs = (game: {
+    dlcs?: { id: number; name: string }[];
+    expansions?: { id: number; name: string }[];
+    standalone_expansions?: { id: number; name: string }[];
+  }) => [...(game.dlcs ?? []), ...(game.expansions ?? []), ...(game.standalone_expansions ?? [])];
+  const known = new Map(refs(graph.base).map((ref) => [ref.id, ref.name]));
+  const targets: WantedContentState["targets"] = { addons: [] };
+  if (selection.mode === "edition") {
+    const edition = graph.editions.find((entry) => entry.id === selection.editionId);
+    if (!edition) return null;
+    targets.edition = {
+      id: edition.id,
+      title: edition.version_title ? `${graph.base.name} ${edition.version_title}` : edition.name,
+      ...(edition.version_title ? { versionTitle: edition.version_title } : {}),
+    };
+  } else {
+    for (const id of selection.addonIds ?? []) {
+      const name = known.get(id);
+      if (!name) return null;
+      targets.addons.push({ id, title: name });
+    }
+    if (targets.addons.length === 0) return null;
+  }
+  return { selection, targets, acquiredAddonIds: [] };
+};
 
 integrationRouter.post(
   "/seerrng/v1/requests",
@@ -621,7 +832,25 @@ integrationRouter.post(
     const parsed = seerrCreateRequestSchema.safeParse(req.body);
     if (!parsed.success)
       return res.status(400).json({ error: "Invalid software request payload." });
-    const { externalRequestId, title, igdbId, variant } = parsed.data;
+    const { externalRequestId, title, igdbId, variant, selection } = parsed.data;
+    if (selection && !igdbId) {
+      return res.status(400).json({ error: "A content selection needs an exact IGDB title." });
+    }
+    let wantedState: WantedContentState | null = null;
+    if (selection && igdbId) {
+      try {
+        wantedState = await buildWantedContentState(igdbId, selection);
+      } catch (error) {
+        logger.error({ error, igdbId }, "SeerrNG content selection lookup failed");
+        return res.status(502).json({ error: "IGDB catalog is unavailable." });
+      }
+      if (!wantedState) {
+        return res
+          .status(400)
+          .json({ error: "The selected content does not belong to this game." });
+      }
+    }
+    const selectionJson = wantedState ? JSON.stringify(wantedState) : null;
     return withSeerrDispatchQueue(`${req.user!.id}:${normalizeTitle(title)}`, async () => {
       try {
         let ledger = await storage.getIntegrationRequest(req.user!.id, externalRequestId);
@@ -630,7 +859,9 @@ integrationRouter.post(
             ledger.title === title &&
             ledger.operatingSystem === variant.operatingSystem &&
             ledger.architecture === variant.architecture &&
-            (ledger.igdbId ?? null) === (igdbId ?? null);
+            (ledger.igdbId ?? null) === (igdbId ?? null) &&
+            // A retried request keeps its original selection and progress.
+            (ledger.selection === null) === (selectionJson === null);
           if (!sameRequest) {
             return res.status(409).json({
               error: "externalRequestId is already bound to a different request identity.",
@@ -657,6 +888,7 @@ integrationRouter.post(
             igdbId: igdbId ?? null,
             operatingSystem: variant.operatingSystem,
             architecture: variant.architecture,
+            selection: selectionJson,
           });
         }
         const existing = await findSeerrGame(req.user!.id, externalRequestId);
@@ -671,6 +903,23 @@ integrationRouter.post(
           });
           const current = await getSeerrRequest(req.user!.id, externalRequestId);
           return res.status(200).json(current);
+        }
+
+        // A selection can be requested for a game already in the library. The
+        // existing game is linked and the selected content is searched for,
+        // without re-adding or changing what the person owns.
+        if (wantedState && igdbId) {
+          const [libraryGame] = await storage.getUserGamesByIgdbIds(req.user!.id, [igdbId]);
+          if (libraryGame) {
+            await storage.updateIntegrationRequest(req.user!.id, externalRequestId, {
+              gameId: libraryGame.id,
+              status: "searching",
+              errorMessage: null,
+              attemptedAt: new Date(),
+            });
+            await checkAutoSearch({ userId: req.user!.id, gameId: libraryGame.id, force: true });
+            return res.status(201).json(await getSeerrRequest(req.user!.id, externalRequestId));
+          }
         }
 
         const result = await quickAddGameByTitle(req.user!.id, title, {

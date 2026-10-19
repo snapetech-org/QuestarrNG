@@ -282,6 +282,9 @@ describe("SeerrNG software-provider contract", () => {
         requestActions: { retry: true, cancel: true },
         assetStreaming: true,
         assetBundles: true,
+        editions: true,
+        discover: true,
+        wantedContent: true,
       },
     });
 

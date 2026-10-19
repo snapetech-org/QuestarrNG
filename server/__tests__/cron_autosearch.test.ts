@@ -61,6 +61,7 @@ vi.mock("../storage.js", () => ({
     recordAiAutoDownloadHold: mockRecordAiAutoDownloadHold,
     clearAiAutoDownloadHold: mockClearAiAutoDownloadHold,
     getDownloadsByGameId: mockGetDownloadsByGameId,
+    getOpenSelectionRequests: vi.fn().mockResolvedValue([]),
   },
 }));
 

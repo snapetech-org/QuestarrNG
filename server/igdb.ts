@@ -18,6 +18,58 @@ export const IGDB_EARLY_ACCESS_STATUS = 4;
 const IGDB_GAME_FIELDS =
   "name, summary, cover.url, first_release_date, rating, aggregated_rating, aggregated_rating_count, platforms.id, platforms.name, genres.name, themes.name, age_ratings.category, age_ratings.rating, screenshots.url, websites.url, websites.category, involved_companies.company.name, involved_companies.developer, involved_companies.publisher, status, game_type, category, version_parent.id, version_parent.name, expansions.name, expansions.cover.url, expansions.first_release_date, expansions.game_type, expansions.url";
 
+/** Facets IGDB can filter games on, resolved by display name. */
+export type IGDBFacetEndpoint = "themes" | "game_modes" | "player_perspectives" | "languages";
+
+export interface IGDBDiscoverGame extends IGDBGame {
+  game_modes?: Array<{ id: number; name: string }>;
+  player_perspectives?: Array<{ id: number; name: string }>;
+  language_supports?: Array<{
+    language?: { name?: string };
+    language_support_type?: { name?: string };
+  }>;
+}
+
+export interface IGDBDiscoverFilters {
+  query?: string | undefined;
+  themes?: string[] | undefined;
+  gameModes?: string[] | undefined;
+  perspectives?: string[] | undefined;
+  genres?: string[] | undefined;
+  languages?: string[] | undefined;
+  excludeThemes?: string[] | undefined;
+  excludeGameModes?: string[] | undefined;
+  excludeGenres?: string[] | undefined;
+  minYear?: number | undefined;
+}
+
+export interface IGDBContentRef {
+  id: number;
+  name: string;
+  cover?: { url: string };
+  first_release_date?: number;
+  game_type?: number;
+}
+
+export interface IGDBEditionGraph {
+  id: number;
+  name: string;
+  summary?: string;
+  version_title?: string;
+  first_release_date?: number;
+  cover?: { url: string };
+  dlcs?: IGDBContentRef[];
+  expansions?: IGDBContentRef[];
+  standalone_expansions?: IGDBContentRef[];
+}
+
+const IGDB_DISCOVER_FIELDS = `${IGDB_GAME_FIELDS}, game_modes.id, game_modes.name, player_perspectives.id, player_perspectives.name, language_supports.language.name, language_supports.language_support_type.name`;
+const IGDB_CONTENT_REF_FIELDS = (prefix: string) =>
+  ["id", "name", "cover.url", "first_release_date", "game_type"]
+    .map((f) => `${prefix}.${f}`)
+    .join(", ");
+const IGDB_EDITION_FIELDS = `name, summary, version_title, first_release_date, cover.url, ${IGDB_CONTENT_REF_FIELDS("dlcs")}, ${IGDB_CONTENT_REF_FIELDS("expansions")}, ${IGDB_CONTENT_REF_FIELDS("standalone_expansions")}`;
+
 // IGDB theme name flagged as adult content (Erotic)
 const ADULT_THEME_NAMES = new Set(["Erotic"]);
 
@@ -1668,6 +1720,97 @@ class IGDBClient {
       igdbLogger.warn({ error }, "IGDB platforms fetch failed; using fallback list");
       return FALLBACK_PLATFORMS;
     }
+  }
+
+  /** Resolves facet display names to IGDB ids. Unknown names are dropped. */
+  async getFacetIds(endpoint: IGDBFacetEndpoint, names: string[]): Promise<number[]> {
+    if (names.length === 0 || !(await this.ensureConfigured())) return [];
+    const rows = await this.makeRequest<Array<{ id: number; name: string }>>(
+      endpoint,
+      `fields id, name; limit 500;`,
+      24 * 60 * 60 * 1000
+    );
+    const wanted = new Set(names.map((name) => name.trim().toLowerCase()));
+    return rows.filter((row) => wanted.has(row.name.toLowerCase())).map((row) => row.id);
+  }
+
+  /**
+   * Attribute-driven discovery. Every filter is optional and built from ids
+   * resolved above, never from raw user text. Exclusions use IGDB's "none of"
+   * operator so excluded themes and modes cannot slip through.
+   */
+  async discoverGames(
+    filters: IGDBDiscoverFilters,
+    limit: number,
+    offset: number
+  ): Promise<IGDBDiscoverGame[]> {
+    if (!(await this.ensureConfigured())) return [];
+    const [
+      themes,
+      gameModes,
+      perspectives,
+      genres,
+      languages,
+      excludeThemes,
+      excludeModes,
+      excludeGenres,
+    ] = await Promise.all([
+      this.getFacetIds("themes", filters.themes ?? []),
+      this.getFacetIds("game_modes", filters.gameModes ?? []),
+      this.getFacetIds("player_perspectives", filters.perspectives ?? []),
+      this.getGenres().then((all) => {
+        const wanted = new Set((filters.genres ?? []).map((name) => name.toLowerCase()));
+        return all.filter((genre) => wanted.has(genre.name.toLowerCase())).map((genre) => genre.id);
+      }),
+      this.getFacetIds("languages", filters.languages ?? []),
+      this.getFacetIds("themes", filters.excludeThemes ?? []),
+      this.getFacetIds("game_modes", filters.excludeGameModes ?? []),
+      this.getGenres().then((all) => {
+        const wanted = new Set((filters.excludeGenres ?? []).map((name) => name.toLowerCase()));
+        return all.filter((genre) => wanted.has(genre.name.toLowerCase())).map((genre) => genre.id);
+      }),
+    ]);
+
+    const conditions = ["game_type = (0, 8, 9, 10)", "version_parent = null"];
+    const list = (ids: number[]) => ids.join(",");
+    if (themes.length) conditions.push(`themes = (${list(themes)})`);
+    if (gameModes.length) conditions.push(`game_modes = (${list(gameModes)})`);
+    if (perspectives.length) conditions.push(`player_perspectives = (${list(perspectives)})`);
+    if (genres.length) conditions.push(`genres = (${list(genres)})`);
+    if (languages.length) conditions.push(`language_supports.language = (${list(languages)})`);
+    if (excludeThemes.length) conditions.push(`themes != (${list(excludeThemes)})`);
+    if (excludeModes.length) conditions.push(`game_modes != (${list(excludeModes)})`);
+    if (excludeGenres.length) conditions.push(`genres != (${list(excludeGenres)})`);
+    if (filters.minYear && Number.isSafeInteger(filters.minYear)) {
+      conditions.push(
+        `first_release_date >= ${Math.floor(Date.UTC(filters.minYear, 0, 1) / 1000)}`
+      );
+    }
+    const term = filters.query ? sanitizeIgdbInput(filters.query) : "";
+    const boundedLimit = Math.max(1, Math.min(limit, MAX_LIMIT));
+    const igdbQuery = `${term ? `search "${term}"; ` : ""}fields ${IGDB_DISCOVER_FIELDS}; where ${conditions.join(" & ")}; ${term ? "" : "sort rating desc; "}limit ${boundedLimit}; offset ${Math.max(0, offset)};`;
+    return this.makeRequest<IGDBDiscoverGame[]>("games", igdbQuery, 15 * 60 * 1000);
+  }
+
+  /** A base game's standalone content and each edition with the content it links. */
+  async getEditionGraph(igdbId: number): Promise<{
+    base: IGDBEditionGraph | null;
+    editions: IGDBEditionGraph[];
+  }> {
+    if (!(await this.ensureConfigured())) return { base: null, editions: [] };
+    const [baseRows, editionRows] = await Promise.all([
+      this.makeRequest<IGDBEditionGraph[]>(
+        "games",
+        `fields ${IGDB_EDITION_FIELDS}; where id = ${igdbId}; limit 1;`,
+        6 * 60 * 60 * 1000
+      ),
+      this.makeRequest<IGDBEditionGraph[]>(
+        "games",
+        `fields ${IGDB_EDITION_FIELDS}; where version_parent = ${igdbId}; limit 30;`,
+        6 * 60 * 60 * 1000
+      ),
+    ]);
+    return { base: baseRows[0] ?? null, editions: editionRows };
   }
 
   formatGameData(igdbGame: IGDBGame): Record<string, unknown> {
