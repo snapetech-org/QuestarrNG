@@ -98,3 +98,28 @@ export const parseWantedContent = (raw: string | null | undefined): WantedConten
 
 export const pendingAddons = (state: WantedContentState) =>
   state.targets.addons.filter((addon) => !state.acquiredAddonIds.includes(addon.id));
+
+/** What is still outstanding for one request, or null when nothing is. */
+export const summarizeWantedRequest = (
+  row: { externalRequestId: string; title: string; selection: string | null },
+  gameTitle?: string
+) => {
+  const state = parseWantedContent(row.selection);
+  if (!state) return null;
+  const edition = state.targets.edition;
+  const pending =
+    state.selection.mode === "edition"
+      ? edition && !state.acquiredAddonIds.includes(edition.id)
+        ? [{ id: edition.id, title: edition.title }]
+        : []
+      : pendingAddons(state).map((addon) => ({ id: addon.id, title: addon.title }));
+  if (pending.length === 0) return null;
+  return {
+    id: row.externalRequestId,
+    // A request not yet linked to a library game still names its title.
+    gameTitle: gameTitle ?? row.title,
+    mode: state.selection.mode,
+    pending,
+    acquiredCount: state.acquiredAddonIds.length,
+  };
+};

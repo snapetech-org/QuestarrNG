@@ -5,6 +5,7 @@ import {
   pendingAddons,
   releaseMatchesAddon,
   releaseMatchesEdition,
+  summarizeWantedRequest,
   wantedContentSchema,
 } from "../wanted-content.js";
 
@@ -142,5 +143,44 @@ describe("wanted content state", () => {
     expect(pendingAddons(state).map((a) => a.id)).toEqual([2]);
     expect(parseWantedContent("{nope")).toBeNull();
     expect(parseWantedContent(null)).toBeNull();
+  });
+});
+
+describe("summarizeWantedRequest", () => {
+  const selection = JSON.stringify({
+    selection: { kind: "game-content", mode: "missing-selected", addonIds: [11, 12] },
+    targets: {
+      addons: [
+        { id: 11, title: "Soundtrack" },
+        { id: 12, title: "Expansion Pass" },
+      ],
+    },
+    acquiredAddonIds: [11],
+  });
+
+  it("lists only add-ons not yet acquired and falls back to the request title", () => {
+    expect(
+      summarizeWantedRequest({ externalRequestId: "e1", title: "Test Game", selection })
+    ).toEqual({
+      id: "e1",
+      gameTitle: "Test Game",
+      mode: "missing-selected",
+      pending: [{ id: 12, title: "Expansion Pass" }],
+      acquiredCount: 1,
+    });
+  });
+
+  it("prefers the library game title and drops completed or unreadable selections", () => {
+    expect(
+      summarizeWantedRequest({ externalRequestId: "e1", title: "Req", selection }, "Library Title")
+        ?.gameTitle
+    ).toBe("Library Title");
+    expect(
+      summarizeWantedRequest({ externalRequestId: "e2", title: "x", selection: null })
+    ).toBeNull();
+    const done = selection.replace('"acquiredAddonIds":[11]', '"acquiredAddonIds":[11,12]');
+    expect(
+      summarizeWantedRequest({ externalRequestId: "e3", title: "x", selection: done })
+    ).toBeNull();
   });
 });

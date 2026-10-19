@@ -1738,30 +1738,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Editions and add-ons a SeerrNG request asked for that are not acquired yet.
   app.get("/api/wanted-content", async (req, res) => {
     try {
-      const { parseWantedContent, pendingAddons } = await import("./wanted-content.js");
+      const { summarizeWantedRequest } = await import("./wanted-content.js");
       const rows = await storage.getOpenSelectionRequests(req.user!.id);
       const items = await Promise.all(
         rows.map(async (row) => {
-          const state = parseWantedContent(row.selection);
-          if (!state) return null;
           const game = row.gameId ? await storage.getGame(row.gameId) : undefined;
-          const edition = state.targets.edition;
-          const pending =
-            state.selection.mode === "edition"
-              ? edition && !state.acquiredAddonIds.includes(edition.id)
-                ? [{ id: edition.id, title: edition.title }]
-                : []
-              : pendingAddons(state).map((addon) => ({ id: addon.id, title: addon.title }));
-          return {
-            id: row.externalRequestId,
-            gameTitle: game?.title ?? edition?.title ?? "",
-            mode: state.selection.mode,
-            pending,
-            acquiredCount: state.acquiredAddonIds.length,
-          };
+          return summarizeWantedRequest(row, game?.title);
         })
       );
-      res.json(items.filter((item) => item && item.pending.length > 0));
+      res.json(items.filter((item) => item !== null));
     } catch (error) {
       routesLogger.error({ error }, "Error listing wanted content");
       res.status(500).json({ error: "Failed to list wanted content" });
