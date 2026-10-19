@@ -148,6 +148,17 @@ and twelve translated locales with regional date and number formatting.
 Emulation acquisition remains unsupported. See the
 [compatibility guide](docs/SEERRNG-INTEGRATION.md#current-capability-status).
 
+**Editions, selected content, and discovery.** The same API now lets SeerrNG
+list a game's editions and the content each links, request only the expansions
+or add-ons a person selected (or a complete edition), and find games by theme,
+game mode, perspective, genre, and language. Content IGDB does not describe is
+reported as unknown instead of guessed, an edition request is met only by
+releases that name that edition, and an add-on request only by releases that
+name it or a complete bundle. For a game already in your library the selected
+content is searched for without changing what you own. Handshake flags:
+`editions`, `discover`, `wantedContent`. Routes and the request `selection`
+field are in [docs/API.md](docs/API.md#seerrng-content-selection-contract-v2).
+
 ### Import processing and file safety
 
 Post-processing can move, copy, hardlink, or symlink completed downloads into
