@@ -1,9 +1,10 @@
 # Home server app store integrations
 
 Questarr ships ready-made app definitions for the main self-hosting platforms, so it can be
-installed without hand-writing a Compose file. The standard Compose, CasaOS, Umbrel, Cosmos, and
-Unraid definitions point at the same published image
-(`ghcr.io/snapetech-org/questarrng:latest`) and use the same two mounts:
+installed without hand-writing a Compose file. Compose, CasaOS, Umbrel, and Cosmos use the stable
+`ghcr.io/snapetech-org/questarrng:latest` alias. The Unraid template follows the moving
+`ghcr.io/snapetech-org/questarrng:main` tag, which advances after the validated main release.
+All definitions use the same two mounts:
 
 | Container path | Purpose                                                                         |
 | -------------- | ------------------------------------------------------------------------------- |

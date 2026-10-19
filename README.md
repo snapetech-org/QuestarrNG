@@ -333,7 +333,7 @@ and troubleshooting.
 The upstream **Questarr** Community Apps entry uses the upstream image and
 does not include this fork's SeerrNG integration routes. Use the
 [QuestarrNG fork template](unraid/questarr.xml)
-for `ghcr.io/snapetech-org/questarrng:latest`. QuestarrNG works as a standalone
+for `ghcr.io/snapetech-org/questarrng:main`. QuestarrNG works as a standalone
 game manager; SeerrNG integration is optional. For package or integration
 support, use the [SeerrNG issue tracker](https://github.com/snapetech/seerrng/issues).
 
@@ -342,7 +342,7 @@ the local user template from the Unraid terminal:
 
 ```bash
 wget -O /boot/config/plugins/dockerMan/templates-user/questarrng.xml \
-  https://raw.githubusercontent.com/snapetech/QuestarrNG/main/unraid/questarr.xml
+  https://raw.githubusercontent.com/snapetech-org/QuestarrNG/main/unraid/questarr.xml
 ```
 
 1. In Docker, choose **Add Container** and select the **QuestarrNG** user template.
