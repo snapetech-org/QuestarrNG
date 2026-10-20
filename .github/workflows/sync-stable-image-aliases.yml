@@ -111,6 +111,7 @@ jobs:
         env:
           SOURCE_IMAGE: ghcr.io/snapetech-org/questarrng
           IMAGE: docker.io/snapetech/questarrng
+          HUB_REPOSITORY: snapetech/questarrng
           VERSION: ${{ steps.release.outputs.version }}
         run: |
           set -euo pipefail
@@ -124,16 +125,32 @@ jobs:
             echo "Could not resolve the GHCR source image digest for $VERSION." >&2
             exit 1
           fi
-          for tag in "$VERSION" main master latest stable; do
-            docker buildx imagetools create --tag "$IMAGE:$tag" "$SOURCE_IMAGE:$VERSION"
-          done
-          mirror_digest="$(digest_for "$IMAGE:$VERSION")"
-          if [[ ! "$mirror_digest" =~ ^sha256:[a-f0-9]{64}$ ]]; then
-            echo "Could not resolve the Docker Hub release image digest for $VERSION." >&2
+          docker_config="${DOCKER_CONFIG:-$HOME/.docker}"
+          authfile="$docker_config/config.json"
+          if [[ ! -s "$authfile" ]]; then
+            echo "Docker login did not create an auth file for the registry copy." >&2
             exit 1
           fi
+          skopeo_image="quay.io/skopeo/stable@sha256:3cee4b44cb54d59f5b8822f8ca6379d6aafa4308834e5d9d958f5a4dc553a428"
           for tag in "$VERSION" main master latest stable; do
-            actual_digest="$(digest_for "$IMAGE:$tag")"
+            docker run --rm \
+              --volume "$authfile:/auth/config.json:ro" \
+              "$skopeo_image" \
+              copy --authfile /auth/config.json \
+                --all --preserve-digests --retry-times 5 \
+                --image-parallel-copies 24 \
+                "docker://$SOURCE_IMAGE:$VERSION" \
+                "docker://$IMAGE:$tag"
+          done
+          mirror_digest="$source_digest"
+          hub_digest_for() {
+            local response
+            response="$(curl --fail --silent --show-error --location --retry 5 --retry-delay 2 \
+              "https://hub.docker.com/v2/repositories/$HUB_REPOSITORY/tags/$1")"
+            jq -r '.digest // empty' <<< "$response"
+          }
+          for tag in "$VERSION" main master latest stable; do
+            actual_digest="$(hub_digest_for "$tag")"
             if [[ "$actual_digest" != "$mirror_digest" ]]; then
               echo "Docker Hub $tag points to $actual_digest, expected $mirror_digest." >&2
               exit 1

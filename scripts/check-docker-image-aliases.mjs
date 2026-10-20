@@ -19,7 +19,9 @@ function checkWorkflow(path, expectedCount) {
   const source = readPolicyFile(path);
   const publishLoops = [
     ...source.matchAll(/for tag in ([^\r\n;]+); do\r?\n([\s\S]*?)\r?\n[ \t]*done/gu),
-  ].filter(([, , body]) => /docker buildx imagetools create/u.test(body));
+  ].filter(([, , body]) =>
+    /docker buildx imagetools create|^[ \t]*copy --authfile/mu.test(body)
+  );
 
   if (publishLoops.length !== expectedCount) {
     throw new Error(
