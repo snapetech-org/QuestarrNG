@@ -1,4 +1,6 @@
 #!/bin/sh
+security_repo_root="$(git rev-parse --show-toplevel)"
+"$security_repo_root/scripts/security-scan-local.sh" --staged --semgrep-only
 node scripts/check-docker-image-aliases.mjs || exit 1
 if [ -x ./node_modules/.bin/lint-staged ]; then
   ./node_modules/.bin/lint-staged

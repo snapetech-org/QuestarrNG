@@ -19,6 +19,8 @@ permissions:
 jobs:
   semgrep:
     name: semgrep
+    env:
+      EIO_BACKEND: posix
     runs-on: ubuntu-latest
     permissions:
       contents: read
