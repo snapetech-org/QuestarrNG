@@ -109,12 +109,12 @@ Contracts in `scripts/validation-engine/workflow-security.contract.mjs` guard
 the workflow structure; the environment's branch policy is configured in
 GitHub repository settings.
 
-Production GHCR version and `latest` tags are published only by the
-`fork-image.yml` workflow after a validated `vMAJOR.MINOR.PATCH` tag points to
-`main` and the release image passes security scans and smoke checks. Main
-branch merges do not publish production images. Manual image builds are limited
-to development and test channels, with reserved production and version tags
-rejected by the workflow contract.
+Production GHCR version tags and the `main`, `master`,
+`latest`, and `stable` aliases are attached by the `fork-image.yml` workflow only after a validated `vMAJOR.MINOR.PATCH` tag points to `main` and the release image passes security scans and smoke
+checks.
+
+The trusted `sync-stable-image-aliases.yml` workflow can reattach these aliases only to the latest published stable release after confirming
+its tag is reachable from `main`. It does not build an image.
 
 GitHub exposes repository secrets to every workflow in the repository, so the
 release webhook must not be repository-scoped. The announcement jobs use the

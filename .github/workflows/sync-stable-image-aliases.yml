@@ -1,0 +1,138 @@
+name: Sync stable image aliases
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-stable-image-aliases-${{ github.repository_id }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.repository_id == '1388297896' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Resolve latest stable release
+        id: release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          release_json="$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName,isDraft,isPrerelease,publishedAt)"
+          tag="$(jq -r '.tagName' <<< "$release_json")"
+          jq -e '(.isDraft == false) and (.isPrerelease == false) and (.publishedAt != null)' <<< "$release_json" >/dev/null
+          if [[ ! "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Latest published release is not a stable semantic version: $tag" >&2
+            exit 1
+          fi
+          git fetch --no-tags origin main "refs/tags/$tag:refs/tags/$tag"
+          release_sha="$(git rev-parse "$tag^{commit}")"
+          if ! git merge-base --is-ancestor "$release_sha" origin/main; then
+            echo "Latest stable release $tag is not reachable from main." >&2
+            exit 1
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+          echo "Resolved latest stable release $tag at $release_sha."
+
+      - name: Require Docker Hub publisher credentials
+        shell: bash
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$DOCKERHUB_USERNAME" || -z "$DOCKERHUB_TOKEN" ]]; then
+            echo "Docker Hub publisher credentials are required to synchronize release aliases." >&2
+            exit 1
+          fi
+
+      - name: Set up Buildx
+        uses: step-security/setup-buildx-action@e50058a0fcd8d1a7d626c905502d010a468bf238 # v4.4.1
+
+      - name: Log in to GHCR
+        uses: step-security/docker-login-action@8c7b695d8738c5699a679ff5254baf0f19f20a94 # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to Docker Hub
+        uses: step-security/docker-login-action@8c7b695d8738c5699a679ff5254baf0f19f20a94 # v4.6.0
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Synchronize GHCR aliases and verify digests
+        shell: bash
+        env:
+          IMAGE: ghcr.io/snapetech-org/questarrng
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          set -euo pipefail
+          digest_for() {
+            docker buildx imagetools inspect "$1" | awk '$1 == "Digest:" { print $2; exit }'
+          }
+          source_digest="$(digest_for "$IMAGE:$VERSION")"
+          if [[ ! "$source_digest" =~ ^sha256:[a-f0-9]{64}$ ]]; then
+            echo "Could not resolve the GHCR release image digest for $VERSION." >&2
+            exit 1
+          fi
+          for tag in main master latest stable; do
+            docker buildx imagetools create --tag "$IMAGE:$tag" "$IMAGE:$VERSION"
+          done
+          for tag in main master latest stable; do
+            actual_digest="$(digest_for "$IMAGE:$tag")"
+            if [[ "$actual_digest" != "$source_digest" ]]; then
+              echo "GHCR $tag points to $actual_digest, expected $source_digest." >&2
+              exit 1
+            fi
+          done
+          echo "Synchronized GHCR aliases to $IMAGE:$VERSION ($source_digest)." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Synchronize Docker Hub aliases and verify digests
+        shell: bash
+        env:
+          SOURCE_IMAGE: ghcr.io/snapetech-org/questarrng
+          IMAGE: docker.io/snapetech/questarrng
+          VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          set -euo pipefail
+          digest_for() {
+            docker buildx imagetools inspect "$1" | awk '$1 == "Digest:" { print $2; exit }'
+          }
+          source_digest="$(digest_for "$SOURCE_IMAGE:$VERSION")"
+          if [[ ! "$source_digest" =~ ^sha256:[a-f0-9]{64}$ ]]; then
+            echo "Could not resolve the GHCR source image digest for $VERSION." >&2
+            exit 1
+          fi
+          for tag in "$VERSION" main master latest stable; do
+            docker buildx imagetools create --tag "$IMAGE:$tag" "$SOURCE_IMAGE:$VERSION"
+          done
+          mirror_digest="$(digest_for "$IMAGE:$VERSION")"
+          if [[ ! "$mirror_digest" =~ ^sha256:[a-f0-9]{64}$ ]]; then
+            echo "Could not resolve the Docker Hub release image digest for $VERSION." >&2
+            exit 1
+          fi
+          for tag in "$VERSION" main master latest stable; do
+            actual_digest="$(digest_for "$IMAGE:$tag")"
+            if [[ "$actual_digest" != "$mirror_digest" ]]; then
+              echo "Docker Hub $tag points to $actual_digest, expected $mirror_digest." >&2
+              exit 1
+            fi
+          done
+          echo "Synchronized Docker Hub aliases to $IMAGE:$VERSION ($mirror_digest)." >> "$GITHUB_STEP_SUMMARY"

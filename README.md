@@ -12,8 +12,10 @@ PostgreSQL, and hardened multi-architecture releases. See
 [the changelog](docs/CHANGELOG.md) for the release-by-release history.
 
 Use `ghcr.io/snapetech-org/questarrng:latest` or the Compose file in this
-repository for the latest published release. Production images are published
-only from explicit version tags; semantic-version tags pin a specific release.
+repository for the latest published release. The `main`, `master`,
+`latest`, and `stable` tags all point to the same most recently
+published stable image. The `dev` tag tracks main-branch builds. Semantic-version
+tags pin one exact release.
 The upstream Questarr image does not contain the SeerrNG provider routes. The
 fork image is published for `linux/amd64` and `linux/arm64`.
 
@@ -40,7 +42,6 @@ A video game management application inspired by the -Arr apps (Sonarr, Radarr, P
 ## Table of Contents
 
 For local MCP access, see the [SnapeTech MCP integration guide](docs/integrations/snapetech-mcp.md).
-
 
 - [What this fork adds](#what-this-fork-adds)
 - [List of features](#list-of-features)
@@ -201,10 +202,10 @@ docker run -d -p 5000:5000 --user "$(id -u):$(id -g)" \
   -v ./data:/app/data --name questarrng ghcr.io/snapetech-org/questarrng:latest
 ```
 
-`latest` and versioned production images are updated only by publishing an
-explicit version tag. A push to `main` does not publish a release image. Release
-tags are published both as `latest` and as the exact semantic version (for
-example, `1.11.0`). To update a Compose install,
+The `main`, `master`, `latest`, and
+`stable` production aliases move together when a validated versioned release
+is published. A push to `main` does not publish a release image. Each release
+also keeps its exact semantic-version tag, such as `2.1.1`. To update a Compose install,
 run `docker compose pull && docker compose up -d`.
 
 ### Option 2: Docker Compose (more detailed)

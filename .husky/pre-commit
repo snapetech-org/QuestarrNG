@@ -1,4 +1,5 @@
 #!/bin/sh
+node scripts/check-docker-image-aliases.mjs || exit 1
 if [ -x ./node_modules/.bin/lint-staged ]; then
   ./node_modules/.bin/lint-staged
 else
