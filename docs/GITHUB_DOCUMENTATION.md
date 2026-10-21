@@ -23,6 +23,7 @@ documentation in this repository.
 
 ## Install and operate
 
+- OpenID Connect provider setup, exact callback, account admission, local-user mapping, recovery, and troubleshooting: [`docs/oidc-authentication.md`](./oidc-authentication.md)
 - Database backends and SQLite-to-PostgreSQL migration:
   [`docs/DATABASE.md`](./DATABASE.md)
 - Operator-only account password recovery:
