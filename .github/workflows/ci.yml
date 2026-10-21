@@ -345,7 +345,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: ${{ fromJSON(github.event_name == 'pull_request' && '["22.19.0"]' || '["22.19.0", "26.x"]') }}
+        node-version: ${{ fromJSON(github.event_name == 'pull_request' && '["22.23.4"]' || '["22.23.4", "26.x"]') }}
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
