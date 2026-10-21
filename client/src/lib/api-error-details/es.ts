@@ -67,6 +67,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Failed to run library health check":
     "No se pudo ejecutar la comprobación del estado de la biblioteca",
   "Failed to list root folders": "No se pudieron listar las carpetas raíz",
+  "Failed to list wanted content": "No se pudo listar el contenido deseado",
   "A root folder with this path already exists": "Ya existe una carpeta raíz con esta ruta",
   "Path is not accessible": "No se puede acceder a la ruta",
   "Failed to create root folder": "No se pudo crear la carpeta raíz",

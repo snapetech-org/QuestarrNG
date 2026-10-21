@@ -57,6 +57,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Failed to refresh metadata": "無法重新整理中繼資料",
   "Failed to run library health check": "無法執行媒體庫健康檢查",
   "Failed to list root folders": "無法列出根資料夾",
+  "Failed to list wanted content": "無法列出想要的內容",
   "A root folder with this path already exists": "此路徑的根資料夾已存在",
   "Path is not accessible": "無法存取此路徑",
   "Failed to create root folder": "無法建立根資料夾",
