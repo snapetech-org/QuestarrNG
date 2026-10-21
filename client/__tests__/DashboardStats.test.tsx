@@ -52,8 +52,8 @@ vi.mock("@tanstack/react-query", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@tanstack/react-query")>();
   return {
     ...actual,
-    useQuery: () => ({
-      data: mockGames,
+    useQuery: (options: { queryKey: readonly unknown[] }) => ({
+      data: options.queryKey[0] === "/api/wanted-content" ? [] : mockGames,
       isLoading: false,
       isFetching: false,
     }),

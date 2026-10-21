@@ -1074,6 +1074,20 @@ const ADDITIONAL_API_ERROR_DETAIL_LABELS: Record<
     "Quá trình quét ClamAV đã vượt quá giới hạn thời gian",
     "Pemindaian ClamAV melampaui batas waktu",
   ],
+  "Failed to list wanted content": [
+    "No se pudo listar el contenido deseado",
+    "无法列出想要的内容",
+    "इच्छित सामग्री की सूची नहीं बनाई जा सकी",
+    "Gewünschte Inhalte konnten nicht aufgelistet werden",
+    "希望するコンテンツを一覧表示できませんでした",
+    "Impossible de lister le contenu souhaité",
+    "Não foi possível listar o conteúdo desejado",
+    "تعذّر إدراج المحتوى المطلوب",
+    "원하는 콘텐츠 목록을 불러오지 못했습니다",
+    "無法列出想要的內容",
+    "Không thể liệt kê nội dung mong muốn",
+    "Tidak dapat mencantumkan konten yang diinginkan",
+  ],
 };
 
 export function getAdditionalApiErrorDetailLabel(
