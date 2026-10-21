@@ -18,7 +18,9 @@ jobs:
   trusted-pr-validation:
     name: trusted-pr-validation
     # Candidate snapshots are evaluated in a read-only sandbox on hosted Linux.
-    runs-on: ubuntu-latest
+    # Bubblewrap needs unprivileged user namespaces; Ubuntu 22.04 supports the
+    # runner policy this sandbox expects.
+    runs-on: ubuntu-22.04
     timeout-minutes: 90
     permissions:
       contents: read
