@@ -33,7 +33,9 @@ export default function LoginPage() {
   useEffect(() => {
     let active = true;
     void apiFetch("/api/auth/oidc/status")
-        .then(async (response) => (response.ok ? (await response.json()) as { enabled?: boolean; provider?: string } : null))
+      .then(async (response) =>
+        response.ok ? ((await response.json()) as { enabled?: boolean; provider?: string }) : null
+      )
       .then((status) => {
         if (active) {
           setOidcEnabled(status?.enabled === true);
@@ -166,7 +168,9 @@ export default function LoginPage() {
             </form>
             {oidcFailed && (
               <p className="text-sm text-destructive" role="alert">
-                {t("Identity provider sign-in failed. Check the provider and account admission settings.")}
+                {t(
+                  "Identity provider sign-in failed. Check the provider and account admission settings."
+                )}
               </p>
             )}
             {oidcEnabled && (
@@ -178,12 +182,18 @@ export default function LoginPage() {
                   onClick={() => window.location.assign(withBasePath("/api/auth/oidc/login"))}
                 >
                   <svg aria-hidden="true" className="mr-2 h-5 w-5" viewBox="0 0 24 24">
-                    <use href={withBasePath(`/oidc-provider-icons.svg#oidc-${oidcPresentation.icon}`)} />
+                    <use
+                      href={withBasePath(`/oidc-provider-icons.svg#oidc-${oidcPresentation.icon}`)}
+                    />
                   </svg>
                   {t("Continue with")} <bdi dir="auto">{t(oidcPresentation.labelKey)}</bdi>
                 </Button>
-                <a className="block text-center text-sm text-muted-foreground underline underline-offset-4"
-                  href={oidcPresentation.setupUrl} target="_blank" rel="noopener noreferrer">
+                <a
+                  className="block text-center text-sm text-muted-foreground underline underline-offset-4"
+                  href={oidcPresentation.setupUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   {t("Provider setup guide")}
                 </a>
               </div>
