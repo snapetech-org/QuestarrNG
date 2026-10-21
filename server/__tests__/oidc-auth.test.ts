@@ -245,6 +245,44 @@ describe("OIDC authentication routes", () => {
     expect(oidcMocks.oidc.authorizationCodeGrant).not.toHaveBeenCalled();
   });
 
+  it("fails closed if OIDC settings disappear during login and handles state-generation errors", async () => {
+    oidcMocks.oidc.randomState.mockImplementationOnce(() => {
+      oidcMocks.config.auth.oidc.clientSecret = "";
+      return "state-1";
+    });
+    const missingSettings = await beginLogin();
+    expect(missingSettings.status).toBe(303);
+    expect(missingSettings.headers.location).toBe("/app/login?oidcFailed=true");
+    expect(oidcMocks.oidc.discovery).not.toHaveBeenCalled();
+
+    vi.resetModules();
+    oidcAuth = await import("../oidc-auth.js");
+    app = express();
+    oidcAuth.registerOidcAuthRoutes(app);
+    oidcMocks.config.auth.oidc.clientSecret = "client-secret";
+    oidcMocks.oidc.randomState.mockImplementationOnce(() => {
+      throw new Error("secure random source unavailable");
+    });
+    const stateFailure = await beginLogin();
+    expect(stateFailure.status).toBe(303);
+    expect(stateFailure.headers.location).toBe("/app/login?oidcFailed=true");
+  });
+
+  it("uses root-relative paths when the application has no base path", async () => {
+    oidcMocks.config.server.basePath = "";
+    await beginLogin("/library?sort=recent");
+    const success = await finishLogin("state-1");
+    expect(success.headers.location).toBe("/library?sort=recent");
+
+    vi.resetModules();
+    oidcAuth = await import("../oidc-auth.js");
+    app = express();
+    oidcAuth.registerOidcAuthRoutes(app);
+    oidcMocks.oidc.discovery.mockRejectedValueOnce(new Error("provider unavailable"));
+    const failure = await beginLogin();
+    expect(failure.headers.location).toBe("/login?oidcFailed=true");
+  });
+
   it("limits concurrent sign-ins and removes expired transactions before admitting another", async () => {
     for (let index = 0; index < 16; index += 1) {
       expect((await beginLogin()).status).toBe(302);
@@ -510,6 +548,14 @@ describe("OIDC authentication routes", () => {
     );
     await expect(fetch("https://issuer.example/metadata", {})).rejects.toThrow(
       "OIDC provider response is too large"
+    );
+  });
+
+  it("refuses custom-fetch calls if the OIDC configuration is removed", async () => {
+    const fetch = await providerFetch();
+    oidcMocks.config.auth.oidc.issuerUrl = "";
+    await expect(fetch("https://issuer.example/userinfo", {})).rejects.toThrow(
+      "OIDC is not configured"
     );
   });
 });

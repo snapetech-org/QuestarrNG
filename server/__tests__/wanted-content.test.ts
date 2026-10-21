@@ -83,6 +83,43 @@ describe("buildEditionsResponse", () => {
   it("returns null for an unknown game", () => {
     expect(buildEditionsResponse({ base: null, editions: [] }, { ids: new Set() })).toBeNull();
   });
+
+  it("fills IGDB defaults, omits unknown dates, and removes duplicate refs", () => {
+    const response = buildEditionsResponse(
+      {
+        base: {
+          id: 42,
+          name: "Example Game",
+          expansions: [{ id: 51, name: "Expansion" }],
+          standalone_expansions: [{ id: 52, name: "Standalone Pack" }],
+          dlcs: [
+            { id: 51, name: "Duplicate expansion" },
+            {
+              id: 53,
+              name: "Story Chapter",
+              cover: { url: "//images.example/t_thumb/chapter.jpg" },
+              first_release_date: 1_700_000_000,
+            },
+          ],
+        },
+        editions: [{ id: 43, name: "Example Game Collector's Edition" }],
+      },
+      { ids: new Set() }
+    )!;
+
+    expect(response.addons).toHaveLength(3);
+    expect(response.addons[0]).toMatchObject({ igdbId: 51, type: "expansion" });
+    expect(response.addons[1]).toMatchObject({ igdbId: 52, type: "expansion" });
+    expect(response.addons[2]).toMatchObject({
+      igdbId: 53,
+      releaseDate: "2023-11-14",
+      coverUrl: "https://images.example/t_cover_big/chapter.jpg",
+    });
+    expect(response.editions[0]).toMatchObject({
+      title: "Example Game Collector's Edition",
+      contentKnown: false,
+    });
+  });
 });
 
 describe("groupLanguages", () => {
@@ -180,6 +217,23 @@ describe("wanted content state", () => {
     expect(parseWantedContent("{nope")).toBeNull();
     expect(parseWantedContent(null)).toBeNull();
   });
+
+  it("requires a valid selection and defaults malformed acquisition progress", () => {
+    expect(
+      parseWantedContent(
+        JSON.stringify({ selection: { kind: "game-content", mode: "edition", editionId: 5 } })
+      )
+    ).toBeNull();
+    expect(
+      parseWantedContent(
+        JSON.stringify({
+          selection: { kind: "game-content", mode: "edition", editionId: 5 },
+          targets: { edition: { id: 5, title: "Deluxe" }, addons: [] },
+          acquiredAddonIds: "invalid",
+        })
+      )?.acquiredAddonIds
+    ).toEqual([]);
+  });
 });
 
 describe("summarizeWantedRequest", () => {
@@ -217,6 +271,38 @@ describe("summarizeWantedRequest", () => {
     const done = selection.replace('"acquiredAddonIds":[11]', '"acquiredAddonIds":[11,12]');
     expect(
       summarizeWantedRequest({ externalRequestId: "e3", title: "x", selection: done })
+    ).toBeNull();
+  });
+
+  it("summarizes pending editions and drops editions already acquired", () => {
+    const edition = JSON.stringify({
+      selection: { kind: "game-content", mode: "edition", editionId: 21 },
+      targets: { edition: { id: 21, title: "Deluxe Edition" }, addons: [] },
+      acquiredAddonIds: [],
+    });
+    expect(
+      summarizeWantedRequest({ externalRequestId: "edition-1", title: "Game", selection: edition })
+    ).toMatchObject({
+      mode: "edition",
+      pending: [{ id: 21, title: "Deluxe Edition" }],
+      acquiredCount: 0,
+    });
+
+    const acquired = edition.replace('"acquiredAddonIds":[]', '"acquiredAddonIds":[21]');
+    expect(
+      summarizeWantedRequest({ externalRequestId: "edition-2", title: "Game", selection: acquired })
+    ).toBeNull();
+
+    const missingTarget = JSON.stringify({
+      selection: { kind: "game-content", mode: "edition", editionId: 21 },
+      targets: { addons: [] },
+    });
+    expect(
+      summarizeWantedRequest({
+        externalRequestId: "edition-3",
+        title: "Game",
+        selection: missingTarget,
+      })
     ).toBeNull();
   });
 });
