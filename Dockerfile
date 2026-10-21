@@ -69,7 +69,7 @@ ENV UMASK=022
 # CLI notifications. The native UnRAR binary is copied from the pinned source build below.
 COPY requirements/apprise.txt /tmp/requirements-apprise.txt
 RUN apk update && apk upgrade --no-cache && \
-    apk add --no-cache 7zip py3-pip python3 shadow su-exec && \
+    apk add --no-cache 'libexpat>=2.9.0-r0' 7zip py3-pip python3 shadow su-exec && \
     python3 -m pip install --no-cache-dir --break-system-packages --only-binary :all: \
       --require-hashes -r /tmp/requirements-apprise.txt && \
     rm /tmp/requirements-apprise.txt

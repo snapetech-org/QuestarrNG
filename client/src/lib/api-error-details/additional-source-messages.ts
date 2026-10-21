@@ -75,6 +75,7 @@ export const ADDITIONAL_API_ERROR_DETAIL_SOURCE_MESSAGES = [
   "Failed to test RAWG API key",
   "Empty response from ClamAV",
   "ClamAV scan exceeded the time limit",
+  "Failed to list wanted content",
 ] as const;
 
 export type AdditionalApiErrorDetailSourceMessage =
