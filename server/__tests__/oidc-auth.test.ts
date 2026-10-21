@@ -518,10 +518,10 @@ describe("OIDC authentication routes", () => {
 
     oidcMocks.config.auth.oidc.allowPrivateIssuer = true;
     oidcMocks.safeFetch.mockImplementationOnce(async () => new Response(null));
-    const empty = await fetch("http://private-issuer/token", { method: "GET" });
+    const empty = await fetch("https://private-issuer/token", { method: "GET" });
     expect(empty.body).toBeNull();
     expect(oidcMocks.safeFetch).toHaveBeenLastCalledWith(
-      "http://private-issuer/token",
+      "https://private-issuer/token",
       expect.objectContaining({ allowPrivate: true, requireHttps: false })
     );
   });
