@@ -680,6 +680,8 @@ If you run into an issue, go to the **Logs** page and click **Send Logs** before
 
 ## Project Security & Documentation
 
+- [OIDC sign-in setup, account admission, and recovery](docs/oidc-authentication.md)
+- [Shared OIDC provider catalog and setup links](https://github.com/snapetech-org/seerrng/blob/main/docs/maintainers/oidc-provider-catalog.md) · [cross-project contract](https://github.com/snapetech-org/seerrng/blob/main/docs/maintainers/oidc-cross-project-template.md)
 - [What changed in the fork](docs/FORK_CHANGES.md) summarizes the maintained additions since the upstream baseline.
 - [Import processing and security scans](docs/IMPORTS.md) explains RomM routing, archive handling, and optional malware checks.
 - Start with [docs/GITHUB_DOCUMENTATION.md](docs/GITHUB_DOCUMENTATION.md) for the full documentation map.
