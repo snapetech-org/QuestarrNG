@@ -110,7 +110,7 @@ type checking, application builds, and Docker image builds:
   to `main`.
 
 - `build`: the reviewed sandbox launcher runs `npm run lint`, `npm run check`
-  (TypeScript) and `npm run build` with offline dependencies, on Node 22.19.0
+  (TypeScript) and `npm run build` with offline dependencies, on Node 22.23.4
   (plus 26.x on pushes to `main`/`release/*`).
 - `docker-build`: builds the image. It always runs on pushes; on a PR it runs when the PR touches the `Dockerfile`, `.dockerignore`, `entrypoint.sh`, `package*.json`, `requirements/`, migrations or `ci.yml`.
 

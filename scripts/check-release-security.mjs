@@ -11,7 +11,7 @@ export const REQUIRED_CHECKS = [
   "sca-scan",
   "test",
   "windows-service",
-  "Build and check on Node 22.19.0",
+  "Build and check on Node 22.23.4",
   "Build and check on Node 26.x",
   "Reconcile test and build node receipts",
   "Analyze (javascript-typescript)",
