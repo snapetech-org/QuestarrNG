@@ -32,6 +32,26 @@ const envSchema = z
           "JWT_SECRET must contain at least 32 bytes and must not be the insecure legacy default. Remove it to auto-generate, or set a strong random value.",
       }),
 
+    // OIDC is configured as a confidential server-side web client. The callback
+    // is fixed to the app's auth route and must be registered exactly at the IdP.
+    QUESTARR_OIDC_ISSUER_URL: z.string().optional(),
+    QUESTARR_OIDC_CLIENT_ID: z.string().optional(),
+    QUESTARR_OIDC_CLIENT_SECRET: z.string().optional(),
+    QUESTARR_OIDC_REDIRECT_URI: z.string().optional(),
+    // Display hint only; OIDC discovery and issuer validation stay generic.
+    QUESTARR_OIDC_PROVIDER: z.string().max(80).optional(),
+    QUESTARR_OIDC_ALLOWED_EMAILS: z.string().optional(),
+    QUESTARR_OIDC_ALLOWED_EMAIL_DOMAINS: z.string().optional(),
+    QUESTARR_OIDC_SCOPES: z.string().optional(),
+    QUESTARR_OIDC_ALLOW_ANY_VERIFIED_USER: z
+      .enum(["true", "false"])
+      .default("false")
+      .transform((value) => value === "true"),
+    QUESTARR_OIDC_ALLOW_PRIVATE_ISSUER: z
+      .enum(["true", "false"])
+      .default("false")
+      .transform((value) => value === "true"),
+
     // IGDB API configuration (optional, but required for game discovery features)
     IGDB_CLIENT_ID: z.string().optional(),
     IGDB_CLIENT_SECRET: z.string().optional(),
@@ -99,6 +119,61 @@ const envSchema = z
       ),
   })
   .superRefine((env, context) => {
+    const oidcValues = [
+      env.QUESTARR_OIDC_ISSUER_URL,
+      env.QUESTARR_OIDC_CLIENT_ID,
+      env.QUESTARR_OIDC_CLIENT_SECRET,
+      env.QUESTARR_OIDC_REDIRECT_URI,
+    ];
+    const oidcConfiguredCount = oidcValues.filter((value) => Boolean(value?.trim())).length;
+    if (oidcConfiguredCount > 0 && oidcConfiguredCount !== oidcValues.length) {
+      context.addIssue({
+        code: "custom",
+        path: ["QUESTARR_OIDC_ISSUER_URL"],
+        message:
+          "QUESTARR_OIDC_ISSUER_URL, CLIENT_ID, CLIENT_SECRET, and REDIRECT_URI must be configured together.",
+      });
+    }
+
+    if (oidcConfiguredCount === oidcValues.length) {
+      try {
+        const issuer = new URL(env.QUESTARR_OIDC_ISSUER_URL!.trim());
+        const redirect = new URL(env.QUESTARR_OIDC_REDIRECT_URI!.trim());
+        const expectedPath = `${normalizeBasePath(env.QUESTARR_BASE_PATH)}/api/auth/oidc/callback` ||
+          "/api/auth/oidc/callback";
+        if (
+          !issuer.host ||
+          issuer.username ||
+          issuer.password ||
+          issuer.search ||
+          issuer.hash ||
+          !["https:", ...(env.QUESTARR_OIDC_ALLOW_PRIVATE_ISSUER ? ["http:"] : [])].includes(
+            issuer.protocol
+          )
+        ) {
+          throw new Error("issuer");
+        }
+        if (
+          !redirect.host ||
+          redirect.username ||
+          redirect.password ||
+          redirect.search ||
+          redirect.hash ||
+          redirect.protocol !== "https:" ||
+          redirect.pathname !== expectedPath
+        ) {
+          throw new Error("redirect");
+        }
+      } catch {
+        context.addIssue({
+          code: "custom",
+          path: ["QUESTARR_OIDC_ISSUER_URL"],
+          message:
+            "OIDC requires an issuer URL (HTTPS unless private HTTP is explicitly enabled) and an HTTPS redirect URI at the app's /api/auth/oidc/callback route.",
+        });
+      }
+    }
+
     if (env.DB_DIALECT !== "postgres" && env.DB_DIALECT !== "postgresql") return;
 
     if (!env.DATABASE_URL) {
@@ -192,6 +267,18 @@ export const config = {
   },
   auth: {
     jwtSecret: env.JWT_SECRET,
+    oidc: {
+      issuerUrl: env.QUESTARR_OIDC_ISSUER_URL?.trim(),
+      clientId: env.QUESTARR_OIDC_CLIENT_ID?.trim(),
+      clientSecret: env.QUESTARR_OIDC_CLIENT_SECRET,
+      redirectUri: env.QUESTARR_OIDC_REDIRECT_URI?.trim(),
+      provider: env.QUESTARR_OIDC_PROVIDER?.trim() ?? "generic",
+      allowedEmails: env.QUESTARR_OIDC_ALLOWED_EMAILS ?? "",
+      allowedEmailDomains: env.QUESTARR_OIDC_ALLOWED_EMAIL_DOMAINS ?? "",
+      scopes: env.QUESTARR_OIDC_SCOPES ?? "openid profile email",
+      allowAnyVerifiedUser: env.QUESTARR_OIDC_ALLOW_ANY_VERIFIED_USER,
+      allowPrivateIssuer: env.QUESTARR_OIDC_ALLOW_PRIVATE_ISSUER,
+    },
   },
   igdb: {
     clientId: env.IGDB_CLIENT_ID,
