@@ -41,16 +41,20 @@ roles/ownership remain controlled by the app.
 
 Optional settings:
 
-| Variable | Default | Purpose |
-| --- | --- | --- |
-| `QUESTARR_OIDC_SCOPES` | `openid profile email` | Requested scopes; `openid` and `email` are always included. |
-| `QUESTARR_OIDC_ALLOWED_EMAIL_DOMAINS` | empty | Comma, semicolon, or whitespace separated verified email domains. |
-| `QUESTARR_OIDC_ALLOW_ANY_VERIFIED_USER` | `false` | Allows any verified email to create/sign into a local account. |
-| `QUESTARR_OIDC_ALLOW_PRIVATE_ISSUER` | `false` | Allows the provider issuer to use private HTTP endpoints; the browser callback must stay HTTPS. |
+| Variable                                | Default                | Purpose                                                                                         |
+| --------------------------------------- | ---------------------- | ----------------------------------------------------------------------------------------------- |
+| `QUESTARR_OIDC_SCOPES`                  | `openid profile email` | Requested scopes; `openid` and `email` are always included.                                     |
+| `QUESTARR_OIDC_ALLOWED_EMAIL_DOMAINS`   | empty                  | Comma, semicolon, or whitespace separated verified email domains.                               |
+| `QUESTARR_OIDC_ALLOW_ANY_VERIFIED_USER` | `false`                | Allows any verified email to create/sign into a local account.                                  |
+| `QUESTARR_OIDC_ALLOW_PRIVATE_ISSUER`    | `false`                | Allows the provider issuer to use private HTTP endpoints; the browser callback must stay HTTPS. |
 
-OIDC transaction state is short-lived and consumed once. Provider requests use
-bounded timeouts and response sizes and reject redirects. Provider tokens are
-not saved in the QuestarrNG session. See the
+OIDC transaction state is short-lived, consumed once, and stored in a distinct
+HttpOnly cookie for each pending sign-in. Up to 16 attempts can be active at
+once; further attempts are rejected until an earlier one completes or expires.
+The callback accepts the normal provider GET response and Apple's URL-encoded
+POST response; reverse proxies must preserve the method and form body.
+Provider requests use bounded timeouts and response sizes and reject redirects.
+Provider tokens are not saved in the QuestarrNG session. See the
 [shared cross-project OIDC contract](https://github.com/snapetech-org/seerrng/blob/main/docs/maintainers/oidc-cross-project-template.md)
 for the common behavior and field semantics. The
 [provider catalog](https://github.com/snapetech-org/seerrng/blob/main/docs/maintainers/oidc-provider-catalog.md)
@@ -93,14 +97,14 @@ the recovery action for an expired or interrupted callback.
 
 ## Troubleshooting
 
-| Symptom | Check |
-| --- | --- |
-| Provider rejects the redirect | Match `QUESTARR_OIDC_REDIRECT_URI` exactly, including scheme, host, port, base path, and `/api/auth/oidc/callback`. |
-| Provider discovery or validation fails | Use the exact issuer from discovery metadata and the intended tenant/realm. Confirm outbound DNS/HTTPS and enable private issuer access only for a trusted internal endpoint. |
-| A valid user is rejected | Check email scope and provider claim mapping, affirmative `email_verified`, the normalized email/domain list, and whether allow-any is intentionally enabled. |
-| Callback state/nonce or cookie validation fails | Retry in the same browser and public hostname; confirm the reverse proxy reports the external HTTPS scheme and host, preserves cookies, and has the configured trusted-proxy policy. |
-| A second local account appeared for the same email | QuestarrNG keys OIDC users by issuer and subject; it does not merge identities by email. Use the intended issuer/client identity and do not expect automatic linking. |
-| Apple returns an error | Check the Services ID, exact issuer, callback, `form_post` cookie handling, `openid email`, and client-secret JWT expiration. |
+| Symptom                                            | Check                                                                                                                                                                                |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Provider rejects the redirect                      | Match `QUESTARR_OIDC_REDIRECT_URI` exactly, including scheme, host, port, base path, and `/api/auth/oidc/callback`.                                                                  |
+| Provider discovery or validation fails             | Use the exact issuer from discovery metadata and the intended tenant/realm. Confirm outbound DNS/HTTPS and enable private issuer access only for a trusted internal endpoint.        |
+| A valid user is rejected                           | Check email scope and provider claim mapping, affirmative `email_verified`, the normalized email/domain list, and whether allow-any is intentionally enabled.                        |
+| Callback state/nonce or cookie validation fails    | Retry in the same browser and public hostname; confirm the reverse proxy reports the external HTTPS scheme and host, preserves cookies, and has the configured trusted-proxy policy. |
+| A second local account appeared for the same email | QuestarrNG keys OIDC users by issuer and subject; it does not merge identities by email. Use the intended issuer/client identity and do not expect automatic linking.                |
+| Apple returns an error                             | Check the Services ID, exact issuer, callback, `form_post` cookie handling, `openid email`, and client-secret JWT expiration.                                                        |
 
 For support, include QuestarrNG's version, provider ID, redacted issuer host,
 callback path, and timestamp. Never include secrets, tokens, authorization

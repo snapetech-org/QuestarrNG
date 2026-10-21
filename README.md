@@ -707,15 +707,14 @@ bounded recursive game-file scans and made partial results clear in the Files
 tab. See the [campaign overview](docs/upstream-resolution/README.md),
 [the Batch 83 validation record](docs/upstream-resolution/evidence/validation-batch-83.md),
 and the [Batch 82 validation record](docs/upstream-resolution/evidence/validation-batch-82.md).
-The DCO sign-off policy is implemented in the campaign branch, but its
-rollout still needs a maintainer decision because the campaign history includes
-unsigned commits. The full review and validation gate must pass before campaign
-work is merged to `main`.
+QuestarrNG does not require DCO sign-off trailers. See the current
+[contribution attribution policy](DCO.md) for licensing responsibility and
+AI-assisted contribution disclosure.
 
 ## Contributing
 
 - See [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) for guidelines on how to contribute to this project.
-- See [DCO.md](DCO.md) for the Developer Certificate of Origin and sign-off instructions.
+- See [DCO.md](DCO.md) for the contribution attribution policy.
 - See [MAINTAINERS.md](docs/MAINTAINERS.md) for how repository access and release permissions are managed.
 
 ### Contributors

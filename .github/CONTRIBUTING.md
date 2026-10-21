@@ -17,7 +17,7 @@ required beyond those rules.
 3. Create a topic branch only when current GitHub rules require a pull request; otherwise work on `main`
 4. Make your changes
 5. Test your changes thoroughly
-6. Commit with a clear message. Add a DCO sign-off to human non-merge commits in pull requests: `git commit -s -m "Add feature: description"`
+6. Commit with a clear message. DCO sign-off trailers are not required.
 7. Push your topic branch when using the pull-request route, or push directly to `main` when current rules allow it
 8. Open a pull request only when current GitHub rules require one
    Note: do not merge a topic branch if you intend to open a pull request
@@ -145,19 +145,14 @@ See [docs/DEPENDENCIES.md](../docs/DEPENDENCIES.md) for how QuestarrNG selects, 
 - Start with a verb in the present tense (e.g., "Add", "Fix", "Update")
 - Reference issue numbers when applicable (e.g., "Fix #123: description")
 
-### DCO sign-off
+### Contribution attribution
 
-Every non-merge commit in a pull request from a human contributor must include
-a valid `Signed-off-by: Name <email>` trailer. Create the trailer by running
-`git commit -s` with your own configured name and email, and only when you
-can truthfully make one of the certifications in [DCO.md](../DCO.md). Never
-add another person's name or sign-off on their behalf. GitHub-verified
-automation accounts are exempt because they cannot make a human DCO
-certification. The DCO file also explains the information recorded with each
-sign-off.
-Maintainers must add the `DCO / Verify sign-offs` check as a required status
-check in branch protection for `main` and release branches to enforce the
-policy before merging.
+QuestarrNG does not require DCO sign-off trailers. Contributors are responsible
+for submitting material they are authorized to contribute under the project's
+license. If AI assistance was used, disclose the tool in the pull request and
+review the generated changes before submission. Do not make or add a personal
+DCO certification on someone else's behalf; see [DCO.md](../DCO.md) for the
+current policy.
 
 ### Pull Requests
 

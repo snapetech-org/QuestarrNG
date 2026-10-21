@@ -147,6 +147,13 @@ describe("default-deny API auth boundary", () => {
   });
 
   describe("fail-safe by default", () => {
+    it("allows both OIDC callback methods, including Apple's form-post response", async () => {
+      const { PUBLIC_API_ROUTES } = await import("../routes.js");
+
+      expect(PUBLIC_API_ROUTES.has("GET /auth/oidc/callback")).toBe(true);
+      expect(PUBLIC_API_ROUTES.has("POST /auth/oidc/callback")).toBe(true);
+    });
+
     it("a route NOT on the allowlist requires auth even though it has no explicit authenticateToken", async () => {
       // /api/ready has no inline `authenticateToken` in its handler -- it is
       // protected purely by being absent from PUBLIC_API_ROUTES combined with

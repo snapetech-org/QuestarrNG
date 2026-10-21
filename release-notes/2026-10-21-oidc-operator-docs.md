@@ -6,4 +6,5 @@ action: none
 breaking: false
 ---
 
-QuestarrNG OIDC guidance now covers exact callbacks, verified-email admission, issuer-and-subject account identity, recovery, and provider troubleshooting.
+QuestarrNG OIDC guidance now covers exact callbacks, verified-email admission,
+issuer-and-subject account identity, recovery, and provider troubleshooting.

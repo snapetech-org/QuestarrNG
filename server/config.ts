@@ -139,8 +139,7 @@ const envSchema = z
       try {
         const issuer = new URL(env.QUESTARR_OIDC_ISSUER_URL!.trim());
         const redirect = new URL(env.QUESTARR_OIDC_REDIRECT_URI!.trim());
-        const expectedPath = `${normalizeBasePath(env.QUESTARR_BASE_PATH)}/api/auth/oidc/callback` ||
-          "/api/auth/oidc/callback";
+        const expectedPath = `${normalizeBasePath(env.QUESTARR_BASE_PATH)}/api/auth/oidc/callback`;
         if (
           !issuer.host ||
           issuer.username ||
