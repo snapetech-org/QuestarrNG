@@ -1089,7 +1089,7 @@ test(
       "assert.equal(process.argv[2], '--root');",
       "assert.equal(process.argv[3], '/mnt/workspace');",
       "assert.equal(process.argv[4], '--tests-only');",
-      "assert.equal(process.env.GITHUB_EVENT_NAME, 'pull_request_target');",
+      "assert.equal(process.env.GITHUB_EVENT_NAME, 'pull_request');",
       "assert.match(process.env.GITHUB_SHA, /^[a-f0-9]{40}$/u);",
       "assert.equal(process.env.VALIDATION_CANDIDATE_SHA, process.env.GITHUB_SHA);",
       "assert.match(process.env.VALIDATION_TRUSTED_BASE_SHA, /^[a-f0-9]{40}$/u);",
@@ -1168,7 +1168,7 @@ test(
         env: {
           ...process.env,
           RUNNER_TEMP: runnerTemp,
-          GITHUB_EVENT_NAME: 'pull_request_target',
+          GITHUB_EVENT_NAME: 'pull_request',
           GITHUB_RUN_ID: 'trusted-run-42',
           GITHUB_RUN_ATTEMPT: '2',
           GITHUB_REPOSITORY: 'snapetech-org/QuestarrNG',
