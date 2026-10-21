@@ -45,7 +45,7 @@ describe("classifyContent", () => {
       storyContent: true,
     });
     expect(classifyContent("Story Chapter", 1)).toEqual({ type: "dlc", storyContent: true });
-    expect(classifyContent("Artbook", 3)).toEqual({ type: "bonus", storyContent: null });
+    expect(classifyContent("Collector's Bundle", 3)).toEqual({ type: "bonus", storyContent: null });
   });
 });
 
