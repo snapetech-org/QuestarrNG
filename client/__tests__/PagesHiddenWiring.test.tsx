@@ -190,6 +190,12 @@ describe("Library filter buttons", () => {
           json: async () => ({ hideOwnedInHasResults: false, hideShelvedByDefault: false }),
         } as Response);
       }
+      if (url.includes("/api/wanted-content")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [],
+        } as Response);
+      }
       return Promise.resolve({
         ok: true,
         json: async () => [gameWithDownload, gameWithSearchResult],
