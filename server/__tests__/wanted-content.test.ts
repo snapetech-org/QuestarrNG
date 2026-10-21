@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { buildEditionsResponse, classifyContent, groupLanguages } from "../content-catalog.js";
+import {
+  buildEditionsResponse,
+  classifyContent,
+  groupLanguages,
+  hoursToBeat,
+} from "../content-catalog.js";
 import {
   parseWantedContent,
   pendingAddons,
@@ -32,6 +37,15 @@ describe("classifyContent", () => {
 
   it("flags a season pass as undocumented", () => {
     expect(classifyContent("Season Pass", 13).storyContent).toBeNull();
+  });
+
+  it("covers standalone expansions, story chapters, and extra-content bundles", () => {
+    expect(classifyContent("Standalone Adventure", 4)).toEqual({
+      type: "expansion",
+      storyContent: true,
+    });
+    expect(classifyContent("Story Chapter", 1)).toEqual({ type: "dlc", storyContent: true });
+    expect(classifyContent("Artbook", 3)).toEqual({ type: "bonus", storyContent: null });
   });
 });
 
@@ -83,6 +97,28 @@ describe("groupLanguages", () => {
       ],
     });
     expect(grouped).toEqual({ audio: ["English"], subtitles: ["French"], interface: ["German"] });
+  });
+
+  it("deduplicates languages and ignores incomplete support records", () => {
+    const grouped = groupLanguages({
+      id: 1,
+      name: "G",
+      language_supports: [
+        { language: { name: "English" }, language_support_type: { name: "Audio" } },
+        { language: { name: "English" }, language_support_type: { name: "Audio" } },
+        { language: null, language_support_type: { name: "Audio" } },
+        { language: { name: "Japanese" }, language_support_type: null },
+      ],
+    });
+    expect(grouped).toEqual({ audio: ["English"], subtitles: [], interface: [] });
+  });
+});
+
+describe("hoursToBeat", () => {
+  it("prefers the normal estimate and falls back to the shorter estimate", () => {
+    expect(hoursToBeat({ normally: 20, hastily: 8 })).toBe(20);
+    expect(hoursToBeat({ hastily: 8 })).toBe(8);
+    expect(hoursToBeat(undefined)).toBeUndefined();
   });
 });
 
