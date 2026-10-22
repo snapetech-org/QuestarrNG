@@ -84,7 +84,11 @@ export default function DiscoveryFilters({ onFiltersChange }: DiscoveryFiltersPr
               </Label>
               <Select
                 value={releaseStatus}
-                onValueChange={handleReleaseStatusChange}
+                onValueChange={(status) => {
+                  if (status === "all" || status === "released" || status === "upcoming") {
+                    handleReleaseStatusChange(status);
+                  }
+                }}
                 data-testid="select-release-status"
               >
                 <SelectTrigger>
