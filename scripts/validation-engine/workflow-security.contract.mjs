@@ -557,6 +557,9 @@ test('main CI jobs use the isolated pool only for main pushes and dispatches', (
   ]) {
     const runner = parsedCiWorkflow.jobs[name]?.['runs-on'];
     assert.match(runner, /ng-shared-main-jit/u, name);
+    assert.match(runner, /ng-shared-main-questarrng/u, name);
+    assert.match(runner, /ng-main-run-\{0\}/u, name);
+    assert.match(runner, /github\.run_id/u, name);
     assert.match(runner, /github.event_name == 'push'/u, name);
     assert.match(runner, /github.event_name == 'workflow_dispatch'/u, name);
     assert.match(runner, /github.ref == 'refs\/heads\/main'/u, name);
@@ -572,6 +575,9 @@ test('CodeQL and Semgrep scans use the isolated pool only for trusted main runs'
   ]) {
     const runner = load(workflow).jobs[jobName]?.['runs-on'];
     assert.match(runner, /ng-shared-main-jit/u, jobName);
+    assert.match(runner, /ng-shared-main-questarrng/u, jobName);
+    assert.match(runner, /ng-main-run-\{0\}/u, jobName);
+    assert.match(runner, /github\.run_id/u, jobName);
     assert.match(runner, /github.event_name == 'push'/u, jobName);
     assert.match(runner, /github.event_name == 'workflow_dispatch'/u, jobName);
     assert.match(runner, /github.event_name == 'schedule'/u, jobName);
