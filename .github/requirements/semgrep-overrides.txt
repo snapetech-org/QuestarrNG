@@ -1,3 +1,5 @@
 # Keep the Semgrep toolchain on the patched MCP SDK release; the scanner's
 # dependency resolver otherwise selects an affected session implementation.
 mcp==1.30.0
+# Keep the scanner's OpenTelemetry API on the release that bounds tracestate parsing.
+opentelemetry-api==1.45.1

@@ -27,6 +27,10 @@ const semgrepWorkflow = readFileSync(
   fileURLToPath(new URL('semgrep-community.yml', workflowDirectory)),
   'utf8'
 );
+const scorecardWorkflow = readFileSync(
+  fileURLToPath(new URL('scorecard.yml', workflowDirectory)),
+  'utf8'
+);
 const releaseWorkflow = readFileSync(
   fileURLToPath(new URL('fork-image.yml', workflowDirectory)),
   'utf8'
@@ -586,6 +590,14 @@ test('CodeQL and Semgrep scans use the isolated pool only for trusted main runs'
   }
   assert.match(semgrepWorkflow, /docker info/u);
   assert.match(semgrepWorkflow, /docker run/u);
+});
+
+test('Scorecard uses a Docker-capable hosted runner with scoped upload permissions', () => {
+  const workflow = load(scorecardWorkflow);
+  assert.equal(workflow.jobs.analysis['runs-on'], 'ubuntu-latest');
+  assert.equal(workflow.permissions.contents, 'read');
+  assert.equal(workflow.jobs.analysis.permissions['security-events'], 'write');
+  assert.match(scorecardWorkflow, /uses:\s*ossf\/scorecard-action@/u);
 });
 
 test('Windows service builds install the SDK in the runner temp directory', () => {
