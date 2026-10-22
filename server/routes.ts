@@ -3150,6 +3150,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           category === "packs" ? "extra" : category;
         const files: ScannedGameFile[] = [];
         let truncated = false;
+        let stopScanning = false;
         const deadline = Date.now() + SCAN_TIME_BUDGET_MS;
         let responseBytes = Buffer.byteLength(JSON.stringify({ files: [], truncated: false }));
         const walk = async (
@@ -3157,13 +3158,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           depth: number,
           inheritedCategory?: DownloadCategory
         ): Promise<void> => {
-          if (truncated) return;
+          if (stopScanning) return;
           if (depth > SCAN_MAX_DEPTH) {
             truncated = true;
             return;
           }
           if (Date.now() >= deadline) {
             truncated = true;
+            stopScanning = true;
             return;
           }
           const canonicalDir = await realpathOrNull(dir);
@@ -3179,10 +3181,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Async directory iteration avoids materializing an arbitrarily large
             // directory in memory before the scan budgets can stop the walk.
             for await (const entry of directory) {
-              // Stop traversing once a budget is exceeded; `truncated` short-circuits
-              // every pending recursion level on the way back up the tree.
-              if (truncated || files.length >= SCAN_MAX_FILES || Date.now() >= deadline) {
+              // File-count and time budgets stop the whole walk. A depth limit
+              // only skips that subtree so sibling files at an allowed depth remain visible.
+              if (stopScanning || files.length >= SCAN_MAX_FILES || Date.now() >= deadline) {
                 truncated = true;
+                stopScanning = true;
                 break;
               }
               // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- entry.name comes from readdir; the directory and resolved file are both checked inside the root.
@@ -3205,6 +3208,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               }
               if (Date.now() >= deadline) {
                 truncated = true;
+                stopScanning = true;
                 break;
               }
               const category = normalizeCategory(
@@ -3220,6 +3224,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const separatorBytes = files.length > 0 ? 1 : 0;
               if (responseBytes + separatorBytes + recordBytes > SCAN_MAX_RESPONSE_BYTES) {
                 truncated = true;
+                stopScanning = true;
                 break;
               }
               responseBytes += separatorBytes + recordBytes;
