@@ -24,7 +24,7 @@ const PROVIDERS: Record<string, OidcProviderPresentation> = {
   okta: {
     labelKey: "Okta",
     icon: "okta",
-    setupUrl: "https://developer.okta.com/docs/guides/implement-grant-type/-/main/",
+    setupUrl: "https://developer.okta.com/docs/guides/implement-grant-type/authcodepkce/main/",
   },
   auth0: {
     labelKey: "Auth0",

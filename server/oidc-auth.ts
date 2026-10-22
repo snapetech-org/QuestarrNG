@@ -9,9 +9,9 @@ import { storage } from "./storage.js";
 import { routesLogger } from "./logger.js";
 import { authRateLimiter } from "./middleware.js";
 
-const STATE_COOKIE = "questarr_oidc_state";
+const STATE_COOKIE_PREFIX = "questarr_oidc_state_";
 const TRANSACTION_TTL_MS = 10 * 60 * 1000;
-const MAX_TRANSACTIONS = 256;
+const MAX_TRANSACTIONS = 16;
 const MAX_PROVIDER_RESPONSE_BYTES = 1 << 20;
 const OIDC_PASSWORD_MARKER = "!oidc$";
 
@@ -80,11 +80,6 @@ function isAppleIssuer(issuerUrl: string): boolean {
 function cleanExpiredTransactions(now = Date.now()): void {
   for (const [state, transaction] of transactions) {
     if (transaction.expiresAt <= now) transactions.delete(state);
-  }
-  while (transactions.size >= MAX_TRANSACTIONS) {
-    const oldestState = transactions.keys().next().value;
-    if (!oldestState) break;
-    transactions.delete(oldestState);
   }
 }
 
@@ -205,26 +200,40 @@ function safeReturnPath(value: unknown, settings: ActiveOidcSettings): string {
   }
 }
 
+function oidcLoginFailurePath(): string {
+  const basePath = config.server.basePath;
+  return basePath ? `${basePath}/login?oidcFailed=true` : "/login?oidcFailed=true";
+}
+
+export function oidcStateCookieName(state: string): string {
+  const suffix = crypto.createHash("sha256").update(state).digest("hex").slice(0, 32);
+  return `${STATE_COOKIE_PREFIX}${suffix}`;
+}
+
 function setTransactionCookie(
   res: ExpressResponse,
   state: string,
   settings: ActiveOidcSettings
 ): void {
-  res.cookie(STATE_COOKIE, state, {
+  res.cookie(oidcStateCookieName(state), state, {
     httpOnly: true,
     secure: new URL(settings.redirectUri).protocol === "https:",
     sameSite: isAppleIssuer(settings.issuerUrl) ? "none" : "lax",
-    path: "/",
+    path: new URL(settings.redirectUri).pathname,
     maxAge: TRANSACTION_TTL_MS,
   });
 }
 
-function clearTransactionCookie(res: ExpressResponse, settings: ActiveOidcSettings): void {
-  res.clearCookie(STATE_COOKIE, {
+function clearTransactionCookie(
+  res: ExpressResponse,
+  state: string,
+  settings: ActiveOidcSettings
+): void {
+  res.clearCookie(oidcStateCookieName(state), {
     httpOnly: true,
     secure: new URL(settings.redirectUri).protocol === "https:",
     sameSite: isAppleIssuer(settings.issuerUrl) ? "none" : "lax",
-    path: "/",
+    path: new URL(settings.redirectUri).pathname,
   });
 }
 
@@ -263,7 +272,6 @@ async function findOrCreateOidcUser(issuer: string, subject: string) {
 }
 
 export function registerOidcAuthRoutes(app: Express): void {
-  const loginFailurePath = `${config.server.basePath}/login?oidcFailed=true`;
   app.get("/api/auth/oidc/status", (_req, res) => {
     const settings = getSettings();
     res.json({ enabled: Boolean(settings), provider: settings?.provider ?? "generic" });
@@ -273,9 +281,14 @@ export function registerOidcAuthRoutes(app: Express): void {
     const settings = getSettings();
     if (!settings) return res.status(404).json({ error: "OIDC sign-in is not configured" });
 
+    let pendingState: string | undefined;
     try {
       cleanExpiredTransactions();
+      if (transactions.size >= MAX_TRANSACTIONS) {
+        return res.status(429).json({ error: "Too many pending sign-ins. Try again shortly." });
+      }
       const state = oidc.randomState();
+      pendingState = state;
       const nonce = oidc.randomNonce();
       const apple = isAppleIssuer(settings.issuerUrl);
       const codeVerifier = apple ? undefined : oidc.randomPKCECodeVerifier();
@@ -307,9 +320,10 @@ export function registerOidcAuthRoutes(app: Express): void {
       setTransactionCookie(res, state, settings);
       return res.redirect(302, authorizationUrl.href);
     } catch {
+      if (pendingState) transactions.delete(pendingState);
       discoveryPromise = undefined;
       routesLogger.warn("OIDC sign-in could not start (provider_discovery_failed)");
-      return res.redirect(303, loginFailurePath);
+      return res.redirect(303, oidcLoginFailurePath());
     }
   });
 
@@ -326,16 +340,12 @@ export function registerOidcAuthRoutes(app: Express): void {
         ? (req.body as Record<string, unknown>)
         : Object.fromEntries(new URL(req.originalUrl, settings.redirectUri).searchParams.entries());
     const state = typeof callbackParams?.state === "string" ? callbackParams.state : "";
+    const stateCookie = state ? getCookie(req, oidcStateCookieName(state)) : undefined;
     const transaction = transactions.get(state);
     transactions.delete(state);
-    clearTransactionCookie(res, settings);
-    if (
-      !state ||
-      !transaction ||
-      transaction.expiresAt <= Date.now() ||
-      getCookie(req, STATE_COOKIE) !== state
-    ) {
-      return res.redirect(303, loginFailurePath);
+    if (state) clearTransactionCookie(res, state, settings);
+    if (!state || !transaction || transaction.expiresAt <= Date.now() || stateCookie !== state) {
+      return res.redirect(303, oidcLoginFailurePath());
     }
 
     try {
@@ -363,20 +373,20 @@ export function registerOidcAuthRoutes(app: Express): void {
         !isAdmitted(email, settings)
       ) {
         routesLogger.warn("OIDC sign-in denied (identity_not_admitted)");
-        return res.redirect(303, loginFailurePath);
+        return res.redirect(303, oidcLoginFailurePath());
       }
 
       const user = await findOrCreateOidcUser(issuer, subject);
       if (!user) {
         routesLogger.warn("OIDC sign-in denied (identity_collision)");
-        return res.redirect(303, loginFailurePath);
+        return res.redirect(303, oidcLoginFailurePath());
       }
       const token = await generateToken(user);
       setAuthCookies(req, res, token, new URL(settings.redirectUri).protocol === "https:");
       return res.redirect(303, transaction.returnTo);
     } catch {
       routesLogger.warn("OIDC sign-in failed (callback_validation_or_session_failed)");
-      return res.redirect(303, loginFailurePath);
+      return res.redirect(303, oidcLoginFailurePath());
     }
   };
 

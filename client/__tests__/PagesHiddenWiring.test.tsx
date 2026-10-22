@@ -77,6 +77,13 @@ describe("Page hidden wiring", () => {
         } as Response);
       }
 
+      if (url.includes("/api/wanted-content")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [],
+        } as Response);
+      }
+
       return Promise.resolve({
         ok: true,
         json: async () => [
@@ -195,6 +202,12 @@ describe("Library filter buttons", () => {
         return Promise.resolve({
           ok: true,
           json: async () => ({ hideOwnedInHasResults: false, hideShelvedByDefault: false }),
+        } as Response);
+      }
+      if (url.includes("/api/wanted-content")) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [],
         } as Response);
       }
       return Promise.resolve({

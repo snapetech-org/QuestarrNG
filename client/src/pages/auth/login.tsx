@@ -193,8 +193,9 @@ export default function LoginPage() {
                   href={oidcPresentation.setupUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label={`${t(oidcPresentation.labelKey)} identity provider setup guide (opens in a new tab)`}
                 >
-                  {t("Provider setup guide")}
+                  {t("Provider setup guide")} <span aria-hidden="true">↗</span>
                 </a>
               </div>
             )}

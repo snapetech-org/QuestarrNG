@@ -36,6 +36,10 @@ vi.mock("../igdb.js", async (importOriginal) => ({
   igdbClient: createIgdbMock(),
 }));
 vi.mock("../db.js", () => createDbModuleMock());
+vi.mock("../cron.js", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../cron.js")>()),
+  checkAutoSearch: vi.fn().mockResolvedValue(undefined),
+}));
 vi.mock("../logger.js", () => createLoggerMocks());
 vi.mock("../rss.js", () => ({ rssService: createRssMock() }));
 vi.mock("../torznab.js", () => ({ torznabClient: createTorznabMock() }));
@@ -342,6 +346,372 @@ describe("integration API", () => {
       );
       expect(response.status).toBe(200);
       expect(response.body.results.map((game: { igdbId: number }) => game.igdbId)).toEqual([2]);
+    });
+  });
+
+  describe("SeerrNG edition and discovery routes", () => {
+    async function catalogMocks() {
+      const { igdbClient } = await import("../igdb.js");
+      const mocks = {
+        getEditionGraph: vi.fn(),
+        discoverGames: vi.fn(),
+        formatGameData: vi.fn((game: Record<string, unknown>) => game),
+        getTimeToBeats: vi.fn().mockResolvedValue(new Map()),
+      };
+      Object.assign(igdbClient, mocks);
+      return mocks;
+    }
+
+    it("returns edition and add-on availability using only owned library states", async () => {
+      const igdb = await catalogMocks();
+      igdb.getEditionGraph.mockResolvedValueOnce({
+        base: {
+          id: 42,
+          name: "Example Game",
+          dlcs: [{ id: 51, name: "Story Chapter" }],
+          expansions: [{ id: 52, name: "Large Expansion", game_type: 2 }],
+        },
+        editions: [
+          {
+            id: 43,
+            name: "Example Game Deluxe",
+            version_title: "Deluxe",
+          },
+        ],
+      });
+      (storage.getUserGamesByIgdbIds as Mock).mockResolvedValueOnce([
+        { igdbId: 42, status: "playing" },
+        { igdbId: 43, status: "completed" },
+        { igdbId: 51, status: "wanted" },
+      ]);
+
+      const response = await withKey(
+        request(app).get("/api/integration/seerrng/v1/catalog/games/42/editions")
+      );
+
+      expect(response.status).toBe(200);
+      expect(storage.getUserGamesByIgdbIds).toHaveBeenCalledWith(USER.id, [42, 43, 51, 52]);
+      expect(response.body.base).toMatchObject({ igdbId: 42, owned: true, status: "playing" });
+      expect(response.body.editions[0]).toMatchObject({
+        igdbId: 43,
+        title: "Example Game: Deluxe",
+        owned: true,
+      });
+      expect(response.body.addons).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ igdbId: 51, title: "Story Chapter", owned: false }),
+          expect.objectContaining({ igdbId: 52, title: "Large Expansion", type: "expansion" }),
+        ])
+      );
+    });
+
+    it("rejects invalid edition IDs, reports missing catalog games, and maps IGDB failures", async () => {
+      const igdb = await catalogMocks();
+      const invalid = await withKey(
+        request(app).get("/api/integration/seerrng/v1/catalog/games/1.5/editions")
+      );
+      expect(invalid.status).toBe(400);
+
+      igdb.getEditionGraph.mockResolvedValueOnce({ base: null, editions: [] });
+      const missing = await withKey(
+        request(app).get("/api/integration/seerrng/v1/catalog/games/42/editions")
+      );
+      expect(missing.status).toBe(404);
+
+      igdb.getEditionGraph.mockRejectedValueOnce(new Error("IGDB unavailable"));
+      const unavailable = await withKey(
+        request(app).get("/api/integration/seerrng/v1/catalog/games/42/editions")
+      );
+      expect(unavailable.status).toBe(502);
+      expect(unavailable.body.error).toBe("IGDB catalog is unavailable.");
+    });
+
+    it("validates discovery filters and requires at least one filter", async () => {
+      const igdb = await catalogMocks();
+      const noFilters = await withKey(
+        request(app).get("/api/integration/seerrng/v1/catalog/discover")
+      );
+      expect(noFilters.status).toBe(400);
+
+      const repeatedFacet = await withKey(
+        request(app)
+          .get("/api/integration/seerrng/v1/catalog/discover")
+          .query({ q: "game", genres: ["RPG", "Adventure"] })
+      );
+      expect(repeatedFacet.status).toBe(400);
+
+      const oversizedFacet = await withKey(
+        request(app)
+          .get("/api/integration/seerrng/v1/catalog/discover")
+          .query({ q: "game", themes: "x".repeat(1501) })
+      );
+      expect(oversizedFacet.status).toBe(400);
+
+      const excessiveFacetValues = await withKey(
+        request(app)
+          .get("/api/integration/seerrng/v1/catalog/discover")
+          .query({
+            q: "game",
+            languages: Array.from({ length: 21 }, (_, index) => `L${index}`).join(","),
+          })
+      );
+      expect(excessiveFacetValues.status).toBe(400);
+
+      for (const query of [
+        { minYear: 1969 },
+        { minYear: 2101 },
+        { minYear: 2024.5 },
+        { maxHoursToBeat: 0 },
+        { maxHoursToBeat: 2001 },
+        { maxHoursToBeat: "not-a-number" },
+      ]) {
+        const invalid = await withKey(
+          request(app)
+            .get("/api/integration/seerrng/v1/catalog/discover")
+            .query({ q: "game", ...query })
+        );
+        expect(invalid.status).toBe(400);
+      }
+      expect(igdb.discoverGames).not.toHaveBeenCalled();
+    });
+
+    it("maps filtered discovery results, language facets, playtime, and bounded cursors", async () => {
+      const igdb = await catalogMocks();
+      const game = {
+        id: 99,
+        igdbId: 99,
+        name: "Example Game",
+        title: "Example Game",
+        themes: [{ name: "Fantasy" }],
+        game_modes: [{ name: "Single player" }],
+        player_perspectives: [{ name: "Third person" }],
+        language_supports: [
+          { language: { name: "English" }, language_support_type: { name: "Audio" } },
+          { language: { name: "English" }, language_support_type: { name: "Audio" } },
+          { language: { name: "French" }, language_support_type: { name: "Subtitles" } },
+          { language: { name: "German" }, language_support_type: { name: "Interface" } },
+          { language: null, language_support_type: { name: "Audio" } },
+          { language: { name: "Japanese" }, language_support_type: null },
+        ],
+      };
+      igdb.discoverGames.mockResolvedValueOnce([game]);
+      igdb.getTimeToBeats.mockResolvedValueOnce(new Map([[99, { normally: 30 }]]));
+
+      const response = await withKey(
+        request(app)
+          .get("/api/integration/seerrng/v1/catalog/discover")
+          .query({
+            q: "x".repeat(110),
+            themes: "Fantasy, Sci-fi",
+            gameModes: "Single player",
+            perspectives: "Third person",
+            genres: "RPG",
+            languages: "English",
+            excludeThemes: "Horror",
+            excludeGameModes: "Multiplayer",
+            excludeGenres: "Sports",
+            minYear: 2024,
+            maxHoursToBeat: 40,
+            limit: 1,
+            cursor: "3",
+          })
+      );
+
+      expect(response.status).toBe(200);
+      expect(igdb.discoverGames).toHaveBeenCalledWith(
+        expect.objectContaining({
+          query: "x".repeat(100),
+          themes: ["Fantasy", "Sci-fi"],
+          gameModes: ["Single player"],
+          perspectives: ["Third person"],
+          genres: ["RPG"],
+          languages: ["English"],
+          excludeThemes: ["Horror"],
+          excludeGameModes: ["Multiplayer"],
+          excludeGenres: ["Sports"],
+          minYear: 2024,
+        }),
+        1,
+        3
+      );
+      expect(response.body.nextCursor).toBe("4");
+      expect(response.body.results[0]).toMatchObject({
+        igdbId: 99,
+        timeToBeat: { normally: 30 },
+        themes: ["Fantasy"],
+        gameModes: ["Single player"],
+        perspectives: ["Third person"],
+        languages: {
+          audio: ["English"],
+          subtitles: ["French"],
+          interface: ["German"],
+        },
+      });
+    });
+
+    it("uses default paging, tolerates missing playtime data, and maps discovery errors", async () => {
+      const igdb = await catalogMocks();
+      igdb.discoverGames.mockResolvedValueOnce([
+        { id: 100, igdbId: 100, title: "Short", timeToBeat: null },
+      ]);
+      igdb.getTimeToBeats.mockRejectedValueOnce(new Error("HowLongToBeat unavailable"));
+      const response = await withKey(
+        request(app)
+          .get("/api/integration/seerrng/v1/catalog/discover")
+          .query({ genres: "RPG", cursor: "not-a-cursor" })
+      );
+      expect(response.status).toBe(200);
+      expect(igdb.discoverGames).toHaveBeenCalledWith(
+        expect.objectContaining({ genres: ["RPG"] }),
+        24,
+        0
+      );
+      expect(response.body.nextCursor).toBeNull();
+      expect(response.body.results[0].timeToBeat).toBeNull();
+
+      igdb.discoverGames.mockRejectedValueOnce(new Error("IGDB unavailable"));
+      const unavailable = await withKey(
+        request(app)
+          .get("/api/integration/seerrng/v1/catalog/discover")
+          .query({ minYear: 2024, limit: 999 })
+      );
+      expect(unavailable.status).toBe(502);
+    });
+
+    it("keeps an existing base game while reporting selected editions and add-ons as pending", async () => {
+      const igdb = await catalogMocks();
+      igdb.getEditionGraph.mockResolvedValue({
+        base: {
+          id: 42,
+          name: "Example Game",
+          dlcs: [
+            { id: 51, name: "Story Chapter" },
+            { id: 52, name: "Soundtrack" },
+          ],
+        },
+        editions: [{ id: 43, name: "Example Game Deluxe", version_title: "Deluxe" }],
+      });
+
+      const game = {
+        id: "owned-game",
+        title: "Example Game",
+        userId: USER.id,
+        igdbId: 42,
+        status: "owned",
+      };
+      let ledger: Record<string, unknown> | undefined;
+      const addIntegrationRequest = vi.fn(async (input: Record<string, unknown>) => {
+        ledger = { ...input, status: "accepted", gameId: null, errorMessage: null };
+        return ledger;
+      });
+      const updateIntegrationRequest = vi.fn(
+        async (_userId: string, _externalRequestId: string, update: Record<string, unknown>) => {
+          ledger = { ...ledger, ...update };
+          return ledger;
+        }
+      );
+      Object.assign(storage, { addIntegrationRequest, updateIntegrationRequest });
+      (storage.getIntegrationRequest as Mock).mockImplementation(async () => ledger);
+      (storage.getUserGamesByIgdbIds as Mock).mockResolvedValue([game]);
+      (storage.getGame as Mock).mockResolvedValue(game);
+
+      const makeRequest = (externalRequestId: string, selection: Record<string, unknown>) =>
+        withKey(request(app).post("/api/integration/seerrng/v1/requests")).send({
+          externalRequestId,
+          title: "Example Game",
+          igdbId: 42,
+          variant: { operatingSystem: "windows", architecture: "x64" },
+          selection: { kind: "game-content", ...selection },
+        });
+
+      const edition = await makeRequest("seerrng:edition", { mode: "edition", editionId: 43 });
+      expect(edition.status).toBe(201);
+      expect(edition.body.status).toBe("searching");
+      expect(edition.body.content).toEqual({
+        mode: "edition",
+        pending: [{ id: 43, title: "Example Game Deluxe" }],
+        acquiredCount: 0,
+      });
+
+      ledger = undefined;
+      const addons = await makeRequest("seerrng:addons", {
+        mode: "missing-selected",
+        addonIds: [51, 52],
+      });
+      expect(addons.status).toBe(201);
+      expect(addons.body.content).toEqual({
+        mode: "missing-selected",
+        pending: [
+          { id: 51, title: "Story Chapter" },
+          { id: 52, title: "Soundtrack" },
+        ],
+        acquiredCount: 0,
+      });
+      expect(addIntegrationRequest).toHaveBeenCalledTimes(2);
+      expect(updateIntegrationRequest).toHaveBeenCalled();
+    });
+
+    it("rejects content selections that are unlinked, incomplete, or different from a retry", async () => {
+      const igdb = await catalogMocks();
+      const postSelection = (body: Record<string, unknown>) =>
+        withKey(request(app).post("/api/integration/seerrng/v1/requests")).send({
+          externalRequestId: "seerrng:invalid-selection",
+          title: "Example Game",
+          variant: { operatingSystem: "windows", architecture: "x64" },
+          ...body,
+        });
+
+      const selection = { kind: "game-content", mode: "edition", editionId: 43 };
+      expect((await postSelection({ selection })).status).toBe(400);
+      expect(igdb.getEditionGraph).not.toHaveBeenCalled();
+
+      igdb.getEditionGraph.mockResolvedValueOnce({ base: null, editions: [] });
+      expect((await postSelection({ igdbId: 42, selection })).status).toBe(400);
+
+      const base = {
+        id: 42,
+        name: "Example Game",
+        dlcs: [{ id: 51, name: "Story Chapter" }],
+      };
+      igdb.getEditionGraph.mockResolvedValueOnce({ base, editions: [] });
+      expect((await postSelection({ igdbId: 42, selection })).status).toBe(400);
+
+      igdb.getEditionGraph.mockResolvedValueOnce({ base, editions: [] });
+      expect(
+        (
+          await postSelection({
+            igdbId: 42,
+            selection: { kind: "game-content", mode: "missing-selected", addonIds: [999] },
+          })
+        ).status
+      ).toBe(400);
+
+      igdb.getEditionGraph.mockResolvedValueOnce({ base, editions: [] });
+      expect(
+        (
+          await postSelection({
+            igdbId: 42,
+            selection: { kind: "game-content", mode: "missing-selected", addonIds: [] },
+          })
+        ).status
+      ).toBe(400);
+
+      igdb.getEditionGraph.mockRejectedValueOnce(new Error("IGDB unavailable"));
+      expect((await postSelection({ igdbId: 42, selection })).status).toBe(502);
+
+      let ledger: Record<string, unknown> | undefined = {
+        externalRequestId: "seerrng:invalid-selection",
+        title: "Example Game",
+        igdbId: 42,
+        operatingSystem: "windows",
+        architecture: "x64",
+        selection: null,
+      };
+      (storage.getIntegrationRequest as Mock).mockImplementation(async () => ledger);
+      igdb.getEditionGraph.mockResolvedValueOnce({ base, editions: [{ id: 43, name: "Deluxe" }] });
+      const differentRetry = await postSelection({ igdbId: 42, selection });
+      expect(differentRetry.status).toBe(409);
+      expect(differentRetry.body.error).toContain("different request identity");
     });
   });
 

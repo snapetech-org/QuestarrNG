@@ -5,6 +5,7 @@ apprise==2.0.1 \
     --hash=sha256:8cae8ae5877b9cfd1dddffc17ac1e50f780ab6bdf948f95215e2466ef7230565
     # via -r requirements/apprise.in
 certifi==2026.10.19 \
+    --hash=sha256:035c1e85572b141bf1c3a3eff0e33a8eb74917522f2559075ff8d2fea780a1ae \
     --hash=sha256:42d35340cc5b9ba78e818ddbff0c5b1c2b779de448a340fd1b989f5fa8670e1b
     # via
     #   apprise

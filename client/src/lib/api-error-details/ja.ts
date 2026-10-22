@@ -64,6 +64,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Failed to refresh metadata": "メタデータを更新できませんでした",
   "Failed to run library health check": "ライブラリのヘルスチェックを実行できませんでした",
   "Failed to list root folders": "ルートフォルダーを一覧表示できませんでした",
+  "Failed to list wanted content": "希望するコンテンツを一覧表示できませんでした",
   "A root folder with this path already exists": "このパスのルートフォルダーはすでに存在します",
   "Path is not accessible": "このパスにはアクセスできません",
   "Failed to create root folder": "ルートフォルダーを作成できませんでした",

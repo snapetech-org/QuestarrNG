@@ -19,7 +19,7 @@ Dependencies are added deliberately as part of normal development, via `npm inst
   `brace-expansion`, `http-cache-semantics`, `ip-address`,
   `postcss-selector-parser`, and `undici`. The installer verifies that every
   installed direct dependency satisfies the CLI's declared version range.
-  This preserves npm 11.21.0 and Node 22.19.0 compatibility while replacing
+  This preserves npm 11.21.0 and Node 22.23.4 compatibility while replacing
   vulnerable bundled copies that normal npm overrides cannot change.
   Both CI and the validation engine audit this separate runtime at all severities.
 - `global.json` pins the .NET SDK used to build the Windows service; Dependabot tracks SDK servicing releases with the `dotnet-sdk` ecosystem.

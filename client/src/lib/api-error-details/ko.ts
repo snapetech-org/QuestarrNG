@@ -64,6 +64,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Failed to refresh metadata": "메타데이터를 새로 고치지 못했습니다",
   "Failed to run library health check": "라이브러리 상태를 확인하지 못했습니다",
   "Failed to list root folders": "루트 폴더 목록을 가져오지 못했습니다",
+  "Failed to list wanted content": "원하는 콘텐츠 목록을 불러오지 못했습니다",
   "A root folder with this path already exists": "이 경로의 루트 폴더가 이미 있습니다",
   "Path is not accessible": "경로에 접근할 수 없습니다",
   "Failed to create root folder": "루트 폴더를 만들지 못했습니다",

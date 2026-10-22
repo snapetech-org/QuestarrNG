@@ -197,6 +197,7 @@ export const PUBLIC_API_ROUTES = new Set<string>([
   "GET /auth/oidc/status", // exposes only whether server-side OIDC is configured
   "GET /auth/oidc/login", // begins the interactive authorization-code flow
   "GET /auth/oidc/callback", // consumes one OIDC transaction and issues the local session
+  "POST /auth/oidc/callback", // Apple returns the authorization code with response_mode=form_post
   "GET /health", // liveness probe (docker/compose healthcheck, DAST workflow)
   "GET /ready", // readiness probe (db/IGDB connectivity), no sensitive data
 ]);
