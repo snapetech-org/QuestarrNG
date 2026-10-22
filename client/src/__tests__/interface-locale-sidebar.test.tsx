@@ -6,9 +6,47 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { applyInitialInterfaceLanguage } from "@/lib/interface-locale";
 import { setRegionalPreference } from "@/lib/regional-format";
 
+const mockVersionService = vi.hoisted(() => ({
+  fetchLatestQuestarrVersion: vi.fn().mockResolvedValue(null),
+}));
+
 vi.mock("@/lib/auth", () => ({
   useAuth: () => ({ logout: vi.fn(), user: { username: "test-user" } }),
 }));
+
+vi.mock("@/lib/versionService", () => mockVersionService);
+
+function createSidebarQueryClient(
+  games: Array<{ status?: string }> = [],
+  downloads: Array<{ status?: string }> = []
+) {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        queryFn: ({ queryKey }) => {
+          throw new Error(`Unexpected sidebar query in test: ${queryKey.join("/")}`);
+        },
+        retry: false,
+        staleTime: Infinity,
+      },
+    },
+  });
+  queryClient.setQueryData(["/api/config"], { igdb: { configured: false } });
+  queryClient.setQueryData(["/api/games"], games);
+  queryClient.setQueryData(["/api/downloads"], { downloads });
+  queryClient.setQueryData(["latestQuestarrVersion"], null);
+  return queryClient;
+}
+
+function renderSidebar(queryClient: QueryClient) {
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <SidebarProvider>
+        <AppSidebar />
+      </SidebarProvider>
+    </QueryClientProvider>
+  );
+}
 
 describe("AppSidebar translated labels", () => {
   beforeEach(() => {
@@ -21,19 +59,9 @@ describe("AppSidebar translated labels", () => {
   });
 
   it("marks collapsible navigation labels with their translated language and direction", () => {
-    const queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false, staleTime: Infinity } },
-    });
-    queryClient.setQueryData(["/api/games"], []);
-    queryClient.setQueryData(["/api/downloads"], { downloads: [] });
-
-    render(
-      <QueryClientProvider client={queryClient}>
-        <SidebarProvider>
-          <AppSidebar />
-        </SidebarProvider>
-      </QueryClientProvider>
-    );
+    const queryClient = createSidebarQueryClient();
+    renderSidebar(queryClient);
+    expect(mockVersionService.fetchLatestQuestarrVersion).not.toHaveBeenCalled();
 
     const libraryButton = screen.getByTestId("nav-library");
     const translatedLabel = within(libraryButton).getByText("المكتبة");
@@ -49,19 +77,8 @@ describe("AppSidebar translated labels", () => {
   });
 
   it("places the desktop sidebar on the right for Arabic and the left for English", () => {
-    const queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false, staleTime: Infinity } },
-    });
-    queryClient.setQueryData(["/api/games"], []);
-    queryClient.setQueryData(["/api/downloads"], { downloads: [] });
-
-    const { unmount } = render(
-      <QueryClientProvider client={queryClient}>
-        <SidebarProvider>
-          <AppSidebar />
-        </SidebarProvider>
-      </QueryClientProvider>
-    );
+    const queryClient = createSidebarQueryClient();
+    const { unmount } = renderSidebar(queryClient);
 
     expect(document.querySelector('[data-slot="sidebar"][data-side="right"]')).not.toBeNull();
 
@@ -69,37 +86,18 @@ describe("AppSidebar translated labels", () => {
     localStorage.setItem("questarr.interface-language", "en");
     applyInitialInterfaceLanguage();
 
-    render(
-      <QueryClientProvider client={queryClient}>
-        <SidebarProvider>
-          <AppSidebar />
-        </SidebarProvider>
-      </QueryClientProvider>
-    );
+    renderSidebar(queryClient);
 
     expect(document.querySelector('[data-slot="sidebar"][data-side="left"]')).not.toBeNull();
   });
 
   it("formats navigation badges with the current regional digits", () => {
     act(() => setRegionalPreference("es"));
-    const queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false, staleTime: Infinity } },
-    });
-    queryClient.setQueryData(
-      ["/api/games"],
-      [{ status: "wanted" }, { status: "wanted" }, { status: "owned" }]
+    const queryClient = createSidebarQueryClient(
+      [{ status: "wanted" }, { status: "wanted" }, { status: "owned" }],
+      [{ status: "downloading" }, { status: "downloading" }]
     );
-    queryClient.setQueryData(["/api/downloads"], {
-      downloads: [{ status: "downloading" }, { status: "downloading" }],
-    });
-
-    render(
-      <QueryClientProvider client={queryClient}>
-        <SidebarProvider>
-          <AppSidebar />
-        </SidebarProvider>
-      </QueryClientProvider>
-    );
+    renderSidebar(queryClient);
 
     fireEvent.click(screen.getByTestId("nav-more"));
     const wishlistButton = screen.getByTestId("nav-wishlist");
