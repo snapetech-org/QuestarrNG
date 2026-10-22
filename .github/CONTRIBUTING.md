@@ -100,21 +100,20 @@ type checking, application builds, and Docker image builds:
 - `test`: the whole Vitest suite with coverage, in one job:
 
   ```bash
-  npm test -- --coverage --reporter=default --reporter=junit --outputFile.junit=test-report.junit.xml
+  npm run test:coverage -- --reporter=default --reporter=junit --outputFile.junit=test-report.junit.xml
   ```
 
-  The reviewed sandbox launcher runs the source-bound plan with an offline npm
-  cache and installs dependencies inside Bubblewrap. Coverage thresholds come
-  from `vitest.config.ts`; reports are exported as a short-lived artifact and a
-  default-branch `workflow_run` uploads them to Codecov only for trusted pushes
-  to `main`.
+  CI installs the locked dependencies with `npm ci --ignore-scripts` and runs
+  Playwright separately. Coverage thresholds come from `vitest.config.ts`; a
+  default-branch `workflow_run` uploads reports to Codecov only for trusted
+  pushes to `main`.
 
-- `build`: the reviewed sandbox launcher runs `npm run lint`, `npm run check`
-  (TypeScript) and `npm run build` with offline dependencies, on Node 22.23.4
-  (plus 26.x on pushes to `main`/`release/*`).
+- `build`: CI runs `npm run format:check`, `npm run lint`, `npm run check`
+  (TypeScript), and `npm run build` on Node 22.23.4 (plus 26.x on pushes to
+  `main`/`release/*`).
 - `docker-build`: builds the image. It always runs on pushes; on a PR it runs when the PR touches the `Dockerfile`, `.dockerignore`, `entrypoint.sh`, `package*.json`, `requirements/`, migrations or `ci.yml`.
 
-Playwright E2E tests run in `.github/workflows/e2e.yml`. A new push to a PR cancels the CI, E2E, CodeQL and SAST runs still going for its previous commit.
+Playwright E2E tests run in CI and `.github/workflows/e2e.yml`. A new push to a PR cancels the CI, E2E, CodeQL and SAST runs still going for its previous commit.
 
 **Interpreting a CI failure:** check the "Tests" step logs first for the failing test name and assertion; a failure in `lint` or `check` instead means a style or type error, not a broken test — fix those before re-pushing. If the Codecov upload step fails but the tests themselves passed, that's usually a Codecov/token issue rather than a code problem.
 

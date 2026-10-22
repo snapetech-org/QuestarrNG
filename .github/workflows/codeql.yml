@@ -90,7 +90,7 @@ jobs:
         env:
           REQUIRE_SANITIZER_TOOLCHAIN: "1"
           LD_PRELOAD: ""
-        run: node --test scripts/validation-engine/data-owner-sanitizers.contract.mjs
+        run: node --test tests/contracts/home-assistant-data-owner-sanitizers.contract.mjs
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3

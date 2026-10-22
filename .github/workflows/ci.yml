@@ -104,12 +104,6 @@ jobs:
       - name: Audit all dependencies (Critical/High blocks build)
         run: npm audit --audit-level=high
 
-      - name: Audit the locked CI npm runtime (all severities block build)
-        run: npm audit --prefix .github/npm-runtime --audit-level=low
-
-      - name: Audit the tracked npm CLI source (all severities block build)
-        run: npm audit --prefix .github/npm-source --audit-level=low
-
       # Policy: docs/VULNERABILITY_MANAGEMENT.md §1.4 — production dependency
       # licenses must be on the allow-list.
       - name: Check dependency licenses
@@ -190,12 +184,9 @@ jobs:
           DOTNET_INSTALL_DIR: ${{ runner.temp }}/questarrng-dotnet-${{ github.run_id }}-${{ github.run_attempt }}
         run: rm -rf -- "$DOTNET_INSTALL_DIR"
 
-  # One job for the whole suite (~3 min on a standard runner): four shards plus a merge
-  # job cost five runners and five `npm ci` for about the same wall time, and runners are
-  # what the account runs out of when several PRs are pushed at once.
+  # Pull requests run app tests on GitHub-hosted runners; only trusted main runs
+  # use the isolated shared runner pool.
   test:
-    # The hosted fallback stays on Ubuntu 24.04 for its AppArmor profile; the
-    # shared runner uses the matching isolated Ubuntu 24.04 guest image.
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) || 'ubuntu-24.04' }}
 
     steps:
@@ -207,7 +198,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0
           persist-credentials: false
 
       - name: Setup Node.js 26.x
@@ -218,120 +208,41 @@ jobs:
           node-version: 26.x
           cache: "npm" # zizmor: ignore[cache-poisoning]
 
-      - name: Prepare reviewed launcher and npm runtime
+      - name: Install locked JavaScript dependencies
         env:
           NPM_CONFIG_CACHE: ${{ runner.temp }}/questarrng-npm-cache
           NODE_USE_ENV_PROXY: '1'
-          TRUSTED_BASE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
-          BOOTSTRAP_LAUNCHER_REF: questarr-validation-launcher-20261013
-          BOOTSTRAP_LAUNCHER_SHA: 2d7ebb7f337398444dc13a5ce7c5fa5eb32b3538
+        run: npm ci --ignore-scripts
+
+      - name: Run Vitest coverage suite
+        env:
+          QUESTARR_CI_VITEST_MAX_WORKERS: "4"
+        run: >-
+          npm run test:coverage --
+          --reporter=default
+          --reporter=junit
+          --outputFile.junit=test-report.junit.xml
+
+      - name: Install Playwright Chromium
+        run: npx --no-install playwright install chromium
+
+      - name: Run Playwright end-to-end suite
+        run: npm run test:e2e -- --reporter=line
+
+      - name: Collect reports for diagnostics and Codecov
+        if: always()
         run: |
           set -euo pipefail
-          umask 077
-          mkdir -p "$NPM_CONFIG_CACHE"
-          if [ -L "$NPM_CONFIG_CACHE" ] || [ ! -d "$NPM_CONFIG_CACHE" ]; then
-            echo "The runner npm cache must be a real directory." >&2
-            exit 1
-          fi
-          trusted_root="$RUNNER_TEMP/questarr-trusted-validation"
-          mkdir -m 700 "$trusted_root"
+          report_dir="$RUNNER_TEMP/quest-codecov-reports"
+          mkdir -p "$report_dir"
+          if [ -d coverage ]; then cp -a coverage "$report_dir/"; fi
+          if [ -f test-report.junit.xml ]; then cp -a test-report.junit.xml "$report_dir/"; fi
 
-          if ! git cat-file -e "$TRUSTED_BASE_SHA^{commit}" 2>/dev/null; then
-            git fetch --no-tags origin "$TRUSTED_BASE_SHA"
-          fi
-          launcher_sha="$TRUSTED_BASE_SHA"
-          if ! git cat-file -e "$launcher_sha:scripts/validation-engine/trusted-test-launcher.mjs" 2>/dev/null; then
-            launcher_sha="$BOOTSTRAP_LAUNCHER_SHA"
-            if ! [[ "$launcher_sha" =~ ^[a-f0-9]{40}$ ]]; then
-              echo "The reviewed bootstrap launcher SHA is not pinned." >&2
-              exit 1
-            fi
-            git fetch --no-tags origin "refs/tags/$BOOTSTRAP_LAUNCHER_REF"
-            fetched_launcher_sha="$(git rev-parse 'FETCH_HEAD^{commit}')"
-            if ! git cat-file -e "$launcher_sha^{commit}" 2>/dev/null || \
-              [ "$fetched_launcher_sha" != "$launcher_sha" ]; then
-              echo "The permanent bootstrap tag does not match the pinned trusted commit." >&2
-              exit 1
-            fi
-          fi
-          git cat-file -e "$launcher_sha:scripts/validation-engine/trusted-test-launcher.mjs"
-          git cat-file -e "$launcher_sha:scripts/validation-engine/trusted-test-sandbox-policy.mjs"
-          git cat-file -e "$launcher_sha:scripts/validation-engine/trusted-test-source-policy.mjs"
-          mkdir -m 700 "$trusted_root/launcher"
-          git show "$launcher_sha:scripts/validation-engine/trusted-test-launcher.mjs" > "$trusted_root/launcher/trusted-test-launcher.mjs"
-          git show "$launcher_sha:scripts/validation-engine/trusted-test-sandbox-policy.mjs" > "$trusted_root/launcher/trusted-test-sandbox-policy.mjs"
-          git show "$launcher_sha:scripts/validation-engine/trusted-test-source-policy.mjs" > "$trusted_root/launcher/trusted-test-source-policy.mjs"
-
-          git cat-file -e "$launcher_sha:scripts/install-npm-runtime.mjs"
-          git cat-file -e "$launcher_sha:.github/npm-runtime/package.json"
-          git cat-file -e "$launcher_sha:.github/npm-runtime/package-lock.json"
-          git cat-file -e "$launcher_sha:.github/npm-source/package.json"
-          git cat-file -e "$launcher_sha:.github/npm-source/package-lock.json"
-          git archive --format=tar "$launcher_sha" \
-            scripts/install-npm-runtime.mjs \
-            .github/npm-runtime/package.json \
-            .github/npm-runtime/package-lock.json \
-            .github/npm-source/package.json \
-            .github/npm-source/package-lock.json \
-            | tar -x -C "$trusted_root"
-          node "$trusted_root/scripts/install-npm-runtime.mjs"
-
-          node --input-type=module - "$GITHUB_WORKSPACE" "$trusted_root/launcher/trusted-test-source-policy.mjs" <<'NODE'
-          import { pathToFileURL } from 'node:url';
-          const candidateRoot = process.argv[2];
-          const policyPath = process.argv[3];
-          const { validateCandidateLockfile } = await import(pathToFileURL(policyPath).href);
-          validateCandidateLockfile(candidateRoot);
-          NODE
-
-      - name: Install Bubblewrap for isolated tests
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes bubblewrap
-          # Ubuntu 24.04 restricts unprivileged user namespaces through AppArmor.
-          # Allow Bubblewrap itself to create the namespace it needs, without
-          # disabling the restriction globally for the runner.
-          profile="$RUNNER_TEMP/questarr-bubblewrap.apparmor"
-          cat > "$profile" <<'APPARMOR'
-          abi <abi/4.0>,
-          include <tunables/global>
-          profile questarr_bubblewrap /usr/bin/bwrap flags=(unconfined) {
-            userns,
-          }
-          APPARMOR
-          sudo apparmor_parser --add "$profile"
-          test "$(sysctl -n kernel.apparmor_restrict_unprivileged_userns)" = 1
-          bwrap --die-with-parent --unshare-user --ro-bind / / -- /bin/true
-
-      - name: Run source-bound test plan
-        env:
-          NPM_CONFIG_CACHE: ${{ runner.temp }}/questarrng-npm-cache
-          VALIDATION_RECEIPT_EXPORT: ${{ runner.temp }}/quest-validation-receipts/test.json
-        run: |
-          node "$RUNNER_TEMP/questarr-trusted-validation/launcher/trusted-test-launcher.mjs" \
-            "$GITHUB_WORKSPACE" \
-            --github-actions-context \
-            --npm-cache "$NPM_CONFIG_CACHE" \
-            --trusted-npm-runtime "$RUNNER_TEMP/questarr-trusted-validation/.github/npm-runtime/node_modules" \
-            --install-dependencies \
-            --receipt-output "$VALIDATION_RECEIPT_EXPORT" \
-            --reports-output "$RUNNER_TEMP/quest-codecov-reports" \
-            -- node scripts/validate-development.mjs --tests-only
-
-      - name: Upload source-bound test receipt
-        if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: validation-receipt-tests-attempt-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/quest-validation-receipts/test.json
-          if-no-files-found: warn
-          retention-days: 1
-
-      - name: Upload pull-request coverage report for diagnosis
+      - name: Upload pull-request reports for diagnosis
         if: ${{ always() && github.event_name == 'pull_request' }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: coverage-report-tests-attempt-${{ github.run_attempt }}
+          name: test-reports-attempt-${{ github.run_attempt }}
           path: ${{ runner.temp }}/quest-codecov-reports
           if-no-files-found: warn
           retention-days: 3
@@ -365,7 +276,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0
           persist-credentials: false
 
       - name: Setup Node.js ${{ matrix.node-version }}
@@ -376,157 +286,30 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm" # zizmor: ignore[cache-poisoning]
 
-      - name: Prepare reviewed launcher and npm runtime
+      - name: Install locked JavaScript dependencies
         env:
           NPM_CONFIG_CACHE: ${{ runner.temp }}/questarrng-npm-cache
           NODE_USE_ENV_PROXY: '1'
-          TRUSTED_BASE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
-          BOOTSTRAP_LAUNCHER_REF: questarr-validation-launcher-20261013
-          BOOTSTRAP_LAUNCHER_SHA: 2d7ebb7f337398444dc13a5ce7c5fa5eb32b3538
-        run: |
-          set -euo pipefail
-          umask 077
-          mkdir -p "$NPM_CONFIG_CACHE"
-          if [ -L "$NPM_CONFIG_CACHE" ] || [ ! -d "$NPM_CONFIG_CACHE" ]; then
-            echo "The runner npm cache must be a real directory." >&2
-            exit 1
-          fi
-          trusted_root="$RUNNER_TEMP/questarr-trusted-validation"
-          mkdir -m 700 "$trusted_root"
+        run: npm ci --ignore-scripts
 
-          if ! git cat-file -e "$TRUSTED_BASE_SHA^{commit}" 2>/dev/null; then
-            git fetch --no-tags origin "$TRUSTED_BASE_SHA"
-          fi
-          launcher_sha="$TRUSTED_BASE_SHA"
-          if ! git cat-file -e "$launcher_sha:scripts/validation-engine/trusted-test-launcher.mjs" 2>/dev/null; then
-            launcher_sha="$BOOTSTRAP_LAUNCHER_SHA"
-            if ! [[ "$launcher_sha" =~ ^[a-f0-9]{40}$ ]]; then
-              echo "The reviewed bootstrap launcher SHA is not pinned." >&2
-              exit 1
-            fi
-            git fetch --no-tags origin "refs/tags/$BOOTSTRAP_LAUNCHER_REF"
-            fetched_launcher_sha="$(git rev-parse 'FETCH_HEAD^{commit}')"
-            if ! git cat-file -e "$launcher_sha^{commit}" 2>/dev/null || \
-              [ "$fetched_launcher_sha" != "$launcher_sha" ]; then
-              echo "The permanent bootstrap tag does not match the pinned trusted commit." >&2
-              exit 1
-            fi
-          fi
-          git cat-file -e "$launcher_sha:scripts/validation-engine/trusted-test-launcher.mjs"
-          git cat-file -e "$launcher_sha:scripts/validation-engine/trusted-test-sandbox-policy.mjs"
-          git cat-file -e "$launcher_sha:scripts/validation-engine/trusted-test-source-policy.mjs"
-          mkdir -m 700 "$trusted_root/launcher"
-          git show "$launcher_sha:scripts/validation-engine/trusted-test-launcher.mjs" > "$trusted_root/launcher/trusted-test-launcher.mjs"
-          git show "$launcher_sha:scripts/validation-engine/trusted-test-sandbox-policy.mjs" > "$trusted_root/launcher/trusted-test-sandbox-policy.mjs"
-          git show "$launcher_sha:scripts/validation-engine/trusted-test-source-policy.mjs" > "$trusted_root/launcher/trusted-test-source-policy.mjs"
+      - name: Check formatting
+        run: npm run format:check
 
-          git cat-file -e "$launcher_sha:scripts/install-npm-runtime.mjs"
-          git cat-file -e "$launcher_sha:.github/npm-runtime/package.json"
-          git cat-file -e "$launcher_sha:.github/npm-runtime/package-lock.json"
-          git cat-file -e "$launcher_sha:.github/npm-source/package.json"
-          git cat-file -e "$launcher_sha:.github/npm-source/package-lock.json"
-          git archive --format=tar "$launcher_sha" \
-            scripts/install-npm-runtime.mjs \
-            .github/npm-runtime/package.json \
-            .github/npm-runtime/package-lock.json \
-            .github/npm-source/package.json \
-            .github/npm-source/package-lock.json \
-            | tar -x -C "$trusted_root"
-          node "$trusted_root/scripts/install-npm-runtime.mjs"
+      - name: Run ESLint
+        run: npm run lint
 
-          node --input-type=module - "$GITHUB_WORKSPACE" "$trusted_root/launcher/trusted-test-source-policy.mjs" <<'NODE'
-          import { pathToFileURL } from 'node:url';
-          const candidateRoot = process.argv[2];
-          const policyPath = process.argv[3];
-          const { validateCandidateLockfile } = await import(pathToFileURL(policyPath).href);
-          validateCandidateLockfile(candidateRoot);
-          NODE
+      - name: Type check
+        run: npm run check
 
-      - name: Install Bubblewrap for isolated build
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes bubblewrap
-          profile="$RUNNER_TEMP/questarr-bubblewrap.apparmor"
-          cat > "$profile" <<'APPARMOR'
-          abi <abi/4.0>,
-          include <tunables/global>
-          profile questarr_bubblewrap /usr/bin/bwrap flags=(unconfined) {
-            userns,
-          }
-          APPARMOR
-          sudo apparmor_parser --add "$profile"
-          test "$(sysctl -n kernel.apparmor_restrict_unprivileged_userns)" = 1
-          bwrap --die-with-parent --unshare-user --ro-bind / / -- /bin/true
+      - name: Build production assets
+        run: npm run build
 
-      # The registered task owns dependency installation, lint, formatting,
-      # type checking, build output, and the receipt for this Node matrix node.
-      - name: Run source-bound build plan
-        env:
-          NPM_CONFIG_CACHE: ${{ runner.temp }}/questarrng-npm-cache
-          VALIDATION_RECEIPT_EXPORT: ${{ runner.temp }}/quest-validation-receipts/build-node-${{ matrix.node-version }}.json
-        run: |
-          node "$RUNNER_TEMP/questarr-trusted-validation/launcher/trusted-test-launcher.mjs" \
-            "$GITHUB_WORKSPACE" \
-            --github-actions-context \
-            --npm-cache "$NPM_CONFIG_CACHE" \
-            --trusted-npm-runtime "$RUNNER_TEMP/questarr-trusted-validation/.github/npm-runtime/node_modules" \
-            --install-dependencies \
-            --receipt-output "$VALIDATION_RECEIPT_EXPORT" \
-            -- node scripts/validate-development.mjs --task build-output
-
-      - name: Upload source-bound build receipt
-        if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: validation-receipt-build-${{ matrix.node-version }}-attempt-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/quest-validation-receipts/build-node-${{ matrix.node-version }}.json
-          if-no-files-found: warn
-          retention-days: 1
-
-  reconcile-validation:
-    name: Reconcile test and build node receipts
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) || 'ubuntu-latest' }}
-    needs: [test, build]
-    if: always() && !cancelled()
-
-    steps:
-      - name: Harden the runner (Audit all outbound calls)
-        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
-        with:
-          egress-policy: audit
-
-      - name: Checkout code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - name: Set up Node.js 26.x
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 26.x
-          package-manager-cache: false
-
-      - name: Download validation node receipts
-        if: always()
-        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-        with:
-          path: ${{ runner.temp }}/quest-validation-receipts
-          pattern: validation-receipt-*-attempt-${{ github.run_attempt }}
-          merge-multiple: true
-
-      - name: Reconcile current workflow attempt
-        env:
-          GITHUB_RUN_ID: ${{ github.run_id }}
-          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
-          GITHUB_SHA: ${{ github.sha }}
-        run: >-
-          node scripts/validation-engine/reconcile-ci.mjs
-          --receipts "${{ runner.temp }}/quest-validation-receipts"
-          --expected-node-majors "${{ github.event_name == 'pull_request' && '22' || '22,26' }}"
+      - name: Verify production build output
+        run: test -d dist
 
   docker-build:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) || 'ubuntu-latest' }}
-    needs: [sca-scan, build, test, reconcile-validation]
+    needs: [sca-scan, build, test]
     if: needs.sca-scan.outputs.docker == 'true'
 
     steps:

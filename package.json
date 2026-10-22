@@ -30,7 +30,6 @@
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "validate:development": "node scripts/validate-development.mjs",
     "test:e2e": "playwright test",
     "test:stack": "playwright test -c playwright.stack.config.ts",
     "reset-password": "tsx scripts/reset-password.ts",
