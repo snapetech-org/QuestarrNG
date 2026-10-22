@@ -154,6 +154,8 @@ export function globRegex(glob) {
       result += character.replace(/[|\\{}()[\]^$+?.]/g, '\\$&');
     }
   }
+  // `result` is built from glob syntax and all other regex metacharacters are escaped above.
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- glob tokens are translated; other regex syntax is escaped.
   return new RegExp(result + '$');
 }
 
@@ -368,6 +370,8 @@ function inspectRuntime(runtime) {
   const version = (result.stdout ?? '') + (result.stderr ?? '');
   const versionLine = version.trim().split(/\r?\n/, 1)[0] ?? '';
   const versionCompatible = !runtime.versionPattern ||
+    // Regexes are reviewed repository-owned validation metadata and match one bounded version line.
+    // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- trusted validation-plan pattern.
     new RegExp(runtime.versionPattern).test(versionLine);
   return {
     ...runtime,
@@ -874,6 +878,8 @@ export async function runCommand(task, root, logPath, onFailure) {
   const combined = stdout + (stdout && stderr ? '\n' : '') + stderr;
   const logBuffer = Buffer.from(combined);
   writeFileSync(logPath, logBuffer, { mode: 0o600 });
+  // Regexes are reviewed repository-owned validation metadata and run over bounded test output.
+  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- trusted validation-plan pattern.
   const casePattern = task.casePattern ? new RegExp(task.casePattern, 'g') : null;
   let activeCases = null;
   if (casePattern) {

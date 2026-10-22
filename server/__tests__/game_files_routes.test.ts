@@ -74,8 +74,9 @@ function makeGame(overrides: Partial<Game> = {}): Game {
 }
 
 function scanFixturePaths(root: string): { libraryRoot: string; gameDir: string } {
+  // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- these paths stay inside a unique test-only temporary directory.
   const libraryRoot = path.join(root, "library");
-  const gameDir = path.join(libraryRoot, "PC", "Test Game");
+  const gameDir = path.join(libraryRoot, "PC", "Test Game"); // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- fixed fixture segments stay inside a unique test-only temporary directory.
   return { libraryRoot, gameDir };
 }
 

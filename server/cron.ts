@@ -2245,9 +2245,10 @@ export async function checkXrelReleases() {
       const extTitleNorm = rel.ext_info?.title ? normalizeTitle(rel.ext_info.title) : null;
       const dirCleaned = cleanReleaseName(rel.dirname);
       const dirNorm = normalizeTitle(dirCleaned);
+      // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- external title text is regex-escaped before interpolation.
       const extRegex =
         extTitleNorm && extTitleNorm.length >= 5
-          ? new RegExp(`\\b${extTitleNorm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i")
+          ? new RegExp(`\\b${extTitleNorm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i") // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- external title text is regex-escaped before interpolation.
           : null;
       return {
         rel,

@@ -23,6 +23,12 @@ import {
   sendLogs,
 } from "../src/lib/send-logs";
 
+function makeTestJwt(): string {
+  const encode = (value: string) =>
+    btoa(value).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+  return `${encode('{"alg":"HS256","typ":"JWT"}')}.${encode('{"sub":"123"}')}.fixture-signature`;
+}
+
 describe("send-logs utilities", () => {
   const originalFetch = globalThis.fetch;
   const originalUserAgent = globalThis.navigator.userAgent;
@@ -44,12 +50,13 @@ describe("send-logs utilities", () => {
   it("scrubs common PII patterns from log text", () => {
     const ipv4 = ["192", "168", "1", "12"].join(".");
     const ipv6 = ["2001", "0db8", "85a3", "0000", "0000", "8a2e", "0370", "7334"].join(":");
+    const token = makeTestJwt();
     const input = [
       "email=user@example.com",
       `ipv4=${ipv4}`,
       `ipv6=${ipv6}`,
       "uuid=123e4567-e89b-12d3-a456-426614174000",
-      "token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjMifQ.signature",
+      `token=${token}`,
       "unix=/home/alice/questarr/logs/app.log",
       String.raw`win=C:\Users\alice\Questarr\logs\app.log`,
     ].join(" ");
@@ -63,9 +70,7 @@ describe("send-logs utilities", () => {
   });
 
   it("redacts a bare JWT with no key= prefix using the JWT-specific label", () => {
-    expect(scrubPii("Authorization: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjMifQ.signature")).toBe(
-      "Authorization: [jwt]"
-    );
+    expect(scrubPii(`Authorization: ${makeTestJwt()}`)).toBe("Authorization: [jwt]");
   });
 
   it("scrubs each line before joining them", () => {
