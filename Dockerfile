@@ -1,5 +1,5 @@
 # Build stage with shared dependencies
-FROM node:26-alpine@sha256:aadf416b2cdce311a8811ba3f0608a61b77dbf997500e2eafe781b51f6a0b019 AS base
+FROM node:26.12.1-alpine@sha256:9bd229b644e391df00fb989efa732335aefc6170a05d8c163c5c8ca9870da401 AS base
 WORKDIR /app
 
 # apk upgrade picks up Alpine's latest patched packages for this branch (e.g. openssl,
@@ -47,7 +47,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:26-alpine@sha256:aadf416b2cdce311a8811ba3f0608a61b77dbf997500e2eafe781b51f6a0b019 AS production
+FROM node:26.12.1-alpine@sha256:9bd229b644e391df00fb989efa732335aefc6170a05d8c163c5c8ca9870da401 AS production
 ARG QUESTARR_VERSION=dev
 
 WORKDIR /app
@@ -69,7 +69,7 @@ ENV UMASK=022
 # CLI notifications. The native UnRAR binary is copied from the pinned source build below.
 COPY requirements/apprise.txt /tmp/requirements-apprise.txt
 RUN apk update && apk upgrade --no-cache && \
-    apk add --no-cache 7zip py3-pip python3 shadow su-exec && \
+    apk add --no-cache 'libexpat>=2.9.0-r0' 7zip py3-pip python3 shadow su-exec && \
     python3 -m pip install --no-cache-dir --break-system-packages --only-binary :all: \
       --require-hashes -r /tmp/requirements-apprise.txt && \
     rm /tmp/requirements-apprise.txt

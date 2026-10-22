@@ -35,14 +35,14 @@ export function getCookie(req: Request, name: string): string | undefined {
   return parseCookies(req.headers.cookie)[name];
 }
 
-function cookieOptions(req: Request, httpOnly: boolean) {
+function cookieOptions(req: Request, httpOnly: boolean, forceSecure = req.secure) {
   return {
     httpOnly,
     sameSite: "lax" as const,
     // With TRUST_PROXY set (see app.ts), req.secure reflects the trusted
     // proxy's X-Forwarded-Proto; otherwise that header is client-controlled
     // and ignored.
-    secure: req.secure,
+    secure: forceSecure,
     path: "/",
   };
 }
@@ -59,14 +59,19 @@ function cookieOptions(req: Request, httpOnly: boolean) {
  * token, which also bypasses CSRF protection outright since bearer-
  * authenticated requests are exempt from the check below.
  */
-export function setAuthCookies(req: Request, res: Response, token: string): void {
+export function setAuthCookies(
+  req: Request,
+  res: Response,
+  token: string,
+  forceSecure = req.secure
+): void {
   const csrfToken = crypto.randomBytes(32).toString("hex");
   res.cookie(AUTH_COOKIE_NAME, token, {
-    ...cookieOptions(req, true),
+    ...cookieOptions(req, true, forceSecure),
     maxAge: AUTH_COOKIE_MAX_AGE_MS,
   });
   res.cookie(CSRF_COOKIE_NAME, csrfToken, {
-    ...cookieOptions(req, false),
+    ...cookieOptions(req, false, forceSecure),
     maxAge: AUTH_COOKIE_MAX_AGE_MS,
   });
 }

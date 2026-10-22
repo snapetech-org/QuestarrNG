@@ -62,6 +62,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Failed to refresh metadata": "تعذر تحديث البيانات الوصفية",
   "Failed to run library health check": "تعذر فحص سلامة المكتبة",
   "Failed to list root folders": "تعذر عرض المجلدات الجذرية",
+  "Failed to list wanted content": "تعذر عرض قائمة المحتوى المطلوب",
   "A root folder with this path already exists": "يوجد مجلد جذري بهذا المسار بالفعل",
   "Path is not accessible": "يتعذر الوصول إلى المسار",
   "Failed to create root folder": "تعذر إنشاء المجلد الجذري",

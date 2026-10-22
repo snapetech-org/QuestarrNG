@@ -120,7 +120,7 @@ describe("API error detail source catalog", () => {
     expect(fixedErrors.size).toBeGreaterThanOrEqual(278);
     expect(missing).toEqual([]);
     expect(stale).toEqual([]);
-    expect(API_ERROR_DETAIL_BASE_SOURCE_MESSAGES).toHaveLength(251);
+    expect(API_ERROR_DETAIL_BASE_SOURCE_MESSAGES).toHaveLength(252);
     expect(API_ERROR_DETAIL_SOURCE_MESSAGES).toHaveLength(
       API_ERROR_DETAIL_BASE_SOURCE_MESSAGES.length +
         ADDITIONAL_API_ERROR_DETAIL_SOURCE_MESSAGES.length

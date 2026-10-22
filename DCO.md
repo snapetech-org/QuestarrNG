@@ -1,47 +1,15 @@
-# Developer Certificate of Origin
+# Contribution attribution
 
-For each non-merge commit in a human-submitted pull request, add a sign-off
-trailer with <code>git commit -s</code>. Use your own name and email address.
-Only sign off when you can truthfully make one of the certifications in
-clauses (a) through (c) below. Never add another person's name or sign-off on
-their behalf. Commit messages and sign-off details are public and may be
-retained indefinitely; see clause (d) below.
+QuestarrNG does not require Developer Certificate of Origin (DCO) sign-off
+trailers. Do not add a `Signed-off-by` trailer to submit a pull request. An
+assistant or automation must not make a personal DCO certification or add one
+on another contributor's behalf.
 
-The DCO 1.1 text below is reproduced verbatim from the
-[official Developer Certificate of Origin](https://developercertificate.org/).
+Contributors are responsible for submitting only material they are authorized
+to contribute under the project's license. If a contribution used AI assistance,
+disclose the tool in the pull request and review the generated changes before
+submission. No AI tool is represented as the author of a legal attestation.
 
-<pre>
-Developer Certificate of Origin
-Version 1.1
-
-Copyright (C) 2004, 2006 The Linux Foundation and its contributors.
-
-Everyone is permitted to copy and distribute verbatim copies of this
-license document, but changing it is not allowed.
-
-Developer's Certificate of Origin 1.1
-
-By making a contribution to this project, I certify that:
-
-(a) The contribution was created in whole or in part by me and I
-    have the right to submit it under the open source license
-    indicated in the file; or
-
-(b) The contribution is based upon previous work that, to the best
-    of my knowledge, is covered under an appropriate open source
-    license and I have the right under that license to submit that
-    work with modifications, whether created in whole or in part
-    by me, under the same open source license (unless I am
-    permitted to submit under a different license), as indicated
-    in the file; or
-
-(c) The contribution was provided directly to me by some other
-    person who certified (a), (b) or (c) and I have not modified
-    it.
-
-(d) I understand and agree that this project and the contribution
-    are public and that a record of the contribution (including all
-    personal information I submit with it, including my sign-off) is
-    maintained indefinitely and may be redistributed consistent with
-    this project or the open source license(s) involved.
-</pre>
+The October 13, 2026 release note recorded the earlier proposed DCO rollout.
+This policy supersedes that proposal; the historical release note remains an
+accurate record of the proposal at the time.

@@ -64,6 +64,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Failed to refresh metadata": "मेटाडेटा रीफ़्रेश नहीं हो सका",
   "Failed to run library health check": "लाइब्रेरी की स्वास्थ्य-जाँच नहीं चल सकी",
   "Failed to list root folders": "रूट फ़ोल्डर सूचीबद्ध नहीं किए जा सके",
+  "Failed to list wanted content": "वांछित सामग्री की सूची नहीं बनाई जा सकी",
   "A root folder with this path already exists": "इस पथ वाला रूट फ़ोल्डर पहले से मौजूद है",
   "Path is not accessible": "इस पथ तक पहुँचना संभव नहीं है",
   "Failed to create root folder": "रूट फ़ोल्डर बनाया नहीं जा सका",

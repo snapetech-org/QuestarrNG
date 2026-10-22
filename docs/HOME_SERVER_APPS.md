@@ -2,8 +2,9 @@
 
 Questarr ships ready-made app definitions for the main self-hosting platforms, so it can be
 installed without hand-writing a Compose file. Compose, CasaOS, Umbrel, and Cosmos use the stable
-`ghcr.io/snapetech-org/questarrng:latest` alias. The Unraid template follows the moving
-`ghcr.io/snapetech-org/questarrng:latest` tag, which follows each validated stable release.
+`ghcr.io/snapetech-org/questarrng:latest` alias. The `main`,
+`master`, `latest`, and `stable` tags point to the same validated release. The Unraid template follows
+`:latest`.
 All definitions use the same two mounts:
 
 | Container path | Purpose                                                                         |
@@ -20,13 +21,13 @@ the configured `PUID`/`PGID`; on Compose-based installs these values also set th
 user. Existing appdata keeps its ownership, so keep the same IDs when upgrading. The Home
 Assistant add-on has different storage semantics and is documented separately below.
 
-| File                                       | Platform                        |
-| ------------------------------------------ | ------------------------------- |
-| `casaos/docker-compose.yml`                | CasaOS (AppFile; ID kept for upgrade compatibility) |
+| File                                       | Platform                                                        |
+| ------------------------------------------ | --------------------------------------------------------------- |
+| `casaos/docker-compose.yml`                | CasaOS (AppFile; ID kept for upgrade compatibility)             |
 | `umbrel-app-store.yml`, `doezer-questarr/` | Umbrel (community app store; ID kept for upgrade compatibility) |
-| `cosmos/questarr.cosmos-compose.json`      | Cosmos Cloud (ServApp)          |
-| `unraid/questarr.xml`                      | Unraid (Community Applications) |
-| `questarr/config.yaml`                     | Home Assistant add-on           |
+| `cosmos/questarr.cosmos-compose.json`      | Cosmos Cloud (ServApp)                                          |
+| `unraid/questarr.xml`                      | Unraid (Community Applications)                                 |
+| `questarr/config.yaml`                     | Home Assistant add-on                                           |
 
 ## Home Assistant add-on
 

@@ -2,7 +2,7 @@ name: E2E
 
 on:
   push:
-    branches: [main, release/*]
+    branches: [main]
     paths-ignore:
       - "**/*.md"
       - "docs/**"
@@ -13,8 +13,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: e2e-${{ github.ref }}
-  cancel-in-progress: true
+  group: e2e-${{ github.run_id }}-${{ github.run_attempt }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
