@@ -31,6 +31,10 @@ const scorecardWorkflow = readFileSync(
   fileURLToPath(new URL('scorecard.yml', workflowDirectory)),
   'utf8'
 );
+const dastWorkflow = readFileSync(
+  fileURLToPath(new URL('dast.yml', workflowDirectory)),
+  'utf8'
+);
 const releaseWorkflow = readFileSync(
   fileURLToPath(new URL('fork-image.yml', workflowDirectory)),
   'utf8'
@@ -604,6 +608,12 @@ test('Scorecard uses a Docker-capable hosted runner with scoped upload permissio
   assert.equal(workflow.permissions.contents, 'read');
   assert.equal(workflow.jobs.analysis.permissions['security-events'], 'write');
   assert.match(scorecardWorkflow, /uses:\s*ossf\/scorecard-action@/u);
+});
+
+test('DAST uses a Docker-capable hosted runner for the ZAP container', () => {
+  const workflow = load(dastWorkflow);
+  assert.equal(workflow.jobs['zap-baseline']['runs-on'], 'ubuntu-latest');
+  assert.match(dastWorkflow, /uses:\s*zaproxy\/action-baseline@/u);
 });
 
 test('Windows service builds install the SDK in the runner temp directory', () => {
