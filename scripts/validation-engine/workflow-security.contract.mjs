@@ -19,6 +19,14 @@ const codecovWorkflow = readFileSync(
   fileURLToPath(new URL('codecov-upload.yml', workflowDirectory)),
   'utf8'
 );
+const codeqlWorkflow = readFileSync(
+  fileURLToPath(new URL('codeql.yml', workflowDirectory)),
+  'utf8'
+);
+const semgrepWorkflow = readFileSync(
+  fileURLToPath(new URL('semgrep-community.yml', workflowDirectory)),
+  'utf8'
+);
 const releaseWorkflow = readFileSync(
   fileURLToPath(new URL('fork-image.yml', workflowDirectory)),
   'utf8'
@@ -505,7 +513,7 @@ test('test and build jobs execute the base-reviewed launcher with isolated depen
   const testJob = jobBlock(ciWorkflow, 'test', 'build');
   const buildJob = jobBlock(ciWorkflow, 'build', 'reconcile-validation');
   for (const [name, job] of [['test', testJob], ['build', buildJob]]) {
-    assert.match(job, /runs-on: ubuntu-24\.04/u);
+    assert.match(job, /runs-on: .*\|\| 'ubuntu-24\.04'/u);
     assert.match(job, /fetch-depth: 0/u);
     assert.match(job, /Prepare reviewed launcher and npm runtime/u);
     assert.match(job, /git show "\$launcher_sha:scripts\/validation-engine\/trusted-test-launcher\.mjs"/u);
@@ -537,11 +545,41 @@ test('test and build jobs execute the base-reviewed launcher with isolated depen
   assert.match(testJob, /path: \$\{\{ runner\.temp \}\}\/quest-codecov-reports/u);
 });
 
-test('main workflow jobs use GitHub-hosted Linux runners', () => {
+test('main CI jobs use the isolated pool only for main pushes and dispatches', () => {
   const parsedCiWorkflow = load(ciWorkflow);
-  assert.equal(parsedCiWorkflow.jobs['sca-scan']?.['runs-on'], 'ubuntu-latest');
-  assert.equal(parsedCiWorkflow.jobs['windows-service']?.['runs-on'], 'ubuntu-latest');
-  assert.doesNotMatch(ciWorkflow, /TRUSTED_MAIN_RUNNERS_ENABLED|self-hosted/u);
+  for (const [name, fallback] of [
+    ['sca-scan', 'ubuntu-latest'],
+    ['windows-service', 'ubuntu-latest'],
+    ['test', 'ubuntu-24.04'],
+    ['build', 'ubuntu-24.04'],
+    ['reconcile-validation', 'ubuntu-latest'],
+    ['docker-build', 'ubuntu-latest'],
+  ]) {
+    const runner = parsedCiWorkflow.jobs[name]?.['runs-on'];
+    assert.match(runner, /ng-shared-main-jit/u, name);
+    assert.match(runner, /github.event_name == 'push'/u, name);
+    assert.match(runner, /github.event_name == 'workflow_dispatch'/u, name);
+    assert.match(runner, /github.ref == 'refs\/heads\/main'/u, name);
+    assert.ok(runner.includes("|| '" + fallback + "'"), name);
+  }
+  assert.doesNotMatch(trustedWorkflow, /ng-shared-main-jit|self-hosted/u);
+});
+
+test('CodeQL and Semgrep scans use the isolated pool only for trusted main runs', () => {
+  for (const [workflow, jobName] of [
+    [codeqlWorkflow, 'analyze'],
+    [semgrepWorkflow, 'semgrep'],
+  ]) {
+    const runner = load(workflow).jobs[jobName]?.['runs-on'];
+    assert.match(runner, /ng-shared-main-jit/u, jobName);
+    assert.match(runner, /github.event_name == 'push'/u, jobName);
+    assert.match(runner, /github.event_name == 'workflow_dispatch'/u, jobName);
+    assert.match(runner, /github.event_name == 'schedule'/u, jobName);
+    assert.match(runner, /github.ref == 'refs\/heads\/main'/u, jobName);
+    assert.match(runner, /\|\| 'ubuntu-latest'/u, jobName);
+  }
+  assert.match(semgrepWorkflow, /docker info/u);
+  assert.match(semgrepWorkflow, /docker run/u);
 });
 
 test('Windows service builds install the SDK in the runner temp directory', () => {

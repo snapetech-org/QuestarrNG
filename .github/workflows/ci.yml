@@ -21,7 +21,7 @@ jobs:
   release-notes:
     name: Release-note contract
     if: github.event_name == 'pull_request' && github.event.pull_request.user.type != 'Bot'
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && github.ref == 'refs/heads/main' && fromJSON('{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main"]}') || 'ubuntu-latest' }}
     permissions:
       contents: read
 
@@ -57,7 +57,7 @@ jobs:
   # None of these steps needs native modules built, so lifecycle scripts (arbitrary code
   # from transitive deps) are skipped.
   sca-scan:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && fromJSON('{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main"]}') || 'ubuntu-latest' }}
     permissions:
       contents: read
       pull-requests: read
@@ -116,7 +116,7 @@ jobs:
         run: npm run check:licenses
 
   windows-service:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && fromJSON('{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main"]}') || 'ubuntu-latest' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -194,9 +194,9 @@ jobs:
   # job cost five runners and five `npm ci` for about the same wall time, and runners are
   # what the account runs out of when several PRs are pushed at once.
   test:
-    # Bubblewrap needs the Ubuntu 24.04 AppArmor profile installed below. Pin this
-    # sandbox job so the ubuntu-latest migration cannot change that runtime unreviewed.
-    runs-on: ubuntu-24.04
+    # The hosted fallback stays on Ubuntu 24.04 for its AppArmor profile; the
+    # shared runner uses the matching isolated Ubuntu 24.04 guest image.
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && fromJSON('{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main"]}') || 'ubuntu-24.04' }}
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -346,7 +346,7 @@ jobs:
 
   build:
     name: Build and check on Node ${{ matrix.node-version }}
-    runs-on: ubuntu-24.04
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && fromJSON('{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main"]}') || 'ubuntu-24.04' }}
 
     # PRs build on the minimum supported Node only (tests already run on 26.x);
     # pushes to main/release also build on 26.x.
@@ -483,7 +483,7 @@ jobs:
 
   reconcile-validation:
     name: Reconcile test and build node receipts
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && fromJSON('{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main"]}') || 'ubuntu-latest' }}
     needs: [test, build]
     if: always() && !cancelled()
 
@@ -523,7 +523,7 @@ jobs:
           --expected-node-majors "${{ github.event_name == 'pull_request' && '22' || '22,26' }}"
 
   docker-build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && fromJSON('{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main"]}') || 'ubuntu-latest' }}
     needs: [sca-scan, build, test, reconcile-validation]
     if: needs.sca-scan.outputs.docker == 'true'
 
