@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   create-release:
-    if: github.repository == 'Doezer/Questarr'
+    if: github.repository == 'snapetech-org/QuestarrNG'
     runs-on: ubuntu-latest
     permissions:
       contents: write
