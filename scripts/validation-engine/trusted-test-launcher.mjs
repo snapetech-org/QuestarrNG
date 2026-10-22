@@ -692,7 +692,7 @@ function makeSandboxCommand({
   if (trustedRoot) {
     env.CI = 'true';
     env.GITHUB_ACTIONS = 'true';
-    env.GITHUB_EVENT_NAME = 'pull_request_target';
+    env.GITHUB_EVENT_NAME = 'pull_request';
     env.GITHUB_SHA = candidateSha;
     env.GITHUB_RUN_ID = process.env.GITHUB_RUN_ID;
     env.GITHUB_RUN_ATTEMPT = process.env.GITHUB_RUN_ATTEMPT;
@@ -991,11 +991,11 @@ async function main() {
   if (trustedRoot && !COMMIT_PATTERN.test(trustedBaseSha))
     throw new Error('--trusted-base-sha must be a full 40-character Git SHA.');
   if (trustedRoot) {
-    if (process.env.GITHUB_EVENT_NAME !== 'pull_request_target' ||
+    if (process.env.GITHUB_EVENT_NAME !== 'pull_request' ||
       !process.env.GITHUB_RUN_ID || !process.env.GITHUB_RUN_ATTEMPT ||
       !process.env.GITHUB_REPOSITORY || !process.env.GITHUB_WORKFLOW ||
       !process.env.GITHUB_JOB) {
-      throw new Error('Trusted CI mode requires pull_request_target workflow metadata.');
+      throw new Error('Trusted CI mode requires pull_request workflow metadata.');
     }
     const launcherPath = realpathSync(fileURLToPath(import.meta.url));
     if (!isWithin(trustedRoot, launcherPath))

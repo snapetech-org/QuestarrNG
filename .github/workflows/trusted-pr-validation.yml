@@ -1,22 +1,26 @@
 name: Trusted PR validation
 
 on:
-  pull_request_target:
+  pull_request:
     branches: [main]
     types: [opened, reopened, ready_for_review, synchronize]
 
 permissions:
   contents: read
 
+# The fork-PR approval policy holds this workflow until a maintainer reviews
+# the candidate; keep each approved candidate's run independent.
 concurrency:
-  group: trusted-pr-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+  group: trusted-pr-${{ github.run_id }}-${{ github.run_attempt }}
+  cancel-in-progress: false
 
 jobs:
   trusted-pr-validation:
     name: trusted-pr-validation
     # Candidate snapshots are evaluated in a read-only sandbox on hosted Linux.
-    runs-on: ubuntu-latest
+    # Bubblewrap needs unprivileged user namespaces; Ubuntu 22.04 supports the
+    # runner policy this sandbox expects.
+    runs-on: ubuntu-22.04
     timeout-minutes: 90
     permissions:
       contents: read

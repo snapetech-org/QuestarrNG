@@ -416,12 +416,12 @@ test('current install and deployment examples use the organization GHCR namespac
   }
 });
 test('trusted PR validation runs on hosted Linux and keeps candidate code sandboxed', () => {
-  assert.match(trustedWorkflow, /pull_request_target:[\s\S]*?branches: \[main\]/u);
+  assert.match(trustedWorkflow, /pull_request:[\s\S]*?branches: \[main\]/u);
   assert.match(trustedWorkflow, /permissions:\n\x20{2}contents:\x20read/u);
   const trustedRunner = trustedWorkflow
     .split('\n')
     .find((line) => line.startsWith('    runs-on: '));
-  assert.equal(trustedRunner, '    runs-on: ubuntu-latest');
+  assert.equal(trustedRunner, '    runs-on: ubuntu-22.04');
   assert.match(
     trustedWorkflow,
     /sudo apparmor_parser --replace "\$profile"/u,

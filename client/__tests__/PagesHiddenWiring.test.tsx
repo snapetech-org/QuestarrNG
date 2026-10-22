@@ -66,6 +66,10 @@ describe("Page hidden wiring", () => {
       const url = String(input);
       const method = (init?.method ?? "GET").toUpperCase();
 
+      if (url.includes("/api/wanted-content")) {
+        return Promise.resolve({ ok: true, json: async () => [] } as Response);
+      }
+
       if (method === "PATCH" && url.includes("/hidden")) {
         return Promise.resolve({
           ok: true,
@@ -181,6 +185,9 @@ describe("Library filter buttons", () => {
 
     global.fetch = vi.fn().mockImplementation((input: RequestInfo | URL) => {
       const url = String(input);
+      if (url.includes("/api/wanted-content")) {
+        return Promise.resolve({ ok: true, json: async () => [] } as Response);
+      }
       if (url.includes("/api/downloads/summary")) {
         return Promise.resolve({
           ok: true,

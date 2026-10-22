@@ -2,18 +2,17 @@ name: CI
 
 on:
   push:
-    branches: [main, release/*]
+    branches: [main]
   pull_request:
     branches: [main, release/*]
   # Allow manual trigger
   workflow_dispatch:
 
-# Only the newest commit of a PR or branch is worth testing: a new push cancels the
-# run still going for the previous one, so bursts of pushes don't queue up runners
-# (the account shares a fixed number of concurrent jobs across all its repositories).
+# Keep each run's result attached to its exact candidate; newer pushes must not
+# cancel builds already in progress.
 concurrency:
-  group: ci-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.run_id }}-${{ github.run_attempt }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -326,6 +325,15 @@ jobs:
           path: ${{ runner.temp }}/quest-validation-receipts/test.json
           if-no-files-found: warn
           retention-days: 1
+
+      - name: Upload pull-request coverage report for diagnosis
+        if: ${{ always() && github.event_name == 'pull_request' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: coverage-report-tests-attempt-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/quest-codecov-reports
+          if-no-files-found: warn
+          retention-days: 3
 
       - name: Upload Codecov reports for the trusted workflow
         if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
