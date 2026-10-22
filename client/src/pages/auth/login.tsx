@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,12 +18,40 @@ import { Lock, User } from "lucide-react";
 import { GitHubVersionLink } from "@/components/GitHubVersionLink";
 import { withBasePath } from "@/lib/app-path";
 import { useInterfaceLanguage } from "@/lib/interface-locale";
+import { apiFetch } from "@/lib/queryClient";
+import { getOidcProviderPresentation } from "@/lib/oidc-provider";
 
 type LoginForm = { username: string; password: string };
 
 export default function LoginPage() {
   const { login, isLoading } = useAuth();
   const { t, languageFor, directionFor } = useInterfaceLanguage();
+  const [oidcEnabled, setOidcEnabled] = useState(false);
+  const [oidcProvider, setOidcProvider] = useState("generic");
+  const oidcFailed = new URLSearchParams(window.location.search).get("oidcFailed") === "true";
+
+  useEffect(() => {
+    let active = true;
+    void apiFetch("/api/auth/oidc/status")
+      .then(async (response) =>
+        response.ok ? ((await response.json()) as { enabled?: boolean; provider?: string }) : null
+      )
+      .then((status) => {
+        if (active) {
+          setOidcEnabled(status?.enabled === true);
+          setOidcProvider(status?.provider ?? "generic");
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setOidcEnabled(false);
+          setOidcProvider("generic");
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
   const loginSchema = useMemo(
     () =>
       z.object({
@@ -39,6 +67,7 @@ export default function LoginPage() {
       password: "",
     },
   });
+  const oidcPresentation = getOidcProviderPresentation(oidcProvider);
 
   const onSubmit = async (data: LoginForm) => {
     await login(data);
@@ -137,6 +166,39 @@ export default function LoginPage() {
                 </span>
               </Button>
             </form>
+            {oidcFailed && (
+              <p className="text-sm text-destructive" role="alert">
+                {t(
+                  "Identity provider sign-in failed. Check the provider and account admission settings."
+                )}
+              </p>
+            )}
+            {oidcEnabled && (
+              <div className="mt-4 space-y-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => window.location.assign(withBasePath("/api/auth/oidc/login"))}
+                >
+                  <svg aria-hidden="true" className="mr-2 h-5 w-5" viewBox="0 0 24 24">
+                    <use
+                      href={withBasePath(`/oidc-provider-icons.svg#oidc-${oidcPresentation.icon}`)}
+                    />
+                  </svg>
+                  {t("Continue with")} <bdi dir="auto">{t(oidcPresentation.labelKey)}</bdi>
+                </Button>
+                <a
+                  className="block text-center text-sm text-muted-foreground underline underline-offset-4"
+                  href={oidcPresentation.setupUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${t(oidcPresentation.labelKey)} identity provider setup guide (opens in a new tab)`}
+                >
+                  {t("Provider setup guide")} <span aria-hidden="true">↗</span>
+                </a>
+              </div>
+            )}
           </Form>
         </CardContent>
       </Card>

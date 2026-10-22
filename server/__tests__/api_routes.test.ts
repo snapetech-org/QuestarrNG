@@ -55,9 +55,10 @@ import { normalizeTitle } from "../../shared/title-utils.js";
 import { DEFAULT_RELEASE_PROFILE } from "../../shared/release-scoring.js";
 
 const safeFetchMock = vi.hoisted(() => vi.fn());
+const isSafeUrlMock = vi.hoisted(() => vi.fn().mockResolvedValue(true));
 vi.mock("../ssrf.js", async () => {
   const actual = await vi.importActual<typeof import("../ssrf.js")>("../ssrf.js");
-  return { ...actual, safeFetch: safeFetchMock };
+  return { ...actual, safeFetch: safeFetchMock, isSafeUrl: isSafeUrlMock };
 });
 
 const checkDownloadStatusMock = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
@@ -238,6 +239,7 @@ describe("API Routes - Extended Coverage", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    isSafeUrlMock.mockReset().mockResolvedValue(true);
     vi.mocked(storage.getImportConfig).mockResolvedValue({ enablePostProcessing: false } as any);
     app = express();
     app.set("trust proxy", 1);

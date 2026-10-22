@@ -63,6 +63,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Failed to refresh metadata": "Không thể làm mới siêu dữ liệu",
   "Failed to run library health check": "Không thể kiểm tra tình trạng thư viện",
   "Failed to list root folders": "Không thể liệt kê thư mục gốc",
+  "Failed to list wanted content": "Không thể liệt kê nội dung mong muốn",
   "A root folder with this path already exists": "Đã có thư mục gốc với đường dẫn này",
   "Path is not accessible": "Không thể truy cập đường dẫn",
   "Failed to create root folder": "Không thể tạo thư mục gốc",

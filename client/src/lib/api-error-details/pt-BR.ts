@@ -64,6 +64,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Failed to refresh metadata": "Não foi possível atualizar os metadados",
   "Failed to run library health check": "Não foi possível verificar a integridade da biblioteca",
   "Failed to list root folders": "Não foi possível listar as pastas raiz",
+  "Failed to list wanted content": "Não foi possível listar o conteúdo desejado",
   "A root folder with this path already exists": "Já existe uma pasta raiz com este caminho",
   "Path is not accessible": "O caminho não está acessível",
   "Failed to create root folder": "Não foi possível criar a pasta raiz",

@@ -12,8 +12,10 @@ PostgreSQL, and hardened multi-architecture releases. See
 [the changelog](docs/CHANGELOG.md) for the release-by-release history.
 
 Use `ghcr.io/snapetech-org/questarrng:latest` or the Compose file in this
-repository for the latest published release. Production images are published
-only from explicit version tags; semantic-version tags pin a specific release.
+repository for the latest published release. The `main`, `master`,
+`latest`, and `stable` tags all point to the same most recently
+published stable image. The `dev` tag tracks main-branch builds. Semantic-version
+tags pin one exact release.
 The upstream Questarr image does not contain the SeerrNG provider routes. The
 fork image is published for `linux/amd64` and `linux/arm64`.
 
@@ -40,7 +42,6 @@ A video game management application inspired by the -Arr apps (Sonarr, Radarr, P
 ## Table of Contents
 
 For local MCP access, see the [SnapeTech MCP integration guide](docs/integrations/snapetech-mcp.md).
-
 
 - [What this fork adds](#what-this-fork-adds)
 - [List of features](#list-of-features)
@@ -201,10 +202,10 @@ docker run -d -p 5000:5000 --user "$(id -u):$(id -g)" \
   -v ./data:/app/data --name questarrng ghcr.io/snapetech-org/questarrng:latest
 ```
 
-`latest` and versioned production images are updated only by publishing an
-explicit version tag. A push to `main` does not publish a release image. Release
-tags are published both as `latest` and as the exact semantic version (for
-example, `1.11.0`). To update a Compose install,
+The `main`, `master`, `latest`, and
+`stable` production aliases move together when a validated versioned release
+is published. A push to `main` does not publish a release image. Each release
+also keeps its exact semantic-version tag, such as `2.1.1`. To update a Compose install,
 run `docker compose pull && docker compose up -d`.
 
 ### Option 2: Docker Compose (more detailed)
@@ -679,6 +680,8 @@ If you run into an issue, go to the **Logs** page and click **Send Logs** before
 
 ## Project Security & Documentation
 
+- [OIDC sign-in setup, account admission, and recovery](docs/oidc-authentication.md)
+- [Shared OIDC provider catalog and setup links](https://github.com/snapetech-org/seerrng/blob/main/docs/maintainers/oidc-provider-catalog.md) · [cross-project contract](https://github.com/snapetech-org/seerrng/blob/main/docs/maintainers/oidc-cross-project-template.md)
 - [What changed in the fork](docs/FORK_CHANGES.md) summarizes the maintained additions since the upstream baseline.
 - [Import processing and security scans](docs/IMPORTS.md) explains RomM routing, archive handling, and optional malware checks.
 - Start with [docs/GITHUB_DOCUMENTATION.md](docs/GITHUB_DOCUMENTATION.md) for the full documentation map.
@@ -704,15 +707,14 @@ bounded recursive game-file scans and made partial results clear in the Files
 tab. See the [campaign overview](docs/upstream-resolution/README.md),
 [the Batch 83 validation record](docs/upstream-resolution/evidence/validation-batch-83.md),
 and the [Batch 82 validation record](docs/upstream-resolution/evidence/validation-batch-82.md).
-The DCO sign-off policy is implemented in the campaign branch, but its
-rollout still needs a maintainer decision because the campaign history includes
-unsigned commits. The full review and validation gate must pass before campaign
-work is merged to `main`.
+QuestarrNG does not require DCO sign-off trailers. See the current
+[contribution attribution policy](DCO.md) for licensing responsibility and
+AI-assisted contribution disclosure.
 
 ## Contributing
 
 - See [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) for guidelines on how to contribute to this project.
-- See [DCO.md](DCO.md) for the Developer Certificate of Origin and sign-off instructions.
+- See [DCO.md](DCO.md) for the contribution attribution policy.
 - See [MAINTAINERS.md](docs/MAINTAINERS.md) for how repository access and release permissions are managed.
 
 ### Contributors
@@ -739,3 +741,7 @@ GPL-3.0-only - see [COPYING](COPYING) for the full license text.
 - Security scanning supported by [Snyk](https://snyk.io) through the Snyk Open Source program
 - AI code reviews by [CodeRabbit](https://coderabbit.ai), free for open source
 - This project is tested with BrowserStack
+
+## Local security scanning
+
+Run `./scripts/security-scan-local.sh` for local Semgrep CE and the Trivy scanners that fit this repository. The installed pre-commit hook runs Semgrep on staged source/config files only; Trivy runs on demand or in CI. See [security-scanning.md](docs/security-scanning.md). Use `./scripts/update-security-tools.sh` to refresh local scanner data and the Trivy database.

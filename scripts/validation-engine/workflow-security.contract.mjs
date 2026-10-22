@@ -23,6 +23,10 @@ const releaseWorkflow = readFileSync(
   fileURLToPath(new URL('fork-image.yml', workflowDirectory)),
   'utf8'
 );
+const syncStableAliasesWorkflow = readFileSync(
+  fileURLToPath(new URL('sync-stable-image-aliases.yml', workflowDirectory)),
+  'utf8'
+);
 const windowsInstallerWorkflow = readFileSync(
   fileURLToPath(new URL('windows-installer.yml', workflowDirectory)),
   'utf8'
@@ -247,7 +251,15 @@ test('production image releases require a version-tag push', () => {
   const attachIndex = releaseJob.indexOf('Attach versioned GHCR tags after all release assets pass');
   const publishIndex = releaseJob.indexOf('name: Publish verified GitHub release');
   assert.ok(assetsVerified >= 0 && attachIndex > assetsVerified && publishIndex > attachIndex);
-  assert.match(releaseJob.slice(attachIndex), /for tag in "\$VERSION" main latest/u);
+  assert.match(releaseJob.slice(attachIndex), /for tag in "\$VERSION" main master latest stable/u);
+  const syncWorkflow = load(syncStableAliasesWorkflow);
+  assert.deepEqual(syncWorkflow.on.workflow_dispatch, {});
+  assert.equal(
+    syncWorkflow.jobs.sync.if,
+    "github.repository_id == '1388297896' && github.ref == 'refs/heads/main'"
+  );
+  assert.equal(syncWorkflow.jobs.sync.permissions.packages, 'write');
+  assert.match(syncStableAliasesWorkflow, /git merge-base --is-ancestor/u);
 
   const deployConfig = load(deployWorkflow);
   assert.deepEqual(deployConfig.on.workflow_dispatch.inputs.environment.options, ['dev', 'test']);
@@ -404,12 +416,12 @@ test('current install and deployment examples use the organization GHCR namespac
   }
 });
 test('trusted PR validation runs on hosted Linux and keeps candidate code sandboxed', () => {
-  assert.match(trustedWorkflow, /pull_request_target:[\s\S]*?branches: \[main\]/u);
+  assert.match(trustedWorkflow, /pull_request:[\s\S]*?branches: \[main\]/u);
   assert.match(trustedWorkflow, /permissions:\n\x20{2}contents:\x20read/u);
   const trustedRunner = trustedWorkflow
     .split('\n')
     .find((line) => line.startsWith('    runs-on: '));
-  assert.equal(trustedRunner, '    runs-on: ubuntu-latest');
+  assert.equal(trustedRunner, '    runs-on: ubuntu-22.04');
   assert.match(
     trustedWorkflow,
     /sudo apparmor_parser --replace "\$profile"/u,

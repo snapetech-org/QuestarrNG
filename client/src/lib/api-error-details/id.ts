@@ -64,6 +64,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Failed to refresh metadata": "Gagal menyegarkan metadata",
   "Failed to run library health check": "Gagal menjalankan pemeriksaan kesehatan pustaka",
   "Failed to list root folders": "Gagal menampilkan folder root",
+  "Failed to list wanted content": "Gagal menampilkan konten yang diinginkan",
   "A root folder with this path already exists": "Folder root dengan path ini sudah ada",
   "Path is not accessible": "Path tidak dapat diakses",
   "Failed to create root folder": "Gagal membuat folder root",

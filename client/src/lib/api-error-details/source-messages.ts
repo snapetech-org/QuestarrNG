@@ -54,6 +54,7 @@ export const API_ERROR_DETAIL_BASE_SOURCE_MESSAGES = [
   "Failed to refresh metadata",
   "Failed to run library health check",
   "Failed to list root folders",
+  "Failed to list wanted content",
   "A root folder with this path already exists",
   "Path is not accessible",
   "Failed to create root folder",

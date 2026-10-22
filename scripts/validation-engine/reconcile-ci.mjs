@@ -163,7 +163,7 @@ export function validateTrustedPrReceipt({
     label: 'Trusted pull request test',
   });
   const github = receipt.executionContext?.github;
-  if (github?.eventName !== 'pull_request_target' ||
+  if (github?.eventName !== 'pull_request' ||
     receipt.executionContext?.trustedBaseSha !== baseSha ||
     !/^[a-f0-9]{40}$/.test(receipt.candidate?.snapshotCommit ?? '')) {
     fail('Trusted pull request receipt does not match the base workflow and isolated source snapshot.');

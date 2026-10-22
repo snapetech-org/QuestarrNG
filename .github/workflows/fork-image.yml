@@ -198,7 +198,7 @@ jobs:
         run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
 
       # Push only the immutable source tag here. The release job attaches the
-      # version and latest tags only after the release assets have passed.
+      # versioned and stable-channel tags only after the release assets have passed.
       - name: Set image tags
         id: tags
         shell: bash
@@ -614,7 +614,7 @@ jobs:
             echo "Invalid release image digest: $BUILD_DIGEST" >&2
             exit 1
           fi
-          for tag in "$VERSION" main master latest; do
+          for tag in "$VERSION" main master latest stable; do
             docker buildx imagetools create \
               --tag "${IMAGE}:${tag}" \
               "${IMAGE}@${BUILD_DIGEST}"
@@ -631,7 +631,7 @@ jobs:
         run: |
           set -euo pipefail
           VERSION="${TAG#v}"
-          for tag in "$VERSION" main master latest; do
+          for tag in "$VERSION" main master latest stable; do
             docker buildx imagetools create \
               --tag "${DOCKERHUB_IMAGE}:${tag}" \
               "${IMAGE}@${BUILD_DIGEST}"
@@ -1008,7 +1008,7 @@ jobs:
           VERSION: ${{ steps.validate.outputs.version }}
         run: |
           set -euo pipefail
-          for tag in "$VERSION" main master latest; do
+          for tag in "$VERSION" main master latest stable; do
             docker buildx imagetools create \
               --tag "${IMAGE}:${tag}" \
               "${IMAGE}:sha-${RELEASE_SHA}"
@@ -1048,7 +1048,7 @@ jobs:
           VERSION: ${{ steps.validate.outputs.version }}
         run: |
           set -euo pipefail
-          for tag in "$VERSION" main master latest; do
+          for tag in "$VERSION" main master latest stable; do
             docker buildx imagetools create \
               --tag "${DOCKERHUB_IMAGE}:${tag}" \
               "${IMAGE}:sha-${RELEASE_SHA}"
