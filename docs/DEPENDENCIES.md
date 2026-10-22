@@ -11,17 +11,8 @@ Dependencies are added deliberately as part of normal development, via `npm inst
 - Packages are installed from the public [npm registry](https://www.npmjs.com/).
 - `package-lock.json` is committed to the repository and used for reproducible installs — the exact resolved version of every direct and transitive dependency is pinned.
 - The `packageManager` field in `package.json` pins the npm version used to install and build the project.
-- CI installs that CLI using `node scripts/install-npm-runtime.mjs`. The registry
-  artifact is pinned by its SHA-512 integrity in `.github/npm-runtime/package.json`;
-  only its CLI source is extracted. Its bundled dependency copies are excluded.
-  The CLI's dependencies are installed separately from
-  `.github/npm-runtime/package-lock.json`, with patched overrides for
-  `brace-expansion`, `http-cache-semantics`, `ip-address`,
-  `postcss-selector-parser`, and `undici`. The installer verifies that every
-  installed direct dependency satisfies the CLI's declared version range.
-  This preserves npm 11.21.0 and Node 22.23.4 compatibility while replacing
-  vulnerable bundled copies that normal npm overrides cannot change.
-  Both CI and the validation engine audit this separate runtime at all severities.
+- CI installs the application dependencies directly with `npm ci --ignore-scripts`;
+  native npm scripts run the unit tests, browser tests, lint, type check, and build.
 - `global.json` pins the .NET SDK used to build the Windows service; Dependabot tracks SDK servicing releases with the `dotnet-sdk` ecosystem.
 - Apprise runtime packages are hash-locked in `requirements/apprise.txt`, and Semgrep 1.180.0 plus its transitive dependencies are hash-locked in `.github/requirements/semgrep.txt` from `.github/requirements/semgrep.in`. The scanner's PyJWT dependency is pinned to 2.15.1. Dependabot tracks both pip lock files. The Semgrep lock keeps its bundled MCP integration on the v1 API until the pinned scanner supports v2.
 - The `allowScripts` field in `package.json` explicitly allowlists which packages are permitted to run install-time (postinstall) scripts. It's npm's own native field (npm ≥ 11.16.0), managed via `npm approve-scripts` / `npm deny-scripts`, not a third-party tool — today it's advisory (npm flags unreviewed scripts but still runs them), with a future npm release expected to block unapproved scripts by default. Any package added here should have a concrete reason (e.g. a native module that needs to compile a binary during install).

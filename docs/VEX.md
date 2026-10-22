@@ -57,8 +57,7 @@ The required merge gate runs `npm audit --audit-level=high` over all direct
 and transitive dependencies, including development tooling. A Critical or
 High finding blocks CI even if a VEX entry exists. Before publication, the
 QuestarrNG fork release gate runs `npm audit --audit-level=low` against the
-application, locked CI npm runtime, and tracked npm CLI source lockfiles. It
-also blocks on open security alerts, so a finding still reported by these raw
+application lockfile. It also blocks on open security alerts, so a finding still reported by these raw
 audits or alert feeds blocks publication at any severity, even if a VEX entry
 exists.
 
@@ -66,7 +65,7 @@ The vulnerability-scan workflow passes its npm audit report through the
 VEX-aware `scripts/audit-prod.mjs` before failing the npm-audit job. Separately,
 the image scan passes the feed to Trivy, which applies it to the image results
 before producing SARIF. These uses do not replace the full-tree merge audit or
-the stricter raw release audits and alert checks. A VEX statement records the
+the stricter raw release audit and alert checks. A VEX statement records the
 assessment and informs triage; it does not waive those publication checks. VEX
 statements still require code-path evidence and review before they are added.
 

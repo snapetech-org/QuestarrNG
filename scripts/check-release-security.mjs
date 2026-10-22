@@ -3,7 +3,7 @@
 import { execFileSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 import { setTimeout as delay } from "node:timers/promises";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -13,7 +13,6 @@ export const REQUIRED_CHECKS = [
   "windows-service",
   "Build and check on Node 22.23.4",
   "Build and check on Node 26.x",
-  "Reconcile test and build node receipts",
   "Analyze (javascript-typescript)",
   "Analyze (csharp)",
   "Analyze (actions)",
@@ -178,18 +177,13 @@ async function waitForReleaseScans(repository, releaseRef, releaseSha) {
 export function auditReleaseLockfiles(sha) {
   const temporary = mkdtempSync(path.join(tmpdir(), "questarr-release-audit-"));
   try {
-    for (const directory of ["", ".github/npm-runtime", ".github/npm-source"]) {
-      const target = path.join(temporary, directory);
-      mkdirSync(target, { recursive: true });
-      for (const filename of ["package.json", "package-lock.json"]) {
-        const sourcePath = directory ? directory + "/" + filename : filename;
-        writeFileSync(
-          path.join(target, filename),
-          execFileSync("git", ["show", sha + ":" + sourcePath])
-        );
-      }
-      execFileSync("npm", ["audit", "--audit-level=low"], { cwd: target, stdio: "inherit" });
+    for (const filename of ["package.json", "package-lock.json"]) {
+      writeFileSync(
+        path.join(temporary, filename),
+        execFileSync("git", ["show", sha + ":" + filename])
+      );
     }
+    execFileSync("npm", ["audit", "--audit-level=low"], { cwd: temporary, stdio: "inherit" });
   } finally {
     rmSync(temporary, { recursive: true, force: true });
   }

@@ -80,15 +80,13 @@ on commit `858e81c64d49fcf75bfa0ee17b93f5f705a2174e`.
 The Home Assistant ownership helper is compiled and exercised with AddressSanitizer
 and UndefinedBehaviorSanitizer in a disposable fixture. The test checks argument
 rejection, nested-file traversal, physical symlink handling, error handling, and
-the ownership callback without changing any real data. It is part of the
-source-bound validation contract inventory; the isolated JavaScript suite skips
-the compiler-dependent case when its sandbox lacks a C compiler. The required
-C++ CodeQL job recompiles the production helper and runs this contract with the
-compiler required.
+the ownership callback without changing any real data. The required C++ CodeQL
+job recompiles the production helper and runs this contract with the compiler
+required.
 
 Evidence: [`fix-data-owner.c`](../questarr/fix-data-owner.c), the
 [test-only `lchown` wrapper](../questarr/fix-data-owner-test-wrap.c),
-[sanitizer contract](../scripts/validation-engine/data-owner-sanitizers.contract.mjs),
+[sanitizer contract](../tests/contracts/home-assistant-data-owner-sanitizers.contract.mjs),
 [`ci.yml`](../.github/workflows/ci.yml), and
 [`codeql.yml`](../.github/workflows/codeql.yml).
 
@@ -204,8 +202,8 @@ See [SECRETS.md](SECRETS.md#2-authentication-secret-jwt_secret) and
 `server/__tests__/config.test.ts` / `jwt-secret-rotation.test.ts`.
 
 The live `main` branch requires the current PR checks: release notes, SCA,
-Windows service publishing, unit tests, the minimum-Node build, validation-receipt
-reconciliation, four CodeQL language jobs (including the Home Assistant C
+Windows service publishing, unit tests, the minimum-Node build, four CodeQL
+language jobs (including the Home Assistant C
 helper), Semgrep, and Playwright. All
 status-check and conversation-resolution requirements apply to administrators.
 Pull requests require no separate approval. See [branch protection

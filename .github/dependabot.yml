@@ -6,8 +6,6 @@ updates:
   - package-ecosystem: "npm"
     directories:
       - "/"
-      - "/.github/npm-runtime"
-      - "/.github/npm-source"
     schedule:
       interval: "weekly"
       day: "monday"

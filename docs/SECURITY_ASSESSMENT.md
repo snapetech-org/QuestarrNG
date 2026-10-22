@@ -98,15 +98,11 @@ the trusted repository default branch and uses Codecov's commit override for the
 triggering run, so the secret-bearing workflow never checks out run-provided
 source. Store
 `CODECOV_TOKEN`, if configured, as a secret in that environment; do not create a
-repository or organization secret with that name. The `trusted-pr-validation`
-workflow is also loaded from the pull-request base and runs the base validator
-against the candidate snapshot inside Bubblewrap without repository secrets.
-The sandbox unshares external networking and supplies only synthetic `localhost`
-entries plus a resolver file with no nameserver for tests that open local sockets;
-it does not mount the host's `/etc/hosts` or resolver settings, or expose host
-services.
-Contracts in `scripts/validation-engine/workflow-security.contract.mjs` guard
-the workflow structure; the environment's branch policy is configured in
+repository or organization secret with that name. Pull-request tests and builds
+run on GitHub-hosted Ubuntu with a read-only `contents` token and no repository
+secrets. Only trusted pushes and manual runs on `main` select the shared runner.
+External-fork release-note validation stays on the separate public-fork runner
+group. Branch protection and environment deployment rules are configured in
 GitHub repository settings.
 
 Production GHCR version tags and the `main`, `master`,

@@ -102,10 +102,10 @@ Eight named trust boundaries:
    INSTREAM TCP protocol at a DNS-validated address. That connection is not encrypted, so
    operators should keep the configured daemon on a trusted network.
 8. **GitHub Actions ↔ candidate source** — pull-request code, lockfiles, and generated
-   reports are untrusted. The base-sourced `trusted-pr-validation` workflow runs the exact
-   candidate snapshot with a read-only token and no repository secrets, using Bubblewrap,
-   a trusted npm runtime, registry-only dependency URLs, and offline tests. Regular test and
-   build jobs also use a reviewed launcher and sandbox. Codecov reports are uploaded by a
+   reports are untrusted. Test and build jobs run on GitHub-hosted Ubuntu with a read-only
+   token and no repository secrets; only trusted pushes and manual runs on `main` use the
+   shared runner. External-fork release-note validation stays on the separate public-fork
+   runner group. Codecov reports are uploaded by a
    default-branch `workflow_run` job only for same-repository pushes to `main`, behind the
    `codecov-main` environment restricted to `main`. The uploader checks out only the trusted
    repository default branch; Codecov's `override_commit` associates reports with the exact
@@ -243,20 +243,15 @@ Prowlarr links.
 ### 4.8 GitHub Actions candidate validation
 
 Pull-request source, dependency lockfiles, and generated coverage/JUnit files are untrusted
-inputs. The `trusted-pr-validation` workflow is loaded from the pull-request base, checks out
-the exact base and candidate commits separately, and runs the base validator against a
-filtered candidate snapshot inside Bubblewrap. The workflow has only `contents: read`; it
-does not pass a GitHub token or repository secrets to candidate code. Candidate dependency
-URLs must use `registry.npmjs.org`; archives are unpacked in Bubblewrap with lifecycle
-scripts disabled, and validation runs offline. The sandbox uses an unshared network
-namespace, a synthetic hosts file containing only `localhost`, and a resolver file with
-no nameserver. This allows loopback-only tests without access to host services, host DNS
-settings, or external networks. The regular test/build jobs
-also use the external reviewed launcher; they keep the same no-secret boundary and isolate
-candidate test/build execution.
+inputs. The `CI` workflow runs pull-request tests and builds on GitHub-hosted Ubuntu with
+`contents: read`, no repository secrets, and checkout credentials disabled. The workflow
+uses the repository's locked npm dependencies and native test/build commands. Trusted
+pushes and manual runs on `main` may use the shared runner; pull requests do not. The
+separate `fork-safe-validation` workflow handles external-fork release-note checks through
+the public-fork runner group and also has only read access.
 
-Coverage and JUnit reports are exported from the sandbox through a size-bounded, no-follow
-copy. The Codecov upload workflow is loaded from the default branch, accepts reports only
+Coverage and JUnit reports are collected from the hosted CI job as an ordinary artifact.
+The Codecov upload workflow is loaded from the default branch, accepts reports only
 from the matching attempt of a same-repository `main` push, and uses the `codecov-main`
 environment. It checks out only trusted default-branch code and uses the triggering run's
 commit SHA as Codecov's report override. Its event and environment restrictions prevent
