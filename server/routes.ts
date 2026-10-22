@@ -1591,8 +1591,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Resolve against the root and normalize. The following checks verify both
         // lexical and canonical containment before the filesystem is accessed.
-        // nosemgrep: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal -- checked lexically and again after realpath() before any filesystem read.
-        const resolvedPath = path.resolve(FILE_BROWSER_ROOT, queryPath);
+        // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- checked lexically and again after realpath() before any filesystem read.
+        const resolvedPath = path.resolve(FILE_BROWSER_ROOT, queryPath); // nosemgrep: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal -- lexical and canonical containment checks run before filesystem access.
         const relativePath = path.relative(FILE_BROWSER_ROOT, resolvedPath);
         if (
           relativePath === ".." ||
@@ -1638,8 +1638,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const files = await Promise.all(
           entries.map(async (entry) => {
             // entry.name comes from readdir on the already-canonicalized in-root directory.
-            // nosemgrep: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal
-            const fullPath = path.join(currentPath, entry.name);
+            // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+            const fullPath = path.join(currentPath, entry.name); // nosemgrep: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal -- entry.name comes from readdir of the canonical in-root directory; symlinks are rejected.
             // Do not follow symlinks from the file browser: even a metadata-only
             // stat can reveal whether a link points to a directory outside this root.
             const isDirectory = entry.isDirectory();
@@ -2454,6 +2454,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user!.id;
       const userGames = await storage.getUserGames(userId, true);
       const config = await storage.getImportConfig(userId);
+      // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- this health check uses the authenticated owner's explicitly configured library root.
       const resolvedRoot = path.resolve(config.libraryRoot);
 
       const gamesWithPath = userGames.filter(
@@ -2469,6 +2470,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .filter(({ exists }) => !exists)
         .map(({ game }) => ({ id: game.id, title: game.title, libraryPath: game.libraryPath }));
 
+      // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- persisted paths belong to this owner's games and are only compared against directory entries.
       const knownPaths = new Set(gamesWithPath.map((g) => path.resolve(g.libraryPath)));
       const orphaned: Array<{ path: string }> = [];
 
@@ -2486,10 +2488,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         for (const platformDir of platformDirs) {
+          // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- platformDir is returned by readdir for the configured library root.
           const platformPath = path.join(resolvedRoot, platformDir);
           try {
             const children = await fsExtra.readdir(platformPath);
             for (const child of children) {
+              // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- child is returned by readdir for the configured platform directory.
               const childPath = path.resolve(path.join(platformPath, child));
               if (!knownPaths.has(childPath)) {
                 orphaned.push({ path: childPath });
@@ -2556,8 +2560,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // paths (`/mnt/games`, `/mnt/games/.`, `/mnt/other/../games`) can't
         // bypass the unique-path constraint and get scanned as duplicates.
         // Root folders are intentionally arbitrary administrator-configured absolute paths.
-        // nosemgrep: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal
-        data.path = path.resolve(data.path);
+        // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- root folder paths are explicit owner configuration, validated by probing the selected directory before storage.
+        data.path = path.resolve(data.path); // nosemgrep: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal -- owner-supplied root-folder configuration is validated as an absolute existing directory before storage.
 
         const existing = await storage.getRootFolderByPath(data.path);
         if (existing) {
@@ -2617,8 +2621,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Same canonicalization as the create route — resolve before the
           // uniqueness check and probe so equivalent paths can't collide.
           // Root folders are intentionally arbitrary administrator-configured absolute paths.
-          // nosemgrep: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal
-          updates.path = path.resolve(updates.path);
+          // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- root folder paths are explicit owner configuration, validated by probing the selected directory before storage.
+          updates.path = path.resolve(updates.path); // nosemgrep: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal -- owner-supplied root-folder configuration is validated as an absolute existing directory before storage.
           const clash = await storage.getRootFolderByPath(updates.path);
           if (clash && clash.id !== id) {
             return res.status(409).json({ error: "Another root folder already uses this path" });
@@ -2843,6 +2847,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               storage.getImportConfig(ownerId),
               storage.getRomMConfig(ownerId),
             ]);
+            // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- the target is checked against the owner's configured roots and canonicalized before deletion.
             const resolvedTarget = path.resolve(game.libraryPath);
             const configuredRoots = [config.libraryRoot];
             if (rommConfig.enabled) configuredRoots.push(rommConfig.libraryRoot);
@@ -2853,6 +2858,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // itself. RomM has its own library root, separate from PC imports.
             let safeConfiguredTarget: string | null = null;
             for (const root of configuredRoots) {
+              // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- the configured root is used for containment and canonical containment is checked before deletion.
               if (!isStrictlyInside(path.resolve(root), resolvedTarget)) continue;
               try {
                 safeConfiguredTarget = await assertWithinRoots(
@@ -3179,6 +3185,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 truncated = true;
                 break;
               }
+              // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- entry.name comes from readdir; the directory and resolved file are both checked inside the root.
               const fullPath = path.join(canonicalDir, entry.name);
               if (entry.isDirectory()) {
                 const lowerName = entry.name.toLowerCase();
@@ -3279,8 +3286,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         // Check containment on the resolved string before touching the filesystem, then
         // again on the real path so a symlink can't lead outside the game's folder.
-        // nosemgrep: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal -- containment is checked before filesystem access and again after realpath; route tests cover traversal and symlink escapes.
-        const resolvedPath = path.resolve(roots.scanRoot, requestedPath);
+        // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- containment is checked before filesystem access and again after realpath; route tests cover traversal and symlink escapes.
+        const resolvedPath = path.resolve(roots.scanRoot, requestedPath); // nosemgrep: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal -- containment is checked before access and again after realpath; traversal and symlink escapes are covered by route tests.
         if (!isContained(resolvedPath, roots.scanRoot)) {
           return res.status(404).json({ error: "File not found in this game's folder" });
         }
@@ -6203,7 +6210,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           normalized: norm,
           regex:
             norm.length >= 5
-              ? new RegExp(`\\b${norm.replace(/[.*+?^${}()|[\\]/g, "\\$&")}\\b`, "i")
+              ? new RegExp(`\\b${norm.replace(/[.*+?^${}()|[\\]/g, "\\$&")}\\b`, "i") // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- normalized title text is regex-escaped before interpolation.
               : null,
           words: norm.split(" ").filter((w: string) => w.length > 2),
         };
@@ -6234,7 +6241,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const relDirLower = rel.dirname.toLowerCase().replace(/[._-]/g, " ");
           const relExtRegex =
             relExtTitleNorm && relExtTitleNorm.length >= 5
-              ? new RegExp(`\\b${relExtTitleNorm.replace(/[.*+?^${}()|[\\]/g, "\\$&")}\\b`, "i")
+              ? new RegExp(`\\b${relExtTitleNorm.replace(/[.*+?^${}()|[\\]/g, "\\$&")}\\b`, "i") // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- normalized release title text is regex-escaped before interpolation.
               : null;
 
           const found = wantedGamesLookup.find((gl) => {

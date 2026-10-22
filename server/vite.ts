@@ -120,7 +120,8 @@ export function serveStatic(
   // index: false sends "/" through the handler below too, so every page gets the <base>.
   app.use(express.static(distPath, { index: false }));
 
-  const indexHtml = fs.readFileSync(path.resolve(distPath, "index.html"), "utf-8");
+  // nosemgrep: javascript.lang.security.audit.path-join-resolve-traversal.path-join-resolve-traversal -- distPath is a server-side build directory, never request input.
+  const indexHtml = fs.readFileSync(path.resolve(distPath, "index.html"), "utf-8"); // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- distPath is a server-side build directory, never request input.
 
   // fall through to index.html if the file doesn't exist
   app.use(staticAssetLimiter, (req, res) => {

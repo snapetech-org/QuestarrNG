@@ -817,8 +817,9 @@ export class ArchiveService {
     } else {
       volumeSuffix = null;
     }
+    // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- stem is escaped and suffix comes from fixed literals.
     const volumePattern = volumeSuffix
-      ? new RegExp(`^${escapeRegExp(stem)}\\.(${volumeSuffix})$`, "i")
+      ? new RegExp(`^${escapeRegExp(stem)}\\.(${volumeSuffix})$`, "i") // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- archive stem is escaped and volumeSuffix comes from fixed literals.
       : null;
 
     return siblingPaths.filter((siblingPath) => {

@@ -1,3 +1,10 @@
 # Keep the Semgrep toolchain on the patched MCP SDK release; the scanner's
 # dependency resolver otherwise selects an affected session implementation.
 mcp==1.30.0
+# Keep the scanner's OpenTelemetry packages on one patched, compatible release
+# set. Updating only opentelemetry-api breaks Semgrep's pinned OTLP exporter.
+opentelemetry-api==1.45.1
+opentelemetry-sdk==1.45.1
+opentelemetry-exporter-otlp-proto-common==1.45.1
+opentelemetry-exporter-otlp-proto-http==1.45.1
+opentelemetry-proto==1.45.1
