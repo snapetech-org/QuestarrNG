@@ -58,7 +58,7 @@ jobs:
         env:
           DOTNET_INSTALL_DIR: ${{ runner.temp }}/questarrng-codeql-dotnet-${{ github.run_id }}-${{ github.run_attempt }}
         with:
-          global-json-file: global.json
+          dotnet-version: '10.0.402'
 
       - name: Setup Node.js 22.x
         if: matrix.language == 'javascript-typescript' || matrix.language == 'cpp'
