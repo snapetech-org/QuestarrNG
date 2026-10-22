@@ -67,6 +67,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Failed to run library health check":
     "Impossible d’exécuter le contrôle d’intégrité de la bibliothèque",
   "Failed to list root folders": "Impossible de lister les dossiers racine",
+  "Failed to list wanted content": "Impossible de répertorier le contenu souhaité",
   "A root folder with this path already exists":
     "Un dossier racine utilisant ce chemin existe déjà",
   "Path is not accessible": "Le chemin n’est pas accessible",

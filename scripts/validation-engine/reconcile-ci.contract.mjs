@@ -129,7 +129,7 @@ test('validates trusted PR receipts against the exact head, base, and workflow a
   const baseSha = '9'.repeat(40);
   const receipt = testReceipt();
   receipt.candidate.snapshotCommit = 'b'.repeat(40);
-  receipt.executionContext.github.eventName = 'pull_request_target';
+  receipt.executionContext.github.eventName = 'pull_request';
   receipt.executionContext.trustedBaseSha = baseSha;
   const result = validateTrustedPrReceipt({ receipt, ...identity, baseSha });
   assert.equal(result.status, 'passed');
@@ -144,7 +144,7 @@ test('validates trusted PR receipts against the exact head, base, and workflow a
   );
 
   const wrongEvent = clone(receipt);
-  wrongEvent.executionContext.github.eventName = 'pull_request';
+  wrongEvent.executionContext.github.eventName = 'pull_request_target';
   assert.throws(
     () => validateTrustedPrReceipt({ receipt: wrongEvent, ...identity, baseSha }),
     /does not match the base workflow/u,

@@ -89,7 +89,14 @@ export async function hashPassword(password: string) {
 }
 
 export async function comparePassword(password: string, hash: string) {
-  return await bcrypt.compare(password, hash);
+  try {
+    return await bcrypt.compare(password, hash);
+  } catch {
+    // OIDC-only users carry a deliberately non-bcrypt marker instead of a
+    // local password verifier. Treat it as a failed login, never as a server
+    // error or a credential accepted by the local-password flow.
+    return false;
+  }
 }
 
 export async function generateToken(user: User) {

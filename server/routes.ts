@@ -120,6 +120,7 @@ import {
   authenticateApiKeyOrToken,
 } from "./auth.js";
 import { setAuthCookies, clearAuthCookies, csrfProtection } from "./security.js";
+import { registerOidcAuthRoutes } from "./oidc-auth.js";
 import { nexusmodsClient } from "./nexusmods.js";
 import {
   typesafeClient,
@@ -193,6 +194,10 @@ export const PUBLIC_API_ROUTES = new Set<string>([
   "POST /auth/setup", // creates the first user; there is no user/token yet
   "POST /auth/setup/test-igdb", // "Test connection" button on the setup wizard, runs pre-login
   "POST /auth/login", // issues the token; obviously can't require one
+  "GET /auth/oidc/status", // exposes only whether server-side OIDC is configured
+  "GET /auth/oidc/login", // begins the interactive authorization-code flow
+  "GET /auth/oidc/callback", // consumes one OIDC transaction and issues the local session
+  "POST /auth/oidc/callback", // Apple returns the authorization code with response_mode=form_post
   "GET /health", // liveness probe (docker/compose healthcheck, DAST workflow)
   "GET /ready", // readiness probe (db/IGDB connectivity), no sensitive data
 ]);
@@ -975,6 +980,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // CSRF protection for cookie-authenticated requests. Must run after the
   // auth boundary above so req.authSource is already populated.
   app.use("/api", csrfProtection);
+  registerOidcAuthRoutes(app);
   // The global limiter protects by source IP before credentials are checked;
   // this authenticated ceiling also applies to a key across many source IPs.
   app.use("/api/integration", integrationRateLimiter);

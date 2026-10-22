@@ -10,8 +10,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: sast-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  group: sast-${{ github.run_id }}-${{ github.run_attempt }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -19,6 +19,8 @@ permissions:
 jobs:
   semgrep:
     name: semgrep
+    env:
+      EIO_BACKEND: posix
     runs-on: ubuntu-latest
     permissions:
       contents: read

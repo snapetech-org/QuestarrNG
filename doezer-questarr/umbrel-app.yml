@@ -2,7 +2,7 @@ manifestVersion: 1
 id: doezer-questarr
 category: media
 name: QuestarrNG
-version: "2.1.1"
+version: "2.1.2"
 tagline: Discover, track and download your video games
 description: >-
   Questarr is a video game management application inspired by the *Arr apps (Sonarr, Radarr,

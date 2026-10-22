@@ -1,0 +1,2 @@
+#!/bin/sh
+node scripts/check-docker-image-aliases.mjs --head || exit 1
