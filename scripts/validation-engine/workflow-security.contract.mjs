@@ -545,6 +545,12 @@ test('test and build jobs execute the base-reviewed launcher with isolated depen
     assert.doesNotMatch(job, /run: node scripts\/validate-development\.mjs/u);
     assert.match(job, /Install Bubblewrap for isolated/u, `${name} job installs and preflights Bubblewrap`);
   }
+  for (const jobName of ['test', 'build']) {
+    const runtimeStep = load(ciWorkflow).jobs[jobName].steps.find(
+      (step) => step.name === 'Prepare reviewed launcher and npm runtime'
+    );
+    assert.equal(runtimeStep.env.NODE_USE_ENV_PROXY, '1');
+  }
   assert.match(testJob, /--reports-output "\$RUNNER_TEMP\/quest-codecov-reports"/u);
   assert.match(testJob, /path: \$\{\{ runner\.temp \}\}\/quest-codecov-reports/u);
 });
@@ -618,7 +624,9 @@ test('Windows service builds install the SDK in the runner temp directory', () =
     '"$RUNNER_TEMP/questarrng-dotnet-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/dotnet"';
 
   assert.match(serviceJob, /uses: actions\/setup-dotnet@[a-f0-9]{40}/u);
-  assert.match(serviceJob, /global-json-file: global\.json/u);
+  assert.match(serviceJob, /dotnet-version: '10\.0\.402'/u);
+  assert.doesNotMatch(serviceJob, /global-json-file: global\.json/u);
+  assert.equal(setupDotnet.with['dotnet-version'], '10.0.402');
   assert.equal(setupDotnet.env.DOTNET_INSTALL_DIR, installDirectory);
   assert.equal(verifySdk.run, `${executable} --version`);
   assert.equal(

@@ -128,7 +128,7 @@ jobs:
         env:
           DOTNET_INSTALL_DIR: ${{ runner.temp }}/questarrng-dotnet-${{ github.run_id }}-${{ github.run_attempt }}
         with:
-          global-json-file: global.json
+          dotnet-version: '10.0.402'
 
       - name: Verify selected .NET SDK
         run: '"$RUNNER_TEMP/questarrng-dotnet-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/dotnet" --version'
@@ -221,6 +221,7 @@ jobs:
       - name: Prepare reviewed launcher and npm runtime
         env:
           NPM_CONFIG_CACHE: ${{ runner.temp }}/questarrng-npm-cache
+          NODE_USE_ENV_PROXY: '1'
           TRUSTED_BASE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
           BOOTSTRAP_LAUNCHER_REF: questarr-validation-launcher-20261013
           BOOTSTRAP_LAUNCHER_SHA: 2d7ebb7f337398444dc13a5ce7c5fa5eb32b3538
@@ -378,6 +379,7 @@ jobs:
       - name: Prepare reviewed launcher and npm runtime
         env:
           NPM_CONFIG_CACHE: ${{ runner.temp }}/questarrng-npm-cache
+          NODE_USE_ENV_PROXY: '1'
           TRUSTED_BASE_SHA: ${{ github.event.pull_request.base.sha || github.sha }}
           BOOTSTRAP_LAUNCHER_REF: questarr-validation-launcher-20261013
           BOOTSTRAP_LAUNCHER_SHA: 2d7ebb7f337398444dc13a5ce7c5fa5eb32b3538
