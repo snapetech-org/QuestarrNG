@@ -40,6 +40,12 @@ describe("trusted-main BuildKit proxy policy", () => {
       expect(setup.with["driver-opts"]).toContain(
         "env.https_proxy=${{ env.BUILDKIT_EGRESS_PROXY }}"
       );
+      expect(
+        setup.with["driver-opts"]
+          .split("\n")
+          .filter(Boolean)
+          .every((option) => !option.includes(","))
+      ).toBe(true);
       expect(build.with["build-args"]).toContain("HTTP_PROXY=${{ env.BUILDKIT_EGRESS_PROXY }}");
       expect(build.with["build-args"]).toContain("https_proxy=${{ env.BUILDKIT_EGRESS_PROXY }}");
     }
