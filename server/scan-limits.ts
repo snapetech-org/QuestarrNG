@@ -2,8 +2,9 @@
  * Budgets for the recursive Scan Disk walk (`GET /api/games/:gameId/files`).
  *
  * A very large library tree can exhaust filesystem I/O and memory if walked
- * without limits, so the traversal stops once either budget is exceeded and
- * reports the result as truncated (see issue #944).
+ * without limits, so the traversal skips over-depth subtrees, stops when its
+ * file, response-size, or time budget is exhausted, and reports truncation
+ * whenever a limit excludes part of the tree (see issue #944).
  */
 
 /** Maximum number of files a single scan will return before truncating. */
