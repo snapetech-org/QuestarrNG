@@ -1,3 +1,4 @@
+# ng-runner-policy: hosted-first-v1
 name: SAST
 
 on:
@@ -10,8 +11,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: sast-${{ github.run_id }}-${{ github.run_attempt }}
-  cancel-in-progress: false
+  group: ng-scan-sast-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -21,7 +22,7 @@ jobs:
     name: semgrep
     env:
       EIO_BACKEND: posix
-    runs-on: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && github.ref == 'refs/heads/main' && fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) || 'ubuntu-latest' }}
+    runs-on: ${{ (vars.NG_HOSTED_FIRST != 'true' || vars.NG_FORCE_JIT == 'true' || github.run_attempt > 1) && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && github.ref == 'refs/heads/main' && fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) || 'ubuntu-latest' }}
     permissions:
       contents: read
       security-events: write
@@ -78,3 +79,4 @@ jobs:
             jq -r '.results[] | select(.extra.severity == "ERROR") | "\(.path):\(.start.line)  \(.check_id)"' semgrep.json
             exit 1
           fi
+

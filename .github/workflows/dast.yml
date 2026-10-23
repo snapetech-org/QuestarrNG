@@ -9,8 +9,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: dast-${{ github.run_id }}-${{ github.run_attempt }}
-  cancel-in-progress: false
+  group: ng-scan-dast-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -100,3 +100,4 @@ jobs:
       - name: Stop server
         if: always()
         run: kill "$(cat server.pid)" 2>/dev/null || true
+
