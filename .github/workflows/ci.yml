@@ -223,11 +223,7 @@ jobs:
           --reporter=junit
           --outputFile.junit=test-report.junit.xml
 
-      - name: Install Playwright Chromium
-        run: npx --no-install playwright install chromium
-
-      - name: Run Playwright end-to-end suite
-        run: npm run test:e2e -- --reporter=line
+      # Playwright runs in e2e.yml after its isolated test server starts.
 
       - name: Collect reports for diagnostics and Codecov
         if: always()
