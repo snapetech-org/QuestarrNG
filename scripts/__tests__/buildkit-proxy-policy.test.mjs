@@ -9,13 +9,13 @@ const workflows = [
     file: ".github/workflows/ci.yml",
     job: "docker-build",
     proxyGate:
-      "${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && 'http://10.0.2.100:3128' || '' }}",
+      "${{ (vars.NG_HOSTED_FIRST != 'true' || vars.NG_FORCE_JIT == 'true' || github.run_attempt > 1) && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && 'http://10.0.2.100:3128' || '' }}",
   },
   {
     file: ".github/workflows/vulnerability-scan.yml",
     job: "image-scan",
     proxyGate:
-      "${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && github.ref == 'refs/heads/main' && 'http://10.0.2.100:3128' || '' }}",
+      "${{ (vars.NG_HOSTED_FIRST != 'true' || vars.NG_FORCE_JIT == 'true' || github.run_attempt > 1) && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && github.ref == 'refs/heads/main' && 'http://10.0.2.100:3128' || '' }}",
   },
 ];
 
