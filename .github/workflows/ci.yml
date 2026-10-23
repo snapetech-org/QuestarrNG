@@ -336,11 +336,16 @@ jobs:
       - name: Set up Docker Buildx
         uses: step-security/setup-buildx-action@e50058a0fcd8d1a7d626c905502d010a468bf238 # v4.4.1
         with:
+          # The isolated BuildKit daemon needs the runner's trust roots too.
+          buildkitd-config-inline: |
+            [registry."docker.io"]
+              ca = ["/etc/ssl/certs/ca-certificates.crt"]
           driver-opts: |
             env.HTTP_PROXY=${{ env.BUILDKIT_EGRESS_PROXY }}
             env.HTTPS_PROXY=${{ env.BUILDKIT_EGRESS_PROXY }}
             env.http_proxy=${{ env.BUILDKIT_EGRESS_PROXY }}
             env.https_proxy=${{ env.BUILDKIT_EGRESS_PROXY }}
+            env.SSL_CERT_FILE=/etc/buildkit/certs/docker.io/ca-certificates.crt
       - name: Build Docker image
         uses: step-security/docker-build-push-action@b736dc8a921e02a288f956d3dd9111e276a4cfec # v7.4.0
         with:
