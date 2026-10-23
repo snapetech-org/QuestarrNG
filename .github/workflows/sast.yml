@@ -64,11 +64,16 @@ jobs:
             --sarif-output semgrep.sarif \
             .
 
+      # Keep the broad SAST scan's upload policy aligned with the community scan.
+      - name: Filter inline-suppressed SARIF results
+        if: always() && hashFiles('semgrep.sarif') != ''
+        run: node scripts/filter-semgrep-sarif.mjs semgrep.sarif semgrep-upload.sarif
+
       - name: Upload SARIF to code scanning
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && hashFiles('semgrep-upload.sarif') != '' }}
         uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
         with:
-          sarif_file: semgrep.sarif
+          sarif_file: semgrep-upload.sarif
 
       - name: Enforce blocking policy (ERROR-severity findings fail the build)
         run: |
