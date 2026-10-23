@@ -48,6 +48,8 @@ describe("trusted-main BuildKit proxy policy", () => {
       ).toBe(true);
       expect(build.with["build-args"]).toContain("HTTP_PROXY=${{ env.BUILDKIT_EGRESS_PROXY }}");
       expect(build.with["build-args"]).toContain("https_proxy=${{ env.BUILDKIT_EGRESS_PROXY }}");
+      expect(build.with["build-args"]).toContain("NO_PROXY=localhost,127.0.0.1");
+      expect(build.with["build-args"]).toContain("no_proxy=localhost,127.0.0.1");
     }
   );
 });
