@@ -65,6 +65,11 @@ jobs:
             --sarif-output semgrep.sarif \
             .
 
+      - name: Set up Node.js for SARIF filtering
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26.x
+
       # Keep the broad SAST scan's upload policy aligned with the community scan.
       - name: Filter inline-suppressed SARIF results
         if: always() && hashFiles('semgrep.sarif') != ''
