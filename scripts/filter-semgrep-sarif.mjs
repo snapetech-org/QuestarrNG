@@ -1,5 +1,7 @@
+import console from "node:console";
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import process from "node:process";
 import { pathToFileURL } from "node:url";
 
 export function filterSemgrepSarif(sarif) {
