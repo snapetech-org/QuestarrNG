@@ -17,10 +17,8 @@ const changelogPath = path.join(repoRoot, "docs", "CHANGELOG.md");
 const lines = fs.readFileSync(changelogPath, "utf8").split("\n");
 
 const findHeading = (v) => {
-  // The CLI version is escaped before it is matched as a literal heading.
-  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- the CLI value is regex-escaped before interpolation.
-  const pattern = new RegExp(`^## \\[${v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\]`);
-  return lines.findIndex((line) => pattern.test(line));
+  const headingPrefix = "## [" + v + "]";
+  return lines.findIndex((line) => line.startsWith(headingPrefix));
 };
 
 // A pre-release ("1.5.0-rc1") without its own entry uses the notes of the version it leads to.
