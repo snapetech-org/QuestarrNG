@@ -104,7 +104,7 @@
     "js-yaml": "~5.4.3",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.57.0",
-    "multer": "^2.4.0",
+    "multer": "^2.5.0",
     "nanoid": "^6.0.2",
     "next-themes": "^0.4.6",
     "openid-client": "^6.8.8",
@@ -214,13 +214,14 @@
     "qs": "^6.16.0",
     "brace-expansion": "^5.0.12",
     "minimatch": "^10.2.6",
-    "fast-uri": "^3.1.8",
+    "fast-uri": "^3.1.9",
     "fast-copy": "^4.1.0",
     "source-map-js": "^1.2.2",
     "eslint-plugin-react": {
       "eslint": "^10.9.1"
     },
-    "ip-address": "^10.7.4"
+    "ip-address": "^10.7.4",
+    "body-parser": "^2.4.0"
   },
   "allowScripts": {
     "esbuild@0.25.12": true,
