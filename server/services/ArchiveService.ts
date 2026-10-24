@@ -15,10 +15,6 @@ export interface ArchiveEntry {
   isLink?: boolean;
 }
 
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
 const EXEC_TIMEOUT_MS = 30 * 60_000;
 const EXEC_MAX_BUFFER = 10 * 1024 * 1024;
 const DEFAULT_ARCHIVE_MAX_ENTRIES = 50_000;
@@ -803,28 +799,44 @@ export class ArchiveService {
     // so matching any numbered-suffix pattern regardless of family (as a single shared
     // regex previously did) could pull in an unrelated archive's volumes that merely
     // share a filename prefix, e.g. "Game.rar" incorrectly matching "Game.7z.001".
-    let volumeSuffix: string | null;
+    let volumeKind: "part-rar" | "rar" | "7z" | "zip" | "numbered" | null;
     if (/\.part\d+\.rar$/i.test(archiveBasename)) {
-      volumeSuffix = "part\\d+\\.rar";
+      volumeKind = "part-rar";
     } else if (/\.(rar|r\d{2,3})$/i.test(archiveBasename)) {
-      volumeSuffix = "r\\d{2,3}";
+      volumeKind = "rar";
     } else if (/\.7z(\.\d{3})?$/i.test(archiveBasename)) {
-      volumeSuffix = "7z\\.\\d{3}";
+      volumeKind = "7z";
     } else if (/\.zip(\.\d{3})?$/i.test(archiveBasename)) {
-      volumeSuffix = "zip\\.\\d{3}";
+      volumeKind = "zip";
     } else if (/\.\d{3}$/.test(archiveBasename)) {
-      volumeSuffix = "\\d{3}";
+      volumeKind = "numbered";
     } else {
-      volumeSuffix = null;
+      volumeKind = null;
     }
-    // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- stem is escaped and suffix comes from fixed literals.
-    const volumePattern = volumeSuffix
-      ? new RegExp(`^${escapeRegExp(stem)}\\.(${volumeSuffix})$`, "i") // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- archive stem is escaped and volumeSuffix comes from fixed literals.
-      : null;
+    const stemPrefix = stem.toLowerCase() + ".";
 
     return siblingPaths.filter((siblingPath) => {
       if (path.resolve(siblingPath) === resolvedArchive) return true;
-      return volumePattern ? volumePattern.test(path.basename(siblingPath)) : false;
+      if (!volumeKind) return false;
+
+      const siblingName = path.basename(siblingPath).toLowerCase();
+      if (!siblingName.startsWith(stemPrefix)) return false;
+      const suffix = siblingName.slice(stemPrefix.length);
+
+      switch (volumeKind) {
+        case "part-rar":
+          return /^part\d+\.rar$/.test(suffix);
+        case "rar":
+          return /^r\d{2,3}$/.test(suffix);
+        case "7z":
+          return /^7z\.\d{3}$/.test(suffix);
+        case "zip":
+          return /^zip\.\d{3}$/.test(suffix);
+        case "numbered":
+          return /^\d{3}$/.test(suffix);
+        default:
+          return false;
+      }
     });
   }
 }

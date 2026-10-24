@@ -220,7 +220,8 @@
     "eslint-plugin-react": {
       "eslint": "^10.9.1"
     },
-    "ip-address": "^10.7.4"
+    "ip-address": "^10.7.4",
+    "body-parser": "^2.4.0"
   },
   "allowScripts": {
     "esbuild@0.25.12": true,

@@ -181,13 +181,23 @@ export function titleMatches(a: string, b: string): boolean {
   // "Dishonored 2" contains "Dishonored" but is another game
   if (isSequelOf(normA, normB) || isSequelOf(normB, normA)) return false;
 
-  // Check if one contains the other (e.g. "The Witcher 3" vs "The Witcher 3: Wild Hunt")
-  // We check for word boundaries to avoid matching "Fable" with "Fabletown"
-  // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- title text is escaped before interpolation, so it is treated as a literal.
-  const regexA = new RegExp(`\\b${normA.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i"); // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- title text is escaped before interpolation.
-  const regexB = new RegExp(`\\b${normB.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i"); // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- title text is escaped before interpolation.
+  // Normalized titles contain only lowercase ASCII letters, digits, and spaces.
+  // Match literal phrases with word boundaries so titles like "Fable" don't
+  // match "Fabletown" and untrusted title text never becomes a regex pattern.
+  const containsWholePhrase = (text: string, phrase: string): boolean => {
+    let index = text.indexOf(phrase);
+    while (index !== -1) {
+      const before = index === 0 ? " " : text[index - 1];
+      const afterIndex = index + phrase.length;
+      const after = afterIndex === text.length ? " " : text[afterIndex];
+      if (before === " " && after === " ") return true;
+      index = text.indexOf(phrase, index + 1);
+    }
+    return false;
+  };
 
-  return regexA.test(normB) || regexB.test(normA);
+  // Check if one contains the other (e.g. "The Witcher 3" vs "The Witcher 3: Wild Hunt").
+  return containsWholePhrase(normB, normA) || containsWholePhrase(normA, normB);
 }
 
 /**
