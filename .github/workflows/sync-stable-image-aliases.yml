@@ -177,7 +177,7 @@ jobs:
             echo "Docker login did not create an auth file for the registry copy." >&2
             exit 1
           fi
-          skopeo_image="quay.io/skopeo/stable@sha256:3cee4b44cb54d59f5b8822f8ca6379d6aafa4308834e5d9d958f5a4dc553a428"
+          skopeo_image="quay.io/skopeo/stable@sha256:24940638e4abb0edfedc78a680554f316069d0212a00159276759421a059e611"
           for tag in "$VERSION" main master latest stable; do
             docker run --rm \
               --volume "$authfile:/auth/config.json:ro" \
