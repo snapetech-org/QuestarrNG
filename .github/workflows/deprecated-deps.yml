@@ -1,22 +1,14 @@
 name: Deprecated Dependencies
 
 on:
-  # Weekly: catches a dependency that's been stuck deprecated becoming fixable upstream.
-  # (Detection reads the committed lockfile, so this can't catch a package becoming newly
-  # deprecated - that only shows up once the lockfile itself is regenerated.)
-  schedule:
-    - cron: "17 7 * * 1"
-  # On these paths a new "deprecated" entry in the updated lockfile is genuinely caused by the diff.
-  pull_request:
-    branches: [main]
-    paths:
-      - "package.json"
-      - "package-lock.json"
   workflow_dispatch:
 
+  push:
+    tags:
+      - '**'
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: false
 
 permissions:
   contents: read

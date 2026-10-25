@@ -1,7 +1,6 @@
 name: Deploy Web App
 
 on:
-  # Allow manual trigger for on-demand deployment
   workflow_dispatch:
     inputs:
       environment:

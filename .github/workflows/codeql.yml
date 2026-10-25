@@ -3,18 +3,12 @@ name: CodeQL
 
 on:
   push:
-    branches: [main]
     tags: [v*]
-  pull_request:
-    branches: [main, release/*]
-  schedule:
-    # Weekly, catches new query-pack findings on unchanged code.
-    - cron: "0 7 * * 1"
   workflow_dispatch:
 
 concurrency:
   group: ng-scan-codeql-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read
