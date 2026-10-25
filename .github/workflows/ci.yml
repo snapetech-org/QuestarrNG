@@ -3,17 +3,15 @@ name: CI
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main, release/*]
-  # Allow manual trigger
+    tags:
+      - '**'
   workflow_dispatch:
 
 # Keep each run's result attached to its exact candidate; newer pushes must not
 # cancel builds already in progress.
 concurrency:
   group: ng-ci-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}-${{ github.event.action == 'edited' && 'metadata' || 'code' }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request_target' }}
+  cancel-in-progress: false
 
 permissions:
   contents: read

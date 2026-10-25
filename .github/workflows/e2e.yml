@@ -3,14 +3,8 @@ name: E2E
 
 on:
   push:
-    branches: [main]
-    paths-ignore:
-      - "**/*.md"
-      - "docs/**"
-      - "LICENSE"
-      - ".github/ISSUE_TEMPLATE/**"
-  pull_request:
-    branches: [main, release/*]
+    tags:
+      - '**'
   workflow_dispatch:
 
 concurrency:

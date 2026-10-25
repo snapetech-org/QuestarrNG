@@ -3,20 +3,13 @@ name: Helm chart
 
 on:
   push:
-    branches: [main]
-    paths:
-      - "charts/**"
-      - ".github/workflows/helm-chart.yml"
-  pull_request:
-    branches: [main]
-    paths:
-      - "charts/**"
-      - ".github/workflows/helm-chart.yml"
+    tags:
+      - '**'
   workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: false
 
 permissions:
   contents: read
