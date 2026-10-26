@@ -1,3 +1,4 @@
+# ng-runner-policy: private-jit-only-v1
 name: Auto-label new issues for Plane
 
 on:
@@ -9,7 +10,7 @@ permissions:
 
 jobs:
   add-plane-label:
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-add-plane-label"]}}', github.run_id)) }}
     steps:
       - name: Harden the runner (Audit all outbound calls)
         uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1

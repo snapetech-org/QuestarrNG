@@ -1,3 +1,4 @@
+# ng-runner-policy: private-jit-only-v1
 name: Codecov upload
 
 on:
@@ -17,7 +18,7 @@ jobs:
       github.event.workflow_run.head_branch == 'main' &&
       github.event.workflow_run.head_repository.full_name == github.repository &&
       github.event.workflow_run.conclusion != 'cancelled'
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-upload"]}}', github.run_id)) }}
     environment: codecov-main
     permissions:
       actions: read
