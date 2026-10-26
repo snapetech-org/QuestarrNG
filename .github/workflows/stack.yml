@@ -1,3 +1,4 @@
+# ng-runner-policy: private-jit-only-v1
 name: Real stack
 
 # The production build of Questarr against real qBittorrent, Transmission and SABnzbd daemons
@@ -20,7 +21,7 @@ permissions:
 jobs:
   stack:
     name: Real-stack journey
-    runs-on: ubuntu-24.04
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-stack"]}}', github.run_id)) }}
     timeout-minutes: 25
 
     steps:

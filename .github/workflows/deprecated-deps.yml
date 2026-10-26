@@ -1,3 +1,4 @@
+# ng-runner-policy: private-jit-only-v1
 name: Deprecated Dependencies
 
 on:
@@ -15,7 +16,7 @@ permissions:
 
 jobs:
   check-deprecated:
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-check-deprecated"]}}', github.run_id)) }}
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
