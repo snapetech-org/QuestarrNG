@@ -895,3 +895,32 @@ test.describe("Game download interface language", () => {
     await expect(failureToast).toContainText(regionalTwo);
   });
 });
+
+test(
+  "keeps a long mixed-direction game title accessible at 200% text scaling",
+  async ({ page }) => {
+    const longMixedTitle =
+      "لعبة استراتيجية طويلة — Space Questarr: Remastered / Edition 2026 — 日本語";
+    const downloadButton = await openLocalizedBundle(page, 1, "ar", undefined, longMixedTitle);
+
+    await expectSeparatedDownloadAccessibleName(page, downloadButton, "تنزيل", longMixedTitle);
+
+    await page.setViewportSize({ width: 640, height: 512 });
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = "200%";
+    });
+
+    await expect(downloadButton).toBeVisible();
+    await expect(downloadButton).toHaveAccessibleName("تنزيل " + longMixedTitle + " Full");
+    const hasDocumentOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+    );
+    expect(hasDocumentOverflow).toBe(false);
+
+    await page.keyboard.press("Tab");
+    const keyboardFocusRemainsInDialog = await page.evaluate(
+      () => Boolean(document.activeElement?.closest('[role="dialog"]'))
+    );
+    expect(keyboardFocusRemainsInDialog).toBe(true);
+  }
+);

@@ -1,0 +1,354 @@
+{
+  "schemaVersion": 1,
+  "checksumAlgorithm": "fnv1a32-utf16-code-units",
+  "defaultStatus": "legacy-unverified",
+  "statusDefinitions": {
+    "source": "English source text.",
+    "machine-draft": "Machine-generated translation awaiting human review.",
+    "inherited": "Translation inherited from an upstream or prior catalog.",
+    "reviewed": "Translation reviewed by a qualified human translator.",
+    "legacy-unverified": "Existing translation with no per-string provenance record."
+  },
+  "messages": {
+    "navigation.library": {
+      "sourceChecksum": "fnv1a32:a8532270",
+      "translations": {
+        "es": "legacy-unverified",
+        "zh-Hans": "legacy-unverified",
+        "hi": "legacy-unverified",
+        "de": "legacy-unverified",
+        "ja": "legacy-unverified",
+        "fr": "legacy-unverified",
+        "pt-BR": "legacy-unverified",
+        "ar": "legacy-unverified",
+        "ko": "legacy-unverified",
+        "zh-Hant": "legacy-unverified",
+        "vi": "legacy-unverified",
+        "id": "legacy-unverified"
+      }
+    },
+    "navigation.all_games": {
+      "sourceChecksum": "fnv1a32:7c46d36f",
+      "translations": {
+        "es": "legacy-unverified",
+        "zh-Hans": "legacy-unverified",
+        "hi": "legacy-unverified",
+        "de": "legacy-unverified",
+        "ja": "legacy-unverified",
+        "fr": "legacy-unverified",
+        "pt-BR": "legacy-unverified",
+        "ar": "legacy-unverified",
+        "ko": "legacy-unverified",
+        "zh-Hant": "legacy-unverified",
+        "vi": "legacy-unverified",
+        "id": "legacy-unverified"
+      }
+    },
+    "navigation.playing": {
+      "sourceChecksum": "fnv1a32:df450ad5",
+      "translations": {
+        "es": "legacy-unverified",
+        "zh-Hans": "legacy-unverified",
+        "hi": "legacy-unverified",
+        "de": "legacy-unverified",
+        "ja": "legacy-unverified",
+        "fr": "legacy-unverified",
+        "pt-BR": "legacy-unverified",
+        "ar": "legacy-unverified",
+        "ko": "legacy-unverified",
+        "zh-Hant": "legacy-unverified",
+        "vi": "legacy-unverified",
+        "id": "legacy-unverified"
+      }
+    },
+    "navigation.custom_lists": {
+      "sourceChecksum": "fnv1a32:0f944d2f",
+      "translations": {
+        "es": "legacy-unverified",
+        "zh-Hans": "legacy-unverified",
+        "hi": "legacy-unverified",
+        "de": "legacy-unverified",
+        "ja": "legacy-unverified",
+        "fr": "legacy-unverified",
+        "pt-BR": "legacy-unverified",
+        "ar": "legacy-unverified",
+        "ko": "legacy-unverified",
+        "zh-Hant": "legacy-unverified",
+        "vi": "legacy-unverified",
+        "id": "legacy-unverified"
+      }
+    },
+    "navigation.library_import": {
+      "sourceChecksum": "fnv1a32:65bfe4cd",
+      "translations": {
+        "es": "legacy-unverified",
+        "zh-Hans": "legacy-unverified",
+        "hi": "legacy-unverified",
+        "de": "legacy-unverified",
+        "ja": "legacy-unverified",
+        "fr": "legacy-unverified",
+        "pt-BR": "legacy-unverified",
+        "ar": "legacy-unverified",
+        "ko": "legacy-unverified",
+        "zh-Hant": "legacy-unverified",
+        "vi": "legacy-unverified",
+        "id": "legacy-unverified"
+      }
+    },
+    "navigation.discover": {
+      "sourceChecksum": "fnv1a32:fa18c0ee",
+      "translations": {
+        "es": "legacy-unverified",
+        "zh-Hans": "legacy-unverified",
+        "hi": "legacy-unverified",
+        "de": "legacy-unverified",
+        "ja": "legacy-unverified",
+        "fr": "legacy-unverified",
+        "pt-BR": "legacy-unverified",
+        "ar": "legacy-unverified",
+        "ko": "legacy-unverified",
+        "zh-Hant": "legacy-unverified",
+        "vi": "legacy-unverified",
+        "id": "legacy-unverified"
+      }
+    },
+    "navigation.browse": {
+      "sourceChecksum": "fnv1a32:0eac1f07",
+      "translations": {
+        "es": "legacy-unverified",
+        "zh-Hans": "legacy-unverified",
+        "hi": "legacy-unverified",
+        "de": "legacy-unverified",
+        "ja": "legacy-unverified",
+        "fr": "legacy-unverified",
+        "pt-BR": "legacy-unverified",
+        "ar": "legacy-unverified",
+        "ko": "legacy-unverified",
+        "zh-Hant": "legacy-unverified",
+        "vi": "legacy-unverified",
+        "id": "legacy-unverified"
+      }
+    },
+    "navigation.xrel_releases": {
+      "sourceChecksum": "fnv1a32:84cc8909",
+      "translations": {
+        "es": "legacy-unverified",
+        "zh-Hans": "legacy-unverified",
+        "hi": "legacy-unverified",
+        "de": "legacy-unverified",
+        "ja": "legacy-unverified",
+        "fr": "legacy-unverified",
+        "pt-BR": "legacy-unverified",
+        "ar": "legacy-unverified",
+        "ko": "legacy-unverified",
+        "zh-Hant": "legacy-unverified",
+        "vi": "legacy-unverified",
+        "id": "legacy-unverified"
+      }
+    },
+    "navigation.rss_feeds": {
+      "sourceChecksum": "fnv1a32:ffd7392e",
+      "translations": {
+        "es": "legacy-unverified",
+        "zh-Hans": "legacy-unverified",
+        "hi": "legacy-unverified",
+        "de": "legacy-unverified",
+        "ja": "legacy-unverified",
+        "fr": "legacy-unverified",
+        "pt-BR": "legacy-unverified",
+        "ar": "legacy-unverified",
+        "ko": "legacy-unverified",
+        "zh-Hant": "legacy-unverified",
+        "vi": "legacy-unverified",
+        "id": "legacy-unverified"
+      }
+    },
+    "navigation.downloads": {
+      "sourceChecksum": "fnv1a32:539307de",
+      "translations": {
+        "es": "legacy-unverified",
+        "zh-Hans": "legacy-unverified",
+        "hi": "legacy-unverified",
+        "de": "legacy-unverified",
+        "ja": "legacy-unverified",
+        "fr": "legacy-unverified",
+        "pt-BR": "legacy-unverified",
+        "ar": "legacy-unverified",
+        "ko": "legacy-unverified",
+        "zh-Hant": "legacy-unverified",
+        "vi": "legacy-unverified",
+        "id": "legacy-unverified"
+      }
+    },
+    "navigation.stats": {
+      "sourceChecksum": "fnv1a32:0fec8e8c",
+      "translations": {
+        "es": "legacy-unverified",
+        "zh-Hans": "legacy-unverified",
+        "hi": "legacy-unverified",
+        "de": "legacy-unverified",
+        "ja": "legacy-unverified",
+        "fr": "legacy-unverified",
+        "pt-BR": "legacy-unverified",
+        "ar": "legacy-unverified",
+        "ko": "legacy-unverified",
+        "zh-Hant": "legacy-unverified",
+        "vi": "legacy-unverified",
+        "id": "legacy-unverified"
+      }
+    },
+    "navigation.more": {
+      "sourceChecksum": "fnv1a32:4f34d900",
+      "translations": {
+        "es": "legacy-unverified",
+        "zh-Hans": "legacy-unverified",
+        "hi": "legacy-unverified",
+        "de": "legacy-unverified",
+        "ja": "legacy-unverified",
+        "fr": "legacy-unverified",
+        "pt-BR": "legacy-unverified",
+        "ar": "legacy-unverified",
+        "ko": "legacy-unverified",
+        "zh-Hant": "legacy-unverified",
+        "vi": "legacy-unverified",
+        "id": "legacy-unverified"
+      }
+    },
+    "navigation.calendar": {
+      "sourceChecksum": "fnv1a32:9e52653f",
+      "translations": {
+        "es": "legacy-unverified",
+        "zh-Hans": "legacy-unverified",
+        "hi": "legacy-unverified",
+        "de": "legacy-unverified",
+        "ja": "legacy-unverified",
+        "fr": "legacy-unverified",
+        "pt-BR": "legacy-unverified",
+        "ar": "legacy-unverified",
+        "ko": "legacy-unverified",
+        "zh-Hant": "legacy-unverified",
+        "vi": "legacy-unverified",
+        "id": "legacy-unverified"
+      }
+    },
+    "navigation.wishlist": {
+      "sourceChecksum": "fnv1a32:058fc7e2",
+      "translations": {
+        "es": "legacy-unverified",
+        "zh-Hans": "legacy-unverified",
+        "hi": "legacy-unverified",
+        "de": "legacy-unverified",
+        "ja": "legacy-unverified",
+        "fr": "legacy-unverified",
+        "pt-BR": "legacy-unverified",
+        "ar": "legacy-unverified",
+        "ko": "legacy-unverified",
+        "zh-Hant": "legacy-unverified",
+        "vi": "legacy-unverified",
+        "id": "legacy-unverified"
+      }
+    },
+    "navigation.indexers": {
+      "sourceChecksum": "fnv1a32:3ad2e761",
+      "translations": {
+        "es": "legacy-unverified",
+        "zh-Hans": "legacy-unverified",
+        "hi": "legacy-unverified",
+        "de": "legacy-unverified",
+        "ja": "legacy-unverified",
+        "fr": "legacy-unverified",
+        "pt-BR": "legacy-unverified",
+        "ar": "legacy-unverified",
+        "ko": "legacy-unverified",
+        "zh-Hant": "legacy-unverified",
+        "vi": "legacy-unverified",
+        "id": "legacy-unverified"
+      }
+    },
+    "navigation.downloaders": {
+      "sourceChecksum": "fnv1a32:842f5453",
+      "translations": {
+        "es": "legacy-unverified",
+        "zh-Hans": "legacy-unverified",
+        "hi": "legacy-unverified",
+        "de": "legacy-unverified",
+        "ja": "legacy-unverified",
+        "fr": "legacy-unverified",
+        "pt-BR": "legacy-unverified",
+        "ar": "legacy-unverified",
+        "ko": "legacy-unverified",
+        "zh-Hant": "legacy-unverified",
+        "vi": "legacy-unverified",
+        "id": "legacy-unverified"
+      }
+    },
+    "navigation.settings": {
+      "sourceChecksum": "fnv1a32:4b058728",
+      "translations": {
+        "es": "legacy-unverified",
+        "zh-Hans": "legacy-unverified",
+        "hi": "legacy-unverified",
+        "de": "legacy-unverified",
+        "ja": "legacy-unverified",
+        "fr": "legacy-unverified",
+        "pt-BR": "legacy-unverified",
+        "ar": "legacy-unverified",
+        "ko": "legacy-unverified",
+        "zh-Hant": "legacy-unverified",
+        "vi": "legacy-unverified",
+        "id": "legacy-unverified"
+      }
+    },
+    "navigation.logs": {
+      "sourceChecksum": "fnv1a32:51a96da6",
+      "translations": {
+        "es": "legacy-unverified",
+        "zh-Hans": "legacy-unverified",
+        "hi": "legacy-unverified",
+        "de": "legacy-unverified",
+        "ja": "legacy-unverified",
+        "fr": "legacy-unverified",
+        "pt-BR": "legacy-unverified",
+        "ar": "legacy-unverified",
+        "ko": "legacy-unverified",
+        "zh-Hant": "legacy-unverified",
+        "vi": "legacy-unverified",
+        "id": "legacy-unverified"
+      }
+    },
+    "navigation.import_history": {
+      "sourceChecksum": "fnv1a32:ff1ef18c",
+      "translations": {
+        "es": "legacy-unverified",
+        "zh-Hans": "legacy-unverified",
+        "hi": "legacy-unverified",
+        "de": "legacy-unverified",
+        "ja": "legacy-unverified",
+        "fr": "legacy-unverified",
+        "pt-BR": "legacy-unverified",
+        "ar": "legacy-unverified",
+        "ko": "legacy-unverified",
+        "zh-Hant": "legacy-unverified",
+        "vi": "legacy-unverified",
+        "id": "legacy-unverified"
+      }
+    },
+    "navigation.search": {
+      "sourceChecksum": "fnv1a32:c646a2c9",
+      "translations": {
+        "es": "legacy-unverified",
+        "zh-Hans": "legacy-unverified",
+        "hi": "legacy-unverified",
+        "de": "legacy-unverified",
+        "ja": "legacy-unverified",
+        "fr": "legacy-unverified",
+        "pt-BR": "legacy-unverified",
+        "ar": "legacy-unverified",
+        "ko": "legacy-unverified",
+        "zh-Hant": "legacy-unverified",
+        "vi": "legacy-unverified",
+        "id": "legacy-unverified"
+      }
+    }
+  }
+}

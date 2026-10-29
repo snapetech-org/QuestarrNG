@@ -34,3 +34,10 @@ This first-wave locale set was selected as a practical rollout order, not as a c
 12. Indonesian (id)
 
 The World Bank's 2025 report estimates Mandarin Chinese, Hindi, and Spanish at 15%, 7.6%, and 6.9% of the global population respectively; its online-content data also places German, Chinese, and Japanese among leading languages. [World Bank, Digital Progress and Trends Report 2025](https://documents1.worldbank.org/curated/en/099112525160536089/pdf/P505350-59c98ca8-0803-4f23-b470-17f3dab010ab.pdf). W3Techs tracks website content-language share rather than app users. [W3Techs content-language survey](https://w3techs.com/technologies/cross/content_language/ranking). Reorder this list if maintainers later receive reliable demand signals.
+
+
+## 2026-10-28 implementation follow-up
+
+The navigation shell now uses namespaced IDs while resolving through the current English-key catalog, and carries a source checksum plus explicit legacy-unverified provenance. Shared locale utilities now expose CLDR plural/select helpers, localized numeric parsing and unit formatting, and a common script-aware direction resolver. A catalog integrity command is wired into `npm run check`; Playwright coverage adds a long mixed-direction title, accessible-name, keyboard-focus, narrow viewport, and 200% text-scale flow.
+
+See the [localization workflow](./localization-workflow.md) and [translation glossary](./translation-glossary.md). This is an incremental foundation: the remaining catalog entries still need stable-ID migration, and new interface locales must have complete reviewed catalogs before they are selectable. The current catalog has twelve target locales; reaching 37 total choices would require 24 additional fully translated locales.

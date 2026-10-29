@@ -1,5 +1,10 @@
 import { useCallback, useSyncExternalStore } from "react";
 import { UI_LABELS } from "./ui-labels";
+import { getLocaleDirection } from "./locale-direction";
+import {
+  STABLE_INTERFACE_MESSAGES,
+  type StableInterfaceMessageId,
+} from "./stable-interface-messages";
 
 export const INTERFACE_LANGUAGE_OPTIONS = [
   { value: "en", nativeName: "English", englishName: undefined },
@@ -119,6 +124,68 @@ export function formatInterfaceMessage(
   });
 }
 
+export type InterfacePluralForms = Readonly<Partial<Record<Intl.LDMLPluralRule, string>>> & {
+  other: string;
+  exact?: Readonly<Record<string, string>>;
+};
+
+export function translateInterfaceMessage(
+  id: StableInterfaceMessageId,
+  language: InterfaceLanguage = activeLanguage
+): string {
+  return translateInterfaceLabel(STABLE_INTERFACE_MESSAGES[id], language);
+}
+
+export function getInterfaceMessageTextLanguage(
+  id: StableInterfaceMessageId,
+  language: InterfaceLanguage
+): InterfaceLanguage {
+  return getInterfaceTextLanguage(STABLE_INTERFACE_MESSAGES[id], language);
+}
+
+export function getInterfaceMessageTextDirection(
+  id: StableInterfaceMessageId,
+  language: InterfaceLanguage
+): "ltr" | "rtl" {
+  return getInterfaceLanguageDirection(getInterfaceMessageTextLanguage(id, language));
+}
+
+export function formatInterfaceMessageById(
+  id: StableInterfaceMessageId,
+  values: Record<string, string | number>,
+  language: InterfaceLanguage = activeLanguage
+): string {
+  return formatInterfaceMessage(STABLE_INTERFACE_MESSAGES[id], values, language);
+}
+
+/** Select a CLDR plural category before interpolating the selected catalog message. */
+export function formatInterfacePluralMessage(
+  count: number,
+  forms: InterfacePluralForms,
+  values: Record<string, string | number> = {},
+  language: InterfaceLanguage = activeLanguage,
+  formattedCount = new Intl.NumberFormat(language).format(count)
+): string {
+  const exact = forms.exact?.[String(count)];
+  const category = new Intl.PluralRules(language).select(count);
+  const template = exact ?? forms[category] ?? forms.other;
+  return formatInterfaceMessage(template, { ...values, count: formattedCount }, language);
+}
+
+/** Select a message branch by a non-numeric value, with a required fallback. */
+export function formatInterfaceSelectMessage(
+  selection: string,
+  forms: Readonly<Record<string, string>> & { other: string },
+  values: Record<string, string | number> = {},
+  language: InterfaceLanguage = activeLanguage
+): string {
+  return formatInterfaceMessage(
+    forms[selection] ?? forms.other,
+    { ...values, selection },
+    language
+  );
+}
+
 function applyDocumentLanguage() {
   if (typeof document === "undefined") return;
   document.documentElement.lang = activeLanguage;
@@ -229,8 +296,8 @@ export function translateInterfaceLabel(
   return typeof translated === "string" && translated.trim() ? translated : source;
 }
 
-export function getInterfaceLanguageDirection(language: InterfaceLanguage): "ltr" | "rtl" {
-  return language === "ar" ? "rtl" : "ltr";
+export function getInterfaceLanguageDirection(language: InterfaceLanguage | string): "ltr" | "rtl" {
+  return getLocaleDirection(language);
 }
 
 export function useInterfaceLanguage() {
@@ -243,6 +310,18 @@ export function useInterfaceLanguage() {
     () => "en"
   );
   const t = useCallback((source: string) => translateInterfaceLabel(source, language), [language]);
+  const tId = useCallback(
+    (id: StableInterfaceMessageId) => translateInterfaceMessage(id, language),
+    [language]
+  );
+  const languageForId = useCallback(
+    (id: StableInterfaceMessageId) => getInterfaceMessageTextLanguage(id, language),
+    [language]
+  );
+  const directionForId = useCallback(
+    (id: StableInterfaceMessageId) => getInterfaceMessageTextDirection(id, language),
+    [language]
+  );
   const languageFor = useCallback(
     (source: string) => getInterfaceTextLanguage(source, language),
     [language]
@@ -251,5 +330,14 @@ export function useInterfaceLanguage() {
     (source: string) => getInterfaceTextDirection(source, language),
     [language]
   );
-  return { language, setLanguage: setInterfaceLanguage, t, languageFor, directionFor };
+  return {
+    language,
+    setLanguage: setInterfaceLanguage,
+    t,
+    tId,
+    languageFor,
+    directionFor,
+    languageForId,
+    directionForId,
+  };
 }

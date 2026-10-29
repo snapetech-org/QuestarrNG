@@ -13,7 +13,7 @@
     "dev": "cross-env NODE_ENV=development tsx server/index.ts",
     "build": "vite build && tsc -p tsconfig.build.json",
     "start": "NODE_ENV=production node dist/server/index.js",
-    "check": "tsc",
+    "check": "npm run check:localization && tsc",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css}\"",
@@ -41,7 +41,8 @@
     "audit:prod": "node scripts/audit-prod.mjs",
     "dev:test": "tsx scripts/clean-test-db.ts && cross-env SQLITE_DB_PATH=data/test.db PORT=5100 DISABLE_RATE_LIMITS=true npm run dev",
     "prepare": "husky",
-    "db:copy:pg-to-sqlite": "tsx scripts/pg-to-sqlite.ts"
+    "db:copy:pg-to-sqlite": "tsx scripts/pg-to-sqlite.ts",
+    "check:localization": "node scripts/check-localization-catalog.js"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
@@ -133,8 +134,7 @@
     "vaul": "^1.1.2",
     "wouter": "^3.13.0",
     "zod": "^4.6.7",
-    "zod-validation-error": "^5.0.0",
-    "re2js": "^2.8.6"
+    "zod-validation-error": "^5.0.0"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.10",

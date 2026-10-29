@@ -1,6 +1,12 @@
 import { formatDistanceToNow } from "date-fns";
 import { useSyncExternalStore } from "react";
-import { getInterfaceLanguage } from "./interface-locale";
+import {
+  formatInterfacePluralMessage,
+  getInterfaceLanguage,
+  type InterfacePluralForms,
+  type InterfaceLanguage,
+} from "./interface-locale";
+import { getLocaleDirection } from "./locale-direction";
 import {
   ar,
   de,
@@ -190,38 +196,10 @@ export function getRegionalLocale(preference = getRegionalPreference()): string 
   return preference === "system" ? undefined : preference;
 }
 
-const rightToLeftScripts = new Set([
-  "Adlm",
-  "Arab",
-  "Hebr",
-  "Mand",
-  "Mend",
-  "Nkoo",
-  "Rohg",
-  "Samr",
-  "Syrc",
-  "Thaa",
-  "Yezi",
-]);
-
-const rightToLeftLanguages = new Set(["ar", "ckb", "fa", "he", "ks", "ps", "sd", "ug", "ur", "yi"]);
-
 export function getRegionalDirection(locale?: string): "ltr" | "rtl" {
   const normalizedLocale =
     locale ?? getRegionalLocale() ?? Intl.DateTimeFormat().resolvedOptions().locale;
-  try {
-    if (rightToLeftScripts.has(new Intl.Locale(normalizedLocale).maximize().script ?? "")) {
-      return "rtl";
-    }
-  } catch {
-    // Fall back to the language subtag for older runtimes or malformed locales.
-  }
-
-  return rightToLeftLanguages.has(
-    normalizedLocale.replaceAll("_", "-").split("-")[0]?.toLowerCase() ?? ""
-  )
-    ? "rtl"
-    : "ltr";
+  return getLocaleDirection(normalizedLocale);
 }
 
 export function getRegionalCollator(
@@ -237,6 +215,23 @@ export function formatRegionalNumber(
   preference = getRegionalPreference()
 ): string {
   return new Intl.NumberFormat(getCurrentLocale(preference), options).format(value);
+}
+
+/** Plural grammar follows the interface language; digits follow the regional preference. */
+export function formatRegionalPluralMessage(
+  count: number,
+  forms: InterfacePluralForms,
+  values: Record<string, string | number> = {},
+  interfaceLanguage: InterfaceLanguage = getInterfaceLanguage(),
+  preference = getRegionalPreference()
+): string {
+  return formatInterfacePluralMessage(
+    count,
+    forms,
+    values,
+    interfaceLanguage,
+    formatRegionalNumber(count, undefined, preference)
+  );
 }
 
 export function formatRegionalDate(
@@ -259,6 +254,88 @@ export function formatRegionalPercent(
     style: "percent",
     ...options,
   }).format(percent / 100);
+}
+
+export type RegionalUnit = NonNullable<Intl.NumberFormatOptions["unit"]>;
+
+/** Format a quantity with the locale's number rules and translated unit label. */
+export function formatRegionalUnit(
+  value: number,
+  unit: RegionalUnit,
+  options: Omit<Intl.NumberFormatOptions, "style" | "unit"> = {},
+  preference = getRegionalPreference()
+): string {
+  return new Intl.NumberFormat(getCurrentLocale(preference), {
+    ...options,
+    style: "unit",
+    unit,
+  }).format(value);
+}
+
+/** Parse a plain numeric field using the selected locale's digits and separators. */
+export function parseRegionalNumber(
+  input: string,
+  locale = getCurrentLocale()
+): number | null {
+  const value = input.trim();
+  if (!value) return null;
+
+  const parts = new Intl.NumberFormat(locale).formatToParts(-1234567890123.5);
+  const groupToken = parts.find((part) => part.type === "group")?.value;
+  const decimalToken = parts.find((part) => part.type === "decimal")?.value ?? ".";
+  const minusToken = parts.find((part) => part.type === "minusSign")?.value ?? "-";
+  const digitFormatter = new Intl.NumberFormat(locale, { useGrouping: false });
+  let normalized = value.replace(/[\u200e\u200f\u061c]/gu, "");
+
+  for (let digit = 0; digit <= 9; digit += 1) {
+    const localizedDigit = digitFormatter.format(digit);
+    if (localizedDigit !== String(digit)) {
+      normalized = normalized.replaceAll(localizedDigit, String(digit));
+    }
+  }
+  if (minusToken !== "-") normalized = normalized.replaceAll(minusToken, "-");
+  normalized = normalized.replace("−", "-");
+  if (groupToken && /[\u0020\u00a0\u202f]/u.test(groupToken)) {
+    normalized = normalized.replace(/[\u0020\u00a0\u202f]/gu, groupToken);
+  }
+
+  let sign = "";
+  if (normalized.startsWith("-") || normalized.startsWith("+")) {
+    sign = normalized[0]!;
+    normalized = normalized.slice(1);
+  }
+  if (!normalized || normalized.includes("-") || normalized.includes("+")) return null;
+
+  const decimalParts = normalized.split(decimalToken);
+  if (decimalParts.length > 2) return null;
+  const [integerPart = "", fractionPart] = decimalParts;
+  if (fractionPart !== undefined && !/^\d+$/u.test(fractionPart)) return null;
+  if (fractionPart !== undefined && groupToken && fractionPart.includes(groupToken)) return null;
+
+  let integerDigits = integerPart;
+  if (groupToken && integerPart.includes(groupToken)) {
+    const groups = integerPart.split(groupToken);
+    if (groups.some((group) => !/^\d+$/u.test(group))) return null;
+    const integerGroups = parts.filter((part) => part.type === "integer").map((part) => part.value);
+    const primaryGroupSize = integerGroups.at(-1)?.length ?? 3;
+    const secondaryGroupSize = integerGroups.at(-2)?.length ?? primaryGroupSize;
+    if (
+      groups.length < 2 ||
+      groups[0]!.length < 1 ||
+      groups[0]!.length > secondaryGroupSize ||
+      groups.at(-1)!.length !== primaryGroupSize ||
+      groups.slice(1, -1).some((group) => group.length !== secondaryGroupSize)
+    ) {
+      return null;
+    }
+    integerDigits = groups.join("");
+  }
+
+  if (!/^\d*$/u.test(integerDigits) || (!integerDigits && fractionPart === undefined)) return null;
+  const canonical =
+    sign + (integerDigits || "0") + (fractionPart === undefined ? "" : "." + fractionPart);
+  const parsed = Number(canonical);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 export function getRegionalDateFnsLocale(): RegionalDateFnsLocale | undefined {

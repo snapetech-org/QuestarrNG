@@ -49,8 +49,23 @@ const EMPTY_GAMES: Game[] = [];
 export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<AppSidebarProps>) {
   const { logout, user } = useAuth();
   const { data: appConfig } = useQuery<Config>({ queryKey: ["/api/config"] });
-  const { language, t, languageFor, directionFor } = useInterfaceLanguage();
+  const {
+    language,
+    t,
+    tId,
+    languageFor,
+    directionFor,
+    languageForId,
+    directionForId,
+  } = useInterfaceLanguage();
   useRegionalPreference();
+
+  const navigationText = (item: AppNavItem) =>
+    item.messageId ? tId(item.messageId) : t(item.title);
+  const navigationLanguage = (item: AppNavItem) =>
+    item.messageId ? languageForId(item.messageId) : languageFor(item.title);
+  const navigationDirection = (item: AppNavItem) =>
+    item.messageId ? directionForId(item.messageId) : directionFor(item.title);
 
   const handleNavigation = (url: string) => {
     onNavigate?.(url);
@@ -200,12 +215,12 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
                             item.children.some((child) => child.url === activeItem)
                           }
                           data-testid={`nav-${item.title.toLowerCase()}`}
-                          lang={languageFor(item.title)}
-                          dir={directionFor(item.title)}
+                          lang={navigationLanguage(item)}
+                          dir={navigationDirection(item)}
                         >
                           <item.icon className="w-4 h-4" aria-hidden="true" />
-                          <span lang={languageFor(item.title)} dir={directionFor(item.title)}>
-                            {t(item.title)}
+                          <span lang={navigationLanguage(item)} dir={navigationDirection(item)}>
+                            {navigationText(item)}
                           </span>
                           <ChevronRight
                             className="ml-auto h-4 w-4 shrink-0 transition-transform group-data-[state=open]/collapsible:rotate-90"
@@ -266,14 +281,14 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
                       <button
                         onClick={() => handleNavigation(item.url)}
                         className="flex items-center justify-between w-full"
-                        lang={languageFor(item.title)}
-                        dir={directionFor(item.title)}
+                        lang={navigationLanguage(item)}
+                        dir={navigationDirection(item)}
                         aria-label={item.badgeLabel}
                       >
                         <div className="flex items-center gap-2">
                           <item.icon className="w-4 h-4" aria-hidden="true" />
-                          <span lang={languageFor(item.title)} dir={directionFor(item.title)}>
-                            {t(item.title)}
+                          <span lang={navigationLanguage(item)} dir={navigationDirection(item)}>
+                            {navigationText(item)}
                           </span>
                         </div>
                         {item.badge && (
@@ -308,8 +323,8 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
                       className="flex items-center gap-2 w-full"
                     >
                       <item.icon className="w-4 h-4" aria-hidden="true" />
-                      <span lang={languageFor(item.title)} dir={directionFor(item.title)}>
-                        {t(item.title)}
+                      <span lang={navigationLanguage(item)} dir={navigationDirection(item)}>
+                        {navigationText(item)}
                       </span>
                     </button>
                   </SidebarMenuButton>
@@ -337,8 +352,8 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
                       className="flex items-center gap-2 w-full"
                     >
                       <item.icon className="w-4 h-4" aria-hidden="true" />
-                      <span lang={languageFor(item.title)} dir={directionFor(item.title)}>
-                        {t(item.title)}
+                      <span lang={navigationLanguage(item)} dir={navigationDirection(item)}>
+                        {navigationText(item)}
                       </span>
                     </button>
                   </SidebarMenuButton>
