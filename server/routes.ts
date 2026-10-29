@@ -312,6 +312,16 @@ const CC_IGDB_METADATA = "public, max-age=86400, stale-while-revalidate=3600";
 const CC_IGDB_GAME_LIST_PRIVATE = "private, max-age=3600, stale-while-revalidate=600";
 
 function preferExistingMetadata<T>(
+  existing: T,
+  incoming: T | null | undefined,
+  overwrite: boolean
+): T;
+function preferExistingMetadata<T>(
+  existing: T | null | undefined,
+  incoming: T | null | undefined,
+  overwrite: boolean
+): T | null | undefined;
+function preferExistingMetadata<T>(
   existing: T | null | undefined,
   incoming: T | null | undefined,
   overwrite: boolean
