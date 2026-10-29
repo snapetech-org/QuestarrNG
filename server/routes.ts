@@ -2440,6 +2440,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return keys;
   };
 
+  const bulkDiscoveryRequestSchema = z
+    .object({
+      games: z.array(libraryCatalogGameSchema).min(1).max(100),
+    })
+    .strict();
+
+  app.post(
+    "/api/games/bulk-discovery",
+    authenticateToken,
+    sensitiveEndpointLimiter,
+    async (req: Request, res: Response) => {
+      const parsed = bulkDiscoveryRequestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({
+          error: "Invalid discovery batch",
+          details: parsed.error.issues,
+        });
+      }
+
+      try {
+        const userId = req.user!.id;
+        const existingGames = await storage.getUserGames(userId, true);
+        const seen = catalogIdentitySet(existingGames);
+        let addedCount = 0;
+        let duplicateCount = 0;
+        let errorCount = 0;
+
+        for (const discoveryGame of parsed.data.games) {
+          const keys = catalogIdentityKeys(discoveryGame);
+          if (keys.some((key) => seen.has(key))) {
+            duplicateCount += 1;
+            continue;
+          }
+
+          try {
+            const insert = insertGameSchema.parse({
+              ...discoveryGame,
+              userId,
+              source: "api",
+              status: "wanted",
+              hidden: false,
+              userRating: null,
+            });
+            await storage.addGame(normalizeInitialReleaseStatus(insert));
+            keys.forEach((key) => seen.add(key));
+            addedCount += 1;
+          } catch (error) {
+            errorCount += 1;
+            routesLogger.warn(
+              { error, title: discoveryGame.title },
+              "skipping invalid discovery game"
+            );
+          }
+        }
+
+        return res.json({
+          success: errorCount === 0,
+          addedCount,
+          duplicateCount,
+          errorCount,
+        });
+      } catch (error) {
+        routesLogger.error({ error }, "error adding discovery batch");
+        return res.status(500).json({ error: "Failed to add selected games" });
+      }
+    }
+  );
+
   app.get("/api/games/export", authenticateToken, sensitiveEndpointLimiter, async (req, res) => {
     try {
       const games = await storage.getUserGames(req.user!.id, true);
