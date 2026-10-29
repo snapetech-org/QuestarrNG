@@ -112,6 +112,33 @@ async function expectSeparatedDownloadAccessibleName(
 }
 
 test.describe("Game download interface language", () => {
+  test("accepts localized digits in the release-year filter and sends a canonical API value", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("questarr.interface-language", "ar");
+      localStorage.setItem("questarrng.regional-format", "ar");
+    });
+    await page.route("**/api/config", async (route) =>
+      route.fulfill({ json: { igdb: { configured: true } } })
+    );
+    await page.route("**/api/games*", async (route) => route.fulfill({ json: [] }));
+    await page.route("**/api/igdb/platforms", async (route) => route.fulfill({ json: [] }));
+    await page.route("**/api/settings", async (route) => route.fulfill({ json: {} }));
+    let requestedYear: string | null | undefined;
+    await page.route("**/api/igdb/search?*", async (route) => {
+      requestedYear = new URL(route.request().url()).searchParams.get("year");
+      await route.fulfill({ json: [] });
+    });
+
+    await page.goto("/");
+    await page.getByTestId("button-add-game").click();
+    await page.getByTestId("input-game-search").fill("zelda");
+    await page.getByRole("textbox", { name: "تصفية سنة الإصدار" }).fill("٢٠٢٤");
+
+    await expect.poll(() => requestedYear).toBe("2024");
+  });
+
   test("formats sidebar badges with the selected regional digits", async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.setItem("questarr.interface-language", "ar");
@@ -199,12 +226,25 @@ test.describe("Game download interface language", () => {
     });
     await expect(regionalArabicOption.locator('[lang="ar"][dir="rtl"]')).toHaveText("العربية");
     await expect(regionalArabicOption.locator('[lang="en"][dir="ltr"]')).toContainText("Arabic");
+    await expect(
+      page.getByRole("option", { name: "English — English", exact: true })
+    ).toBeVisible();
+    const regionalRussianOption = page.getByRole("option", {
+      name: "Русский — Russian",
+      exact: true,
+    });
+    await expect(regionalRussianOption).toBeVisible();
     if (process.env.PR47_VISUAL_EVIDENCE_DIR) {
       await page.screenshot({
         path: `${process.env.PR47_VISUAL_EVIDENCE_DIR}/pr47-bilingual-locale-options-ar.png`,
         fullPage: true,
       });
     }
+    await regionalRussianOption.click();
+    await expect(regionalFormat).toContainText("Русский");
+    await expect
+      .poll(() => page.evaluate(() => localStorage.getItem("questarrng.regional-format")))
+      .toBe("ru");
   });
 
   test("marks translated calendar labels and release counts with their language", async ({

@@ -6,7 +6,7 @@ Questarr's React interface has a browser-local language preference for English a
 
 Fixed interface call sites now use stable IDs. Dynamic legacy surfaces retain a source-text compatibility path while they migrate; unknown or external text still falls back unchanged. Game names, release names, paths, identifiers, API values, and provider text remain untouched. Known generated notifications and app-owned API summaries continue to use their specialized catalogs.
 
-The interface language and regional-format preference are independent. Regional formatting controls dates, times, numbers, calendar weeks, locale-aware sorting, and unit formatting. Localized numeric parsing is available for input. Language choice is saved in browser-local preferences, and first use follows the browser's preferred language before falling back to English.
+The interface language and regional-format preference are independent. Regional formatting offers all 37 mapped locales plus browser settings, even when a locale is not yet ready for interface translation. It controls dates, times, relative time, numbers, calendar weeks, locale-aware sorting, and unit formatting. Localized numeric parsing is used by the release-year search field; localized digits are converted to a canonical year before the API request. Language choice is saved in browser-local preferences, and first use follows the browser's preferred language before falling back to English.
 
 RTL direction is resolved by script and applied to the document. Common inline layout utilities use logical start/end properties, including spacing, alignment, borders, corners, and edge positions. The shared resolver recognizes Arabic, Persian, and Hebrew even though only Arabic currently has a complete translated interface catalog.
 
@@ -16,7 +16,7 @@ The current selector offers 15 choices including English. Reaching the 37-choice
 
 Existing translation history is not available per string, so the baseline catalog is marked `legacy-unverified`. Two new labels are marked `machine-draft`. The `es-419` and `fr-CA` catalogs are marked `inherited` from `es` and `fr` respectively; they remain unreviewed. The terminology glossary defines game-domain terms and protected values. Native-speaker review remains outstanding.
 
-The Playwright suite covers Arabic navigation, settings and calendar form input, download dialogs, mixed-direction game titles, accessible names, keyboard focus, narrow viewports, and 200% text scaling. It now also covers the import-history table, manual-import form, and task sheet with RTL mixed-script titles and paths. The stable-ID migration and layout audit have not been run in CI yet; repository workflows currently run on tag pushes or manual dispatch. Populated integrations and live provider data remain outside the current browser coverage.
+The Playwright suite covers Arabic navigation, settings and calendar form input, localized-digit release-year filtering, download dialogs, mixed-direction game titles, accessible names, keyboard focus, narrow viewports, and 200% text scaling. It now also covers the import-history table, manual-import form, and task sheet with RTL mixed-script titles and paths. The stable-ID migration and layout audit have not been run in CI yet; repository workflows currently run on tag pushes or manual dispatch. Populated integrations and live provider data remain outside the current browser coverage.
 
 ## Locale selection
 
@@ -74,7 +74,7 @@ The two regional additions already available are es-419 (inherited from es) and 
 
 The full 2,232-message catalog uses stable namespaced IDs in the source manifest, and 1,456 fixed translation calls plus localizable source attributes have been migrated. Two inherited regional catalogs bring target translation values to 31,248 across fourteen non-English choices. A generated source map preserves a compatibility bridge for dynamic legacy messages. Catalog generation is reproducible, source checksums fail on unreviewed source edits, and the integrity check compares selector locales with complete manifest coverage.
 
-Plural and select helpers now take stable message IDs. Sidebar count labels use CLDR plural categories, regional digits come from the shared regional formatter, and date, number, percent, unit, and localized-number parsing helpers are available.
+Plural and select helpers now take stable message IDs. Sidebar count labels use CLDR plural categories, regional digits come from the shared regional formatter, and date, number, percent, unit, relative-time, and localized-number parsing helpers are available. Relative time uses the interface locale where a date-fns locale exists and Intl.RelativeTimeFormat for other language tags, while retaining the selected regional digits. A catalog guard ensures all 37 mapped locales remain available in the regional-format selector.
 
 Common physical inline Tailwind utilities were replaced with logical equivalents. The catalog check blocks regressions to physical inline spacing, alignment, borders, corners, and noncentered positions. Existing RTL browser coverage includes a long Arabic/English/Japanese game title, screen-reader naming, dialog keyboard focus, and 200% text scaling. Persian and Hebrew are covered by direction-resolver checks; they do not appear as selectable interface languages until their catalogs are complete.
 

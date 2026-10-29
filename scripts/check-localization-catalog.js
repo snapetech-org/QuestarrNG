@@ -6,11 +6,12 @@ import ts from "typescript";
 
 const root = process.cwd();
 const failures = [];
-const [manifestSource, provenanceSource, interfaceSource, localeMapSource] = await Promise.all([
+const [manifestSource, provenanceSource, interfaceSource, localeMapSource, regionalFormatSource] = await Promise.all([
   readFile(path.join(root, "localization/messages.json"), "utf8"),
   readFile(path.join(root, "client/src/lib/localization-provenance.json"), "utf8"),
   readFile(path.join(root, "client/src/lib/interface-locale.ts"), "utf8"),
   readFile(path.join(root, "localization/locale-map.json"), "utf8"),
+  readFile(path.join(root, "client/src/lib/regional-format.ts"), "utf8"),
 ]);
 const manifest = JSON.parse(manifestSource);
 const provenance = JSON.parse(provenanceSource);
@@ -166,6 +167,28 @@ if (JSON.stringify(enabledMapTags) !== JSON.stringify(enabledManifestTags)) {
 }
 if (plannedLocaleCount !== localeRows.length - enabledManifestTags.length) {
   failures.push("Every locale outside the selector must be explicitly marked translation-needed.");
+}
+const regionalAst = parse(regionalFormatSource, "regional-format.ts");
+const regionalOptions = unwrap(constInitializer(regionalAst, "REGIONAL_FORMAT_OPTIONS"));
+const regionalOptionValues = ts.isArrayLiteralExpression(regionalOptions)
+  ? regionalOptions.elements
+      .map((element) => new Map(properties(unwrap(element))).get("value"))
+      .filter((value) => value && ts.isStringLiteralLike(value))
+      .map((value) => value.text)
+  : [];
+const regionalAliases = {
+  hi: "hi-IN",
+  "zh-Hans": "zh-CN",
+  "zh-Hant": "zh-TW",
+};
+const expectedRegionalValues = localeTags.map((tag) => regionalAliases[tag] ?? tag);
+if (
+  new Set(regionalOptionValues).size !== regionalOptionValues.length ||
+  !regionalOptionValues.includes("system") ||
+  expectedRegionalValues.some((value) => !regionalOptionValues.includes(value)) ||
+  regionalOptionValues.length !== expectedRegionalValues.length + 1
+) {
+  failures.push("Regional-format options must include browser settings and one entry for every mapped locale, using documented script/region aliases.");
 }
 for (const locale of localeRows) {
   if (locale.availability === "source" && locale.tag !== "en") {

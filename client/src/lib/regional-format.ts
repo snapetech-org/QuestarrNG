@@ -33,6 +33,7 @@ export const REGIONAL_FORMAT_KEY = "questarrng.regional-format";
 
 export const REGIONAL_FORMAT_OPTIONS = [
   { value: "system", label: "Use browser settings" },
+  { value: "en", nativeName: "English", englishName: "English" },
   { value: "es", nativeName: "Español", englishName: "Spanish" },
   { value: "es-419", nativeName: "Español (Latinoamérica)", englishName: "Spanish (Latin America)" },
   { value: "zh-CN", nativeName: "简体中文", englishName: "Chinese (Simplified)" },
@@ -47,6 +48,28 @@ export const REGIONAL_FORMAT_OPTIONS = [
   { value: "zh-TW", nativeName: "繁體中文", englishName: "Chinese (Traditional)" },
   { value: "vi", nativeName: "Tiếng Việt", englishName: "Vietnamese" },
   { value: "id", nativeName: "Bahasa Indonesia", englishName: "Indonesian" },
+  { value: "az", nativeName: "Azərbaycanca", englishName: "Azerbaijani" },
+  { value: "bg", nativeName: "Български", englishName: "Bulgarian" },
+  { value: "bn", nativeName: "বাংলা", englishName: "Bengali" },
+  { value: "cs", nativeName: "Čeština", englishName: "Czech" },
+  { value: "da", nativeName: "Dansk", englishName: "Danish" },
+  { value: "fa", nativeName: "فارسی", englishName: "Persian" },
+  { value: "he", nativeName: "עברית", englishName: "Hebrew" },
+  { value: "hu", nativeName: "Magyar", englishName: "Hungarian" },
+  { value: "it", nativeName: "Italiano", englishName: "Italian" },
+  { value: "kk", nativeName: "Қазақша", englishName: "Kazakh" },
+  { value: "ms", nativeName: "Bahasa Melayu", englishName: "Malay" },
+  { value: "nb", nativeName: "Norsk bokmål", englishName: "Norwegian Bokmål" },
+  { value: "nl", nativeName: "Nederlands", englishName: "Dutch" },
+  { value: "pl", nativeName: "Polski", englishName: "Polish" },
+  { value: "pt", nativeName: "Português", englishName: "Portuguese" },
+  { value: "pt-PT", nativeName: "Português (Portugal)", englishName: "European Portuguese" },
+  { value: "ru", nativeName: "Русский", englishName: "Russian" },
+  { value: "sv", nativeName: "Svenska", englishName: "Swedish" },
+  { value: "th", nativeName: "ไทย", englishName: "Thai" },
+  { value: "tr", nativeName: "Türkçe", englishName: "Turkish" },
+  { value: "uk", nativeName: "Українська", englishName: "Ukrainian" },
+  { value: "uz", nativeName: "Oʻzbekcha", englishName: "Uzbek" },
 ] as const;
 
 const supportedRegionalFormats = new Set<string>(
@@ -373,9 +396,74 @@ export function getRegionalWeekStartsOn(): number {
   return getDateFnsLocale(locale)?.options?.weekStartsOn ?? 1;
 }
 
-export function formatRegionalDistanceToNow(date: Date): string {
-  const interfaceLocale = getDateFnsLocale(getInterfaceLanguage()) ?? enUS;
-  // Keep date-fns wording and plural rules, but format its count with the separate regional choice.
+function formatIntlRelativeDistance(
+  date: Date,
+  interfaceLanguage: string,
+  regionalPreference: string
+): string {
+  const deltaSeconds = (date.getTime() - Date.now()) / 1000;
+  const absoluteSeconds = Math.abs(deltaSeconds);
+  let value: number;
+  let unit: Intl.RelativeTimeFormatUnit;
+
+  if (absoluteSeconds < 45) {
+    value = Math.round(deltaSeconds);
+    unit = "second";
+  } else if (absoluteSeconds < 90) {
+    value = Math.sign(deltaSeconds);
+    unit = "minute";
+  } else if (absoluteSeconds < 45 * 60) {
+    value = Math.round(deltaSeconds / 60);
+    unit = "minute";
+  } else if (absoluteSeconds < 90 * 60) {
+    value = Math.sign(deltaSeconds);
+    unit = "hour";
+  } else if (absoluteSeconds < 22 * 60 * 60) {
+    value = Math.round(deltaSeconds / (60 * 60));
+    unit = "hour";
+  } else if (absoluteSeconds < 36 * 60 * 60) {
+    value = Math.sign(deltaSeconds);
+    unit = "day";
+  } else if (absoluteSeconds < 26 * 24 * 60 * 60) {
+    value = Math.round(deltaSeconds / (24 * 60 * 60));
+    unit = "day";
+  } else if (absoluteSeconds < 46 * 24 * 60 * 60) {
+    value = Math.sign(deltaSeconds);
+    unit = "month";
+  } else if (absoluteSeconds < 320 * 24 * 60 * 60) {
+    value = Math.round(deltaSeconds / (30 * 24 * 60 * 60));
+    unit = "month";
+  } else if (absoluteSeconds < 548 * 24 * 60 * 60) {
+    value = Math.sign(deltaSeconds);
+    unit = "year";
+  } else {
+    value = Math.round(deltaSeconds / (365 * 24 * 60 * 60));
+    unit = "year";
+  }
+
+  const parts = new Intl.RelativeTimeFormat(interfaceLanguage, { numeric: "always" }).formatToParts(
+    value,
+    unit
+  );
+  return parts
+    .map((part) =>
+      part.type === "integer"
+        ? formatRegionalNumber(Number(part.value), { useGrouping: false }, regionalPreference)
+        : part.value
+    )
+    .join("");
+}
+
+export function formatRegionalDistanceToNow(
+  date: Date,
+  interfaceLanguage = getInterfaceLanguage(),
+  regionalPreference = getRegionalPreference()
+): string {
+  const interfaceLocale = getDateFnsLocale(interfaceLanguage);
+  if (!interfaceLocale) {
+    return formatIntlRelativeDistance(date, interfaceLanguage, regionalPreference);
+  }
+  // Keep existing date-fns wording and plural rules, but format its count with the separate regional choice.
   const regionalizedLocale = {
     ...interfaceLocale,
     formatDistance: (
@@ -385,7 +473,10 @@ export function formatRegionalDistanceToNow(date: Date): string {
     ) =>
       interfaceLocale
         .formatDistance(token, count, options)
-        .replace(String(count), formatRegionalNumber(count, { useGrouping: false })),
+        .replace(
+          String(count),
+          formatRegionalNumber(count, { useGrouping: false }, regionalPreference)
+        ),
   };
 
   return formatDistanceToNow(date, { addSuffix: true, locale: regionalizedLocale });

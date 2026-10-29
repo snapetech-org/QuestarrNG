@@ -11,6 +11,7 @@ import {
 import {
   formatRegionalPluralMessage,
   formatRegionalNumber,
+  formatRegionalDistanceToNow,
   formatRegionalUnit,
   parseRegionalNumber,
 } from "@/lib/regional-format";
@@ -125,6 +126,19 @@ describe("localization infrastructure", () => {
     expect(formatRegionalNumber(1234.5, undefined, "fr-CA")).toBe(
       new Intl.NumberFormat("fr-CA").format(1234.5)
     );
+  });
+
+  it("formats relative time in the interface locale with regional digits", () => {
+    const date = new Date(Date.now() - 3 * 60 * 60 * 1000);
+    const expected = new Intl.RelativeTimeFormat("ru", { numeric: "always" })
+      .formatToParts(-3, "hour")
+      .map((part) =>
+        part.type === "integer"
+          ? new Intl.NumberFormat("ar", { useGrouping: false }).format(Number(part.value))
+          : part.value
+      )
+      .join("");
+    expect(formatRegionalDistanceToNow(date, "ru", "ar")).toBe(expected);
   });
 
   it("formats measurement units through Intl.NumberFormat", () => {

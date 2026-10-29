@@ -1,4 +1,8 @@
-import { getRegionalDirection, getRegionalLocale } from "@/lib/regional-format";
+import {
+  getRegionalDirection,
+  getRegionalLocale,
+  parseRegionalNumber,
+} from "@/lib/regional-format";
 import { coverSrc } from "@/lib/cover";
 import React, { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -73,9 +77,12 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
   const isMobile = useIsMobile();
   const regionalLocale = getRegionalLocale() ?? Intl.DateTimeFormat().resolvedOptions().locale;
   const regionalDirection = getRegionalDirection(regionalLocale);
-  const parsedReleaseYear = Number.parseInt(releaseYear, 10);
+  const parsedReleaseYear = parseRegionalNumber(releaseYear, regionalLocale);
   const hasValidReleaseYear =
-    /^\d{4}$/.test(releaseYear) && parsedReleaseYear >= 1950 && parsedReleaseYear <= 2100;
+    parsedReleaseYear !== null &&
+    Number.isInteger(parsedReleaseYear) &&
+    parsedReleaseYear >= 1950 &&
+    parsedReleaseYear <= 2100;
   const canSearchWithReleaseYear = releaseYear === "" || hasValidReleaseYear;
 
   const { data: config } = useQuery<Config>({
@@ -144,7 +151,7 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
 
   // Search IGDB for games
   const { data: searchResults = [], isFetching: isSearching } = useQuery({
-    queryKey: ["/api/igdb/search", debouncedQuery, showUndatedGames, selectedPlatform, releaseYear],
+    queryKey: ["/api/igdb/search", debouncedQuery, showUndatedGames, selectedPlatform, parsedReleaseYear ?? releaseYear],
     queryFn: async () => {
       if (!debouncedQuery.trim()) return [];
       const params = new URLSearchParams({
@@ -154,7 +161,7 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
       });
       if (selectedPlatform !== "all") params.set("platform", selectedPlatform);
       if (hasValidReleaseYear) {
-        params.set("year", releaseYear);
+        params.set("year", String(parsedReleaseYear));
       }
       const response = await apiFetch(`/api/igdb/search?${params.toString()}`);
       await throwIfResNotOk(response);
@@ -209,8 +216,13 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
 
   const handleReleaseYearChange = (value: string) => {
     setReleaseYear(value);
-    const parsedYear = Number.parseInt(value, 10);
-    if (/^\d{4}$/.test(value) && parsedYear >= 1950 && parsedYear <= 2100) {
+    const parsedYear = parseRegionalNumber(value, regionalLocale);
+    if (
+      parsedYear !== null &&
+      Number.isInteger(parsedYear) &&
+      parsedYear >= 1950 &&
+      parsedYear <= 2100
+    ) {
       setShowUndatedGames(false);
     }
   };
@@ -242,16 +254,14 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
           </SelectContent>
         </Select>
         <Input
-          type="number"
+          type="text"
           inputMode="numeric"
-          min="1950"
-          max="2100"
           placeholder={t("interface.release_year_e4615ec7")}
           value={releaseYear}
           onChange={(event) => handleReleaseYearChange(event.target.value)}
           aria-label={t("interface.release_year_filter_3b994a57")}
-          lang={languageFor("interface.release_year_filter_3b994a57")}
-          dir={directionFor("interface.release_year_filter_3b994a57")}
+          lang={regionalLocale}
+          dir={regionalDirection}
         />
       </div>
       <div
