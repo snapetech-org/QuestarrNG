@@ -16,7 +16,7 @@ The current selector offers 15 choices including English. Reaching the 37-choice
 
 Existing translation history is not available per string, so the baseline catalog is marked `legacy-unverified`. Two new labels are marked `machine-draft`. The `es-419` and `fr-CA` catalogs are marked `inherited` from `es` and `fr` respectively; they remain unreviewed. The terminology glossary defines game-domain terms and protected values. Native-speaker review remains outstanding.
 
-The Playwright suite covers Arabic navigation, settings and calendar form input, download dialogs, mixed-direction game titles, accessible names, keyboard focus, narrow viewports, and 200% text scaling. It now also covers the import-history table and task sheet with an RTL mixed-script title. The stable-ID migration and layout audit have not been run in CI yet; repository workflows currently run on tag pushes or manual dispatch. Populated integrations and live provider data remain outside the current browser coverage.
+The Playwright suite covers Arabic navigation, settings and calendar form input, download dialogs, mixed-direction game titles, accessible names, keyboard focus, narrow viewports, and 200% text scaling. It now also covers the import-history table, manual-import form, and task sheet with RTL mixed-script titles and paths. The stable-ID migration and layout audit have not been run in CI yet; repository workflows currently run on tag pushes or manual dispatch. Populated integrations and live provider data remain outside the current browser coverage.
 
 ## Locale selection
 
