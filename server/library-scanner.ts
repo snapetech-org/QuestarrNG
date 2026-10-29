@@ -89,6 +89,110 @@ function isIgnoredFile(filename: string): boolean {
 const progressByFolder = new Map<string, ScanProgress>();
 const unmatchedByFolder = new Map<string, UnmatchedEntry[]>();
 const activeScans = new Set<string>();
+const scanOwnersByFolder = new Map<string, string>();
+const processedCandidatesByFolder = new Map<string, Set<string>>();
+const LIBRARY_SCAN_STATE_KEY = "library_scan_state_v1";
+const INTERRUPTED_SCAN_MESSAGE = "Server restarted during this scan. Start a scan to resume.";
+let scanStateHydration: Promise<void> | undefined;
+let scanStateWriteQueue: Promise<void> = Promise.resolve();
+
+async function hydrateScanState(): Promise<void> {
+  if (!scanStateHydration) {
+    scanStateHydration = (async () => {
+      const raw = await storage.getSystemConfig(LIBRARY_SCAN_STATE_KEY);
+      if (!raw) return;
+      let saved: unknown;
+      try {
+        saved = JSON.parse(raw);
+      } catch {
+        routesLogger.warn("Ignoring malformed persisted library scan state");
+        return;
+      }
+      if (!saved || typeof saved !== "object") return;
+      const savedFolders = saved as { folders?: unknown };
+      if (!Array.isArray(savedFolders.folders)) return;
+      for (const rawFolder of savedFolders.folders) {
+        if (!rawFolder || typeof rawFolder !== "object") continue;
+        const folder = rawFolder as {
+          progress?: unknown;
+          userId?: unknown;
+          unmatched?: unknown;
+          processedCandidateNames?: unknown;
+        };
+        const progress = folder.progress as ScanProgress | undefined;
+        if (
+          !progress ||
+          typeof progress.rootFolderId !== "string" ||
+          typeof folder.userId !== "string" ||
+          !["queued", "running", "completed", "failed"].includes(progress.status)
+        ) {
+          continue;
+        }
+        const rootFolderId = progress.rootFolderId;
+        const hydrated = { ...progress };
+        if (hydrated.status === "running" || hydrated.status === "queued") {
+          hydrated.status = "failed";
+          hydrated.finishedAt = new Date().toISOString();
+          hydrated.currentCandidate = undefined;
+          hydrated.errorMessage = INTERRUPTED_SCAN_MESSAGE;
+        }
+        progressByFolder.set(rootFolderId, hydrated);
+        scanOwnersByFolder.set(rootFolderId, folder.userId);
+        unmatchedByFolder.set(
+          rootFolderId,
+          Array.isArray(folder.unmatched) ? folder.unmatched as UnmatchedEntry[] : []
+        );
+        const processedNames = Array.isArray(folder.processedCandidateNames)
+          ? folder.processedCandidateNames.filter((name): name is string => typeof name === "string")
+          : [];
+        processedCandidatesByFolder.set(rootFolderId, new Set(processedNames));
+      }
+      await persistScanState();
+    })().catch((error) => {
+      routesLogger.error({ error }, "failed to restore durable library scan state");
+    });
+  }
+  await scanStateHydration;
+}
+
+function persistScanState(): Promise<void> {
+  const snapshot = JSON.stringify({
+    version: 1,
+    folders: Array.from(progressByFolder.entries()).flatMap(([rootFolderId, progress]) => {
+      const userId = scanOwnersByFolder.get(rootFolderId);
+      if (!userId) return [];
+      return [{
+        progress,
+        userId,
+        unmatched: unmatchedByFolder.get(rootFolderId) ?? [],
+        processedCandidateNames: Array.from(processedCandidatesByFolder.get(rootFolderId) ?? []),
+      }];
+    }),
+  });
+  const write = () => storage.setSystemConfig(LIBRARY_SCAN_STATE_KEY, snapshot);
+  scanStateWriteQueue = scanStateWriteQueue.then(write, write).catch((error) => {
+    routesLogger.error({ error }, "failed to persist library scan state");
+  });
+  return scanStateWriteQueue;
+}
+
+function resumeScanProgress(
+  previous: ScanProgress,
+  status: "queued" | "running",
+  startedAt?: string
+): ScanProgress {
+  const resumed: ScanProgress = {
+    ...previous,
+    status,
+    ...(startedAt ? { startedAt } : {}),
+  };
+  delete resumed.finishedAt;
+  delete resumed.errorMessage;
+  resumed.currentCandidate = undefined;
+  return resumed;
+}
+
+const progressOwnerBeforeQueued = new Map<string, string | undefined>();
 // Root folders whose settings changed while a scan of them was running. The
 // running scan captured the old path, so they get one more scan when it ends.
 const rescanRequested = new Map<string, string>(); // rootFolderId -> userId
@@ -99,30 +203,51 @@ const progressBeforeQueued = new Map<string, ScanProgress | undefined>();
  * Show a folder as waiting for its scan, so scan status never looks idle
  * between two folders of a batch or before a requested rescan starts.
  */
-function markQueued(rootFolderId: string, rootFolderPath: string, userId: string): void {
+async function markQueued(rootFolderId: string, rootFolderPath: string, userId: string): Promise<void> {
   const previous = progressByFolder.get(rootFolderId);
-  if (previous?.status !== "queued") progressBeforeQueued.set(rootFolderId, previous);
-  const queued: ScanProgress = {
-    rootFolderId,
-    rootFolderPath,
-    startedAt: new Date().toISOString(),
-    status: "queued",
-    totalCandidates: 0,
-    processedCandidates: 0,
-    matched: 0,
-    unmatched: 0,
-    errors: 0,
-  };
+  if (previous?.status !== "queued") {
+    progressBeforeQueued.set(rootFolderId, previous);
+    progressOwnerBeforeQueued.set(rootFolderId, scanOwnersByFolder.get(rootFolderId));
+  }
+  scanOwnersByFolder.set(rootFolderId, userId);
+  const canResume =
+    previous?.status === "failed" &&
+    previous.errorMessage === INTERRUPTED_SCAN_MESSAGE &&
+    previous.rootFolderPath === rootFolderPath;
+  if (!canResume) processedCandidatesByFolder.set(rootFolderId, new Set());
+  const queued: ScanProgress = canResume && previous
+    ? {
+        ...resumeScanProgress(previous, "queued", new Date().toISOString()),
+        rootFolderPath,
+      }
+    : {
+        rootFolderId,
+        rootFolderPath,
+        startedAt: new Date().toISOString(),
+        status: "queued",
+        totalCandidates: 0,
+        processedCandidates: 0,
+        matched: 0,
+        unmatched: 0,
+        errors: 0,
+      };
   progressByFolder.set(rootFolderId, queued);
   emitProgress(queued, userId);
+  await persistScanState();
 }
 
 /** Put back what a "queued" entry replaced when its scan did not run. */
-function clearQueued(rootFolderId: string): void {
+async function clearQueued(rootFolderId: string): Promise<void> {
   if (progressByFolder.get(rootFolderId)?.status !== "queued") return;
   const previous = progressBeforeQueued.get(rootFolderId);
   if (previous) progressByFolder.set(rootFolderId, previous);
   else progressByFolder.delete(rootFolderId);
+  const previousOwner = progressOwnerBeforeQueued.get(rootFolderId);
+  if (previousOwner) scanOwnersByFolder.set(rootFolderId, previousOwner);
+  else scanOwnersByFolder.delete(rootFolderId);
+  progressBeforeQueued.delete(rootFolderId);
+  progressOwnerBeforeQueued.delete(rootFolderId);
+  await persistScanState();
 }
 
 export function getAllScanProgress(): ScanProgress[] {
@@ -133,8 +258,22 @@ export function getScanProgress(rootFolderId: string): ScanProgress | undefined 
   return progressByFolder.get(rootFolderId);
 }
 
+export async function getUserScanProgress(userId: string): Promise<ScanProgress[]> {
+  await hydrateScanState();
+  return Array.from(progressByFolder.values()).filter(
+    (progress) => scanOwnersByFolder.get(progress.rootFolderId) === userId
+  );
+}
+
 export function getAllUnmatched(): UnmatchedEntry[] {
   return Array.from(unmatchedByFolder.values()).flat();
+}
+
+export async function getUserUnmatched(userId: string): Promise<UnmatchedEntry[]> {
+  await hydrateScanState();
+  return Array.from(unmatchedByFolder.entries())
+    .filter(([rootFolderId]) => scanOwnersByFolder.get(rootFolderId) === userId)
+    .flatMap(([, entries]) => entries);
 }
 
 export function clearUnmatched(rootFolderId: string, folderName: string): void {
@@ -146,6 +285,7 @@ export function clearUnmatched(rootFolderId: string, folderName: string): void {
   } else {
     unmatchedByFolder.set(rootFolderId, filtered);
   }
+  void persistScanState();
 }
 
 /**
@@ -361,8 +501,13 @@ async function assignFilesToGame(
 export async function searchUnmatchedFolder(
   rootFolderId: string,
   folderName: string,
-  query: string
+  query: string,
+  userId?: string
 ): Promise<UnmatchedEntry["candidates"]> {
+  await hydrateScanState();
+  if (userId && scanOwnersByFolder.get(rootFolderId) !== userId) {
+    throw new Error("No matching unmatched entry for this root folder");
+  }
   const entry = getUnmatchedEntry(rootFolderId, folderName);
   if (!entry) throw new Error("No matching unmatched entry for this root folder");
   const results = await igdbClient.searchGames(query, 5);
@@ -374,6 +519,7 @@ export async function searchUnmatchedFolder(
   const accepted = offeredIds(entry);
   entry.candidates = toUnmatchedCandidates(results);
   for (const c of entry.candidates) accepted.add(c.igdbId);
+  await persistScanState();
   return entry.candidates;
 }
 
@@ -383,8 +529,12 @@ export async function matchUnmatchedFolder(
   igdbId: number,
   userId: string
 ): Promise<{ gameId: string; filesAdded: number }> {
+  await hydrateScanState();
   const rootFolder = await storage.getRootFolder(rootFolderId);
   if (!rootFolder) throw new Error("Root folder not found");
+  if (scanOwnersByFolder.get(rootFolderId) !== userId) {
+    throw new Error("No matching unmatched entry for this root folder");
+  }
 
   // Never join client-supplied `folderName` onto a filesystem path — resolve
   // it against the server-trusted list of folders/files this root folder's
@@ -392,8 +542,27 @@ export async function matchUnmatchedFolder(
   const entry = getUnmatchedEntry(rootFolderId, folderName);
   if (!entry) throw new Error("No matching unmatched entry for this root folder");
   const absolutePath = entry.absolutePath;
+  let realRoot: string;
+  let realEntry: string;
+  try {
+    [realRoot, realEntry] = await Promise.all([
+      fs.promises.realpath(rootFolder.path),
+      fs.promises.realpath(absolutePath),
+    ]);
+  } catch {
+    throw new Error("Unmatched folder no longer exists");
+  }
+  const relativeEntry = path.relative(realRoot, realEntry);
+  if (
+    relativeEntry === "" ||
+    relativeEntry === ".." ||
+    relativeEntry.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(relativeEntry)
+  ) {
+    throw new Error("Unmatched folder is no longer within its configured root");
+  }
 
-  const stat = await fs.promises.stat(absolutePath);
+  const stat = await fs.promises.stat(realEntry);
   if (!stat.isFile() && !stat.isDirectory()) {
     throw new Error("Path is neither a directory nor a file");
   }
@@ -427,6 +596,7 @@ export async function matchUnmatchedFolder(
   const filesAdded = await assignFilesToGame(game.id, files);
 
   clearUnmatched(rootFolderId, folderName);
+  await persistScanState();
   return { gameId: game.id, filesAdded };
 }
 
@@ -435,6 +605,7 @@ export async function matchUnmatchedFolder(
  * available via `getScanProgress` / `getAllUnmatched` while it runs.
  */
 export async function scanRootFolderById(rootFolderId: string, userId: string): Promise<void> {
+  await hydrateScanState();
   // Guard before the first await so two near-simultaneous requests for the
   // same root folder can't both pass this check and race on shared
   // progress/unmatched state or duplicate filesystem/IGDB work.
@@ -452,32 +623,49 @@ export async function scanRootFolderById(rootFolderId: string, userId: string): 
       return;
     }
 
-    const progress: ScanProgress = {
-      rootFolderId,
-      rootFolderPath: rootFolder.path,
-      startedAt: new Date().toISOString(),
-      status: "running",
-      totalCandidates: 0,
-      processedCandidates: 0,
-      matched: 0,
-      unmatched: 0,
-      errors: 0,
-    };
+    const activeProgress = progressByFolder.get(rootFolderId);
+    const previous =
+      activeProgress?.status === "queued"
+        ? progressBeforeQueued.get(rootFolderId)
+        : activeProgress;
+    const canResume =
+      previous?.status === "failed" &&
+      previous.errorMessage === INTERRUPTED_SCAN_MESSAGE &&
+      previous.rootFolderPath === rootFolder.path;
+    const progress: ScanProgress = canResume && previous
+      ? resumeScanProgress(previous, "running")
+      : {
+          rootFolderId,
+          rootFolderPath: rootFolder.path,
+          startedAt: new Date().toISOString(),
+          status: "running",
+          totalCandidates: 0,
+          processedCandidates: 0,
+          matched: 0,
+          unmatched: 0,
+          errors: 0,
+        };
+    scanOwnersByFolder.set(rootFolderId, userId);
     progressByFolder.set(rootFolderId, progress);
     progressBeforeQueued.delete(rootFolderId);
-    unmatchedByFolder.set(rootFolderId, []);
+    progressOwnerBeforeQueued.delete(rootFolderId);
+    if (!canResume) {
+      processedCandidatesByFolder.set(rootFolderId, new Set());
+      unmatchedByFolder.set(rootFolderId, []);
+    }
     emitProgress(progress, userId);
+    await persistScanState();
 
     await runScan(rootFolder, progress, userId);
   } finally {
     activeScans.delete(rootFolderId);
     // A missing or disabled folder never replaces its "queued" entry.
-    clearQueued(rootFolderId);
+    await clearQueued(rootFolderId);
     const rescanUserId = rescanRequested.get(rootFolderId);
     if (rescanUserId !== undefined) {
       rescanRequested.delete(rootFolderId);
       const finished = progressByFolder.get(rootFolderId);
-      if (finished) markQueued(rootFolderId, finished.rootFolderPath, rescanUserId);
+      if (finished) await markQueued(rootFolderId, finished.rootFolderPath, rescanUserId);
       // Never let the follow-up scan's failure replace this scan's own error.
       try {
         await scanRootFolderById(rootFolderId, rescanUserId);
@@ -611,10 +799,20 @@ async function runScan(
   const rootFolderId = rootFolder.id;
   try {
     const candidates = await listCandidates(rootFolder.path);
+    const processedNames =
+      processedCandidatesByFolder.get(rootFolderId) ?? new Set<string>();
+    const candidateNames = new Set(candidates.map((candidate) => candidate.folderName));
+    for (const processedName of processedNames) {
+      if (!candidateNames.has(processedName)) processedNames.delete(processedName);
+    }
+    processedCandidatesByFolder.set(rootFolderId, processedNames);
     progress.totalCandidates = candidates.length;
+    progress.processedCandidates = processedNames.size;
     emitProgress(progress, userId);
+    await persistScanState();
 
     for (const cand of candidates) {
+      if (processedNames.has(cand.folderName)) continue;
       progress.currentCandidate = cand.folderName;
       emitProgress(progress, userId);
       try {
@@ -623,8 +821,11 @@ async function runScan(
         progress.errors += 1;
         routesLogger.error({ err, folder: cand.folderName }, "scan: error processing folder");
       }
-      progress.processedCandidates += 1;
+      processedNames.add(cand.folderName);
+      progress.processedCandidates = processedNames.size;
+      progress.currentCandidate = undefined;
       emitProgress(progress, userId);
+      await persistScanState();
     }
 
     // Record the scan time first: the next folder of a batch is already
@@ -644,6 +845,7 @@ async function runScan(
   // Auto-matched games were added or updated, even if the scan failed later.
   // Tell every open client to refresh its games list, since only the Discover
   // tab watches scan progress.
+  await persistScanState();
   if (gamesChangedByScan.has(progress)) notifyUser("gameUpdated", rootFolderId, userId);
 }
 
@@ -653,9 +855,10 @@ async function runScan(
  * gets one more pass instead of being skipped.
  */
 export async function rescanAllEnabledRootFolders(userId: string): Promise<void> {
+  await hydrateScanState();
   const folders = await storage.getEnabledRootFolders();
   for (const folder of folders) {
-    if (!activeScans.has(folder.id)) markQueued(folder.id, folder.path, userId);
+    if (!activeScans.has(folder.id)) await markQueued(folder.id, folder.path, userId);
   }
   for (const folder of folders) {
     // One folder failing (e.g. deleted mid-batch) must not stop the rest.
@@ -668,9 +871,10 @@ export async function rescanAllEnabledRootFolders(userId: string): Promise<void>
 }
 
 export async function scanAllEnabledRootFolders(userId: string): Promise<void> {
+  await hydrateScanState();
   const folders = await storage.getEnabledRootFolders();
   for (const folder of folders) {
-    if (!activeScans.has(folder.id)) markQueued(folder.id, folder.path, userId);
+    if (!activeScans.has(folder.id)) await markQueued(folder.id, folder.path, userId);
   }
   for (const folder of folders) {
     // One folder failing (e.g. deleted mid-batch) must not stop the rest.
