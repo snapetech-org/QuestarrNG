@@ -114,7 +114,7 @@ const CompactGameCard = ({
           language === "en" ? (
             "Failed to save your rating"
           ) : (
-            <InterfaceText source="Failed to save your rating" />
+            <InterfaceText source="interface.failed_to_save_your_rating_02ea6f62" />
           ),
         variant: "destructive",
       }),
@@ -137,7 +137,7 @@ const CompactGameCard = ({
             language === "en" ? (
               "Failed to add game to library before downloading"
             ) : (
-              <InterfaceText source="Failed to add game to library before downloading" />
+              <InterfaceText source="interface.failed_to_add_game_to_library_befo_2d413451" />
             ),
           variant: "destructive",
         });
@@ -173,15 +173,15 @@ const CompactGameCard = ({
               type="button"
               onClick={handleDetailsClick}
               className="h-24 w-[4.5rem] shrink-0 overflow-hidden rounded-lg bg-muted"
-              aria-label={formatInterfaceMessage("View details for {title}", { title: game.title })}
-              lang={languageFor("View details for {title}")}
-              dir={directionFor("View details for {title}")}
+              aria-label={formatInterfaceMessage("interface.view_details_for_title_0a6aaff1", { title: game.title })}
+              lang={languageFor("interface.view_details_for_title_0a6aaff1")}
+              dir={directionFor("interface.view_details_for_title_0a6aaff1")}
             >
               <img
                 src={coverSrc(game.coverUrl)}
-                alt={formatInterfaceMessage("Cover art for {title}", { title: game.title })}
-                lang={languageFor("Cover art for {title}")}
-                dir={directionFor("Cover art for {title}")}
+                alt={formatInterfaceMessage("interface.cover_art_for_title_44c4687e", { title: game.title })}
+                lang={languageFor("interface.cover_art_for_title_44c4687e")}
+                dir={directionFor("interface.cover_art_for_title_44c4687e")}
                 className="h-full w-full object-cover"
                 loading="lazy"
                 data-testid={`img-cover-${game.id}`}
@@ -193,12 +193,12 @@ const CompactGameCard = ({
                 <button
                   type="button"
                   onClick={handleDetailsClick}
-                  className="min-w-0 text-left"
-                  aria-label={formatInterfaceMessage("View details for {title}", {
+                  className="min-w-0 text-start"
+                  aria-label={formatInterfaceMessage("interface.view_details_for_title_0a6aaff1", {
                     title: game.title,
                   })}
-                  lang={languageFor("View details for {title}")}
-                  dir={directionFor("View details for {title}")}
+                  lang={languageFor("interface.view_details_for_title_0a6aaff1")}
+                  dir={directionFor("interface.view_details_for_title_0a6aaff1")}
                 >
                   <h3
                     className="truncate text-sm font-semibold"
@@ -235,9 +235,9 @@ const CompactGameCard = ({
                 {game.earlyAccess && (
                   <Badge
                     className="h-5 bg-amber-500 px-1.5 text-[10px] text-white"
-                    aria-label={t("Early Access")}
-                    lang={languageFor("Early Access")}
-                    dir={directionFor("Early Access")}
+                    aria-label={t("interface.early_access_3a5fe28e")}
+                    lang={languageFor("interface.early_access_3a5fe28e")}
+                    dir={directionFor("interface.early_access_3a5fe28e")}
                   >
                     <InterfaceText source={"EA"} />
                   </Badge>
@@ -247,8 +247,8 @@ const CompactGameCard = ({
                     variant="secondary"
                     className="h-5 bg-gray-500 px-1.5 text-[10px] text-white"
                   >
-                    <span lang={languageFor("Hidden")} dir={directionFor("Hidden")}>
-                      {t("Hidden")}
+                    <span lang={languageFor("interface.hidden_3c2dfe59")} dir={directionFor("interface.hidden_3c2dfe59")}>
+                      {t("interface.hidden_3c2dfe59")}
                     </span>
                   </Badge>
                 )}
@@ -268,10 +268,10 @@ const CompactGameCard = ({
                     {game.genres.length > 2 && (
                       <span className="rounded-full bg-muted/40 px-2 py-1 text-[11px] text-muted-foreground/60">
                         <span
-                          lang={languageFor("+{count} more")}
-                          dir={directionFor("+{count} more")}
+                          lang={languageFor("interface.count_more_1b6a0c82")}
+                          dir={directionFor("interface.count_more_1b6a0c82")}
                         >
-                          {formatInterfaceMessage("+{count} more", {
+                          {formatInterfaceMessage("interface.count_more_1b6a0c82", {
                             count: game.genres.length - 2,
                           })}
                         </span>
@@ -281,10 +281,10 @@ const CompactGameCard = ({
                 ) : (
                   <span
                     className="text-xs text-muted-foreground/50"
-                    lang={languageFor("No genres")}
-                    dir={directionFor("No genres")}
+                    lang={languageFor("interface.no_genres_0b16e77a")}
+                    dir={directionFor("interface.no_genres_0b16e77a")}
                   >
-                    {t("No genres")}
+                    {t("interface.no_genres_0b16e77a")}
                   </span>
                 )}
               </div>
@@ -293,14 +293,14 @@ const CompactGameCard = ({
                 <span
                   className="inline-flex items-center gap-1"
                   role="img"
-                  aria-label={formatInterfaceMessage("IGDB rating: {rating} out of 10", {
-                    rating: ratingDisplay ?? t("Not rated"),
+                  aria-label={formatInterfaceMessage("interface.igdb_rating_rating_out_of_10_fbf37993", {
+                    rating: ratingDisplay ?? t("interface.not_rated_9de37148"),
                   })}
-                  lang={languageFor("IGDB rating: {rating} out of 10")}
-                  dir={directionFor("IGDB rating: {rating} out of 10")}
+                  lang={languageFor("interface.igdb_rating_rating_out_of_10_fbf37993")}
+                  dir={directionFor("interface.igdb_rating_rating_out_of_10_fbf37993")}
                 >
                   <Star className="h-3 w-3 text-amber-400" />
-                  {ratingDisplay ? `${ratingDisplay}/10` : t("Not rated")}
+                  {ratingDisplay ? `${ratingDisplay}/10` : t("interface.not_rated_9de37148")}
                 </span>
                 {!isDiscovery && (
                   <span
@@ -308,8 +308,8 @@ const CompactGameCard = ({
                     role="img"
                     aria-label={
                       game.userRating == null
-                        ? t("Not rated")
-                        : formatInterfaceMessage("My rating: {rating} out of 10", {
+                        ? t("interface.not_rated_9de37148")
+                        : formatInterfaceMessage("interface.my_rating_rating_out_of_10_f3d2beef", {
                             rating: game.userRating,
                           })
                     }
@@ -329,9 +329,9 @@ const CompactGameCard = ({
                 <span
                   className="inline-flex items-center gap-1"
                   role="img"
-                  aria-label={formatInterfaceMessage("Release Date: {date}", { date: releaseYear })}
-                  lang={languageFor("Release Date: {date}")}
-                  dir={directionFor("Release Date: {date}")}
+                  aria-label={formatInterfaceMessage("interface.release_date_date_e2610e34", { date: releaseYear })}
+                  lang={languageFor("interface.release_date_date_e2610e34")}
+                  dir={directionFor("interface.release_date_date_e2610e34")}
                 >
                   <Calendar className="h-3 w-3" />
                   {releaseYear}
@@ -348,9 +348,9 @@ const CompactGameCard = ({
                 className="h-10 w-10"
                 onClick={handleDownloadClick}
                 disabled={addGameMutation.isPending}
-                aria-label={formatInterfaceMessage("Download {title}", { title: game.title })}
-                lang={languageFor("Download {title}")}
-                dir={directionFor("Download {title}")}
+                aria-label={formatInterfaceMessage("interface.download_title_5de658d1", { title: game.title })}
+                lang={languageFor("interface.download_title_5de658d1")}
+                dir={directionFor("interface.download_title_5de658d1")}
               >
                 {addGameMutation.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -371,9 +371,9 @@ const CompactGameCard = ({
               size="icon"
               className="h-10 w-10"
               onClick={handleDetailsClick}
-              aria-label={formatInterfaceMessage("View details for {title}", { title: game.title })}
-              lang={languageFor("View details for {title}")}
-              dir={directionFor("View details for {title}")}
+              aria-label={formatInterfaceMessage("interface.view_details_for_title_0a6aaff1", { title: game.title })}
+              lang={languageFor("interface.view_details_for_title_0a6aaff1")}
+              dir={directionFor("interface.view_details_for_title_0a6aaff1")}
             >
               <Info className="h-4 w-4" />
             </Button>
@@ -437,7 +437,7 @@ const CompactGameCard = ({
             "py-2 border-b border-border/40 hover:bg-accent/30",
           density === "comfortable" &&
             !useSubgrid &&
-            "gap-3 pl-[13px] pr-3 py-2 border-l-[3px] border-l-transparent hover:bg-accent/30 hover:border-l-primary",
+            "gap-3 ps-[13px] pe-3 py-2 border-s-[3px] border-s-transparent hover:bg-accent/30 hover:border-s-primary",
           density === "compact" && "gap-2 px-2 py-1 border-b border-slate-700/50 hover:bg-accent/20"
         )}
         data-testid={`card-game-compact-${game.id}`}
@@ -452,9 +452,9 @@ const CompactGameCard = ({
           >
             <img
               src={coverSrc(game.coverUrl)}
-              alt={formatInterfaceMessage("Cover art for {title}", { title: game.title })}
-              lang={languageFor("Cover art for {title}")}
-              dir={directionFor("Cover art for {title}")}
+              alt={formatInterfaceMessage("interface.cover_art_for_title_44c4687e", { title: game.title })}
+              lang={languageFor("interface.cover_art_for_title_44c4687e")}
+              dir={directionFor("interface.cover_art_for_title_44c4687e")}
               className="w-full h-full object-cover"
               loading="lazy"
               data-testid={`img-cover-${game.id}`}
@@ -539,8 +539,8 @@ const CompactGameCard = ({
                   onClick={(e) => e.stopPropagation()}
                   aria-label={
                     game.userRating == null
-                      ? t("Rate this game")
-                      : formatInterfaceMessage("My rating: {rating}/10. Click to change.", {
+                      ? t("interface.rate_this_game_b97d58a1")
+                      : formatInterfaceMessage("interface.my_rating_rating_10_click_to_chang_26204fee", {
                           rating: game.userRating,
                         })
                   }
@@ -572,10 +572,10 @@ const CompactGameCard = ({
                 <div className="flex items-center justify-between">
                   <span
                     className="text-sm font-medium"
-                    lang={languageFor("My rating")}
-                    dir={directionFor("My rating")}
+                    lang={languageFor("interface.my_rating_809bd9fc")}
+                    dir={directionFor("interface.my_rating_809bd9fc")}
                   >
-                    {t("My rating")}
+                    {t("interface.my_rating_809bd9fc")}
                   </span>
                   <span className="text-sm font-bold">{popoverRating}/10</span>
                 </div>
@@ -589,9 +589,9 @@ const CompactGameCard = ({
                     val !== undefined &&
                     userRatingMutation.mutate({ gameId: game.id, userRating: val })
                   }
-                  aria-label={t("My rating")}
-                  lang={languageFor("My rating")}
-                  dir={directionFor("My rating")}
+                  aria-label={t("interface.my_rating_809bd9fc")}
+                  lang={languageFor("interface.my_rating_809bd9fc")}
+                  dir={directionFor("interface.my_rating_809bd9fc")}
                 />
                 {game.userRating != null && (
                   <Button
@@ -603,8 +603,8 @@ const CompactGameCard = ({
                       userRatingMutation.mutate({ gameId: game.id, userRating: null });
                     }}
                   >
-                    <span lang={languageFor("Clear rating")} dir={directionFor("Clear rating")}>
-                      {t("Clear rating")}
+                    <span lang={languageFor("interface.clear_rating_0479d557")} dir={directionFor("interface.clear_rating_0479d557")}>
+                      {t("interface.clear_rating_0479d557")}
                     </span>
                   </Button>
                 )}
@@ -667,9 +667,9 @@ const CompactGameCard = ({
           {game.earlyAccess && (
             <Badge className="text-[9px] h-4 px-1 bg-amber-500 border-amber-600 text-white">
               <span
-                lang={languageFor("Early Access")}
-                dir={directionFor("Early Access")}
-                aria-label={t("Early Access")}
+                lang={languageFor("interface.early_access_3a5fe28e")}
+                dir={directionFor("interface.early_access_3a5fe28e")}
+                aria-label={t("interface.early_access_3a5fe28e")}
               >
                 <InterfaceText source={"EA"} />
               </span>
@@ -677,8 +677,8 @@ const CompactGameCard = ({
           )}
           {game.hidden && (
             <Badge variant="secondary" className="text-[9px] h-4 px-1 bg-gray-500 text-white">
-              <span lang={languageFor("Hidden")} dir={directionFor("Hidden")}>
-                {t("Hidden")}
+              <span lang={languageFor("interface.hidden_3c2dfe59")} dir={directionFor("interface.hidden_3c2dfe59")}>
+                {t("interface.hidden_3c2dfe59")}
               </span>
             </Badge>
           )}
@@ -688,9 +688,9 @@ const CompactGameCard = ({
         <div
           className="flex items-center justify-end gap-1"
           role="group"
-          aria-label={t("Game actions")}
-          lang={languageFor("Game actions")}
-          dir={directionFor("Game actions")}
+          aria-label={t("interface.game_actions_57bffba4")}
+          lang={languageFor("interface.game_actions_57bffba4")}
+          dir={directionFor("interface.game_actions_57bffba4")}
         >
           {isDiscovery ? (
             <Tooltip>
@@ -707,9 +707,9 @@ const CompactGameCard = ({
                     void handleDownloadClick();
                   }}
                   disabled={addGameMutation.isPending}
-                  aria-label={formatInterfaceMessage("Download {title}", { title: game.title })}
-                  lang={languageFor("Download {title}")}
-                  dir={directionFor("Download {title}")}
+                  aria-label={formatInterfaceMessage("interface.download_title_5de658d1", { title: game.title })}
+                  lang={languageFor("interface.download_title_5de658d1")}
+                  dir={directionFor("interface.download_title_5de658d1")}
                 >
                   {addGameMutation.isPending ? (
                     <Loader2 className="h-3 w-3 animate-spin" />
@@ -719,8 +719,8 @@ const CompactGameCard = ({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <span lang={languageFor("Download")} dir={directionFor("Download")}>
-                  {t("Download")}
+                <span lang={languageFor("interface.download_6964bb19")} dir={directionFor("interface.download_6964bb19")}>
+                  {t("interface.download_6964bb19")}
                 </span>
               </TooltipContent>
             </Tooltip>
@@ -738,11 +738,11 @@ const CompactGameCard = ({
                   "transition-all text-muted-foreground hover:text-foreground",
                   density === "comfortable" ? "h-7 w-7" : "h-6 w-6"
                 )}
-                aria-label={formatInterfaceMessage("Change status for {title}", {
+                aria-label={formatInterfaceMessage("interface.change_status_for_title_4314f9e2", {
                   title: game.title,
                 })}
-                lang={languageFor("Change status for {title}")}
-                dir={directionFor("Change status for {title}")}
+                lang={languageFor("interface.change_status_for_title_4314f9e2")}
+                dir={directionFor("interface.change_status_for_title_4314f9e2")}
                 onClick={(e) => e.stopPropagation()}
               >
                 {(() => {
@@ -775,18 +775,18 @@ const CompactGameCard = ({
                   e.stopPropagation();
                   handleDetailsClick();
                 }}
-                aria-label={formatInterfaceMessage("View details for {title}", {
+                aria-label={formatInterfaceMessage("interface.view_details_for_title_0a6aaff1", {
                   title: game.title,
                 })}
-                lang={languageFor("View details for {title}")}
-                dir={directionFor("View details for {title}")}
+                lang={languageFor("interface.view_details_for_title_0a6aaff1")}
+                dir={directionFor("interface.view_details_for_title_0a6aaff1")}
               >
                 <Info className="w-3 h-3" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <span lang={languageFor("View details")} dir={directionFor("View details")}>
-                {t("View details")}
+              <span lang={languageFor("interface.view_details_136a35ae")} dir={directionFor("interface.view_details_136a35ae")}>
+                {t("interface.view_details_136a35ae")}
               </span>
             </TooltipContent>
           </Tooltip>

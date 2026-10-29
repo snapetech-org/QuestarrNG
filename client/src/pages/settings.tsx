@@ -182,8 +182,8 @@ function SettingsSaveButton({
         {pending ? (
           <>
             <RefreshCw className="h-4 w-4 motion-safe:animate-spin" />
-            <span lang={languageFor("Saving...")} dir={directionFor("Saving...")}>
-              {t("Saving...")}
+            <span lang={languageFor("interface.saving_1ee0c88f")} dir={directionFor("interface.saving_1ee0c88f")}>
+              {t("interface.saving_1ee0c88f")}
             </span>
           </>
         ) : (
@@ -677,7 +677,7 @@ export default function SettingsPage() {
     },
     onError: (err: Error) => {
       toast({
-        title: formatInterfaceMessage("Apprise test failed: {error}", {
+        title: formatInterfaceMessage("interface.apprise_test_failed_error_da0c79c6", {
           error: String(err.message ?? ""),
         }),
         variant: "destructive",
@@ -925,7 +925,7 @@ export default function SettingsPage() {
 
       let message = error.message;
       if (message.includes("Unexpected token") || message.includes("JSON")) {
-        message = translateInterfaceLabel("Server response invalid. Please restart the server.");
+        message = translateInterfaceLabel("interface.server_response_invalid_please_res_4762a781");
       }
 
       toast({
@@ -970,7 +970,7 @@ export default function SettingsPage() {
 
       let message = error.message;
       if (message.includes("Unexpected token") || message.includes("JSON")) {
-        message = translateInterfaceLabel("Server response invalid. Please restart the server.");
+        message = translateInterfaceLabel("interface.server_response_invalid_please_res_4762a781");
       }
 
       toast({
@@ -1096,7 +1096,7 @@ export default function SettingsPage() {
         description:
           data.drifted.length === 0 && data.orphaned.length === 0
             ? "Library is in sync."
-            : formatInterfaceMessage("{length} drifted, {length2} orphaned", {
+            : formatInterfaceMessage("interface.length_drifted_length2_orphaned_0fc153d0", {
                 length: String(data.drifted.length ?? ""),
                 length2: String(data.orphaned.length ?? ""),
               }),
@@ -1388,17 +1388,17 @@ export default function SettingsPage() {
       <div className="mb-6">
         <h1
           className="text-2xl font-bold tracking-tight"
-          lang={languageFor("Settings")}
-          dir={directionFor("Settings")}
+          lang={languageFor("navigation.settings")}
+          dir={directionFor("navigation.settings")}
         >
-          {t("Settings")}
+          {t("navigation.settings")}
         </h1>
         <p className="text-muted-foreground text-sm mt-0.5">
           <span
-            lang={languageFor("Configure your preferences and system settings")}
-            dir={directionFor("Configure your preferences and system settings")}
+            lang={languageFor("interface.configure_your_preferences_and_sys_639f0da3")}
+            dir={directionFor("interface.configure_your_preferences_and_sys_639f0da3")}
           >
-            {t("Configure your preferences and system settings")}
+            {t("interface.configure_your_preferences_and_sys_639f0da3")}
           </span>
         </p>
       </div>
@@ -1442,10 +1442,10 @@ export default function SettingsPage() {
               <div ref={setTabsInnerNode} className="flex w-max flex-nowrap [&>*]:shrink-0">
                 <TabsTrigger
                   value="appearance"
-                  lang={languageFor("Appearance")}
-                  dir={directionFor("Appearance")}
+                  lang={languageFor("interface.appearance_31018b9f")}
+                  dir={directionFor("interface.appearance_31018b9f")}
                 >
-                  {t("Appearance")}
+                  {t("interface.appearance_31018b9f")}
                 </TabsTrigger>
                 {(
                   [
@@ -1474,13 +1474,13 @@ export default function SettingsPage() {
             {tabsCanScrollLeft && (
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-y-0 left-0 w-6 rounded-l-md bg-gradient-to-r from-muted to-transparent"
+                className="pointer-events-none absolute inset-y-0 start-0 w-6 rounded-s-md bg-gradient-to-r from-muted to-transparent"
               />
             )}
             {tabsCanScrollRight && (
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-y-0 right-0 w-6 rounded-r-md bg-gradient-to-l from-muted to-transparent"
+                className="pointer-events-none absolute inset-y-0 end-0 w-6 rounded-e-md bg-gradient-to-l from-muted to-transparent"
               />
             )}
           </div>
@@ -1492,25 +1492,25 @@ export default function SettingsPage() {
                   <Monitor className="h-5 w-5 text-muted-foreground" />
                   <CardTitle
                     className="text-lg"
-                    lang={languageFor("Theme")}
-                    dir={directionFor("Theme")}
+                    lang={languageFor("interface.theme_4eaf7c92")}
+                    dir={directionFor("interface.theme_4eaf7c92")}
                   >
-                    {t("Theme")}
+                    {t("interface.theme_4eaf7c92")}
                   </CardTitle>
                 </div>
                 <CardDescription
-                  lang={languageFor("Select the visual theme for QuestarrNG")}
-                  dir={directionFor("Select the visual theme for QuestarrNG")}
+                  lang={languageFor("interface.select_the_visual_theme_for_questa_42c0b096")}
+                  dir={directionFor("interface.select_the_visual_theme_for_questa_42c0b096")}
                 >
-                  {t("Select the visual theme for QuestarrNG")}
+                  {t("interface.select_the_visual_theme_for_questa_42c0b096")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="theme-select" className="text-sm font-medium">
-                      <span lang={languageFor("Select Theme")} dir={directionFor("Select Theme")}>
-                        {t("Select Theme")}
+                      <span lang={languageFor("interface.select_theme_9ef7e3d8")} dir={directionFor("interface.select_theme_9ef7e3d8")}>
+                        {t("interface.select_theme_9ef7e3d8")}
                       </span>
                     </Label>
                     <Select
@@ -1518,7 +1518,7 @@ export default function SettingsPage() {
                       onValueChange={(value) => handleThemeChange(value as Theme)}
                     >
                       <SelectTrigger id="theme-select" className="w-full sm:w-64">
-                        <SelectValue placeholder={t("Select a theme")}>
+                        <SelectValue placeholder={t("interface.select_a_theme_96ebfc5f")}>
                           <span
                             lang={languageFor(THEME_CONFIGS[effectiveTheme].name)}
                             dir={directionFor(THEME_CONFIGS[effectiveTheme].name)}
@@ -1559,13 +1559,13 @@ export default function SettingsPage() {
                     <p
                       className="text-xs text-muted-foreground"
                       lang={languageFor(
-                        "Purely cosmetic — changes the visual appearance, nothing else changes"
+                        "interface.purely_cosmetic_changes_the_visual_963dcc6c"
                       )}
                       dir={directionFor(
-                        "Purely cosmetic — changes the visual appearance, nothing else changes"
+                        "interface.purely_cosmetic_changes_the_visual_963dcc6c"
                       )}
                     >
-                      {t("Purely cosmetic — changes the visual appearance, nothing else changes")}
+                      {t("interface.purely_cosmetic_changes_the_visual_963dcc6c")}
                     </p>
                   </div>
                 </div>
@@ -1576,27 +1576,27 @@ export default function SettingsPage() {
               <CardHeader>
                 <CardTitle
                   className="text-lg"
-                  lang={languageFor("Interface language")}
-                  dir={directionFor("Interface language")}
+                  lang={languageFor("interface.interface_language_66eac25a")}
+                  dir={directionFor("interface.interface_language_66eac25a")}
                 >
-                  {t("Interface language")}
+                  {t("interface.interface_language_66eac25a")}
                 </CardTitle>
                 <CardDescription>
                   <span
-                    lang={languageFor("Choose the language used for the interface.")}
-                    dir={directionFor("Choose the language used for the interface.")}
+                    lang={languageFor("interface.choose_the_language_used_for_the_i_9e8c84a3")}
+                    dir={directionFor("interface.choose_the_language_used_for_the_i_9e8c84a3")}
                   >
-                    {t("Choose the language used for the interface.")}
+                    {t("interface.choose_the_language_used_for_the_i_9e8c84a3")}
                   </span>{" "}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 <Label
                   htmlFor="interface-language"
-                  lang={languageFor("Select a language")}
-                  dir={directionFor("Select a language")}
+                  lang={languageFor("interface.select_a_language_9e9b2e24")}
+                  dir={directionFor("interface.select_a_language_9e9b2e24")}
                 >
-                  {t("Select a language")}
+                  {t("interface.select_a_language_9e9b2e24")}
                 </Label>
                 <InterfaceLanguageSelect
                   id="interface-language"
@@ -1611,22 +1611,22 @@ export default function SettingsPage() {
               <CardHeader>
                 <CardTitle
                   className="text-lg"
-                  lang={languageFor("Regional format")}
-                  dir={directionFor("Regional format")}
+                  lang={languageFor("interface.regional_format_8050949b")}
+                  dir={directionFor("interface.regional_format_8050949b")}
                 >
-                  {t("Regional format")}
+                  {t("interface.regional_format_8050949b")}
                 </CardTitle>
                 <CardDescription>
                   <span
                     lang={languageFor(
-                      "Choose how dates, times, and numbers are displayed. This setting is separate from interface language."
+                      "interface.choose_how_dates_times_and_numbers_54ff187b"
                     )}
                     dir={directionFor(
-                      "Choose how dates, times, and numbers are displayed. This setting is separate from interface language."
+                      "interface.choose_how_dates_times_and_numbers_54ff187b"
                     )}
                   >
                     {t(
-                      "Choose how dates, times, and numbers are displayed. This setting is separate from interface language."
+                      "interface.choose_how_dates_times_and_numbers_54ff187b"
                     )}
                   </span>
                 </CardDescription>
@@ -1634,14 +1634,14 @@ export default function SettingsPage() {
               <CardContent className="space-y-2">
                 <Label
                   htmlFor="regional-format"
-                  lang={languageFor("Date, time, and number format")}
-                  dir={directionFor("Date, time, and number format")}
+                  lang={languageFor("interface.date_time_and_number_format_d853f2cd")}
+                  dir={directionFor("interface.date_time_and_number_format_d853f2cd")}
                 >
-                  {t("Date, time, and number format")}
+                  {t("interface.date_time_and_number_format_d853f2cd")}
                 </Label>
                 <Select value={regionalFormat} onValueChange={setRegionalPreference}>
                   <SelectTrigger id="regional-format" className="w-full sm:w-80">
-                    <SelectValue placeholder={t("Use browser settings")}>
+                    <SelectValue placeholder={t("interface.use_browser_settings_3ed7f671")}>
                       {selectedRegionalFormatOption
                         ? renderRegionalFormatLabel(selectedRegionalFormatOption)
                         : null}
@@ -1704,7 +1704,7 @@ export default function SettingsPage() {
 
                   {/* Search Interval */}
                   {autoSearchEnabled && (
-                    <div className="space-y-2 pl-4 border-l-2">
+                    <div className="space-y-2 ps-4 border-s-2">
                       <Label htmlFor="search-interval" className="text-sm font-medium">
                         <InterfaceText source={"Search Interval (hours)"} />
                       </Label>
@@ -1729,7 +1729,7 @@ export default function SettingsPage() {
 
                   {/* Auto Search Unreleased Toggle */}
                   {autoSearchEnabled && (
-                    <div className="flex items-center justify-between pl-4 border-l-2">
+                    <div className="flex items-center justify-between ps-4 border-s-2">
                       <div className="space-y-0.5">
                         <Label htmlFor="auto-search-unreleased" className="text-sm font-medium">
                           <InterfaceText source={"Search Unreleased Games"} />
@@ -1750,7 +1750,7 @@ export default function SettingsPage() {
 
                   {/* Auto Download Toggle */}
                   {autoSearchEnabled && (
-                    <div className="flex items-center justify-between pl-4 border-l-2">
+                    <div className="flex items-center justify-between ps-4 border-s-2">
                       <div className="space-y-0.5">
                         <Label htmlFor="auto-download" className="text-sm font-medium">
                           <InterfaceText source={"Auto-Download Single Releases"} />
@@ -1882,7 +1882,7 @@ export default function SettingsPage() {
                     {Object.entries(blacklistByGame).map(([gameId, entries]) => (
                       <div key={gameId}>
                         <h4 className="text-sm font-semibold mb-2">
-                          {entries[0]?.gameTitle ?? <InterfaceText source="Unknown game" />}
+                          {entries[0]?.gameTitle ?? <InterfaceText source="interface.unknown_game_6b8a9739" />}
                         </h4>
                         <div className="space-y-2">
                           {entries.map((entry) => (
@@ -1905,7 +1905,7 @@ export default function SettingsPage() {
                                 variant="ghost"
                                 size="icon"
                                 aria-label={formatInterfaceMessage(
-                                  "Remove {title} from blacklist",
+                                  "interface.remove_title_from_blacklist_36f68958",
                                   { title: String(entry.releaseTitle ?? "") }
                                 )}
                                 onClick={() =>
@@ -2177,13 +2177,13 @@ export default function SettingsPage() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b">
-                        <th className="text-left text-sm font-medium text-muted-foreground pb-3 pr-2 sm:pr-4">
+                        <th className="text-start text-sm font-medium text-muted-foreground pb-3 pe-2 sm:pe-4">
                           <InterfaceText source={"Event"} />
                         </th>
                         <th className="text-center text-sm font-medium text-muted-foreground pb-3 px-3 sm:px-6 w-14 sm:w-24">
                           <InterfaceText source={"In-App"} />
                         </th>
-                        <th className="text-center text-sm font-medium text-muted-foreground pb-3 pl-3 sm:pl-6 w-14 sm:w-24">
+                        <th className="text-center text-sm font-medium text-muted-foreground pb-3 ps-3 sm:ps-6 w-14 sm:w-24">
                           <InterfaceText source={"Apprise"} />
                         </th>
                       </tr>
@@ -2196,12 +2196,12 @@ export default function SettingsPage() {
                             key={key}
                             className={`border-b last:border-0 ${isGroupStart ? "border-t-2 border-t-muted" : ""}`}
                           >
-                            <td className="py-3 pr-2 sm:pr-4 text-sm">
+                            <td className="py-3 pe-2 sm:pe-4 text-sm">
                               <InterfaceText source={label} />
                             </td>
                             <td className="py-3 px-3 sm:px-6 text-center">
                               <Switch
-                                aria-label={formatInterfaceMessage("In-App: {label}", {
+                                aria-label={formatInterfaceMessage("interface.in_app_label_3479d69a", {
                                   label: String(label ?? ""),
                                 })}
                                 checked={notifPrefs[key].inApp}
@@ -2210,7 +2210,7 @@ export default function SettingsPage() {
                                 }
                               />
                             </td>
-                            <td className="py-3 pl-3 sm:pl-6 text-center">
+                            <td className="py-3 ps-3 sm:ps-6 text-center">
                               <div
                                 title={
                                   !appriseSettings?.configured
@@ -2224,7 +2224,7 @@ export default function SettingsPage() {
                                 }
                               >
                                 <Switch
-                                  aria-label={formatInterfaceMessage("Apprise: {label}", {
+                                  aria-label={formatInterfaceMessage("interface.apprise_label_c780bd91", {
                                     label: String(label ?? ""),
                                   })}
                                   checked={notifPrefs[key].apprise}
@@ -2358,7 +2358,7 @@ export default function SettingsPage() {
                   </div>
 
                   {steamSyncEnabled && (
-                    <div className="space-y-2 pl-4 border-l-2">
+                    <div className="space-y-2 ps-4 border-s-2">
                       <Label htmlFor="steam-sync-interval" className="text-sm font-medium">
                         <InterfaceText source={"Sync Interval (hours)"} />
                       </Label>
@@ -2463,14 +2463,14 @@ export default function SettingsPage() {
                       }
                       value={nexusApiKey}
                       onChange={(e) => setNexusApiKey(e.target.value)}
-                      className="pr-10"
+                      className="pe-10"
                     />
                     {nexusApiKey && (
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        className="absolute end-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                         onClick={() => setShowNexusApiKey(!showNexusApiKey)}
                         aria-label={showNexusApiKey ? "Hide API key" : "Show API key"}
                         data-i18n-aria-label={showNexusApiKey ? "Hide API key" : "Show API key"}
@@ -2610,14 +2610,14 @@ export default function SettingsPage() {
                       }
                       value={typesafeApiKey}
                       onChange={(e) => setTypesafeApiKey(e.target.value)}
-                      className="pr-10"
+                      className="pe-10"
                     />
                     {typesafeApiKey && (
                       <Button
                         type="button"
                         variant="ghost"
                         size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        className="absolute end-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                         onClick={() => setShowTypesafeApiKey(!showTypesafeApiKey)}
                         aria-label={showTypesafeApiKey ? "Hide API key" : "Show API key"}
                         data-i18n-aria-label={showTypesafeApiKey ? "Hide API key" : "Show API key"}
@@ -2695,17 +2695,17 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-3">
                   <Key className="h-5 w-5 text-muted-foreground" />
                   <CardTitle className="text-lg">
-                    <InterfaceText source="RAWG Game Database" />
+                    <InterfaceText source="interface.rawg_game_database_bbb5daf9" />
                   </CardTitle>
                 </div>
                 <CardDescription>
-                  <InterfaceText source="Optional game search and discovery provider. IGDB and its SeerrNG identity remain available alongside RAWG." />
+                  <InterfaceText source="interface.optional_game_search_and_discovery_deb5487e" />
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">
-                    <InterfaceText source="Status" />
+                    <InterfaceText source="interface.status_005ef20f" />
                   </span>
                   <Badge variant={rawgSettings?.configured ? "default" : "secondary"}>
                     <InterfaceText
@@ -2715,7 +2715,7 @@ export default function SettingsPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="rawg-api-key">
-                    <InterfaceText source="RAWG API key" />
+                    <InterfaceText source="interface.rawg_api_key_bda9facd" />
                   </Label>
                   <Input
                     id="rawg-api-key"
@@ -2741,15 +2741,15 @@ export default function SettingsPage() {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      <InterfaceText source="Get a RAWG API key" />
+                      <InterfaceText source="interface.get_a_rawg_api_key_1b8fbe8c" />
                     </a>
-                    <InterfaceText source=". The key is encrypted at rest. RAWG attribution appears in the app sidebar." />
+                    <InterfaceText source="interface.the_key_is_encrypted_at_rest_rawg_124d64bf" />
                   </p>
                 </div>
                 <div className="flex flex-wrap justify-end gap-2 border-t pt-4">
                   {rawgSettings?.configured && (
                     <Button variant="outline" onClick={removeRawg}>
-                      <InterfaceText source="Remove RAWG" />
+                      <InterfaceText source="interface.remove_rawg_d29dbae0" />
                     </Button>
                   )}
                   <Button
@@ -2757,13 +2757,13 @@ export default function SettingsPage() {
                     onClick={testRawg}
                     disabled={!rawgApiKey.trim() && !rawgSettings?.configured}
                   >
-                    <InterfaceText source="Test connection" />
+                    <InterfaceText source="interface.test_connection_e0f3b6b7" />
                   </Button>
                   <Button
                     onClick={saveRawg}
                     disabled={!rawgApiKey.trim() && !rawgSettings?.configured}
                   >
-                    <InterfaceText source="Save RAWG key" />
+                    <InterfaceText source="interface.save_rawg_key_8a77d6d8" />
                   </Button>
                 </div>
               </CardContent>
@@ -2844,14 +2844,14 @@ export default function SettingsPage() {
                         }
                         value={igdbClientSecret}
                         onChange={(e) => setIgdbClientSecret(e.target.value)}
-                        className="pr-10"
+                        className="pe-10"
                       />
                       {igdbClientSecret && (
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          className="absolute end-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                           onClick={() => setShowClientSecret(!showClientSecret)}
                           aria-label={
                             showClientSecret ? "Hide client secret" : "Show client secret"
@@ -3240,7 +3240,7 @@ export default function SettingsPage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <div className="space-y-0.5 pr-4">
+                  <div className="space-y-0.5 pe-4">
                     <Label htmlFor="telemetry-enabled" className="text-sm font-medium">
                       <InterfaceText source={"Automatically send error reports"} />
                     </Label>
@@ -3645,7 +3645,7 @@ export default function SettingsPage() {
                                   htmlFor="cert-upload"
                                   className={`flex h-10 w-full cursor-pointer items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${selectedCert ? "text-primary border-primary" : "text-muted-foreground"}`}
                                 >
-                                  <Upload className="mr-2 h-4 w-4" />
+                                  <Upload className="me-2 h-4 w-4" />
                                   {selectedCert ? (
                                     selectedCert.name
                                   ) : (
@@ -3671,7 +3671,7 @@ export default function SettingsPage() {
                                   htmlFor="key-upload"
                                   className={`flex h-10 w-full cursor-pointer items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${selectedKey ? "text-primary border-primary" : "text-muted-foreground"}`}
                                 >
-                                  <Upload className="mr-2 h-4 w-4" />
+                                  <Upload className="me-2 h-4 w-4" />
                                   {selectedKey ? (
                                     selectedKey.name
                                   ) : (

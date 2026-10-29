@@ -240,16 +240,16 @@ const LogLineRow = memo(function LogLineRow({
     <button
       type="button"
       className={[
-        "grid h-8 min-w-max grid-cols-[5rem_4rem_6.5rem_minmax(18rem,2fr)_minmax(14rem,1.6fr)] items-center gap-2 rounded px-1 text-left transition-colors",
+        "grid h-8 min-w-max grid-cols-[5rem_4rem_6.5rem_minmax(18rem,2fr)_minmax(14rem,1.6fr)] items-center gap-2 rounded px-1 text-start transition-colors",
         isSelected ? "bg-white/10" : "hover:bg-white/5",
       ].join(" ")}
       onClick={() => onSelect(line)}
       data-testid="log-line-row"
-      aria-label={formatInterfaceMessage("Inspect log: {message}", { message: line.msg }, language)}
-      lang={languageFor("Inspect log: {message}")}
-      dir={directionFor("Inspect log: {message}")}
+      aria-label={formatInterfaceMessage("interface.inspect_log_message_991b5716", { message: line.msg }, language)}
+      lang={languageFor("interface.inspect_log_message_991b5716")}
+      dir={directionFor("interface.inspect_log_message_991b5716")}
     >
-      <span className="w-20 flex-shrink-0 text-right tabular-nums text-zinc-500">{timeStr}</span>
+      <span className="w-20 flex-shrink-0 text-end tabular-nums text-zinc-500">{timeStr}</span>
       <span
         className={`w-12 flex-shrink-0 rounded px-1.5 text-center text-xs font-bold leading-5 ${line.levelClass}`}
       >
@@ -286,14 +286,14 @@ const LogLineCard = memo(function LogLineCard({
     <button
       type="button"
       className={[
-        "w-full rounded-xl border border-zinc-800 bg-zinc-950/90 p-3 text-left transition-colors",
+        "w-full rounded-xl border border-zinc-800 bg-zinc-950/90 p-3 text-start transition-colors",
         isSelected ? "ring-1 ring-primary/60" : "hover:bg-zinc-900/90",
       ].join(" ")}
       onClick={() => onSelect(line)}
       data-testid="log-line-row"
-      aria-label={formatInterfaceMessage("Inspect log: {message}", { message: line.msg }, language)}
-      lang={languageFor("Inspect log: {message}")}
-      dir={directionFor("Inspect log: {message}")}
+      aria-label={formatInterfaceMessage("interface.inspect_log_message_991b5716", { message: line.msg }, language)}
+      lang={languageFor("interface.inspect_log_message_991b5716")}
+      dir={directionFor("interface.inspect_log_message_991b5716")}
     >
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-xs tabular-nums text-zinc-500">{timeStr}</span>
@@ -378,18 +378,18 @@ function LogInspector({
     <Sheet open={Boolean(line)} onOpenChange={(open) => !open && onClose()}>
       <SheetContent
         side="right"
-        className="flex h-full w-full flex-col gap-0 border-l border-border bg-zinc-950 p-0 text-zinc-100 sm:max-w-3xl"
+        className="flex h-full w-full flex-col gap-0 border-s border-border bg-zinc-950 p-0 text-zinc-100 sm:max-w-3xl"
       >
         {line && (
           <>
-            <SheetHeader className="border-b border-border p-6 pr-14">
+            <SheetHeader className="border-b border-border p-6 pe-14">
               <div className="flex flex-wrap items-center gap-2">
                 <SheetTitle
                   className="text-zinc-50"
-                  lang={languageFor("Log details")}
-                  dir={directionFor("Log details")}
+                  lang={languageFor("interface.log_details_74fe9c53")}
+                  dir={directionFor("interface.log_details_74fe9c53")}
                 >
-                  {t("Log details")}
+                  {t("interface.log_details_74fe9c53")}
                 </SheetTitle>
                 <Badge variant="outline" className="border-zinc-700 bg-zinc-900 text-zinc-100">
                   {line.levelLabel}
@@ -404,10 +404,10 @@ function LogInspector({
               </div>
               <SheetDescription
                 className="text-zinc-400"
-                lang={line.time ? "und" : languageFor("No timestamp")}
-                dir={line.time ? "auto" : directionFor("No timestamp")}
+                lang={line.time ? "und" : languageFor("interface.no_timestamp_b045a976")}
+                dir={line.time ? "auto" : directionFor("interface.no_timestamp_b045a976")}
               >
-                {line.time ? formatDateTime(line.time) : t("No timestamp")}
+                {line.time ? formatDateTime(line.time) : t("interface.no_timestamp_b045a976")}
               </SheetDescription>
               <p className="mt-2 text-sm text-zinc-100" lang="und" dir="auto">
                 {line.msg}
@@ -432,23 +432,23 @@ function LogInspector({
             <div className="flex items-center justify-between gap-2 border-b border-border px-6 py-3">
               <p
                 className="text-sm text-zinc-400"
-                lang={languageFor("Full parsed payload retained for this log entry.")}
-                dir={directionFor("Full parsed payload retained for this log entry.")}
+                lang={languageFor("interface.full_parsed_payload_retained_for_t_e0cae336")}
+                dir={directionFor("interface.full_parsed_payload_retained_for_t_e0cae336")}
               >
-                {t("Full parsed payload retained for this log entry.")}
+                {t("interface.full_parsed_payload_retained_for_t_e0cae336")}
               </p>
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => onCopy(line.raw, "Raw log line copied")}
-                  aria-label={t("Copy raw log line")}
-                  lang={languageFor("Copy raw log line")}
-                  dir={directionFor("Copy raw log line")}
+                  aria-label={t("interface.copy_raw_log_line_16ea97d6")}
+                  lang={languageFor("interface.copy_raw_log_line_16ea97d6")}
+                  dir={directionFor("interface.copy_raw_log_line_16ea97d6")}
                 >
-                  <Copy className="mr-1 h-4 w-4" />
-                  <span lang={languageFor("Copy raw")} dir={directionFor("Copy raw")}>
-                    {t("Copy raw")}
+                  <Copy className="me-1 h-4 w-4" />
+                  <span lang={languageFor("interface.copy_raw_adfbe522")} dir={directionFor("interface.copy_raw_adfbe522")}>
+                    {t("interface.copy_raw_adfbe522")}
                   </span>
                 </Button>
                 <Button
@@ -457,13 +457,13 @@ function LogInspector({
                   onClick={() =>
                     onCopy(JSON.stringify(line.payload, null, 2), "Parsed payload copied")
                   }
-                  aria-label={t("Copy parsed payload")}
-                  lang={languageFor("Copy parsed payload")}
-                  dir={directionFor("Copy parsed payload")}
+                  aria-label={t("interface.copy_parsed_payload_12cb9427")}
+                  lang={languageFor("interface.copy_parsed_payload_12cb9427")}
+                  dir={directionFor("interface.copy_parsed_payload_12cb9427")}
                 >
-                  <Copy className="mr-1 h-4 w-4" />
-                  <span lang={languageFor("Copy JSON")} dir={directionFor("Copy JSON")}>
-                    {t("Copy JSON")}
+                  <Copy className="me-1 h-4 w-4" />
+                  <span lang={languageFor("interface.copy_json_e595bc8e")} dir={directionFor("interface.copy_json_e595bc8e")}>
+                    {t("interface.copy_json_e595bc8e")}
                   </span>
                 </Button>
               </div>
@@ -474,46 +474,46 @@ function LogInspector({
                 <section className="rounded-lg border border-border bg-black/20 p-4">
                   <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-zinc-400">
                     <span
-                      lang={languageFor("Standard fields")}
-                      dir={directionFor("Standard fields")}
+                      lang={languageFor("interface.standard_fields_68afefe5")}
+                      dir={directionFor("interface.standard_fields_68afefe5")}
                     >
-                      {t("Standard fields")}
+                      {t("interface.standard_fields_68afefe5")}
                     </span>
                   </h3>
                   <div className="grid gap-3 text-sm sm:grid-cols-2">
                     <div>
                       <span
                         className="text-zinc-500"
-                        lang={languageFor("Timestamp")}
-                        dir={directionFor("Timestamp")}
+                        lang={languageFor("interface.timestamp_29ade1c3")}
+                        dir={directionFor("interface.timestamp_29ade1c3")}
                       >
-                        {t("Timestamp")}
+                        {t("interface.timestamp_29ade1c3")}
                       </span>
                       <p
                         className="mt-1 break-words text-zinc-100"
-                        lang={line.time ? "und" : languageFor("No timestamp")}
-                        dir={line.time ? "auto" : directionFor("No timestamp")}
+                        lang={line.time ? "und" : languageFor("interface.no_timestamp_b045a976")}
+                        dir={line.time ? "auto" : directionFor("interface.no_timestamp_b045a976")}
                       >
-                        {line.time ? formatDateTime(line.time) : t("No timestamp")}
+                        {line.time ? formatDateTime(line.time) : t("interface.no_timestamp_b045a976")}
                       </p>
                     </div>
                     <div>
                       <span
                         className="text-zinc-500"
-                        lang={languageFor("Level")}
-                        dir={directionFor("Level")}
+                        lang={languageFor("interface.level_4155597d")}
+                        dir={directionFor("interface.level_4155597d")}
                       >
-                        {t("Level")}
+                        {t("interface.level_4155597d")}
                       </span>
                       <p className="mt-1 text-zinc-100">{line.levelLabel}</p>
                     </div>
                     <div>
                       <span
                         className="text-zinc-500"
-                        lang={languageFor("Module")}
-                        dir={directionFor("Module")}
+                        lang={languageFor("interface.module_c4fc60bd")}
+                        dir={directionFor("interface.module_c4fc60bd")}
                       >
-                        {t("Module")}
+                        {t("interface.module_c4fc60bd")}
                       </span>
                       <p className="mt-1 break-words text-zinc-100" lang="und" dir="auto">
                         {line.module ?? "-"}
@@ -522,10 +522,10 @@ function LogInspector({
                     <div>
                       <span
                         className="text-zinc-500"
-                        lang={languageFor("Message")}
-                        dir={directionFor("Message")}
+                        lang={languageFor("interface.message_ae0ed984")}
+                        dir={directionFor("interface.message_ae0ed984")}
                       >
-                        {t("Message")}
+                        {t("interface.message_ae0ed984")}
                       </span>
                       <p className="mt-1 break-words text-zinc-100" lang="und" dir="auto">
                         {line.msg}
@@ -537,10 +537,10 @@ function LogInspector({
                 <section className="space-y-3">
                   <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
                     <span
-                      lang={languageFor("Additional metadata")}
-                      dir={directionFor("Additional metadata")}
+                      lang={languageFor("interface.additional_metadata_bf9f8441")}
+                      dir={directionFor("interface.additional_metadata_bf9f8441")}
                     >
-                      {t("Additional metadata")}
+                      {t("interface.additional_metadata_bf9f8441")}
                     </span>
                   </h3>
                   <InspectorFieldList
@@ -553,10 +553,10 @@ function LogInspector({
                   <section className="space-y-3">
                     <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-400">
                       <span
-                        lang={languageFor("Structured error")}
-                        dir={directionFor("Structured error")}
+                        lang={languageFor("interface.structured_error_26a19c34")}
+                        dir={directionFor("interface.structured_error_26a19c34")}
                       >
-                        {t("Structured error")}
+                        {t("interface.structured_error_26a19c34")}
                       </span>
                     </h3>
                     <InspectorFieldList
@@ -568,8 +568,8 @@ function LogInspector({
 
                 <section className="rounded-lg border border-border bg-black/20 p-4">
                   <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-zinc-400">
-                    <span lang={languageFor("Raw NDJSON")} dir={directionFor("Raw NDJSON")}>
-                      {t("Raw NDJSON")}
+                    <span lang={languageFor("interface.raw_ndjson_00787ad7")} dir={directionFor("interface.raw_ndjson_00787ad7")}>
+                      {t("interface.raw_ndjson_00787ad7")}
                     </span>
                   </h3>
                   <pre className="overflow-x-auto whitespace-pre-wrap break-words font-mono text-xs text-zinc-100">
@@ -724,12 +724,12 @@ export default function LogsPage() {
   const logCountSummary =
     isMobile && filteredLines.length > MOBILE_LOG_CAP
       ? formatInterfaceMessage(
-          "Showing the latest {shown} of {count} matching lines. Copy includes all matches.",
+          "interface.showing_the_latest_shown_of_count_1e0667a5",
           { shown: MOBILE_LOG_CAP, count: filteredLines.length },
           language
         )
       : formatInterfaceMessage(
-          "{count} lines displayed",
+          "interface.count_lines_displayed_cae583fc",
           { count: filteredLines.length },
           language
         );
@@ -739,13 +739,13 @@ export default function LogsPage() {
       void copyToClipboard(text).then((succeeded) => {
         if (succeeded) {
           toast({
-            title: localizedText("Copied"),
+            title: localizedText("interface.copied_8dc21305"),
             description: localizedText(description, values),
           });
         } else {
           toast({
-            title: localizedText("Copy failed"),
-            description: localizedText("Clipboard access denied"),
+            title: localizedText("interface.copy_failed_aad6c2a1"),
+            description: localizedText("interface.clipboard_access_denied_c311c408"),
             variant: "destructive",
           });
         }
@@ -779,17 +779,17 @@ export default function LogsPage() {
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
             <ScrollText className="h-6 w-6" />
-            <span lang={languageFor("Server Logs")} dir={directionFor("Server Logs")}>
-              {t("Server Logs")}
+            <span lang={languageFor("interface.server_logs_b6f4597d")} dir={directionFor("interface.server_logs_b6f4597d")}>
+              {t("interface.server_logs_b6f4597d")}
             </span>
           </h1>
           <p
             className="mt-0.5 text-sm text-muted-foreground"
-            lang={languageFor("Real-time server output — {summary}")}
-            dir={directionFor("Real-time server output — {summary}")}
+            lang={languageFor("interface.real_time_server_output_summary_8dd9dcd7")}
+            dir={directionFor("interface.real_time_server_output_summary_8dd9dcd7")}
           >
             {formatInterfaceMessage(
-              "Real-time server output — {summary}",
+              "interface.real_time_server_output_summary_8dd9dcd7",
               { summary: logCountSummary },
               language
             )}
@@ -812,16 +812,16 @@ export default function LogsPage() {
           >
             {autoScroll ? (
               <>
-                <PauseCircle className="mr-1 h-4 w-4" />
-                <span lang={languageFor("Pause")} dir={directionFor("Pause")}>
-                  {t("Pause")}
+                <PauseCircle className="me-1 h-4 w-4" />
+                <span lang={languageFor("interface.pause_44f9bf2d")} dir={directionFor("interface.pause_44f9bf2d")}>
+                  {t("interface.pause_44f9bf2d")}
                 </span>
               </>
             ) : (
               <>
-                <PlayCircle className="mr-1 h-4 w-4" />
-                <span lang={languageFor("Resume")} dir={directionFor("Resume")}>
-                  {t("Resume")}
+                <PlayCircle className="me-1 h-4 w-4" />
+                <span lang={languageFor("interface.resume_454d1d8a")} dir={directionFor("interface.resume_454d1d8a")}>
+                  {t("interface.resume_454d1d8a")}
                 </span>
               </>
             )}
@@ -831,13 +831,13 @@ export default function LogsPage() {
             size="sm"
             onClick={handleCopy}
             disabled={filteredLines.length === 0}
-            aria-label={t("Copy log lines")}
-            lang={languageFor("Copy log lines")}
-            dir={directionFor("Copy log lines")}
+            aria-label={t("interface.copy_log_lines_2ec889e1")}
+            lang={languageFor("interface.copy_log_lines_2ec889e1")}
+            dir={directionFor("interface.copy_log_lines_2ec889e1")}
           >
-            <Copy className="mr-1 h-4 w-4" />
-            <span lang={languageFor("Copy")} dir={directionFor("Copy")}>
-              {t("Copy")}
+            <Copy className="me-1 h-4 w-4" />
+            <span lang={languageFor("interface.copy_658f3664")} dir={directionFor("interface.copy_658f3664")}>
+              {t("interface.copy_658f3664")}
             </span>
           </Button>
           <Button
@@ -845,13 +845,13 @@ export default function LogsPage() {
             size="sm"
             onClick={handleClear}
             disabled={lines.length === 0}
-            aria-label={t("Clear log lines")}
-            lang={languageFor("Clear log lines")}
-            dir={directionFor("Clear log lines")}
+            aria-label={t("interface.clear_log_lines_be68a65f")}
+            lang={languageFor("interface.clear_log_lines_be68a65f")}
+            dir={directionFor("interface.clear_log_lines_be68a65f")}
           >
-            <Trash2 className="mr-1 h-4 w-4" />
-            <span lang={languageFor("Clear")} dir={directionFor("Clear")}>
-              {t("Clear")}
+            <Trash2 className="me-1 h-4 w-4" />
+            <span lang={languageFor("interface.clear_04a57fc2")} dir={directionFor("interface.clear_04a57fc2")}>
+              {t("interface.clear_04a57fc2")}
             </span>
           </Button>
           <Button
@@ -859,13 +859,13 @@ export default function LogsPage() {
             size="sm"
             onClick={() => setSendLogsOpen(true)}
             disabled={filteredLines.length === 0}
-            aria-label={t("Send logs to support")}
-            lang={languageFor("Send logs to support")}
-            dir={directionFor("Send logs to support")}
+            aria-label={t("interface.send_logs_to_support_755fbd30")}
+            lang={languageFor("interface.send_logs_to_support_755fbd30")}
+            dir={directionFor("interface.send_logs_to_support_755fbd30")}
           >
-            <Send className="mr-1 h-4 w-4" />
-            <span lang={languageFor("Send Logs")} dir={directionFor("Send Logs")}>
-              {t("Send Logs")}
+            <Send className="me-1 h-4 w-4" />
+            <span lang={languageFor("interface.send_logs_be96d4fe")} dir={directionFor("interface.send_logs_be96d4fe")}>
+              {t("interface.send_logs_be96d4fe")}
             </span>
           </Button>
         </div>
@@ -875,34 +875,34 @@ export default function LogsPage() {
         <Select value={filterLevel} onValueChange={setFilterLevel}>
           <SelectTrigger
             className="w-full sm:w-36"
-            aria-label={t("Filter by log level")}
-            lang={languageFor("Filter by log level")}
-            dir={directionFor("Filter by log level")}
+            aria-label={t("interface.filter_by_log_level_71023c08")}
+            lang={languageFor("interface.filter_by_log_level_71023c08")}
+            dir={directionFor("interface.filter_by_log_level_71023c08")}
           >
-            <SelectValue placeholder={t("Level")} />
+            <SelectValue placeholder={t("interface.level_4155597d")} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem
               value="all"
-              lang={languageFor("All levels")}
-              dir={directionFor("All levels")}
+              lang={languageFor("interface.all_levels_a3c66913")}
+              dir={directionFor("interface.all_levels_a3c66913")}
             >
-              {t("All levels")}
+              {t("interface.all_levels_a3c66913")}
             </SelectItem>
-            <SelectItem value="10" lang={languageFor("Trace+")} dir={directionFor("Trace+")}>
-              {t("Trace+")}
+            <SelectItem value="10" lang={languageFor("interface.trace_bed443ff")} dir={directionFor("interface.trace_bed443ff")}>
+              {t("interface.trace_bed443ff")}
             </SelectItem>
-            <SelectItem value="20" lang={languageFor("Debug+")} dir={directionFor("Debug+")}>
-              {t("Debug+")}
+            <SelectItem value="20" lang={languageFor("interface.debug_c9b7d6e9")} dir={directionFor("interface.debug_c9b7d6e9")}>
+              {t("interface.debug_c9b7d6e9")}
             </SelectItem>
-            <SelectItem value="30" lang={languageFor("Info+")} dir={directionFor("Info+")}>
-              {t("Info+")}
+            <SelectItem value="30" lang={languageFor("interface.info_8e9d280a")} dir={directionFor("interface.info_8e9d280a")}>
+              {t("interface.info_8e9d280a")}
             </SelectItem>
-            <SelectItem value="40" lang={languageFor("Warn+")} dir={directionFor("Warn+")}>
-              {t("Warn+")}
+            <SelectItem value="40" lang={languageFor("interface.warn_3ca5bb4e")} dir={directionFor("interface.warn_3ca5bb4e")}>
+              {t("interface.warn_3ca5bb4e")}
             </SelectItem>
-            <SelectItem value="50" lang={languageFor("Error+")} dir={directionFor("Error+")}>
-              {t("Error+")}
+            <SelectItem value="50" lang={languageFor("interface.error_41edeb2e")} dir={directionFor("interface.error_41edeb2e")}>
+              {t("interface.error_41edeb2e")}
             </SelectItem>
           </SelectContent>
         </Select>
@@ -910,19 +910,19 @@ export default function LogsPage() {
         <Select value={filterModule} onValueChange={setFilterModule}>
           <SelectTrigger
             className="w-full sm:w-40"
-            aria-label={t("Filter by module")}
-            lang={languageFor("Filter by module")}
-            dir={directionFor("Filter by module")}
+            aria-label={t("interface.filter_by_module_1ff8bbc4")}
+            lang={languageFor("interface.filter_by_module_1ff8bbc4")}
+            dir={directionFor("interface.filter_by_module_1ff8bbc4")}
           >
-            <SelectValue placeholder={t("Module")} />
+            <SelectValue placeholder={t("interface.module_c4fc60bd")} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem
               value="all"
-              lang={languageFor("All modules")}
-              dir={directionFor("All modules")}
+              lang={languageFor("interface.all_modules_15d36235")}
+              dir={directionFor("interface.all_modules_15d36235")}
             >
-              {t("All modules")}
+              {t("interface.all_modules_15d36235")}
             </SelectItem>
             {modules.map((module) => (
               <SelectItem key={module} value={module} lang="und" dir="auto">
@@ -933,15 +933,15 @@ export default function LogsPage() {
         </Select>
 
         <div className="relative min-w-0 flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+          <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
           <Input
             value={filterText}
             onChange={(event) => setFilterText(event.target.value)}
-            placeholder={t("Search message or any JSON field")}
-            lang={languageFor("Search message or any JSON field")}
-            dir={directionFor("Search message or any JSON field")}
-            className="pl-9"
-            aria-label={t("Search log lines")}
+            placeholder={t("interface.search_message_or_any_json_field_3c9cb905")}
+            lang={languageFor("interface.search_message_or_any_json_field_3c9cb905")}
+            dir={directionFor("interface.search_message_or_any_json_field_3c9cb905")}
+            className="ps-9"
+            aria-label={t("interface.search_log_lines_a9ee0b38")}
           />
         </div>
       </div>
@@ -956,9 +956,9 @@ export default function LogsPage() {
           className="flex-1 overflow-auto rounded-lg border border-border bg-zinc-950 font-mono text-xs"
           onScroll={handleScroll}
           role="log"
-          aria-label={t("Server log output")}
-          lang={languageFor("Server log output")}
-          dir={directionFor("Server log output")}
+          aria-label={t("interface.server_log_output_160abbb9")}
+          lang={languageFor("interface.server_log_output_160abbb9")}
+          dir={directionFor("interface.server_log_output_160abbb9")}
           aria-live="polite"
           aria-relevant="additions text"
           data-testid="logs-viewport"
@@ -966,10 +966,10 @@ export default function LogsPage() {
           {filteredLines.length === 0 && (
             <p
               className="p-3 pt-8 text-center text-zinc-500"
-              lang={languageFor("No log lines to display.")}
-              dir={directionFor("No log lines to display.")}
+              lang={languageFor("interface.no_log_lines_to_display_2cf3f974")}
+              dir={directionFor("interface.no_log_lines_to_display_2cf3f974")}
             >
-              {t("No log lines to display.")}
+              {t("interface.no_log_lines_to_display_2cf3f974")}
             </p>
           )}
           {filteredLines.length > 0 && (
@@ -978,27 +978,27 @@ export default function LogsPage() {
                 <>
                   <div className="mb-2 grid grid-cols-[5rem_4rem_6.5rem_minmax(18rem,2fr)_minmax(14rem,1.6fr)] gap-2 px-1 text-[11px] uppercase tracking-wide text-zinc-500">
                     <span
-                      className="text-right"
-                      lang={languageFor("Time")}
-                      dir={directionFor("Time")}
+                      className="text-end"
+                      lang={languageFor("interface.time_dfe4e404")}
+                      dir={directionFor("interface.time_dfe4e404")}
                     >
-                      {t("Time")}
+                      {t("interface.time_dfe4e404")}
                     </span>
                     <span
                       className="text-center"
-                      lang={languageFor("Level")}
-                      dir={directionFor("Level")}
+                      lang={languageFor("interface.level_4155597d")}
+                      dir={directionFor("interface.level_4155597d")}
                     >
-                      {t("Level")}
+                      {t("interface.level_4155597d")}
                     </span>
-                    <span lang={languageFor("Module")} dir={directionFor("Module")}>
-                      {t("Module")}
+                    <span lang={languageFor("interface.module_c4fc60bd")} dir={directionFor("interface.module_c4fc60bd")}>
+                      {t("interface.module_c4fc60bd")}
                     </span>
-                    <span lang={languageFor("Message")} dir={directionFor("Message")}>
-                      {t("Message")}
+                    <span lang={languageFor("interface.message_ae0ed984")} dir={directionFor("interface.message_ae0ed984")}>
+                      {t("interface.message_ae0ed984")}
                     </span>
-                    <span lang={languageFor("Context")} dir={directionFor("Context")}>
-                      {t("Context")}
+                    <span lang={languageFor("interface.context_bd317f1c")} dir={directionFor("interface.context_bd317f1c")}>
+                      {t("interface.context_bd317f1c")}
                     </span>
                   </div>
                   {topSpacerHeight > 0 && (

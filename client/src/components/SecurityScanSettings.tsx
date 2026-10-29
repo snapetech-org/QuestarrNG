@@ -249,7 +249,7 @@ export default function SecurityScanSettings() {
                   />
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  <InterfaceText source="Downloads ClamAV cannot fully scan (because clamd is unavailable or a file exceeds its size limits) wait in Pending Manual Imports. Increase StreamMaxLength, MaxFileSize, and MaxScanSize in clamd.conf to scan larger game files." />
+                  <InterfaceText source="interface.downloads_clamav_cannot_fully_scan_e84e5a81" />
                 </p>
               </div>
               <Switch
@@ -316,7 +316,7 @@ export default function SecurityScanSettings() {
 
           <div className="flex justify-end pt-2">
             <Button onClick={() => saveMutation.mutate(local)} disabled={saveMutation.isPending}>
-              {saveMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {saveMutation.isPending && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
               <InterfaceText source={"Save Changes"} />
             </Button>
           </div>

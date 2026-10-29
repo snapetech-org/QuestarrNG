@@ -62,7 +62,7 @@ export function IgdbHelpPopover() {
             </li>
             <li>
               <InterfaceText source={"Set Redirect URI to:"} />
-              <div className="mt-1 flex items-center gap-1.5 rounded border bg-muted/50 p-1 pl-2">
+              <div className="mt-1 flex items-center gap-1.5 rounded border bg-muted/50 p-1 ps-2">
                 <code className="flex-1 text-foreground">{IGDB_REDIRECT_URI}</code>
                 <Button
                   type="button"

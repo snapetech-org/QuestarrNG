@@ -30,11 +30,14 @@ import {
 import { withBasePath } from "@/lib/app-path";
 import { cn } from "@/lib/utils";
 import {
-  formatInterfaceMessage,
   getInterfaceLanguageDirection,
   useInterfaceLanguage,
 } from "@/lib/interface-locale";
-import { formatRegionalNumber, useRegionalPreference } from "@/lib/regional-format";
+import {
+  formatRegionalNumber,
+  formatRegionalPluralMessage,
+  useRegionalPreference,
+} from "@/lib/regional-format";
 import { InterfaceText } from "@/components/InterfaceText";
 
 interface AppSidebarProps {
@@ -58,7 +61,7 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
     languageForId,
     directionForId,
   } = useInterfaceLanguage();
-  useRegionalPreference();
+  const regionalPreference = useRegionalPreference();
 
   const navigationText = (item: AppNavItem) =>
     item.messageId ? tId(item.messageId) : t(item.title);
@@ -119,31 +122,53 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
     let badgeVariant: NavItemWithBadge["badgeVariant"];
     if (item.title === "All Games" && games.length > 0) {
       badge = formatRegionalNumber(games.length);
-      badgeLabel = formatInterfaceMessage("All Games, {count} games", { count: badge }, language);
+      badgeLabel = formatRegionalPluralMessage(
+        games.length,
+        {
+          one: "navigation.all_games_count_singular",
+          other: "interface.all_games_count_games_298d9ef9",
+        },
+        {},
+        language,
+        regionalPreference
+      );
       badgeVariant = "outline";
     } else if (item.title === "Wishlist" && wishlistCount > 0) {
       badge = formatRegionalNumber(wishlistCount);
-      badgeLabel = formatInterfaceMessage(
-        wishlistCount === 1 ? "Wishlist, {count} game" : "Wishlist, {count} games",
-        { count: badge },
-        language
+      badgeLabel = formatRegionalPluralMessage(
+        wishlistCount,
+        {
+          one: "interface.wishlist_count_game_a1c82ba1",
+          other: "interface.wishlist_count_games_801cfb96",
+        },
+        {},
+        language,
+        regionalPreference
       );
     } else if (item.title === "Playing" && playingCount > 0) {
       badge = formatRegionalNumber(playingCount);
-      badgeLabel = formatInterfaceMessage(
-        playingCount === 1 ? "Playing, {count} game" : "Playing, {count} games",
-        { count: badge },
-        language
+      badgeLabel = formatRegionalPluralMessage(
+        playingCount,
+        {
+          one: "interface.playing_count_game_77e0c872",
+          other: "interface.playing_count_games_b7dad993",
+        },
+        {},
+        language,
+        regionalPreference
       );
       badgeClassName = "border-transparent bg-cyan-600 text-white";
     } else if (item.title === "Downloads" && activeDownloadsCount > 0) {
       badge = formatRegionalNumber(activeDownloadsCount);
-      badgeLabel = formatInterfaceMessage(
-        activeDownloadsCount === 1
-          ? "Downloads, {count} active download"
-          : "Downloads, {count} active downloads",
-        { count: badge },
-        language
+      badgeLabel = formatRegionalPluralMessage(
+        activeDownloadsCount,
+        {
+          one: "interface.downloads_count_active_download_5035e337",
+          other: "interface.downloads_count_active_downloads_88d4c40c",
+        },
+        {},
+        language,
+        regionalPreference
       );
     }
     return {
@@ -168,9 +193,9 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
           <div className="w-8 h-8 flex items-center justify-center">
             <img
               src={withBasePath("/Questarr.svg")}
-              alt={t("QuestarrNG logo")}
-              lang={languageFor("QuestarrNG logo")}
-              dir={directionFor("QuestarrNG logo")}
+              alt={t("interface.questarrng_logo_48dde88a")}
+              lang={languageFor("interface.questarrng_logo_48dde88a")}
+              dir={directionFor("interface.questarrng_logo_48dde88a")}
               className="w-8 h-8"
             />
           </div>
@@ -180,10 +205,10 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
             </span>
             <p
               className="text-xs text-muted-foreground"
-              lang={languageFor("Game Management")}
-              dir={directionFor("Game Management")}
+              lang={languageFor("interface.game_management_b1319076")}
+              dir={directionFor("interface.game_management_b1319076")}
             >
-              {t("Game Management")}
+              {t("interface.game_management_b1319076")}
             </p>
           </div>
         </div>
@@ -191,8 +216,8 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel lang={languageFor("Navigation")} dir={directionFor("Navigation")}>
-            {t("Navigation")}
+          <SidebarGroupLabel lang={languageFor("interface.navigation_d08919c3")} dir={directionFor("interface.navigation_d08919c3")}>
+            {t("interface.navigation_d08919c3")}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -223,7 +248,7 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
                             {navigationText(item)}
                           </span>
                           <ChevronRight
-                            className="ml-auto h-4 w-4 shrink-0 transition-transform group-data-[state=open]/collapsible:rotate-90"
+                            className="ms-auto h-4 w-4 shrink-0 transition-transform group-data-[state=open]/collapsible:rotate-90 rtl:rotate-180"
                             aria-hidden="true"
                           />
                         </SidebarMenuButton>
@@ -256,7 +281,7 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
                                   {child.badge && (
                                     <Badge
                                       variant={child.badgeVariant ?? "secondary"}
-                                      className={cn("ml-auto text-xs", child.badgeClassName)}
+                                      className={cn("ms-auto text-xs", child.badgeClassName)}
                                       aria-hidden="true"
                                       data-testid={`badge-${child.title.toLowerCase().replace(/\s+/g, "-")}`}
                                     >
@@ -292,7 +317,7 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
                           </span>
                         </div>
                         {item.badge && (
-                          <Badge variant="secondary" className="ml-auto text-xs" aria-hidden="true">
+                          <Badge variant="secondary" className="ms-auto text-xs" aria-hidden="true">
                             {item.badge}
                           </Badge>
                         )}
@@ -306,8 +331,8 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel lang={languageFor("Management")} dir={directionFor("Management")}>
-            {t("Management")}
+          <SidebarGroupLabel lang={languageFor("interface.management_da9fd136")} dir={directionFor("interface.management_da9fd136")}>
+            {t("interface.management_da9fd136")}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -335,8 +360,8 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel lang={languageFor("Activity")} dir={directionFor("Activity")}>
-            {t("Activity")}
+          <SidebarGroupLabel lang={languageFor("interface.activity_9e75940c")} dir={directionFor("interface.activity_9e75940c")}>
+            {t("interface.activity_9e75940c")}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -374,7 +399,7 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
       <SidebarFooter>
         {appConfig?.rawg?.configured && (
           <div className="px-3 pb-2 text-center text-xs text-muted-foreground">
-            <InterfaceText source="Game metadata by" />{" "}
+            <InterfaceText source="interface.game_metadata_by_bc91010d" />{" "}
             <a className="underline" href="https://rawg.io" target="_blank" rel="noreferrer">
               RAWG
             </a>
@@ -386,24 +411,24 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
               size="lg"
               onClick={() => logout()}
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer w-full"
-              tooltip={t("Log out")}
+              tooltip={t("interface.log_out_88c6d8b5")}
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                 <User className="size-4" />
               </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
+              <div className="grid flex-1 text-start text-sm leading-tight">
                 <span className="truncate font-semibold" lang="und" dir="auto">
-                  {user?.username || t("User")}
+                  {user?.username || t("interface.user_e0a63e12")}
                 </span>
                 <span
                   className="truncate text-xs"
-                  lang={languageFor("Logged in")}
-                  dir={directionFor("Logged in")}
+                  lang={languageFor("interface.logged_in_3ecfe96a")}
+                  dir={directionFor("interface.logged_in_3ecfe96a")}
                 >
-                  {t("Logged in")}
+                  {t("interface.logged_in_3ecfe96a")}
                 </span>
               </div>
-              <LogOut className="ml-auto size-4" />
+              <LogOut className="ms-auto size-4" />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

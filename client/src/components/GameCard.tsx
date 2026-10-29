@@ -135,7 +135,7 @@ const GameCard = ({
             language === "en" ? (
               "Failed to add game to library before downloading"
             ) : (
-              <InterfaceText source="Failed to add game to library before downloading" />
+              <InterfaceText source="interface.failed_to_add_game_to_library_befo_2d413451" />
             ),
           variant: "destructive",
         });
@@ -162,32 +162,32 @@ const GameCard = ({
       className={`group hover-elevate transition-all duration-200 mx-auto min-w-0 w-full max-w-full cursor-pointer flex flex-col h-full overflow-hidden sm:max-w-[225px] ${game.hidden ? "opacity-60 grayscale" : ""}`}
       data-testid={`card-game-${game.id}`}
       role="group"
-      aria-label={formatInterfaceMessage("Game card for {title}", { title: game.title })}
-      lang={languageFor("Game card for {title}")}
-      dir={directionFor("Game card for {title}")}
+      aria-label={formatInterfaceMessage("interface.game_card_for_title_da08dee8", { title: game.title })}
+      lang={languageFor("interface.game_card_for_title_da08dee8")}
+      dir={directionFor("interface.game_card_for_title_da08dee8")}
     >
       <div className="relative">
         {/* ⚡ Bolt: Lazy loading images prevents fetching all game covers upfront,
             improving initial page load speed, especially on pages with many carousels. */}
         <img
           src={coverSrc(game.coverUrl)}
-          alt={formatInterfaceMessage("Cover art for {title}", { title: game.title })}
-          lang={languageFor("Cover art for {title}")}
-          dir={directionFor("Cover art for {title}")}
+          alt={formatInterfaceMessage("interface.cover_art_for_title_44c4687e", { title: game.title })}
+          lang={languageFor("interface.cover_art_for_title_44c4687e")}
+          dir={directionFor("interface.cover_art_for_title_44c4687e")}
           className="thumbnail-image rounded-t-md"
           loading="lazy"
           data-testid={`img-cover-${game.id}`}
         />
         <DownloadIndicator summary={downloadSummary} />
-        <div className="absolute right-1.5 top-1.5 flex max-w-[calc(100%-0.75rem)] flex-col items-end gap-1 sm:right-2 sm:top-2">
+        <div className="absolute end-1.5 top-1.5 flex max-w-[calc(100%-0.75rem)] flex-col items-end gap-1 sm:end-2 sm:top-2">
           {!isDiscovery && game.status && <StatusBadge status={game.status} />}
           {game.earlyAccess && (
             <Badge
               className="text-xs bg-amber-500 border-amber-600 text-white"
-              lang={languageFor("Early Access")}
-              dir={directionFor("Early Access")}
+              lang={languageFor("interface.early_access_3a5fe28e")}
+              dir={directionFor("interface.early_access_3a5fe28e")}
             >
-              {t("Early Access")}
+              {t("interface.early_access_3a5fe28e")}
             </Badge>
           )}
           {game.status === "wanted" && (
@@ -202,15 +202,15 @@ const GameCard = ({
           )}
           {game.hidden && (
             <Badge variant="secondary" className="text-xs bg-gray-500 text-white">
-              <span lang={languageFor("Hidden")} dir={directionFor("Hidden")}>
-                {t("Hidden")}
+              <span lang={languageFor("interface.hidden_3c2dfe59")} dir={directionFor("interface.hidden_3c2dfe59")}>
+                {t("interface.hidden_3c2dfe59")}
               </span>
             </Badge>
           )}
         </div>
         {!isDiscovery && (
           <div
-            className={`absolute left-1.5 top-1.5 z-10 transition-opacity duration-200 sm:left-2 sm:top-2 ${
+            className={`absolute start-1.5 top-1.5 z-10 transition-opacity duration-200 sm:start-2 sm:top-2 ${
               isMobile
                 ? "opacity-100"
                 : "pointer-events-none opacity-0 group-hover:pointer-events-auto group-hover:opacity-100 focus-within:pointer-events-auto focus-within:opacity-100"
@@ -265,9 +265,9 @@ const GameCard = ({
                       void handleDownloadClick();
                     }}
                     disabled={addGameMutation.isPending}
-                    aria-label={formatInterfaceMessage("Download {title}", { title: game.title })}
-                    lang={languageFor("Download {title}")}
-                    dir={directionFor("Download {title}")}
+                    aria-label={formatInterfaceMessage("interface.download_title_5de658d1", { title: game.title })}
+                    lang={languageFor("interface.download_title_5de658d1")}
+                    dir={directionFor("interface.download_title_5de658d1")}
                     data-testid={`button-download-${game.id}`}
                   >
                     {addGameMutation.isPending ? (
@@ -278,8 +278,8 @@ const GameCard = ({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p lang={languageFor("Download")} dir={directionFor("Download")}>
-                    {t("Download")}
+                  <p lang={languageFor("interface.download_6964bb19")} dir={directionFor("interface.download_6964bb19")}>
+                    {t("interface.download_6964bb19")}
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -296,7 +296,7 @@ const GameCard = ({
         >
           <button
             type="button"
-            className="w-full rounded-sm text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="w-full rounded-sm text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             onClick={(event) => {
               event.stopPropagation();
               handleDetailsClick();
@@ -316,10 +316,10 @@ const GameCard = ({
                 role="img"
                 aria-label={
                   hasUserVisibleRating
-                    ? formatInterfaceMessage("IGDB rating: {rating} out of 10", {
+                    ? formatInterfaceMessage("interface.igdb_rating_rating_out_of_10_fbf37993", {
                         rating: Number(game.rating),
                       })
-                    : t("Not rated")
+                    : t("interface.not_rated_9de37148")
                 }
                 lang={languageFor(
                   hasUserVisibleRating ? "IGDB rating: {rating} out of 10" : "Not rated"
@@ -331,13 +331,13 @@ const GameCard = ({
               >
                 <Star className="w-3 h-3 text-accent" aria-hidden="true" />
                 <span data-testid={`text-rating-${game.id}`}>
-                  {hasUserVisibleRating ? `${game.rating}/10` : t("N/A")}
+                  {hasUserVisibleRating ? `${game.rating}/10` : t("interface.n_a_79db7a01")}
                 </span>
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              <p lang={languageFor("IGDB score")} dir={directionFor("IGDB score")}>
-                {t("IGDB score")}
+              <p lang={languageFor("interface.igdb_score_39719cbd")} dir={directionFor("interface.igdb_score_39719cbd")}>
+                {t("interface.igdb_score_39719cbd")}
               </p>
             </TooltipContent>
           </Tooltip>
@@ -347,11 +347,11 @@ const GameCard = ({
                 <div
                   className="flex items-center gap-1 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   role="img"
-                  aria-label={formatInterfaceMessage("My rating: {rating} out of 10", {
+                  aria-label={formatInterfaceMessage("interface.my_rating_rating_out_of_10_f3d2beef", {
                     rating: game.userRating,
                   })}
-                  lang={languageFor("My rating: {rating} out of 10")}
-                  dir={directionFor("My rating: {rating} out of 10")}
+                  lang={languageFor("interface.my_rating_rating_out_of_10_f3d2beef")}
+                  dir={directionFor("interface.my_rating_rating_out_of_10_f3d2beef")}
                   tabIndex={0}
                 >
                   <Star className="w-3 h-3 fill-primary text-primary" aria-hidden="true" />
@@ -359,8 +359,8 @@ const GameCard = ({
                 </div>
               </TooltipTrigger>
               <TooltipContent>
-                <p lang={languageFor("My rating")} dir={directionFor("My rating")}>
-                  {t("My rating")}
+                <p lang={languageFor("interface.my_rating_809bd9fc")} dir={directionFor("interface.my_rating_809bd9fc")}>
+                  {t("interface.my_rating_809bd9fc")}
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -370,9 +370,9 @@ const GameCard = ({
               <div
                 className="flex items-center gap-1 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 role="img"
-                aria-label={formatInterfaceMessage("Release Date: {date}", { date: releaseYear })}
-                lang={languageFor("Release Date: {date}")}
-                dir={directionFor("Release Date: {date}")}
+                aria-label={formatInterfaceMessage("interface.release_date_date_e2610e34", { date: releaseYear })}
+                lang={languageFor("interface.release_date_date_e2610e34")}
+                dir={directionFor("interface.release_date_date_e2610e34")}
                 tabIndex={0}
               >
                 <Calendar className="w-3 h-3" aria-hidden="true" />
@@ -385,8 +385,8 @@ const GameCard = ({
                   {releaseFullDate}
                 </p>
               ) : (
-                <p lang={languageFor("Release Date")} dir={directionFor("Release Date")}>
-                  {t("Release Date")}
+                <p lang={languageFor("interface.release_date_1d144bfe")} dir={directionFor("interface.release_date_1d144bfe")}>
+                  {t("interface.release_date_1d144bfe")}
                 </p>
               )}
             </TooltipContent>
@@ -410,9 +410,9 @@ const GameCard = ({
               e.stopPropagation();
             }}
             role="toolbar"
-            aria-label={formatInterfaceMessage("Actions for {title}", { title: game.title })}
-            lang={languageFor("Actions for {title}")}
-            dir={directionFor("Actions for {title}")}
+            aria-label={formatInterfaceMessage("interface.actions_for_title_f9d3c417", { title: game.title })}
+            lang={languageFor("interface.actions_for_title_f9d3c417")}
+            dir={directionFor("interface.actions_for_title_f9d3c417")}
             tabIndex={0}
           >
             <Button
@@ -421,9 +421,9 @@ const GameCard = ({
               className={mobileActionButtonClass}
               onClick={() => void handleDownloadClick()}
               disabled={addGameMutation.isPending}
-              aria-label={formatInterfaceMessage("Download {title}", { title: game.title })}
-              lang={languageFor("Download {title}")}
-              dir={directionFor("Download {title}")}
+              aria-label={formatInterfaceMessage("interface.download_title_5de658d1", { title: game.title })}
+              lang={languageFor("interface.download_title_5de658d1")}
+              dir={directionFor("interface.download_title_5de658d1")}
               data-testid={`button-download-${game.id}`}
             >
               {addGameMutation.isPending ? (
@@ -446,20 +446,20 @@ const GameCard = ({
               }}
               disabled={addGameMutation.isPending}
               data-testid={`button-track-${game.id}`}
-              aria-label={formatInterfaceMessage("Track {title}", { title: game.title })}
-              lang={languageFor("Track {title}")}
-              dir={directionFor("Track {title}")}
+              aria-label={formatInterfaceMessage("interface.track_title_c799ab04", { title: game.title })}
+              lang={languageFor("interface.track_title_c799ab04")}
+              dir={directionFor("interface.track_title_c799ab04")}
             >
               {addGameMutation.isPending ? (
                 <>
-                  <Loader2 className="h-3 w-3 mr-2 animate-spin" />
-                  <span lang={languageFor("Tracking...")} dir={directionFor("Tracking...")}>
-                    {t("Tracking...")}
+                  <Loader2 className="h-3 w-3 me-2 animate-spin" />
+                  <span lang={languageFor("interface.tracking_0f7e9712")} dir={directionFor("interface.tracking_0f7e9712")}>
+                    {t("interface.tracking_0f7e9712")}
                   </span>
                 </>
               ) : (
-                <span lang={languageFor("Track Game")} dir={directionFor("Track Game")}>
-                  {t("Track Game")}
+                <span lang={languageFor("interface.track_game_164dac9e")} dir={directionFor("interface.track_game_164dac9e")}>
+                  {t("interface.track_game_164dac9e")}
                 </span>
               )}
             </Button>

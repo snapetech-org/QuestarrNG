@@ -96,17 +96,17 @@ export default function GameGrid({
       <div className="text-center py-12" data-testid="text-no-games">
         <div
           className="text-muted-foreground text-lg mb-2"
-          lang={languageFor("No games found")}
-          dir={directionFor("No games found")}
+          lang={languageFor("interface.no_games_found_6cfb59f1")}
+          dir={directionFor("interface.no_games_found_6cfb59f1")}
         >
-          {t("No games found")}
+          {t("interface.no_games_found_6cfb59f1")}
         </div>
         <div
           className="text-sm text-muted-foreground"
-          lang={languageFor("Try adjusting your search or filters")}
-          dir={directionFor("Try adjusting your search or filters")}
+          lang={languageFor("interface.try_adjusting_your_search_or_filte_1393483c")}
+          dir={directionFor("interface.try_adjusting_your_search_or_filte_1393483c")}
         >
-          {t("Try adjusting your search or filters")}
+          {t("interface.try_adjusting_your_search_or_filte_1393483c")}
         </div>
       </div>
     );
@@ -177,52 +177,52 @@ export default function GameGrid({
             <div />
             <span
               className={headerCellClass}
-              lang={languageFor("Title")}
-              dir={directionFor("Title")}
+              lang={languageFor("interface.title_24d471a9")}
+              dir={directionFor("interface.title_24d471a9")}
             >
-              {t("Title")}
+              {t("interface.title_24d471a9")}
             </span>
             <span
               className={headerCellClass}
-              lang={languageFor("Genres")}
-              dir={directionFor("Genres")}
+              lang={languageFor("interface.genres_65d70ee9")}
+              dir={directionFor("interface.genres_65d70ee9")}
             >
-              {t("Genres")}
+              {t("interface.genres_65d70ee9")}
             </span>
             <span
               className={cn(headerCellClass, "text-center")}
-              lang={languageFor("Score")}
-              dir={directionFor("Score")}
+              lang={languageFor("interface.score_77eb0235")}
+              dir={directionFor("interface.score_77eb0235")}
             >
-              {t("Score")}
+              {t("interface.score_77eb0235")}
             </span>
             <span
               className={cn(headerCellClass, "text-center")}
-              lang={languageFor("My Score")}
-              dir={directionFor("My Score")}
+              lang={languageFor("interface.my_score_5a685d11")}
+              dir={directionFor("interface.my_score_5a685d11")}
             >
-              {t("My Score")}
+              {t("interface.my_score_5a685d11")}
             </span>
             <span
               className={cn(headerCellClass, "text-center")}
-              lang={languageFor("Release")}
-              dir={directionFor("Release")}
+              lang={languageFor("interface.release_6d1e9b1e")}
+              dir={directionFor("interface.release_6d1e9b1e")}
             >
-              {t("Release")}
+              {t("interface.release_6d1e9b1e")}
             </span>
             <span
               className={cn(headerCellClass, "text-center")}
-              lang={languageFor("Status")}
-              dir={directionFor("Status")}
+              lang={languageFor("interface.status_005ef20f")}
+              dir={directionFor("interface.status_005ef20f")}
             >
-              {t("Status")}
+              {t("interface.status_005ef20f")}
             </span>
             <span
               className={cn(headerCellClass, "text-center")}
-              lang={languageFor("Type")}
-              dir={directionFor("Type")}
+              lang={languageFor("interface.type_d155d06d")}
+              dir={directionFor("interface.type_d155d06d")}
             >
-              {t("Type")}
+              {t("interface.type_d155d06d")}
             </span>
             <div />
           </div>
@@ -242,50 +242,50 @@ export default function GameGrid({
           className="col-span-full grid items-center py-1 border-b border-border bg-muted/40"
           style={{ gridTemplateColumns: "subgrid" }}
         >
-          <span className={headerCellClass} lang={languageFor("Title")} dir={directionFor("Title")}>
-            {t("Title")}
+          <span className={headerCellClass} lang={languageFor("interface.title_24d471a9")} dir={directionFor("interface.title_24d471a9")}>
+            {t("interface.title_24d471a9")}
           </span>
           <span
             className={headerCellClass}
-            lang={languageFor("Genres")}
-            dir={directionFor("Genres")}
+            lang={languageFor("interface.genres_65d70ee9")}
+            dir={directionFor("interface.genres_65d70ee9")}
           >
-            {t("Genres")}
+            {t("interface.genres_65d70ee9")}
           </span>
           <span
             className={cn(headerCellClass, "text-center")}
-            lang={languageFor("Score")}
-            dir={directionFor("Score")}
+            lang={languageFor("interface.score_77eb0235")}
+            dir={directionFor("interface.score_77eb0235")}
           >
-            {t("Score")}
+            {t("interface.score_77eb0235")}
           </span>
           <span
             className={cn(headerCellClass, "text-center")}
-            lang={languageFor("My Score")}
-            dir={directionFor("My Score")}
+            lang={languageFor("interface.my_score_5a685d11")}
+            dir={directionFor("interface.my_score_5a685d11")}
           >
-            {t("My Score")}
+            {t("interface.my_score_5a685d11")}
           </span>
           <span
             className={cn(headerCellClass, "text-center")}
-            lang={languageFor("Release")}
-            dir={directionFor("Release")}
+            lang={languageFor("interface.release_6d1e9b1e")}
+            dir={directionFor("interface.release_6d1e9b1e")}
           >
-            {t("Release")}
+            {t("interface.release_6d1e9b1e")}
           </span>
           <span
             className={cn(headerCellClass, "text-center")}
-            lang={languageFor("Status")}
-            dir={directionFor("Status")}
+            lang={languageFor("interface.status_005ef20f")}
+            dir={directionFor("interface.status_005ef20f")}
           >
-            {t("Status")}
+            {t("interface.status_005ef20f")}
           </span>
           <span
             className={cn(headerCellClass, "text-center")}
-            lang={languageFor("Type")}
-            dir={directionFor("Type")}
+            lang={languageFor("interface.type_d155d06d")}
+            dir={directionFor("interface.type_d155d06d")}
           >
-            {t("Type")}
+            {t("interface.type_d155d06d")}
           </span>
           <div />
         </div>

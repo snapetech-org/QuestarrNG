@@ -10,17 +10,17 @@ export default function RssPage() {
         <div>
           <h1
             className="text-2xl font-bold tracking-tight"
-            lang={languageFor("RSS Feeds")}
-            dir={directionFor("RSS Feeds")}
+            lang={languageFor("navigation.rss_feeds")}
+            dir={directionFor("navigation.rss_feeds")}
           >
-            {t("RSS Feeds")}
+            {t("navigation.rss_feeds")}
           </h1>
           <p
             className="text-muted-foreground text-sm mt-0.5"
-            lang={languageFor("Browse and manage RSS feeds to automatically track releases.")}
-            dir={directionFor("Browse and manage RSS feeds to automatically track releases.")}
+            lang={languageFor("interface.browse_and_manage_rss_feeds_to_aut_7b5c058b")}
+            dir={directionFor("interface.browse_and_manage_rss_feeds_to_aut_7b5c058b")}
           >
-            {t("Browse and manage RSS feeds to automatically track releases.")}
+            {t("interface.browse_and_manage_rss_feeds_to_aut_7b5c058b")}
           </p>
         </div>
         <div className="shrink-0 pt-1">

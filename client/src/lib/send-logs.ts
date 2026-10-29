@@ -8,7 +8,7 @@
  */
 
 import { SUPPORT_WORKER_URL, GITHUB_ISSUES_URL } from "./support-config";
-import { UI_LABELS } from "./ui-labels";
+import { hasInterfaceMessage } from "./interface-locale";
 
 export { scrubPii, scrubLogLines } from "@shared/log-scrub";
 
@@ -80,7 +80,7 @@ export async function sendLogs(payload: SendLogsPayload): Promise<SendLogsResult
       const body = (await response.json()) as { error?: string };
       if (body.error) {
         message = body.error;
-        messageKey = Object.hasOwn(UI_LABELS, body.error) ? body.error : undefined;
+        messageKey = hasInterfaceMessage(body.error) ? body.error : undefined;
         messageValues = messageKey?.includes("{status}") ? { status: response.status } : undefined;
       }
     } catch {

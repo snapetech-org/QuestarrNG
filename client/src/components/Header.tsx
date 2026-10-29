@@ -76,19 +76,19 @@ export default function Header({
     },
     onSuccess: (data) => {
       toast({
-        title: t("Steam Sync"),
+        title: t("interface.steam_sync_c6095686"),
         description:
           data.addedCount != null
-            ? formatInterfaceMessage("Synced {count} games from your Steam Wishlist.", {
+            ? formatInterfaceMessage("interface.synced_count_games_from_your_steam_7088fb6b", {
                 count: data.addedCount,
               })
-            : data.message || t("Sync completed successfully"),
+            : data.message || t("interface.sync_completed_successfully_adfc2778"),
       });
     },
     onError: (error: Error) => {
       toast({
-        title: t("Sync Failed"),
-        description: error.message || t("Failed to connect to server"),
+        title: t("interface.sync_failed_f2f390af"),
+        description: error.message || t("interface.failed_to_connect_to_server_611d3813"),
         variant: "destructive",
       });
     },
@@ -122,8 +122,8 @@ export default function Header({
                   />
                 </TooltipTrigger>
                 <TooltipContent side="right">
-                  <p lang={languageFor("Toggle Sidebar")} dir={directionFor("Toggle Sidebar")}>
-                    {t("Toggle Sidebar")}
+                  <p lang={languageFor("interface.toggle_sidebar_1824bc01")} dir={directionFor("interface.toggle_sidebar_1824bc01")}>
+                    {t("interface.toggle_sidebar_1824bc01")}
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -144,26 +144,26 @@ export default function Header({
               {isLoading && (
                 <span className="text-xs text-muted-foreground animate-pulse">
                   <span
-                    lang={languageFor("Checking storage...")}
-                    dir={directionFor("Checking storage...")}
+                    lang={languageFor("interface.checking_storage_f60685d6")}
+                    dir={directionFor("interface.checking_storage_f60685d6")}
                   >
-                    {t("Checking storage...")}
+                    {t("interface.checking_storage_f60685d6")}
                   </span>
                 </span>
               )}
               {isError && (
                 <span
                   className="text-xs text-destructive"
-                  lang={languageFor("Error")}
-                  dir={directionFor("Error")}
+                  lang={languageFor("interface.error_f38d9cf1")}
+                  dir={directionFor("interface.error_f38d9cf1")}
                 >
-                  {t("Error")}
+                  {t("interface.error_f38d9cf1")}
                 </span>
               )}
               {!isLoading && !isError && storageInfo.length === 0 && (
                 <span className="hidden text-xs text-muted-foreground opacity-50 sm:inline">
-                  <span lang={languageFor("No downloaders")} dir={directionFor("No downloaders")}>
-                    {t("No downloaders")}
+                  <span lang={languageFor("interface.no_downloaders_3707f3b6")} dir={directionFor("interface.no_downloaders_3707f3b6")}>
+                    {t("interface.no_downloaders_3707f3b6")}
                   </span>
                 </span>
               )}
@@ -177,14 +177,14 @@ export default function Header({
                         tabIndex={0}
                         role="button"
                         aria-label={formatInterfaceMessage(
-                          "Storage for {downloader}: {space} available",
+                          "interface.storage_for_downloader_space_avail_f3f38303",
                           {
                             downloader: info.downloaderName,
                             space: formatBytes(info.freeSpace),
                           }
                         )}
-                        lang={languageFor("Storage for {downloader}: {space} available")}
-                        dir={directionFor("Storage for {downloader}: {space} available")}
+                        lang={languageFor("interface.storage_for_downloader_space_avail_f3f38303")}
+                        dir={directionFor("interface.storage_for_downloader_space_avail_f3f38303")}
                         onKeyDown={(e) => {
                           if (e.key === "Enter" || e.key === " ") e.currentTarget.click();
                         }}
@@ -198,10 +198,10 @@ export default function Header({
                         <p className="font-semibold">{info.downloaderName}</p>
                         <p
                           className="text-xs text-muted-foreground"
-                          lang={languageFor("Free Disk Space")}
-                          dir={directionFor("Free Disk Space")}
+                          lang={languageFor("interface.free_disk_space_0fc774ae")}
+                          dir={directionFor("interface.free_disk_space_0fc774ae")}
                         >
-                          {t("Free Disk Space")}
+                          {t("interface.free_disk_space_0fc774ae")}
                         </p>
                         {info.error && (
                           <p className="mt-1 text-xs text-destructive" lang="en" dir="auto">
@@ -220,17 +220,17 @@ export default function Header({
                   <Button
                     variant="default"
                     size="sm"
-                    aria-label={t("Add Game")}
+                    aria-label={t("interface.add_game_75fb4616")}
                     data-testid="button-add-game"
                     className="h-10 gap-2 px-3 sm:h-9"
                   >
                     <Plus className="w-4 h-4" />
                     <span
                       className="hidden sm:inline"
-                      lang={languageFor("Add Game")}
-                      dir={directionFor("Add Game")}
+                      lang={languageFor("interface.add_game_75fb4616")}
+                      dir={directionFor("interface.add_game_75fb4616")}
                     >
-                      {t("Add Game")}
+                      {t("interface.add_game_75fb4616")}
                     </span>
                   </Button>
                 }
@@ -239,17 +239,17 @@ export default function Header({
                   <Button
                     variant="default"
                     size="sm"
-                    aria-label={t("Add Game")}
+                    aria-label={t("interface.add_game_75fb4616")}
                     data-testid="button-add-game"
                     className="h-10 gap-2 px-3 sm:h-9"
                   >
                     <Plus className="w-4 h-4" />
                     <span
                       className="hidden sm:inline"
-                      lang={languageFor("Add Game")}
-                      dir={directionFor("Add Game")}
+                      lang={languageFor("interface.add_game_75fb4616")}
+                      dir={directionFor("interface.add_game_75fb4616")}
                     >
-                      {t("Add Game")}
+                      {t("interface.add_game_75fb4616")}
                     </span>
                   </Button>
                 </AddGameModal>
@@ -270,10 +270,10 @@ export default function Header({
                   )}
                   <span
                     className="hidden sm:inline"
-                    lang={languageFor("Sync Steam")}
-                    dir={directionFor("Sync Steam")}
+                    lang={languageFor("interface.sync_steam_7b1a59d6")}
+                    dir={directionFor("interface.sync_steam_7b1a59d6")}
                   >
-                    {t("Sync Steam")}
+                    {t("interface.sync_steam_7b1a59d6")}
                   </span>
                 </Button>
               )}
@@ -286,9 +286,9 @@ export default function Header({
                 className="h-10 w-10 sm:h-9 sm:w-9"
                 onClick={handleThemeToggle}
                 data-testid="button-theme-toggle"
-                aria-label={t("Toggle theme")}
-                lang={languageFor("Toggle theme")}
-                dir={directionFor("Toggle theme")}
+                aria-label={t("interface.toggle_theme_8a1231d0")}
+                lang={languageFor("interface.toggle_theme_8a1231d0")}
+                dir={directionFor("interface.toggle_theme_8a1231d0")}
               >
                 {mounted &&
                   (theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />)}
@@ -304,31 +304,31 @@ export default function Header({
         <Alert variant="destructive" className="rounded-none border-x-0 border-t-0 border-b-1">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle
-            lang={languageFor("Configuration Required")}
-            dir={directionFor("Configuration Required")}
+            lang={languageFor("interface.configuration_required_59dd2f26")}
+            dir={directionFor("interface.configuration_required_59dd2f26")}
           >
-            {t("Configuration Required")}
+            {t("interface.configuration_required_59dd2f26")}
           </AlertTitle>
           <AlertDescription className="flex items-center gap-2">
             <span
               lang={languageFor(
-                "IGDB credentials are required. The application will only function for existing games until configured."
+                "interface.igdb_credentials_are_required_the_e38cceec"
               )}
               dir={directionFor(
-                "IGDB credentials are required. The application will only function for existing games until configured."
+                "interface.igdb_credentials_are_required_the_e38cceec"
               )}
             >
               {t(
-                "IGDB credentials are required. The application will only function for existing games until configured."
+                "interface.igdb_credentials_are_required_the_e38cceec"
               )}
             </span>
             <Link href="/settings">
               <span
                 className="underline font-bold cursor-pointer hover:text-white"
-                lang={languageFor("Configure in Settings")}
-                dir={directionFor("Configure in Settings")}
+                lang={languageFor("interface.configure_in_settings_583e5b23")}
+                dir={directionFor("interface.configure_in_settings_583e5b23")}
               >
-                {t("Configure in Settings")}
+                {t("interface.configure_in_settings_583e5b23")}
               </span>
             </Link>
           </AlertDescription>

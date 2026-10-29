@@ -16,26 +16,41 @@ import {
 describe("localization infrastructure", () => {
   it("selects CLDR plural categories and exact-count overrides", () => {
     const forms = {
-      one: "one",
-      two: "two",
-      few: "few",
-      many: "many",
-      other: "other",
-      exact: { "0": "zero" },
-    };
+      one: "interface.wishlist_count_game_a1c82ba1",
+      two: "navigation.library",
+      few: "navigation.playing",
+      many: "navigation.downloads",
+      other: "navigation.settings",
+      exact: { "0": "navigation.search" },
+    } as const;
 
-    expect(formatInterfacePluralMessage(1, forms, {}, "ar")).toBe("one");
-    expect(formatInterfacePluralMessage(2, forms, {}, "ar")).toBe("two");
-    expect(formatInterfacePluralMessage(3, forms, {}, "ar")).toBe("few");
-    expect(formatInterfacePluralMessage(11, forms, {}, "ar")).toBe("many");
-    expect(formatInterfacePluralMessage(0, forms, {}, "ar")).toBe("zero");
+    const oneCount = new Intl.NumberFormat("ar").format(1);
+    expect(formatInterfacePluralMessage(1, forms, {}, "ar")).toBe(
+      translateInterfaceMessage(forms.one, "ar").replace("{count}", oneCount)
+    );
+    expect(formatInterfacePluralMessage(2, forms, {}, "ar")).toBe(
+      translateInterfaceMessage(forms.two, "ar")
+    );
+    expect(formatInterfacePluralMessage(3, forms, {}, "ar")).toBe(
+      translateInterfaceMessage(forms.few, "ar")
+    );
+    expect(formatInterfacePluralMessage(11, forms, {}, "ar")).toBe(
+      translateInterfaceMessage(forms.many, "ar")
+    );
+    expect(formatInterfacePluralMessage(0, forms, {}, "ar")).toBe(
+      translateInterfaceMessage(forms.exact["0"], "ar")
+    );
   });
 
   it("keeps plural grammar in the interface language and digits in the regional format", () => {
-    const forms = { one: "one {count}", other: "many {count}" };
+    const forms = {
+      one: "interface.wishlist_count_game_a1c82ba1",
+      other: "interface.wishlist_count_games_801cfb96",
+    } as const;
 
+    const regionalCount = new Intl.NumberFormat("ar").format(2);
     expect(formatRegionalPluralMessage(2, forms, {}, "es", "ar")).toBe(
-      "many " + new Intl.NumberFormat("ar").format(2)
+      translateInterfaceLabel(forms.other, "es").replace("{count}", regionalCount)
     );
   });
 
@@ -43,12 +58,22 @@ describe("localization infrastructure", () => {
     expect(
       formatInterfaceSelectMessage(
         "download",
-        { download: "Download {selection}", other: "Open {selection}" },
+        {
+          download: "interface.download_title_5de658d1",
+          other: "interface.cancel_35afca3b",
+        },
+        { title: "Example" },
+        "en"
+      )
+    ).toBe("Download Example");
+    expect(
+      formatInterfaceSelectMessage(
+        "unknown",
+        { other: "interface.cancel_35afca3b" },
         {},
         "en"
       )
-    ).toBe("Download download");
-    expect(formatInterfaceSelectMessage("unknown", { other: "Open" }, {}, "en")).toBe("Open");
+    ).toBe("Cancel");
   });
 
   it("resolves RTL direction for scripts beyond the currently translated locale set", () => {

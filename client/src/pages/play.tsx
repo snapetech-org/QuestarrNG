@@ -222,7 +222,7 @@ export default function PlayPage() {
             ref={promptRef}
             className="rounded-md bg-black/70 px-4 py-2 text-sm text-white opacity-0 transition-opacity"
           >
-            <InterfaceText source="Hacking — stay in range" />
+            <InterfaceText source="interface.hacking_stay_in_range_411746f9" />
             <div className="mt-1 h-1.5 w-40 overflow-hidden rounded-full bg-white/20">
               <div ref={progressFillRef} className="h-full w-0 bg-emerald-400" />
             </div>
@@ -261,7 +261,7 @@ export default function PlayPage() {
             </span>
           </div>
           <div className="rounded-md bg-black/50 px-3 py-1 text-xs text-white/50">
-            <InterfaceText source="Left click to move · Ctrl to crouch · right click to throw · Esc to pause" />
+            <InterfaceText source="interface.left_click_to_move_ctrl_to_crouch_c319c3ce" />
           </div>
         </div>
       </div>
@@ -270,7 +270,7 @@ export default function PlayPage() {
         // The Button itself can't carry the positioning: the shared .hover-elevate
         // utility forces position: relative on every button, which would win over
         // an `absolute` class here and drop it into normal flow below the canvas.
-        <div className="absolute right-6 top-6">
+        <div className="absolute end-6 top-6">
           <Button
             variant="outline"
             size="sm"
@@ -295,7 +295,7 @@ export default function PlayPage() {
             <p className="text-sm text-white/70">
               <InterfaceText source={BRIEFING_TEXT} />
             </p>
-            <dl className="mx-auto grid max-w-xs grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-left text-sm text-white/70">
+            <dl className="mx-auto grid max-w-xs grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-start text-sm text-white/70">
               {CONTROLS.map(({ keys, action }) => (
                 <div key={keys} className="contents">
                   <dt className="font-mono text-white/90">
@@ -329,7 +329,7 @@ export default function PlayPage() {
               <InterfaceText source={"Terminal hacked"} />
             </h1>
             <p className="text-sm text-white/70">
-              <InterfaceText source="Ghost Mode is now unlocked — find it under Settings → Appearance." />
+              <InterfaceText source="interface.ghost_mode_is_now_unlocked_find_it_4a364fe7" />
             </p>
             <div className="flex justify-center gap-2 pt-2">
               <Button onClick={handlePlayAgain}>

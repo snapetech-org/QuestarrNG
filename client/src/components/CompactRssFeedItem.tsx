@@ -50,10 +50,10 @@ const CompactRssFeedItem = ({ item }: CompactRssFeedItemProps) => {
         {item.igdbGameName && (
           <div
             className="text-xs text-muted-foreground truncate"
-            lang={languageFor("Matched: {title}")}
-            dir={directionFor("Matched: {title}")}
+            lang={languageFor("interface.matched_title_3fa18293")}
+            dir={directionFor("interface.matched_title_3fa18293")}
           >
-            {formatInterfaceMessage("Matched: {title}", { title: item.igdbGameName }, language)}
+            {formatInterfaceMessage("interface.matched_title_3fa18293", { title: item.igdbGameName }, language)}
           </div>
         )}
 
@@ -64,8 +64,8 @@ const CompactRssFeedItem = ({ item }: CompactRssFeedItemProps) => {
             {item.pubDate ? (
               <RegionalRelativeTime date={new Date(item.pubDate)} />
             ) : (
-              <span lang={languageFor("Unknown date")} dir={directionFor("Unknown date")}>
-                {t("Unknown date")}
+              <span lang={languageFor("interface.unknown_date_6888dd2f")} dir={directionFor("interface.unknown_date_6888dd2f")}>
+                {t("interface.unknown_date_6888dd2f")}
               </span>
             )}
           </div>
@@ -80,20 +80,20 @@ const CompactRssFeedItem = ({ item }: CompactRssFeedItemProps) => {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={formatInterfaceMessage(
-              "View original article for {title}",
+              "interface.view_original_article_for_title_730db17a",
               { title: item.title },
               language
             )}
-            lang={languageFor("View original article for {title}")}
-            dir={directionFor("View original article for {title}")}
+            lang={languageFor("interface.view_original_article_for_title_730db17a")}
+            dir={directionFor("interface.view_original_article_for_title_730db17a")}
           >
             <ExternalLink className="w-4 h-4" aria-hidden="true" />
             <span
               className="hidden sm:inline"
-              lang={languageFor("View")}
-              dir={directionFor("View")}
+              lang={languageFor("interface.view_5e4baa18")}
+              dir={directionFor("interface.view_5e4baa18")}
             >
-              {t("View")}
+              {t("interface.view_5e4baa18")}
             </span>
           </a>
         </Button>

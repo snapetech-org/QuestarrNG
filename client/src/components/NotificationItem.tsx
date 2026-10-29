@@ -57,8 +57,8 @@ export function NotificationItem({ notification, onRead, onClick }: Notification
     <button
       type="button"
       className={cn(
-        "flex w-full text-left gap-3 p-3 text-sm transition-colors hover:bg-muted/50 relative group cursor-pointer",
-        !notification.read && "bg-muted/30 border-l-2 border-primary"
+        "flex w-full text-start gap-3 p-3 text-sm transition-colors hover:bg-muted/50 relative group cursor-pointer",
+        !notification.read && "bg-muted/30 border-s-2 border-primary"
       )}
       onClick={handleClick}
     >

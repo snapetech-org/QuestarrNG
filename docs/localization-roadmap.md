@@ -2,19 +2,21 @@
 
 ## Coverage
 
-Questarr's React interface has a browser-local language preference for English and twelve non-English locales: Spanish, Simplified Chinese, Hindi, German, Japanese, French, Brazilian Portuguese, Arabic, Korean, Traditional Chinese, Vietnamese, and Indonesian. The English-keyed catalog contains 1,980 app-owned source strings with a translation in every locale. English is the fallback for missing keys. Translated strings and accessible attributes carry language and direction metadata; Arabic sets the document language and direction and uses logical layout rules.
+Questarr's React interface has a browser-local language preference for English and twelve non-English locales: Spanish, Simplified Chinese, Hindi, German, Japanese, French, Brazilian Portuguese, Arabic, Korean, Traditional Chinese, Vietnamese, and Indonesian. The stable catalog contains 2,232 namespaced message IDs and 26,784 nonempty target-locale values. The generated catalog check verifies placeholder parity and prevents incomplete locales from entering the selector.
 
-Catalog coverage includes navigation and page copy, settings, labels and accessible names, forms, help, empty states, dynamic summaries, notifications, finite app-owned statuses, and stable API error summaries. API responses retain their English `error` or `message` detail and include a stable `errorCode`; the browser translates recognized app-owned diagnostic details for display. Unknown or provider-supplied text and structured validation payloads remain unchanged. Known generated notification templates are translated; custom or changed notification text falls back to its original text because notification parameters are not stored separately. Unknown status values, game titles, release names, paths, and user input remain unchanged.
+Fixed interface call sites now use stable IDs. Dynamic legacy surfaces retain a source-text compatibility path while they migrate; unknown or external text still falls back unchanged. Game names, release names, paths, identifiers, API values, and provider text remain untouched. Known generated notifications and app-owned API summaries continue to use their specialized catalogs.
 
-The interface language and regional-format preference are independent. Regional formatting controls dates, times, numbers, calendar weeks, and locale-aware sorting. Language choice is saved in browser-local preferences; first use follows the browser's preferred language before falling back to English.
+The interface language and regional-format preference are independent. Regional formatting controls dates, times, numbers, calendar weeks, locale-aware sorting, and unit formatting. Localized numeric parsing is available for input. Language choice is saved in browser-local preferences, and first use follows the browser's preferred language before falling back to English.
+
+RTL direction is resolved by script and applied to the document. Common inline layout utilities use logical start/end properties, including spacing, alignment, borders, corners, and edge positions. The shared resolver recognizes Arabic, Persian, and Hebrew even though only Arabic currently has a complete translated interface catalog.
 
 ## Review status and limits
 
-The catalog has 1,980 keys across twelve target locales (23,760 translated values), with no empty values or interpolation-placeholder mismatches. A source-reference test checks every fixed interface-label reference; the provider and protocol names RAWG and Torznab intentionally remain unchanged. Catalog review checked protected technical tokens and suspicious duplicate or context-mismatched translations.
+The current selector offers 13 choices including English. Reaching 37 choices would require 24 additional fully translated catalogs. No partial locale is exposed as complete. Browser fallback rules map supported regional tags explicitly, including script-priority handling for Chinese and Portuguese-to-Brazilian-Portuguese fallback.
 
-The source-reference test covers strings already routed through `InterfaceText`, `formatInterfaceMessage`, and the interface-language helper. It does not prove that every UI literal in the application has been routed through localization; full app-wide translation remains outstanding. Native-speaker review and full RTL layout validation also remain open.
+Existing translation history is not available per string, so the baseline catalog is marked `legacy-unverified`. Two new labels are marked `machine-draft`. The terminology glossary defines game-domain terms and protected values. Native-speaker review remains outstanding.
 
-Production browser review used the Agentic VM at desktop and mobile widths. It checked Arabic setup, authenticated library, download empty states, settings (including the theme picker), document language and direction, and horizontal overflow. A wider Arabic route sample covered the main navigation and administration pages. The production build passed and the full test suite passed (3,772 passed, 7 skipped; one test file skipped). Populated API-backed flows, live indexer/download-client integrations, and externally supplied game or release text were not exercised; unrecognized or provider-supplied error details remain in their source language.
+The existing Playwright suite includes Arabic flows, mixed-direction game titles, accessible names, keyboard focus, narrow viewports, and 200% text scaling. The new stable-ID migration and layout audit have not been run in CI yet; repository workflows currently run on tag pushes or manual dispatch. Populated integrations and live provider data remain outside the current browser coverage.
 
 ## Locale selection
 
@@ -36,8 +38,12 @@ This first-wave locale set was selected as a practical rollout order, not as a c
 The World Bank's 2025 report estimates Mandarin Chinese, Hindi, and Spanish at 15%, 7.6%, and 6.9% of the global population respectively; its online-content data also places German, Chinese, and Japanese among leading languages. [World Bank, Digital Progress and Trends Report 2025](https://documents1.worldbank.org/curated/en/099112525160536089/pdf/P505350-59c98ca8-0803-4f23-b470-17f3dab010ab.pdf). W3Techs tracks website content-language share rather than app users. [W3Techs content-language survey](https://w3techs.com/technologies/cross/content_language/ranking). Reorder this list if maintainers later receive reliable demand signals.
 
 
-## 2026-10-28 implementation follow-up
+## 2026-10-29 implementation follow-up
 
-The navigation shell now uses namespaced IDs while resolving through the current English-key catalog, and carries a source checksum plus explicit legacy-unverified provenance. Shared locale utilities now expose CLDR plural/select helpers, localized numeric parsing and unit formatting, and a common script-aware direction resolver. A catalog integrity command is wired into `npm run check`; Playwright coverage adds a long mixed-direction title, accessible-name, keyboard-focus, narrow viewport, and 200% text-scale flow.
+The full 2,232-message catalog now uses stable namespaced IDs in the source manifest, and 1,456 fixed translation calls plus localizable source attributes were migrated. A generated source map preserves a compatibility bridge for dynamic legacy messages. Catalog generation is reproducible, source checksums fail on unreviewed source edits, and the integrity check compares selector locales with complete manifest coverage.
 
-See the [localization workflow](./localization-workflow.md) and [translation glossary](./translation-glossary.md). This is an incremental foundation: the remaining catalog entries still need stable-ID migration, and new interface locales must have complete reviewed catalogs before they are selectable. The current catalog has twelve target locales; reaching 37 total choices would require 24 additional fully translated locales.
+Plural and select helpers now take stable message IDs. Sidebar count labels use CLDR plural categories, regional digits come from the shared regional formatter, and date, number, percent, unit, and localized-number parsing helpers are available.
+
+Common physical inline Tailwind utilities were replaced with logical equivalents. The catalog check blocks regressions to physical inline spacing, alignment, borders, corners, and noncentered positions. Existing RTL browser coverage includes a long Arabic/English/Japanese game title, screen-reader naming, dialog keyboard focus, and 200% text scaling. Persian and Hebrew are covered by direction-resolver checks; they do not appear as selectable interface languages until their catalogs are complete.
+
+See the [localization workflow](./localization-workflow.md) and [translation glossary](./translation-glossary.md).

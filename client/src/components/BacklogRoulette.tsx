@@ -110,11 +110,11 @@ export default function BacklogRoulette({
             size="sm"
             className="h-8 gap-1.5"
             disabled={loading}
-            aria-label={t("Pick a game")}
+            aria-label={t("interface.pick_a_game_c1a9f0fb")}
           >
             <Dices className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">
-              <InterfaceText source="Pick a game" />
+              <InterfaceText source="interface.pick_a_game_c1a9f0fb" />
             </span>
           </Button>
         </DialogTrigger>
@@ -122,15 +122,15 @@ export default function BacklogRoulette({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Dices className="h-5 w-5 text-primary" />
-              <InterfaceText source="Backlog roulette" />
+              <InterfaceText source="interface.backlog_roulette_a636d178" />
             </DialogTitle>
             <DialogDescription>
-              <InterfaceText source="Too many games, nothing to play? Let fate choose tonight’s quest." />
+              <InterfaceText source="interface.too_many_games_nothing_to_play_let_6cb0fba3" />
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
             <Label htmlFor="roulette-pool">
-              <InterfaceText source="Pick from" />
+              <InterfaceText source="interface.pick_from_cd0562f8" />
             </Label>
             <Select
               value={pool}
@@ -148,37 +148,37 @@ export default function BacklogRoulette({
                 {pools.map((value) => (
                   <SelectItem key={value} value={value}>
                     {value === "owned" ? (
-                      <InterfaceText source="Owned games" />
+                      <InterfaceText source="interface.owned_games_daef9331" />
                     ) : value === "playing" ? (
-                      <InterfaceText source="Currently playing" />
+                      <InterfaceText source="interface.currently_playing_11f33077" />
                     ) : (
-                      <InterfaceText source="All visible games" />
+                      <InterfaceText source="interface.all_visible_games_21a37c61" />
                     )}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              <InterfaceText source="Your current search and filters apply. Hidden games stay out of the draw." />
+              <InterfaceText source="interface.your_current_search_and_filters_ap_d16bd663" />
             </p>
           </div>
           <div aria-live="polite" aria-atomic="true">
             {selected ? (
               <div className="rounded-lg border bg-muted/30 p-4 space-y-4">
                 <p className="text-xs font-semibold uppercase tracking-widest text-primary">
-                  <InterfaceText source="Tonight’s quest" />
+                  <InterfaceText source="interface.tonight_s_quest_07b89764" />
                 </p>
                 <div className="flex gap-4">
                   <img
                     key={selected.id}
                     src={coverSrc(selected.coverUrl)}
                     alt={formatInterfaceMessage(
-                      "Cover art for {title}",
+                      "interface.cover_art_for_title_44c4687e",
                       { title: selected.title },
                       language
                     )}
-                    lang={languageFor("Cover art for {title}")}
-                    dir={directionFor("Cover art for {title}")}
+                    lang={languageFor("interface.cover_art_for_title_44c4687e")}
+                    dir={directionFor("interface.cover_art_for_title_44c4687e")}
                     className="w-24 sm:w-28 aspect-[3/4] shrink-0 self-start rounded-md object-cover"
                   />
                   <div className="min-w-0 space-y-2">
@@ -196,7 +196,7 @@ export default function BacklogRoulette({
                 </div>
                 <p className="text-xs text-muted-foreground">
                   <InterfaceText
-                    source="Eligible options: {count}"
+                    source="interface.eligible_options_count_f3ea0f53"
                     values={{ count: Intl.NumberFormat(language).format(candidates.length) }}
                   />
                 </p>
@@ -206,16 +206,16 @@ export default function BacklogRoulette({
                 <Gamepad2 className="h-8 w-8 mx-auto text-muted-foreground" />
                 <p className="font-medium">
                   {candidates.length ? (
-                    <InterfaceText source="Ready for another quest?" />
+                    <InterfaceText source="interface.ready_for_another_quest_940cc507" />
                   ) : (
-                    <InterfaceText source="No games in this draw" />
+                    <InterfaceText source="interface.no_games_in_this_draw_5859286a" />
                   )}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {candidates.length ? (
-                    <InterfaceText source="Roll again to pick from your updated list." />
+                    <InterfaceText source="interface.roll_again_to_pick_from_your_updat_4148ccba" />
                   ) : (
-                    <InterfaceText source="Choose another pool or adjust your filters to find a game." />
+                    <InterfaceText source="interface.choose_another_pool_or_adjust_your_6ba5536a" />
                   )}
                 </p>
               </div>
@@ -229,8 +229,8 @@ export default function BacklogRoulette({
                 loading || starting || !candidates.length || (candidates.length === 1 && !!selected)
               }
             >
-              <Dices className="h-4 w-4 mr-2" />
-              <InterfaceText source="Roll again" />
+              <Dices className="h-4 w-4 me-2" />
+              <InterfaceText source="interface.roll_again_ba2a178a" />
             </Button>
             {selected && (
               <>
@@ -242,20 +242,20 @@ export default function BacklogRoulette({
                     setOpen(false);
                   }}
                 >
-                  <InterfaceText source="View game" />
+                  <InterfaceText source="interface.view_game_a57efe9a" />
                 </Button>
                 {selected.status === "owned" && onStartPlaying && (
                   <Button
-                    className="sm:ml-auto"
+                    className="sm:ms-auto"
                     onClick={startPlaying}
                     disabled={starting || loading}
                   >
                     {starting ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      <Loader2 className="h-4 w-4 me-2 animate-spin" />
                     ) : (
-                      <Gamepad2 className="h-4 w-4 mr-2" />
+                      <Gamepad2 className="h-4 w-4 me-2" />
                     )}
-                    <InterfaceText source="Mark as Playing" />
+                    <InterfaceText source="interface.mark_as_playing_d108203e" />
                   </Button>
                 )}
               </>

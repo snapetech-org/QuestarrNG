@@ -100,14 +100,14 @@ export default function TagListEditor({
       {tags.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {tags.map((tag) => (
-            <Badge key={tag} variant="secondary" className="gap-1 pr-1">
+            <Badge key={tag} variant="secondary" className="gap-1 pe-1">
               <span lang="und" dir="auto">
                 {tag}
               </span>
               <button
                 type="button"
                 onClick={() => handleRemove(tag)}
-                className="ml-1 rounded-full hover:bg-muted-foreground/20 p-0.5"
+                className="ms-1 rounded-full hover:bg-muted-foreground/20 p-0.5"
                 aria-label={formatInterfaceMessage(removeNameSource, { name: tag }, language)}
                 lang={languageFor(removeNameSource)}
                 dir={directionFor(removeNameSource)}

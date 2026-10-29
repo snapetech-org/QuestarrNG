@@ -553,7 +553,7 @@ export default function IndexersPage() {
               onClick={() => setIsProwlarrDialogOpen(true)}
               data-testid="button-sync-prowlarr"
             >
-              <RefreshCw className="h-4 w-4 mr-2" />
+              <RefreshCw className="h-4 w-4 me-2" />
               <InterfaceText source={"Sync Prowlarr"} />
             </Button>
             <Button
@@ -561,7 +561,7 @@ export default function IndexersPage() {
               onClick={handleAdd}
               data-testid="button-add-indexer"
             >
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 me-2" />
               <InterfaceText source={"Add Indexer"} />
             </Button>
           </>
@@ -592,7 +592,7 @@ export default function IndexersPage() {
                       className="uppercase"
                     >
                       {indexer.protocol === "json-catalog" ? (
-                        <InterfaceText source="JSON catalog" />
+                        <InterfaceText source="interface.json_catalog_2c1a40d4" />
                       ) : indexer.protocol === "newznab" ? (
                         <InterfaceText source={"Newznab"} />
                       ) : indexer.protocol === "g4u" ? (
@@ -607,12 +607,12 @@ export default function IndexersPage() {
                     >
                       {indexer.enabled ? (
                         <>
-                          <Check className="h-3 w-3 mr-1" />
+                          <Check className="h-3 w-3 me-1" />
                           <InterfaceText source={"Enabled"} />
                         </>
                       ) : (
                         <>
-                          <X className="h-3 w-3 mr-1" />
+                          <X className="h-3 w-3 me-1" />
                           <InterfaceText source={"Disabled"} />
                         </>
                       )}
@@ -630,7 +630,7 @@ export default function IndexersPage() {
                       onClick={() => testConnectionMutation.mutate({ id: indexer.id })}
                       disabled={testingIndexerId === indexer.id}
                       title="Test connection"
-                      aria-label={formatInterfaceMessage("Test connection for {name}", {
+                      aria-label={formatInterfaceMessage("interface.test_connection_for_name_8d0baec5", {
                         name: String(indexer.name ?? ""),
                       })}
                       data-testid={`button-test-indexer-${indexer.id}`}
@@ -649,7 +649,7 @@ export default function IndexersPage() {
                       variant="outline"
                       size="icon"
                       onClick={() => handleEdit(indexer)}
-                      aria-label={formatInterfaceMessage("Edit {name}", {
+                      aria-label={formatInterfaceMessage("interface.edit_name_4688b082", {
                         name: String(indexer.name ?? ""),
                       })}
                       data-testid={`button-edit-indexer-${indexer.id}`}
@@ -660,7 +660,7 @@ export default function IndexersPage() {
                       variant="outline"
                       size="icon"
                       onClick={() => deleteMutation.mutate(indexer.id)}
-                      aria-label={formatInterfaceMessage("Delete {name}", {
+                      aria-label={formatInterfaceMessage("interface.delete_name_2617e173", {
                         name: String(indexer.name ?? ""),
                       })}
                       data-testid={`button-delete-indexer-${indexer.id}`}
@@ -785,7 +785,7 @@ export default function IndexersPage() {
                           <InterfaceText source={"Torznab (Torrent)"} />
                         </SelectItem>
                         <SelectItem value="json-catalog">
-                          <InterfaceText source="JSON catalog (Hydra format)" />
+                          <InterfaceText source="interface.json_catalog_hydra_format_931fa886" />
                         </SelectItem>
                         <SelectItem value="newznab">
                           <InterfaceText source={"Newznab (Usenet)"} />
@@ -801,7 +801,7 @@ export default function IndexersPage() {
                           "Torznab for torrent indexers, Newznab for Usenet indexers, g4u.to for the g4u.to VIP API"
                         }
                       />{" "}
-                      <InterfaceText source="or a public HTTPS JSON catalog containing torrent links." />
+                      <InterfaceText source="interface.or_a_public_https_json_catalog_con_0b1ca305" />
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -814,11 +814,11 @@ export default function IndexersPage() {
                   <FormItem>
                     <RequiredFormLabel required>
                       {form.watch("protocol") === "json-catalog" ? (
-                        <InterfaceText source="Catalog HTTPS URL" />
+                        <InterfaceText source="interface.catalog_https_url_7c6cfad4" />
                       ) : form.watch("protocol") === "newznab" ? (
                         <InterfaceText source={"Newznab URL"} />
                       ) : form.watch("protocol") === "g4u" ? (
-                        <InterfaceText source="g4u.to URL" />
+                        <InterfaceText source="interface.g4u_to_url_b2eef5f5" />
                       ) : (
                         <InterfaceText source={"Torznab URL"} />
                       )}
@@ -937,10 +937,10 @@ export default function IndexersPage() {
                           onChange={field.onChange}
                           placeholder={
                             loadingCategories
-                              ? t("Loading categories...")
+                              ? t("interface.loading_categories_efb98511")
                               : availableCategories.length > 0
-                                ? t("Select categories...")
-                                : t("Save indexer first to load categories")
+                                ? t("interface.select_categories_cbcfbbf7")
+                                : t("interface.save_indexer_first_to_load_categor_29a6e9ba")
                           }
                           lang={languageFor(
                             loadingCategories
@@ -1006,7 +1006,7 @@ export default function IndexersPage() {
                   disabled={testingIndexerId !== null}
                   data-testid="button-test-connection-dialog"
                 >
-                  <Activity className="h-4 w-4 mr-2" />
+                  <Activity className="h-4 w-4 me-2" />
                   {testingIndexerId === "new" ? (
                     <InterfaceText source={"Testing..."} />
                   ) : (
@@ -1019,11 +1019,11 @@ export default function IndexersPage() {
                   data-testid="button-save-indexer"
                 >
                   {addMutation.isPending || updateMutation.isPending ? (
-                    <InterfaceText source="Saving..." />
+                    <InterfaceText source="interface.saving_1ee0c88f" />
                   ) : editingIndexer ? (
-                    <InterfaceText source="Update" />
+                    <InterfaceText source="interface.update_6e230e94" />
                   ) : (
-                    <InterfaceText source="Add" />
+                    <InterfaceText source="interface.add_9dc3aa14" />
                   )}
                 </Button>
               </div>
@@ -1204,7 +1204,7 @@ export default function IndexersPage() {
                   >
                     {prowlarrDiagnostics.management.success ? (
                       <>
-                        <InterfaceText source="Connected" />
+                        <InterfaceText source="interface.connected_7bf69370" />
                         {prowlarrDiagnostics.management.version && (
                           <>
                             {" "}
@@ -1214,7 +1214,7 @@ export default function IndexersPage() {
                       </>
                     ) : (
                       <>
-                        <InterfaceText source="Failed" />
+                        <InterfaceText source="interface.failed_5579c3d4" />
                         {prowlarrDiagnostics.management.status && (
                           <>
                             {" "}
@@ -1248,7 +1248,7 @@ export default function IndexersPage() {
                         <Badge variant={item.success ? "secondary" : "destructive"}>
                           {item.success ? (
                             <>
-                              <InterfaceText source="Connected" />
+                              <InterfaceText source="interface.connected_7bf69370" />
                               {item.status && (
                                 <>
                                   {" "}
@@ -1258,7 +1258,7 @@ export default function IndexersPage() {
                             </>
                           ) : (
                             <>
-                              <InterfaceText source="Failed" />
+                              <InterfaceText source="interface.failed_5579c3d4" />
                               {item.status && (
                                 <>
                                   {" "}
@@ -1290,11 +1290,11 @@ export default function IndexersPage() {
               >
                 {diagnosingProwlarr ? (
                   <>
-                    <Activity className="mr-2 h-4 w-4 animate-spin" />
+                    <Activity className="me-2 h-4 w-4 animate-spin" />
                     <InterfaceText source={"Testing..."} />
                   </>
                 ) : (
-                  <InterfaceText source="Test indexers" />
+                  <InterfaceText source="interface.test_indexers_fb298fff" />
                 )}
               </Button>
               <Button
@@ -1309,11 +1309,11 @@ export default function IndexersPage() {
               >
                 {syncProwlarrMutation.isPending ? (
                   <>
-                    <Activity className="mr-2 h-4 w-4 animate-spin" />
+                    <Activity className="me-2 h-4 w-4 animate-spin" />
                     <InterfaceText source={"Syncing..."} />
                   </>
                 ) : (
-                  <InterfaceText source="Sync Indexers" />
+                  <InterfaceText source="interface.sync_indexers_8ae22cc2" />
                 )}
               </Button>
             </div>

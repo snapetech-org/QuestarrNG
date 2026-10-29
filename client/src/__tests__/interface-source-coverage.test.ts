@@ -7,7 +7,12 @@ import {
   RELEASE_FORMAT_FIELD_LABELS,
   RELEASE_FORMAT_MATCH_MODE_LABELS,
 } from "@/lib/release-scoring-labels";
-import { UI_LABELS } from "@/lib/ui-labels";
+import { STABLE_INTERFACE_MESSAGES } from "@/lib/stable-interface-messages";
+
+const catalogIds = new Set(Object.keys(STABLE_INTERFACE_MESSAGES));
+const catalogSources = new Set(Object.values(STABLE_INTERFACE_MESSAGES));
+const hasCatalogMessage = (reference: string) =>
+  catalogIds.has(reference) || catalogSources.has(reference);
 
 const CLIENT_SOURCE_ROOT = resolve(process.cwd(), "client/src");
 
@@ -482,7 +487,7 @@ describe("interface source coverage", () => {
   it("catalogs every fixed interface string reference", () => {
     const uncatalogued = [...interfaceSourceKeys()].filter(
       (source) =>
-        !Object.hasOwn(UI_LABELS, source) && !INTENTIONALLY_UNTRANSLATED_SOURCE_KEYS.has(source)
+        !hasCatalogMessage(source) && !INTENTIONALLY_UNTRANSLATED_SOURCE_KEYS.has(source)
     );
 
     expect(uncatalogued).toEqual([]);
@@ -499,7 +504,7 @@ describe("interface source coverage", () => {
   it("catalogs fixed toast copy and translates it in the shared toast hook", () => {
     const uncatalogued = [...rawToastCopy()].filter(
       (source) =>
-        !Object.hasOwn(UI_LABELS, source) && !INTENTIONALLY_UNTRANSLATED_SOURCE_KEYS.has(source)
+        !hasCatalogMessage(source) && !INTENTIONALLY_UNTRANSLATED_SOURCE_KEYS.has(source)
     );
     const toastHook = readFileSync(resolve(CLIENT_SOURCE_ROOT, "hooks/use-toast.ts"), "utf8");
 

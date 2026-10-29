@@ -123,10 +123,10 @@ const GameCarouselSection = ({
         <div className="flex items-center gap-2 text-muted-foreground p-4 border rounded-md">
           <AlertCircle className="h-5 w-5" />
           <span
-            lang={languageFor("Failed to load games. Please try again later.")}
-            dir={directionFor("Failed to load games. Please try again later.")}
+            lang={languageFor("interface.failed_to_load_games_please_try_ag_acd660af")}
+            dir={directionFor("interface.failed_to_load_games_please_try_ag_acd660af")}
           >
-            {t("Failed to load games. Please try again later.")}
+            {t("interface.failed_to_load_games_please_try_ag_acd660af")}
           </span>
         </div>
       </div>
@@ -146,8 +146,8 @@ const GameCarouselSection = ({
         </div>
         <div className="flex items-center gap-2 text-muted-foreground p-4 border rounded-md">
           <AlertCircle className="h-5 w-5" />
-          <span lang={languageFor("No games found.")} dir={directionFor("No games found.")}>
-            {t("No games found.")}
+          <span lang={languageFor("interface.no_games_found_6eae7a0d")} dir={directionFor("interface.no_games_found_6eae7a0d")}>
+            {t("interface.no_games_found_6eae7a0d")}
           </span>
         </div>
       </div>
@@ -172,15 +172,15 @@ const GameCarouselSection = ({
                 onClick={() => refetch()}
                 disabled={isFetching}
                 className="h-8 w-8"
-                aria-label={t("Refresh games")}
-                lang={languageFor("Refresh games")}
-                dir={directionFor("Refresh games")}
+                aria-label={t("interface.refresh_games_8afd0f9f")}
+                lang={languageFor("interface.refresh_games_8afd0f9f")}
+                dir={directionFor("interface.refresh_games_8afd0f9f")}
               >
                 <RefreshCw className={cn("h-4 w-4", isFetching && "animate-spin")} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent lang={languageFor("Refresh")} dir={directionFor("Refresh")}>
-              {t("Refresh")}
+            <TooltipContent lang={languageFor("interface.refresh_0815aad4")} dir={directionFor("interface.refresh_0815aad4")}>
+              {t("interface.refresh_0815aad4")}
             </TooltipContent>
           </Tooltip>
           <Tooltip>
@@ -188,7 +188,7 @@ const GameCarouselSection = ({
               <div
                 className="inline-block"
                 role={canScrollPrev ? undefined : "group"}
-                aria-label={canScrollPrev ? undefined : t("First page reached")}
+                aria-label={canScrollPrev ? undefined : t("interface.first_page_reached_e70e1122")}
                 lang={languageFor(previousLabel)}
                 dir={directionFor(previousLabel)}
                 tabIndex={canScrollPrev ? undefined : 0}
@@ -204,7 +204,7 @@ const GameCarouselSection = ({
                   dir={directionFor(previousLabel)}
                   data-testid={`carousel-prev-${title.toLowerCase().replace(/\s+/g, "-")}`}
                 >
-                  <ChevronLeft className="h-4 w-4" />
+                  <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
                 </Button>
               </div>
             </TooltipTrigger>
@@ -219,7 +219,7 @@ const GameCarouselSection = ({
               <div
                 className="inline-block"
                 role={canScrollNext ? undefined : "group"}
-                aria-label={canScrollNext ? undefined : t("Last page reached")}
+                aria-label={canScrollNext ? undefined : t("interface.last_page_reached_0918b29a")}
                 lang={languageFor(nextLabel)}
                 dir={directionFor(nextLabel)}
                 tabIndex={canScrollNext ? undefined : 0}
@@ -235,7 +235,7 @@ const GameCarouselSection = ({
                   dir={directionFor(nextLabel)}
                   data-testid={`carousel-next-${title.toLowerCase().replace(/\s+/g, "-")}`}
                 >
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronRight className="h-4 w-4 rtl:rotate-180" />
                 </Button>
               </div>
             </TooltipTrigger>
@@ -249,7 +249,7 @@ const GameCarouselSection = ({
       </div>
       {isFetching && !isLoading && (
         <span role="status" aria-live="polite" className="sr-only">
-          <InterfaceText source="Updating {title}…" values={{ title }} />
+          <InterfaceText source="interface.updating_title_b02b8c3f" values={{ title }} />
         </span>
       )}
       <div className="relative w-full overflow-hidden" aria-busy={isFetching && !isLoading}>
@@ -273,11 +273,11 @@ const GameCarouselSection = ({
           aria-hidden={isFetching && !isLoading}
           inert={isFetching && !isLoading}
         >
-          <CarouselContent className="-ml-4 max-w-full">
+          <CarouselContent className="-ms-4 max-w-full">
             {games.map((game) => (
               <CarouselItem
                 key={game.id}
-                className="pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6"
+                className="ps-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6"
               >
                 <GameCard
                   game={game}

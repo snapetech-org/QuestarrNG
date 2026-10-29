@@ -13,9 +13,15 @@ import {
 } from "@/lib/notification-locale";
 import { localizeNotificationMessage } from "@/lib/notification-messages";
 import { UI_LABELS } from "@/lib/ui-labels";
+import { STABLE_INTERFACE_MESSAGES } from "@/lib/stable-interface-messages";
 import type { InterfaceLanguage } from "@/lib/interface-locale";
 
-const labels = UI_LABELS as Record<string, Partial<Record<InterfaceLanguage, string>>>;
+const labels = Object.fromEntries(
+  Object.entries(STABLE_INTERFACE_MESSAGES).map(([id, source]) => [
+    source,
+    UI_LABELS[id as keyof typeof UI_LABELS],
+  ])
+) as Record<string, Partial<Record<InterfaceLanguage, string>>>;
 
 function placeholders(value: string): string[] {
   return Array.from(value.matchAll(/\{([A-Za-z][A-Za-z0-9_]*)\}/g), (match) => match[1]!).sort();
@@ -33,7 +39,8 @@ describe("UI catalog structure", () => {
   it("has a nonempty translation and matching placeholders for every locale cell", () => {
     const problems: string[] = [];
 
-    for (const [source, translations] of Object.entries(labels)) {
+    for (const [id, translations] of Object.entries(UI_LABELS)) {
+      const source = STABLE_INTERFACE_MESSAGES[id as keyof typeof STABLE_INTERFACE_MESSAGES];
       const expected = placeholders(source).join(",");
       for (const language of NOTIFICATION_LOCALES) {
         const translation = translations[language];

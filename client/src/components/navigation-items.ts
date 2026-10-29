@@ -126,6 +126,10 @@ const allNavigation: AppNavItem[] = [
   { title: "Search", messageId: "navigation.search", url: "/search", icon: Search },
 ];
 
+export function getPageMessageId(path: string): StableInterfaceMessageId | undefined {
+  return allNavigation.find((entry) => entry.url === path)?.messageId;
+}
+
 export function getPageTitle(path: string): string {
   const item = allNavigation.find((entry) => entry.url === path);
   return item?.title ?? "QuestarrNG";

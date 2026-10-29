@@ -358,12 +358,12 @@ export default function ShareDiscordDialog({
           <Button variant="outline" onClick={handleDownload} disabled={busy || selected.size === 0}>
             {downloading ? (
               <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Loader2 className="w-4 h-4 me-2 animate-spin" />
                 <InterfaceText source={"Downloading..."} />
               </>
             ) : (
               <>
-                <Download className="w-4 h-4 mr-2" />
+                <Download className="w-4 h-4 me-2" />
                 <InterfaceText source={"Download"} />
               </>
             )}
@@ -372,12 +372,12 @@ export default function ShareDiscordDialog({
             <Button onClick={handleShare} disabled={busy || selected.size === 0}>
               {sharing ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2 className="w-4 h-4 me-2 animate-spin" />
                   <InterfaceText source={"Sharing..."} />
                 </>
               ) : (
                 <>
-                  <Share2 className="w-4 h-4 mr-2" />
+                  <Share2 className="w-4 h-4 me-2" />
                   <InterfaceText source={"Share to Discord"} />
                 </>
               )}

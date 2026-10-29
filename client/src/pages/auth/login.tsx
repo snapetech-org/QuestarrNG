@@ -79,23 +79,23 @@ export default function LoginPage() {
         <CardHeader className="text-center flex flex-col items-center gap-2">
           <img
             src={withBasePath("/Questarr_Logo-nobg.png")}
-            alt={t("QuestarrNG Logo")}
-            lang={languageFor("QuestarrNG Logo")}
-            dir={directionFor("QuestarrNG Logo")}
+            alt={t("interface.questarrng_logo_c8b19c6a")}
+            lang={languageFor("interface.questarrng_logo_c8b19c6a")}
+            dir={directionFor("interface.questarrng_logo_c8b19c6a")}
             className="h-16 w-auto mb-2"
           />
           <CardTitle
             className="text-2xl font-bold"
-            lang={languageFor("Welcome Back")}
-            dir={directionFor("Welcome Back")}
+            lang={languageFor("interface.welcome_back_cb897846")}
+            dir={directionFor("interface.welcome_back_cb897846")}
           >
-            {t("Welcome Back")}
+            {t("interface.welcome_back_cb897846")}
           </CardTitle>
           <CardDescription
-            lang={languageFor("Login to manage your game collection")}
-            dir={directionFor("Login to manage your game collection")}
+            lang={languageFor("interface.login_to_manage_your_game_collecti_af64167b")}
+            dir={directionFor("interface.login_to_manage_your_game_collecti_af64167b")}
           >
-            {t("Login to manage your game collection")}
+            {t("interface.login_to_manage_your_game_collecti_af64167b")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -106,24 +106,24 @@ export default function LoginPage() {
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel lang={languageFor("Username")} dir={directionFor("Username")}>
-                      {t("Username")}
+                    <FormLabel lang={languageFor("interface.username_1c08d4d9")} dir={directionFor("interface.username_1c08d4d9")}>
+                      {t("interface.username_1c08d4d9")}
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <User className="absolute start-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input
-                          className="pl-9"
-                          placeholder={t("Enter your username")}
-                          lang={languageFor("Enter your username")}
+                          className="ps-9"
+                          placeholder={t("interface.enter_your_username_50b9f4ac")}
+                          lang={languageFor("interface.enter_your_username_50b9f4ac")}
                           dir="auto"
                           {...field}
                         />
                       </div>
                     </FormControl>
                     <FormMessage
-                      lang={languageFor("Username is required")}
-                      dir={directionFor("Username is required")}
+                      lang={languageFor("interface.username_is_required_6d2b33f8")}
+                      dir={directionFor("interface.username_is_required_6d2b33f8")}
                     />
                   </FormItem>
                 )}
@@ -133,26 +133,26 @@ export default function LoginPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel lang={languageFor("Password")} dir={directionFor("Password")}>
-                      {t("Password")}
+                    <FormLabel lang={languageFor("interface.password_2cc30838")} dir={directionFor("interface.password_2cc30838")}>
+                      {t("interface.password_2cc30838")}
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Lock className="absolute start-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input
                           type="password"
-                          className="pl-9"
+                          className="ps-9"
                           autoComplete="current-password"
-                          placeholder={t("Enter your password")}
-                          lang={languageFor("Enter your password")}
-                          dir={directionFor("Enter your password")}
+                          placeholder={t("interface.enter_your_password_7b5830fd")}
+                          lang={languageFor("interface.enter_your_password_7b5830fd")}
+                          dir={directionFor("interface.enter_your_password_7b5830fd")}
                           {...field}
                         />
                       </div>
                     </FormControl>
                     <FormMessage
-                      lang={languageFor("Password is required")}
-                      dir={directionFor("Password is required")}
+                      lang={languageFor("interface.password_is_required_dd9a7069")}
+                      dir={directionFor("interface.password_is_required_dd9a7069")}
                     />
                   </FormItem>
                 )}
@@ -169,7 +169,7 @@ export default function LoginPage() {
             {oidcFailed && (
               <p className="text-sm text-destructive" role="alert">
                 {t(
-                  "Identity provider sign-in failed. Check the provider and account admission settings."
+                  "interface.identity_provider_sign_in_failed_c_86dc0d0c"
                 )}
               </p>
             )}
@@ -181,12 +181,12 @@ export default function LoginPage() {
                   className="w-full"
                   onClick={() => window.location.assign(withBasePath("/api/auth/oidc/login"))}
                 >
-                  <svg aria-hidden="true" className="mr-2 h-5 w-5" viewBox="0 0 24 24">
+                  <svg aria-hidden="true" className="me-2 h-5 w-5" viewBox="0 0 24 24">
                     <use
                       href={withBasePath(`/oidc-provider-icons.svg#oidc-${oidcPresentation.icon}`)}
                     />
                   </svg>
-                  {t("Continue with")} <bdi dir="auto">{t(oidcPresentation.labelKey)}</bdi>
+                  {t("interface.continue_with_5b5c8ac4")} <bdi dir="auto">{t(oidcPresentation.labelKey)}</bdi>
                 </Button>
                 <a
                   className="block text-center text-sm text-muted-foreground underline underline-offset-4"
@@ -195,7 +195,7 @@ export default function LoginPage() {
                   rel="noopener noreferrer"
                   aria-label={`${t(oidcPresentation.labelKey)} identity provider setup guide (opens in a new tab)`}
                 >
-                  {t("Provider setup guide")} <span aria-hidden="true">↗</span>
+                  {t("interface.provider_setup_guide_9f61fa39")} <span aria-hidden="true">↗</span>
                 </a>
               </div>
             )}

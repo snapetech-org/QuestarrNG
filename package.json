@@ -42,7 +42,8 @@
     "dev:test": "tsx scripts/clean-test-db.ts && cross-env SQLITE_DB_PATH=data/test.db PORT=5100 DISABLE_RATE_LIMITS=true npm run dev",
     "prepare": "husky",
     "db:copy:pg-to-sqlite": "tsx scripts/pg-to-sqlite.ts",
-    "check:localization": "node scripts/check-localization-catalog.js"
+    "check:localization": "node scripts/check-localization-catalog.js",
+    "generate:localization": "node scripts/generate-localization-catalog.js"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",

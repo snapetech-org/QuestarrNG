@@ -14,17 +14,17 @@ export default function LazyModalFallback({ message = "Loading..." }: LazyModalF
       <DialogContent className="sm:max-w-md" data-testid="lazy-modal-fallback">
         <DialogTitle
           className="sr-only"
-          lang={languageFor("Loading modal")}
-          dir={directionFor("Loading modal")}
+          lang={languageFor("interface.loading_modal_e1186d4e")}
+          dir={directionFor("interface.loading_modal_e1186d4e")}
         >
-          {t("Loading modal")}
+          {t("interface.loading_modal_e1186d4e")}
         </DialogTitle>
         <DialogDescription
           className="sr-only"
-          lang={languageFor("Please wait while content loads.")}
-          dir={directionFor("Please wait while content loads.")}
+          lang={languageFor("interface.please_wait_while_content_loads_6af7d155")}
+          dir={directionFor("interface.please_wait_while_content_loads_6af7d155")}
         >
-          {t("Please wait while content loads.")}
+          {t("interface.please_wait_while_content_loads_6af7d155")}
         </DialogDescription>
         <div
           className="flex h-32 items-center justify-center gap-2"

@@ -66,11 +66,11 @@ export default function StatsPage() {
 
   const pieData = useMemo(() => {
     return [
-      { key: "Wanted", name: t("Wanted"), value: stats.statusBreakdown.wanted },
-      { key: "Owned", name: t("Owned"), value: stats.statusBreakdown.owned },
-      { key: "Playing", name: t("Playing"), value: stats.statusBreakdown.playing },
-      { key: "Completed", name: t("Completed"), value: stats.statusBreakdown.completed },
-      { key: "Downloading", name: t("Downloading"), value: stats.statusBreakdown.downloading },
+      { key: "Wanted", name: t("interface.wanted_4237dc0e"), value: stats.statusBreakdown.wanted },
+      { key: "Owned", name: t("interface.owned_8922a21e"), value: stats.statusBreakdown.owned },
+      { key: "Playing", name: t("navigation.playing"), value: stats.statusBreakdown.playing },
+      { key: "Completed", name: t("interface.completed_ec88aab2"), value: stats.statusBreakdown.completed },
+      { key: "Downloading", name: t("interface.downloading_8d063a47"), value: stats.statusBreakdown.downloading },
     ].filter((item) => item.value > 0);
   }, [stats.statusBreakdown, t]);
 
@@ -96,18 +96,18 @@ export default function StatsPage() {
         <div>
           <h1
             className="text-2xl font-bold tracking-tight"
-            lang={languageFor("Statistics")}
-            dir={directionFor("Statistics")}
+            lang={languageFor("interface.statistics_9e6fb02a")}
+            dir={directionFor("interface.statistics_9e6fb02a")}
           >
-            {t("Statistics")}
+            {t("interface.statistics_9e6fb02a")}
           </h1>
           <p
             className="text-muted-foreground text-sm mt-0.5"
-            lang={languageFor("Detailed insights into your collection of {count} games.")}
-            dir={directionFor("Detailed insights into your collection of {count} games.")}
+            lang={languageFor("interface.detailed_insights_into_your_collec_02841828")}
+            dir={directionFor("interface.detailed_insights_into_your_collec_02841828")}
           >
             {formatInterfaceMessage(
-              "Detailed insights into your collection of {count} games.",
+              "interface.detailed_insights_into_your_collec_02841828",
               { count: stats.totalGames },
               language
             )}
@@ -115,7 +115,7 @@ export default function StatsPage() {
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <Button variant="outline" size="sm" onClick={() => setShareOpen(true)}>
-            <Share2 className="w-4 h-4 mr-2" />
+            <Share2 className="w-4 h-4 me-2" />
             <span
               lang={languageFor(discordConfig?.configured ? "Share to Discord" : "Share")}
               dir={directionFor(discordConfig?.configured ? "Share to Discord" : "Share")}
@@ -207,8 +207,8 @@ export default function StatsPage() {
           <CardHeader>
             <CardTitle className="text-lg font-medium flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-primary" />
-              <span lang={languageFor("Status Breakdown")} dir={directionFor("Status Breakdown")}>
-                {t("Status Breakdown")}
+              <span lang={languageFor("interface.status_breakdown_2dd0dd1c")} dir={directionFor("interface.status_breakdown_2dd0dd1c")}>
+                {t("interface.status_breakdown_2dd0dd1c")}
               </span>
             </CardTitle>
           </CardHeader>
@@ -259,8 +259,8 @@ export default function StatsPage() {
           <CardHeader>
             <CardTitle className="text-lg font-medium flex items-center gap-2">
               <LayoutGrid className="w-5 h-5 text-primary" />
-              <span lang={languageFor("Quick Info")} dir={directionFor("Quick Info")}>
-                {t("Quick Info")}
+              <span lang={languageFor("interface.quick_info_c8098f68")} dir={directionFor("interface.quick_info_c8098f68")}>
+                {t("interface.quick_info_c8098f68")}
               </span>
             </CardTitle>
           </CardHeader>
@@ -270,8 +270,8 @@ export default function StatsPage() {
                 <Tags className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 <div>
                   <p className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
-                    <span lang={languageFor("Top Genre")} dir={directionFor("Top Genre")}>
-                      {t("Top Genre")}
+                    <span lang={languageFor("interface.top_genre_cc7e50f3")} dir={directionFor("interface.top_genre_cc7e50f3")}>
+                      {t("interface.top_genre_cc7e50f3")}
                     </span>
                   </p>
                   <p className="font-medium">
@@ -280,8 +280,8 @@ export default function StatsPage() {
                         {stats.topGenre.name}
                       </span>
                     ) : (
-                      <span lang={languageFor("N/A")} dir={directionFor("N/A")}>
-                        {t("N/A")}
+                      <span lang={languageFor("interface.n_a_79db7a01")} dir={directionFor("interface.n_a_79db7a01")}>
+                        {t("interface.n_a_79db7a01")}
                       </span>
                     )}
                   </p>
@@ -292,8 +292,8 @@ export default function StatsPage() {
                 <Gamepad2 className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 <div>
                   <p className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
-                    <span lang={languageFor("Top Platform")} dir={directionFor("Top Platform")}>
-                      {t("Top Platform")}
+                    <span lang={languageFor("interface.top_platform_55121747")} dir={directionFor("interface.top_platform_55121747")}>
+                      {t("interface.top_platform_55121747")}
                     </span>
                   </p>
                   <p className="font-medium">
@@ -302,8 +302,8 @@ export default function StatsPage() {
                         {stats.topPlatform.name}
                       </span>
                     ) : (
-                      <span lang={languageFor("N/A")} dir={directionFor("N/A")}>
-                        {t("N/A")}
+                      <span lang={languageFor("interface.n_a_79db7a01")} dir={directionFor("interface.n_a_79db7a01")}>
+                        {t("interface.n_a_79db7a01")}
                       </span>
                     )}
                   </p>
@@ -314,8 +314,8 @@ export default function StatsPage() {
                 <Building2 className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 <div>
                   <p className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
-                    <span lang={languageFor("Top Publisher")} dir={directionFor("Top Publisher")}>
-                      {t("Top Publisher")}
+                    <span lang={languageFor("interface.top_publisher_7dcd1cec")} dir={directionFor("interface.top_publisher_7dcd1cec")}>
+                      {t("interface.top_publisher_7dcd1cec")}
                     </span>
                   </p>
                   <p className="font-medium">
@@ -324,8 +324,8 @@ export default function StatsPage() {
                         {stats.topPublisher.name}
                       </span>
                     ) : (
-                      <span lang={languageFor("N/A")} dir={directionFor("N/A")}>
-                        {t("N/A")}
+                      <span lang={languageFor("interface.n_a_79db7a01")} dir={directionFor("interface.n_a_79db7a01")}>
+                        {t("interface.n_a_79db7a01")}
                       </span>
                     )}
                   </p>
@@ -337,10 +337,10 @@ export default function StatsPage() {
                 <div>
                   <p className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
                     <span
-                      lang={languageFor("Unique Developers")}
-                      dir={directionFor("Unique Developers")}
+                      lang={languageFor("interface.unique_developers_476b0305")}
+                      dir={directionFor("interface.unique_developers_476b0305")}
                     >
-                      {t("Unique Developers")}
+                      {t("interface.unique_developers_476b0305")}
                     </span>
                   </p>
                   <p className="font-medium">{stats.uniqueDevelopers}</p>
@@ -352,10 +352,10 @@ export default function StatsPage() {
                 <div>
                   <p className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
                     <span
-                      lang={languageFor("Avg. Release Year")}
-                      dir={directionFor("Avg. Release Year")}
+                      lang={languageFor("interface.avg_release_year_2229636f")}
+                      dir={directionFor("interface.avg_release_year_2229636f")}
                     >
-                      {t("Avg. Release Year")}
+                      {t("interface.avg_release_year_2229636f")}
                     </span>
                   </p>
                   <p className="font-medium">{stats.avgReleaseYear}</p>

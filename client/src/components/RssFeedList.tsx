@@ -59,7 +59,7 @@ export default function RssFeedList() {
           />
         </p>
         <Button onClick={() => refreshFeeds()} disabled={isRefreshing} variant="outline">
-          <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+          <RefreshCw className={`me-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
           <InterfaceText source={"Refresh Feeds"} />
         </Button>
       </div>
@@ -111,7 +111,7 @@ export default function RssFeedList() {
         </div>
 
         <Button onClick={() => refreshFeeds()} disabled={isRefreshing} size="sm" variant="outline">
-          <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
+          <RefreshCw className={`me-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
           <InterfaceText source={"Refresh Feeds"} />
         </Button>
       </div>
@@ -138,7 +138,7 @@ export default function RssFeedList() {
                     className="w-full h-full object-cover"
                   />
                   {item.igdbGameName && (
-                    <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white p-2 text-xs truncate">
+                    <div className="absolute bottom-0 start-0 end-0 bg-black/60 text-white p-2 text-xs truncate">
                       <InterfaceText source={"Matched:"} /> {item.igdbGameName}
                     </div>
                   )}
@@ -165,7 +165,7 @@ export default function RssFeedList() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-primary hover:underline flex items-center gap-1 mt-2"
-                  aria-label={formatInterfaceMessage("View original article for {title}", {
+                  aria-label={formatInterfaceMessage("interface.view_original_article_for_title_730db17a", {
                     title: String(item.title ?? ""),
                   })}
                   data-i18n-aria-label={"View original article for {title}"}

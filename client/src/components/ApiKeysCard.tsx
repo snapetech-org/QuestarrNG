@@ -233,7 +233,7 @@ export function ApiKeysCard() {
             className="sm:col-span-2 xl:col-span-1"
             disabled={!trimmedName || createMutation.isPending}
           >
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="me-2 h-4 w-4" />
             {createMutation.isPending ? (
               <InterfaceText source={"Creating..."} />
             ) : (
@@ -323,7 +323,7 @@ export function ApiKeysCard() {
                     type="button"
                     variant="ghost"
                     size="icon"
-                    aria-label={formatInterfaceMessage("Revoke API key {name}", {
+                    aria-label={formatInterfaceMessage("interface.revoke_api_key_name_4e64cd95", {
                       name: String(key.name ?? ""),
                     })}
                     onClick={() => setPendingRevoke(key)}
