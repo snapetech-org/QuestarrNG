@@ -2,7 +2,7 @@ import { coverSrc } from "@/lib/cover";
 import React, { useState, memo, useRef, useEffect, lazy, Suspense } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Star, Calendar, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Download, Star, Calendar, Eye, EyeOff, Loader2, Check, Plus } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { TagList } from "@/components/ui/tag-list";
@@ -37,6 +37,9 @@ interface GameCardProps {
   onViewDetails?: ((gameId: string) => void) | undefined;
   onTrackGame?: ((game: Game) => void) | undefined;
   onToggleHidden?: ((gameId: string, hidden: boolean) => void) | undefined;
+  isBulkSelected?: boolean;
+  bulkSelectionDisabled?: boolean;
+  onToggleBulkSelection?: ((game: Game) => void) | undefined;
   isDiscovery?: boolean;
   downloadSummary?: DownloadSummary | undefined;
 }
@@ -50,6 +53,9 @@ const GameCard = ({
   onViewDetails,
   onTrackGame,
   onToggleHidden,
+  isBulkSelected = false,
+  bulkSelectionDisabled = false,
+  onToggleBulkSelection,
   isDiscovery = false,
   downloadSummary,
 }: GameCardProps) => {
@@ -178,6 +184,28 @@ const GameCard = ({
           loading="lazy"
           data-testid={`img-cover-${game.id}`}
         />
+        {isDiscovery && onToggleBulkSelection && (!bulkSelectionDisabled || isBulkSelected) && (
+          <div className="absolute left-1.5 top-1.5 z-20 sm:left-2 sm:top-2">
+            <Button
+              type="button"
+              size="icon"
+              variant={isBulkSelected ? "default" : "secondary"}
+              className="h-9 w-9 bg-background/90 shadow-sm backdrop-blur-sm"
+              onClick={(event) => {
+                event.stopPropagation();
+                onToggleBulkSelection(game);
+              }}
+              aria-label={formatInterfaceMessage(
+                isBulkSelected ? "Remove {title} from bulk selection" : "Select {title} for bulk add",
+                { title: game.title }
+              )}
+              aria-pressed={isBulkSelected}
+              data-testid={`button-bulk-select-${game.id}`}
+            >
+              {isBulkSelected ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+            </Button>
+          </div>
+        )}
         <DownloadIndicator summary={downloadSummary} />
         <div className="absolute right-1.5 top-1.5 flex max-w-[calc(100%-0.75rem)] flex-col items-end gap-1 sm:right-2 sm:top-2">
           {!isDiscovery && game.status && <StatusBadge status={game.status} />}
