@@ -16,16 +16,16 @@ Run `npm run check:localization` to check IDs, generated output, locale complete
 - Keep game titles, release names, paths, filenames, URLs, hashes, API values, status codes, provider details, and other user or external data intact.
 - Keep placeholders identical across every locale.
 - Use the [translation glossary](./translation-glossary.md) for game-domain terms and protected values.
-- Record `machine-draft`, `inherited`, or `reviewed` per locale when the translation history is known. Use `reviewed` only after a qualified human checks the wording and product context. Existing translations without an audit trail remain `legacy-unverified`.
+- Record `machine-draft`, `inherited`, or `reviewed` per locale when the translation history is known. Use `reviewed` only after a qualified human checks the wording and product context. Existing translations without an audit trail remain `legacy-unverified`. For inherited entries, record the parent locale in `translationSources`; the checker verifies that the inherited text matches the parent.
 - Review all translations affected by a source edit, then update that message's source checksum. A copy edit must not change the ID.
 
 ## Locale availability and fallback
 
-The selector contains English plus the twelve complete target catalogs. The checker requires the selector and manifest locale lists to match and every target cell to be nonempty with matching placeholders. This blocks partial catalogs from appearing as complete interface languages.
+The selector contains English plus fourteen complete target catalogs. The checker requires the selector and manifest locale lists to match and every target cell to be nonempty with matching placeholders. The two regional additions inherit complete Spanish and French catalogs and retain per-message parent provenance; inherited status does not imply native review.
 
-Browser-language fallback is explicit: Portuguese regional tags resolve to Brazilian Portuguese; Chinese scripts take priority, then Taiwan/Hong Kong/Macau resolve to Traditional Chinese and China/Singapore resolve to Simplified Chinese; other supported regional tags fall back to their supported base language. Regional formatting remains independent from interface language.
+Browser-language fallback is explicit: Latin American Spanish regions resolve to es-419, other Spanish regions to es; Canadian French resolves to fr-CA, other French to fr; Portuguese uses the only currently complete catalog (pt-BR) until pt or pt-PT is complete; Chinese script tags take priority, then Taiwan/Hong Kong/Macau resolve to Traditional Chinese and China/Singapore to Simplified Chinese. Other supported regional tags fall back to their available base language. Regional formatting remains independent from interface language.
 
-Locale breadth can grow only when full message coverage is supplied. The current 13 selector choices are short of a 37-choice target by 24; this change adds the completeness gate, not fabricated translations.
+The [machine-readable locale map](../localization/locale-map.json) lists all 37 target choices, availability, native names, direction, provenance, and fallback rules. Fifteen choices are available now including English; 22 need complete catalogs. A locale enters the selector only after every stable message is present with matching placeholders.
 
 ## Message formatting and direction
 

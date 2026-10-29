@@ -4,11 +4,13 @@ import {
   formatInterfacePluralMessage,
   formatInterfaceSelectMessage,
   getInterfaceLanguageDirection,
+  resolveInterfaceLanguage,
   translateInterfaceLabel,
   translateInterfaceMessage,
 } from "@/lib/interface-locale";
 import {
   formatRegionalPluralMessage,
+  formatRegionalNumber,
   formatRegionalUnit,
   parseRegionalNumber,
 } from "@/lib/regional-format";
@@ -76,6 +78,20 @@ describe("localization infrastructure", () => {
     ).toBe("Cancel");
   });
 
+  it("resolves regional language tags only to complete selectable catalogs", () => {
+    expect(resolveInterfaceLanguage("es-MX")).toBe("es-419");
+    expect(resolveInterfaceLanguage("es-419")).toBe("es-419");
+    expect(resolveInterfaceLanguage("es-ES")).toBe("es");
+    expect(resolveInterfaceLanguage("fr-CA")).toBe("fr-CA");
+    expect(resolveInterfaceLanguage("fr-FR")).toBe("fr");
+    expect(resolveInterfaceLanguage("pt-BR")).toBe("pt-BR");
+    // European Portuguese remains on the only selectable Portuguese catalog until its own is complete.
+    expect(resolveInterfaceLanguage("pt-PT")).toBe("pt-BR");
+    expect(resolveInterfaceLanguage("ru-RU")).toBeUndefined();
+    expect(resolveInterfaceLanguage("zh-Hant-HK")).toBe("zh-Hant");
+    expect(resolveInterfaceLanguage("zh-Hans-SG")).toBe("zh-Hans");
+  });
+
   it("resolves RTL direction for scripts beyond the currently translated locale set", () => {
     expect(getInterfaceLanguageDirection("ar")).toBe("rtl");
     expect(getInterfaceLanguageDirection("fa-IR")).toBe("rtl");
@@ -100,6 +116,15 @@ describe("localization infrastructure", () => {
     expect(parseRegionalNumber("12,34.5", "en-US")).toBeNull();
     expect(parseRegionalNumber("1.234,5", "en-US")).toBeNull();
     expect(parseRegionalNumber("", "en-US")).toBeNull();
+  });
+
+  it("formats numbers using regional variant preferences", () => {
+    expect(formatRegionalNumber(1234.5, undefined, "es-419")).toBe(
+      new Intl.NumberFormat("es-419").format(1234.5)
+    );
+    expect(formatRegionalNumber(1234.5, undefined, "fr-CA")).toBe(
+      new Intl.NumberFormat("fr-CA").format(1234.5)
+    );
   });
 
   it("formats measurement units through Intl.NumberFormat", () => {

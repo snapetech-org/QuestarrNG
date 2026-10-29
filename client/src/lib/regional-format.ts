@@ -34,11 +34,13 @@ export const REGIONAL_FORMAT_KEY = "questarrng.regional-format";
 export const REGIONAL_FORMAT_OPTIONS = [
   { value: "system", label: "Use browser settings" },
   { value: "es", nativeName: "Español", englishName: "Spanish" },
+  { value: "es-419", nativeName: "Español (Latinoamérica)", englishName: "Spanish (Latin America)" },
   { value: "zh-CN", nativeName: "简体中文", englishName: "Chinese (Simplified)" },
   { value: "hi-IN", nativeName: "हिन्दी", englishName: "Hindi" },
   { value: "de", nativeName: "Deutsch", englishName: "German" },
   { value: "ja", nativeName: "日本語", englishName: "Japanese" },
   { value: "fr", nativeName: "Français", englishName: "French" },
+  { value: "fr-CA", nativeName: "Français (Canada)", englishName: "French (Canada)" },
   { value: "pt-BR", nativeName: "Português (Brasil)", englishName: "Brazilian Portuguese" },
   { value: "ar", nativeName: "العربية", englishName: "Arabic" },
   { value: "ko", nativeName: "한국어", englishName: "Korean" },

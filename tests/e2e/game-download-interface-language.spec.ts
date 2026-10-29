@@ -924,3 +924,78 @@ test(
     expect(keyboardFocusRemainsInDialog).toBe(true);
   }
 );
+
+test("keeps the RTL import-history table and task sheet accessible", async ({ page }) => {
+  const longMixedTitle =
+    "لعبة استراتيجية طويلة — Questarr Import Review / Edition 2026 — 日本語";
+  const task = {
+    id: "rtl-import-task-1",
+    taskType: "file_import",
+    triggeredBy: "manual",
+    status: "completed",
+    createdAt: Date.now() - 60_000,
+    startedAt: Date.now() - 55_000,
+    completedAt: Date.now() - 10_000,
+    totalItems: 1,
+    addedItems: 1,
+    skippedItems: 0,
+    failedItems: 0,
+    errorMessage: null,
+  };
+
+  await page.addInitScript(() => {
+    localStorage.setItem("questarr.interface-language", "ar");
+    localStorage.setItem("questarrng.regional-format", "ar");
+  });
+  await page.route("**/api/games*", async (route) => route.fulfill({ json: [] }));
+  await page.route("**/api/downloads*", async (route) =>
+    route.fulfill({ json: { downloads: [], errors: [] } })
+  );
+  await page.route("**/api/config", async (route) =>
+    route.fulfill({ json: { igdb: { configured: true } } })
+  );
+  await page.route("**/api/import-tasks*", async (route) => {
+    const pathname = new URL(route.request().url()).pathname;
+    if (pathname.endsWith("/api/import-tasks")) {
+      await route.fulfill({ json: [task] });
+      return;
+    }
+    await route.fulfill({
+      json: {
+        ...task,
+        items: [
+          {
+            id: "rtl-import-item-1",
+            itemName: longMixedTitle,
+            gameTitle: longMixedTitle,
+            errorMessage: null,
+          },
+        ],
+      },
+    });
+  });
+
+  await page.goto("/import-history");
+  await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+  const table = page.getByRole("table");
+  await expect(table).toBeVisible();
+  const firstHeader = table.getByRole("columnheader").first();
+  await expect(firstHeader).toContainText("النوع");
+  await expect(firstHeader.locator("span")).toHaveAttribute("lang", "ar");
+  await expect(firstHeader).toHaveCSS("text-align", "right");
+
+  const taskRow = table.locator("tbody tr").first();
+  await taskRow.focus();
+  await page.keyboard.press("Enter");
+
+  const taskSheet = page.getByRole("dialog", { name: "استيراد الملفات" });
+  await expect(taskSheet).toBeVisible();
+  await expect(taskSheet).toHaveCSS("direction", "rtl");
+  const title = taskSheet.getByText(longMixedTitle, { exact: true });
+  await expect(title).toHaveAttribute("lang", "und");
+  await expect(title).toHaveAttribute("dir", "auto");
+  await expect(title).toBeVisible();
+
+  await page.keyboard.press("Escape");
+  await expect(taskSheet).not.toBeVisible();
+});

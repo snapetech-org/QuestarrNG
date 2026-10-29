@@ -9,11 +9,13 @@ import {
 export const INTERFACE_LANGUAGE_OPTIONS = [
   { value: "en", nativeName: "English", englishName: undefined },
   { value: "es", nativeName: "Español", englishName: "Spanish" },
+  { value: "es-419", nativeName: "Español (Latinoamérica)", englishName: "Spanish (Latin America)" },
   { value: "zh-Hans", nativeName: "简体中文", englishName: "Simplified Chinese" },
   { value: "hi", nativeName: "हिन्दी", englishName: "Hindi" },
   { value: "de", nativeName: "Deutsch", englishName: "German" },
   { value: "ja", nativeName: "日本語", englishName: "Japanese" },
   { value: "fr", nativeName: "Français", englishName: "French" },
+  { value: "fr-CA", nativeName: "Français (Canada)", englishName: "French (Canada)" },
   { value: "pt-BR", nativeName: "Português (Brasil)", englishName: "Brazilian Portuguese" },
   { value: "ar", nativeName: "العربية", englishName: "Arabic" },
   { value: "ko", nativeName: "한국어", englishName: "Korean" },
@@ -43,7 +45,17 @@ function isInterfaceLanguage(value: string | null): value is InterfaceLanguage {
 }
 
 export const INTERFACE_LANGUAGE_FALLBACKS = {
-  pt: "pt-BR",
+  es: {
+    default: "es",
+    latinAmerica: "es-419",
+    latinAmericaRegions: ["419", "ar", "bo", "br", "bz", "cl", "co", "cr", "cu", "do", "ec", "gt", "hn", "mx", "ni", "pa", "pe", "pr", "py", "sv", "us", "uy", "ve"],
+  },
+  fr: { default: "fr", regions: { ca: "fr-CA" } },
+  pt: {
+    default: "pt-BR",
+    regions: { br: "pt-BR", pt: "pt-PT" },
+    unavailableFallback: "pt-BR",
+  },
   zh: {
     default: "zh-Hans",
     script: { hans: "zh-Hans", hant: "zh-Hant" },
@@ -51,26 +63,67 @@ export const INTERFACE_LANGUAGE_FALLBACKS = {
   },
 } as const;
 
+function availableInterfaceLanguage(value: string): InterfaceLanguage | undefined {
+  const normalized = value.toLowerCase();
+  return INTERFACE_LANGUAGE_OPTIONS.find((option) => option.value.toLowerCase() === normalized)?.value;
+}
+
+function localeRegion(subtags: string[]): string | undefined {
+  return subtags.find((subtag) => subtag === "419" || /^[a-z]{2}$/u.test(subtag));
+}
+
 export function resolveInterfaceLanguage(candidate: string): InterfaceLanguage | undefined {
   const normalized = candidate.trim().replaceAll("_", "-").toLowerCase();
   if (!normalized) return undefined;
   const subtags = normalized.split("-");
   const base = subtags[0];
+  const region = localeRegion(subtags);
+
   if (base === "zh") {
     const script = subtags.find((subtag) => subtag === "hans" || subtag === "hant");
     if (script === "hans" || script === "hant") {
-      return INTERFACE_LANGUAGE_FALLBACKS.zh.script[script];
+      return availableInterfaceLanguage(INTERFACE_LANGUAGE_FALLBACKS.zh.script[script]);
     }
-    const region = subtags.find((subtag) => /^[a-z]{2}$/u.test(subtag));
-    if (region && Object.hasOwn(INTERFACE_LANGUAGE_FALLBACKS.zh.region, region)) {
-      return INTERFACE_LANGUAGE_FALLBACKS.zh.region[
-        region as keyof typeof INTERFACE_LANGUAGE_FALLBACKS.zh.region
-      ];
-    }
-    return INTERFACE_LANGUAGE_FALLBACKS.zh.default;
+    const regional = region
+      ? INTERFACE_LANGUAGE_FALLBACKS.zh.region[
+          region as keyof typeof INTERFACE_LANGUAGE_FALLBACKS.zh.region
+        ]
+      : undefined;
+    return availableInterfaceLanguage(regional ?? INTERFACE_LANGUAGE_FALLBACKS.zh.default);
   }
-  if (base === "pt") return INTERFACE_LANGUAGE_FALLBACKS.pt;
-  return INTERFACE_LANGUAGE_OPTIONS.find((option) => option.value.toLowerCase() === base)?.value;
+
+  if (base === "es") {
+    const isLatinAmerican =
+      region !== undefined &&
+      INTERFACE_LANGUAGE_FALLBACKS.es.latinAmericaRegions.includes(
+        region as (typeof INTERFACE_LANGUAGE_FALLBACKS.es.latinAmericaRegions)[number]
+      );
+    const preferred = isLatinAmerican
+      ? INTERFACE_LANGUAGE_FALLBACKS.es.latinAmerica
+      : INTERFACE_LANGUAGE_FALLBACKS.es.default;
+    return availableInterfaceLanguage(preferred) ?? availableInterfaceLanguage("es");
+  }
+
+  if (base === "fr") {
+    const preferred =
+      region === "ca" ? INTERFACE_LANGUAGE_FALLBACKS.fr.regions.ca : INTERFACE_LANGUAGE_FALLBACKS.fr.default;
+    return availableInterfaceLanguage(preferred) ?? availableInterfaceLanguage("fr");
+  }
+
+  if (base === "pt") {
+    const preferred = region
+      ? INTERFACE_LANGUAGE_FALLBACKS.pt.regions[
+          region as keyof typeof INTERFACE_LANGUAGE_FALLBACKS.pt.regions
+        ]
+      : undefined;
+    return (
+      (preferred ? availableInterfaceLanguage(preferred) : undefined) ??
+      availableInterfaceLanguage("pt") ??
+      availableInterfaceLanguage(INTERFACE_LANGUAGE_FALLBACKS.pt.unavailableFallback)
+    );
+  }
+
+  return availableInterfaceLanguage(base);
 }
 
 export function getBrowserInterfaceLanguage(

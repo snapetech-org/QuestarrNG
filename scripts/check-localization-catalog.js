@@ -6,13 +6,15 @@ import ts from "typescript";
 
 const root = process.cwd();
 const failures = [];
-const [manifestSource, provenanceSource, interfaceSource] = await Promise.all([
+const [manifestSource, provenanceSource, interfaceSource, localeMapSource] = await Promise.all([
   readFile(path.join(root, "localization/messages.json"), "utf8"),
   readFile(path.join(root, "client/src/lib/localization-provenance.json"), "utf8"),
   readFile(path.join(root, "client/src/lib/interface-locale.ts"), "utf8"),
+  readFile(path.join(root, "localization/locale-map.json"), "utf8"),
 ]);
 const manifest = JSON.parse(manifestSource);
 const provenance = JSON.parse(provenanceSource);
+const localeMap = JSON.parse(localeMapSource);
 const messages = manifest.messages ?? {};
 const ids = Object.keys(messages);
 const idSet = new Set(ids);
@@ -135,8 +137,64 @@ if (JSON.stringify(optionValues) !== JSON.stringify(expectedOptions)) {
   failures.push("Interface selector locales must match English plus localization/messages.json targetLanguages in order.");
 }
 
-if (provenance.schemaVersion !== 1 || provenance.checksumAlgorithm !== "fnv1a32-utf16-code-units") {
+if (provenance.schemaVersion !== 2 || provenance.checksumAlgorithm !== "fnv1a32-utf16-code-units") {
   failures.push("Localization provenance schema or checksum algorithm is unsupported.");
+}
+
+const localeRows = Array.isArray(localeMap.locales) ? localeMap.locales : [];
+const localeTags = localeRows.map((locale) => locale.tag);
+const localeTagSet = new Set(localeTags);
+const enabledMapTags = localeRows
+  .filter((locale) => locale.availability === "source" || locale.availability === "available")
+  .map((locale) => locale.tag)
+  .sort();
+const enabledManifestTags = ["en", ...targetLanguages].sort();
+const plannedLocaleCount = localeRows.filter(
+  (locale) => locale.availability === "translation-needed"
+).length;
+if (
+  localeMap.schemaVersion !== 1 ||
+  localeMap.sourceLanguage !== "en" ||
+  localeMap.targetChoiceCount !== 37 ||
+  localeRows.length !== localeMap.targetChoiceCount ||
+  new Set(localeTags).size !== localeTags.length
+) {
+  failures.push("The locale rollout map must contain 37 unique choices including English.");
+}
+if (JSON.stringify(enabledMapTags) !== JSON.stringify(enabledManifestTags)) {
+  failures.push("Available locale-map entries must match English plus the complete selector catalogs.");
+}
+if (plannedLocaleCount !== localeRows.length - enabledManifestTags.length) {
+  failures.push("Every locale outside the selector must be explicitly marked translation-needed.");
+}
+for (const locale of localeRows) {
+  if (locale.availability === "source" && locale.tag !== "en") {
+    failures.push("Only English may be marked as the source locale.");
+  }
+  if (locale.availability === "translation-needed" && !locale.reviewStatus) {
+    failures.push("Planned locale " + locale.tag + " needs a review-status marker.");
+  }
+  if (locale.reviewStatus === "inherited") {
+    if (!locale.translationSource || !enabledManifestTags.includes(locale.translationSource)) {
+      failures.push("Inherited locale " + locale.tag + " must identify an enabled translation source.");
+    }
+  }
+}
+const fallbackReferences = [
+  localeMap.regionalFallbacks?.es?.default,
+  localeMap.regionalFallbacks?.es?.latinAmerica,
+  ...Object.values(localeMap.regionalFallbacks?.fr?.regions ?? {}),
+  localeMap.regionalFallbacks?.pt?.default,
+  ...Object.values(localeMap.regionalFallbacks?.pt?.regions ?? {}),
+  localeMap.regionalFallbacks?.pt?.unavailableFallback,
+  localeMap.regionalFallbacks?.zh?.default,
+  ...Object.values(localeMap.regionalFallbacks?.zh?.script ?? {}),
+  ...Object.values(localeMap.regionalFallbacks?.zh?.regions ?? {}),
+].filter(Boolean);
+for (const fallback of fallbackReferences) {
+  if (!localeTagSet.has(fallback)) {
+    failures.push("Regional fallback references a locale missing from localization/locale-map.json: " + fallback);
+  }
 }
 if (!validStatuses.has(provenance.defaultStatus)) {
   failures.push("The provenance defaultStatus is not defined.");
@@ -151,12 +209,30 @@ for (const id of ids) {
   if (record.sourceChecksum !== checksum(messages[id].source)) {
     failures.push("Source changed for " + id + "; review translations and update its provenance checksum.");
   }
-  for (const [locale, status] of Object.entries(record.translations ?? {})) {
+  const translationStatuses = record.translations ?? {};
+  const translationSources = record.translationSources ?? {};
+  for (const [locale, status] of Object.entries(translationStatuses)) {
     if (!targetLanguages.includes(locale)) {
       failures.push("Provenance locale " + locale + " is not declared for " + id);
     }
     if (!validStatuses.has(status)) {
       failures.push("Unknown translation provenance status " + status + " for " + id + " (" + locale + ").");
+    }
+    if (status === "inherited") {
+      const parent = translationSources[locale];
+      if (!parent || !targetLanguages.includes(parent)) {
+        failures.push("Inherited translation " + id + " (" + locale + ") must name a supported parent locale.");
+      } else if (messages[id].translations[locale] !== messages[id].translations[parent]) {
+        failures.push("Inherited translation " + id + " (" + locale + ") must match its recorded parent " + parent + ".");
+      }
+    }
+  }
+  for (const [locale, parent] of Object.entries(translationSources)) {
+    if (translationStatuses[locale] !== "inherited") {
+      failures.push("Translation source for " + id + " (" + locale + ") requires inherited provenance.");
+    }
+    if (!targetLanguages.includes(parent)) {
+      failures.push("Translation source " + parent + " for " + id + " (" + locale + ") is not a supported locale.");
     }
   }
 }
@@ -284,6 +360,8 @@ if (failures.length > 0) {
       ids.length +
       " stable IDs, " +
       targetLanguages.length +
-      " complete target locales."
+      " complete target locales; " +
+      plannedLocaleCount +
+      " more mapped toward the 37-choice target."
   );
 }

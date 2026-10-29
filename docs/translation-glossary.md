@@ -20,3 +20,8 @@ Use these meanings consistently across interface copy, help text, notifications,
 Keep these values unchanged: game titles, release names and group tags, file paths, filenames, URLs, hashes, API identifiers, status codes, provider-supplied text, and protocol names such as RAWG, IGDB, Steam, Torznab, and xREL.to. Localize the surrounding explanation and labels only.
 
 For each translation, record whether it is a machine draft, inherited, reviewed, or legacy-unverified. A reviewed status means a qualified human checked the wording and product context; automated placeholder checks alone do not count as translation review.
+
+
+## Regional catalog inheritance
+
+An inherited catalog is a complete copy of its named parent locale, recorded per message. It is useful as a regional fallback, but it is not a reviewed regional translation. Keep the source relation explicit until a qualified translator reviews and updates the regional wording. For this catalog, es-419 inherits from es and fr-CA inherits from fr. Preserve region-specific terminology and spelling when the review replaces inherited text.
