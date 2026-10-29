@@ -1,4 +1,5 @@
 import {
+  formatRegionalDate,
   formatRegionalNumber,
   getRegionalDirection as getLocaleDirection,
   getRegionalLocale,
@@ -58,7 +59,7 @@ export function formatCalendarDate(
   options: Intl.DateTimeFormatOptions,
   locale = getRegionalLocale()
 ): string {
-  return new Intl.DateTimeFormat(locale, { ...options, calendar: "gregory" }).format(date);
+  return formatRegionalDate(date, { ...options, calendar: "gregory" }, locale);
 }
 
 export function formatCalendarTitle(

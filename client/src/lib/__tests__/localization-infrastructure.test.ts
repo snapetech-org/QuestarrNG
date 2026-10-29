@@ -9,6 +9,7 @@ import {
   translateInterfaceMessage,
 } from "@/lib/interface-locale";
 import {
+  formatRegionalDate,
   formatRegionalPluralMessage,
   formatRegionalNumber,
   formatRegionalDistanceToNow,
@@ -117,6 +118,14 @@ describe("localization infrastructure", () => {
     expect(parseRegionalNumber("12,34.5", "en-US")).toBeNull();
     expect(parseRegionalNumber("1.234,5", "en-US")).toBeNull();
     expect(parseRegionalNumber("", "en-US")).toBeNull();
+  });
+
+  it("formats dates through the shared regional formatter", () => {
+    const date = new Date("2026-05-17T12:00:00.000Z");
+    const options: Intl.DateTimeFormatOptions = { year: "numeric", month: "long", day: "numeric" };
+    expect(formatRegionalDate(date, options, "es-419")).toBe(
+      new Intl.DateTimeFormat("es-419", options).format(date)
+    );
   });
 
   it("formats numbers using regional variant preferences", () => {

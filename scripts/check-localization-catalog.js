@@ -6,7 +6,13 @@ import ts from "typescript";
 
 const root = process.cwd();
 const failures = [];
-const [manifestSource, provenanceSource, interfaceSource, localeMapSource, regionalFormatSource] = await Promise.all([
+const [
+  manifestSource,
+  provenanceSource,
+  interfaceSource,
+  localeMapSource,
+  regionalFormatSource,
+] = await Promise.all([
   readFile(path.join(root, "localization/messages.json"), "utf8"),
   readFile(path.join(root, "client/src/lib/localization-provenance.json"), "utf8"),
   readFile(path.join(root, "client/src/lib/interface-locale.ts"), "utf8"),
@@ -188,7 +194,9 @@ if (
   expectedRegionalValues.some((value) => !regionalOptionValues.includes(value)) ||
   regionalOptionValues.length !== expectedRegionalValues.length + 1
 ) {
-  failures.push("Regional-format options must include browser settings and one entry for every mapped locale, using documented script/region aliases.");
+  failures.push(
+    "Regional-format options must include browser settings and one entry for every mapped locale, using documented script/region aliases."
+  );
 }
 for (const locale of localeRows) {
   if (locale.availability === "source" && locale.tag !== "en") {

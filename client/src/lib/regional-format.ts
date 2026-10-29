@@ -264,10 +264,7 @@ export function formatRegionalDate(
   options?: Intl.DateTimeFormatOptions,
   preference = getRegionalPreference()
 ): string {
-  return new Intl.DateTimeFormat(getCurrentLocale(preference), {
-    ...options,
-    timeZone: "UTC",
-  }).format(date);
+  return new Intl.DateTimeFormat(getCurrentLocale(preference), options).format(date);
 }
 
 export function formatRegionalPercent(

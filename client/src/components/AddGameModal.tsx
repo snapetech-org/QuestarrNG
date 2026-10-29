@@ -151,7 +151,13 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
 
   // Search IGDB for games
   const { data: searchResults = [], isFetching: isSearching } = useQuery({
-    queryKey: ["/api/igdb/search", debouncedQuery, showUndatedGames, selectedPlatform, parsedReleaseYear ?? releaseYear],
+    queryKey: [
+      "/api/igdb/search",
+      debouncedQuery,
+      showUndatedGames,
+      selectedPlatform,
+      parsedReleaseYear ?? releaseYear,
+    ],
     queryFn: async () => {
       if (!debouncedQuery.trim()) return [];
       const params = new URLSearchParams({
