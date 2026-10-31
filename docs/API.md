@@ -13,6 +13,11 @@ PCGamingWiki sections when `server/steam-routes.ts` or
 
 ## Overview
 
+**Transport security:** The default localhost URL is for development. For remote use or
+when entering credentials and archive passwords, serve QuestarrNG through a trusted
+HTTPS reverse proxy. Downloader-side HTTPS checks do not encrypt the separate
+browser-to-Questarr connection; see the [deployment security guide](SECURITY.md).
+
 - **Base URL**: all endpoints are served under `/api` on the same origin as
   the app (default `http://localhost:5000`).
 - **Format**: JSON request/response bodies throughout, except file uploads

@@ -27966,10 +27966,20 @@
       "historyEvidence": "merge-commit-in-fork-history",
       "mergeCommit": "0636e6725037e4842aa4852af51287d0a1a522ef",
       "review": {
-        "status": "unreviewed",
-        "findings": [],
-        "acceptance": [],
-        "evidence": [],
+        "status": "verified",
+        "findings": [
+          "The fork already uses @types/better-sqlite3 9.6.0 in package.json and the lockfile, matching the upstream target. Its merged PR has successful CI, SAST, Dependency Review, and Deprecated Dependencies checks; no review threads were present."
+        ],
+        "acceptance": [
+          "The declared and locked better-sqlite3 type package is at least 9.6.0 and the repository typecheck passes."
+        ],
+        "evidence": [
+          "package.json",
+          "package-lock.json",
+          "docs/upstream-resolution/evidence/validation-batch-82.md",
+          "docs/upstream-resolution/evidence/validation-batch-85.md",
+          "https://github.com/Doezer/Questarr/pull/958"
+        ],
         "dependencies": []
       },
       "sourceChangedSinceReview": false
@@ -27986,11 +27996,24 @@
       "historyEvidence": "no-merge-commit",
       "mergeCommit": null,
       "review": {
-        "status": "unreviewed",
-        "findings": [],
-        "acceptance": [],
-        "evidence": [],
-        "dependencies": []
+        "status": "superseded",
+        "findings": [
+          "Upstream closed this PR without merging because PR #947 had already fixed the same TLS issue more completely. QuestarrNG is stricter: it never retries with certificate verification disabled, including when the legacy allowSelfSignedCertificate setting is true."
+        ],
+        "acceptance": [
+          "Keep TLS certificate verification enabled for every SABnzbd request; document trusted-CA setup instead of bypassing validation."
+        ],
+        "evidence": [
+          "server/downloaders/sabnzbd.ts",
+          "server/__tests__/downloaders_ssl_fallback.test.ts",
+          "docs/upstream-resolution/evidence/validation-batch-83.md",
+          "https://github.com/Doezer/Questarr/pull/959",
+          "https://github.com/Doezer/Questarr/pull/947",
+          "docs/upstream-resolution/evidence/validation-batch-85.md"
+        ],
+        "dependencies": [
+          "pr:947"
+        ]
       },
       "sourceChangedSinceReview": false
     },
@@ -28006,11 +28029,25 @@
       "historyEvidence": "merge-commit-in-fork-history",
       "mergeCommit": "d1d032c27c3bd0213b3efd4378bb3336678fc710",
       "review": {
-        "status": "unreviewed",
-        "findings": [],
-        "acceptance": [],
-        "evidence": [],
-        "dependencies": []
+        "status": "verified",
+        "findings": [
+          "The shared scrubber redacts API-key, token, password, secret, and bearer-shaped values before manual support-log submission and automatic error telemetry leave the instance. The merged PR was approved and its CI, SAST, and Dependency Review runs succeeded."
+        ],
+        "acceptance": [
+          "Manual Send Logs and automatic telemetry use the shared secret scrubber; regression tests ensure API-key and token values do not survive."
+        ],
+        "evidence": [
+          "shared/log-scrub.ts",
+          "shared/__tests__/log-scrub.test.ts",
+          "client/src/components/SendLogsDialog.tsx",
+          "server/error-telemetry.ts",
+          "docs/upstream-resolution/evidence/validation-batch-58.txt",
+          "docs/upstream-resolution/evidence/validation-batch-85.md",
+          "https://github.com/Doezer/Questarr/pull/960"
+        ],
+        "dependencies": [
+          "pr:648"
+        ]
       },
       "sourceChangedSinceReview": false
     },
@@ -28026,11 +28063,25 @@
       "historyEvidence": "merge-commit-in-fork-history",
       "mergeCommit": "77b3a790e67986b6b75a849a05fe33d951b6b03a",
       "review": {
-        "status": "unreviewed",
-        "findings": [],
-        "acceptance": [],
-        "evidence": [],
-        "dependencies": []
+        "status": "verified",
+        "findings": [
+          "The shared copyToClipboard helper uses the secure-context Clipboard API when available, falls back to document.execCommand for plain HTTP, and reports failure; download, log, and error-report controls use it. The matching issue #914 and Batch 79 evidence cover the behavior."
+        ],
+        "acceptance": [
+          "Copy buttons work in secure and non-secure contexts where the browser permits copying, and callers surface a failure when both methods fail."
+        ],
+        "evidence": [
+          "client/src/lib/utils.ts",
+          "client/__tests__/utils.test.ts",
+          "client/src/components/GameDownloadDialog.tsx",
+          "client/src/components/SendLogsDialog.tsx",
+          "docs/upstream-resolution/evidence/validation-batch-79.md",
+          "docs/upstream-resolution/evidence/validation-batch-85.md",
+          "https://github.com/Doezer/Questarr/pull/961"
+        ],
+        "dependencies": [
+          "issue:914"
+        ]
       },
       "sourceChangedSinceReview": false
     },
@@ -28046,11 +28097,35 @@
       "historyEvidence": "merge-commit-in-fork-history",
       "mergeCommit": "3a486e1f6121affe4200f85ed0d81d4d61b6971b",
       "review": {
-        "status": "unreviewed",
-        "findings": [],
-        "acceptance": [],
-        "evidence": [],
-        "dependencies": []
+        "status": "verified",
+        "findings": [
+          "The archive-password request is implemented for per-download and per-downloader defaults in SABnzbd and NZBGet. Passwords are refused over plaintext downloader connections, HTTPS redirects remain on the same origin, request/response and validation errors redact secrets, and passwords are bounded to 200 characters. All 20 upstream review threads were resolved. The maintainer explicitly deferred browser-to-Questarr HTTP transport as a separate deployment threat model; archive passwords should be entered through a TLS-protected Questarr URL."
+        ],
+        "acceptance": [
+          "Per-download and default archive passwords reach both supported Usenet downloaders.",
+          "Downloader password transmission requires HTTPS and credential-bearing redirects remain same-origin.",
+          "Passwords are masked in API responses, excluded from validation diagnostics, and limited to 200 characters.",
+          "Document the separate requirement to protect browser-to-Questarr traffic with TLS."
+        ],
+        "evidence": [
+          "shared/archive-password.ts",
+          "server/downloaders/sabnzbd.ts",
+          "server/downloaders/nzbget.ts",
+          "server/ssrf.ts",
+          "server/middleware.ts",
+          "server/routes.ts",
+          "client/src/pages/search.tsx",
+          "client/src/pages/downloaders.tsx",
+          "shared/__tests__/archive-password.test.ts",
+          "docs/upstream-resolution/evidence/validation-batch-73.txt",
+          "docs/API.md",
+          "docs/THREAT_MODEL.md",
+          "docs/upstream-resolution/evidence/validation-batch-85.md",
+          "https://github.com/Doezer/Questarr/pull/962"
+        ],
+        "dependencies": [
+          "issue:849"
+        ]
       },
       "sourceChangedSinceReview": false
     },
@@ -28066,11 +28141,29 @@
       "historyEvidence": "merge-commit-in-fork-history",
       "mergeCommit": "66186c3a85256cc8e97bb84d465023bc5b6c0e64",
       "review": {
-        "status": "unreviewed",
-        "findings": [],
-        "acceptance": [],
-        "evidence": [],
-        "dependencies": []
+        "status": "verified",
+        "findings": [
+          "Indexer-priority sorting is available in the download dialog and automatic-search rules. Lower numeric priority sorts first; indexers without a configured priority stay last in either sort direction; desktop result rows include a priority cell. Upstream review threads for unknown-indexer placement and the missing cell were resolved."
+        ],
+        "acceptance": [
+          "Manual and automatic search allow priority sorting.",
+          "Lower configured priorities sort first and unknown indexers remain last in either direction.",
+          "The desktop result table renders a priority value for each row."
+        ],
+        "evidence": [
+          "client/src/components/GameDownloadDialog.tsx",
+          "client/src/components/AutoDownloadRulesSettings.tsx",
+          "server/cron.ts",
+          "shared/schema.ts",
+          "client/__tests__/GameDownloadDialog.test.tsx",
+          "server/__tests__/cron_autosearch.test.ts",
+          "docs/upstream-resolution/evidence/validation-batch-47.txt",
+          "docs/upstream-resolution/evidence/validation-batch-85.md",
+          "https://github.com/Doezer/Questarr/pull/963"
+        ],
+        "dependencies": [
+          "issue:811"
+        ]
       },
       "sourceChangedSinceReview": false
     },

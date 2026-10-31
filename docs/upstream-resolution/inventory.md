@@ -939,12 +939,12 @@ Snapshot: 2026-10-31T04:04:24.266Z. 1246 items. All ancestry observations requir
 | [pr #955](https://github.com/Doezer/Questarr/pull/955) | Bound the recursive Scan Disk endpoint (file count, time budget, rate limit) | CLOSED | no-merge-commit | verified |
 | [pr #956](https://github.com/Doezer/Questarr/pull/956) | chore(deps): bump the production group with 5 updates | MERGED | merge-commit-in-fork-history | superseded |
 | [pr #957](https://github.com/Doezer/Questarr/pull/957) | chore(deps): bump the all-actions group with 2 updates | MERGED | merge-commit-in-fork-history | superseded |
-| [pr #958](https://github.com/Doezer/Questarr/pull/958) | chore(deps-dev): bump @types/better-sqlite3 from 7.6.13 to 9.6.0 | MERGED | merge-commit-in-fork-history | unreviewed |
-| [pr #959](https://github.com/Doezer/Questarr/pull/959) | Narrow SABnzbd TLS fallback to self-signed cert errors only | CLOSED | no-merge-commit | unreviewed |
-| [pr #960](https://github.com/Doezer/Questarr/pull/960) | Redact API keys/tokens when sending logs to support | MERGED | merge-commit-in-fork-history | unreviewed |
-| [pr #961](https://github.com/Doezer/Questarr/pull/961) | Fix clipboard copy buttons on non-secure (HTTP) contexts | MERGED | merge-commit-in-fork-history | unreviewed |
-| [pr #962](https://github.com/Doezer/Questarr/pull/962) | Add SABnzbd archive password support for G4U-style releases | MERGED | merge-commit-in-fork-history | unreviewed |
-| [pr #963](https://github.com/Doezer/Questarr/pull/963) | Add indexer priority sort option to download search results | MERGED | merge-commit-in-fork-history | unreviewed |
+| [pr #958](https://github.com/Doezer/Questarr/pull/958) | chore(deps-dev): bump @types/better-sqlite3 from 7.6.13 to 9.6.0 | MERGED | merge-commit-in-fork-history | verified |
+| [pr #959](https://github.com/Doezer/Questarr/pull/959) | Narrow SABnzbd TLS fallback to self-signed cert errors only | CLOSED | no-merge-commit | superseded |
+| [pr #960](https://github.com/Doezer/Questarr/pull/960) | Redact API keys/tokens when sending logs to support | MERGED | merge-commit-in-fork-history | verified |
+| [pr #961](https://github.com/Doezer/Questarr/pull/961) | Fix clipboard copy buttons on non-secure (HTTP) contexts | MERGED | merge-commit-in-fork-history | verified |
+| [pr #962](https://github.com/Doezer/Questarr/pull/962) | Add SABnzbd archive password support for G4U-style releases | MERGED | merge-commit-in-fork-history | verified |
+| [pr #963](https://github.com/Doezer/Questarr/pull/963) | Add indexer priority sort option to download search results | MERGED | merge-commit-in-fork-history | verified |
 | [pr #964](https://github.com/Doezer/Questarr/pull/964) | Convert the /play ghost game into an isometric infiltration game | MERGED | merge-commit-in-fork-history | unreviewed |
 | [issue #965](https://github.com/Doezer/Questarr/issues/965) | Validate IGDB API rate limit on client and server | CLOSED | no-merge-commit | unreviewed |
 | [pr #966](https://github.com/Doezer/Questarr/pull/966) | 📝 Add docstrings to `claude/settings-tabs-reorg` | MERGED | merge-commit-in-fork-history | unreviewed |

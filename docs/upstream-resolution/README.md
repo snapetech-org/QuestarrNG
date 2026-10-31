@@ -23,27 +23,29 @@ The live audit refreshed upstream main
 235 issues and 1,011 pull requests (1,246 records total) and was generated at
 2026-10-31 04:04:24 UTC. The current ledger records 44 source-changed records;
 each needs renewed review against its current source. Batch 84 reviewed PRs
-#950–#957, and all eight source digests matched the refreshed snapshot.
+#950–#957 and Batch 85 reviewed PRs #958–#963; all 14 source digests matched
+the refreshed snapshot.
 
 | Review status | Items |
 | --- | ---: |
-| verified | 694 |
-| superseded | 226 |
+| verified | 699 |
+| superseded | 227 |
 | not-applicable | 14 |
 | implemented-unverified | 8 |
 | needs-implementation | 0 |
-| unreviewed | 304 |
+| unreviewed | 298 |
 | **Total** | **1,246** |
 
-The ledger gives 942 records an assigned disposition. The eight
+The ledger gives 948 records an assigned disposition. The eight
 implemented-unverified items include four integrations awaiting live-service
 checks, DCO enforcement awaiting maintainer rollout, PR #933 awaiting an
 Inno Setup build and Windows installation/service-lifecycle checks, plus the
 new fallback-category and cookie-first auth changes from Batch 84. Forty-four
-source-changed records and 304 unreviewed records remain. Batch 84's code-level
-and browser validation is blocked until compatible private ephemeral JIT
-capacity and current workflow-run state are confirmed. These counts describe
-progress, not campaign completion. See [Batch 84 evidence](evidence/validation-batch-84.md).
+source-changed records and 298 unreviewed records remain. Batch 84's new
+category notice and cookie-first auth behavior still need exact-head tests and
+browser evidence on compatible private ephemeral JIT capacity. These counts
+describe progress, not campaign completion. See the
+[Batch 85 review evidence](evidence/validation-batch-85.md).
 
 
 ## Project records
@@ -2382,3 +2384,21 @@ Linux x64 runner with the QuestarrNG labels was available. The active JIT
 broker was left running; no workflow was dispatched or retried. The records
 that need fresh validation remain implemented-unverified. See
 [Batch 84 evidence](evidence/validation-batch-84.md).
+
+## Batch 85 — October 31, 2026
+
+Batch 85 reviewed PRs #958–#963. Five are verified against current QuestarrNG
+behavior and prior passing evidence: the better-sqlite3 type update, support-log
+secret redaction, clipboard fallback on plain HTTP, archive-password handling,
+and indexer-priority sorting. PR #959 is superseded: upstream closed it because
+#947 already fixed the same TLS issue, while QuestarrNG has removed the
+certificate-verification bypass entirely. The #962 review also records the
+maintainer's explicit decision to treat browser-to-Questarr TLS as a deployment
+boundary; use a TLS-protected app URL when entering archive passwords.
+
+The upstream checks passed for #958, #960–#963; #959 was closed without merge
+after the owner linked #947. The previously implemented behaviors are covered
+by focused validation in Batches 47, 58, 73, 79, 82, and 83. No source code
+changed in Batch 85, so no new test job was started. The full current-head
+validation gate remains outstanding, as do 298 unreviewed records and 44
+source-changed records. See [Batch 85 evidence](evidence/validation-batch-85.md).
