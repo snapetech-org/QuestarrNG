@@ -4,14 +4,18 @@ import { getNotificationTextDirection, NOTIFICATION_LOCALES } from "@/lib/notifi
 type MessageKey =
   | "gameReleased"
   | "gameDelayed"
+  | "gameDelayedNoDate"
   | "downloadFinished"
   | "importRemotePath"
   | "importLocalPath"
+  | "importInterrupted"
+  | "downloadRemovedBeforeImport"
   | "downloadAborted"
   | "downloadFailed"
   | "releaseReview"
   | "downloadStarted"
   | "gameAvailable"
+  | "contentAvailable"
   | "multipleResults"
   | "updatesAvailable"
   | "packsAvailable"
@@ -54,6 +58,20 @@ const MESSAGES: Record<MessageKey, readonly string[]> = {
     "{game} đã bị hoãn đến ngày {date}.",
     "{game} ditunda hingga {date}.",
   ],
+  gameDelayedNoDate: [
+    "{game} se ha retrasado.",
+    "{game} 已延期。",
+    "{game} की रिलीज़ टल गई है।",
+    "{game} wurde verschoben.",
+    "{game} の発売が延期されました。",
+    "La sortie de {game} a été reportée.",
+    "O lançamento de {game} foi adiado.",
+    "تأجل إصدار {game}.",
+    "{game} 출시가 연기되었습니다.",
+    "{game} 已延期。",
+    "{game} đã bị hoãn.",
+    "{game} ditunda.",
+  ],
   downloadFinished: [
     "La descarga de {game} ha terminado.",
     "{game} 已下载完成。",
@@ -95,6 +113,34 @@ const MESSAGES: Record<MessageKey, readonly string[]> = {
     "{game} 已下載完成，但無法存取本機路徑。請檢查「設定 → 路徑對應」，或手動開始匯入。",
     "Đã tải xong {game}, nhưng không thể truy cập đường dẫn cục bộ. Hãy kiểm tra Cài đặt → Ánh xạ đường dẫn hoặc tự bắt đầu nhập.",
     "Unduhan {game} selesai, tetapi jalur lokal tidak dapat diakses. Periksa Pengaturan → Pemetaan jalur atau mulai impor secara manual.",
+  ],
+  importInterrupted: [
+    "Se interrumpió la importación de «{game}». Revisa las importaciones pendientes para volver a ejecutarla.",
+    "“{game}” 的导入已中断。请在待处理导入中查看并重试。",
+    "{game} का आयात बीच में रुक गया। इसे फिर से चलाने के लिए लंबित आयातों में देखें।",
+    "Der Import von „{game}“ wurde unterbrochen. Prüfe die ausstehenden Importe, um ihn erneut zu starten.",
+    "「{game}」のインポートが中断されました。再実行するには、保留中のインポートで確認してください。",
+    "L’importation de « {game} » a été interrompue. Consultez les importations en attente pour la relancer.",
+    "A importação de “{game}” foi interrompida. Confira os itens pendentes para executá-la novamente.",
+    "توقف استيراد «{game}». راجعه ضمن عمليات الاستيراد المعلّقة لإعادة تشغيله.",
+    "“{game}” 가져오기가 중단되었습니다. 다시 실행하려면 대기 중인 가져오기에서 확인하세요.",
+    "「{game}」的匯入已中斷。請在待處理匯入中檢查並重新執行。",
+    "Việc nhập “{game}” đã bị gián đoạn. Hãy xem mục nhập đang chờ để chạy lại.",
+    "Impor “{game}” terhenti. Periksa di daftar impor tertunda untuk menjalankannya kembali.",
+  ],
+  downloadRemovedBeforeImport: [
+    "«{game}» terminó de descargarse, pero el cliente eliminó la descarga antes de que Questarr pudiera importarla. Revísala en las importaciones pendientes y selecciona los archivos descargados.",
+    "“{game}” 已下载完成，但下载客户端在 Questarr 导入前删除了该任务。请在待处理导入中查看并选择已下载的文件。",
+    "“{game}” डाउनलोड हो गया, लेकिन Questarr के आयात करने से पहले डाउनलोड क्लाइंट ने इसे हटा दिया। लंबित आयातों में इसे देखें और डाउनलोड की गई फ़ाइलें चुनें।",
+    "„{game}“ wurde heruntergeladen, aber der Download-Client hat den Eintrag entfernt, bevor Questarr ihn importieren konnte. Prüfe die ausstehenden Importe und wähle die heruntergeladenen Dateien aus.",
+    "「{game}」のダウンロードは完了しましたが、Questarrがインポートする前にダウンロードクライアントから削除されました。保留中のインポートで確認し、ダウンロードしたファイルを選択してください。",
+    "« {game} » a été téléchargé, mais le client l’a supprimé avant que Questarr puisse l’importer. Consultez les importations en attente et sélectionnez les fichiers téléchargés.",
+    "“{game}” terminou de baixar, mas o cliente removeu o download antes que o Questarr pudesse importá-lo. Confira os itens pendentes e selecione os arquivos baixados.",
+    "اكتمل تنزيل «{game}»، لكن عميل التنزيل أزاله قبل أن يتمكن Questarr من استيراده. راجعه ضمن عمليات الاستيراد المعلّقة وحدد الملفات التي تم تنزيلها.",
+    "“{game}” 다운로드는 완료되었지만 Questarr가 가져오기 전에 다운로드 클라이언트에서 항목을 삭제했습니다. 대기 중인 가져오기에서 확인하고 다운로드한 파일을 선택하세요.",
+    "「{game}」已下載完成，但下載用戶端在 Questarr 匯入前將其移除。請在待處理匯入中檢查並選取已下載的檔案。",
+    "“{game}” đã tải xong nhưng trình tải đã xóa mục này trước khi Questarr nhập. Hãy xem trong mục nhập đang chờ và chọn các tệp đã tải xuống.",
+    "“{game}” selesai diunduh, tetapi klien unduhan menghapusnya sebelum Questarr dapat mengimpornya. Periksa di daftar impor tertunda dan pilih file yang sudah diunduh.",
   ],
   downloadAborted: [
     "Se interrumpió la descarga de {game}: {error}",
@@ -165,6 +211,20 @@ const MESSAGES: Record<MessageKey, readonly string[]> = {
     "{game} 現在可以下載。",
     "{game} hiện đã có thể tải xuống.",
     "{game} kini tersedia untuk diunduh.",
+  ],
+  contentAvailable: [
+    "{content} está disponible para {game}. Revísalo y elige.",
+    "有可供 {game} 使用的 {content}。请查看并选择。",
+    "{game} के लिए {content} उपलब्ध है। समीक्षा करके चुनें।",
+    "{content} ist für {game} verfügbar. Bitte prüfen und auswählen.",
+    "{game} 向けの「{content}」が利用可能です。確認して選択してください。",
+    "{content} est disponible pour {game}. Vérifiez et choisissez.",
+    "{content} está disponível para {game}. Revise e escolha.",
+    "{content} متاح لـ{game}. راجع التفاصيل واختر.",
+    "{game}에서 이용할 수 있는 {content}이(가) 있습니다. 검토한 뒤 선택하세요.",
+    "有供 {game} 使用的 {content}。請查看並選擇。",
+    "Đã có {content} cho {game}. Hãy xem và chọn.",
+    "{content} tersedia untuk {game}. Tinjau dan pilih.",
   ],
   multipleResults: [
     "Se encontraron {count} resultados para {game}. Revísalos y elige una opción.",
@@ -376,6 +436,8 @@ function matchNotification(
     return { key: "gameReleased", params: { game: match[1]! } };
   if (title === "Game Delayed" && (match = message.match(/^(.*) has been delayed to (.*)$/)))
     return { key: "gameDelayed", params: { game: match[1]!, date: match[2]! } };
+  if (title === "Game Delayed" && (match = message.match(/^(.*) has been delayed$/)))
+    return { key: "gameDelayedNoDate", params: { game: match[1]! } };
   if (title === "Download Completed" && (match = message.match(/^Download finished for (.*)$/)))
     return { key: "downloadFinished", params: { game: match[1]! } };
   if (
@@ -392,6 +454,20 @@ function matchNotification(
     ))
   )
     return { key: "importLocalPath", params: { game: match[1]! } };
+  if (
+    title === "Import needs attention" &&
+    (match = message.match(
+      /^The import of "([\s\S]*)" was interrupted\. Review it in Pending Imports to run it again\.$/
+    ))
+  )
+    return { key: "importInterrupted", params: { game: match[1]! } };
+  if (
+    title === "Import needs attention" &&
+    (match = message.match(
+      /^"([\s\S]*)" finished downloading but the download client removed it before Questarr could import it\. Review it in Pending Imports and select the downloaded files\.$/
+    ))
+  )
+    return { key: "downloadRemovedBeforeImport", params: { game: match[1]! } };
   if (
     title === "Download Aborted" &&
     (match = message.match(/^Download aborted for "(.*)": ([\s\S]*)$/))
@@ -416,6 +492,11 @@ function matchNotification(
     return { key: "downloadStarted", params: { release: match[1]!, method: match[2]! } };
   if (title === "Game Available" && (match = message.match(/^(.*) is now available for download$/)))
     return { key: "gameAvailable", params: { game: match[1]! } };
+  if (
+    title === "Content Available" &&
+    (match = message.match(/^(.*) is available for (.*)\. Review and choose\.$/))
+  )
+    return { key: "contentAvailable", params: { content: match[1]!, game: match[2]! } };
   if (
     title === "Multiple Results Found" &&
     (match = message.match(/^(\d+) result\(s\) found for (.*)\. Please review and choose\.$/))

@@ -76,6 +76,12 @@ The full 2,232-message catalog uses stable namespaced IDs in the source manifest
 
 Plural and select helpers now take stable message IDs. Sidebar count labels use CLDR plural categories, regional digits come from the shared regional formatter, and date, number, percent, unit, relative-time, and localized-number parsing helpers are available. Relative time uses the interface locale where a date-fns locale exists and Intl.RelativeTimeFormat for other language tags, while retaining the selected regional digits. A catalog guard ensures all 37 mapped locales remain available in the regional-format selector.
 
+Fixed server notifications use a separate client-side translation table. It now
+covers the no-date game-delay message, content-available notices, and both
+pending-import recovery notices emitted by the server. These added notification
+templates are machine-drafted and still need native-speaker review; runtime game
+titles, release text, reasons, paths, and other dynamic details remain intact.
+
 Common physical inline Tailwind utilities were replaced with logical equivalents. The catalog check blocks regressions to physical inline spacing, alignment, borders, corners, and noncentered positions. Existing RTL browser coverage includes a long Arabic/English/Japanese game title, screen-reader naming, dialog keyboard focus, and 200% text scaling. Persian and Hebrew are covered by direction-resolver checks; they do not appear as selectable interface languages until their catalogs are complete.
 
 See the [localization workflow](./localization-workflow.md), [translation glossary](./translation-glossary.md), and 37-choice locale map (../localization/locale-map.json).

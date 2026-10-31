@@ -21,6 +21,7 @@ type NotificationLabelKey =
   | "Download Failed"
   | "Download Started"
   | "Game Available"
+  | "Content Available"
   | "Multiple Results Found"
   | "Multiple Releases Found"
   | "Game Updates Available"
@@ -329,6 +330,20 @@ const LABELS: Record<NotificationLabelKey, readonly string[]> = {
     "遊戲已可下載",
     "Trò chơi đã có",
     "Game tersedia",
+  ],
+  "Content Available": [
+    "Contenido disponible",
+    "内容已推出",
+    "सामग्री उपलब्ध है",
+    "Inhalt verfügbar",
+    "コンテンツが利用可能",
+    "Contenu disponible",
+    "Conteúdo disponível",
+    "المحتوى متاح",
+    "콘텐츠 이용 가능",
+    "內容已推出",
+    "Đã có nội dung",
+    "Konten tersedia",
   ],
   "Multiple Results Found": [
     "Se encontraron varios resultados",
