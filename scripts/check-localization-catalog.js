@@ -129,6 +129,39 @@ for (const [id, message] of Object.entries(messages)) {
   }
 }
 
+// These examples are matching expressions/identifiers, so their tokens stay literal.
+const literalExamples = {
+  "interface.e_g_gog_drm_free_df026737": { tokens: ["(GOG|DRM-free)"], ignoreCase: false },
+  "interface.e_g_hypervisor_cam_sample_655a5dd1": {
+    tokens: ["HYPERVISOR", "CAM", "SAMPLE"],
+    ignoreCase: true,
+  },
+  "interface.e_g_codex_skidrow_empress_50f0eff0": {
+    tokens: ["CODEX", "SKIDROW", "EMPRESS"],
+    ignoreCase: true,
+  },
+};
+for (const [id, requirement] of Object.entries(literalExamples)) {
+  const message = messages[id];
+  if (!message) {
+    failures.push("Missing matching-rule example " + id);
+    continue;
+  }
+  for (const locale of targetLanguages) {
+    const value = message.translations?.[locale];
+    if (typeof value !== "string") continue;
+    const normalized = requirement.ignoreCase ? value.toLowerCase() : value;
+    for (const token of requirement.tokens) {
+      const literal = requirement.ignoreCase ? token.toLowerCase() : token;
+      if (!normalized.includes(literal)) {
+        failures.push(
+          "Matching-rule example changes literal " + token + " for " + id + " in " + locale
+        );
+      }
+    }
+  }
+}
+
 const interfaceAst = parse(interfaceSource, "interface-locale.ts");
 const languageOptions = unwrap(constInitializer(interfaceAst, "INTERFACE_LANGUAGE_OPTIONS"));
 const optionValues = ts.isArrayLiteralExpression(languageOptions)
