@@ -111,6 +111,7 @@ import {
   useInterfaceLanguage,
 } from "@/lib/interface-locale";
 import { InterfaceText } from "@/components/InterfaceText";
+import { ApiErrorDetailText } from "@/components/ApiErrorDetailText";
 
 const GameDownloadDialog = lazy(() => import("./GameDownloadDialog"));
 
@@ -1725,7 +1726,7 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                               </span>
                               {dl.errorMessage && (
                                 <span className="text-xs text-red-400 break-words max-w-full">
-                                  {dl.errorMessage}
+                                  <ApiErrorDetailText source={dl.errorMessage} />
                                 </span>
                               )}
                             </div>
