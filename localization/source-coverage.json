@@ -593,6 +593,461 @@
       "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
       "targetStatus": "source-fallback",
       "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_local_staging_path_required",
+      "source": "Set an absolute local staging path that QuestarrNG can write to.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_local_staging_path_add_required",
+      "source": "Set an absolute QuestarrNG local staging path before adding downloads.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_indexer_result_unusable",
+      "source": "The indexer result was not a usable magnet link or torrent file.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_remote_id_missing",
+      "source": "Real-Debrid did not return a torrent ID.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_sent",
+      "source": "Torrent sent to Real-Debrid.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_indexer_torrent_too_large",
+      "source": "The indexer torrent file is larger than 10 MB.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_indexer_torrent_rejected",
+      "source": "Real-Debrid could not accept the indexer torrent file.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_pause_unsupported",
+      "source": "Real-Debrid does not support pausing torrents through its API.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_resume_unsupported",
+      "source": "Real-Debrid starts torrents automatically and does not expose a resume action.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_staging_symlink_removal_refused",
+      "source": "The QuestarrNG staging directory is a symbolic link and was not removed.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_staging_outside_configured_path",
+      "source": "The QuestarrNG staging directory is outside the configured path.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_removed_with_staged_files",
+      "source": "Real-Debrid torrent and QuestarrNG staged files removed.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_removed_staged_files_kept",
+      "source": "Real-Debrid torrent removed. QuestarrNG staged files were kept.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_local_cleanup_needed",
+      "source": "The torrent was removed but its local staging directory needs cleanup.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_local_copy_stopped",
+      "source": "The local copy stopped when torrent removal was requested.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_removed_staged_removal_failed",
+      "source": "The Real-Debrid torrent was removed, but its staged files could not be removed.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_remove_failed",
+      "source": "Could not remove the Real-Debrid torrent.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_selected_files_missing",
+      "source": "Real-Debrid did not provide selected files and matching download links.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_staging_directory_unsafe",
+      "source": "The Real-Debrid staging directory is not a safe local directory.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_staging_directory_escaped",
+      "source": "The Real-Debrid staging directory escaped its configured local path.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_file_link_list_incomplete",
+      "source": "Real-Debrid returned an incomplete file link list.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_file_path_escaped",
+      "source": "A Real-Debrid file path escaped the staging directory.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_directory_escaped",
+      "source": "A torrent directory escaped the QuestarrNG staging directory.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_unsafe_torrent_file_path",
+      "source": "Real-Debrid returned an unsafe torrent file path.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_file_url_not_https",
+      "source": "Real-Debrid returned a non-HTTPS file URL.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_staged_file_symlink",
+      "source": "A staged file path is a symbolic link.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_staged_file_not_regular",
+      "source": "A staged file path is not a regular file.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_partial_staged_file_symlink",
+      "source": "A partial staged file is a symbolic link.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_file_stream_failed",
+      "source": "Real-Debrid could not stream a completed file into QuestarrNG.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_request_failed",
+      "source": "Real-Debrid request failed.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_provider_error",
+      "source": "Real-Debrid: {error}",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_removed_staged_removal_failed_detail",
+      "source": "The Real-Debrid torrent was removed, but its staged files could not be removed: {error}",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_selected_files_limit",
+      "source": "This torrent has more than {limit} selected files.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_copied_file_unexpected_size",
+      "source": "The copied file {file} has an unexpected size.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_copied_bytes",
+      "source": "Real-Debrid copied {actual} of {expected} bytes.",
+      "kind": "app-owned Real-Debrid service/staging",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
     }
   ],
   "codeUnits": [

@@ -2739,6 +2739,63 @@ export const STABLE_INTERFACE_MESSAGES = {
   "service.nzbget_fault": "NZBGet Fault: {error} ({code})",
   "service.archive_password_https":
     "Refusing to send the archive password over an insecure connection. Enable SSL for this {client} downloader, or remove the archive password.",
+  "service.realdebrid_local_staging_path_required":
+    "Set an absolute local staging path that QuestarrNG can write to.",
+  "service.realdebrid_local_staging_path_add_required":
+    "Set an absolute QuestarrNG local staging path before adding downloads.",
+  "service.realdebrid_indexer_result_unusable":
+    "The indexer result was not a usable magnet link or torrent file.",
+  "service.realdebrid_remote_id_missing": "Real-Debrid did not return a torrent ID.",
+  "service.realdebrid_sent": "Torrent sent to Real-Debrid.",
+  "service.realdebrid_indexer_torrent_too_large": "The indexer torrent file is larger than 10 MB.",
+  "service.realdebrid_indexer_torrent_rejected":
+    "Real-Debrid could not accept the indexer torrent file.",
+  "service.realdebrid_pause_unsupported":
+    "Real-Debrid does not support pausing torrents through its API.",
+  "service.realdebrid_resume_unsupported":
+    "Real-Debrid starts torrents automatically and does not expose a resume action.",
+  "service.realdebrid_staging_symlink_removal_refused":
+    "The QuestarrNG staging directory is a symbolic link and was not removed.",
+  "service.realdebrid_staging_outside_configured_path":
+    "The QuestarrNG staging directory is outside the configured path.",
+  "service.realdebrid_removed_with_staged_files":
+    "Real-Debrid torrent and QuestarrNG staged files removed.",
+  "service.realdebrid_removed_staged_files_kept":
+    "Real-Debrid torrent removed. QuestarrNG staged files were kept.",
+  "service.realdebrid_local_cleanup_needed":
+    "The torrent was removed but its local staging directory needs cleanup.",
+  "service.realdebrid_local_copy_stopped":
+    "The local copy stopped when torrent removal was requested.",
+  "service.realdebrid_removed_staged_removal_failed":
+    "The Real-Debrid torrent was removed, but its staged files could not be removed.",
+  "service.realdebrid_remove_failed": "Could not remove the Real-Debrid torrent.",
+  "service.realdebrid_selected_files_missing":
+    "Real-Debrid did not provide selected files and matching download links.",
+  "service.realdebrid_staging_directory_unsafe":
+    "The Real-Debrid staging directory is not a safe local directory.",
+  "service.realdebrid_staging_directory_escaped":
+    "The Real-Debrid staging directory escaped its configured local path.",
+  "service.realdebrid_file_link_list_incomplete":
+    "Real-Debrid returned an incomplete file link list.",
+  "service.realdebrid_file_path_escaped": "A Real-Debrid file path escaped the staging directory.",
+  "service.realdebrid_directory_escaped":
+    "A torrent directory escaped the QuestarrNG staging directory.",
+  "service.realdebrid_unsafe_torrent_file_path":
+    "Real-Debrid returned an unsafe torrent file path.",
+  "service.realdebrid_file_url_not_https": "Real-Debrid returned a non-HTTPS file URL.",
+  "service.realdebrid_staged_file_symlink": "A staged file path is a symbolic link.",
+  "service.realdebrid_staged_file_not_regular": "A staged file path is not a regular file.",
+  "service.realdebrid_partial_staged_file_symlink": "A partial staged file is a symbolic link.",
+  "service.realdebrid_file_stream_failed":
+    "Real-Debrid could not stream a completed file into QuestarrNG.",
+  "service.realdebrid_request_failed": "Real-Debrid request failed.",
+  "service.realdebrid_provider_error": "Real-Debrid: {error}",
+  "service.realdebrid_removed_staged_removal_failed_detail":
+    "The Real-Debrid torrent was removed, but its staged files could not be removed: {error}",
+  "service.realdebrid_selected_files_limit": "This torrent has more than {limit} selected files.",
+  "service.realdebrid_copied_file_unexpected_size":
+    "The copied file {file} has an unexpected size.",
+  "service.realdebrid_copied_bytes": "Real-Debrid copied {actual} of {expected} bytes.",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

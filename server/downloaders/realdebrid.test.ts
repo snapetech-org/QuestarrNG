@@ -3,7 +3,11 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import type { Downloader } from "../../shared/schema.js";
-import { ServiceMessageError } from "../../shared/service-messages.js";
+import {
+  ServiceMessageError,
+  serviceMessage,
+  serializeServiceMessageDescriptor,
+} from "../../shared/service-messages.js";
 
 const mocks = vi.hoisted(() => ({
   safeFetch: vi.fn(),
@@ -79,6 +83,47 @@ describe("RealDebridClient", () => {
       expect(mocks.safeFetch).not.toHaveBeenCalled();
     }
   );
+
+  it.each([
+    ["pauseDownload", "service.realdebrid_pause_unsupported"],
+    ["resumeDownload", "service.realdebrid_resume_unsupported"],
+  ] as const)("tags fixed %s limitations without sending a request", async (method, key) => {
+    const result = await new RealDebridClient(makeDownloader())[method]("torrent:العربية");
+    expect(result).toEqual({ success: false, ...serviceMessage(key, {}) });
+    expect(serializeServiceMessageDescriptor(result)).not.toBeNull();
+    expect(mocks.safeFetch).not.toHaveBeenCalled();
+  });
+
+  it.each([true, false])(
+    "distinguishes provider payloads from the fixed request fallback: %s",
+    async (provider) => {
+      const text = "Real-Debrid request failed.";
+      mocks.safeFetch.mockResolvedValueOnce(
+        new Response(provider ? JSON.stringify({ error: text }) : "<html>offline</html>", {
+          status: 503,
+        })
+      );
+      const result = await new RealDebridClient(makeDownloader()).testConnection();
+      expect(result).toMatchObject(
+        provider
+          ? {
+              success: false,
+              ...serviceMessage("service.realdebrid_provider_error", { error: text }),
+            }
+          : { success: false, ...serviceMessage("service.realdebrid_request_failed", {}) }
+      );
+      expect(result).not.toHaveProperty("messageDetails");
+    }
+  );
+
+  it.each([true, false])("preserves typed versus provider removal errors: %s", async (typed) => {
+    const error = new ServiceMessageError("service.realdebrid_authorization_expired", {});
+    mocks.getRealDebridAccessToken.mockRejectedValueOnce(typed ? error : new Error(error.message));
+    const result = await new RealDebridClient(makeDownloader()).removeDownload("not-started");
+    expect(result).toMatchObject({ success: false, message: error.message });
+    expect(serializeServiceMessageDescriptor(result) !== null).toBe(typed);
+    expect(mocks.safeFetch).not.toHaveBeenCalled();
+  });
 
   it("selects all files when a newly added torrent is waiting for file selection", async () => {
     const client = new RealDebridClient(makeDownloader());
@@ -232,7 +277,10 @@ describe("RealDebridClient", () => {
       status = await client.getDownloadStatus("torrent-traversal");
     }
 
-    expect(status).toMatchObject({ status: "error" });
+    expect(status).toMatchObject({
+      status: "error",
+      errorI18n: { messageKey: "service.realdebrid_unsafe_torrent_file_path", messageValues: {} },
+    });
     await expect(fs.access(path.join(root, "escape.bin"))).rejects.toThrow();
     expect(mocks.safeFetch).toHaveBeenCalledTimes(1);
   });
