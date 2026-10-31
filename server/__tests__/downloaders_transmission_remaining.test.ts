@@ -129,6 +129,9 @@ describe("transmission remaining regression coverage", () => {
       success: true,
       id: "hash-1",
       message: "Download added successfully",
+
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     fetchWithMagnetDetectionMock.mockResolvedValueOnce({
@@ -148,6 +151,9 @@ describe("transmission remaining regression coverage", () => {
       success: true,
       id: "hash-2",
       message: "Download added successfully",
+
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     fetchWithMagnetDetectionMock.mockRejectedValueOnce(new Error("download boom"));
@@ -161,6 +167,9 @@ describe("transmission remaining regression coverage", () => {
       success: true,
       id: "hash-3",
       message: "Download added successfully",
+
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     makeRequestSpy.mockRejectedValueOnce("boom");
@@ -172,6 +181,12 @@ describe("transmission remaining regression coverage", () => {
     ).resolves.toEqual({
       success: false,
       message: "Failed to add download: Unknown error",
+
+      messageKey: "service.download_add_failed",
+      messageValues: { error: "Unknown error" },
+      messageDetails: {
+        error: { messageKey: "interface.unknown_error_ce512b43", messageValues: {} },
+      },
     });
   });
 
@@ -269,18 +284,27 @@ describe("transmission remaining regression coverage", () => {
     await expect(client.pauseDownload("7")).resolves.toEqual({
       success: false,
       message: "Failed to pause download: pause boom",
+
+      messageKey: "service.download_pause_failed",
+      messageValues: { error: "pause boom" },
     });
 
     makeRequestSpy.mockRejectedValueOnce(new Error("resume boom"));
     await expect(client.resumeDownload("7")).resolves.toEqual({
       success: false,
       message: "Failed to resume download: resume boom",
+
+      messageKey: "service.download_resume_failed",
+      messageValues: { error: "resume boom" },
     });
 
     makeRequestSpy.mockRejectedValueOnce(new Error("remove boom"));
     await expect(client.removeDownload("7")).resolves.toEqual({
       success: false,
       message: "Failed to remove download: remove boom",
+
+      messageKey: "service.download_remove_failed",
+      messageValues: { error: "remove boom" },
     });
 
     makeRequestSpy.mockRejectedValueOnce(new Error("space boom"));

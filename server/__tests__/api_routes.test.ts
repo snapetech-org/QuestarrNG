@@ -2161,6 +2161,28 @@ describe("API Routes - Extended Coverage", () => {
         expect(response.status).toBe(200);
       });
 
+      it.each([
+        ["pauseDownload", "pause", "download_pause_failed"],
+        ["resumeDownload", "resume", "download_resume_failed"],
+        ["removeDownload", "remove", "download_remove_failed"],
+      ] as const)(
+        "preserves exact action metadata from %s through HTTP JSON",
+        async (method, action, key) => {
+          vi.mocked(storage.getDownloader).mockResolvedValue({ id: "dl-1" } as Downloader);
+          const result = {
+            success: false,
+            ...serviceMessage(`service.${key}`, { error: 'Provider / لعبة "A"' }),
+          };
+          vi.mocked(DownloaderManager[method]).mockResolvedValue(result);
+          const response =
+            action === "remove"
+              ? await request(app).delete("/api/downloaders/dl-1/downloads/d-1")
+              : await request(app).post(`/api/downloaders/dl-1/downloads/d-1/${action}`);
+          expect(response.status).toBe(200);
+          expect(response.body).toEqual(result);
+        }
+      );
+
       it("should return 404 for missing downloader", async () => {
         vi.mocked(storage.getDownloader).mockResolvedValue(null as any);
         const response = await request(app).post(

@@ -746,6 +746,9 @@ describe("SynologyDownloadStationClient", () => {
         success: true,
         id: "dbid_123",
         message: "Download added successfully",
+
+        messageKey: "service.download_added",
+        messageValues: {},
       });
     });
 

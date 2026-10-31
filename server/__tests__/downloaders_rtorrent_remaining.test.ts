@@ -141,6 +141,9 @@ describe("rtorrent remaining regression coverage", () => {
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully",
+
+      messageKey: "service.download_added",
+      messageValues: {},
     });
     expect(fetchWithMagnetDetectionMock).toHaveBeenNthCalledWith(
       2,
@@ -163,6 +166,9 @@ describe("rtorrent remaining regression coverage", () => {
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully",
+
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     rpcSpy.mockResolvedValueOnce(7);
@@ -189,6 +195,9 @@ describe("rtorrent remaining regression coverage", () => {
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully",
+
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     fetchWithMagnetDetectionMock.mockResolvedValueOnce({
@@ -233,6 +242,9 @@ describe("rtorrent remaining regression coverage", () => {
       success: true,
       id: "unknown",
       message: "Download added successfully (stopped)",
+
+      messageKey: "service.download_added_stopped",
+      messageValues: {},
     });
     expect(stoppedRpcSpy).toHaveBeenLastCalledWith("load.raw", [
       "",
@@ -268,6 +280,12 @@ describe("rtorrent remaining regression coverage", () => {
     ).resolves.toEqual({
       success: false,
       message: "Failed to add download: Unknown error",
+
+      messageKey: "service.download_add_failed",
+      messageValues: { error: "Unknown error" },
+      messageDetails: {
+        error: { messageKey: "interface.unknown_error_ce512b43", messageValues: {} },
+      },
     });
   });
 
@@ -423,42 +441,63 @@ describe("rtorrent remaining regression coverage", () => {
     await expect(client.pauseDownload("hash-pause")).resolves.toEqual({
       success: true,
       message: "Download paused successfully",
+
+      messageKey: "service.download_paused",
+      messageValues: {},
     });
 
     rpcSpy.mockRejectedValueOnce(new Error("pause failed"));
     await expect(client.pauseDownload("hash-pause")).resolves.toEqual({
       success: false,
       message: "Failed to pause download: pause failed",
+
+      messageKey: "service.download_pause_failed",
+      messageValues: { error: "pause failed" },
     });
 
     rpcSpy.mockResolvedValueOnce(0);
     await expect(client.resumeDownload("hash-pause")).resolves.toEqual({
       success: true,
       message: "Download resumed successfully",
+
+      messageKey: "service.download_resumed",
+      messageValues: {},
     });
 
     rpcSpy.mockRejectedValueOnce(new Error("resume failed"));
     await expect(client.resumeDownload("hash-pause")).resolves.toEqual({
       success: false,
       message: "Failed to resume download: resume failed",
+
+      messageKey: "service.download_resume_failed",
+      messageValues: { error: "resume failed" },
     });
 
     rpcSpy.mockResolvedValueOnce(0);
     await expect(client.removeDownload("hash-remove", false)).resolves.toEqual({
       success: true,
       message: "Download removed successfully",
+
+      messageKey: "service.download_removed",
+      messageValues: {},
     });
 
     rpcSpy.mockResolvedValueOnce(0).mockResolvedValueOnce(0).mockResolvedValueOnce(0);
     await expect(client.removeDownload("hash-remove", true)).resolves.toEqual({
       success: true,
       message: "Download removed successfully",
+
+      messageKey: "service.download_removed",
+      messageValues: {},
     });
 
     rpcSpy.mockRejectedValueOnce(new Error("remove failed"));
     await expect(client.removeDownload("hash-remove", false)).resolves.toEqual({
       success: false,
       message: "Failed to remove download: remove failed",
+
+      messageKey: "service.download_remove_failed",
+      messageValues: { error: "remove failed" },
     });
 
     rpcSpy.mockResolvedValueOnce("/downloads").mockResolvedValueOnce("12345");

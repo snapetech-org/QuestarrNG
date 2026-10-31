@@ -1,4 +1,4 @@
-import { serviceMessage } from "../../shared/service-messages.js";
+import { serviceErrorValue, serviceMessage } from "../../shared/service-messages.js";
 import type {
   Downloader,
   DownloadStatus,
@@ -380,7 +380,7 @@ export class DelugeClient implements DownloaderClient {
 
         return {
           success: false,
-          message: `Failed to add download: ${errorMessage}`,
+          ...serviceMessage("service.download_add_failed", { error: serviceErrorValue(error) }),
         };
       }
 
@@ -424,7 +424,10 @@ export class DelugeClient implements DownloaderClient {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
       downloadersLogger.error({ error: errorMessage }, "Error adding download to Deluge");
-      return { success: false, message: `Failed to add download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_add_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
@@ -660,10 +663,12 @@ export class DelugeClient implements DownloaderClient {
       await this.authenticate();
       await this.ensureConnected();
       await this.makeRequest("core.pause_torrent", [id]);
-      return { success: true, message: "Download paused successfully" };
+      return { success: true, ...serviceMessage("service.download_paused", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to pause download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_pause_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
@@ -672,10 +677,12 @@ export class DelugeClient implements DownloaderClient {
       await this.authenticate();
       await this.ensureConnected();
       await this.makeRequest("core.resume_torrent", [id]);
-      return { success: true, message: "Download resumed successfully" };
+      return { success: true, ...serviceMessage("service.download_resumed", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to resume download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_resume_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
@@ -687,10 +694,12 @@ export class DelugeClient implements DownloaderClient {
       await this.authenticate();
       await this.ensureConnected();
       await this.makeRequest("core.remove_torrent", [id, deleteFiles]);
-      return { success: true, message: "Download removed successfully" };
+      return { success: true, ...serviceMessage("service.download_removed", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to remove download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_remove_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 

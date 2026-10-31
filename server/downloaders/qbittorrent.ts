@@ -1,4 +1,4 @@
-import { serviceMessage } from "../../shared/service-messages.js";
+import { serviceErrorValue, serviceMessage } from "../../shared/service-messages.js";
 import type {
   Downloader,
   DownloadStatus,
@@ -20,8 +20,7 @@ import {
   logDownloaderDebugResponse,
 } from "./utils.js";
 
-const UNCONFIRMED_ADD_MESSAGE =
-  "qBittorrent accepted the request, but the download is not confirmed yet. Check qBittorrent before retrying to avoid creating a duplicate.";
+const UNCONFIRMED_ADD_RESULT = serviceMessage("service.download_unconfirmed", {});
 const QB_HASH_RESOLUTION_TIMEOUT_MS = 15_000;
 
 interface QBittorrentTorrent {
@@ -432,11 +431,11 @@ export class QBittorrentClient implements DownloaderClient {
                 return {
                   success: true,
                   ...(resolvedHash ? { id: resolvedHash } : { correlationTag }),
-                  message: resolvedHash
+                  ...(resolvedHash
                     ? isPending
-                      ? "Download queued in qBittorrent"
-                      : "Download added successfully"
-                    : UNCONFIRMED_ADD_MESSAGE,
+                      ? serviceMessage("service.download_queued", { client: "qBittorrent" })
+                      : serviceMessage("service.download_added", {})
+                    : UNCONFIRMED_ADD_RESULT),
                 };
               }
 
@@ -465,7 +464,7 @@ export class QBittorrentClient implements DownloaderClient {
           if (urlAddDuplicate) {
             return {
               success: true,
-              message: "Download already exists (qBittorrent)",
+              ...serviceMessage("service.download_already_exists", { client: "qBittorrent" }),
             };
           }
 
@@ -487,7 +486,7 @@ export class QBittorrentClient implements DownloaderClient {
                 return {
                   success: true,
                   id: hashFromUrl,
-                  message: "Download already exists (qBittorrent)",
+                  ...serviceMessage("service.download_already_exists", { client: "qBittorrent" }),
                 };
               }
 
@@ -496,7 +495,7 @@ export class QBittorrentClient implements DownloaderClient {
               return {
                 success: true,
                 id: hashFromUrl,
-                message: "Download added successfully",
+                ...serviceMessage("service.download_added", {}),
               };
             }
 
@@ -518,7 +517,7 @@ export class QBittorrentClient implements DownloaderClient {
                 return {
                   success: true,
                   id: recent.hash,
-                  message: "Download already exists (qBittorrent)",
+                  ...serviceMessage("service.download_already_exists", { client: "qBittorrent" }),
                 };
               }
 
@@ -527,7 +526,7 @@ export class QBittorrentClient implements DownloaderClient {
               return {
                 success: true,
                 id: recent.hash,
-                message: "Download added successfully",
+                ...serviceMessage("service.download_added", {}),
               };
             }
 
@@ -841,7 +840,7 @@ export class QBittorrentClient implements DownloaderClient {
             return {
               success: true,
               id: recent.hash,
-              message: "Download added successfully",
+              ...serviceMessage("service.download_added", {}),
             };
           }
 
@@ -858,7 +857,7 @@ export class QBittorrentClient implements DownloaderClient {
               pendingFallbackCorrelationTag ??
               pendingUrlCorrelationTag ??
               `questarr-add-${randomUUID()}`,
-            message: UNCONFIRMED_ADD_MESSAGE,
+            ...UNCONFIRMED_ADD_RESULT,
           };
         }
 
@@ -891,7 +890,7 @@ export class QBittorrentClient implements DownloaderClient {
           return {
             success: true,
             id: hash,
-            message: "Download added successfully",
+            ...serviceMessage("service.download_added", {}),
           };
         } else {
           downloadersLogger.error({ hash }, "Download not found in qBittorrent after adding");
@@ -922,19 +921,22 @@ export class QBittorrentClient implements DownloaderClient {
         return {
           success: true,
           ...(duplicateHash ? { id: duplicateHash } : {}),
-          message: "Download already exists (qBittorrent)",
+          ...serviceMessage("service.download_already_exists", { client: "qBittorrent" }),
         };
       } else {
         downloadersLogger.error({ responseText }, "Unexpected response from qBittorrent");
         return {
           success: false,
-          message: `Failed to add download: ${responseText}`,
+          ...serviceMessage("service.download_add_failed", { error: responseText }),
         };
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
       downloadersLogger.error({ error: errorMessage }, "Error adding download to qBittorrent");
-      return { success: false, message: `Failed to add download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_add_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
@@ -1142,10 +1144,12 @@ export class QBittorrentClient implements DownloaderClient {
         "Content-Type": "application/x-www-form-urlencoded",
       });
 
-      return { success: true, message: "Download paused successfully" };
+      return { success: true, ...serviceMessage("service.download_paused", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to pause download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_pause_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
@@ -1160,10 +1164,12 @@ export class QBittorrentClient implements DownloaderClient {
         "Content-Type": "application/x-www-form-urlencoded",
       });
 
-      return { success: true, message: "Download resumed successfully" };
+      return { success: true, ...serviceMessage("service.download_resumed", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to resume download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_resume_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
@@ -1182,10 +1188,12 @@ export class QBittorrentClient implements DownloaderClient {
         "Content-Type": "application/x-www-form-urlencoded",
       });
 
-      return { success: true, message: "Download removed successfully" };
+      return { success: true, ...serviceMessage("service.download_removed", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to remove download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_remove_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 

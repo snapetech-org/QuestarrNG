@@ -268,7 +268,14 @@ export default function Downloads() {
         toast({ title: "Download paused" });
         invalidateDownloadCaches();
       } else {
-        toast({ title: result.message || "Failed to pause download", variant: "destructive" });
+        toast({
+          title: result.message ? (
+            <ServiceMessageText message={result.message} metadata={result} />
+          ) : (
+            "Failed to pause download"
+          ),
+          variant: "destructive",
+        });
       }
     },
     onError: () => {
@@ -296,7 +303,14 @@ export default function Downloads() {
         toast({ title: "Download resumed" });
         invalidateDownloadCaches();
       } else {
-        toast({ title: result.message || "Failed to resume download", variant: "destructive" });
+        toast({
+          title: result.message ? (
+            <ServiceMessageText message={result.message} metadata={result} />
+          ) : (
+            "Failed to resume download"
+          ),
+          variant: "destructive",
+        });
       }
     },
     onError: () => {
@@ -326,7 +340,14 @@ export default function Downloads() {
         toast({ title: "Download removed" });
         invalidateDownloadCaches();
       } else {
-        toast({ title: result.message || "Failed to remove download", variant: "destructive" });
+        toast({
+          title: result.message ? (
+            <ServiceMessageText message={result.message} metadata={result} />
+          ) : (
+            "Failed to remove download"
+          ),
+          variant: "destructive",
+        });
       }
     },
     onError: () => {

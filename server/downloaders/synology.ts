@@ -1,4 +1,8 @@
-import { parseServiceMessageDescriptor, serviceMessage } from "../../shared/service-messages.js";
+import {
+  parseServiceMessageDescriptor,
+  serviceErrorValue,
+  serviceMessage,
+} from "../../shared/service-messages.js";
 import type {
   Downloader,
   DownloadStatus,
@@ -998,7 +1002,7 @@ export class SynologyDownloadStationClient implements DownloaderClient {
         return {
           success: true,
           id,
-          message: "Download added successfully",
+          ...serviceMessage("service.download_added", {}),
         };
       };
 
@@ -1086,7 +1090,7 @@ export class SynologyDownloadStationClient implements DownloaderClient {
     return {
       success: true,
       id: uploadResponse.data?.task_id?.[0],
-      message: "Download added successfully",
+      ...serviceMessage("service.download_added", {}),
     };
   }
 
@@ -1171,10 +1175,12 @@ export class SynologyDownloadStationClient implements DownloaderClient {
         httpMethod: "GET",
         params: { id },
       });
-      return { success: true, message: "Download paused successfully" };
+      return { success: true, ...serviceMessage("service.download_paused", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to pause download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_pause_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
@@ -1184,10 +1190,12 @@ export class SynologyDownloadStationClient implements DownloaderClient {
         httpMethod: "GET",
         params: { id },
       });
-      return { success: true, message: "Download resumed successfully" };
+      return { success: true, ...serviceMessage("service.download_resumed", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to resume download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_resume_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
@@ -1204,10 +1212,12 @@ export class SynologyDownloadStationClient implements DownloaderClient {
           force_complete: deleteFiles,
         },
       });
-      return { success: true, message: "Download removed successfully" };
+      return { success: true, ...serviceMessage("service.download_removed", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to remove download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_remove_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 

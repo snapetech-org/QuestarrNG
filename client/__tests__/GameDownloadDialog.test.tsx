@@ -1675,7 +1675,15 @@ describe("GameDownloadDialog", () => {
         expect.objectContaining({ method: "POST" })
       );
       expect(mockToast).toHaveBeenCalledWith(
-        expect.objectContaining({ title: "Checking qBittorrent", description: message })
+        expect.objectContaining({
+          title: "Checking qBittorrent",
+          description: expect.objectContaining({
+            props: {
+              message,
+              metadata: { success: true, correlationTag: "questarr-add-pending", message },
+            },
+          }),
+        })
       );
     });
   });

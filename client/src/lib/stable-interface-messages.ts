@@ -2678,6 +2678,20 @@ export const STABLE_INTERFACE_MESSAGES = {
   "downloads.status.pending_import": "Pending Import",
   "downloads.status.game_link_required": "Game Link Required",
   "imports.start_time": "Start time",
+  "service.download_added": "Download added successfully",
+  "service.download_paused": "Download paused successfully",
+  "service.download_resumed": "Download resumed successfully",
+  "service.download_removed": "Download removed successfully",
+  "service.download_add_failed": "Failed to add download: {error}",
+  "service.download_pause_failed": "Failed to pause download: {error}",
+  "service.download_resume_failed": "Failed to resume download: {error}",
+  "service.download_remove_failed": "Failed to remove download: {error}",
+  "service.download_added_stopped": "Download added successfully (stopped)",
+  "service.download_add_failed_without_details": "Failed to add download",
+  "service.download_already_exists": "Download already exists ({client})",
+  "service.download_queued": "Download queued in {client}",
+  "service.download_unconfirmed":
+    "qBittorrent accepted the request, but the download is not confirmed yet. Check qBittorrent before retrying to avoid creating a duplicate.",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

@@ -311,14 +311,23 @@ describe("qbittorrent regression coverage", () => {
     await expect(client.pauseDownload("hash-3")).resolves.toEqual({
       success: true,
       message: "Download paused successfully",
+
+      messageKey: "service.download_paused",
+      messageValues: {},
     });
     await expect(client.resumeDownload("hash-3")).resolves.toEqual({
       success: true,
       message: "Download resumed successfully",
+
+      messageKey: "service.download_resumed",
+      messageValues: {},
     });
     await expect(client.removeDownload("hash-3", true)).resolves.toEqual({
       success: true,
       message: "Download removed successfully",
+
+      messageKey: "service.download_removed",
+      messageValues: {},
     });
 
     makeRequestSpy.mockRejectedValueOnce(new Error("status boom"));
@@ -331,16 +340,25 @@ describe("qbittorrent regression coverage", () => {
     await expect(client.pauseDownload("boom")).resolves.toEqual({
       success: false,
       message: "Failed to pause download: pause boom",
+
+      messageKey: "service.download_pause_failed",
+      messageValues: { error: "pause boom" },
     });
     makeRequestSpy.mockRejectedValueOnce(new Error("resume boom"));
     await expect(client.resumeDownload("boom")).resolves.toEqual({
       success: false,
       message: "Failed to resume download: resume boom",
+
+      messageKey: "service.download_resume_failed",
+      messageValues: { error: "resume boom" },
     });
     makeRequestSpy.mockRejectedValueOnce(new Error("remove boom"));
     await expect(client.removeDownload("boom")).resolves.toEqual({
       success: false,
       message: "Failed to remove download: remove boom",
+
+      messageKey: "service.download_remove_failed",
+      messageValues: { error: "remove boom" },
     });
   });
 
@@ -395,6 +413,9 @@ describe("qbittorrent regression coverage", () => {
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download already exists (qBittorrent)",
+
+      messageKey: "service.download_already_exists",
+      messageValues: { client: "qBittorrent" },
     });
 
     makeRequestSpy.mockReset();
@@ -562,6 +583,9 @@ describe("qbittorrent regression coverage", () => {
       success: true,
       id: "recent-hash",
       message: "Download added successfully",
+
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     setTimeoutSpy.mockRestore();
@@ -623,6 +647,9 @@ describe("qbittorrent regression coverage", () => {
         success: true,
         id: "wanted-hash",
         message: "Download added successfully",
+
+        messageKey: "service.download_added",
+        messageValues: {},
       });
     });
 
@@ -637,6 +664,9 @@ describe("qbittorrent regression coverage", () => {
         success: true,
         id: "wanted-hash",
         message: "Download added successfully",
+
+        messageKey: "service.download_added",
+        messageValues: {},
       });
     });
 
@@ -653,6 +683,9 @@ describe("qbittorrent regression coverage", () => {
         success: true,
         id: "wanted-hash",
         message: "Download added successfully",
+
+        messageKey: "service.download_added",
+        messageValues: {},
       });
     });
   });
@@ -715,6 +748,9 @@ describe("qbittorrent regression coverage", () => {
         success: true,
         id: "existing-hash",
         message: "Download already exists (qBittorrent)",
+
+        messageKey: "service.download_already_exists",
+        messageValues: { client: "qBittorrent" },
       });
 
       // The correlation tag is removed from the pre-existing torrent too,
@@ -802,6 +838,9 @@ describe("qbittorrent regression coverage", () => {
         success: true,
         id: "async-hash",
         message: "Download queued in qBittorrent",
+
+        messageKey: "service.download_queued",
+        messageValues: { client: "qBittorrent" },
       });
 
       // The initial add is tagged, and the poll looks the torrent up by that exact
@@ -930,6 +969,9 @@ describe("qbittorrent regression coverage", () => {
         success: true,
         id: "fallback-hash",
         message: "Download added successfully",
+
+        messageKey: "service.download_added",
+        messageValues: {},
       });
 
       expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -1064,6 +1106,9 @@ describe("qbittorrent regression coverage", () => {
         success: true,
         id: "torrent_hash_abc123",
         message: "Download added successfully",
+
+        messageKey: "service.download_added",
+        messageValues: {},
       });
 
       expect(
@@ -1401,6 +1446,9 @@ describe("qbittorrent regression coverage", () => {
       success: true,
       message:
         "qBittorrent accepted the request, but the download is not confirmed yet. Check qBittorrent before retrying to avoid creating a duplicate.",
+
+      messageKey: "service.download_unconfirmed",
+      messageValues: {},
     });
     expect(fetchMock).not.toHaveBeenCalled();
     expect(
@@ -1451,6 +1499,9 @@ describe("qbittorrent regression coverage", () => {
       success: true,
       id: "immediate-hash",
       message: "Download added successfully",
+
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     // No polling needed when the hash is already known; the only extra call
@@ -1524,6 +1575,9 @@ describe("qbittorrent regression coverage", () => {
         correlationTag: expect.stringMatching(/^questarr-add-/),
         message:
           "qBittorrent accepted the request, but the download is not confirmed yet. Check qBittorrent before retrying to avoid creating a duplicate.",
+
+        messageKey: "service.download_unconfirmed",
+        messageValues: {},
       });
 
       // 1 add request + 1 failed lookup, no upload fallback request.
@@ -1594,6 +1648,9 @@ describe("qbittorrent regression coverage", () => {
         correlationTag: expect.stringMatching(/^questarr-add-/),
         message:
           "qBittorrent accepted the request, but the download is not confirmed yet. Check qBittorrent before retrying to avoid creating a duplicate.",
+
+        messageKey: "service.download_unconfirmed",
+        messageValues: {},
       });
       expect(pollSignal).toBeInstanceOf(AbortSignal);
       expect(makeRequestSpy).toHaveBeenCalledTimes(2);

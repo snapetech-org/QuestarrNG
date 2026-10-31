@@ -15,6 +15,7 @@ import {
   useInterfaceLanguage,
 } from "@/lib/interface-locale";
 import { ApiErrorDetailText } from "@/components/ApiErrorDetailText";
+import { ServiceMessageText } from "@/components/ServiceMessageText";
 import { isTorrentDownloaderType, isUsenetDownloaderType } from "@shared/downloader-types";
 import { cleanReleaseName } from "@shared/title-utils";
 import {
@@ -317,9 +318,11 @@ export default function SearchPage() {
           title: awaitingConfirmation ? "Checking qBittorrent" : "Download started successfully",
           ...(awaitingConfirmation
             ? {
-                description:
-                  result.message ||
-                  "The request was accepted, but qBittorrent has not confirmed the download yet. Check qBittorrent before retrying to avoid a duplicate.",
+                description: result.message ? (
+                  <ServiceMessageText message={result.message} metadata={result} />
+                ) : (
+                  "The request was accepted, but qBittorrent has not confirmed the download yet. Check qBittorrent before retrying to avoid a duplicate."
+                ),
               }
             : {}),
         });
@@ -328,7 +331,14 @@ export default function SearchPage() {
         void queryClient.invalidateQueries({ queryKey: ["/api/downloads"] });
         void queryClient.invalidateQueries({ queryKey: ["/api/downloads/summary"] });
       } else {
-        toast({ title: result.message || "Failed to start download", variant: "destructive" });
+        toast({
+          title: result.message ? (
+            <ServiceMessageText message={result.message} metadata={result} />
+          ) : (
+            "Failed to start download"
+          ),
+          variant: "destructive",
+        });
       }
     },
     onError: () => {

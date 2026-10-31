@@ -1,4 +1,4 @@
-import { serviceMessage } from "../../shared/service-messages.js";
+import { serviceErrorValue, serviceMessage } from "../../shared/service-messages.js";
 import type {
   Downloader,
   DownloadStatus,
@@ -313,7 +313,7 @@ export class TransmissionClient implements DownloaderClient {
         return {
           success: true,
           id: id || torrent.id?.toString(),
-          message: "Download added successfully",
+          ...serviceMessage("service.download_added", {}),
         };
       } else if (response.arguments["torrent-duplicate"]) {
         const torrent = response.arguments["torrent-duplicate"];
@@ -322,7 +322,7 @@ export class TransmissionClient implements DownloaderClient {
         return {
           success: true,
           id: torrent.hashString || torrent.id?.toString(),
-          message: "Download already exists (Transmission)",
+          ...serviceMessage("service.download_already_exists", { client: "Transmission" }),
         };
       } else {
         const transmissionError =
@@ -331,14 +331,16 @@ export class TransmissionClient implements DownloaderClient {
             : null;
         return {
           success: false,
-          message: transmissionError
-            ? `Failed to add download: ${transmissionError}`
-            : "Failed to add download",
+          ...(transmissionError
+            ? serviceMessage("service.download_add_failed", { error: transmissionError })
+            : serviceMessage("service.download_add_failed_without_details", {})),
         };
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to add download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_add_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
@@ -458,20 +460,24 @@ export class TransmissionClient implements DownloaderClient {
   async pauseDownload(id: string): Promise<{ success: boolean; message: string }> {
     try {
       await this.makeRequest("torrent-stop", { ids: this.toTransmissionIds(id) });
-      return { success: true, message: "Download paused successfully" };
+      return { success: true, ...serviceMessage("service.download_paused", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to pause download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_pause_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
   async resumeDownload(id: string): Promise<{ success: boolean; message: string }> {
     try {
       await this.makeRequest("torrent-start", { ids: this.toTransmissionIds(id) });
-      return { success: true, message: "Download resumed successfully" };
+      return { success: true, ...serviceMessage("service.download_resumed", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to resume download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_resume_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
@@ -484,10 +490,12 @@ export class TransmissionClient implements DownloaderClient {
         ids: this.toTransmissionIds(id),
         "delete-local-data": deleteFiles,
       });
-      return { success: true, message: "Download removed successfully" };
+      return { success: true, ...serviceMessage("service.download_removed", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to remove download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_remove_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 

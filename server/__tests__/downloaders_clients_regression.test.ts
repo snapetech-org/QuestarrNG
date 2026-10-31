@@ -1331,6 +1331,8 @@ describe("downloader client regression coverage", () => {
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully",
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     makeRequestSpy.mockReset();
@@ -1365,6 +1367,8 @@ describe("downloader client regression coverage", () => {
       success: true,
       id: "recent-hash",
       message: "Download already exists (qBittorrent)",
+      messageKey: "service.download_already_exists",
+      messageValues: { client: "qBittorrent" },
     });
 
     vi.useRealTimers();
@@ -1433,6 +1437,8 @@ describe("downloader client regression coverage", () => {
       success: true,
       id: "dup-hash",
       message: "Download already exists (Transmission)",
+      messageKey: "service.download_already_exists",
+      messageValues: { client: "Transmission" },
     });
   });
 
@@ -1480,6 +1486,8 @@ describe("downloader client regression coverage", () => {
       success: true,
       id: "magnet-hash",
       message: "Download added successfully",
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     fetchMock
@@ -1508,6 +1516,8 @@ describe("downloader client regression coverage", () => {
     ).resolves.toEqual({
       success: false,
       message: "Failed to add download: tracker offline",
+      messageKey: "service.download_add_failed",
+      messageValues: { error: "tracker offline" },
     });
   });
 
@@ -1565,6 +1575,8 @@ describe("downloader client regression coverage", () => {
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully",
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     rpcSpy.mockResolvedValueOnce(5);
@@ -1606,6 +1618,8 @@ describe("downloader client regression coverage", () => {
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully (stopped)",
+      messageKey: "service.download_added_stopped",
+      messageValues: {},
     });
 
     fetchMock.mockResolvedValueOnce({
@@ -1929,6 +1943,8 @@ describe("downloader client regression coverage", () => {
       success: true,
       id: "task-1",
       message: "Download added successfully",
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     vi.spyOn(privateClient, "getTask").mockRejectedValue(new Error("status boom"));
@@ -1941,16 +1957,22 @@ describe("downloader client regression coverage", () => {
     await expect(client.pauseDownload("task-1")).resolves.toEqual({
       success: false,
       message: "Failed to pause download: pause boom",
+      messageKey: "service.download_pause_failed",
+      messageValues: { error: "pause boom" },
     });
     requestTaskApiSpy.mockRejectedValueOnce(new Error("resume boom"));
     await expect(client.resumeDownload("task-1")).resolves.toEqual({
       success: false,
       message: "Failed to resume download: resume boom",
+      messageKey: "service.download_resume_failed",
+      messageValues: { error: "resume boom" },
     });
     requestTaskApiSpy.mockRejectedValueOnce(new Error("remove boom"));
     await expect(client.removeDownload("task-1", true)).resolves.toEqual({
       success: false,
       message: "Failed to remove download: remove boom",
+      messageKey: "service.download_remove_failed",
+      messageValues: { error: "remove boom" },
     });
 
     privateClient.apiInfo = null;
@@ -2026,6 +2048,8 @@ describe("downloader client regression coverage", () => {
       success: true,
       id: "task-upload",
       message: "Download added successfully",
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     requestTaskApiSpy.mockResolvedValueOnce({

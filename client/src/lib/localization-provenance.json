@@ -25440,6 +25440,305 @@
         "es-419": "es",
         "fr-CA": "fr"
       }
+    },
+    "service.download_added": {
+      "sourceChecksum": "fnv1a32:a4fe080c",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.download_paused": {
+      "sourceChecksum": "fnv1a32:8aca9ab6",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.download_resumed": {
+      "sourceChecksum": "fnv1a32:01a06ca9",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.download_removed": {
+      "sourceChecksum": "fnv1a32:43fbfa42",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.download_add_failed": {
+      "sourceChecksum": "fnv1a32:937e3744",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.download_pause_failed": {
+      "sourceChecksum": "fnv1a32:293a2009",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.download_resume_failed": {
+      "sourceChecksum": "fnv1a32:7266cc46",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.download_remove_failed": {
+      "sourceChecksum": "fnv1a32:f7d34a2d",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.download_added_stopped": {
+      "sourceChecksum": "fnv1a32:6722da44",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.download_add_failed_without_details": {
+      "sourceChecksum": "fnv1a32:b4281b06",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.download_already_exists": {
+      "sourceChecksum": "fnv1a32:df71c031",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.download_queued": {
+      "sourceChecksum": "fnv1a32:8f5e96fe",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.download_unconfirmed": {
+      "sourceChecksum": "fnv1a32:5c52f1e6",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
     }
   }
 }

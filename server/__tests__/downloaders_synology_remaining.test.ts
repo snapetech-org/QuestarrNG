@@ -390,6 +390,9 @@ describe("synology remaining regression coverage", () => {
       success: true,
       id: "task-magnet",
       message: "Download added successfully",
+
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     fetchWithMagnetDetectionMock.mockResolvedValueOnce({
@@ -424,14 +427,23 @@ describe("synology remaining regression coverage", () => {
     await expect(client.pauseDownload("task-1")).resolves.toEqual({
       success: true,
       message: "Download paused successfully",
+
+      messageKey: "service.download_paused",
+      messageValues: {},
     });
     await expect(client.resumeDownload("task-1")).resolves.toEqual({
       success: true,
       message: "Download resumed successfully",
+
+      messageKey: "service.download_resumed",
+      messageValues: {},
     });
     await expect(client.removeDownload("task-1", true)).resolves.toEqual({
       success: true,
       message: "Download removed successfully",
+
+      messageKey: "service.download_removed",
+      messageValues: {},
     });
 
     const requestApiSpy = vi.spyOn(privateClient, "requestApi");
@@ -746,6 +758,9 @@ describe("synology remaining regression coverage", () => {
       success: true,
       id: "task-default",
       message: "Download added successfully",
+
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     expect(requestTaskApiSpy).toHaveBeenLastCalledWith("create", {

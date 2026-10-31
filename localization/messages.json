@@ -42995,6 +42995,253 @@
         "es-419": "Hora de inicio",
         "fr-CA": "Heure de début"
       }
+    },
+    "service.download_added": {
+      "source": "Download added successfully",
+      "translations": {
+        "es": "Descarga añadida correctamente",
+        "zh-Hans": "下载已添加",
+        "hi": "डाउनलोड सफलतापूर्वक जोड़ा गया",
+        "de": "Download erfolgreich hinzugefügt",
+        "ja": "ダウンロードを追加しました",
+        "fr": "Téléchargement ajouté avec succès",
+        "pt-BR": "Download adicionado com sucesso",
+        "ar": "تمت إضافة التنزيل بنجاح",
+        "ko": "다운로드가 추가되었습니다",
+        "zh-Hant": "下載已新增",
+        "vi": "Đã thêm lượt tải thành công",
+        "id": "Unduhan berhasil ditambahkan",
+        "es-419": "Descarga añadida correctamente",
+        "fr-CA": "Téléchargement ajouté avec succès"
+      }
+    },
+    "service.download_paused": {
+      "source": "Download paused successfully",
+      "translations": {
+        "es": "Descarga pausada correctamente",
+        "zh-Hans": "下载已暂停",
+        "hi": "डाउनलोड को अस्थायी रूप से रोक दिया गया",
+        "de": "Download erfolgreich angehalten",
+        "ja": "ダウンロードを一時停止しました",
+        "fr": "Téléchargement mis en pause avec succès",
+        "pt-BR": "Download pausado com sucesso",
+        "ar": "تم إيقاف التنزيل مؤقتًا بنجاح",
+        "ko": "다운로드가 일시 중지되었습니다",
+        "zh-Hant": "下載已暫停",
+        "vi": "Đã tạm dừng lượt tải thành công",
+        "id": "Unduhan berhasil dijeda",
+        "es-419": "Descarga pausada correctamente",
+        "fr-CA": "Téléchargement mis en pause avec succès"
+      }
+    },
+    "service.download_resumed": {
+      "source": "Download resumed successfully",
+      "translations": {
+        "es": "Descarga reanudada correctamente",
+        "zh-Hans": "下载已恢复",
+        "hi": "डाउनलोड सफलतापूर्वक फिर से शुरू किया गया",
+        "de": "Download erfolgreich fortgesetzt",
+        "ja": "ダウンロードを再開しました",
+        "fr": "Téléchargement repris avec succès",
+        "pt-BR": "Download retomado com sucesso",
+        "ar": "تم استئناف التنزيل بنجاح",
+        "ko": "다운로드가 재개되었습니다",
+        "zh-Hant": "下載已繼續",
+        "vi": "Đã tiếp tục lượt tải thành công",
+        "id": "Unduhan berhasil dilanjutkan",
+        "es-419": "Descarga reanudada correctamente",
+        "fr-CA": "Téléchargement repris avec succès"
+      }
+    },
+    "service.download_removed": {
+      "source": "Download removed successfully",
+      "translations": {
+        "es": "Descarga eliminada correctamente",
+        "zh-Hans": "下载已移除",
+        "hi": "डाउनलोड सफलतापूर्वक हटाया गया",
+        "de": "Download erfolgreich entfernt",
+        "ja": "ダウンロードを削除しました",
+        "fr": "Téléchargement supprimé avec succès",
+        "pt-BR": "Download removido com sucesso",
+        "ar": "تمت إزالة التنزيل بنجاح",
+        "ko": "다운로드가 제거되었습니다",
+        "zh-Hant": "下載已移除",
+        "vi": "Đã xóa lượt tải thành công",
+        "id": "Unduhan berhasil dihapus",
+        "es-419": "Descarga eliminada correctamente",
+        "fr-CA": "Téléchargement supprimé avec succès"
+      }
+    },
+    "service.download_add_failed": {
+      "source": "Failed to add download: {error}",
+      "translations": {
+        "es": "No se pudo añadir la descarga: {error}",
+        "zh-Hans": "添加下载失败：{error}",
+        "hi": "डाउनलोड जोड़ने में विफल: {error}",
+        "de": "Download konnte nicht hinzugefügt werden: {error}",
+        "ja": "ダウンロードを追加できませんでした: {error}",
+        "fr": "Impossible d’ajouter le téléchargement : {error}",
+        "pt-BR": "Não foi possível adicionar o download: {error}",
+        "ar": "تعذرت إضافة التنزيل: {error}",
+        "ko": "다운로드를 추가하지 못했습니다: {error}",
+        "zh-Hant": "新增下載失敗：{error}",
+        "vi": "Không thể thêm lượt tải: {error}",
+        "id": "Gagal menambahkan unduhan: {error}",
+        "es-419": "No se pudo añadir la descarga: {error}",
+        "fr-CA": "Impossible d’ajouter le téléchargement : {error}"
+      }
+    },
+    "service.download_pause_failed": {
+      "source": "Failed to pause download: {error}",
+      "translations": {
+        "es": "No se pudo pausar la descarga: {error}",
+        "zh-Hans": "暂停下载失败：{error}",
+        "hi": "डाउनलोड को अस्थायी रूप से रोकने में विफल: {error}",
+        "de": "Download konnte nicht angehalten werden: {error}",
+        "ja": "ダウンロードを一時停止できませんでした: {error}",
+        "fr": "Impossible de mettre le téléchargement en pause : {error}",
+        "pt-BR": "Não foi possível pausar o download: {error}",
+        "ar": "تعذر إيقاف التنزيل مؤقتًا: {error}",
+        "ko": "다운로드를 일시 중지하지 못했습니다: {error}",
+        "zh-Hant": "暫停下載失敗：{error}",
+        "vi": "Không thể tạm dừng lượt tải: {error}",
+        "id": "Gagal menjeda unduhan: {error}",
+        "es-419": "No se pudo pausar la descarga: {error}",
+        "fr-CA": "Impossible de mettre le téléchargement en pause : {error}"
+      }
+    },
+    "service.download_resume_failed": {
+      "source": "Failed to resume download: {error}",
+      "translations": {
+        "es": "No se pudo reanudar la descarga: {error}",
+        "zh-Hans": "恢复下载失败：{error}",
+        "hi": "डाउनलोड फिर से शुरू करने में विफल: {error}",
+        "de": "Download konnte nicht fortgesetzt werden: {error}",
+        "ja": "ダウンロードを再開できませんでした: {error}",
+        "fr": "Impossible de reprendre le téléchargement : {error}",
+        "pt-BR": "Não foi possível retomar o download: {error}",
+        "ar": "تعذر استئناف التنزيل: {error}",
+        "ko": "다운로드를 재개하지 못했습니다: {error}",
+        "zh-Hant": "繼續下載失敗：{error}",
+        "vi": "Không thể tiếp tục lượt tải: {error}",
+        "id": "Gagal melanjutkan unduhan: {error}",
+        "es-419": "No se pudo reanudar la descarga: {error}",
+        "fr-CA": "Impossible de reprendre le téléchargement : {error}"
+      }
+    },
+    "service.download_remove_failed": {
+      "source": "Failed to remove download: {error}",
+      "translations": {
+        "es": "No se pudo eliminar la descarga: {error}",
+        "zh-Hans": "移除下载失败：{error}",
+        "hi": "डाउनलोड हटाने में विफल: {error}",
+        "de": "Download konnte nicht entfernt werden: {error}",
+        "ja": "ダウンロードを削除できませんでした: {error}",
+        "fr": "Impossible de supprimer le téléchargement : {error}",
+        "pt-BR": "Não foi possível remover o download: {error}",
+        "ar": "تعذرت إزالة التنزيل: {error}",
+        "ko": "다운로드를 제거하지 못했습니다: {error}",
+        "zh-Hant": "移除下載失敗：{error}",
+        "vi": "Không thể xóa lượt tải: {error}",
+        "id": "Gagal menghapus unduhan: {error}",
+        "es-419": "No se pudo eliminar la descarga: {error}",
+        "fr-CA": "Impossible de supprimer le téléchargement : {error}"
+      }
+    },
+    "service.download_added_stopped": {
+      "source": "Download added successfully (stopped)",
+      "translations": {
+        "es": "Descarga añadida correctamente (sin iniciar)",
+        "zh-Hans": "下载已添加（未启动）",
+        "hi": "डाउनलोड सफलतापूर्वक जोड़ा गया (शुरू नहीं किया गया)",
+        "de": "Download erfolgreich hinzugefügt (nicht gestartet)",
+        "ja": "ダウンロードを追加しました（未開始）",
+        "fr": "Téléchargement ajouté avec succès (non démarré)",
+        "pt-BR": "Download adicionado com sucesso (sem iniciar)",
+        "ar": "تمت إضافة التنزيل بنجاح (دون بدء)",
+        "ko": "다운로드가 추가되었습니다 (시작하지 않음)",
+        "zh-Hant": "下載已新增（未啟動）",
+        "vi": "Đã thêm lượt tải thành công (chưa bắt đầu)",
+        "id": "Unduhan berhasil ditambahkan (belum dimulai)",
+        "es-419": "Descarga añadida correctamente (sin iniciar)",
+        "fr-CA": "Téléchargement ajouté avec succès (non démarré)"
+      }
+    },
+    "service.download_add_failed_without_details": {
+      "source": "Failed to add download",
+      "translations": {
+        "es": "No se pudo añadir la descarga",
+        "zh-Hans": "添加下载失败",
+        "hi": "डाउनलोड जोड़ने में विफल",
+        "de": "Download konnte nicht hinzugefügt werden",
+        "ja": "ダウンロードを追加できませんでした",
+        "fr": "Impossible d’ajouter le téléchargement",
+        "pt-BR": "Não foi possível adicionar o download",
+        "ar": "تعذرت إضافة التنزيل",
+        "ko": "다운로드를 추가하지 못했습니다",
+        "zh-Hant": "新增下載失敗",
+        "vi": "Không thể thêm lượt tải",
+        "id": "Gagal menambahkan unduhan",
+        "es-419": "No se pudo añadir la descarga",
+        "fr-CA": "Impossible d’ajouter le téléchargement"
+      }
+    },
+    "service.download_already_exists": {
+      "source": "Download already exists ({client})",
+      "translations": {
+        "es": "La descarga ya existe ({client})",
+        "zh-Hans": "下载已存在（{client}）",
+        "hi": "डाउनलोड पहले से मौजूद है ({client})",
+        "de": "Download existiert bereits ({client})",
+        "ja": "ダウンロードは既に存在します（{client}）",
+        "fr": "Le téléchargement existe déjà ({client})",
+        "pt-BR": "O download já existe ({client})",
+        "ar": "التنزيل موجود بالفعل ({client})",
+        "ko": "다운로드가 이미 존재합니다({client})",
+        "zh-Hant": "下載已存在（{client}）",
+        "vi": "Lượt tải đã tồn tại ({client})",
+        "id": "Unduhan sudah ada ({client})",
+        "es-419": "La descarga ya existe ({client})",
+        "fr-CA": "Le téléchargement existe déjà ({client})"
+      }
+    },
+    "service.download_queued": {
+      "source": "Download queued in {client}",
+      "translations": {
+        "es": "Descarga en cola en {client}",
+        "zh-Hans": "下载已加入 {client} 队列",
+        "hi": "डाउनलोड {client} की कतार में जोड़ा गया",
+        "de": "Download in {client} eingereiht",
+        "ja": "ダウンロードを {client} のキューに追加しました",
+        "fr": "Téléchargement mis en file d’attente dans {client}",
+        "pt-BR": "Download na fila do {client}",
+        "ar": "أُضيف التنزيل إلى قائمة الانتظار في {client}",
+        "ko": "다운로드가 {client} 대기열에 추가되었습니다",
+        "zh-Hant": "下載已加入 {client} 佇列",
+        "vi": "Đã xếp lượt tải vào hàng đợi trong {client}",
+        "id": "Unduhan masuk antrean di {client}",
+        "es-419": "Descarga en cola en {client}",
+        "fr-CA": "Téléchargement mis en file d’attente dans {client}"
+      }
+    },
+    "service.download_unconfirmed": {
+      "source": "qBittorrent accepted the request, but the download is not confirmed yet. Check qBittorrent before retrying to avoid creating a duplicate.",
+      "translations": {
+        "es": "qBittorrent aceptó la solicitud, pero la descarga aún no está confirmada. Comprueba qBittorrent antes de volver a intentarlo para evitar duplicados.",
+        "zh-Hans": "qBittorrent 已接受请求，但下载尚未确认。重试前请检查 qBittorrent，以免重复添加。",
+        "hi": "qBittorrent ने अनुरोध स्वीकार कर लिया है, लेकिन डाउनलोड की पुष्टि अभी नहीं हुई है। दोबारा कोशिश करने से पहले qBittorrent में जाँच लें, ताकि डुप्लिकेट डाउनलोड न बने।",
+        "de": "qBittorrent hat die Anfrage angenommen, aber der Download ist noch nicht bestätigt. Prüfe qBittorrent vor einem erneuten Versuch, um einen doppelten Download zu vermeiden.",
+        "ja": "qBittorrent はリクエストを受け付けましたが、ダウンロードはまだ確認されていません。重複を避けるため、再試行する前に qBittorrent を確認してください。",
+        "fr": "qBittorrent a accepté la demande, mais le téléchargement n’est pas encore confirmé. Vérifiez qBittorrent avant de réessayer pour éviter un doublon.",
+        "pt-BR": "qBittorrent aceitou a solicitação, mas o download ainda não foi confirmado. Verifique o qBittorrent antes de tentar novamente para evitar duplicatas.",
+        "ar": "قَبِلَ qBittorrent الطلب، لكن التنزيل لم يُؤكَّد بعد. تحقّق من qBittorrent قبل إعادة المحاولة لتجنب إنشاء تنزيل مكرر.",
+        "ko": "qBittorrent가 요청을 수락했지만 아직 다운로드가 확인되지 않았습니다. 중복 다운로드를 만들지 않도록 다시 시도하기 전에 qBittorrent를 확인하세요.",
+        "zh-Hant": "qBittorrent 已接受請求，但尚未確認下載。重試前請檢查 qBittorrent，以免重複新增。",
+        "vi": "qBittorrent đã chấp nhận yêu cầu nhưng lượt tải chưa được xác nhận. Hãy kiểm tra qBittorrent trước khi thử lại để tránh tạo lượt tải trùng lặp.",
+        "id": "qBittorrent menerima permintaan, tetapi unduhan belum dikonfirmasi. Periksa qBittorrent sebelum mencoba lagi agar tidak membuat unduhan duplikat.",
+        "es-419": "qBittorrent aceptó la solicitud, pero la descarga aún no está confirmada. Comprueba qBittorrent antes de volver a intentarlo para evitar duplicados.",
+        "fr-CA": "qBittorrent a accepté la demande, mais le téléchargement n’est pas encore confirmé. Vérifiez qBittorrent avant de réessayer pour éviter un doublon."
+      }
     }
   }
 }

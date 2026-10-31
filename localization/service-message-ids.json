@@ -18,5 +18,18 @@
   "service.client_reported_error",
   "service.download_aborted_without_details",
   "service.notification_download_aborted",
-  "interface.my_questarr_library_stats_6f07559d"
+  "interface.my_questarr_library_stats_6f07559d",
+  "service.download_added",
+  "service.download_paused",
+  "service.download_resumed",
+  "service.download_removed",
+  "service.download_add_failed",
+  "service.download_pause_failed",
+  "service.download_resume_failed",
+  "service.download_remove_failed",
+  "service.download_added_stopped",
+  "service.download_add_failed_without_details",
+  "service.download_already_exists",
+  "service.download_queued",
+  "service.download_unconfirmed"
 ]

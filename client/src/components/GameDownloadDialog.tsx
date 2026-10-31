@@ -5,6 +5,7 @@ import {
 } from "@/lib/regional-format";
 import { getInterfaceCollator, formatInterfaceMessage } from "@/lib/interface-locale";
 import { ApiErrorDetailText } from "@/components/ApiErrorDetailText";
+import { ServiceMessageText } from "@/components/ServiceMessageText";
 import React, { useState, useEffect, useMemo, useCallback, useRef, useId } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -958,9 +959,11 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
               }),
           ...(awaitingConfirmation
             ? {
-                description:
-                  result.message ||
-                  localizedText("interface.the_request_was_accepted_but_qbitt_b7adf1a8"),
+                description: result.message ? (
+                  <ServiceMessageText message={result.message} metadata={result} />
+                ) : (
+                  localizedText("interface.the_request_was_accepted_but_qbitt_b7adf1a8")
+                ),
               }
             : {}),
         });
@@ -971,7 +974,14 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
           queryClient.invalidateQueries({ queryKey: [`/api/games/${gameId}/downloads`] });
         }
       } else {
-        toast({ title: result.message || "Failed to start download", variant: "destructive" });
+        toast({
+          title: result.message ? (
+            <ServiceMessageText message={result.message} metadata={result} />
+          ) : (
+            "Failed to start download"
+          ),
+          variant: "destructive",
+        });
       }
     },
     onError: (error: Error) => {
