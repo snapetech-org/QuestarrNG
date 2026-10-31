@@ -4,11 +4,11 @@ name: Publish QuestarrNG image
 
 
 run-name: >-
-  ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag != '' &&
-      format('action:release:pool:private:tag:{0}', inputs.release_tag) ||
-      github.event_name == 'workflow_dispatch' && (inputs.finalize_release_tag || inputs.announce_release_tag) != '' &&
-      format('action:release:pool:private:tag:{0}', inputs.finalize_release_tag || inputs.announce_release_tag) ||
-      format('action:smoke:pool:private') }}
+  ${{ github.event_name == 'workflow_dispatch' && inputs.action == 'release' && inputs.release_tag != '' &&
+      format('action:{0}:pool:{1}:tag:{2}', inputs.action, inputs.runner_pool, inputs.release_tag) ||
+      github.event_name == 'workflow_dispatch' && inputs.action == 'release' && (inputs.finalize_release_tag || inputs.announce_release_tag) != '' &&
+      format('action:{0}:pool:{1}:tag:{2}', inputs.action, inputs.runner_pool, inputs.finalize_release_tag || inputs.announce_release_tag) ||
+      format('action:{0}:pool:{1}', inputs.action, inputs.runner_pool) }}
 on:
 
   workflow_dispatch:

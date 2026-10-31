@@ -1,15 +1,12 @@
 # ng-runner-policy: private-jit-only-v1
+# packer-windows-jit-v1
 name: Deploy Web App
 
 
 run-name: >-
-  ${{ github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/tags/') &&
-      format('action:{0}:pool:{1}:tag:{2}', inputs.action || 'publish', inputs.runner_pool || 'private', github.ref_name) ||
-      github.event_name == 'workflow_dispatch' &&
-      (inputs.tag) != '' &&
-      format('action:{0}:pool:{1}:tag:{2}', inputs.action || 'publish', inputs.runner_pool || 'private', inputs.tag) ||
-      github.event_name == 'workflow_dispatch' &&
-      format('action:{0}:pool:{1}', inputs.action || 'publish', inputs.runner_pool || 'private') || format('action:publish:pool:private') }}
+  ${{ github.event_name == 'workflow_dispatch' &&
+      format('action:{0}:pool:{1}', inputs.action, inputs.runner_pool) ||
+      format('action:publish:pool:private') }}
 on:
   workflow_dispatch:
     inputs:
@@ -427,7 +424,9 @@ jobs:
   windows-installer:
     name: Build optional Windows installer
     needs: sca-gate
-    if: github.event_name == 'workflow_dispatch' && inputs.build_windows_installer == true
+    if: github.event_name == 'workflow_dispatch' &&
+      inputs.action == 'publish' && inputs.runner_pool == 'private' &&
+      inputs.build_windows_installer == true
     permissions:
       contents: write
     uses: ./.github/workflows/windows-installer.yml
