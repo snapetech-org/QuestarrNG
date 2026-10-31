@@ -183,8 +183,6 @@ jobs:
           DOTNET_INSTALL_DIR: ${{ runner.temp }}/questarrng-dotnet-${{ github.run_id }}-${{ github.run_attempt }}
         run: rm -rf -- "$DOTNET_INSTALL_DIR"
 
-  # Pull requests run app tests on GitHub-hosted runners; only trusted main runs
-  # use the isolated shared runner pool.
   test:
     runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
 
@@ -206,6 +204,12 @@ jobs:
         with:
           node-version: 26.x
           cache: "npm" # zizmor: ignore[cache-poisoning]
+
+      - name: Validate Home Assistant ownership helper with sanitizers
+        env:
+          REQUIRE_SANITIZER_TOOLCHAIN: "1"
+          LD_PRELOAD: ""
+        run: node --test tests/contracts/home-assistant-data-owner-sanitizers.contract.mjs
 
       - name: Install locked JavaScript dependencies
         env:

@@ -113,7 +113,7 @@ type checking, application builds, and Docker image builds:
   `main`/`release/*`).
 - `docker-build`: builds the image. It always runs on pushes; on a PR it runs when the PR touches the `Dockerfile`, `.dockerignore`, `entrypoint.sh`, `package*.json`, `requirements/`, migrations or `ci.yml`.
 
-Playwright E2E tests run in CI and `.github/workflows/e2e.yml`. A new push to a PR cancels the CI, E2E, CodeQL and SAST runs still going for its previous commit.
+Playwright E2E tests run in CI and `.github/workflows/e2e.yml`. A new push to a PR cancels the CI, E2E and SAST runs still going for its previous commit.
 
 **Interpreting a CI failure:** check the "Tests" step logs first for the failing test name and assertion; a failure in `lint` or `check` instead means a style or type error, not a broken test — fix those before re-pushing. If the Codecov upload step fails but the tests themselves passed, that's usually a Codecov/token issue rather than a code problem.
 

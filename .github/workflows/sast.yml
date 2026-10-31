@@ -21,7 +21,6 @@ jobs:
     runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
     permissions:
       contents: read
-      security-events: write
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -44,10 +43,9 @@ jobs:
 
       # Blocking policy and suppression process documented in
       # docs/VULNERABILITY_MANAGEMENT.md (OSPS-VM-06.02). Scan is run
-      # unfiltered (all severities) so WARNING/INFO findings still reach the
-      # Code Scanning tab; the ERROR-only blocking gate is enforced as a
-      # separate step below rather than by filtering the scan itself, so it
-      # doesn't strip lower-severity findings from the SARIF upload.
+      # unfiltered (all severities) so WARNING/INFO findings stay in the
+      # retained report artifact; the ERROR-only blocking gate is enforced as
+      # a separate step below rather than by filtering the scan itself.
       - name: Run Semgrep SAST scan
         run: |
           semgrep scan \
@@ -66,16 +64,21 @@ jobs:
         with:
           node-version: 26.x
 
-      # Keep the broad SAST scan's upload policy aligned with the community scan.
+      # Keep the broad SAST report policy aligned with the community scan.
       - name: Filter inline-suppressed SARIF results
         if: always() && hashFiles('semgrep.sarif') != ''
         run: node scripts/filter-semgrep-sarif.mjs semgrep.sarif semgrep-upload.sarif
 
-      - name: Upload SARIF to code scanning
+      - name: Preserve Semgrep reports as artifacts
         if: ${{ !cancelled() && hashFiles('semgrep-upload.sarif') != '' }}
-        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          sarif_file: semgrep-upload.sarif
+          name: semgrep-reports-attempt-${{ github.run_attempt }}
+          path: |
+            semgrep.json
+            semgrep-upload.sarif
+          if-no-files-found: ignore
+          retention-days: 30
 
       - name: Enforce blocking policy (ERROR-severity findings fail the build)
         run: |
