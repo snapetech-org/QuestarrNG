@@ -213,4 +213,29 @@ describe("API error detail source catalog", () => {
       }
     }
   });
+
+  it("uses the in-app milestone terms for Hindi and Indonesian API errors", () => {
+    const translations = [
+      {
+        source: "Invalid milestone",
+        hi: "मील का पत्थर अमान्य है",
+        id: "Tonggak tidak valid",
+      },
+      {
+        source: "Milestone not found",
+        hi: "मील का पत्थर नहीं मिला",
+        id: "Tonggak tidak ditemukan",
+      },
+      {
+        source: "Invalid milestone update",
+        hi: "मील के पत्थर का अपडेट अमान्य है",
+        id: "Pembaruan tonggak tidak valid",
+      },
+    ] as const;
+
+    for (const { source, hi, id } of translations) {
+      expect(getApiErrorDetailLabel(source, "hi")).toBe(hi);
+      expect(getApiErrorDetailLabel(source, "id")).toBe(id);
+    }
+  });
 });
