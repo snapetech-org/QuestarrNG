@@ -30,9 +30,12 @@ const API_ERROR_SOURCE_FILES = [
   "server/game-journal-routes.ts",
   "server/steam-routes.ts",
   "server/routes/api-keys.ts",
+  "server/routes/integration.ts",
   "server/routes/import-tasks.ts",
   "server/pcgamingwiki-router.ts",
   "server/auth.ts",
+  "server/oidc-auth.ts",
+  "server/hltb.ts",
   "server/security.ts",
   "server/middleware.ts",
   "server/igdb.ts",
@@ -50,7 +53,11 @@ const API_ERROR_SOURCE_FILES = [
 
 const ADDITIONAL_API_ERROR_SOURCE_FILES = [
   "server/routes.ts",
+  "server/routes/integration.ts",
+  "server/middleware.ts",
   "server/routes/import.ts",
+  "server/oidc-auth.ts",
+  "server/hltb.ts",
   "server/igdb.ts",
   "server/apprise.ts",
   "server/prowlarr.ts",
@@ -173,10 +180,13 @@ describe("API error detail source catalog", () => {
         "$" +
         "{vtSettings.threshold})",
       "ClamAV detected " + "$" + "{verdict.signature} in " + "$" + "{path.basename(file)}",
+      "The provided domain is not in the allowed list: " +
+        "$" +
+        '{ALLOWED_XREL_DOMAINS.join(", ")}',
     ];
 
     for (const template of expected) expect(source).toContain(template);
-    expect(expected).toHaveLength(23);
+    expect(expected).toHaveLength(24);
     expect(source.match(/Invalid SSL configuration: \$\{error\}/g)).toHaveLength(2);
   });
 

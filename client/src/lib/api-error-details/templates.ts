@@ -483,6 +483,20 @@ export const API_ERROR_DETAIL_TEMPLATES = {
     "Bạn có thể có tối đa {count} khóa API. Hãy thu hồi một khóa trước.",
     "Anda dapat memiliki paling banyak {count} kunci API. Cabut satu terlebih dahulu.",
   ],
+  "The provided domain is not in the allowed list: {domains}": [
+    "El dominio indicado no está en la lista de permitidos: {domains}",
+    "提供的域名不在允许列表中：{domains}",
+    "दिया गया डोमेन अनुमत सूची में नहीं है: {domains}",
+    "Die angegebene Domain steht nicht auf der Zulassungsliste: {domains}",
+    "指定されたドメインは許可リストにありません: {domains}",
+    "Le domaine fourni ne figure pas dans la liste des domaines autorisés : {domains}",
+    "O domínio informado não está na lista de permitidos: {domains}",
+    "النطاق المُدخل غير موجود في قائمة النطاقات المسموح بها: {domains}",
+    "입력한 도메인이 허용 목록에 없습니다: {domains}",
+    "提供的網域不在允許清單中：{domains}",
+    "Tên miền được cung cấp không nằm trong danh sách cho phép: {domains}",
+    "Domain yang diberikan tidak ada dalam daftar yang diizinkan: {domains}",
+  ],
 } as const satisfies Record<string, LocaleMessages>;
 
 type TemplateKey = keyof typeof API_ERROR_DETAIL_TEMPLATES;
@@ -635,6 +649,11 @@ export function localizeApiErrorDetailTemplate(
       /^ClamAV detected (.+) in (.+)$/,
       "ClamAV detected {signature} in {filename}",
       ["signature", "filename"],
+    ],
+    [
+      /^The provided domain is not in the allowed list: (.+)$/,
+      "The provided domain is not in the allowed list: {domains}",
+      ["domains"],
     ],
   ];
   for (const [pattern, template, names] of statusPatterns) {

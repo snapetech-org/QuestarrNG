@@ -82,6 +82,14 @@ pending-import recovery notices emitted by the server. These added notification
 templates are machine-drafted and still need native-speaker review; runtime game
 titles, release text, reasons, paths, and other dynamic details remain intact.
 
+Known fixed API error details are also localized separately from the main UI
+catalog. A source audit across production server code found 352 unique fixed
+`error` response values and four fixed error `message` values. Fifty-eight
+additional details now have translations in all twelve target locales, and one
+parameterized domain-list error keeps its runtime domain values as placeholders.
+These additions are machine-drafted and remain unreviewed; arbitrary provider or
+server details continue to use the existing English fallback.
+
 Common physical inline Tailwind utilities were replaced with logical equivalents. The catalog check blocks regressions to physical inline spacing, alignment, borders, corners, and noncentered positions. Existing RTL browser coverage includes a long Arabic/English/Japanese game title, screen-reader naming, dialog keyboard focus, and 200% text scaling. Persian and Hebrew are covered by direction-resolver checks; they do not appear as selectable interface languages until their catalogs are complete.
 
 See the [localization workflow](./localization-workflow.md), [translation glossary](./translation-glossary.md), and 37-choice locale map (../localization/locale-map.json).
