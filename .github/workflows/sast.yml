@@ -85,4 +85,3 @@ jobs:
             jq -r '.results[] | select(.extra.severity == "ERROR") | "\(.path):\(.start.line)  \(.check_id)"' semgrep.json
             exit 1
           fi
-
