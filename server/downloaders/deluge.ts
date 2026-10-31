@@ -202,7 +202,10 @@ export class DelugeClient implements DownloaderClient {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
       return {
         success: false,
-        ...serviceMessage("service.connection_failed", { client: "Deluge", error: errorMessage }),
+        ...serviceMessage("service.connection_failed", {
+          client: "Deluge",
+          error: serviceErrorValue(error),
+        }),
       };
     }
   }
@@ -241,7 +244,7 @@ export class DelugeClient implements DownloaderClient {
   ): Promise<{ success: boolean; id?: string; message: string }> {
     try {
       if (!request.url) {
-        return { success: false, message: "Download URL is required" };
+        return { success: false, ...serviceMessage("service.download_url_required", {}) };
       }
 
       await this.authenticate();
@@ -307,7 +310,10 @@ export class DelugeClient implements DownloaderClient {
 
       // Non-magnet URL: download torrent file locally, then upload
       if (!(await isSafeUrl(request.url))) {
-        return { success: false, message: `Unsafe URL blocked: ${request.url}` };
+        return {
+          success: false,
+          ...serviceMessage("service.unsafe_url_blocked", { url: request.url }),
+        };
       }
 
       downloadersLogger.info({ url: request.url }, "Downloading torrent file for Deluge");

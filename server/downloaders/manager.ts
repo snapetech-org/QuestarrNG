@@ -1,3 +1,13 @@
+import {
+  ServiceMessageError,
+  serviceErrorResult,
+  serviceErrorValue,
+  serviceMessage,
+  matchingServiceMessageDescriptor,
+  parseServiceMessageDescriptor,
+  type ServiceMessageFragment,
+  type ServiceMessageMetadata,
+} from "../../shared/service-messages.js";
 import type { Downloader, DownloadStatus, DownloadDetails } from "../../shared/schema.js";
 import { isTorrentDownloaderType, isUsenetDownloaderType } from "../../shared/downloader-types.js";
 import { downloadersLogger } from "../logger.js";
@@ -23,6 +33,21 @@ import { RealDebridClient } from "./realdebrid.js";
 // 4. Add a case below in createClient()
 // 5. Export from downloaders/index.ts
 
+function joinErrors(errors: readonly ServiceMessageFragment[]): string | ServiceMessageFragment {
+  if (errors.length === 0) return "";
+  if (errors.length === 1) return errors[0]!;
+  const middle = Math.floor(errors.length / 2);
+  const left = joinErrors(errors.slice(0, middle));
+  const right = joinErrors(errors.slice(middle));
+  try {
+    const joined = serviceMessage("service.joined_errors", { left, right });
+    if (parseServiceMessageDescriptor(joined)) return joined;
+  } catch {
+    /* Too deep: retain the exact original text. */
+  }
+  return errors.map((e) => e.message).join("; ");
+}
+
 export class DownloaderManager {
   static createClient(downloader: Downloader): DownloaderClient {
     switch (downloader.type) {
@@ -43,7 +68,9 @@ export class DownloaderManager {
       case "realdebrid":
         return new RealDebridClient(downloader);
       default:
-        throw new Error(`Unsupported downloader type: ${downloader.type}`);
+        throw new ServiceMessageError("service.downloader_type_unsupported", {
+          type: downloader.type,
+        });
     }
   }
 
@@ -52,8 +79,7 @@ export class DownloaderManager {
       const client = this.createClient(downloader);
       return await client.testConnection();
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: errorMessage };
+      return serviceErrorResult(error, serviceMessage("interface.unknown_error_ce512b43", {}));
     }
   }
 
@@ -78,8 +104,7 @@ export class DownloaderManager {
       const client = this.createClient(downloader);
       return await client.addDownload(request);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: errorMessage };
+      return serviceErrorResult(error, serviceMessage("interface.unknown_error_ce512b43", {}));
     }
   }
 
@@ -152,8 +177,7 @@ export class DownloaderManager {
       const client = this.createClient(downloader);
       return await client.pauseDownload(id);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: errorMessage };
+      return serviceErrorResult(error, serviceMessage("interface.unknown_error_ce512b43", {}));
     }
   }
 
@@ -165,8 +189,7 @@ export class DownloaderManager {
       const client = this.createClient(downloader);
       return await client.resumeDownload(id);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: errorMessage };
+      return serviceErrorResult(error, serviceMessage("interface.unknown_error_ce512b43", {}));
     }
   }
 
@@ -179,8 +202,7 @@ export class DownloaderManager {
       const client = this.createClient(downloader);
       return await client.removeDownload(id, deleteFiles);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: errorMessage };
+      return serviceErrorResult(error, serviceMessage("interface.unknown_error_ce512b43", {}));
     }
   }
 
@@ -197,25 +219,27 @@ export class DownloaderManager {
   static async addDownloadWithFallback(
     downloaders: Downloader[],
     request: DownloadRequest
-  ): Promise<{
-    success: boolean;
-    id?: string | undefined;
-    correlationTag?: string | undefined;
-    message?: string;
-    downloaderId?: string;
-    downloaderName?: string;
-    attemptedDownloaders: string[];
-  }> {
+  ): Promise<
+    ServiceMessageMetadata & {
+      success: boolean;
+      id?: string | undefined;
+      correlationTag?: string | undefined;
+      message?: string;
+      downloaderId?: string;
+      downloaderName?: string;
+      attemptedDownloaders: string[];
+    }
+  > {
     if (downloaders.length === 0) {
       return {
         success: false,
-        message: "No downloaders available",
+        ...serviceMessage("service.no_downloaders_available", {}),
         attemptedDownloaders: [],
       };
     }
 
     const attemptedDownloaders: string[] = [];
-    const errors: string[] = [];
+    const errors: ServiceMessageFragment[] = [];
 
     // Filter downloaders by compatibility if downloadType is specified
     let compatibleDownloaders = downloaders;
@@ -228,7 +252,9 @@ export class DownloaderManager {
     if (compatibleDownloaders.length === 0) {
       return {
         success: false,
-        message: `No compatible downloaders found for type: ${request.downloadType || "unknown"}`,
+        ...serviceMessage("service.no_compatible_downloaders", {
+          type: request.downloadType || "unknown",
+        }),
         attemptedDownloaders: [],
       };
     }
@@ -247,20 +273,36 @@ export class DownloaderManager {
             attemptedDownloaders,
           };
         } else {
-          errors.push(`${downloader.name}: ${result.message}`);
+          const descriptor = matchingServiceMessageDescriptor(result.message, result);
+          errors.push(
+            serviceMessage("service.downloader_named_error", {
+              client: downloader.name,
+              error: descriptor ? { message: result.message, ...descriptor } : result.message,
+            })
+          );
         }
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "Unknown error";
-        errors.push(`${downloader.name}: ${errorMessage}`);
+        errors.push(
+          serviceMessage("service.downloader_named_error", {
+            client: downloader.name,
+            error: serviceErrorValue(error),
+          })
+        );
       }
     }
 
-    // All downloaders failed
-    return {
-      success: false,
-      message: `All downloaders failed. Errors: ${errors.join("; ")}`,
-      attemptedDownloaders,
-    };
+    // Keep explicit app details when they fit the bounded descriptor. Oversized
+    // aggregates retain their exact English/provider text rather than parsing it.
+    const joined = joinErrors(errors);
+    let failure: ServiceMessageFragment;
+    try {
+      failure = serviceMessage("service.all_downloaders_failed", { errors: joined });
+    } catch {
+      failure = serviceMessage("service.all_downloaders_failed", {
+        errors: errors.map((e) => e.message).join("; "),
+      });
+    }
+    return { success: false, ...failure, attemptedDownloaders };
   }
 
   /**

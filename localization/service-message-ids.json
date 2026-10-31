@@ -102,5 +102,20 @@
   "service.realdebrid_removed_staged_removal_failed_detail",
   "service.realdebrid_selected_files_limit",
   "service.realdebrid_copied_file_unexpected_size",
-  "service.realdebrid_copied_bytes"
+  "service.realdebrid_copied_bytes",
+  "service.credentials_http_refused",
+  "service.password_http_refused",
+  "service.api_key_http_refused",
+  "service.credential_kind_http_refused",
+  "service.redirect_limit",
+  "service.download_path_relative_required",
+  "service.download_path_escapes_directory",
+  "service.downloader_type_unsupported",
+  "service.no_downloaders_available",
+  "service.no_compatible_downloaders",
+  "service.all_downloaders_failed",
+  "service.downloader_named_error",
+  "service.joined_errors",
+  "service.download_url_required",
+  "service.invalid_relative_download_path"
 ]

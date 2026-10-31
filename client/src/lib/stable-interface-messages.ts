@@ -2796,6 +2796,27 @@ export const STABLE_INTERFACE_MESSAGES = {
   "service.realdebrid_copied_file_unexpected_size":
     "The copied file {file} has an unexpected size.",
   "service.realdebrid_copied_bytes": "Real-Debrid copied {actual} of {expected} bytes.",
+  "service.credentials_http_refused":
+    "{client}: refusing to send credentials over unencrypted HTTP. QuestarrNG received Allow insecure LAN as disabled for this request. Enable SSL or turn on 'Allow insecure LAN' in the downloader settings or current test form.",
+  "service.password_http_refused":
+    "{client}: refusing to send password over unencrypted HTTP. QuestarrNG received Allow insecure LAN as disabled for this request. Enable SSL or turn on 'Allow insecure LAN' in the downloader settings or current test form.",
+  "service.api_key_http_refused":
+    "{client}: refusing to send API key over unencrypted HTTP. QuestarrNG received Allow insecure LAN as disabled for this request. Enable SSL or turn on 'Allow insecure LAN' in the downloader settings or current test form.",
+  "service.credential_kind_http_refused":
+    "{client}: refusing to send {credentialKind} over unencrypted HTTP. QuestarrNG received Allow insecure LAN as disabled for this request. Enable SSL or turn on 'Allow insecure LAN' in the downloader settings or current test form.",
+  "service.redirect_limit": "Too many redirects (max {limit})",
+  "service.download_path_relative_required":
+    "Download path must be relative to its download directory",
+  "service.download_path_escapes_directory": "Download path escapes its download directory",
+  "service.downloader_type_unsupported": "Unsupported downloader type: {type}",
+  "service.no_downloaders_available": "No downloaders available",
+  "service.no_compatible_downloaders": "No compatible downloaders found for type: {type}",
+  "service.all_downloaders_failed": "All downloaders failed. Errors: {errors}",
+  "service.downloader_named_error": "{client}: {error}",
+  "service.joined_errors": "{left}; {right}",
+  "service.download_url_required": "Download URL is required",
+  "service.invalid_relative_download_path":
+    "Invalid download path: use a relative path without parent-directory segments",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

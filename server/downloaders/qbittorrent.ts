@@ -106,7 +106,7 @@ export class QBittorrentClient implements DownloaderClient {
         success: false,
         ...serviceMessage("service.connection_failed", {
           client: "qBittorrent",
-          error: errorMessage,
+          error: serviceErrorValue(error),
         }),
       };
     }
@@ -130,12 +130,15 @@ export class QBittorrentClient implements DownloaderClient {
       if (!request.url) {
         return {
           success: false,
-          message: "Download URL is required",
+          ...serviceMessage("service.download_url_required", {}),
         };
       }
 
       if (!(await isSafeUrl(request.url))) {
-        return { success: false, message: `Unsafe URL blocked: ${request.url}` };
+        return {
+          success: false,
+          ...serviceMessage("service.unsafe_url_blocked", { url: request.url }),
+        };
       }
 
       await this.authenticate();

@@ -1,4 +1,8 @@
-import { serviceErrorValue, serviceMessage } from "../../shared/service-messages.js";
+import {
+  serviceErrorValue,
+  serviceErrorResult,
+  serviceMessage,
+} from "../../shared/service-messages.js";
 import type {
   Downloader,
   DownloadStatus,
@@ -76,11 +80,14 @@ export class RTorrentClient implements DownloaderClient {
       );
 
       if (errorMessage.includes("Authentication failed")) {
-        return { success: false, message: errorMessage };
+        return serviceErrorResult(error, serviceMessage("interface.unknown_error_ce512b43", {}));
       }
       return {
         success: false,
-        ...serviceMessage("service.connection_failed", { client: "rTorrent", error: errorMessage }),
+        ...serviceMessage("service.connection_failed", {
+          client: "rTorrent",
+          error: serviceErrorValue(error),
+        }),
       };
     }
   }
@@ -103,17 +110,20 @@ export class RTorrentClient implements DownloaderClient {
     if (request.downloadPath && !isSafeDownloadPathOverride(request.downloadPath)) {
       return {
         success: false,
-        message: "Invalid download path: use a relative path without parent-directory segments",
+        ...serviceMessage("service.invalid_relative_download_path", {}),
       };
     }
 
     try {
       if (!request.url) {
-        return { success: false, message: "Download URL is required" };
+        return { success: false, ...serviceMessage("service.download_url_required", {}) };
       }
 
       if (!(await isSafeUrl(request.url))) {
-        return { success: false, message: `Unsafe URL blocked: ${request.url}` };
+        return {
+          success: false,
+          ...serviceMessage("service.unsafe_url_blocked", { url: request.url }),
+        };
       }
 
       const isMagnet = request.url.startsWith("magnet:");

@@ -1048,6 +1048,221 @@
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "source-fallback",
       "directTargetCells": 12
+    },
+    {
+      "key": "service.credentials_http_refused",
+      "source": "{client}: refusing to send credentials over unencrypted HTTP. QuestarrNG received Allow insecure LAN as disabled for this request. Enable SSL or turn on 'Allow insecure LAN' in the downloader settings or current test form.",
+      "kind": "app-owned downloader utility/manager",
+      "owners": ["server/downloaders/utils.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_utils_manager.test.ts",
+        "server/__tests__/downloaders_insecure_lan_policy.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.password_http_refused",
+      "source": "{client}: refusing to send password over unencrypted HTTP. QuestarrNG received Allow insecure LAN as disabled for this request. Enable SSL or turn on 'Allow insecure LAN' in the downloader settings or current test form.",
+      "kind": "app-owned downloader utility/manager",
+      "owners": ["server/downloaders/utils.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_utils_manager.test.ts",
+        "server/__tests__/downloaders_insecure_lan_policy.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_key_http_refused",
+      "source": "{client}: refusing to send API key over unencrypted HTTP. QuestarrNG received Allow insecure LAN as disabled for this request. Enable SSL or turn on 'Allow insecure LAN' in the downloader settings or current test form.",
+      "kind": "app-owned downloader utility/manager",
+      "owners": ["server/downloaders/utils.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_utils_manager.test.ts",
+        "server/__tests__/downloaders_insecure_lan_policy.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.credential_kind_http_refused",
+      "source": "{client}: refusing to send {credentialKind} over unencrypted HTTP. QuestarrNG received Allow insecure LAN as disabled for this request. Enable SSL or turn on 'Allow insecure LAN' in the downloader settings or current test form.",
+      "kind": "app-owned downloader utility/manager",
+      "owners": ["server/downloaders/utils.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_utils_manager.test.ts",
+        "server/__tests__/downloaders_insecure_lan_policy.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.redirect_limit",
+      "source": "Too many redirects (max {limit})",
+      "kind": "app-owned downloader utility/manager",
+      "owners": ["server/downloaders/utils.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_utils_manager.test.ts",
+        "server/__tests__/downloaders_insecure_lan_policy.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.download_path_relative_required",
+      "source": "Download path must be relative to its download directory",
+      "kind": "app-owned downloader utility/manager",
+      "owners": ["server/downloaders/utils.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_utils_manager.test.ts",
+        "server/__tests__/downloaders_insecure_lan_policy.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.download_path_escapes_directory",
+      "source": "Download path escapes its download directory",
+      "kind": "app-owned downloader utility/manager",
+      "owners": ["server/downloaders/utils.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_utils_manager.test.ts",
+        "server/__tests__/downloaders_insecure_lan_policy.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.downloader_type_unsupported",
+      "source": "Unsupported downloader type: {type}",
+      "kind": "app-owned downloader utility/manager",
+      "owners": ["server/downloaders/manager.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_utils_manager.test.ts",
+        "server/__tests__/downloaders_insecure_lan_policy.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.no_downloaders_available",
+      "source": "No downloaders available",
+      "kind": "app-owned downloader utility/manager",
+      "owners": ["server/downloaders/manager.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_utils_manager.test.ts",
+        "server/__tests__/downloaders_insecure_lan_policy.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.no_compatible_downloaders",
+      "source": "No compatible downloaders found for type: {type}",
+      "kind": "app-owned downloader utility/manager",
+      "owners": ["server/downloaders/manager.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_utils_manager.test.ts",
+        "server/__tests__/downloaders_insecure_lan_policy.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.all_downloaders_failed",
+      "source": "All downloaders failed. Errors: {errors}",
+      "kind": "app-owned downloader utility/manager",
+      "owners": ["server/downloaders/manager.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_utils_manager.test.ts",
+        "server/__tests__/downloaders_insecure_lan_policy.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.downloader_named_error",
+      "source": "{client}: {error}",
+      "kind": "app-owned downloader utility/manager",
+      "owners": ["server/downloaders/manager.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_utils_manager.test.ts",
+        "server/__tests__/downloaders_insecure_lan_policy.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.joined_errors",
+      "source": "{left}; {right}",
+      "kind": "app-owned downloader utility/manager",
+      "owners": ["server/downloaders/manager.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_utils_manager.test.ts",
+        "server/__tests__/downloaders_insecure_lan_policy.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.download_url_required",
+      "source": "Download URL is required",
+      "kind": "app-owned downloader utility/manager",
+      "owners": [
+        "server/downloaders/deluge.ts",
+        "server/downloaders/qbittorrent.ts",
+        "server/downloaders/rtorrent.ts",
+        "server/downloaders/synology.ts"
+      ],
+      "coverage": [
+        "server/__tests__/downloaders_utils_manager.test.ts",
+        "server/__tests__/downloaders_insecure_lan_policy.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.invalid_relative_download_path",
+      "source": "Invalid download path: use a relative path without parent-directory segments",
+      "kind": "app-owned downloader utility/manager",
+      "owners": ["server/downloaders/rtorrent.ts", "server/downloaders/transmission.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_utils_manager.test.ts",
+        "server/__tests__/downloaders_insecure_lan_policy.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
     }
   ],
   "codeUnits": [

@@ -946,7 +946,7 @@ export class SynologyDownloadStationClient implements DownloaderClient {
         success: false,
         ...serviceMessage("service.connection_failed", {
           client: "Synology Download Station",
-          error: errorMessage,
+          error: serviceErrorValue(error),
         }),
       };
     }
@@ -978,7 +978,7 @@ export class SynologyDownloadStationClient implements DownloaderClient {
   ): Promise<{ success: boolean; id?: string | undefined; message: string }> {
     try {
       if (!request.url) {
-        return { success: false, message: "Download URL is required" };
+        return { success: false, ...serviceMessage("service.download_url_required", {}) };
       }
 
       await this.ensureApiInfo();

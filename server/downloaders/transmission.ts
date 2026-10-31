@@ -1,4 +1,8 @@
-import { serviceErrorValue, serviceMessage } from "../../shared/service-messages.js";
+import {
+  serviceErrorValue,
+  serviceErrorResult,
+  serviceMessage,
+} from "../../shared/service-messages.js";
 import type {
   Downloader,
   DownloadStatus,
@@ -138,13 +142,13 @@ export class TransmissionClient implements DownloaderClient {
       );
 
       if (errorMessage.includes("Authentication failed")) {
-        return { success: false, message: errorMessage };
+        return serviceErrorResult(error, serviceMessage("interface.unknown_error_ce512b43", {}));
       }
       return {
         success: false,
         ...serviceMessage("service.connection_failed", {
           client: "Transmission",
-          error: errorMessage,
+          error: serviceErrorValue(error),
         }),
       };
     }
@@ -182,7 +186,7 @@ export class TransmissionClient implements DownloaderClient {
     if (request.downloadPath && !isSafeDownloadPathOverride(request.downloadPath)) {
       return {
         success: false,
-        message: "Invalid download path: use a relative path without parent-directory segments",
+        ...serviceMessage("service.invalid_relative_download_path", {}),
       };
     }
 
@@ -200,7 +204,10 @@ export class TransmissionClient implements DownloaderClient {
       } else {
         // Check URL safety before attempting download or fallback
         if (!(await isSafeUrl(request.url))) {
-          return { success: false, message: `Unsafe URL blocked: ${request.url}` };
+          return {
+            success: false,
+            ...serviceMessage("service.unsafe_url_blocked", { url: request.url }),
+          };
         }
 
         // Download the torrent file locally; uses manual redirect-following to detect
