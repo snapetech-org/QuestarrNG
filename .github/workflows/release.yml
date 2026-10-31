@@ -1,17 +1,33 @@
 # ng-runner-policy: private-jit-only-v1
 name: Create Release
 
+
+run-name: >-
+  ${{ format('action:{0}:pool:{1}:tag:{2}', inputs.action, inputs.runner_pool, inputs.release_tag) }}
 on:
-  push:
-    tags:
-      - "v*"
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Release action
+        type: choice
+        options: [release]
+        required: true
+      runner_pool:
+        description: Private ephemeral JIT runner pool
+        type: choice
+        options: [private]
+        required: true
+      release_tag:
+        description: Exact version tag to publish as a draft release
+        type: string
+        required: true
 
 permissions:
   contents: read
 
 jobs:
   create-release:
-    if: github.repository == 'snapetech-org/QuestarrNG'
+    if: github.repository == 'snapetech-org/QuestarrNG' && github.ref == 'refs/heads/main' && github.actor == 'snapetech' && inputs.action == 'release' && inputs.runner_pool == 'private' && inputs.release_tag != ''
     runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-create-release"]}}', github.run_id)) }}
     permissions:
       contents: write
@@ -25,6 +41,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.release_tag }}
           fetch-depth: 0
           persist-credentials: false
 
@@ -35,16 +52,17 @@ jobs:
 
       - name: Extract changelog section
         env:
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ inputs.release_tag }}
         run: |
           VERSION="${TAG#v}"
           node scripts/extract-changelog.mjs "$VERSION" > changelog-section.md
 
       - name: Append release footer
         env:
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ inputs.release_tag }}
           REPO: ${{ github.repository }}
         run: |
+          git merge-base --is-ancestor "$TAG^{commit}" origin/main
           PREV_TAG=$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)
 
           {
@@ -60,7 +78,7 @@ jobs:
       - name: Create draft release
         uses: step-security/action-gh-release@44319d37c8b7966bf07f89f0cbf63408141446df # v3.0.3
         with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
+          tag_name: ${{ inputs.release_tag }}
+          name: ${{ inputs.release_tag }}
           body_path: changelog-section.md
           draft: true

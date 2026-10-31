@@ -1,6 +1,9 @@
 # ng-runner-policy: private-jit-only-v1
 name: Sync stable image aliases
 
+
+run-name: >-
+  ${{ format('action:{0}:pool:{1}:tag:{2}', inputs.action, inputs.runner_pool, inputs.release_tag) }}
 on:
   workflow_dispatch:
     inputs:
@@ -14,9 +17,10 @@ on:
         type: choice
         options: [private]
         required: true
-  release:
-    types:
-      - published
+      release_tag:
+        description: Exact stable release tag whose image aliases should be synchronized
+        type: string
+        required: true
 
 permissions:
   contents: read
@@ -33,11 +37,12 @@ jobs:
         (
           github.ref == 'refs/heads/main' &&
           inputs.action == 'publish' &&
-          inputs.runner_pool == 'private'
+          inputs.runner_pool == 'private' &&
+          inputs.release_tag != ''
         )
       ) &&
       (
-        github.repository_id == '1388297896' && ((github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') || (github.event_name == 'release' && github.event.action == 'published' && github.event.release.draft == false && github.event.release.prerelease == false))
+        github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
       )
     runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-sync"]}}', github.run_id)) }}
     permissions:
@@ -50,14 +55,15 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Resolve latest stable release
+      - name: Resolve selected stable release
         id: release
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
         run: |
           set -euo pipefail
-          release_json="$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName,isDraft,isPrerelease,publishedAt)"
+          release_json="$(gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json tagName,isDraft,isPrerelease,publishedAt)"
           tag="$(jq -r '.tagName' <<< "$release_json")"
           jq -e '(.isDraft == false) and (.isPrerelease == false) and (.publishedAt != null)' <<< "$release_json" >/dev/null
           if [[ ! "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then

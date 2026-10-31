@@ -1,10 +1,16 @@
 # ng-runner-policy: private-jit-only-v1
 name: E2E
 
+
+run-name: >-
+  ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') &&
+      format('action:ci:pool:private:tag:{0}', github.ref_name) ||
+      github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/tags/') &&
+      format('action:{0}:pool:{1}:tag:{2}', inputs.action || 'ci', inputs.runner_pool || 'private', github.ref_name) ||
+      github.event_name == 'workflow_dispatch' &&
+      format('action:{0}:pool:{1}', inputs.action || 'ci', inputs.runner_pool || 'private') || format('action:ci:pool:private') }}
 on:
-  push:
-    tags:
-      - '**'
+
   workflow_dispatch:
     inputs:
       action:
@@ -106,4 +112,3 @@ jobs:
       - name: Stop test server
         if: always()
         run: kill "$(cat e2e-server.pid)" 2>/dev/null || true
-
