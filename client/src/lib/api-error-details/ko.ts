@@ -233,7 +233,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Failed to check hardlink capability": "하드 링크 지원 여부를 확인하지 못했습니다",
   "Internal server error": "내부 서버 오류",
   "Download was linked to a game before it could be skipped":
-    "다운로드를 건너뛰기 전에 게임에 연결했습니다",
+    "건너뛰기 전에 다운로드가 게임에 연결되었습니다",
   "This download does not need to be linked to a game":
     "이 다운로드는 게임에 연결할 필요가 없습니다",
   "This download was already linked to a game by another request":

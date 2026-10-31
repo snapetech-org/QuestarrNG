@@ -234,7 +234,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Failed to check hardlink capability": "हार्ड लिंक की क्षमता जाँची नहीं जा सकी",
   "Internal server error": "आंतरिक सर्वर त्रुटि",
   "Download was linked to a game before it could be skipped":
-    "इस डाउनलोड को स्किप किए जाने से पहले यह एक गेम से लिंक हो गया था",
+    "इस डाउनलोड को छोड़ा जा सके, उससे पहले ही यह किसी गेम से जुड़ गया था",
   "This download does not need to be linked to a game":
     "इस डाउनलोड को किसी गेम से लिंक करने की आवश्यकता नहीं है",
   "This download was already linked to a game by another request":

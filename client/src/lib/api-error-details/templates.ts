@@ -295,7 +295,7 @@ export const API_ERROR_DETAIL_TEMPLATES = {
     "Téléchargement {downloadId} introuvable",
     "O download {downloadId} não foi encontrado",
     "تعذر العثور على التنزيل {downloadId}",
-    "다운로드 {downloadId}을(를) 찾을 수 없습니다",
+    "다운로드 ID {downloadId}에 해당하는 항목을 찾을 수 없습니다",
     "找不到下載項目 {downloadId}",
     "Không tìm thấy lượt tải {downloadId}",
     "Unduhan {downloadId} tidak ditemukan",
