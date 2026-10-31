@@ -201,7 +201,7 @@ export default function ClaimBatchModal({ open, onOpenChange }: ClaimBatchModalP
       const { count, hadErrors } = result ?? { count: 0, hadErrors: false };
       if (hadErrors) {
         toast({
-          title: formatInterfaceMessage("interface.some_groups_failed_to_link_count_995eaf75", {
+          title: formatInterfaceMessage("claims.some_downloads_failed", {
             count: String(count),
           }),
           description: "Check your downloads.",
@@ -209,12 +209,7 @@ export default function ClaimBatchModal({ open, onOpenChange }: ClaimBatchModalP
         });
       } else {
         toast({
-          title:
-            count === 1
-              ? "Linked 1 group to a game"
-              : formatInterfaceMessage("interface.linked_count_groups_to_games_1a79db95", {
-                  count: String(count),
-                }),
+          title: formatInterfaceMessage("claims.downloads_linked", { count: String(count) }),
         });
       }
       queryClient.invalidateQueries({ queryKey: ["/api/downloads"] });

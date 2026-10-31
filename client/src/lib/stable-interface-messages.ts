@@ -2692,6 +2692,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "service.download_queued": "Download queued in {client}",
   "service.download_unconfirmed":
     "qBittorrent accepted the request, but the download is not confirmed yet. Check qBittorrent before retrying to avoid creating a duplicate.",
+  "claims.downloads_linked": "Downloads linked to games: {count}",
+  "claims.some_downloads_failed": "Some downloads failed to link ({count} linked)",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

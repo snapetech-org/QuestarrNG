@@ -7,7 +7,8 @@
     "machine-draft": "Machine-generated translation awaiting human review.",
     "inherited": "Translation inherited from an upstream or prior catalog.",
     "reviewed": "Translation reviewed by a qualified human translator.",
-    "legacy-unverified": "Existing translation with no per-string provenance record."
+    "legacy-unverified": "Existing translation with no per-string provenance record.",
+    "source-fallback": "English source fallback for a newly authored key awaiting target translation; not a translated or reviewed target."
   },
   "messages": {
     "navigation.settings": {
@@ -26064,6 +26065,52 @@
         "id": "machine-draft",
         "es-419": "inherited",
         "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "claims.downloads_linked": {
+      "sourceChecksum": "fnv1a32:84adebc8",
+      "translations": {
+        "es": "source-fallback",
+        "es-419": "inherited",
+        "zh-Hans": "source-fallback",
+        "hi": "source-fallback",
+        "de": "source-fallback",
+        "ja": "source-fallback",
+        "fr": "source-fallback",
+        "fr-CA": "inherited",
+        "pt-BR": "source-fallback",
+        "ar": "source-fallback",
+        "ko": "source-fallback",
+        "zh-Hant": "source-fallback",
+        "vi": "source-fallback",
+        "id": "source-fallback"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "claims.some_downloads_failed": {
+      "sourceChecksum": "fnv1a32:c0147ea1",
+      "translations": {
+        "es": "source-fallback",
+        "es-419": "inherited",
+        "zh-Hans": "source-fallback",
+        "hi": "source-fallback",
+        "de": "source-fallback",
+        "ja": "source-fallback",
+        "fr": "source-fallback",
+        "fr-CA": "inherited",
+        "pt-BR": "source-fallback",
+        "ar": "source-fallback",
+        "ko": "source-fallback",
+        "zh-Hant": "source-fallback",
+        "vi": "source-fallback",
+        "id": "source-fallback"
       },
       "translationSources": {
         "es-419": "es",

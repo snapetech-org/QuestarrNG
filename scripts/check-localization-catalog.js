@@ -294,6 +294,9 @@ for (const id of ids) {
         "Unknown translation provenance status " + status + " for " + id + " (" + locale + ")."
       );
     }
+    if (status === "source-fallback" && messages[id].translations[locale] !== messages[id].source) {
+      failures.push("English source fallback differs from its source for " + id + " in " + locale);
+    }
     if (status === "inherited") {
       const parent = translationSources[locale];
       if (!parent || !targetLanguages.includes(parent)) {

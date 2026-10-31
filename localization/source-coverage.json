@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "sourceLanguage": "en",
+  "description": "Source/code closure ledger; catalogs and provenance remain authoritative for per-locale target status. English fallbacks are explicitly pending translation, never counted as translated.",
+  "baselineHead": "f191e2edc83bf47a3def653ac990fa13bb7c23d5",
+  "entries": [
+    {
+      "key": "claims.downloads_linked",
+      "source": "Downloads linked to games: {count}",
+      "kind": "interface count/status",
+      "owners": ["client/src/components/ClaimBatchModal.tsx"],
+      "coverage": ["client/__tests__/ClaimModals.test.tsx"],
+      "codeStatus": "implemented; download-item count with independent group selection count",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "claims.some_downloads_failed",
+      "source": "Some downloads failed to link ({count} linked)",
+      "kind": "interface count/status",
+      "owners": ["client/src/components/ClaimBatchModal.tsx"],
+      "coverage": ["client/__tests__/ClaimModals.test.tsx"],
+      "codeStatus": "implemented; download-item count with independent group selection count",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    }
+  ]
+}
