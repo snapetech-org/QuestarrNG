@@ -2891,6 +2891,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "service.download_fetch_failed": "Failed to fetch download: {error}",
   "service.synology_download_add_failed":
     "Failed to add download to Synology Download Station: {error}",
+  "service.tracker_requests_failed": "{count} tracker request(s) failed",
+  "service.internal_server_error": "Internal Server Error",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

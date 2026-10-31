@@ -177,5 +177,7 @@
   "service.synology_all_create_variants_failed",
   "service.synology_destination_unconfigured",
   "service.download_fetch_failed",
-  "service.synology_download_add_failed"
+  "service.synology_download_add_failed",
+  "service.tracker_requests_failed",
+  "service.internal_server_error"
 ]

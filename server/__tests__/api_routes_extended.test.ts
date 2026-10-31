@@ -201,6 +201,40 @@ describe("API Routes - Additional Coverage", () => {
   });
 
   describe("Downloader downloads endpoints", () => {
+    it.each([
+      { production: false, typed: false },
+      { production: false, typed: true },
+      { production: true, typed: false },
+      { production: true, typed: true },
+    ])(
+      "retains aggregate downloader error ownership/redaction: $production/$typed",
+      async ({ production, typed }) => {
+        const previous = mockConfig.server.isProduction;
+        mockConfig.server.isProduction = production;
+        const error = new ServiceMessageError("service.download_path_escapes_directory", {});
+        vi.mocked(storage.getEnabledDownloaders).mockResolvedValueOnce([testDownloader]);
+        vi.mocked(storage.getTrackedDownloadKeys).mockResolvedValueOnce(new Set());
+        vi.mocked(storage.getTrackedDownloadGameStatuses).mockResolvedValueOnce(new Map());
+        vi.mocked(DownloaderManager.getAllDownloads).mockRejectedValueOnce(
+          typed ? error : new Error(error.message)
+        );
+        try {
+          const res = await request(app).get("/api/downloads");
+          expect(res.status).toBe(200);
+          const detail = res.body.errors[0];
+          expect(detail.downloaderId).toBe(testDownloader.id);
+          expect(detail.error).toBe(production ? "Internal Server Error" : error.message);
+          if (production || typed)
+            expect(parseServiceMessageDescriptor(detail.errorI18n)?.messageKey).toBe(
+              production ? "service.internal_server_error" : error.messageKey
+            );
+          else expect(detail.errorI18n).toBeNull();
+        } finally {
+          mockConfig.server.isProduction = previous;
+        }
+      }
+    );
+
     beforeEach(() => {
       vi.mocked(storage.getDownloader).mockResolvedValue(testDownloader);
     });

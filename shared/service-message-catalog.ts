@@ -232,6 +232,8 @@ export const SERVICE_MESSAGE_SOURCES = {
   "service.download_fetch_failed": "Failed to fetch download: {error}",
   "service.synology_download_add_failed":
     "Failed to add download to Synology Download Station: {error}",
+  "service.tracker_requests_failed": "{count} tracker request(s) failed",
+  "service.internal_server_error": "Internal Server Error",
 } as const;
 export const SERVICE_MESSAGE_TRANSLATIONS = {
   "service.connected_successfully": {
@@ -3159,6 +3161,38 @@ export const SERVICE_MESSAGE_TRANSLATIONS = {
     "zh-Hant": "Failed to add download to Synology Download Station: {error}",
     vi: "Failed to add download to Synology Download Station: {error}",
     id: "Failed to add download to Synology Download Station: {error}",
+  },
+  "service.tracker_requests_failed": {
+    es: "{count} tracker request(s) failed",
+    "es-419": "{count} tracker request(s) failed",
+    "zh-Hans": "{count} tracker request(s) failed",
+    hi: "{count} tracker request(s) failed",
+    de: "{count} tracker request(s) failed",
+    ja: "{count} tracker request(s) failed",
+    fr: "{count} tracker request(s) failed",
+    "fr-CA": "{count} tracker request(s) failed",
+    "pt-BR": "{count} tracker request(s) failed",
+    ar: "{count} tracker request(s) failed",
+    ko: "{count} tracker request(s) failed",
+    "zh-Hant": "{count} tracker request(s) failed",
+    vi: "{count} tracker request(s) failed",
+    id: "{count} tracker request(s) failed",
+  },
+  "service.internal_server_error": {
+    es: "Internal Server Error",
+    "es-419": "Internal Server Error",
+    "zh-Hans": "Internal Server Error",
+    hi: "Internal Server Error",
+    de: "Internal Server Error",
+    ja: "Internal Server Error",
+    fr: "Internal Server Error",
+    "fr-CA": "Internal Server Error",
+    "pt-BR": "Internal Server Error",
+    ar: "Internal Server Error",
+    ko: "Internal Server Error",
+    "zh-Hant": "Internal Server Error",
+    vi: "Internal Server Error",
+    id: "Internal Server Error",
   },
 } as const;
 export type ServiceMessageKey = keyof typeof SERVICE_MESSAGE_SOURCES;

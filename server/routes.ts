@@ -50,6 +50,8 @@ import {
   matchingServiceMessageDescriptor,
   serviceMessage,
   serviceErrorBody,
+  serviceErrorValue,
+  parseServiceMessageDescriptor,
 } from "../shared/service-messages.js";
 import { readNotificationLanguage } from "../shared/notification-language.js";
 import { torznabClient } from "./torznab.js";
@@ -4627,12 +4629,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const errors = results
         .filter((r): r is { success: false; downloader: Downloader; error: unknown } => !r.success)
         .map(({ downloader, error }) => {
-          const errorMessage = error instanceof Error ? error.message : "Unknown error";
+          const value = appConfig.server.isProduction
+            ? serviceMessage("service.internal_server_error", {})
+            : serviceErrorValue(error);
           routesLogger.error({ downloaderName: downloader.name, error }, "error getting downloads");
           return {
             downloaderId: downloader.id,
             downloaderName: downloader.name,
-            error: appConfig.server.isProduction ? "Internal Server Error" : errorMessage,
+            error: typeof value === "string" ? value : value.message,
+            errorI18n: typeof value === "string" ? null : parseServiceMessageDescriptor(value),
           };
         });
 

@@ -3,6 +3,7 @@ import {
   serviceErrorValue,
   serviceErrorResult,
   serviceMessage,
+  parseServiceMessageDescriptor,
 } from "../../shared/service-messages.js";
 import type {
   Downloader,
@@ -454,7 +455,16 @@ export class RTorrentClient implements DownloaderClient {
           nextAnnounce: toIsoTimestamp(activityTimeNext),
           error:
             trackerHealthAvailable && Number(failedCounter) > 0
-              ? `${Number(failedCounter)} tracker request(s) failed`
+              ? serviceMessage("service.tracker_requests_failed", { count: Number(failedCounter) })
+                  .message
+              : undefined,
+          errorI18n:
+            trackerHealthAvailable && Number(failedCounter) > 0
+              ? parseServiceMessageDescriptor(
+                  serviceMessage("service.tracker_requests_failed", {
+                    count: Number(failedCounter),
+                  })
+                )
               : undefined,
         };
       });

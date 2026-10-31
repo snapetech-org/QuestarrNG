@@ -1149,6 +1149,7 @@ export interface DownloadTracker {
   lastAnnounce?: string | undefined;
   nextAnnounce?: string | undefined;
   error?: string | undefined;
+  errorI18n?: ServiceMessageDescriptor | undefined;
 }
 
 export type DownloadStatusType =

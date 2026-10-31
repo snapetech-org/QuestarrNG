@@ -1,3 +1,5 @@
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
+import { ServiceMessageText } from "@/components/ServiceMessageText";
 import {
   formatRegionalPercent,
   getRegionalLocale,
@@ -126,7 +128,7 @@ export default function DownloadDetailsModal({
       {error && (
         <div className="text-destructive py-4" data-testid="download-details-error">
           <InterfaceText source={"Failed to load download details:"} />{" "}
-          {error instanceof Error ? error.message : <InterfaceText source={"Unknown error"} />}
+          <ApiErrorDescription error={error} fallbackSource="Unknown error" />
         </div>
       )}
 
@@ -437,7 +439,11 @@ export default function DownloadDetailsModal({
                             )}
                             {tracker.error && (
                               <div className="text-xs text-destructive">
-                                <InterfaceText source={"Error:"} /> {tracker.error}
+                                <InterfaceText source={"Error:"} />{" "}
+                                <ServiceMessageText
+                                  message={tracker.error}
+                                  metadata={tracker.errorI18n}
+                                />
                               </div>
                             )}
                           </div>

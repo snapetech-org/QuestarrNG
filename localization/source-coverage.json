@@ -2212,6 +2212,44 @@
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "source-fallback",
       "directTargetCells": 12
+    },
+    {
+      "key": "service.tracker_requests_failed",
+      "source": "{count} tracker request(s) failed",
+      "kind": "app-owned download status/API transport",
+      "owners": [
+        "server/downloaders/rtorrent.ts",
+        "server/routes.ts",
+        "client/src/pages/downloads.tsx",
+        "client/src/components/DownloadDetailsModal.tsx"
+      ],
+      "coverage": [
+        "server/__tests__/api_routes_extended.test.ts",
+        "client/__tests__/DownloadDetailsModal.test.tsx",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.internal_server_error",
+      "source": "Internal Server Error",
+      "kind": "app-owned download status/API transport",
+      "owners": [
+        "server/downloaders/rtorrent.ts",
+        "server/routes.ts",
+        "client/src/pages/downloads.tsx",
+        "client/src/components/DownloadDetailsModal.tsx"
+      ],
+      "coverage": [
+        "server/__tests__/api_routes_extended.test.ts",
+        "client/__tests__/DownloadDetailsModal.test.tsx",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
     }
   ],
   "codeUnits": [

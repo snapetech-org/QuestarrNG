@@ -1,3 +1,4 @@
+import type { ServiceMessageDescriptor } from "@shared/service-messages";
 import { getDownloadStatusSource } from "@/lib/download-status-locale";
 import { ServiceMessageText } from "@/components/ServiceMessageText";
 import {
@@ -11,7 +12,6 @@ import {
   useInterfaceLanguage,
   formatInterfaceMessage,
 } from "@/lib/interface-locale";
-import { ApiErrorDetailText } from "@/components/ApiErrorDetailText";
 import { useState, useEffect, useMemo, useRef, lazy, Suspense } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiFetch, throwIfResNotOk } from "@/lib/queryClient";
@@ -84,6 +84,7 @@ interface DownloaderError {
   downloaderId: string;
   downloaderName: string;
   error: string;
+  errorI18n?: ServiceMessageDescriptor | null;
 }
 
 interface DownloadsResponse {
@@ -229,7 +230,7 @@ export default function Downloads() {
             title: formatInterfaceMessage("interface.downloader_error_downloadername_4342528e", {
               downloaderName: String(error.downloaderName ?? ""),
             }),
-            description: <ApiErrorDetailText source={error.error} />,
+            description: <ServiceMessageText message={error.error} metadata={error.errorI18n} />,
             variant: "destructive",
           });
           hasShownErrorsRef.current.add(errorKey);
