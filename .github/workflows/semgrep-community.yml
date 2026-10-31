@@ -3,7 +3,7 @@ name: Semgrep Community Edition
 
 on:
   push:
-    tags: ["**"]
+    tags: ['**']
   workflow_dispatch:
 
 permissions:
@@ -20,11 +20,17 @@ jobs:
     timeout-minutes: 30
     permissions:
       contents: read
+      security-events: write
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
+      - name: Set up Node.js for SARIF filtering
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26.x
 
       - name: Verify the isolated Docker daemon
         run: docker info
@@ -41,11 +47,25 @@ jobs:
             -v /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro \
             -v "$GITHUB_WORKSPACE:/src" -w /src semgrep/semgrep:latest \
             semgrep scan --config p/default --metrics=off --jobs 2 \
-              --json-output semgrep.json .
+              --json-output semgrep.json --sarif-output semgrep.sarif .
 
-      - name: Report findings to the job log
+      - name: Report finding count
         if: always() && hashFiles('semgrep.json') != ''
         run: |
-          semgrep_finding_count="$(jq -r '.results | length' semgrep.json)"
-          printf 'Semgrep CE reported %s finding(s).\n' "$semgrep_finding_count"
-          jq -r '.results[]? | [.extra.severity, .path, .start.line, .check_id, .extra.message] | @tsv' semgrep.json
+          jq -r '"Semgrep CE reported \(.results | length) finding(s). Review semgrep.sarif and the scan log."' semgrep.json
+
+      # Omit accepted in-source suppressions from active GitHub alerts. Semgrep's
+      # SARIF uses kind=inSource and may omit suppression.status entirely.
+      - name: Filter inline-suppressed SARIF results
+        if: always() && hashFiles('semgrep.sarif') != ''
+        run: node scripts/filter-semgrep-sarif.mjs semgrep.sarif semgrep-upload.sarif
+
+      - name: Upload findings to GitHub code scanning
+        if: >-
+          always() && hashFiles('semgrep-upload.sarif') != '' &&
+          (github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.full_name == github.repository)
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
+        with:
+          sarif_file: semgrep-upload.sarif
+          category: semgrep-ce-community
