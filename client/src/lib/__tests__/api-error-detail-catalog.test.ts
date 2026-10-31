@@ -9,7 +9,7 @@ import {
 } from "@/lib/api-error-details/source-messages";
 import { ADDITIONAL_API_ERROR_DETAIL_SOURCE_MESSAGES } from "@/lib/api-error-details/additional-source-messages";
 import { getApiErrorDetailLabel } from "@/lib/api-error-details";
-import { UI_LABELS } from "@/lib/ui-labels";
+import { hasInterfaceMessage } from "@/lib/interface-locale";
 import { API_ERROR_DETAIL_LABELS as spanish } from "@/lib/api-error-details/es";
 import { API_ERROR_DETAIL_LABELS as simplifiedChinese } from "@/lib/api-error-details/zh-Hans";
 import { API_ERROR_DETAIL_LABELS as hindi } from "@/lib/api-error-details/hi";
@@ -30,9 +30,12 @@ const API_ERROR_SOURCE_FILES = [
   "server/game-journal-routes.ts",
   "server/steam-routes.ts",
   "server/routes/api-keys.ts",
+  "server/routes/integration.ts",
   "server/routes/import-tasks.ts",
   "server/pcgamingwiki-router.ts",
   "server/auth.ts",
+  "server/oidc-auth.ts",
+  "server/hltb.ts",
   "server/security.ts",
   "server/middleware.ts",
   "server/igdb.ts",
@@ -50,7 +53,11 @@ const API_ERROR_SOURCE_FILES = [
 
 const ADDITIONAL_API_ERROR_SOURCE_FILES = [
   "server/routes.ts",
+  "server/routes/integration.ts",
+  "server/middleware.ts",
   "server/routes/import.ts",
+  "server/oidc-auth.ts",
+  "server/hltb.ts",
   "server/igdb.ts",
   "server/apprise.ts",
   "server/prowlarr.ts",
@@ -110,10 +117,9 @@ describe("API error detail source catalog", () => {
       }
     }
 
-    const catalogKeys = new Set(Object.keys(UI_LABELS));
     const listedKeys = new Set<string>(API_ERROR_DETAIL_SOURCE_MESSAGES);
     const missing = [...fixedErrors].filter(
-      (message) => !catalogKeys.has(message) && !listedKeys.has(message)
+      (message) => !hasInterfaceMessage(message) && !listedKeys.has(message)
     );
     const stale = API_ERROR_DETAIL_SOURCE_MESSAGES.filter((message) => !source.includes(message));
 
@@ -174,10 +180,13 @@ describe("API error detail source catalog", () => {
         "$" +
         "{vtSettings.threshold})",
       "ClamAV detected " + "$" + "{verdict.signature} in " + "$" + "{path.basename(file)}",
+      "The provided domain is not in the allowed list: " +
+        "$" +
+        '{ALLOWED_XREL_DOMAINS.join(", ")}',
     ];
 
     for (const template of expected) expect(source).toContain(template);
-    expect(expected).toHaveLength(23);
+    expect(expected).toHaveLength(24);
     expect(source.match(/Invalid SSL configuration: \$\{error\}/g)).toHaveLength(2);
   });
 
@@ -202,6 +211,65 @@ describe("API error detail source catalog", () => {
           `${locale}: ${source}`
         ).toBe(translation);
       }
+    }
+  });
+
+  it("uses the in-app milestone terms for Hindi and Indonesian API errors", () => {
+    const translations = [
+      {
+        source: "Invalid milestone",
+        hi: "मील का पत्थर अमान्य है",
+        id: "Tonggak tidak valid",
+      },
+      {
+        source: "Milestone not found",
+        hi: "मील का पत्थर नहीं मिला",
+        id: "Tonggak tidak ditemukan",
+      },
+      {
+        source: "Invalid milestone update",
+        hi: "मील के पत्थर का अपडेट अमान्य है",
+        id: "Pembaruan tonggak tidak valid",
+      },
+    ] as const;
+
+    for (const { source, hi, id } of translations) {
+      expect(getApiErrorDetailLabel(source, "hi")).toBe(hi);
+      expect(getApiErrorDetailLabel(source, "id")).toBe(id);
+    }
+  });
+
+  it("describes certificate parsing as parsing in German", () => {
+    expect(getApiErrorDetailLabel("Failed to parse certificate content", "de")).toBe(
+      "Der Zertifikatsinhalt konnte nicht geparst werden"
+    );
+  });
+
+  it("uses the Hindi API key term from the in-app revoke action", () => {
+    expect(getApiErrorDetailLabel("Failed to revoke API key", "hi")).toBe(
+      "API कुंजी रद्द नहीं की जा सकी"
+    );
+  });
+
+  it("uses the Hindi API key term consistently across API-key errors", () => {
+    expect(getApiErrorDetailLabel("Failed to create API key", "hi")).toBe(
+      "API कुंजी नहीं बनाई जा सकी"
+    );
+    expect(getApiErrorDetailLabel("API key not found", "hi")).toBe("API कुंजी नहीं मिली");
+  });
+
+  it("uses the in-app Traditional Chinese term for RSS subscriptions", () => {
+    const rssTranslations = [
+      ["Failed to fetch RSS feeds", "無法取得 RSS 訂閱"],
+      ["Failed to add RSS feed", "無法新增 RSS 訂閱"],
+      ["Feed not found", "找不到 RSS 訂閱"],
+      ["Failed to update RSS feed", "無法更新 RSS 訂閱"],
+      ["Failed to delete RSS feed", "無法刪除 RSS 訂閱"],
+      ["Failed to refresh RSS feeds", "無法重新整理 RSS 訂閱"],
+    ] as const;
+
+    for (const [source, translation] of rssTranslations) {
+      expect(getApiErrorDetailLabel(source, "zh-Hant")).toBe(translation);
     }
   });
 });

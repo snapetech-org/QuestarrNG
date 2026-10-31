@@ -13,9 +13,15 @@ import {
 } from "@/lib/notification-locale";
 import { localizeNotificationMessage } from "@/lib/notification-messages";
 import { UI_LABELS } from "@/lib/ui-labels";
+import { STABLE_INTERFACE_MESSAGES } from "@/lib/stable-interface-messages";
 import type { InterfaceLanguage } from "@/lib/interface-locale";
 
-const labels = UI_LABELS as Record<string, Partial<Record<InterfaceLanguage, string>>>;
+const labels = Object.fromEntries(
+  Object.entries(STABLE_INTERFACE_MESSAGES).map(([id, source]) => [
+    source,
+    UI_LABELS[id as keyof typeof UI_LABELS],
+  ])
+) as Record<string, Partial<Record<InterfaceLanguage, string>>>;
 
 function placeholders(value: string): string[] {
   return Array.from(value.matchAll(/\{([A-Za-z][A-Za-z0-9_]*)\}/g), (match) => match[1]!).sort();
@@ -33,7 +39,8 @@ describe("UI catalog structure", () => {
   it("has a nonempty translation and matching placeholders for every locale cell", () => {
     const problems: string[] = [];
 
-    for (const [source, translations] of Object.entries(labels)) {
+    for (const [id, translations] of Object.entries(UI_LABELS)) {
+      const source = STABLE_INTERFACE_MESSAGES[id as keyof typeof STABLE_INTERFACE_MESSAGES];
       const expected = placeholders(source).join(",");
       for (const language of NOTIFICATION_LOCALES) {
         const translation = translations[language];
@@ -61,7 +68,7 @@ describe("UI catalog structure", () => {
     expect(labels["Repair OK"]?.vi).toBe("Sửa chữa thành công");
     expect(labels["Mapping Deleted"]?.fr).toBe("Mappage supprimé");
     expect(labels["Mapping Deleted"]?.ko).toBe("매핑 삭제됨");
-    expect(labels["Auto-Unpack Archives"]?.hi).toBe("संग्रह फ़ाइलें अपने-आप निकालें");
+    expect(labels["Auto-Unpack Archives"]?.hi).toBe("आर्काइव फ़ाइलें अपने-आप निकालें");
     expect(labels["Auto-Unpack Archives"]?.de).toBe("Archive automatisch entpacken");
     expect(labels["Unpack:"]?.ja).toBe("展開：");
     expect(labels["Auto-Sync Wishlist"]?.de).toBe("Wunschliste automatisch synchronisieren");
@@ -70,6 +77,13 @@ describe("UI catalog structure", () => {
       "Synchroniser automatiquement la liste de souhaits"
     );
     expect(labels["Auto-Sync Wishlist"]?.id).toBe("Sinkronkan daftar keinginan secara otomatis");
+  });
+
+  it("keeps translated connection-result labels semantically explicit", () => {
+    expect(labels["Connection failed"]?.ar).toBe("فشل الاتصال");
+    expect(labels["Connection successful"]?.ar).toBe("تم الاتصال بنجاح");
+    expect(labels["Connection successful"]?.de).toBe("Verbindung erfolgreich");
+    expect(labels["Connection successful"]?.["pt-BR"]).toBe("Conexão bem-sucedida");
   });
 });
 

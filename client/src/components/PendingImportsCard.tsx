@@ -83,7 +83,7 @@ export default function PendingImportsCard() {
               <CardTitle className="text-lg">
                 {multiple ? (
                   <InterfaceText
-                    source="Pending manual imports: {count}"
+                    source="interface.pending_manual_imports_count_2435af85"
                     values={{ count: pendingImports.length }}
                   />
                 ) : (
@@ -130,7 +130,7 @@ export default function PendingImportsCard() {
         </CardHeader>
         {!collapsed && (
           <CardContent>
-            <div className="space-y-4 max-h-96 overflow-y-auto pr-1">
+            <div className="space-y-4 max-h-96 overflow-y-auto pe-1">
               {pendingImports.map((item) => (
                 <div
                   key={item.id}
@@ -182,12 +182,12 @@ export default function PendingImportsCard() {
                       <Button size="sm" onClick={() => setSelectedImport(item)}>
                         {(() => {
                           if (item.status === GAME_LINK_REQUIRED_STATUS) {
-                            return <InterfaceText source="Link Game" />;
+                            return <InterfaceText source="interface.link_game_167e02e9" />;
                           }
                           if (item.passwordRequired) {
-                            return <InterfaceText source="Enter Password" />;
+                            return <InterfaceText source="interface.enter_password_8063209e" />;
                           }
-                          return <InterfaceText source="Review" />;
+                          return <InterfaceText source="interface.review_6ae55601" />;
                         })()}
                       </Button>
                     )}

@@ -91,7 +91,7 @@ export default function ReleaseScoringSettings({
     mutationFn: async () => {
       const releaseScoringProfile = JSON.stringify({ profile, formats });
       if (!validateSavedReleaseScoringConfig(releaseScoringProfile)) {
-        throw new Error(t("Check the scoring profile and custom format conditions before saving."));
+        throw new Error(t("interface.check_the_scoring_profile_and_cust_5782a7b2"));
       }
       const response = await apiRequest("PATCH", "/api/settings", {
         releaseScoringEnabled: enabled,
@@ -102,17 +102,17 @@ export default function ReleaseScoringSettings({
     onSuccess: () => {
       setValidationMessage(null);
       toast({
-        title: t("Release scoring saved"),
+        title: t("interface.release_scoring_saved_669d0e10"),
         description: enabled
-          ? t("Manual and automatic searches will use this profile.")
-          : t("Your profile is saved and scoring remains disabled."),
+          ? t("interface.manual_and_automatic_searches_will_fbc27d33")
+          : t("interface.your_profile_is_saved_and_scoring_9c5a735d"),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/settings"] });
     },
     onError: (error: Error) => {
       setValidationMessage(t(error.message));
       toast({
-        title: t("Could not save release scoring"),
+        title: t("interface.could_not_save_release_scoring_30c243e4"),
         description: t(error.message),
         variant: "destructive",
       });
@@ -155,14 +155,18 @@ export default function ReleaseScoringSettings({
           <SlidersHorizontal className="h-5 w-5 text-muted-foreground" />
           <div className="flex-1">
             <CardTitle className="text-lg">
-              <InterfaceText source="Release Scoring" />
+              <InterfaceText source="interface.release_scoring_7b864a9b" />
             </CardTitle>
             <CardDescription>
-              <InterfaceText source="Rank releases by title match, quality, platform, and your own rules. Rejected releases remain visible in manual search with the reason." />
+              <InterfaceText source="interface.rank_releases_by_title_match_quali_acb717ae" />
             </CardDescription>
           </div>
           <Badge variant={enabled ? "default" : "outline"}>
-            {enabled ? <InterfaceText source="Enabled" /> : <InterfaceText source="Off" />}
+            {enabled ? (
+              <InterfaceText source="interface.enabled_9c86e43e" />
+            ) : (
+              <InterfaceText source="interface.off_0dc6b4aa" />
+            )}
           </Badge>
         </div>
       </CardHeader>
@@ -170,10 +174,10 @@ export default function ReleaseScoringSettings({
         <div className="flex items-center justify-between rounded-md border p-4">
           <div className="space-y-1">
             <Label htmlFor="release-scoring-enabled">
-              <InterfaceText source="Use this profile" />
+              <InterfaceText source="interface.use_this_profile_5115d68d" />
             </Label>
             <p className="text-xs text-muted-foreground">
-              <InterfaceText source="Auto-search will only consider accepted releases while this is enabled." />
+              <InterfaceText source="interface.auto_search_will_only_consider_acc_a9be7ca7" />
             </p>
           </div>
           <Switch id="release-scoring-enabled" checked={enabled} onCheckedChange={setEnabled} />
@@ -181,12 +185,12 @@ export default function ReleaseScoringSettings({
 
         <section className="space-y-4">
           <h3 className="font-semibold">
-            <InterfaceText source="Profile limits and preferences" />
+            <InterfaceText source="interface.profile_limits_and_preferences_d75c3081" />
           </h3>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-2">
               <Label htmlFor="release-min-score">
-                <InterfaceText source="Minimum score" />
+                <InterfaceText source="interface.minimum_score_355c98c5" />
               </Label>
               <Input
                 id="release-min-score"
@@ -199,7 +203,7 @@ export default function ReleaseScoringSettings({
             </div>
             <div className="space-y-2">
               <Label htmlFor="release-protocol">
-                <InterfaceText source="Preferred protocol" />
+                <InterfaceText source="interface.preferred_protocol_5a068eba" />
               </Label>
               <select
                 id="release-protocol"
@@ -211,14 +215,14 @@ export default function ReleaseScoringSettings({
                   })
                 }
               >
-                <option value="either">{t("Torrent or Usenet")}</option>
-                <option value="torrent">{t("Torrent")}</option>
-                <option value="usenet">{t("Usenet")}</option>
+                <option value="either">{t("interface.torrent_or_usenet_b31597b8")}</option>
+                <option value="torrent">{t("interface.torrent_eb9280a5")}</option>
+                <option value="usenet">{t("interface.usenet_d2d3d95f")}</option>
               </select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="release-min-seeders">
-                <InterfaceText source="Minimum torrent seeders" />
+                <InterfaceText source="interface.minimum_torrent_seeders_12f445f2" />
               </Label>
               <Input
                 id="release-min-seeders"
@@ -231,7 +235,7 @@ export default function ReleaseScoringSettings({
             </div>
             <div className="space-y-2">
               <Label htmlFor="release-max-size">
-                <InterfaceText source="Maximum size (GiB)" />
+                <InterfaceText source="interface.maximum_size_gib_de79c0c3" />
               </Label>
               <Input
                 id="release-max-size"
@@ -255,19 +259,19 @@ export default function ReleaseScoringSettings({
                 }}
               />
               <p className="text-xs text-muted-foreground">
-                <InterfaceText source="Leave blank to allow any size." />
+                <InterfaceText source="interface.leave_blank_to_allow_any_size_10200c55" />
               </p>
             </div>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="release-required-terms">
-                <InterfaceText source="Required title terms" />
+                <InterfaceText source="interface.required_title_terms_4eb7d961" />
               </Label>
               <Textarea
                 id="release-required-terms"
                 rows={3}
-                placeholder={`${t("One per line, e.g.")}\nGOG\n/\\bportable\\b/i`}
+                placeholder={`${t("interface.one_per_line_e_g_9632168c")}\nGOG\n/\\bportable\\b/i`}
                 value={termsText(profile.requiredTerms)}
                 onChange={(event) =>
                   updateProfile({ requiredTerms: parseTerms(event.target.value) })
@@ -276,12 +280,12 @@ export default function ReleaseScoringSettings({
             </div>
             <div className="space-y-2">
               <Label htmlFor="release-ignored-terms">
-                <InterfaceText source="Ignored title terms" />
+                <InterfaceText source="interface.ignored_title_terms_d8b7775c" />
               </Label>
               <Textarea
                 id="release-ignored-terms"
                 rows={3}
-                placeholder={`${t("One per line, e.g.")}\ncrackfix\n/\\bmultiplayer\\b/i`}
+                placeholder={`${t("interface.one_per_line_e_g_9632168c")}\ncrackfix\n/\\bmultiplayer\\b/i`}
                 value={termsText(profile.ignoredTerms)}
                 onChange={(event) =>
                   updateProfile({ ignoredTerms: parseTerms(event.target.value) })
@@ -290,17 +294,17 @@ export default function ReleaseScoringSettings({
             </div>
           </div>
           <p className="text-xs text-muted-foreground">
-            <InterfaceText source="Terms are whole words. Use /pattern/ for a bounded RE2 regular expression." />
+            <InterfaceText source="interface.terms_are_whole_words_use_pattern_cb999547" />
           </p>
         </section>
 
         <section className="space-y-4">
           <div>
             <h3 className="font-semibold">
-              <InterfaceText source="Built-in rule weights" />
+              <InterfaceText source="interface.built_in_rule_weights_d71361b4" />
             </h3>
             <p className="mt-1 text-xs text-muted-foreground">
-              <InterfaceText source="Locked title mismatch and sequel checks always reject their matches." />
+              <InterfaceText source="interface.locked_title_mismatch_and_sequel_c_c7559edb" />
             </p>
           </div>
           <div className="divide-y rounded-md border">
@@ -317,13 +321,13 @@ export default function ReleaseScoringSettings({
                     </p>
                     {rule.locked && (
                       <p className="text-xs text-muted-foreground">
-                        <InterfaceText source="Always enforced" />
+                        <InterfaceText source="interface.always_enforced_accc58ca" />
                       </p>
                     )}
                   </div>
                   <div className="space-y-1">
                     <Label htmlFor={`score-${rule.id}`} className="text-xs">
-                      <InterfaceText source="Points" />
+                      <InterfaceText source="interface.points_a9f0a4e6" />
                     </Label>
                     <Input
                       id={`score-${rule.id}`}
@@ -360,8 +364,8 @@ export default function ReleaseScoringSettings({
                       />
                     </div>
                   ) : (
-                    <span className="text-right text-xs text-muted-foreground">
-                      <InterfaceText source="Required" />
+                    <span className="text-end text-xs text-muted-foreground">
+                      <InterfaceText source="interface.required_51e4b240" />
                     </span>
                   )}
                 </div>
@@ -374,10 +378,10 @@ export default function ReleaseScoringSettings({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h3 className="font-semibold">
-                <InterfaceText source="Custom formats" />
+                <InterfaceText source="interface.custom_formats_b29cb34e" />
               </h3>
               <p className="mt-1 text-xs text-muted-foreground">
-                <InterfaceText source="Each format adds points when its conditions match; hard rejects exclude the release." />
+                <InterfaceText source="interface.each_format_adds_points_when_its_c_1fd601cb" />
               </p>
             </div>
             <Button
@@ -385,14 +389,17 @@ export default function ReleaseScoringSettings({
               variant="outline"
               size="sm"
               disabled={formats.length >= 50}
-              onClick={() => setFormats((current) => [...current, newFormat(t("New format"))])}
+              onClick={() =>
+                setFormats((current) => [...current, newFormat(t("interface.new_format_b446762c"))])
+              }
             >
-              <Plus className="mr-2 h-4 w-4" /> <InterfaceText source="Add format" />
+              <Plus className="me-2 h-4 w-4" />{" "}
+              <InterfaceText source="interface.add_format_d4df950f" />
             </Button>
           </div>
           {formats.length === 0 ? (
             <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-              <InterfaceText source="No custom formats yet." />
+              <InterfaceText source="interface.no_custom_formats_yet_7ad2d7f3" />
             </p>
           ) : (
             <div className="space-y-3">
@@ -412,7 +419,7 @@ export default function ReleaseScoringSettings({
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor={`format-score-${format.id}`}>
-                        <InterfaceText source="Points" />
+                        <InterfaceText source="interface.points_a9f0a4e6" />
                       </Label>
                       <Input
                         id={`format-score-${format.id}`}
@@ -437,7 +444,7 @@ export default function ReleaseScoringSettings({
                     </div>
                     <div className="flex items-center gap-2 pb-2">
                       <Label htmlFor={`format-reject-${format.id}`}>
-                        <InterfaceText source="Hard reject" />
+                        <InterfaceText source="interface.hard_reject_00848d4f" />
                       </Label>
                       <Switch
                         id={`format-reject-${format.id}`}
@@ -452,12 +459,12 @@ export default function ReleaseScoringSettings({
                       size="icon"
                       variant="ghost"
                       aria-label={formatInterfaceMessage(
-                        "Remove {name}",
-                        { name: format.name || t("Custom format") },
+                        "interface.remove_name_feab7316",
+                        { name: format.name || t("interface.custom_format_2e094849") },
                         language
                       )}
-                      lang={languageFor("Remove {name}")}
-                      dir={directionFor("Remove {name}")}
+                      lang={languageFor("interface.remove_name_feab7316")}
+                      dir={directionFor("interface.remove_name_feab7316")}
                       onClick={() =>
                         setFormats((current) => current.filter((item) => item.id !== format.id))
                       }
@@ -473,7 +480,7 @@ export default function ReleaseScoringSettings({
                       >
                         <div className="space-y-1">
                           <Label htmlFor={`${format.id}-field-${index}`} className="text-xs">
-                            <InterfaceText source="Field" />
+                            <InterfaceText source="interface.field_0fb83d07" />
                           </Label>
                           <select
                             id={`${format.id}-field-${index}`}
@@ -494,7 +501,7 @@ export default function ReleaseScoringSettings({
                         </div>
                         <div className="space-y-1">
                           <Label htmlFor={`${format.id}-mode-${index}`} className="text-xs">
-                            <InterfaceText source="Match" />
+                            <InterfaceText source="interface.match_52951b36" />
                           </Label>
                           <select
                             id={`${format.id}-mode-${index}`}
@@ -515,14 +522,16 @@ export default function ReleaseScoringSettings({
                         </div>
                         <div className="space-y-1">
                           <Label htmlFor={`${format.id}-value-${index}`} className="text-xs">
-                            <InterfaceText source="Value" />
+                            <InterfaceText source="interface.value_d147f96a" />
                           </Label>
                           <Input
                             id={`${format.id}-value-${index}`}
                             maxLength={500}
                             value={spec.value}
                             placeholder={
-                              spec.mode === "regex" ? t("e.g. (GOG|DRM-free)") : t("Text to match")
+                              spec.mode === "regex"
+                                ? t("interface.e_g_gog_drm_free_df026737")
+                                : t("interface.text_to_match_744e05ce")
                             }
                             onChange={(event) =>
                               updateSpec(format.id, index, { value: event.target.value })
@@ -538,7 +547,7 @@ export default function ReleaseScoringSettings({
                             }
                           />
                           <Label htmlFor={`${format.id}-negate-${index}`} className="text-xs">
-                            <InterfaceText source="Negate" />
+                            <InterfaceText source="interface.negate_be0c317b" />
                           </Label>
                         </div>
                         <div className="flex items-center gap-1 pb-2">
@@ -550,16 +559,16 @@ export default function ReleaseScoringSettings({
                             }
                           />
                           <Label htmlFor={`${format.id}-required-${index}`} className="text-xs">
-                            <InterfaceText source="Required" />
+                            <InterfaceText source="interface.required_51e4b240" />
                           </Label>
                         </div>
                         <Button
                           type="button"
                           variant="ghost"
                           size="icon"
-                          aria-label={t("Remove condition")}
-                          lang={languageFor("Remove condition")}
-                          dir={directionFor("Remove condition")}
+                          aria-label={t("interface.remove_condition_e85ec5a0")}
+                          lang={languageFor("interface.remove_condition_e85ec5a0")}
+                          dir={directionFor("interface.remove_condition_e85ec5a0")}
                           disabled={format.specs.length === 1}
                           onClick={() =>
                             updateFormat(format.id, {
@@ -585,7 +594,8 @@ export default function ReleaseScoringSettings({
                         })
                       }
                     >
-                      <Plus className="mr-2 h-4 w-4" /> <InterfaceText source="Add condition" />
+                      <Plus className="me-2 h-4 w-4" />{" "}
+                      <InterfaceText source="interface.add_condition_4c29d229" />
                     </Button>
                   </div>
                 </div>
@@ -596,8 +606,7 @@ export default function ReleaseScoringSettings({
 
         {(validationMessage || !isValid) && (
           <p role="alert" className="text-sm text-destructive">
-            {validationMessage ??
-              t("Complete each custom format condition with a valid value before saving.")}
+            {validationMessage ?? t("interface.complete_each_custom_format_condit_74039cef")}
           </p>
         )}
         <div className="flex justify-end border-t pt-4">
@@ -612,9 +621,9 @@ export default function ReleaseScoringSettings({
               <SlidersHorizontal className="h-4 w-4" />
             )}
             {mutation.isPending ? (
-              <InterfaceText source="Saving..." />
+              <InterfaceText source="interface.saving_1ee0c88f" />
             ) : (
-              <InterfaceText source="Save Release Scoring" />
+              <InterfaceText source="interface.save_release_scoring_3dab91a4" />
             )}
           </Button>
         </div>

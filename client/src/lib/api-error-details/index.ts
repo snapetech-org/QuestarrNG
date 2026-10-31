@@ -20,11 +20,13 @@ const API_ERROR_DETAIL_LABELS: Record<
   Record<ApiErrorDetailSourceMessage, string>
 > = {
   es: labels0,
+  "es-419": labels0,
   "zh-Hans": labels1,
   hi: labels2,
   de: labels3,
   ja: labels4,
   fr: labels5,
+  "fr-CA": labels5,
   "pt-BR": labels6,
   ar: labels7,
   ko: labels8,

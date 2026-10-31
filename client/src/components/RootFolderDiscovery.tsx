@@ -363,7 +363,7 @@ export function RootFolderDiscovery() {
                     onClick={() => addMutation.mutate()}
                     disabled={!newPath.trim() || addMutation.isPending}
                   >
-                    {addMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {addMutation.isPending && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                     <InterfaceText source={"Add Root Folder"} />
                   </Button>
                 </div>
@@ -472,7 +472,7 @@ export function RootFolderDiscovery() {
                       onCheckedChange={(enabled) =>
                         toggleMutation.mutate({ id: folder.id, enabled })
                       }
-                      aria-label={formatInterfaceMessage("Enable {path}", {
+                      aria-label={formatInterfaceMessage("interface.enable_path_0220093b", {
                         path: String(folder.path ?? ""),
                       })}
                     />
@@ -483,9 +483,12 @@ export function RootFolderDiscovery() {
                       onCheckedChange={(allowDelete) =>
                         allowDeleteMutation.mutate({ id: folder.id, allowDelete })
                       }
-                      aria-label={formatInterfaceMessage("Allow deleting files in {path}", {
-                        path: String(folder.path ?? ""),
-                      })}
+                      aria-label={formatInterfaceMessage(
+                        "interface.allow_deleting_files_in_path_f384e71d",
+                        {
+                          path: String(folder.path ?? ""),
+                        }
+                      )}
                     />
                   </TableCell>
                   <TableCell>
@@ -493,7 +496,7 @@ export function RootFolderDiscovery() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        aria-label={formatInterfaceMessage("Scan {path}", {
+                        aria-label={formatInterfaceMessage("interface.scan_path_1e763d0d", {
                           path: String(folder.path ?? ""),
                         })}
                         disabled={
@@ -508,9 +511,12 @@ export function RootFolderDiscovery() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        aria-label={formatInterfaceMessage("Recheck health of {path}", {
-                          path: String(folder.path ?? ""),
-                        })}
+                        aria-label={formatInterfaceMessage(
+                          "interface.recheck_health_of_path_40380028",
+                          {
+                            path: String(folder.path ?? ""),
+                          }
+                        )}
                         disabled={healthCheckMutation.isPending}
                         onClick={() => healthCheckMutation.mutate(folder.id)}
                       >
@@ -519,7 +525,7 @@ export function RootFolderDiscovery() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        aria-label={formatInterfaceMessage("Delete {path}", {
+                        aria-label={formatInterfaceMessage("interface.delete_path_d1d3ca3f", {
                           path: String(folder.path ?? ""),
                         })}
                         className="text-destructive hover:text-destructive"
@@ -648,7 +654,11 @@ function UnmatchedEntryCard({ entry, matchPending, onMatch }: UnmatchedEntryCard
       );
     },
     onError: (error: Error) => {
-      toast({ title: t("Search Failed"), description: error.message, variant: "destructive" });
+      toast({
+        title: t("interface.search_failed_9104d446"),
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -690,18 +700,20 @@ function UnmatchedEntryCard({ entry, matchPending, onMatch }: UnmatchedEntryCard
         <Label
           htmlFor={searchId}
           className="sr-only"
-          lang={languageFor("Search IGDB for {name}")}
-          dir={directionFor("Search IGDB for {name}")}
+          lang={languageFor("interface.search_igdb_for_name_44a43523")}
+          dir={directionFor("interface.search_igdb_for_name_44a43523")}
         >
-          {formatInterfaceMessage("Search IGDB for {name}", { name: entry.folderName })}
+          {formatInterfaceMessage("interface.search_igdb_for_name_44a43523", {
+            name: entry.folderName,
+          })}
         </Label>
         <Input
           id={searchId}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={t("Not listed? Search IGDB by name")}
-          lang={languageFor("Not listed? Search IGDB by name")}
-          dir={directionFor("Not listed? Search IGDB by name")}
+          placeholder={t("interface.not_listed_search_igdb_by_name_a6670652")}
+          lang={languageFor("interface.not_listed_search_igdb_by_name_a6670652")}
+          dir={directionFor("interface.not_listed_search_igdb_by_name_a6670652")}
           className="h-9"
         />
         <Button
@@ -716,8 +728,12 @@ function UnmatchedEntryCard({ entry, matchPending, onMatch }: UnmatchedEntryCard
           ) : (
             <Search className="h-4 w-4" />
           )}
-          <span className="ml-1" lang={languageFor("Search")} dir={directionFor("Search")}>
-            {t("Search")}
+          <span
+            className="ms-1"
+            lang={languageFor("navigation.search")}
+            dir={directionFor("navigation.search")}
+          >
+            {t("navigation.search")}
           </span>
         </Button>
       </form>

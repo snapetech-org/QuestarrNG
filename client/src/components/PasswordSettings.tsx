@@ -34,8 +34,10 @@ export default function PasswordSettings() {
     },
     onSuccess: () => {
       toast({
-        title: "Password Updated",
-        description: "Your password has been changed successfully.",
+        title: <InterfaceText source="interface.password_updated_ff566677" />,
+        description: (
+          <InterfaceText source="interface.your_password_has_been_changed_suc_5c02a986" />
+        ),
       });
       form.reset();
     },
@@ -75,10 +77,10 @@ export default function PasswordSettings() {
               <Input
                 id="currentPassword"
                 type={showCurrentPassword ? "text" : "password"}
-                className="pr-10"
+                className="pe-10"
                 {...form.register("currentPassword")}
               />
-              <div className="absolute inset-y-0 right-0 flex items-center">
+              <div className="absolute inset-y-0 end-0 flex items-center">
                 <Button
                   type="button"
                   variant="ghost"
@@ -115,10 +117,10 @@ export default function PasswordSettings() {
               <Input
                 id="newPassword"
                 type={showNewPassword ? "text" : "password"}
-                className="pr-10"
+                className="pe-10"
                 {...form.register("newPassword")}
               />
-              <div className="absolute inset-y-0 right-0 flex items-center">
+              <div className="absolute inset-y-0 end-0 flex items-center">
                 <Button
                   type="button"
                   variant="ghost"
@@ -156,10 +158,10 @@ export default function PasswordSettings() {
               <Input
                 id="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
-                className="pr-10"
+                className="pe-10"
                 {...form.register("confirmPassword")}
               />
-              <div className="absolute inset-y-0 right-0 flex items-center">
+              <div className="absolute inset-y-0 end-0 flex items-center">
                 <Button
                   type="button"
                   variant="ghost"

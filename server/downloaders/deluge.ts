@@ -1,3 +1,4 @@
+import { serviceMessage } from "../../shared/service-messages.js";
 import type {
   Downloader,
   DownloadStatus,
@@ -190,13 +191,19 @@ export class DelugeClient implements DownloaderClient {
 
       return {
         success: true,
-        message: version
-          ? `Connected successfully to Deluge ${version}`
-          : "Connected successfully to Deluge",
+        ...(version
+          ? serviceMessage("service.connected_successfully_version", {
+              client: "Deluge",
+              version: String(version),
+            })
+          : serviceMessage("service.connected_successfully", { client: "Deluge" })),
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to connect to Deluge: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.connection_failed", { client: "Deluge", error: errorMessage }),
+      };
     }
   }
 

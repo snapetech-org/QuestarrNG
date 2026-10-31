@@ -266,7 +266,7 @@ export default function WishlistPage() {
               <span lang={languageFor(section.label)} dir={directionFor(section.label)}>
                 {t(section.label)}
               </span>
-              <span className="ml-1.5 text-xs opacity-60">{section.count}</span>
+              <span className="ms-1.5 text-xs opacity-60">{section.count}</span>
             </TabsTrigger>
           ))}
         </TabsList>
@@ -294,10 +294,10 @@ export default function WishlistPage() {
             <div className="flex items-baseline gap-2 mb-3">
               <h2
                 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground"
-                lang={languageFor("Released")}
-                dir={directionFor("Released")}
+                lang={languageFor("interface.released_412ec10e")}
+                dir={directionFor("interface.released_412ec10e")}
               >
-                {t("Released")}
+                {t("interface.released_412ec10e")}
               </h2>
               <span className="text-xs text-muted-foreground/60">{releasedGames.length}</span>
             </div>
@@ -319,10 +319,10 @@ export default function WishlistPage() {
             <div className="flex items-baseline gap-2 mb-3">
               <h2
                 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground"
-                lang={languageFor("Upcoming")}
-                dir={directionFor("Upcoming")}
+                lang={languageFor("interface.upcoming_ff276823")}
+                dir={directionFor("interface.upcoming_ff276823")}
               >
-                {t("Upcoming")}
+                {t("interface.upcoming_ff276823")}
               </h2>
               <span className="text-xs text-muted-foreground/60">{upcomingGames.length}</span>
             </div>
@@ -344,10 +344,10 @@ export default function WishlistPage() {
             <div className="flex items-baseline gap-2 mb-3">
               <h2
                 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground"
-                lang={languageFor("TBA")}
-                dir={directionFor("TBA")}
+                lang={languageFor("interface.tba_f6316096")}
+                dir={directionFor("interface.tba_f6316096")}
               >
-                {t("TBA")}
+                {t("interface.tba_f6316096")}
               </h2>
               <span className="text-xs text-muted-foreground/60">{tbaGames.length}</span>
             </div>
@@ -373,10 +373,10 @@ export default function WishlistPage() {
         <div>
           <h1
             className="text-2xl font-bold tracking-tight"
-            lang={languageFor("Wishlist")}
-            dir={directionFor("Wishlist")}
+            lang={languageFor("navigation.wishlist")}
+            dir={directionFor("navigation.wishlist")}
           >
-            {t("Wishlist")}
+            {t("navigation.wishlist")}
           </h1>
           {games.length > 0 && (
             <p
@@ -416,8 +416,11 @@ export default function WishlistPage() {
                 onClick={() => setShowUnreleased(!showUnreleased)}
               >
                 {showUnreleased ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
-                <span lang={languageFor("Unreleased")} dir={directionFor("Unreleased")}>
-                  {t("Unreleased")}
+                <span
+                  lang={languageFor("interface.unreleased_28ff5dad")}
+                  dir={directionFor("interface.unreleased_28ff5dad")}
+                >
+                  {t("interface.unreleased_28ff5dad")}
                 </span>
               </Button>
               <GameFilterPills
@@ -429,10 +432,10 @@ export default function WishlistPage() {
               {showSearchResultsOnly && showDownloadsOnly && (
                 <p
                   className="text-xs text-muted-foreground"
-                  lang={languageFor("Multiple filters active")}
-                  dir={directionFor("Multiple filters active")}
+                  lang={languageFor("interface.multiple_filters_active_6d809578")}
+                  dir={directionFor("interface.multiple_filters_active_6d809578")}
                 >
-                  {t("Multiple filters active")}
+                  {t("interface.multiple_filters_active_6d809578")}
                 </p>
               )}
             </>

@@ -1,6 +1,12 @@
 import { formatDistanceToNow } from "date-fns";
 import { useSyncExternalStore } from "react";
-import { getInterfaceLanguage } from "./interface-locale";
+import {
+  formatInterfacePluralMessage,
+  getInterfaceLanguage,
+  type InterfacePluralForms,
+  type InterfaceLanguage,
+} from "./interface-locale";
+import { getLocaleDirection } from "./locale-direction";
 import {
   ar,
   de,
@@ -27,18 +33,47 @@ export const REGIONAL_FORMAT_KEY = "questarrng.regional-format";
 
 export const REGIONAL_FORMAT_OPTIONS = [
   { value: "system", label: "Use browser settings" },
+  { value: "en", nativeName: "English", englishName: "English" },
   { value: "es", nativeName: "Español", englishName: "Spanish" },
+  {
+    value: "es-419",
+    nativeName: "Español (Latinoamérica)",
+    englishName: "Spanish (Latin America)",
+  },
   { value: "zh-CN", nativeName: "简体中文", englishName: "Chinese (Simplified)" },
   { value: "hi-IN", nativeName: "हिन्दी", englishName: "Hindi" },
   { value: "de", nativeName: "Deutsch", englishName: "German" },
   { value: "ja", nativeName: "日本語", englishName: "Japanese" },
   { value: "fr", nativeName: "Français", englishName: "French" },
+  { value: "fr-CA", nativeName: "Français (Canada)", englishName: "French (Canada)" },
   { value: "pt-BR", nativeName: "Português (Brasil)", englishName: "Brazilian Portuguese" },
   { value: "ar", nativeName: "العربية", englishName: "Arabic" },
   { value: "ko", nativeName: "한국어", englishName: "Korean" },
   { value: "zh-TW", nativeName: "繁體中文", englishName: "Chinese (Traditional)" },
   { value: "vi", nativeName: "Tiếng Việt", englishName: "Vietnamese" },
   { value: "id", nativeName: "Bahasa Indonesia", englishName: "Indonesian" },
+  { value: "az", nativeName: "Azərbaycanca", englishName: "Azerbaijani" },
+  { value: "bg", nativeName: "Български", englishName: "Bulgarian" },
+  { value: "bn", nativeName: "বাংলা", englishName: "Bengali" },
+  { value: "cs", nativeName: "Čeština", englishName: "Czech" },
+  { value: "da", nativeName: "Dansk", englishName: "Danish" },
+  { value: "fa", nativeName: "فارسی", englishName: "Persian" },
+  { value: "he", nativeName: "עברית", englishName: "Hebrew" },
+  { value: "hu", nativeName: "Magyar", englishName: "Hungarian" },
+  { value: "it", nativeName: "Italiano", englishName: "Italian" },
+  { value: "kk", nativeName: "Қазақша", englishName: "Kazakh" },
+  { value: "ms", nativeName: "Bahasa Melayu", englishName: "Malay" },
+  { value: "nb", nativeName: "Norsk bokmål", englishName: "Norwegian Bokmål" },
+  { value: "nl", nativeName: "Nederlands", englishName: "Dutch" },
+  { value: "pl", nativeName: "Polski", englishName: "Polish" },
+  { value: "pt", nativeName: "Português", englishName: "Portuguese" },
+  { value: "pt-PT", nativeName: "Português (Portugal)", englishName: "European Portuguese" },
+  { value: "ru", nativeName: "Русский", englishName: "Russian" },
+  { value: "sv", nativeName: "Svenska", englishName: "Swedish" },
+  { value: "th", nativeName: "ไทย", englishName: "Thai" },
+  { value: "tr", nativeName: "Türkçe", englishName: "Turkish" },
+  { value: "uk", nativeName: "Українська", englishName: "Ukrainian" },
+  { value: "uz", nativeName: "Oʻzbekcha", englishName: "Uzbek" },
 ] as const;
 
 const supportedRegionalFormats = new Set<string>(
@@ -190,38 +225,10 @@ export function getRegionalLocale(preference = getRegionalPreference()): string 
   return preference === "system" ? undefined : preference;
 }
 
-const rightToLeftScripts = new Set([
-  "Adlm",
-  "Arab",
-  "Hebr",
-  "Mand",
-  "Mend",
-  "Nkoo",
-  "Rohg",
-  "Samr",
-  "Syrc",
-  "Thaa",
-  "Yezi",
-]);
-
-const rightToLeftLanguages = new Set(["ar", "ckb", "fa", "he", "ks", "ps", "sd", "ug", "ur", "yi"]);
-
 export function getRegionalDirection(locale?: string): "ltr" | "rtl" {
   const normalizedLocale =
     locale ?? getRegionalLocale() ?? Intl.DateTimeFormat().resolvedOptions().locale;
-  try {
-    if (rightToLeftScripts.has(new Intl.Locale(normalizedLocale).maximize().script ?? "")) {
-      return "rtl";
-    }
-  } catch {
-    // Fall back to the language subtag for older runtimes or malformed locales.
-  }
-
-  return rightToLeftLanguages.has(
-    normalizedLocale.replaceAll("_", "-").split("-")[0]?.toLowerCase() ?? ""
-  )
-    ? "rtl"
-    : "ltr";
+  return getLocaleDirection(normalizedLocale);
 }
 
 export function getRegionalCollator(
@@ -237,6 +244,23 @@ export function formatRegionalNumber(
   preference = getRegionalPreference()
 ): string {
   return new Intl.NumberFormat(getCurrentLocale(preference), options).format(value);
+}
+
+/** Plural grammar follows the interface language; digits follow the regional preference. */
+export function formatRegionalPluralMessage(
+  count: number,
+  forms: InterfacePluralForms,
+  values: Record<string, string | number> = {},
+  interfaceLanguage: InterfaceLanguage = getInterfaceLanguage(),
+  preference = getRegionalPreference()
+): string {
+  return formatInterfacePluralMessage(
+    count,
+    forms,
+    values,
+    interfaceLanguage,
+    formatRegionalNumber(count, undefined, preference)
+  );
 }
 
 export function formatRegionalDate(
@@ -259,6 +283,91 @@ export function formatRegionalPercent(
     style: "percent",
     ...options,
   }).format(percent / 100);
+}
+
+export type RegionalUnit = NonNullable<Intl.NumberFormatOptions["unit"]>;
+
+/** Format a quantity with the locale's number rules and translated unit label. */
+export function formatRegionalUnit(
+  value: number,
+  unit: RegionalUnit,
+  options: Omit<Intl.NumberFormatOptions, "style" | "unit"> = {},
+  preference = getRegionalPreference()
+): string {
+  return new Intl.NumberFormat(getCurrentLocale(preference), {
+    ...options,
+    style: "unit",
+    unit,
+  }).format(value);
+}
+
+/** Parse a plain numeric field using the selected locale's digits and separators. */
+export function parseRegionalNumber(input: string, locale = getCurrentLocale()): number | null {
+  const value = input.trim();
+  if (!value) return null;
+
+  const parts = new Intl.NumberFormat(locale).formatToParts(-1234567890123.5);
+  const groupToken = value.includes("\u066c")
+    ? "\u066c"
+    : parts.find((part) => part.type === "group")?.value;
+  const decimalToken = value.includes("\u066b")
+    ? "\u066b"
+    : (parts.find((part) => part.type === "decimal")?.value ?? ".");
+  const minusToken = parts.find((part) => part.type === "minusSign")?.value ?? "-";
+  const digitFormatter = new Intl.NumberFormat(locale, { useGrouping: false });
+  let normalized = value.replace(/[\u200e\u200f\u061c]/gu, "");
+
+  for (let digit = 0; digit <= 9; digit += 1) {
+    const localizedDigit = digitFormatter.format(digit);
+    if (localizedDigit !== String(digit)) {
+      normalized = normalized.replaceAll(localizedDigit, String(digit));
+    }
+    normalized = normalized.replaceAll(String.fromCharCode(0x0660 + digit), String(digit));
+    normalized = normalized.replaceAll(String.fromCharCode(0x06f0 + digit), String(digit));
+  }
+  if (minusToken !== "-") normalized = normalized.replaceAll(minusToken, "-");
+  normalized = normalized.replace("−", "-");
+  if (groupToken && /[\u0020\u00a0\u202f]/u.test(groupToken)) {
+    normalized = normalized.replace(/[\u0020\u00a0\u202f]/gu, groupToken);
+  }
+
+  let sign = "";
+  if (normalized.startsWith("-") || normalized.startsWith("+")) {
+    sign = normalized[0]!;
+    normalized = normalized.slice(1);
+  }
+  if (!normalized || normalized.includes("-") || normalized.includes("+")) return null;
+
+  const decimalParts = normalized.split(decimalToken);
+  if (decimalParts.length > 2) return null;
+  const [integerPart = "", fractionPart] = decimalParts;
+  if (fractionPart !== undefined && !/^\d+$/u.test(fractionPart)) return null;
+  if (fractionPart !== undefined && groupToken && fractionPart.includes(groupToken)) return null;
+
+  let integerDigits = integerPart;
+  if (groupToken && integerPart.includes(groupToken)) {
+    const groups = integerPart.split(groupToken);
+    if (groups.some((group) => !/^\d+$/u.test(group))) return null;
+    const integerGroups = parts.filter((part) => part.type === "integer").map((part) => part.value);
+    const primaryGroupSize = integerGroups.at(-1)?.length ?? 3;
+    const secondaryGroupSize = integerGroups.at(-2)?.length ?? primaryGroupSize;
+    if (
+      groups.length < 2 ||
+      groups[0]!.length < 1 ||
+      groups[0]!.length > secondaryGroupSize ||
+      groups.at(-1)!.length !== primaryGroupSize ||
+      groups.slice(1, -1).some((group) => group.length !== secondaryGroupSize)
+    ) {
+      return null;
+    }
+    integerDigits = groups.join("");
+  }
+
+  if (!/^\d*$/u.test(integerDigits) || (!integerDigits && fractionPart === undefined)) return null;
+  const canonical =
+    sign + (integerDigits || "0") + (fractionPart === undefined ? "" : "." + fractionPart);
+  const parsed = Number(canonical);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 export function getRegionalDateFnsLocale(): RegionalDateFnsLocale | undefined {
@@ -294,9 +403,74 @@ export function getRegionalWeekStartsOn(): number {
   return getDateFnsLocale(locale)?.options?.weekStartsOn ?? 1;
 }
 
-export function formatRegionalDistanceToNow(date: Date): string {
-  const interfaceLocale = getDateFnsLocale(getInterfaceLanguage()) ?? enUS;
-  // Keep date-fns wording and plural rules, but format its count with the separate regional choice.
+function formatIntlRelativeDistance(
+  date: Date,
+  interfaceLanguage: string,
+  regionalPreference: string
+): string {
+  const deltaSeconds = (date.getTime() - Date.now()) / 1000;
+  const absoluteSeconds = Math.abs(deltaSeconds);
+  let value: number;
+  let unit: Intl.RelativeTimeFormatUnit;
+
+  if (absoluteSeconds < 45) {
+    value = Math.round(deltaSeconds);
+    unit = "second";
+  } else if (absoluteSeconds < 90) {
+    value = Math.sign(deltaSeconds);
+    unit = "minute";
+  } else if (absoluteSeconds < 45 * 60) {
+    value = Math.round(deltaSeconds / 60);
+    unit = "minute";
+  } else if (absoluteSeconds < 90 * 60) {
+    value = Math.sign(deltaSeconds);
+    unit = "hour";
+  } else if (absoluteSeconds < 22 * 60 * 60) {
+    value = Math.round(deltaSeconds / (60 * 60));
+    unit = "hour";
+  } else if (absoluteSeconds < 36 * 60 * 60) {
+    value = Math.sign(deltaSeconds);
+    unit = "day";
+  } else if (absoluteSeconds < 26 * 24 * 60 * 60) {
+    value = Math.round(deltaSeconds / (24 * 60 * 60));
+    unit = "day";
+  } else if (absoluteSeconds < 46 * 24 * 60 * 60) {
+    value = Math.sign(deltaSeconds);
+    unit = "month";
+  } else if (absoluteSeconds < 320 * 24 * 60 * 60) {
+    value = Math.round(deltaSeconds / (30 * 24 * 60 * 60));
+    unit = "month";
+  } else if (absoluteSeconds < 548 * 24 * 60 * 60) {
+    value = Math.sign(deltaSeconds);
+    unit = "year";
+  } else {
+    value = Math.round(deltaSeconds / (365 * 24 * 60 * 60));
+    unit = "year";
+  }
+
+  const parts = new Intl.RelativeTimeFormat(interfaceLanguage, { numeric: "always" }).formatToParts(
+    value,
+    unit
+  );
+  return parts
+    .map((part) =>
+      part.type === "integer"
+        ? formatRegionalNumber(Number(part.value), { useGrouping: false }, regionalPreference)
+        : part.value
+    )
+    .join("");
+}
+
+export function formatRegionalDistanceToNow(
+  date: Date,
+  interfaceLanguage = getInterfaceLanguage(),
+  regionalPreference = getRegionalPreference()
+): string {
+  const interfaceLocale = getDateFnsLocale(interfaceLanguage);
+  if (!interfaceLocale) {
+    return formatIntlRelativeDistance(date, interfaceLanguage, regionalPreference);
+  }
+  // Keep existing date-fns wording and plural rules, but format its count with the separate regional choice.
   const regionalizedLocale = {
     ...interfaceLocale,
     formatDistance: (
@@ -306,7 +480,10 @@ export function formatRegionalDistanceToNow(date: Date): string {
     ) =>
       interfaceLocale
         .formatDistance(token, count, options)
-        .replace(String(count), formatRegionalNumber(count, { useGrouping: false })),
+        .replace(
+          String(count),
+          formatRegionalNumber(count, { useGrouping: false }, regionalPreference)
+        ),
   };
 
   return formatDistanceToNow(date, { addSuffix: true, locale: regionalizedLocale });

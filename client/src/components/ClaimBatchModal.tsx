@@ -201,7 +201,7 @@ export default function ClaimBatchModal({ open, onOpenChange }: ClaimBatchModalP
       const { count, hadErrors } = result ?? { count: 0, hadErrors: false };
       if (hadErrors) {
         toast({
-          title: formatInterfaceMessage("Some groups failed to link ({count}).", {
+          title: formatInterfaceMessage("interface.some_groups_failed_to_link_count_995eaf75", {
             count: String(count),
           }),
           description: "Check your downloads.",
@@ -212,7 +212,7 @@ export default function ClaimBatchModal({ open, onOpenChange }: ClaimBatchModalP
           title:
             count === 1
               ? "Linked 1 group to a game"
-              : formatInterfaceMessage("Linked {count} groups to games", {
+              : formatInterfaceMessage("interface.linked_count_groups_to_games_1a79db95", {
                   count: String(count),
                 }),
         });
@@ -250,7 +250,7 @@ export default function ClaimBatchModal({ open, onOpenChange }: ClaimBatchModalP
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 min-h-0 overflow-y-auto pr-2">
+        <div className="flex-1 min-h-0 overflow-y-auto pe-2">
           {isLoading && (
             <div className="flex items-center justify-center py-12 gap-2 text-muted-foreground">
               <Loader2 className="h-5 w-5 animate-spin" />
@@ -296,7 +296,7 @@ export default function ClaimBatchModal({ open, onOpenChange }: ClaimBatchModalP
         <div className="flex items-center justify-between gap-2 pt-2 border-t">
           <span className="text-sm text-muted-foreground">
             <InterfaceText
-              source="Groups ready to link: {count}"
+              source="interface.groups_ready_to_link_count_29cbe906"
               values={{ count: pendingCount }}
             />
           </span>
@@ -308,7 +308,7 @@ export default function ClaimBatchModal({ open, onOpenChange }: ClaimBatchModalP
               onClick={() => claimAllMutation.mutate()}
               disabled={pendingCount === 0 || claimAllMutation.isPending}
             >
-              <Link2 className="h-4 w-4 mr-2" />
+              <Link2 className="h-4 w-4 me-2" />
               {claimAllMutation.isPending ? (
                 <InterfaceText source={"Claiming…"} />
               ) : (
@@ -405,14 +405,14 @@ function GroupRow({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-6 px-2 text-xs ml-auto"
+                className="h-6 px-2 text-xs ms-auto"
                 onClick={() => {
                   onUpdate({ igdbOpen: !state.igdbOpen, igdbQuery: "" });
                   setIgdbDebouncedQuery("");
                 }}
               >
                 <InterfaceText source={"Change"} />
-                <ChevronDown className="h-3 w-3 ml-1" />
+                <ChevronDown className="h-3 w-3 ms-1" />
               </Button>
             </div>
           ) : (
@@ -424,7 +424,7 @@ function GroupRow({
               <Button
                 variant="outline"
                 size="sm"
-                className="h-6 px-2 text-xs ml-auto"
+                className="h-6 px-2 text-xs ms-auto"
                 onClick={() =>
                   onUpdate({
                     igdbOpen: !state.igdbOpen,
@@ -432,7 +432,7 @@ function GroupRow({
                   })
                 }
               >
-                <Search className="h-3 w-3 mr-1" />
+                <Search className="h-3 w-3 me-1" />
                 <InterfaceText source={"Search IGDB"} />
               </Button>
             </div>
@@ -442,9 +442,9 @@ function GroupRow({
           {state.igdbOpen && (
             <div className="mt-2 space-y-1.5">
               <div className="relative">
-                <Search className="absolute left-2 top-2 h-3.5 w-3.5 text-muted-foreground" />
+                <Search className="absolute start-2 top-2 h-3.5 w-3.5 text-muted-foreground" />
                 <Input
-                  className="pl-7 h-8 text-sm"
+                  className="ps-7 h-8 text-sm"
                   placeholder="Search IGDB…"
                   value={state.igdbQuery}
                   onChange={(e) => onUpdate({ igdbQuery: e.target.value })}
@@ -497,7 +497,7 @@ function GroupRow({
                             igdbOpen: false,
                           });
                         }}
-                        className="w-full flex items-center gap-2 px-2 py-1 rounded text-sm hover:bg-accent text-left"
+                        className="w-full flex items-center gap-2 px-2 py-1 rounded text-sm hover:bg-accent text-start"
                       >
                         {g.coverUrl ? (
                           <img

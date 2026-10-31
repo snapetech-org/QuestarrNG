@@ -1,3 +1,5 @@
+import { localizeServiceResultMessage } from "@/lib/service-message-locale";
+import type { ServiceMessageResult } from "@shared/service-messages";
 import { useMemo, useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiFetch, throwIfResNotOk, queryClient } from "@/lib/queryClient";
@@ -334,7 +336,7 @@ export default function DownloadersPage() {
           headers,
         });
         await throwIfResNotOk(response);
-        return response.json() as Promise<{ success: boolean; message: string }>;
+        return response.json() as Promise<ServiceMessageResult>;
       } else if (data.formData) {
         // Test with form data (new downloader)
         const response = await apiFetch(`/api/downloaders/test`, {
@@ -343,7 +345,7 @@ export default function DownloadersPage() {
           body: JSON.stringify(data.formData),
         });
         await throwIfResNotOk(response);
-        return response.json() as Promise<{ success: boolean; message: string }>;
+        return response.json() as Promise<ServiceMessageResult>;
       } else {
         throw new Error("Either id or formData must be provided");
       }
@@ -353,9 +355,13 @@ export default function DownloadersPage() {
     },
     onSuccess: (data) => {
       if (data.success) {
-        toast({ title: "Connection successful", description: data.message });
+        toast({ title: "Connection successful", description: localizeServiceResultMessage(data) });
       } else {
-        toast({ title: "Connection failed", description: data.message, variant: "destructive" });
+        toast({
+          title: "Connection failed",
+          description: localizeServiceResultMessage(data),
+          variant: "destructive",
+        });
       }
     },
     onError: (error) => {
@@ -579,7 +585,7 @@ export default function DownloadersPage() {
             onClick={handleAdd}
             data-testid="button-add-downloader"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 me-2" />
             <InterfaceText source={"Add Downloader"} />
           </Button>
         }
@@ -611,9 +617,12 @@ export default function DownloadersPage() {
                       onClick={() => testConnectionMutation.mutate({ id: downloader.id })}
                       disabled={testingDownloaderId === downloader.id}
                       title="Test connection"
-                      aria-label={formatInterfaceMessage("Test connection for {name}", {
-                        name: String(downloader.name ?? ""),
-                      })}
+                      aria-label={formatInterfaceMessage(
+                        "interface.test_connection_for_name_8d0baec5",
+                        {
+                          name: String(downloader.name ?? ""),
+                        }
+                      )}
                       className="h-11 w-11 md:h-9 md:w-9"
                       data-testid={`button-test-downloader-${downloader.id}`}
                       data-i18n-title={"Test connection"}
@@ -631,7 +640,7 @@ export default function DownloadersPage() {
                       variant="outline"
                       size="icon"
                       onClick={() => handleEdit(downloader)}
-                      aria-label={formatInterfaceMessage("Edit {name}", {
+                      aria-label={formatInterfaceMessage("interface.edit_name_4688b082", {
                         name: String(downloader.name ?? ""),
                       })}
                       className="h-11 w-11 md:h-9 md:w-9"
@@ -643,7 +652,7 @@ export default function DownloadersPage() {
                       variant="outline"
                       size="icon"
                       onClick={() => deleteMutation.mutate(downloader.id)}
-                      aria-label={formatInterfaceMessage("Delete {name}", {
+                      aria-label={formatInterfaceMessage("interface.delete_name_2617e173", {
                         name: String(downloader.name ?? ""),
                       })}
                       className="h-11 w-11 md:h-9 md:w-9"
@@ -674,12 +683,12 @@ export default function DownloadersPage() {
                   >
                     {downloader.enabled ? (
                       <>
-                        <Check className="h-3 w-3 mr-1" />
+                        <Check className="h-3 w-3 me-1" />
                         <InterfaceText source={"Enabled"} />
                       </>
                     ) : (
                       <>
-                        <X className="h-3 w-3 mr-1" />
+                        <X className="h-3 w-3 me-1" />
                         <InterfaceText source={"Disabled"} />
                       </>
                     )}
@@ -817,7 +826,7 @@ export default function DownloadersPage() {
                             const typeLabel = downloaderTypes.find(
                               (type) => type.value === form.watch("type")
                             )?.label;
-                            return typeLabel ?? t("Downloader");
+                            return typeLabel ?? t("interface.downloader_2ca21a32");
                           })()}
                           required
                           {...field}
@@ -974,15 +983,15 @@ export default function DownloadersPage() {
                                 }
                               />
                             ) : form.watch("type") === "transmission" ? (
-                              <InterfaceText source="Enable HTTPS (see Settings → Web in Transmission)" />
+                              <InterfaceText source="interface.enable_https_see_settings_web_in_t_bb284471" />
                             ) : form.watch("type") === "synology" ? (
-                              <InterfaceText source="DSM 7 commonly uses HTTPS on port 5001" />
+                              <InterfaceText source="interface.dsm_7_commonly_uses_https_on_port_ce0f5781" />
                             ) : form.watch("type") === "sabnzbd" ? (
-                              <InterfaceText source="Enable HTTPS in SABnzbd (Config → General)" />
+                              <InterfaceText source="interface.enable_https_in_sabnzbd_config_gen_ea9a1ef1" />
                             ) : form.watch("type") === "nzbget" ? (
-                              <InterfaceText source="Enable HTTPS in NZBGet (Settings → Security)" />
+                              <InterfaceText source="interface.enable_https_in_nzbget_settings_se_a13e0e06" />
                             ) : (
-                              <InterfaceText source="Enable HTTPS" />
+                              <InterfaceText source="interface.enable_https_7d7e94a3" />
                             )}
                           </FormDescription>
                         </div>
@@ -1118,9 +1127,9 @@ export default function DownloadersPage() {
                           form.watch("type") === "transmission" ||
                           form.watch("type") === "nzbget" ||
                           form.watch("type") === "synology" ? (
-                          <InterfaceText source="Username" />
+                          <InterfaceText source="interface.username_1c08d4d9" />
                         ) : (
-                          <InterfaceText source="Username (Optional)" />
+                          <InterfaceText source="interface.username_optional_4da1faf4" />
                         )}
                       </RequiredFormLabel>
                       <FormControl>
@@ -1185,7 +1194,7 @@ export default function DownloadersPage() {
                         form.watch("type") === "transmission" ||
                         form.watch("type") === "nzbget" ||
                         form.watch("type") === "synology" ? (
-                          <InterfaceText source="Password" />
+                          <InterfaceText source="interface.password_2cc30838" />
                         ) : (
                           <InterfaceText source={"Password (Optional)"} />
                         )}
@@ -1228,7 +1237,7 @@ export default function DownloadersPage() {
                           {isRealDebrid ? (
                             <InterfaceText source={"QuestarrNG Local Staging Path (Required)"} />
                           ) : (
-                            <InterfaceText source="Download Path (Optional)" />
+                            <InterfaceText source="interface.download_path_optional_b80c57e3" />
                           )}
                         </FormLabel>
                         <FormControl>
@@ -1304,9 +1313,9 @@ export default function DownloadersPage() {
                           disabled={startRealDebridAuthMutation.isPending || !!realDebridAuth}
                         >
                           {startRealDebridAuthMutation.isPending ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            <Loader2 className="me-2 h-4 w-4 animate-spin" />
                           ) : (
-                            <ExternalLink className="mr-2 h-4 w-4" />
+                            <ExternalLink className="me-2 h-4 w-4" />
                           )}
                           {isRealDebridConnected ? (
                             <InterfaceText source={"Reconnect"} />
@@ -1386,13 +1395,13 @@ export default function DownloadersPage() {
                             source={"Adding a category avoids conflicts with unrelated downloads"}
                           />
                         ) : form.watch("type") === "transmission" ? (
-                          <InterfaceText source="Creates a subdirectory in the output directory. Label for downloads in downloader" />
+                          <InterfaceText source="interface.creates_a_subdirectory_in_the_outp_ebed8330" />
                         ) : form.watch("type") === "synology" ? (
-                          <InterfaceText source="Optional Questarr label only. Synology stores downloads by destination path." />
+                          <InterfaceText source="interface.optional_questarr_label_only_synol_bff73441" />
                         ) : form.watch("type") === "sabnzbd" || form.watch("type") === "nzbget" ? (
-                          <InterfaceText source="Category for NZBs in downloader (path is managed by category settings)" />
+                          <InterfaceText source="interface.category_for_nzbs_in_downloader_pa_c8ccd9ee" />
                         ) : (
-                          <InterfaceText source="Label for downloads in downloader" />
+                          <InterfaceText source="interface.label_for_downloads_in_downloader_bd4d188d" />
                         )}
                       </FormDescription>
                       <FormMessage />
@@ -1635,7 +1644,7 @@ export default function DownloadersPage() {
                     disabled={testingDownloaderId !== null}
                     data-testid="button-test-connection-dialog"
                   >
-                    <Activity className="h-4 w-4 mr-2" />
+                    <Activity className="h-4 w-4 me-2" />
                     {testingDownloaderId === "new" ? (
                       <InterfaceText source={"Testing..."} />
                     ) : (
@@ -1649,7 +1658,7 @@ export default function DownloadersPage() {
                     onClick={() => testConnectionMutation.mutate({ id: editingDownloader.id })}
                     disabled={testingDownloaderId !== null}
                   >
-                    <Activity className="h-4 w-4 mr-2" />
+                    <Activity className="h-4 w-4 me-2" />
                     {testingDownloaderId === editingDownloader.id ? (
                       <InterfaceText source={"Testing..."} />
                     ) : (
@@ -1663,11 +1672,11 @@ export default function DownloadersPage() {
                   data-testid="button-save-downloader"
                 >
                   {addMutation.isPending || updateMutation.isPending ? (
-                    <InterfaceText source="Saving..." />
+                    <InterfaceText source="interface.saving_1ee0c88f" />
                   ) : editingDownloader ? (
-                    <InterfaceText source="Update" />
+                    <InterfaceText source="interface.update_6e230e94" />
                   ) : (
-                    <InterfaceText source="Add" />
+                    <InterfaceText source="interface.add_9dc3aa14" />
                   )}
                 </Button>
               </div>

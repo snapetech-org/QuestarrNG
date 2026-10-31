@@ -1,4 +1,5 @@
 import {
+  formatRegionalDate,
   formatRegionalNumber,
   getRegionalDirection as getLocaleDirection,
   getRegionalLocale,
@@ -58,7 +59,7 @@ export function formatCalendarDate(
   options: Intl.DateTimeFormatOptions,
   locale = getRegionalLocale()
 ): string {
-  return new Intl.DateTimeFormat(locale, { ...options, calendar: "gregory" }).format(date);
+  return formatRegionalDate(date, { ...options, calendar: "gregory" }, locale);
 }
 
 export function formatCalendarTitle(
@@ -294,14 +295,14 @@ export default function CalendarPage({ today: injectedToday }: CalendarPageProps
           <AlertCircle className="h-12 w-12 text-muted-foreground" />
         </div>
         <h2 className="text-2xl font-bold">
-          <LocalizedText source="IGDB Configuration Required" />
+          <LocalizedText source="interface.igdb_configuration_required_6ad1583e" />
         </h2>
         <p className="text-muted-foreground max-w-md">
-          <LocalizedText source="To track game release dates and view the calendar, you need to configure your IGDB credentials in the settings." />
+          <LocalizedText source="interface.to_track_game_release_dates_and_vi_26aeca72" />
         </p>
         <Link href="/settings">
           <Button>
-            <LocalizedText source="Go to Settings" />
+            <LocalizedText source="interface.go_to_settings_a94624fd" />
           </Button>
         </Link>
       </div>
@@ -313,22 +314,22 @@ export default function CalendarPage({ today: injectedToday }: CalendarPageProps
       <div className="space-y-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
-            <LocalizedText source="Release Calendar" />
+            <LocalizedText source="interface.release_calendar_9a00977c" />
           </h1>
           <p className="text-muted-foreground text-sm mt-0.5">
-            <LocalizedText source="Track upcoming game releases." />
+            <LocalizedText source="interface.track_upcoming_game_releases_e9820f4c" />
           </p>
         </div>
         <PageToolbar
           search={searchQuery}
           onSearchChange={setSearchQuery}
-          searchPlaceholder={t("Filter games...")}
-          searchClearLabel={t("Clear search")}
-          searchClearLang={languageFor("Clear search")}
-          searchClearDir={directionFor("Clear search")}
-          searchLang={languageFor("Filter games...")}
+          searchPlaceholder={t("interface.filter_games_adc0d742")}
+          searchClearLabel={t("interface.clear_search_5a13e946")}
+          searchClearLang={languageFor("interface.clear_search_5a13e946")}
+          searchClearDir={directionFor("interface.clear_search_5a13e946")}
+          searchLang={languageFor("interface.filter_games_adc0d742")}
           searchDir="auto"
-          searchEmptyDir={directionFor("Filter games...")}
+          searchEmptyDir={directionFor("interface.filter_games_adc0d742")}
           filterPills={
             <span className="text-base font-semibold" lang={regionalLocale} dir={regionalDirection}>
               {getTitle()}
@@ -340,33 +341,33 @@ export default function CalendarPage({ today: injectedToday }: CalendarPageProps
                 variant="ghost"
                 size="icon"
                 onClick={navigatePrevious}
-                aria-label={t("Previous period")}
-                lang={languageFor("Previous period")}
-                dir={directionFor("Previous period")}
+                aria-label={t("interface.previous_period_b5a4f439")}
+                lang={languageFor("interface.previous_period_b5a4f439")}
+                dir={directionFor("interface.previous_period_b5a4f439")}
               >
                 {language === "ar" ? (
-                  <ChevronRight className="h-5 w-5" />
+                  <ChevronRight className="h-5 w-5 rtl:rotate-180" />
                 ) : (
-                  <ChevronLeft className="h-5 w-5" />
+                  <ChevronLeft className="h-5 w-5 rtl:rotate-180" />
                 )}
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={navigateNext}
-                aria-label={t("Next period")}
-                lang={languageFor("Next period")}
-                dir={directionFor("Next period")}
+                aria-label={t("interface.next_period_2feea679")}
+                lang={languageFor("interface.next_period_2feea679")}
+                dir={directionFor("interface.next_period_2feea679")}
               >
                 {language === "ar" ? (
-                  <ChevronLeft className="h-5 w-5" />
+                  <ChevronLeft className="h-5 w-5 rtl:rotate-180" />
                 ) : (
-                  <ChevronRight className="h-5 w-5" />
+                  <ChevronRight className="h-5 w-5 rtl:rotate-180" />
                 )}
               </Button>
               <div className="w-px h-5 bg-border" />
               <Button variant="outline" size="sm" onClick={goToToday}>
-                <LocalizedText source="Today" />
+                <LocalizedText source="interface.today_e7c0775e" />
               </Button>
               <Select value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)}>
                 <SelectTrigger
@@ -378,13 +379,13 @@ export default function CalendarPage({ today: injectedToday }: CalendarPageProps
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="year">
-                    <LocalizedText source="Year" />
+                    <LocalizedText source="interface.year_155ee43c" />
                   </SelectItem>
                   <SelectItem value="month">
-                    <LocalizedText source="Month" />
+                    <LocalizedText source="interface.month_a8761ba5" />
                   </SelectItem>
                   <SelectItem value="week">
-                    <LocalizedText source="Week" />
+                    <LocalizedText source="interface.week_55f2e27d" />
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -395,11 +396,11 @@ export default function CalendarPage({ today: injectedToday }: CalendarPageProps
 
       {isLoading ? (
         <div className="text-center py-12 text-muted-foreground">
-          <LocalizedText source="Loading calendar..." />
+          <LocalizedText source="interface.loading_calendar_178984ab" />
         </div>
       ) : wantedGames.length === 0 && undatedGames.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
-          <LocalizedText source="No games in your wishlist. Add games to track their release dates." />
+          <LocalizedText source="interface.no_games_in_your_wishlist_add_game_610879cc" />
         </div>
       ) : (
         <div className="space-y-6">
@@ -535,7 +536,7 @@ function YearView({
                 ))
               ) : (
                 <p className="text-xs text-muted-foreground">
-                  <LocalizedText source="No releases" />
+                  <LocalizedText source="interface.no_releases_af6c37cc" />
                 </p>
               )}
             </div>
@@ -829,7 +830,7 @@ function WeekView({
                   </div>
                 ) : (
                   <p className="text-xs text-muted-foreground">
-                    <LocalizedText source="No releases" />
+                    <LocalizedText source="interface.no_releases_af6c37cc" />
                   </p>
                 )}
               </div>
@@ -891,7 +892,7 @@ function WeekView({
                   ))
                 ) : (
                   <p className="text-xs text-muted-foreground text-center">
-                    <LocalizedText source="No releases" />
+                    <LocalizedText source="interface.no_releases_af6c37cc" />
                   </p>
                 )}
               </div>
@@ -918,7 +919,7 @@ function UndatedSection({
     <div>
       <div className="flex items-center gap-3 mb-3">
         <h2 className="text-base font-semibold text-muted-foreground">
-          <LocalizedText source="No Release Date" /> —{" "}
+          <LocalizedText source="interface.no_release_date_b2664da9" /> —{" "}
           <span lang={getRegionalLanguage()} dir={getRegionalDirection()}>
             {formatRegionalNumber(year, { useGrouping: false })}
           </span>
@@ -977,7 +978,7 @@ function GameBadge({
               {isDelayed && (
                 <>
                   {" ("}
-                  <LocalizedText source="Delayed" />
+                  <LocalizedText source="interface.delayed_356b9df9" />
                   {")"}
                 </>
               )}
@@ -989,7 +990,7 @@ function GameBadge({
             <p className="font-semibold">{game.title}</p>
             {isDelayed && (
               <Badge variant="destructive" className="mt-1 text-xs h-4">
-                <LocalizedText source="Delayed" />
+                <LocalizedText source="interface.delayed_356b9df9" />
               </Badge>
             )}
             <p
@@ -1006,7 +1007,7 @@ function GameBadge({
             </p>
             {isDelayed && game.originalReleaseDate && (
               <p className="text-xs text-muted-foreground">
-                <LocalizedText source="Was originally scheduled for:" />{" "}
+                <LocalizedText source="interface.was_originally_scheduled_for_3fd66704" />{" "}
                 <span lang={getRegionalLanguage()} dir={getRegionalDirection()}>
                   {formatCalendarDate(new Date(game.originalReleaseDate), {
                     month: "short",
@@ -1045,7 +1046,7 @@ function GameBadge({
               </p>
               {isDelayed && (
                 <Badge variant="destructive" className="text-xs h-4 px-1">
-                  <LocalizedText source="Delayed" />
+                  <LocalizedText source="interface.delayed_356b9df9" />
                 </Badge>
               )}
             </div>
@@ -1075,7 +1076,7 @@ function GameBadge({
             dir={getRegionalDirection()}
           >
             {hideDate ? (
-              <LocalizedText source="Release date TBD" />
+              <LocalizedText source="interface.release_date_tbd_d9339594" />
             ) : game.releaseDate ? (
               formatCalendarDate(new Date(game.releaseDate), {
                 month: "long",
@@ -1087,11 +1088,11 @@ function GameBadge({
           {isDelayed && (
             <div className="flex flex-col gap-0.5 mt-1">
               <Badge variant="destructive" className="w-fit text-xs h-4">
-                <LocalizedText source="Delayed" />
+                <LocalizedText source="interface.delayed_356b9df9" />
               </Badge>
               {game.originalReleaseDate && (
                 <p className="text-xs text-muted-foreground">
-                  <LocalizedText source="Was originally scheduled for:" />{" "}
+                  <LocalizedText source="interface.was_originally_scheduled_for_3fd66704" />{" "}
                   <span lang={getRegionalLanguage()} dir={getRegionalDirection()}>
                     {formatCalendarDate(new Date(game.originalReleaseDate), {
                       month: "long",

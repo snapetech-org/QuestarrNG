@@ -702,6 +702,8 @@ describe("rtorrent remaining regression coverage", () => {
     await expect(connectionClient.testConnection()).resolves.toEqual({
       success: true,
       message: "Connected to rTorrent v0.9.8",
+      messageKey: "service.connected_version",
+      messageValues: { client: "rTorrent", version: "0.9.8" },
     });
     connectionSpy.mockRejectedValueOnce(new Error("Authentication failed: denied"));
     await expect(connectionClient.testConnection()).resolves.toEqual({
@@ -712,6 +714,8 @@ describe("rtorrent remaining regression coverage", () => {
     await expect(connectionClient.testConnection()).resolves.toEqual({
       success: false,
       message: "Failed to connect to rTorrent: rpc down",
+      messageKey: "service.connection_failed",
+      messageValues: { client: "rTorrent", error: "rpc down" },
     });
 
     await expect(connectionClient.addDownload({ url: "", title: "No URL" })).resolves.toEqual({

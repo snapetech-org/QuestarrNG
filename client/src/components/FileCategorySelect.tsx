@@ -63,7 +63,7 @@ export default function FileCategorySelect({ gameId, file }: FileCategorySelectP
     >
       <SelectTrigger
         className="h-9 w-[7.5rem] shrink-0 text-xs"
-        aria-label={formatInterfaceMessage("Category for {name}", {
+        aria-label={formatInterfaceMessage("interface.category_for_name_ffbdc0b7", {
           name: String(file.name ?? ""),
         })}
         data-testid={`select-file-category-${file.name}`}

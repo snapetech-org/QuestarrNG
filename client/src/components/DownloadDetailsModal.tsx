@@ -116,7 +116,7 @@ export default function DownloadDetailsModal({
           className="flex items-center justify-center py-8"
           data-testid="download-details-loading"
         >
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent mr-2" />
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent me-2" />
           <span>
             <InterfaceText source={"Loading download details..."} />
           </span>
@@ -144,16 +144,16 @@ export default function DownloadDetailsModal({
               <>
                 <TabsList className="grid w-full grid-cols-3 flex-shrink-0">
                   <TabsTrigger value="info" data-testid="tab-info">
-                    <Activity className="w-4 h-4 mr-2" />
+                    <Activity className="w-4 h-4 me-2" />
                     <InterfaceText source={"Info"} />
                   </TabsTrigger>
                   <TabsTrigger value="files" data-testid="tab-files">
-                    <File className="w-4 h-4 mr-2" />
+                    <File className="w-4 h-4 me-2" />
                     <InterfaceText source={"Files ("} />
                     {filesCountLabel})
                   </TabsTrigger>
                   <TabsTrigger value="trackers" data-testid="tab-trackers">
-                    <Server className="w-4 h-4 mr-2" />
+                    <Server className="w-4 h-4 me-2" />
                     <InterfaceText source={"Trackers ("} />
                     {details.trackers.length})
                   </TabsTrigger>
@@ -165,7 +165,7 @@ export default function DownloadDetailsModal({
                   className="flex-1 overflow-hidden mt-4"
                   data-testid="tab-content-info"
                 >
-                  <ScrollArea className="h-full pr-4">
+                  <ScrollArea className="h-full pe-4">
                     <div className="space-y-6">
                       <div className="grid gap-4 md:grid-cols-2">
                         {details.hash && (
@@ -308,14 +308,14 @@ export default function DownloadDetailsModal({
                   className="flex-1 overflow-hidden mt-4"
                   data-testid="tab-content-files"
                 >
-                  <ScrollArea className="h-full pr-4">
+                  <ScrollArea className="h-full pe-4">
                     {filesSupport === "unsupported" ? (
                       <div
                         className="text-center text-muted-foreground py-8"
                         data-testid="files-unsupported"
                       >
                         {details.filesSupportReason || (
-                          <InterfaceText source="This downloader does not expose per-file listing." />
+                          <InterfaceText source="interface.this_downloader_does_not_expose_pe_2b5a077a" />
                         )}
                       </div>
                     ) : details.files.length === 0 ? (
@@ -378,7 +378,7 @@ export default function DownloadDetailsModal({
                   className="flex-1 overflow-hidden mt-4"
                   data-testid="tab-content-trackers"
                 >
-                  <ScrollArea className="h-full pr-4">
+                  <ScrollArea className="h-full pe-4">
                     {details.trackers.length === 0 ? (
                       <div
                         className="text-center text-muted-foreground py-8"

@@ -1,3 +1,4 @@
+import { serviceMessage } from "../../shared/service-messages.js";
 import { constants as fsConstants } from "node:fs";
 import * as fs from "node:fs/promises";
 import { createWriteStream } from "node:fs";
@@ -189,7 +190,14 @@ export class RealDebridClient implements DownloaderClient {
       const user = await this.request<{ username?: string; type?: string }>("/user");
       return {
         success: true,
-        message: `Connected to Real-Debrid${user.username ? ` as ${user.username}` : ""}. Downloads will be copied into QuestarrNG at ${this.downloader.downloadPath}.`,
+        ...(user.username
+          ? serviceMessage("service.realdebrid_connected_user", {
+              username: user.username,
+              path: String(this.downloader.downloadPath),
+            })
+          : serviceMessage("service.realdebrid_connected", {
+              path: String(this.downloader.downloadPath),
+            })),
       };
     } catch (error) {
       return {

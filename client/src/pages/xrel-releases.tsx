@@ -89,7 +89,7 @@ export default function XrelReleasesPage() {
     onSuccess: (data) => {
       toast({
         title: "Game added",
-        description: formatInterfaceMessage('Added "{title}" to your wanted list', {
+        description: formatInterfaceMessage("interface.added_title_to_your_wanted_list_abe8d624", {
           title: String(data.title ?? ""),
         }),
       });
@@ -162,7 +162,7 @@ export default function XrelReleasesPage() {
         <CardContent>
           {isLoading ? (
             <div className="flex items-center justify-center py-12 text-muted-foreground">
-              <RefreshCw className="h-8 w-8 animate-spin mr-2" />
+              <RefreshCw className="h-8 w-8 animate-spin me-2" />
               <InterfaceText source={"Loading…"} />
             </div>
           ) : !isFetching && list.length === 0 ? (
@@ -205,9 +205,12 @@ export default function XrelReleasesPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="shrink-0 text-primary hover:underline inline-flex items-center gap-0.5 text-sm"
-                        aria-label={formatInterfaceMessage("View {value} on xREL", {
-                          value: String(rel.ext_info?.title ?? rel.dirname ?? ""),
-                        })}
+                        aria-label={formatInterfaceMessage(
+                          "interface.view_value_on_xrel_ecfcd495",
+                          {
+                            value: String(rel.ext_info?.title ?? rel.dirname ?? ""),
+                          }
+                        )}
                         data-i18n-aria-label={"View {value} on xREL"}
                         data-i18n-aria-label-values={JSON.stringify({
                           value: String(rel.ext_info?.title ?? rel.dirname ?? ""),
@@ -240,7 +243,7 @@ export default function XrelReleasesPage() {
                           <Badge
                             variant="destructive"
                             className="text-[10px] h-4 px-1.5"
-                            title={formatInterfaceMessage("Nuked: {reason}", {
+                            title={formatInterfaceMessage("interface.nuked_reason_26eed06a", {
                               reason: String(rel.nukeReason ?? ""),
                             })}
                           >
@@ -274,9 +277,12 @@ export default function XrelReleasesPage() {
                             addGameMutation.isPending &&
                             addGameMutation.variables === rel.matchCandidate?.title
                           }
-                          title={formatInterfaceMessage('Add "{value}" to wanted list', {
-                            value: String(rel.matchCandidate?.title ?? ""),
-                          })}
+                          title={formatInterfaceMessage(
+                            "interface.add_value_to_wanted_list_791eb955",
+                            {
+                              value: String(rel.matchCandidate?.title ?? ""),
+                            }
+                          )}
                         >
                           {addGameMutation.isPending &&
                           addGameMutation.variables === rel.matchCandidate?.title ? (

@@ -136,7 +136,7 @@ export function FileBrowser({
             <button
               key={item.path}
               type="button"
-              className="flex items-center gap-2 p-2 rounded-sm cursor-pointer hover:bg-accent w-full text-left"
+              className="flex items-center gap-2 p-2 rounded-sm cursor-pointer hover:bg-accent w-full text-start"
               onClick={() => handleNavigate(item.path)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
@@ -147,7 +147,7 @@ export function FileBrowser({
             >
               <Folder className="h-4 w-4 text-blue-500" />
               <span className="text-sm flex-1 truncate">{item.name}</span>
-              <ChevronRight className="h-3 w-3 text-muted-foreground" />
+              <ChevronRight className="h-3 w-3 text-muted-foreground rtl:rotate-180" />
             </button>
           ) : (
             <div

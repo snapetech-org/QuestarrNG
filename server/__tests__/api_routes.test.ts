@@ -3052,6 +3052,8 @@ describe("API Routes - Extended Coverage", () => {
         expect(response.body).toEqual({
           success: true,
           message: "Connected to SABnzbd v4.4.0",
+          messageKey: "service.connected_version",
+          messageValues: { client: "SABnzbd", version: "4.4.0" },
         });
         expect(safeFetch).toHaveBeenCalledTimes(1);
         const [requestUrl] = safeFetch.mock.calls[0] as [string];

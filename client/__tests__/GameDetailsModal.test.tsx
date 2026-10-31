@@ -7,6 +7,7 @@ import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import GameDetailsModal from "../src/components/GameDetailsModal";
 import { Toaster } from "@/components/ui/toaster";
+import { setInterfaceLanguage } from "@/lib/interface-locale";
 
 // Mocking external dependencies
 vi.mock("socket.io-client", () => ({
@@ -221,7 +222,12 @@ const renderComponent = (game = mockGame) => {
 describe("GameDetailsModal", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    setInterfaceLanguage("en");
     (global.fetch as ReturnType<typeof vi.fn>).mockImplementation(makeFetchMock());
+  });
+
+  afterEach(() => {
+    setInterfaceLanguage("en");
   });
 
   it("renders game details correctly", () => {
@@ -994,6 +1000,51 @@ describe("GameDetailsModal", () => {
         expect(screen.getByText("Aborted")).toBeInTheDocument();
         expect(
           screen.getByText("Aborted, cannot be completed - https://sabnzbd.org/not-complete")
+        ).toBeInTheDocument();
+      });
+    });
+
+    it("localizes fixed persisted errors and keeps downloader errors in English fallback", async () => {
+      setInterfaceLanguage("es");
+      const downloads = [
+        {
+          id: "dl-fixed-error",
+          downloadTitle: "Test Game-SKIDROW",
+          status: "failed",
+          downloadType: "torrent",
+          downloaderName: "qBittorrent",
+          fileSize: null,
+          downloadHash: "fixed-error",
+          errorMessage: "Could not resolve game",
+        },
+        {
+          id: "dl-runtime-error",
+          downloadTitle: "Other Game-SKIDROW",
+          status: "failed",
+          downloadType: "torrent",
+          downloaderName: "qBittorrent",
+          fileSize: null,
+          downloadHash: "runtime-error",
+          errorMessage: "Connection refused by qBittorrent at 10.0.0.7",
+        },
+      ];
+      const qc = createQueryClient();
+      qc.setQueryData(["/api/games/1/downloads"], downloads);
+      (global.fetch as ReturnType<typeof vi.fn>).mockImplementation(
+        makeFetchMock({ "/api/games/1/downloads": downloads })
+      );
+
+      render(
+        <QueryClientProvider client={qc}>
+          <GameDetailsModal game={mockGame} open={true} onOpenChange={() => {}} />
+          <Toaster />
+        </QueryClientProvider>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText("No se pudo encontrar el juego")).toBeInTheDocument();
+        expect(
+          screen.getByText("Connection refused by qBittorrent at 10.0.0.7")
         ).toBeInTheDocument();
       });
     });

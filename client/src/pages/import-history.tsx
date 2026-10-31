@@ -36,8 +36,11 @@ function StatusBadge({ status }: { status: string }) {
     return (
       <Badge className="bg-emerald-900/40 text-emerald-400 border-emerald-700/50 gap-1">
         <CheckCircle className="w-3 h-3" aria-hidden="true" />
-        <span lang={languageFor("Completed")} dir={directionFor("Completed")}>
-          {t("Completed")}
+        <span
+          lang={languageFor("interface.completed_ec88aab2")}
+          dir={directionFor("interface.completed_ec88aab2")}
+        >
+          {t("interface.completed_ec88aab2")}
         </span>
       </Badge>
     );
@@ -46,8 +49,11 @@ function StatusBadge({ status }: { status: string }) {
     return (
       <Badge className="bg-amber-900/40 text-amber-400 border-amber-700/50 gap-1">
         <AlertTriangle className="w-3 h-3" aria-hidden="true" />
-        <span lang={languageFor("With errors")} dir={directionFor("With errors")}>
-          {t("With errors")}
+        <span
+          lang={languageFor("interface.with_errors_58377360")}
+          dir={directionFor("interface.with_errors_58377360")}
+        >
+          {t("interface.with_errors_58377360")}
         </span>
       </Badge>
     );
@@ -56,8 +62,11 @@ function StatusBadge({ status }: { status: string }) {
     return (
       <Badge className="bg-red-900/40 text-red-400 border-red-700/50 gap-1">
         <XCircle className="w-3 h-3" aria-hidden="true" />
-        <span lang={languageFor("Failed")} dir={directionFor("Failed")}>
-          {t("Failed")}
+        <span
+          lang={languageFor("interface.failed_5579c3d4")}
+          dir={directionFor("interface.failed_5579c3d4")}
+        >
+          {t("interface.failed_5579c3d4")}
         </span>
       </Badge>
     );
@@ -66,8 +75,11 @@ function StatusBadge({ status }: { status: string }) {
     return (
       <Badge className="bg-blue-900/40 text-blue-400 border-blue-700/50 gap-1">
         <Loader2 className="w-3 h-3 animate-spin" aria-hidden="true" />
-        <span lang={languageFor("In progress")} dir={directionFor("In progress")}>
-          {t("In progress")}
+        <span
+          lang={languageFor("interface.in_progress_2948b425")}
+          dir={directionFor("interface.in_progress_2948b425")}
+        >
+          {t("interface.in_progress_2948b425")}
         </span>
       </Badge>
     );
@@ -75,8 +87,11 @@ function StatusBadge({ status }: { status: string }) {
   return (
     <Badge className="bg-slate-800 text-slate-400 border-slate-700 gap-1">
       <Clock className="w-3 h-3" aria-hidden="true" />
-      <span lang={languageFor("Pending")} dir={directionFor("Pending")}>
-        {t("Pending")}
+      <span
+        lang={languageFor("interface.pending_3352afdc")}
+        dir={directionFor("interface.pending_3352afdc")}
+      >
+        {t("interface.pending_3352afdc")}
       </span>
     </Badge>
   );
@@ -178,10 +193,10 @@ export default function ImportHistoryPage() {
         <ClipboardList className="w-5 h-5 text-blue-400" aria-hidden="true" />
         <h1
           className="text-xl font-semibold text-white"
-          lang={languageFor("Import History")}
-          dir={directionFor("Import History")}
+          lang={languageFor("navigation.import_history")}
+          dir={directionFor("navigation.import_history")}
         >
-          {t("Import History")}
+          {t("navigation.import_history")}
         </h1>
       </div>
 
@@ -191,10 +206,10 @@ export default function ImportHistoryPage() {
             <ClipboardList className="w-10 h-10 mb-3 opacity-30" aria-hidden="true" />
             <p
               className="text-sm"
-              lang={languageFor("No import tasks yet")}
-              dir={directionFor("No import tasks yet")}
+              lang={languageFor("interface.no_import_tasks_yet_088e5dff")}
+              dir={directionFor("interface.no_import_tasks_yet_088e5dff")}
             >
-              {t("No import tasks yet")}
+              {t("interface.no_import_tasks_yet_088e5dff")}
             </p>
           </div>
         ) : (
@@ -202,31 +217,31 @@ export default function ImportHistoryPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[#374151]/40 bg-[#111827]">
-                  <th className="text-left px-4 py-3 text-slate-400 font-medium">
+                  <th className="text-start px-4 py-3 text-slate-400 font-medium">
                     {header("Type")}
                   </th>
-                  <th className="text-left px-4 py-3 text-slate-400 font-medium">
+                  <th className="text-start px-4 py-3 text-slate-400 font-medium">
                     {header("Triggered by")}
                   </th>
-                  <th className="text-left px-4 py-3 text-slate-400 font-medium">
+                  <th className="text-start px-4 py-3 text-slate-400 font-medium">
                     {header("Status")}
                   </th>
-                  <th className="text-left px-4 py-3 text-slate-400 font-medium">
+                  <th className="text-start px-4 py-3 text-slate-400 font-medium">
                     {header("Started")}
                   </th>
-                  <th className="text-left px-4 py-3 text-slate-400 font-medium">
+                  <th className="text-start px-4 py-3 text-slate-400 font-medium">
                     {header("Created")}
                   </th>
-                  <th className="text-left px-4 py-3 text-slate-400 font-medium">
+                  <th className="text-start px-4 py-3 text-slate-400 font-medium">
                     {header("Duration")}
                   </th>
-                  <th className="text-right px-4 py-3 text-slate-400 font-medium">
+                  <th className="text-end px-4 py-3 text-slate-400 font-medium">
                     {header("Added")}
                   </th>
-                  <th className="text-right px-4 py-3 text-slate-400 font-medium">
+                  <th className="text-end px-4 py-3 text-slate-400 font-medium">
                     {header("Skipped")}
                   </th>
-                  <th className="text-right px-4 py-3 text-slate-400 font-medium">
+                  <th className="text-end px-4 py-3 text-slate-400 font-medium">
                     {header("Failed")}
                   </th>
                 </tr>
@@ -283,9 +298,9 @@ export default function ImportHistoryPage() {
                     <td className="px-4 py-3 text-slate-400 text-xs">
                       {formatDuration(task.startedAt, task.completedAt)}
                     </td>
-                    <td className="px-4 py-3 text-right text-emerald-400">{task.addedItems}</td>
-                    <td className="px-4 py-3 text-right text-slate-400">{task.skippedItems}</td>
-                    <td className="px-4 py-3 text-right text-red-400">{task.failedItems}</td>
+                    <td className="px-4 py-3 text-end text-emerald-400">{task.addedItems}</td>
+                    <td className="px-4 py-3 text-end text-slate-400">{task.skippedItems}</td>
+                    <td className="px-4 py-3 text-end text-red-400">{task.failedItems}</td>
                   </tr>
                 ))}
               </tbody>
@@ -295,7 +310,7 @@ export default function ImportHistoryPage() {
       </div>
 
       <Sheet open={!!selectedTaskId} onOpenChange={(open) => !open && setSelectedTaskId(null)}>
-        <SheetContent className="w-full sm:max-w-xl bg-[#111827] border-l border-[#374151]/40 overflow-y-auto">
+        <SheetContent className="w-full sm:max-w-xl bg-[#111827] border-s border-[#374151]/40 overflow-y-auto">
           <SheetHeader className="mb-4">
             <SheetTitle className="text-white">
               {selectedTask ? (
@@ -312,8 +327,11 @@ export default function ImportHistoryPage() {
                   </span>
                 )
               ) : (
-                <span lang={languageFor("Task detail")} dir={directionFor("Task detail")}>
-                  {t("Task detail")}
+                <span
+                  lang={languageFor("interface.task_detail_ad64fa95")}
+                  dir={directionFor("interface.task_detail_ad64fa95")}
+                >
+                  {t("interface.task_detail_ad64fa95")}
                 </span>
               )}
             </SheetTitle>
@@ -336,15 +354,11 @@ export default function ImportHistoryPage() {
                 <StatusBadge status={selectedTask.status} />
                 <span
                   className="text-xs text-slate-500"
-                  lang={languageFor(
-                    "{total} total · {added} added · {skipped} skipped · {failed} failed"
-                  )}
-                  dir={directionFor(
-                    "{total} total · {added} added · {skipped} skipped · {failed} failed"
-                  )}
+                  lang={languageFor("interface.total_total_added_added_skipped_sk_21cf07a0")}
+                  dir={directionFor("interface.total_total_added_added_skipped_sk_21cf07a0")}
                 >
                   {formatInterfaceMessage(
-                    "{total} total · {added} added · {skipped} skipped · {failed} failed",
+                    "interface.total_total_added_added_skipped_sk_21cf07a0",
                     {
                       total: selectedTask.totalItems,
                       added: selectedTask.addedItems,
@@ -365,10 +379,10 @@ export default function ImportHistoryPage() {
               {selectedTask.items.length === 0 ? (
                 <p
                   className="text-sm text-slate-500"
-                  lang={languageFor("No item-level detail available.")}
-                  dir={directionFor("No item-level detail available.")}
+                  lang={languageFor("interface.no_item_level_detail_available_8d5ef01e")}
+                  dir={directionFor("interface.no_item_level_detail_available_8d5ef01e")}
                 >
-                  {t("No item-level detail available.")}
+                  {t("interface.no_item_level_detail_available_8d5ef01e")}
                 </p>
               ) : (
                 <div className="space-y-1">

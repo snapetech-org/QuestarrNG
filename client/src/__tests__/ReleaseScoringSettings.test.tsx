@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import ReleaseScoringSettings from "@/components/ReleaseScoringSettings";
 import type { UserSettings } from "@shared/schema";
 import { BUILT_IN_RULES, DEFAULT_RELEASE_PROFILE } from "@shared/release-scoring";
+import { setInterfaceLanguage } from "@/lib/interface-locale";
 
 const mockState = vi.hoisted(() => ({
   apiRequest: vi.fn(),
@@ -17,19 +18,6 @@ const mockState = vi.hoisted(() => ({
 
 vi.mock("@/lib/queryClient", () => ({ apiRequest: mockState.apiRequest }));
 vi.mock("@/hooks/use-toast", () => ({ useToast: () => ({ toast: mockState.toast }) }));
-vi.mock("@/components/InterfaceText", () => ({
-  InterfaceText: ({ source }: { source: string }) => source,
-}));
-vi.mock("@/lib/interface-locale", () => ({
-  useInterfaceLanguage: () => ({
-    language: "en",
-    t: (value: string) => value,
-    languageFor: () => "en",
-    directionFor: () => "ltr",
-  }),
-  formatInterfaceMessage: (source: string, values: Record<string, string>) =>
-    source.replace(/\{(\w+)\}/g, (_match, key: string) => values[key] ?? ""),
-}));
 vi.mock("@shared/release-scoring", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@shared/release-scoring")>();
   mockState.validateSavedReleaseScoringConfig.mockImplementation((raw: unknown) =>
@@ -62,6 +50,7 @@ function renderSettings(settings?: UserSettings) {
 describe("ReleaseScoringSettings", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    setInterfaceLanguage("en");
     mockState.forceInvalid = false;
     mockState.apiRequest.mockResolvedValue({ json: async () => ({ ok: true }) });
   });

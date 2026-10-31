@@ -198,7 +198,7 @@ export function NotificationCenter() {
           >
             <Bell className="h-5 w-5" />
             {unreadCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-600 animate-pulse" />
+              <span className="absolute top-1.5 end-1.5 h-2 w-2 rounded-full bg-red-600 animate-pulse" />
             )}
           </Button>
         </PopoverTrigger>

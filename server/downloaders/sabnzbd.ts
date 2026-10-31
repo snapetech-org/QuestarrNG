@@ -1,3 +1,4 @@
+import { serviceMessage } from "../../shared/service-messages.js";
 import type { Downloader, DownloadStatus, DownloadDetails } from "../../shared/schema.js";
 import { resolveArchivePassword } from "../../shared/archive-password.js";
 import { downloadersLogger } from "../logger.js";
@@ -174,7 +175,13 @@ export class SABnzbdClient implements DownloaderClient {
     try {
       const data = await this.getVersionInfo();
       if (data.version) {
-        return { success: true, message: `Connected to SABnzbd v${data.version}` };
+        return {
+          success: true,
+          ...serviceMessage("service.connected_version", {
+            client: "SABnzbd",
+            version: String(data.version),
+          }),
+        };
       }
 
       return { success: false, message: "Invalid SABnzbd response - missing version field" };
@@ -184,7 +191,11 @@ export class SABnzbdClient implements DownloaderClient {
       downloadersLogger.error({ error, url: baseUrl }, "SABnzbd connection test failed");
       return {
         success: false,
-        message: `Failed to connect to SABnzbd at ${baseUrl}: ${errorMessage}`,
+        ...serviceMessage("service.connection_failed_at", {
+          client: "SABnzbd",
+          url: baseUrl,
+          error: errorMessage,
+        }),
       };
     }
   }

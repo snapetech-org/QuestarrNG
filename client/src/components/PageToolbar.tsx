@@ -87,13 +87,13 @@ export default function PageToolbar({
       >
         {hasSearch && (
           <div className="relative h-10 flex-1 min-w-0 sm:h-8 sm:flex-initial sm:min-w-[220px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
             <Input
               type="text"
               value={search ?? ""}
               onChange={(e) => onSearchChange?.(e.target.value)}
               placeholder={t(searchPlaceholder)}
-              className="h-10 pl-9 pr-8 text-sm sm:h-8"
+              className="h-10 ps-9 pe-8 text-sm sm:h-8"
               aria-label={t(searchPlaceholder)}
               lang={search ? "und" : (searchLang ?? languageFor(searchPlaceholder))}
               dir={inputSearchDir}
@@ -103,7 +103,7 @@ export default function PageToolbar({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2 p-0 hover:bg-transparent sm:h-6 sm:w-6 no-default-hover-elevate no-default-active-elevate"
+                className="absolute end-1 top-1/2 h-8 w-8 -translate-y-1/2 p-0 hover:bg-transparent sm:h-6 sm:w-6 no-default-hover-elevate no-default-active-elevate"
                 onClick={() => onSearchChange?.("")}
                 aria-label={t(searchClearLabel)}
                 lang={searchClearLang ?? languageFor(searchClearLabel)}
@@ -137,10 +137,10 @@ export default function PageToolbar({
             <div className="flex flex-1 items-center gap-1.5 md:flex-initial">
               <span
                 className="text-xs text-muted-foreground hidden sm:inline"
-                lang={languageFor("Sort")}
-                dir={directionFor("Sort")}
+                lang={languageFor("interface.sort_8459a7f1")}
+                dir={directionFor("interface.sort_8459a7f1")}
               >
-                {t("Sort")}
+                {t("interface.sort_8459a7f1")}
               </span>
               <Select
                 {...(sortValue !== undefined ? { value: sortValue } : {})}

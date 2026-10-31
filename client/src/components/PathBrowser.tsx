@@ -162,7 +162,7 @@ export function PathBrowser({
                 {data?.parent && (
                   <button
                     type="button"
-                    className="flex items-center gap-2 p-2 w-full text-left hover:bg-accent rounded-sm cursor-pointer select-none"
+                    className="flex items-center gap-2 p-2 w-full text-start hover:bg-accent rounded-sm cursor-pointer select-none"
                     onClick={() => data.parent && handleNavigate(data.parent.path)}
                   >
                     <ArrowUp className="h-4 w-4 text-muted-foreground" />
@@ -173,7 +173,7 @@ export function PathBrowser({
                   <button
                     type="button"
                     key={file.name}
-                    className={`flex items-center gap-2 p-2 w-full text-left rounded-sm cursor-pointer select-none ${
+                    className={`flex items-center gap-2 p-2 w-full text-start rounded-sm cursor-pointer select-none ${
                       selectedPath === file.path
                         ? "bg-primary text-primary-foreground"
                         : "hover:bg-accent"
@@ -204,8 +204,8 @@ export function PathBrowser({
 
         <DialogFooter>
           <div className="flex justify-between w-full items-center pt-2">
-            <div className="text-xs text-muted-foreground truncate max-w-[300px] font-mono mr-2">
-              {selectedPath || <InterfaceText source="No file selected" />}
+            <div className="text-xs text-muted-foreground truncate max-w-[300px] font-mono me-2">
+              {selectedPath || <InterfaceText source="interface.no_file_selected_d1f08ab1" />}
             </div>
             <div className="gap-2 flex">
               <Button type="button" variant="outline" onClick={onClose}>

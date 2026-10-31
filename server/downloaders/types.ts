@@ -1,3 +1,4 @@
+import type { ServiceMessageMetadata } from "../../shared/service-messages.js";
 import type { DownloadStatus, DownloadDetails } from "../../shared/schema.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -15,7 +16,7 @@ export interface DownloadRequest {
   password?: string;
 }
 
-export interface DownloaderActionResult {
+export interface DownloaderActionResult extends ServiceMessageMetadata {
   success: boolean;
   message: string;
 }
