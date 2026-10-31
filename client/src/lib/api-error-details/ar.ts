@@ -66,7 +66,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "A root folder with this path already exists": "يوجد مجلد جذري بهذا المسار بالفعل",
   "Path is not accessible": "يتعذر الوصول إلى المسار",
   "Failed to create root folder": "تعذر إنشاء المجلد الجذري",
-  "Another root folder already uses this path": "تستخدم مجلدات جذرية أخرى هذا المسار بالفعل",
+  "Another root folder already uses this path": "يوجد مجلد جذري آخر يستخدم هذا المسار بالفعل",
   "Root folder not found": "لم يتم العثور على المجلد الجذري",
   "Failed to update root folder": "تعذر تحديث المجلد الجذري",
   "Failed to delete root folder": "تعذر حذف المجلد الجذري",
@@ -134,7 +134,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "This SeerrNG request was cancelled and cannot accept a download.":
     "تم إلغاء طلب SeerrNG هذا ولا يمكنه قبول تنزيل.",
   "Another acquisition or cancellation operation is in progress.":
-    "هناك عملية اكتساب أو إلغاء أخرى قيد التنفيذ.",
+    "هناك عملية أخرى للحصول على اللعبة أو إلغاء الطلب قيد التنفيذ.",
   "Download could not be started": "تعذر بدء التنزيل",
   "No downloads provided": "لم يتم تقديم أي تنزيلات",
   "Failed to fetch notifications": "تعذر جلب الإشعارات",

@@ -33,7 +33,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Invalid 'port' value": "'port'の値が正しくありません",
   "Invalid certificate or key path": "証明書または鍵のパスが正しくありません",
   "Access to cert path is not allowed": "証明書のパスへのアクセスは許可されていません",
-  "Access to key path is not allowed": "鍵のパスへのアクセスは許可されていません",
+  "Access to key path is not allowed": "秘密鍵のパスへのアクセスは許可されていません",
   "Certificate and key paths are required to enable SSL":
     "SSLを有効にするには証明書と鍵のパスが必要です",
   "Failed to update SSL settings": "SSL設定を更新できませんでした",
