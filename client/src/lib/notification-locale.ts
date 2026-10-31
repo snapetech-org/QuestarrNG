@@ -334,7 +334,7 @@ const LABELS: Record<NotificationLabelKey, readonly string[]> = {
   ],
   "Content Available": [
     "Contenido disponible",
-    "内容已推出",
+    "内容已可用",
     "सामग्री उपलब्ध है",
     "Inhalt verfügbar",
     "コンテンツが利用可能",
@@ -342,7 +342,7 @@ const LABELS: Record<NotificationLabelKey, readonly string[]> = {
     "Conteúdo disponível",
     "المحتوى متاح",
     "콘텐츠 이용 가능",
-    "內容已推出",
+    "內容已可用",
     "Đã có nội dung",
     "Konten tersedia",
   ],

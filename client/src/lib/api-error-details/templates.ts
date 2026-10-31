@@ -350,11 +350,11 @@ export const API_ERROR_DETAIL_TEMPLATES = {
     "{destination} に使える空き RomM 保存先が見つかりません",
     "Aucune destination RomM libre trouvée pour {destination}",
     "Não foi encontrado um destino RomM livre para {destination}",
-    "تعذر العثور على وجهة RomM فارغة لـ {destination}",
+    "تعذّر العثور على وجهة RomM متاحة لـ {destination}",
     "{destination}에 사용할 수 있는 RomM 대상이 없습니다",
     "找不到可供 {destination} 使用的空閒 RomM 目的地",
     "Không tìm thấy đích RomM trống cho {destination}",
-    "Tujuan RomM kosong untuk {destination} tidak ditemukan",
+    "Tidak ditemukan tujuan RomM yang tersedia untuk {destination}",
   ],
   "Archive contains too many entries (limit: {limit}).": [
     "El archivo comprimido contiene demasiadas entradas (límite: {limit}).",

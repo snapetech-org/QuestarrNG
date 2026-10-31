@@ -186,7 +186,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Failed to fetch RSS items": "تعذر جلب عناصر خلاصة RSS",
   "Failed to refresh RSS feeds": "تعذر تحديث خلاصات RSS",
   "Discord webhook not configured. Go to Settings → Services to set it up.":
-    "لم يتم إعداد خطاف Discord. انتقل إلى الإعدادات ← الخدمات لإعداده.",
+    "لم يتم إعداد Webhook الخاص بـ Discord. انتقل إلى الإعدادات ← الخدمات لإعداده.",
   "Invalid Discord webhook URL configured.": "عنوان URL لخطاف Discord المُعدّ غير صالح.",
   "No image data provided": "لم يتم تقديم بيانات الصورة",
   "Invalid image format. Only PNG, JPEG, GIF, and WebP are supported.":
