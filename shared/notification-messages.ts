@@ -47,7 +47,7 @@ export const MESSAGES: Record<MessageKey, readonly string[]> = {
     "Notifikasi uji dari Questarr",
   ],
   gameReleased: [
-    "¡{game} ya está a la venta!",
+    "¡{game} ya se ha lanzado!",
     "{game} 已发行！",
     "{game} जारी हो गया है!",
     "{game} ist erschienen!",
@@ -371,7 +371,7 @@ export const MESSAGES: Record<MessageKey, readonly string[]> = {
   errorOccurred: [
     "Questarr encontró un error inesperado. Selecciona para revisarlo y, si quieres, enviar un informe de diagnóstico para ayudar a corregirlo.",
     "Questarr 遇到意外错误。点击查看，并可选择发送诊断报告来协助修复问题。",
-    "Questarr में अप्रत्याशित त्रुटि हुई। इसकी समीक्षा करने और समस्या ठीक करने में मदद के लिए निदान रिपोर्ट भेजने हेतु क्लिक करें।",
+    "Questarr में अप्रत्याशित त्रुटि हुई। क्लिक करके इसकी समीक्षा करें और, यदि चाहें, तो समस्या ठीक करने में मदद के लिए निदान रिपोर्ट भेजें।",
     "Questarr ist auf einen unerwarteten Fehler gestoßen. Klicke hier, um ihn zu prüfen und bei Bedarf einen Diagnosebericht zur Fehlerbehebung zu senden.",
     "Questarr で予期しないエラーが発生しました。クリックして確認し、修正に役立つ診断レポートを送信するか選択してください。",
     "Questarr a rencontré une erreur inattendue. Cliquez pour l’examiner et, si vous le souhaitez, envoyer un rapport de diagnostic pour aider à la corriger.",

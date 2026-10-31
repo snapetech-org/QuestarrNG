@@ -188,10 +188,10 @@ const LOCALE_ORDER: readonly InterfaceLanguage[] = [
 ];
 
 function localizeApiErrorDetail(detail: string, language: InterfaceLanguage): string | undefined {
-  const localizedDetail = translateInterfaceLabel(detail, language);
-  if (localizedDetail !== detail) return localizedDetail;
   const localizedApiErrorDetail = getApiErrorDetailLabel(detail, language);
   if (localizedApiErrorDetail !== undefined) return localizedApiErrorDetail;
+  const localizedDetail = translateInterfaceLabel(detail, language);
+  if (localizedDetail !== detail) return localizedDetail;
   const importWrapper = detail.match(/^(Security alert|Password required|Import failed): (.+)$/);
   if (importWrapper?.[1] && importWrapper[2]) {
     const nestedDetail = localizeApiErrorDetail(importWrapper[2], language) ?? importWrapper[2];

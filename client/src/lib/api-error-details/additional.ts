@@ -304,7 +304,7 @@ const ADDITIONAL_API_ERROR_DETAIL_LABELS: Record<
   "No matching unmatched entry for this root folder": [
     "No hay ninguna entrada sin coincidencia para esta carpeta raíz",
     "此根目录没有匹配的未匹配条目",
-    "इस रूट फ़ोल्डर के लिए कोई मेल न खाने वाली प्रविष्टि नहीं है",
+    "इस रूट फ़ोल्डर की बिना मिलान वाली प्रविष्टियों में कोई मेल नहीं मिला",
     "Für diesen Stammordner gibt es keinen passenden nicht zugeordneten Eintrag",
     "このルートフォルダーに一致する未照合項目がありません",
     "Aucune entrée non associée correspondante pour ce dossier racine",
