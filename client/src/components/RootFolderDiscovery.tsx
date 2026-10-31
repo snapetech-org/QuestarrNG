@@ -384,7 +384,7 @@ export function RootFolderDiscovery() {
               source={
                 "and linked to their folder on disk, but that folder stays outside your library root — it is never moved, renamed, or deleted by Questarr unless you turn on"
               }
-            />
+            />{" "}
             <strong>
               <InterfaceText source={"Allow Delete"} />
             </strong>{" "}

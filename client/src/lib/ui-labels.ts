@@ -339,7 +339,7 @@ export const UI_LABELS = {
   "interface.date_time_and_number_format_d853f2cd": {
     es: "Fechas, horas y números",
     "zh-Hans": "日期、时间和数字格式",
-    hi: "तारीख, समय और संख्या",
+    hi: "तारीख, समय और संख्या प्रारूप",
     de: "Datum, Uhrzeit und Zahlen",
     ja: "日付・時刻・数値の表示形式",
     fr: "Dates, heures et nombres",
@@ -12020,7 +12020,7 @@ export const UI_LABELS = {
   "interface.created_0a16de56": {
     es: "· Creado",
     "zh-Hans": "已创建",
-    hi: "बनाना",
+    hi: "· बनाया गया",
     de: "· Erstellt",
     ja: "・作成",
     fr: "· Création",
@@ -12052,7 +12052,7 @@ export const UI_LABELS = {
   "interface.expires_a023da52": {
     es: "· Caduca",
     "zh-Hans": "过期",
-    hi: "· अनुभव",
+    hi: "· समाप्ति",
     de: "· Läuft ab",
     ja: "· 有効期限",
     fr: "· Expire",
@@ -12164,7 +12164,7 @@ export const UI_LABELS = {
   "interface.seeds_30df856b": {
     es: "• Semillas:",
     "zh-Hans": "• 做种者：",
-    hi: "• बीज:",
+    hi: "• सीडर:",
     de: "• Samen:",
     ja: "• シーダー:",
     fr: "• Graines:",
@@ -15094,7 +15094,7 @@ export const UI_LABELS = {
   "interface.control_which_events_create_notifi_716d0d76": {
     es: "Controlar qué eventos crean notificaciones y dónde se envían.",
     "zh-Hans": "控制哪些事件产生通知以及发送地点。",
-    hi: "कौन से कार्यक्रम अधिसूचनाएं बनाते हैं और वे कहाँ भेजे जाते हैं।",
+    hi: "तय करें कि कौन-सी घटनाएँ सूचनाएँ बनाएँ और वे कहाँ भेजी जाएँ।",
     de: "Kontrollieren Sie, welche Ereignisse Benachrichtigungen erstellen und wohin sie gesendet werden.",
     ja: "どのイベントが通知や送信先を生成するかを制御します。",
     fr: "Contrôler quels événements créent des notifications et où ils sont envoyés.",
@@ -15110,7 +15110,7 @@ export const UI_LABELS = {
   "interface.copy_api_key_950de65b": {
     es: "Copia clave de API",
     "zh-Hans": "复制 API 密钥",
-    hi: "कॉपी API कुंजी",
+    hi: "API कुंजी कॉपी करें",
     de: "API Schlüssel kopieren",
     ja: "APIキーのコピー",
     fr: "Copier la clé API",
@@ -15142,7 +15142,7 @@ export const UI_LABELS = {
   "interface.copy_support_code_73faae20": {
     es: "Copiar código de soporte",
     "zh-Hans": "复制支持代码",
-    hi: "समर्थन कोड",
+    hi: "समर्थन कोड कॉपी करें",
     de: "Kopierunterstützungscode",
     ja: "サポートコードのコピー",
     fr: "Copier le code de support",
@@ -15174,7 +15174,7 @@ export const UI_LABELS = {
   "interface.could_not_add_folder_39f33de8": {
     es: "No se pudo añadir la carpeta",
     "zh-Hans": "无法添加文件夹",
-    hi: "फ़ोल्डर जोड़ें नहीं",
+    hi: "फ़ोल्डर जोड़ा नहीं जा सका",
     de: "Kann keinen Ordner hinzufügen",
     ja: "フォルダを追加できません",
     fr: "Impossible d'ajouter un dossier",
@@ -15190,7 +15190,7 @@ export const UI_LABELS = {
   "interface.could_not_change_the_category_85f1741e": {
     es: "No se pudo cambiar la categoría",
     "zh-Hans": "无法更改类别",
-    hi: "श्रेणी को नहीं बदल सकता",
+    hi: "श्रेणी बदली नहीं जा सकी",
     de: "Kann die Kategorie nicht ändern",
     ja: "カテゴリを変更できません",
     fr: "Impossible de changer la catégorie",
@@ -15206,7 +15206,7 @@ export const UI_LABELS = {
   "interface.could_not_create_api_key_58ace79e": {
     es: "No se pudo crear la clave de API",
     "zh-Hans": "无法创建 API 密钥",
-    hi: "नहीं बना सकता API कुंजी",
+    hi: "API कुंजी नहीं बनाई जा सकी",
     de: "Kann keinen API-Schlüssel erstellen",
     ja: "APIキーを作成できません",
     fr: "Impossible de créer la clé API",
@@ -15222,7 +15222,7 @@ export const UI_LABELS = {
   "interface.could_not_link_real_debrid_be750164": {
     es: "No se pudo vincular Real-Debrid",
     "zh-Hans": "无法链接 Real-Debrid",
-    hi: "लिंक नहीं Real-Debrid",
+    hi: "Real-Debrid से लिंक नहीं हो सका",
     de: "Konnte Real-Debrid nicht verbinden",
     ja: "リンクできません Real-Debrid",
     fr: "Impossible de relier Real-Debrid",
@@ -15271,7 +15271,7 @@ export const UI_LABELS = {
   "interface.could_not_revoke_api_key_b29ba530": {
     es: "No podría revocar la clave de API",
     "zh-Hans": "无法撤销 API 密钥",
-    hi: "रद्द करना API कुंजी",
+    hi: "API कुंजी रद्द नहीं की जा सकी",
     de: "API-Schlüssel konnte nicht widerrufen werden",
     ja: "APIキーを無効化できませんでした",
     fr: "Impossible de révoquer la clé API",
@@ -15287,7 +15287,7 @@ export const UI_LABELS = {
   "interface.could_not_update_delete_permission_daf261d2": {
     es: "No se pudo actualizar el permiso de eliminación.",
     "zh-Hans": "无法更新删除权限。",
-    hi: "मिटाने की अनुमति अपडेट नहीं की जा सकी。",
+    hi: "मिटाने की अनुमति अपडेट नहीं की जा सकी।",
     de: "Die Löschberechtigung konnte nicht aktualisiert werden.",
     ja: "削除権限を更新できませんでした。",
     fr: "Impossible de mettre à jour l'autorisation de suppression.",
@@ -15415,7 +15415,7 @@ export const UI_LABELS = {
   "interface.create_a_webhook_in_your_discord_s_8c8899d7": {
     es: "Crear un Webhook en su servidor Discord bajo Configuración de Canal → Integraciónes.",
     "zh-Hans": "在您的 Discord 服务器中，前往频道设置 → 集成，创建一个 Webhook。",
-    hi: "अपने आप में एक वेबहुक बनाएँ Discord चैनल सेटिंग → एकीकरण के तहत सर्वर।",
+    hi: "अपने Discord सर्वर में चैनल सेटिंग → एकीकरण के तहत एक वेबहुक बनाएँ।",
     de: "Erstellen Sie einen Webhook in Ihrem Discord-Server unter Channel Settings → Integrations.",
     ja: "チャンネル設定→インテグレーションでDiscordサーバーでwebhookを作成します。",
     fr: "Créez un webhook dans votre serveur Discord sous Paramètres du canal → Intégrations.",
@@ -15432,7 +15432,7 @@ export const UI_LABELS = {
   "interface.create_github_issue_45ec6e6f": {
     es: "Crear un problema GitHub",
     "zh-Hans": "创建 GitHub 问题",
-    hi: "GitHub मुद्दा",
+    hi: "GitHub इश्यू बनाएँ",
     de: "GitHub-Problem erstellen",
     ja: "GitHub の作成",
     fr: "Créer un problème GitHub",
@@ -15496,7 +15496,7 @@ export const UI_LABELS = {
   "interface.creating_12186874": {
     es: "Creando...",
     "zh-Hans": "正在创建...",
-    hi: "बनाना",
+    hi: "बनाया जा रहा है...",
     de: "Erstellen...",
     ja: "作成中…",
     fr: "Création...",
@@ -15755,7 +15755,7 @@ export const UI_LABELS = {
   "interface.deluge_44f0cba1": {
     es: "Deluge",
     "zh-Hans": "Deluge",
-    hi: "डेल्ज",
+    hi: "Deluge",
     de: "Deluge",
     ja: "デルジュ",
     fr: "Deluge",
@@ -16142,7 +16142,7 @@ export const UI_LABELS = {
   "interface.download_failed_6e2ce5d6": {
     es: "Descarga fallida",
     "zh-Hans": "下载失败",
-    hi: "असफल",
+    hi: "डाउनलोड असफल रहा",
     de: "Download fehlgeschlagen",
     ja: "ダウンロード失敗",
     fr: "Le téléchargement a échoué",
@@ -16446,7 +16446,7 @@ export const UI_LABELS = {
   "interface.downloads_not_yet_tracked_by_quest_89a25310": {
     es: "Descargas todavía no rastreadas por Questarr, agrupadas por juego. Seleccione un juego para cada uno para vincularlos.",
     "zh-Hans": "尚未被Questarr跟踪的下载,按游戏分组. 选择每个游戏来链接它们。",
-    hi: "डाउनलोड अभी तक ट्रैक नहीं Questarr, खेल द्वारा समूहित। प्रत्येक के लिए उन्हें जोड़ने के लिए एक खेल का चयन करें।",
+    hi: "डाउनलोड अभी तक Questarr द्वारा ट्रैक नहीं किए गए हैं, खेल के अनुसार समूहित। उन्हें जोड़ने के लिए प्रत्येक के लिए एक खेल का चयन करें।",
     de: "Downloads noch nicht von Questarr verfolgt, gruppiert nach Spiel. Wählen Sie ein Spiel für jeden, um sie zu verknüpfen.",
     ja: "Questarrによってまだ追跡されていないダウンロード, ゲームによってグループ化. 各ゲームを選択してリンクします。",
     fr: "Téléchargements non encore suivis par Questarr, regroupés par jeu. Sélectionnez un jeu pour chaque lien.",
@@ -16753,7 +16753,7 @@ export const UI_LABELS = {
   "interface.enter_api_key_2b85154e": {
     es: "Introduzca clave API",
     "zh-Hans": "输入 API 密钥",
-    hi: "प्रवेश API कुंजी",
+    hi: "API कुंजी दर्ज करें",
     de: "API-Schlüssel eingeben",
     ja: "API キーの入力",
     fr: "Saisissez la clé API",
@@ -16785,7 +16785,7 @@ export const UI_LABELS = {
   "interface.enter_prowlarr_api_key_914cef27": {
     es: "Introduzca la clave de API de Prowlarr",
     "zh-Hans": "输入 Prowlarr API 密钥",
-    hi: "Prowlarr API कुंजी",
+    hi: "Prowlarr API कुंजी दर्ज करें",
     de: "Geben Sie Prowlarr API Key ein",
     ja: "Prowlarr API キーを入力してください",
     fr: "Saisissez la clé d'API Prowlarr",
@@ -16801,7 +16801,7 @@ export const UI_LABELS = {
   "interface.enter_sabnzbd_api_key_dc26dafe": {
     es: "Introduzca la clave de API SABnzbd",
     "zh-Hans": "输入 SABnzbd API 密钥",
-    hi: "SABnzbd API कुंजी",
+    hi: "SABnzbd API कुंजी दर्ज करें",
     de: "Geben Sie den SABnzbd API-Schlüssel ein",
     ja: "SABnzbd API キーを入力してください",
     fr: "Saisissez la touche API SABnzbd",
@@ -16833,7 +16833,7 @@ export const UI_LABELS = {
   "interface.enter_your_api_key_db5e361b": {
     es: "Introduzca su clave API",
     "zh-Hans": "输入您的 API 密钥",
-    hi: "प्रवेश API कुंजी",
+    hi: "अपनी API कुंजी दर्ज करें",
     de: "Geben Sie Ihren API Key ein",
     ja: "APIキーを入力してください",
     fr: "Saisissez votre clé API",
@@ -16897,7 +16897,7 @@ export const UI_LABELS = {
   "interface.enter_your_steamid64_to_sync_your_3ec224b1": {
     es: "Introduzca su SteamID64 para sincronizar su lista de deseos. Puedes encontrarlo.",
     "zh-Hans": "输入您的 SteamID64 以同步愿望单。您可以在以下网站找到它：",
-    hi: "प्रवेश SteamID64 अपनी इच्छा सूची को सिंक करने के लिए। आप इसे देख सकते हैं",
+    hi: "अपनी इच्छा सूची को सिंक करने के लिए अपना SteamID64 दर्ज करें। आप इसे यहां पा सकते हैं:",
     de: "Geben Sie Ihre SteamID64 ein, um Ihre Wunschliste zu synchronisieren. Sie finden es auf",
     ja: "SteamID64を入力してウィッシュリストを同期してください。SteamID64は次のページで確認できます：",
     fr: "Entrez votre SteamID64 pour synchroniser votre wishlist. Vous pouvez le trouver sur",
@@ -16977,7 +16977,7 @@ export const UI_LABELS = {
   "interface.error_detected_349a58c5": {
     es: "Error detectado",
     "zh-Hans": "检测出错误",
-    hi: "त्रुटि का पता लगाना",
+    hi: "त्रुटि का पता चला",
     de: "Fehler erkannt",
     ja: "検出される間違い",
     fr: "Erreur détectée",
@@ -17121,7 +17121,7 @@ export const UI_LABELS = {
   "interface.exit_to_questarr_75ef9e6b": {
     es: "Salida a Questarr",
     "zh-Hans": "退出到 Questarr",
-    hi: "बाहर निकलें Questarr",
+    hi: "Questarr पर वापस जाएं",
     de: "Ausfahrt nach Questarr",
     ja: "Questarr への出口",
     fr: "Sortie vers Questarr",
@@ -17153,7 +17153,7 @@ export const UI_LABELS = {
   "interface.experimental_feature_behavior_and_c81027bd": {
     es: "Función experimental: el comportamiento y los resultados pueden cambiar entre versiones",
     "zh-Hans": "实验性功能：行为和结果可能会在版本之间发生变化",
-    hi: "अनुभवजन्य विशेषता: व्यवहार और परिणाम रिलीज के बीच बदल सकते हैं",
+    hi: "प्रायोगिक विशेषता: व्यवहार और परिणाम रिलीज़ के बीच बदल सकते हैं",
     de: "Experimentelles Merkmal: Verhalten und Ergebnisse können sich zwischen den Releases ändern",
     ja: "実験的特徴: 動作と結果はリリース間で変化する可能性があります",
     fr: "Caractéristiques expérimentales : le comportement et les résultats peuvent changer entre les versions",
@@ -17835,7 +17835,7 @@ export const UI_LABELS = {
   "interface.fetching_report_details_2356b693": {
     es: "Obtener detalles del informe",
     "zh-Hans": "获取报告细节",
-    hi: "Fetching Report विवरण",
+    hi: "रिपोर्ट विवरण प्राप्त किया जा रहा है",
     de: "Angaben zum Abrufbericht",
     ja: "レポートの詳細の取得",
     fr: "Récupération des détails du rapport",
@@ -17979,7 +17979,7 @@ export const UI_LABELS = {
   "interface.filtered_to_games_only_master_game_929b86c8": {
     es: "Filtrado a juegos solamente (master_game). Datos de",
     "zh-Hans": "已筛选为仅游戏 (master_game)。数据来自",
-    hi: "केवल खेलों के लिए फ़िल्टर्ड (master game). डेटा से",
+    hi: "केवल गेम (master_game) तक फ़िल्टर किया गया। डेटा स्रोत:",
     de: "Gefiltert nur nach Spielen (master game). Daten aus",
     ja: "ゲームのみにフィルタリング(master game)。 データから",
     fr: "Filtré aux jeux uniquement (master_game). Données de",
@@ -18030,7 +18030,7 @@ export const UI_LABELS = {
   "interface.for_directory_imports_place_detect_2a0f3d16": {
     es: "Para las importaciones de directorios, coloca el DLC, las actualizaciones y los extras detectados en",
     "zh-Hans": "对于目录导入，请将检测到的 DLC、更新和附加内容放置在",
-    hi: "निर्देशिका आयात के लिए, जगह में डीएलसी, अद्यतन और अतिरिक्त पता चला",
+    hi: "निर्देशिका आयात में मिले DLC, अपडेट और अतिरिक्त सामग्री को इन उपफ़ोल्डरों में रखें:",
     de: "Bei Verzeichnisimporten können Sie DLC, Updates und Extras in",
     ja: "ディレクトリのインポート、検出された DLC の場所、更新および余分のために",
     fr: "Pour les importations de répertoire, placer DLC détecté, mises à jour et extras dans",
@@ -18048,7 +18048,7 @@ export const UI_LABELS = {
     es: "para esa carpeta abajo. Con él desactivado (el valor predeterminado), al eliminar un juego con sus archivos se omitirá cualquier cosa descubierta aquí.",
     "zh-Hans":
       "下面的文件夹。 由于它关闭( 默认) , 删除一个带有文件的游戏会跳过在此发现的任何东西 。",
-    hi: "को उस फ़ोल्डर के लिए चालू करते हैं। इसे बंद रखने पर (डिफ़ॉल्ट रूप से), गेम और उसकी फ़ाइलें हटाते समय यहाँ खोजी गई कोई भी चीज़ नहीं हटाई जाएगी।",
+    hi: "विकल्प को चालू नहीं करते। इसे बंद रखने पर (डिफ़ॉल्ट रूप से), गेम और उसकी फ़ाइलें हटाते समय यहाँ खोजी गई कोई भी चीज़ नहीं हटाई जाएगी।",
     de: "Für diesen Ordner unten. Wenn es ausgeschaltet ist (der Standard), überspringt das Entfernen eines Spiels mit seinen Dateien alles, was hier entdeckt wurde.",
     ja: "をそのフォルダーに対して有効にした場合を除きます。無効のまま（既定）の場合、ゲームとファイルを削除するとき、ここで検出された項目は削除対象から除外されます。",
     fr: "pour ce dossier ci-dessous. Si cette option reste désactivée (par défaut), les éléments trouvés ici ne seront pas supprimés lorsque vous supprimerez un jeu avec ses fichiers.",
@@ -18488,7 +18488,7 @@ export const UI_LABELS = {
   "interface.generate_a_self_signed_certificate_0cfb613b": {
     es: "Genera un certificado auto-firmado si no tienes uno.",
     "zh-Hans": "如果没有证书，请生成自签名证书。",
-    hi: "यदि आपके पास कोई अधिकार नहीं है, तो एक स्व-signed प्रमाणपत्र उत्पन्न करें।",
+    hi: "यदि आपके पास कोई प्रमाणपत्र नहीं है, तो एक स्व-हस्ताक्षरित प्रमाणपत्र बनाएं।",
     de: "Generieren Sie ein selbstsigniertes Zertifikat, wenn Sie keins haben.",
     ja: "自己署名証明書を 1 つを持っていない場合は生成します。",
     fr: "Générer un certificat autosigné si vous n'en avez pas.",
@@ -18504,7 +18504,7 @@ export const UI_LABELS = {
   "interface.generate_self_signed_certificate_e87bee34": {
     es: "Generar certificado autofirmado",
     "zh-Hans": "生成自签名证书",
-    hi: "जनरेट स्व-Signed प्रमाणपत्र",
+    hi: "स्व-हस्ताक्षरित प्रमाणपत्र बनाएं",
     de: "Generieren Sie ein selbstsigniertes Zertifikat",
     ja: "自己署名証明書を生成",
     fr: "Générer un certificat auto-signé",
@@ -18617,7 +18617,7 @@ export const UI_LABELS = {
     es: "El repositorio de GitHub solo será visible para el responsable de Questarr y se marcará como un informe de telemetría automático para distinguirlo claramente de los informes enviados manualmente. Recibirás el número de incidencia como código de soporte.",
     "zh-Hans":
       "GitHub 仓库仅对 Questarr 维护者可见，并会标记为自动遥测报告，以便与手动提交的报告明确区分。你会收到一个 GitHub issue 编号作为支持代码。",
-    hi: "GitHub रिपॉज़िटरी केवल Questarr के अनुरक्षक को दिखाई देगी। इसे स्वचालित टेलीमेट्री रिपोर्ट के रूप में चिह्नित किया जाएगा, ताकि यह हाथ से भेजी गई रिपोर्ट से स्पष्ट रूप से अलग हो। सहायता कोड के रूप में आपको GitHub issue नंबर मिलेगा।",
+    hi: "GitHub रिपॉज़िटरी केवल Questarr के अनुरक्षक को दिखाई देगी। रिपोर्ट को स्वचालित टेलीमेट्री रिपोर्ट के रूप में चिह्नित किया जाएगा, ताकि यह हाथ से भेजी गई रिपोर्ट से स्पष्ट रूप से अलग हो। सहायता कोड के रूप में आपको GitHub इश्यू नंबर मिलेगा।",
     de: "Das GitHub-Repository ist nur für die Questarr-Verantwortlichen sichtbar und wird als automatischer Telemetriebericht gekennzeichnet, damit es klar von manuell eingereichten Berichten zu unterscheiden ist. Du erhältst eine GitHub-Issue-Nummer als Supportcode.",
     ja: "GitHub リポジトリは Questarr のメンテナーだけが閲覧できます。手動送信のレポートと明確に区別できるよう、自動テレメトリーレポートとしてマークされます。サポートコードとして GitHub Issue 番号が発行されます。",
     fr: "Le dépôt GitHub ne sera visible que par les responsables de Questarr et sera marqué comme rapport de télémétrie automatique afin de le distinguer clairement des rapports envoyés manuellement. Vous recevrez un numéro d’issue GitHub comme code d’assistance.",
@@ -18972,7 +18972,7 @@ export const UI_LABELS = {
   "interface.hide_api_key_7f76682e": {
     es: "Ocultar clave de API",
     "zh-Hans": "隐藏 API 密钥",
-    hi: "छुपाना API कुंजी",
+    hi: "API कुंजी छिपाएँ",
     de: "API Key ausblenden",
     ja: "API キーを隠す",
     fr: "Cacher la clé API",
@@ -19135,7 +19135,7 @@ export const UI_LABELS = {
   "interface.how_often_to_search_for_new_releas_c8e6b9e4": {
     es: "Frecuencia de búsqueda de nuevos lanzamientos (1-168 horas)",
     "zh-Hans": "搜索新发布资源的频率（1-168 小时）",
-    hi: "अक्सर नए रिलीज़ की खोज कैसे करें (1-168 घंटे)",
+    hi: "नए रिलीज़ की खोज कितनी बार करें (1-168 घंटे)",
     de: "Wie oft man nach neuen Releases sucht (1-168 Stunden)",
     ja: "新規リリースの検索頻度(1-168時間)",
     fr: "Combien de fois rechercher de nouvelles versions (1-168 heures)",
@@ -19682,7 +19682,7 @@ export const UI_LABELS = {
   "interface.indexer_added_successfully_bef98cbb": {
     es: "Indexador añadido con éxito",
     "zh-Hans": "成功添加索引器",
-    hi: "इंडेक्सर ने सफलतापूर्वक जोड़ा",
+    hi: "इंडेक्सर सफलतापूर्वक जोड़ा गया",
     de: "Indexer erfolgreich hinzugefügt",
     ja: "インデックスが正常に追加",
     fr: "Indexer ajouté avec succès",
@@ -19714,7 +19714,7 @@ export const UI_LABELS = {
   "interface.indexer_error_s_d4280d7e": {
     es: "error de indexador(s)",
     "zh-Hans": "索引器出错",
-    hi: "अनुक्रमणिका त्रुटि (s)",
+    hi: "इंडेक्सर त्रुटियां",
     de: "Indexerfehler",
     ja: "インデックスエラー(s)",
     fr: "erreur(s) de l'indexeur",
@@ -19746,7 +19746,7 @@ export const UI_LABELS = {
   "interface.indexer_updated_successfully_23654644": {
     es: "Indexador actualizado con éxito",
     "zh-Hans": "成功更新索引器",
-    hi: "इंडेक्सर ने सफलतापूर्वक अपडेट किया",
+    hi: "इंडेक्सर सफलतापूर्वक अपडेट किया गया",
     de: "Indexer erfolgreich aktualisiert",
     ja: "インデックス更新",
     fr: "Indexer mis à jour avec succès",
@@ -19813,7 +19813,7 @@ export const UI_LABELS = {
   "interface.initial_state_02337fba": {
     es: "Estado inicial",
     "zh-Hans": "初始状态",
-    hi: "प्रारंभिक राज्य",
+    hi: "प्रारंभिक स्थिति",
     de: "Ausgangszustand",
     ja: "初期状態",
     fr: "État initial",
@@ -19861,7 +19861,7 @@ export const UI_LABELS = {
   "interface.issued_to_fe5a22d5": {
     es: "A:",
     "zh-Hans": "发给:",
-    hi: "जारी करना:",
+    hi: "जिसको जारी किया गया:",
     de: "Ausgestellt an:",
     ja: "に発行:",
     fr: "Émis à:",
@@ -20454,7 +20454,7 @@ export const UI_LABELS = {
   "interface.local_clamav_deep_scan_b54a871c": {
     es: "ClamAV local (Escaneo profundo)",
     "zh-Hans": "本地 ClamAV (深扫描)",
-    hi: "स्थानीय ClamaV (डीप स्कैन)",
+    hi: "स्थानीय ClamAV (डीप स्कैन)",
     de: "Lokales ClamAV (Deep Scan)",
     ja: "ローカルClamAV (ディープスキャン)",
     fr: "ClamAV local (Scannage profond)",
@@ -20632,7 +20632,7 @@ export const UI_LABELS = {
   "interface.login_failed_b62966b7": {
     es: "Login fallido",
     "zh-Hans": "登录失败",
-    hi: "लॉग इन",
+    hi: "लॉग इन विफल रहा",
     de: "Login fehlgeschlagen",
     ja: "ログイン失敗",
     fr: "Échec de l’authentification",
@@ -20648,7 +20648,7 @@ export const UI_LABELS = {
   "interface.logout_failed_2e7223b0": {
     es: "Error al cerrar sesión",
     "zh-Hans": "注销失败",
-    hi: "लॉग इन",
+    hi: "लॉग आउट विफल रहा",
     de: "Logout fehlgeschlagen",
     ja: "ログアウト失敗",
     fr: "La déconnexion a échoué",
@@ -20664,7 +20664,7 @@ export const UI_LABELS = {
   "interface.logs_are_stored_as_an_issue_in_a_738f4d2d": {
     es: "Los registros se almacenan como un problema en un",
     "zh-Hans": "日志作为问题存储在",
-    hi: "लॉग्स को एक मुद्दे के रूप में संग्रहीत किया जाता है",
+    hi: "लॉग्स को इश्यू के रूप में सहेजने वाली",
     de: "Logs werden als Problem in einem",
     ja: "ログは問題として保存されます",
     fr: "Les journaux sont stockés comme un problème dans un",
@@ -21054,7 +21054,7 @@ export const UI_LABELS = {
   "interface.model_8285e8fa": {
     es: "Modelo",
     "zh-Hans": "模型",
-    hi: "आदर्श",
+    hi: "मॉडल",
     de: "Modell",
     ja: "モデル",
     fr: "Modèle",
@@ -21153,7 +21153,7 @@ export const UI_LABELS = {
   "interface.my_config_key_f7e6ee42": {
     es: "mi-config-key",
     "zh-Hans": "我的密钥",
-    hi: "मेरा विन्यास कुंजी",
+    hi: "my-config-key",
     de: "my-config-key",
     ja: "設定キー",
     fr: "Mon-config-clé",
@@ -21217,7 +21217,7 @@ export const UI_LABELS = {
   "interface.navigate_up_f1f093af": {
     es: "Subir",
     "zh-Hans": "向上导航",
-    hi: "नेविगेट करें",
+    hi: "ऊपर जाएँ",
     de: "Navigieren Sie nach oben",
     ja: "上の階層へ移動",
     fr: "Naviguez vers le haut",
@@ -21249,7 +21249,7 @@ export const UI_LABELS = {
   "interface.needs_review_527986ce": {
     es: "Requiere revisión (",
     "zh-Hans": "需要审查 (",
-    hi: "आवश्यकता समीक्षा",
+    hi: "समीक्षा आवश्यक (",
     de: "Bedarfsprüfung ()",
     ja: "ニーズレビュー (",
     fr: "Examen des besoins (",
@@ -21281,7 +21281,7 @@ export const UI_LABELS = {
   "interface.new_api_key_5044899a": {
     es: "Nueva clave de API",
     "zh-Hans": "新建 API 密钥",
-    hi: "नया API कुंजी",
+    hi: "नई API कुंजी",
     de: "Neuer API Key",
     ja: "新しい API キー",
     fr: "Nouvelle clé API",
@@ -21409,7 +21409,7 @@ export const UI_LABELS = {
   "interface.nexus_mods_e6fcabbd": {
     es: "Nexus Mods",
     "zh-Hans": "Nexus Mods",
-    hi: "नेक्सस मोड",
+    hi: "Nexus Mods",
     de: "Nexus Mods",
     ja: "ネクサス Mods",
     fr: "Nexus Mods",
@@ -21457,7 +21457,7 @@ export const UI_LABELS = {
   "interface.nexusmods_25bab58d": {
     es: "NexusMods",
     "zh-Hans": "NexusMods",
-    hi: "नेक्ससमोड",
+    hi: "NexusMods",
     de: "NexusMods",
     ja: "ネクサスモッド",
     fr: "NexusMods",
@@ -21716,7 +21716,7 @@ export const UI_LABELS = {
   "interface.no_matching_downloader_3c37bfcc": {
     es: "No hay descargador de coincidencias",
     "zh-Hans": "没有匹配的下载器",
-    hi: "कोई मेलिंग डाउनलोडर",
+    hi: "कोई मेल खाता डाउनलोडर नहीं मिला",
     de: "Kein passender Downloader",
     ja: "マッチングダウンローダーなし",
     fr: "Aucun téléchargeur correspondant",
@@ -21780,7 +21780,7 @@ export const UI_LABELS = {
   "interface.no_root_folders_configured_yet_a9ad4b6b": {
     es: "No hay carpetas de raíz configuradas aún",
     "zh-Hans": "尚未配置根文件夹",
-    hi: "अभी तक कॉन्फ़िगर नहीं किया गया कोई रूट फ़ोल्डर",
+    hi: "अभी तक कोई रूट फ़ोल्डर कॉन्फ़िगर नहीं किया गया है",
     de: "Noch keine Root-Ordner konfiguriert",
     ja: "まだ設定されていないルートフォルダ",
     fr: "Pas encore de dossiers root configurés",
@@ -21796,7 +21796,7 @@ export const UI_LABELS = {
   "interface.no_rss_feeds_configured_add_one_ab_a99af602": {
     es: "No hay feeds RSS configurados. ¡Añada uno arriba!",
     "zh-Hans": "尚未配置 RSS 订阅源。请在上方添加一个！",
-    hi: "नहीं RSS कॉन्फ़िगर किया गया फ़ीड। ऊपर एक जोड़ें!",
+    hi: "कोई RSS फ़ीड कॉन्फ़िगर नहीं किया गया है। ऊपर एक जोड़ें!",
     de: "Keine RSS-Feeds konfiguriert. Fügen Sie einen oben hinzu!",
     ja: "RSSフィードの設定はありません。 上記を追加!",
     fr: "Aucun flux RSS configuré. Ajoutez-en un au-dessus !",
@@ -21812,7 +21812,7 @@ export const UI_LABELS = {
   "interface.no_rss_items_found_make_sure_you_h_35ea381d": {
     es: "No se encontraron elementos RSS. Asegúrese de haber habilitado los feeds y de haberlos actualizado.",
     "zh-Hans": "未找到 RSS 条目。请确认已启用订阅源并刷新。",
-    hi: "नहीं RSS आइटम पाया गया। सुनिश्चित करें कि आपने फ़ीड को सक्षम किया है और ताज़ा किया है।",
+    hi: "कोई RSS आइटम नहीं मिला। सुनिश्चित करें कि आपने फ़ीड सक्षम किए हैं और रिफ्रेश किया है।",
     de: "Keine RSS-Artikel gefunden. Stellen Sie sicher, dass Sie Feeds aktiviert und aktualisiert haben.",
     ja: "RSSの項目が見つかりません。 フィードを有効化し、更新されていることを確認してください。",
     fr: "Aucun élément RSS trouvé. Assurez-vous d'avoir activé les flux et rafraîchi.",
@@ -21877,7 +21877,7 @@ export const UI_LABELS = {
   "interface.not_configured_1164a60e": {
     es: "No configurado",
     "zh-Hans": "未配置",
-    hi: "नहीं विन्यास",
+    hi: "कॉन्फ़िगर नहीं किया गया",
     de: "nicht konfiguriert",
     ja: "設定されていない",
     fr: "Non configuré",
@@ -21979,7 +21979,7 @@ export const UI_LABELS = {
   "interface.notify_for_completed_games_b03943d1": {
     es: "Notificar para juegos completados",
     "zh-Hans": "通知已完成的游戏",
-    hi: "पूरा खेल के लिए सूचित करें",
+    hi: "पूरे किए गए गेम के लिए सूचनाएँ दें",
     de: "Benachrichtigung für abgeschlossene Spiele",
     ja: "完成したゲームの通知",
     fr: "Avis pour les jeux terminés",
@@ -22220,7 +22220,7 @@ export const UI_LABELS = {
   "interface.open_real_debrid_and_enter_this_on_cdb7aed0": {
     es: "Abra Real-Debrid e introduzca este código de una sola vez:",
     "zh-Hans": "打开 Real-Debrid 并输入此一次性代码 :",
-    hi: "खुला Real-Debrid और इस एक बार कोड दर्ज करें:",
+    hi: "Real-Debrid खोलें और एक बार इस्तेमाल होने वाला यह कोड दर्ज करें:",
     de: "Öffnen Sie Real-Debrid und geben Sie diesen einmaligen Code ein:",
     ja: "Real-Debrid を開き、このワンタイムコードを入力します。",
     fr: "Ouvrez Real-Debrid et saisissez ce code unique :",
@@ -24125,7 +24125,7 @@ export const UI_LABELS = {
   "interface.report_sent_b572f793": {
     es: "Informe enviado",
     "zh-Hans": "报告已发送",
-    hi: "भेजे गए रिपोर्ट",
+    hi: "रिपोर्ट भेज दी गई",
     de: "Versendeter Bericht",
     ja: "レポート送信",
     fr: "Rapport envoyé",
@@ -24141,7 +24141,7 @@ export const UI_LABELS = {
   "interface.reports_are_stored_as_an_issue_in_5f23e7db": {
     es: "Los informes se almacenan como un problema en un",
     "zh-Hans": "报告以 issue 的形式存储，所在的",
-    hi: "रिपोर्ट को एक मुद्दे के रूप में संग्रहीत किया जाता है",
+    hi: "रिपोर्टों को इश्यू के रूप में सहेजने वाली",
     de: "Berichte werden als Problem in einem",
     ja: "レポートは問題として保存されます",
     fr: "Les rapports sont stockés comme un problème dans un",
@@ -24338,7 +24338,7 @@ export const UI_LABELS = {
   "interface.revoke_this_api_key_1d1a24d3": {
     es: "¿Revocar esta clave de API?",
     "zh-Hans": "撤销这个 API 密钥?",
-    hi: "इसे रद्द करें API कुंजी?",
+    hi: "क्या आप इस API कुंजी को रद्द करना चाहते हैं?",
     de: "Entziehen Sie diesen API-Schlüssel?",
     ja: "この API キーを無効化しますか？",
     fr: "Révoquer cette clé API ?",
@@ -24466,7 +24466,7 @@ export const UI_LABELS = {
   "interface.route_rom_imports_to_romm_a0a2b6a0": {
     es: "Dirigir las importaciones de ROM a RomM",
     "zh-Hans": "将 ROM 导入路由至 RomM",
-    hi: "रूट रॉम को आयात करता है RomM",
+    hi: "ROM आयातों को RomM पर भेजें",
     de: "Einfuhren von Route-ROM nach RomM",
     ja: "RomMへのルートROMの輸入",
     fr: "Importations de route ROM vers RomM",
@@ -25173,7 +25173,7 @@ export const UI_LABELS = {
   "interface.search_results_cache_has_been_clea_af657a65": {
     es: "Se borró la caché de resultados de búsqueda. Las búsquedas nuevas obtendrán datos actualizados.",
     "zh-Hans": "搜索结果缓存已被清除 。 新搜索将获取新数据 。",
-    hi: "खोज परिणाम कैश को मंजूरी दे दी गई है। नई खोज ताजा डेटा प्राप्त करेगी।",
+    hi: "खोज परिणाम कैश साफ़ कर दिया गया है। नई खोजें ताज़ा डेटा प्राप्त करेंगी।",
     de: "Der Cache der Suchergebnisse wurde gelöscht. Neue Suchanfragen werden neue Daten abrufen.",
     ja: "結果キャッシュをクリアしました。 新規検索すると、新鮮なデータが取得されます。",
     fr: "Le cache des résultats de recherche a été effacé. De nouvelles recherches permettront de récupérer de nouvelles données.",
@@ -25431,7 +25431,7 @@ export const UI_LABELS = {
   "interface.select_api_base_url_a0859c7f": {
     es: "Seleccionar la URL base de la API",
     "zh-Hans": "选择 API 基础 URL",
-    hi: "चयन API आधार URL",
+    hi: "API बेस URL चुनें",
     de: "API-Basis-URL auswählen",
     ja: "API のベース URL を選択",
     fr: "Sélectionnez la base d'API URL",
@@ -25527,7 +25527,7 @@ export const UI_LABELS = {
   "interface.select_mode_28e36bb0": {
     es: "Seleccione el modo",
     "zh-Hans": "选择模式",
-    hi: "चुनें",
+    hi: "मोड चुनें",
     de: "Modus auswählen",
     ja: "モードの選択",
     fr: "Sélectionner le mode",
@@ -25642,7 +25642,7 @@ export const UI_LABELS = {
   "interface.send_failed_9e8824cc": {
     es: "Enviar falló",
     "zh-Hans": "发送失败",
-    hi: "असफल",
+    hi: "भेजना असफल रहा",
     de: "Senden fehlgeschlagen",
     ja: "送信失敗",
     fr: "L'envoi a échoué",
@@ -26042,7 +26042,7 @@ export const UI_LABELS = {
   "interface.show_api_key_60cc3543": {
     es: "Mostrar clave API",
     "zh-Hans": "显示 API 密钥",
-    hi: "प्रदर्शन API कुंजी",
+    hi: "API कुंजी दिखाएं",
     de: "API Schlüssel anzeigen",
     ja: "API キーを表示",
     fr: "Afficher la clé API",
@@ -26539,7 +26539,7 @@ export const UI_LABELS = {
   "interface.stopped_863f19ee": {
     es: "Detenido",
     "zh-Hans": "已停止",
-    hi: "बंद करना",
+    hi: "रोका गया",
     de: "gestoppt",
     ja: "停止",
     fr: "Arrêt",
@@ -26574,7 +26574,7 @@ export const UI_LABELS = {
   "interface.subfolders_inside_the_game_folder_51a5a9d2": {
     es: "subcarpetas dentro de la carpeta del juego. Las importaciones de un solo fichero mantienen su disposición existente.",
     "zh-Hans": "游戏文件夹中的子文件夹。 单文件导入保留其现有的布局.",
-    hi: "गेम फ़ोल्डर के अंदर सबफ़ोल्डर्स। एकल-फ़ाइल आयात उनके मौजूदा लेआउट को बनाए रखते हैं।",
+    hi: "(गेम के फ़ोल्डर के अंदर)। एकल-फ़ाइल आयात में मौजूदा लेआउट बना रहता है।",
     de: "Unterordner im Spielordner. Single-File-Importe behalten ihr bestehendes Layout bei.",
     ja: "ゲームフォルダ内のサブフォルダ。 単一ファイルインポートは既存のレイアウトを保持します。",
     fr: "sous-dossiers dans le dossier de jeu. Les importations de fichiers uniques conservent leur disposition existante.",
@@ -27585,7 +27585,7 @@ export const UI_LABELS = {
   "interface.typesafe_settings_saved_d705a7f2": {
     es: "Ajustes de TypeSafe guardados",
     "zh-Hans": "TypeSafe 设置已保存",
-    hi: "TypeSafe सेटिंग्स बचाया",
+    hi: "TypeSafe सेटिंग्स सहेजी गईं",
     de: "TypeSafe Einstellungen gespeichert",
     ja: "TypeSafe の設定を保存しました",
     fr: "Paramètres de typeSafe enregistrés",
@@ -27650,7 +27650,7 @@ export const UI_LABELS = {
   "interface.unique_devs_d75ebf8e": {
     es: "Desarrolladores únicos",
     "zh-Hans": "不同开发商数量",
-    hi: "अनोखा देव",
+    hi: "अलग-अलग डेवलपर",
     de: "Einzigartige Entwickler",
     ja: "ユニークなデベロッパー",
     fr: "Devs uniques",
@@ -27892,7 +27892,7 @@ export const UI_LABELS = {
   "interface.upload_failed_52a23be9": {
     es: "Subida fallida",
     "zh-Hans": "上传失败",
-    hi: "असफल",
+    hi: "अपलोड विफल",
     de: "Upload fehlgeschlagen",
     ja: "アップロード失敗",
     fr: "Le chargement a échoué",
@@ -27924,7 +27924,7 @@ export const UI_LABELS = {
   "interface.upload_in_progress_f8cba67a": {
     es: "Subida en curso",
     "zh-Hans": "上传中",
-    hi: "प्रगति पर",
+    hi: "अपलोड प्रगति पर है",
     de: "Upload in Arbeit",
     ja: "アップロード中",
     fr: "Chargement en cours",
@@ -28136,7 +28136,7 @@ export const UI_LABELS = {
   "interface.using_manual_input_instead_807bf209": {
     es: "Usando la entrada manual en su lugar",
     "zh-Hans": "使用手动输入",
-    hi: "बजाय मैनुअल इनपुट का उपयोग करना",
+    hi: "इसके बजाय मैन्युअल इनपुट का उपयोग किया जा रहा है",
     de: "Stattdessen manuelle Eingabe",
     ja: "手動入力を代わりに使用",
     fr: "Utiliser l'entrée manuelle à la place",
@@ -28152,7 +28152,7 @@ export const UI_LABELS = {
   "interface.using_the_saved_key_type_a_new_one_d7e5b4d5": {
     es: "Usando la clave guardada. Escribe una nueva para reemplazarla.",
     "zh-Hans": "使用已保存的密钥。输入新的密钥以替换它。",
-    hi: "बचाया कुंजी का उपयोग करना। इसे बदलने के लिए एक नया टाइप करें।",
+    hi: "सहेजी गई कुंजी का उपयोग हो रहा है। इसे बदलने के लिए नई कुंजी दर्ज करें।",
     de: "Verwenden Sie den gespeicherten Schlüssel. Geben Sie eine neue ein, um sie zu ersetzen.",
     ja: "保存されたキーを使用して。 交換する新しいものをタイプして下さい。",
     fr: "En utilisant la clé enregistrée. Tapez un nouveau pour le remplacer.",
@@ -28397,7 +28397,7 @@ export const UI_LABELS = {
   "interface.when_do_i_need_this_0963e03a": {
     es: "¿Cuándo necesito esto?",
     "zh-Hans": "我什么时候需要这个?",
-    hi: "क्या मुझे इसकी आवश्यकता है?",
+    hi: "मुझे इसकी आवश्यकता कब होती है?",
     de: "Wann brauche ich das?",
     ja: "いつ必要ですか?",
     fr: "Quand ai-je besoin de ça ?",
@@ -29133,7 +29133,7 @@ export const UI_LABELS = {
   "interface.edit_mapping_for_path_ddb1e915": {
     es: "Editar asignación para {path}",
     "zh-Hans": "编辑映射 {path}",
-    hi: "के लिए मैपिंग संपादित करें {path}",
+    hi: "{path} के लिए मैपिंग संपादित करें",
     de: "Edit Mapping für {path}",
     ja: "マッピングの編集 {path}",
     fr: "Modifier le mappage de {path}",
@@ -29181,7 +29181,7 @@ export const UI_LABELS = {
   "interface.estimated_time_remaining_value_07a00335": {
     es: "Tiempo estimado: {value}",
     "zh-Hans": "估计剩余时间: {value}",
-    hi: "शेष समय: {value}",
+    hi: "अनुमानित शेष समय: {value}",
     de: "Geschätzte verbleibende Zeit: {value}",
     ja: "推定時間残り: {value}",
     fr: "Temps restant estimé: {value}",
@@ -29197,7 +29197,7 @@ export const UI_LABELS = {
   "interface.filter_by_s_1aabcf5d": {
     es: "Filtrar por {s}",
     "zh-Hans": "按 {s} 筛选",
-    hi: "द्वारा फ़िल्टर करें {s}",
+    hi: "{s} से फ़िल्टर करें",
     de: "Nach {s} filtern",
     ja: "フィルターによる {s}",
     fr: "Filtrer par {s}",
@@ -29549,7 +29549,7 @@ export const UI_LABELS = {
   "interface.test_connection_for_name_8d0baec5": {
     es: "Conexión de prueba para {name}",
     "zh-Hans": "测试连接 {name}",
-    hi: "टेस्ट कनेक्शन के लिए {name}",
+    hi: "{name} के लिए कनेक्शन जाँचें",
     de: "Verbindung mit {name} testen",
     ja: "{name} への接続をテスト",
     fr: "Tester la connexion à {name}",
@@ -29581,7 +29581,7 @@ export const UI_LABELS = {
   "interface.upload_speed_value_4f019642": {
     es: "Velocidad de carga: {value}",
     "zh-Hans": "上传速度 : {value}",
-    hi: "गति अपलोड करें: {value}",
+    hi: "अपलोड गति: {value}",
     de: "Hochladegeschwindigkeit: {value}",
     ja: "アップロード速度: {value}",
     fr: "Vitesse de chargement: {value}",
@@ -29661,7 +29661,7 @@ export const UI_LABELS = {
   "interface.seeders_seeders_value_leechers_2f904bab": {
     es: "{seeders} usuarios compartiendo, {value} descargando",
     "zh-Hans": "{seeders} 个做种者，{value} 个下载者",
-    hi: "{seeders} बीज, {value} लीचर",
+    hi: "{seeders} सीडर, {value} लीचर",
     de: "{seeders} Seeder, {value} Leecher",
     ja: "{seeders} シーダー, {value} リーチャーズ",
     fr: "{seeders} seeders, {value} leechers",
@@ -29741,7 +29741,7 @@ export const UI_LABELS = {
   "interface.downloads_sent_count_9e81f8d5": {
     es: "Descargas enviadas: {count}",
     "zh-Hans": "已发送下载 : {count}",
-    hi: "डाउनलोड: {count}",
+    hi: "डाउनलोड भेजे गए: {count}",
     de: "Versendete Downloads: {count}",
     ja: "ダウンロード: {count}",
     fr: "Téléchargements envoyés : {count}",
@@ -29917,7 +29917,7 @@ export const UI_LABELS = {
   "interface.indexer_errors_count_7e2cd7f4": {
     es: "Errores de indexador: {count}",
     "zh-Hans": "索引器错误：{count}",
-    hi: "सूचक त्रुटि: {count}",
+    hi: "इंडेक्सर त्रुटियां: {count}",
     de: "Indexerfehler: {count}",
     ja: "インデックスエラー: {count}",
     fr: "Erreurs d'indexeur  : {count}",
@@ -30093,7 +30093,7 @@ export const UI_LABELS = {
   "interface.left_click_to_move_ctrl_to_crouch_c319c3ce": {
     es: "Clic izquierdo para moverte · Ctrl para agacharte · clic derecho para lanzar una distracción · Esc para pausar",
     "zh-Hans": "左键移动 · Ctrl 蹲下 · 右键投掷诱饵 · Esc 暂停",
-    hi: "चलने के लिए बायाँ क्लिक · झुकने के लिए Ctrl · ध्यान भटकाने के लिए दायाँ क्लिक · रोकने के लिए Esc",
+    hi: "चलने के लिए बायाँ क्लिक · झुकने के लिए Ctrl · ध्यान भटकाने वाली वस्तु फेंकने के लिए दायाँ क्लिक · रोकने के लिए Esc",
     de: "Linksklick zum Bewegen · Strg zum Ducken · Rechtsklick zum Werfen einer Ablenkung · Esc zum Pausieren",
     ja: "左クリックで移動 · Ctrl でしゃがむ · 右クリックで注意をそらす · Esc で一時停止",
     fr: "Clic gauche pour vous déplacer · Ctrl pour vous accroupir · clic droit pour lancer une diversion · Échap pour mettre en pause",
@@ -31472,7 +31472,7 @@ export const UI_LABELS = {
   "interface.select_games_from_your_library_a_g_c2400527": {
     es: "Selecciona juegos de tu biblioteca. Un juego puede estar en varias listas.",
     "zh-Hans": "从媒体库选择游戏。同一款游戏可以加入多个列表。",
-    hi: "अपनी लाइब्रेरी से गेम चुनें। एक गेम एक से अधिक सूचियों में हो सकता है。",
+    hi: "अपनी लाइब्रेरी से गेम चुनें। एक गेम एक से अधिक सूचियों में हो सकता है।",
     de: "Wähle Spiele aus deiner Bibliothek. Ein Spiel kann in mehreren Listen sein.",
     ja: "ライブラリからゲームを選択してください。同じゲームを複数のリストに追加できます。",
     fr: "Sélectionnez des jeux de votre bibliothèque. Un jeu peut figurer dans plusieurs listes.",
@@ -32378,7 +32378,7 @@ export const UI_LABELS = {
   "interface.eligible_options_count_f3ea0f53": {
     es: "Opciones disponibles: {count}",
     "zh-Hans": "可选项：{count}",
-    hi: "उपलब्ध विकल्प: {count}",
+    hi: "योग्य विकल्प: {count}",
     de: "Verfügbare Optionen: {count}",
     ja: "選択可能な候補：{count}",
     fr: "Options disponibles : {count}",

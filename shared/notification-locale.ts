@@ -517,7 +517,7 @@ const LABELS: Record<NotificationLabelKey, readonly string[]> = {
   "Security Alert: Download Flagged by": [
     "Alerta de seguridad: descarga señalada por",
     "安全警报：下载被以下服务标记",
-    "सुरक्षा चेतावनी: डाउनलोड को इस सेवा ने चिह्नित किया",
+    "सुरक्षा चेतावनी: डाउनलोड को चिह्नित करने वाली सेवा:",
     "Sicherheitswarnung: Download markiert durch",
     "セキュリティ警告: ダウンロードを検出したサービス",
     "Alerte de sécurité : téléchargement signalé par",
