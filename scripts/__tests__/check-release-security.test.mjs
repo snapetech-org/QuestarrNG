@@ -168,7 +168,10 @@ describe("release security gate", () => {
     }));
     expect(sourceAnalysisBlockers(analyses, releaseRef, releaseSha)).toEqual([]);
     expect(sourceAnalysisBlockers(analyses.slice(1), releaseRef, releaseSha)).toEqual([
-      "CodeQL /language:csharp analysis is missing for " + releaseRef + "@" + releaseSha,
+      "Semgrep OSS .github/workflows/sast.yml:semgrep analysis is missing for " +
+        releaseRef +
+        "@" +
+        releaseSha,
     ]);
     expect(sourceAnalysisBlockers(analyses, releaseRef, "b".repeat(40))).toHaveLength(
       REQUIRED_CODE_ANALYSES.length
@@ -179,14 +182,6 @@ describe("release security gate", () => {
     const ref = "refs/tags/v1.2.3";
     const commit_sha = "a".repeat(40);
     const analyses = [
-      ...["csharp", "javascript-typescript", "actions", "cpp"].map((language) => ({
-        ref,
-        commit_sha,
-        tool: { name: "CodeQL" },
-        category: "/language:" + language,
-        error: "",
-        created_at: "2026-10-12T10:00:00Z",
-      })),
       {
         ref,
         commit_sha,
@@ -215,13 +210,18 @@ describe("release security gate", () => {
     const failedLatest = {
       ref,
       commit_sha,
-      tool: { name: "CodeQL" },
-      category: "/language:csharp",
+      tool: { name: "Semgrep OSS" },
+      category: ".github/workflows/sast.yml:semgrep",
       error: "SARIF processing failed",
       created_at: "2026-10-12T12:00:00Z",
     };
     const successfulOlder = { ...failedLatest, error: "", created_at: "2026-10-12T11:00:00Z" };
-    const expected = ["CodeQL /language:csharp analysis is missing for " + ref + "@" + commit_sha];
+    const expected = [
+      "Semgrep OSS .github/workflows/sast.yml:semgrep analysis is missing for " +
+        ref +
+        "@" +
+        commit_sha,
+    ];
 
     expect(
       sourceAnalysisBlockers([failedLatest, successfulOlder, ...otherAnalyses], ref, commit_sha)
