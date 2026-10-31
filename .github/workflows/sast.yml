@@ -21,6 +21,7 @@ jobs:
     runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
     permissions:
       contents: read
+      security-events: write
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -70,19 +71,12 @@ jobs:
         if: always() && hashFiles('semgrep.sarif') != ''
         run: node scripts/filter-semgrep-sarif.mjs semgrep.sarif semgrep-upload.sarif
 
-      - name: Retain scan report (semgrep-upload)
-        if: >-
-          always() &&
-          (hashFiles('semgrep-upload.sarif') != '') &&
-          (github.event_name != 'pull_request' ||
-          github.event.pull_request.head.repo.full_name == github.repository)
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      - name: Upload SARIF to code scanning
+        if: ${{ !cancelled() && hashFiles('semgrep-upload.sarif') != '' }}
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
         with:
-          name: scan-report-semgrep-upload-${{ github.job }}-${{ strategy.job-index }}-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            semgrep-upload.sarif
-          if-no-files-found: warn
-          retention-days: 14
+          sarif_file: semgrep-upload.sarif
+
       - name: Enforce blocking policy (ERROR-severity findings fail the build)
         run: |
           error_count=$(jq '[.results[] | select(.extra.severity == "ERROR")] | length' semgrep.json)
@@ -91,4 +85,3 @@ jobs:
             jq -r '.results[] | select(.extra.severity == "ERROR") | "\(.path):\(.start.line)  \(.check_id)"' semgrep.json
             exit 1
           fi
-
