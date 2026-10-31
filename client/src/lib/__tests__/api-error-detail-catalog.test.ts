@@ -238,4 +238,10 @@ describe("API error detail source catalog", () => {
       expect(getApiErrorDetailLabel(source, "id")).toBe(id);
     }
   });
+
+  it("describes certificate parsing as parsing in German", () => {
+    expect(getApiErrorDetailLabel("Failed to parse certificate content", "de")).toBe(
+      "Der Zertifikatsinhalt konnte nicht geparst werden"
+    );
+  });
 });

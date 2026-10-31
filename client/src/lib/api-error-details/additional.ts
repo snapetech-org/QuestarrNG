@@ -516,7 +516,7 @@ const ADDITIONAL_API_ERROR_DETAIL_LABELS: Record<
     "No se pudo analizar el contenido del certificado",
     "无法解析证书内容",
     "प्रमाणपत्र की सामग्री को पार्स नहीं किया जा सका",
-    "Der Zertifikatsinhalt konnte nicht gelesen werden",
+    "Der Zertifikatsinhalt konnte nicht geparst werden",
     "証明書の内容を解析できませんでした",
     "Impossible d’analyser le contenu du certificat",
     "Não foi possível analisar o conteúdo do certificado",
