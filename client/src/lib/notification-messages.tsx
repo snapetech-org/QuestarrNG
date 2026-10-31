@@ -374,7 +374,7 @@ const MESSAGES: Record<MessageKey, readonly string[]> = {
     "{game} は検出され、隔離されました。理由: {reason}。",
     "{game} a été signalé et mis en quarantaine. Motif : {reason}.",
     "{game} foi sinalizado e colocado em quarentena. Motivo: {reason}.",
-    "تم وضع {game} في العزل بعد الإبلاغ عنه. السبب: {reason}.",
+    "تم رصد {game} ووضعه في العزل. السبب: {reason}.",
     "{game}이(가) 탐지되어 격리되었습니다. 사유: {reason}.",
     "{game} 已遭標記並隔離。原因：{reason}。",
     "{game} bị đánh dấu và cách ly. Lý do: {reason}.",
