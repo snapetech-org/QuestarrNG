@@ -1,3 +1,5 @@
+import { readNotificationLanguage } from "../shared/notification-language.js";
+import { localizeOutboundNotification } from "../shared/notification-messages.js";
 import { execFile } from "child_process";
 import { accessSync, constants as fsConstants } from "fs";
 import { mkdtemp, rm, writeFile } from "fs/promises";
@@ -355,22 +357,48 @@ class AppriseClient {
     }
   }
 
+  private async localize(
+    title: string,
+    message: string,
+    userId?: string | null
+  ): Promise<{ title: string; message: string }> {
+    if (!userId) return { title, message };
+    try {
+      // Lazy import keeps transport-only consumers independent of database startup.
+      const { storage } = await import("./storage.js");
+      const settings = await storage.getUserSettings(userId);
+      return localizeOutboundNotification(
+        title,
+        message,
+        readNotificationLanguage(settings?.notificationPreferences)
+      );
+    } catch (error) {
+      appriseLogger.warn({ error }, "Could not load notification language, using English");
+      return { title, message };
+    }
+  }
+
   async send(notification: Notification): Promise<void> {
     if (!this.isConfigured()) return;
 
+    const translated = {
+      ...notification,
+      ...(await this.localize(notification.title, notification.message, notification.userId)),
+    };
     if (this.settings.mode === "cli") {
-      await this.sendViaCli(notification);
+      await this.sendViaCli(translated);
       return;
     }
 
-    await this.sendViaApi(notification);
+    await this.sendViaApi(translated);
   }
 
-  async test(): Promise<{ success: boolean; error?: string }> {
+  async test(userId?: string): Promise<{ success: boolean; error?: string }> {
     if (!this.isConfigured()) {
       return { success: false, error: "Apprise is not configured" };
     }
 
+    const text = await this.localize("Questarr", "Test notification from Questarr", userId);
     if (this.settings.mode === "cli") {
       const urls = parseAppriseUrls(this.settings.urls);
       if (urls.length === 0) {
@@ -378,14 +406,7 @@ class AppriseClient {
       }
 
       try {
-        await runAppriseCliWithUrls(urls, [
-          "-t",
-          "Questarr",
-          "-b",
-          "Test notification from Questarr",
-          "-n",
-          "info",
-        ]);
+        await runAppriseCliWithUrls(urls, ["-t", text.title, "-b", text.message, "-n", "info"]);
         return { success: true };
       } catch (result) {
         const { error, stdout, stderr } =
@@ -394,7 +415,7 @@ class AppriseClient {
       }
     }
 
-    const request = this.buildApiRequest("Questarr", "Test notification from Questarr", "info");
+    const request = this.buildApiRequest(text.title, text.message, "info");
     if (!request) {
       return { success: false, error: "No config key or notification URLs provided" };
     }

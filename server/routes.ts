@@ -5904,9 +5904,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   );
 
-  app.post("/api/settings/apprise/test", async (_req, res) => {
+  app.post("/api/settings/apprise/test", async (req, res) => {
     try {
-      const result = await appriseClient.test();
+      const result = await appriseClient.test(req.user?.id);
       if (result.success) {
         res.json({ success: true });
       } else {

@@ -1,3 +1,4 @@
+import { normalizeNotificationLanguage } from "@shared/notification-language";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -502,9 +503,11 @@ export default function SettingsPage() {
       );
       if (userSettings.notificationPreferences) {
         try {
+          const savedPreferences = JSON.parse(userSettings.notificationPreferences);
           setNotifPrefs({
             ...DEFAULT_NOTIFICATION_PREFERENCES,
-            ...JSON.parse(userSettings.notificationPreferences),
+            ...savedPreferences,
+            language: normalizeNotificationLanguage(savedPreferences?.language),
           });
         } catch {
           setNotifPrefs(DEFAULT_NOTIFICATION_PREFERENCES);
@@ -688,12 +691,7 @@ export default function SettingsPage() {
     },
   });
 
-  const handleNotifPrefChange = (
-    key: NotificationEvent,
-    channel: "inApp" | "apprise" | "includeShelved" | "includeCompleted",
-    checked: boolean
-  ) => {
-    const updated = { ...notifPrefs, [key]: { ...notifPrefs[key], [channel]: checked } };
+  const saveNotificationPreferences = (updated: NotificationPreferences) => {
     setNotifPrefs(updated);
     if (notifPrefSaveTimeoutRef.current) clearTimeout(notifPrefSaveTimeoutRef.current);
     notifPrefSaveTimeoutRef.current = setTimeout(() => {
@@ -703,6 +701,16 @@ export default function SettingsPage() {
       });
     }, 500);
   };
+
+  const handleNotifPrefChange = (
+    key: NotificationEvent,
+    channel: "inApp" | "apprise" | "includeShelved" | "includeCompleted",
+    checked: boolean
+  ) =>
+    saveNotificationPreferences({
+      ...notifPrefs,
+      [key]: { ...notifPrefs[key], [channel]: checked },
+    });
 
   const updateNexusMutation = useMutation({
     mutationFn: async (apiKey: string) => {
@@ -2178,6 +2186,21 @@ export default function SettingsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                <div className="space-y-2 mb-6">
+                  <Label htmlFor="notification-language">
+                    <InterfaceText source="notifications.delivery_language" />
+                  </Label>
+                  <p id="notification-language-help" className="text-sm text-muted-foreground">
+                    <InterfaceText source="notifications.delivery_language_help" />
+                  </p>
+                  <InterfaceLanguageSelect
+                    id="notification-language"
+                    value={normalizeNotificationLanguage(notifPrefs.language)}
+                    onValueChange={(language) =>
+                      saveNotificationPreferences({ ...notifPrefs, language })
+                    }
+                  />
+                </div>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>

@@ -1,3 +1,4 @@
+import { readNotificationLanguage } from "../shared/notification-language.js";
 import { igdbLogger } from "./logger.js";
 import {
   DEFAULT_NOTIFICATION_PREFERENCES,
@@ -17,7 +18,14 @@ export function resolvePrefs(
 ): NotificationPreferences {
   if (!settings?.notificationPreferences) return DEFAULT_NOTIFICATION_PREFERENCES;
   try {
-    return { ...DEFAULT_NOTIFICATION_PREFERENCES, ...JSON.parse(settings.notificationPreferences) };
+    const parsed: unknown = JSON.parse(settings.notificationPreferences);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed))
+      return DEFAULT_NOTIFICATION_PREFERENCES;
+    return {
+      ...DEFAULT_NOTIFICATION_PREFERENCES,
+      ...parsed,
+      language: readNotificationLanguage(settings.notificationPreferences),
+    };
   } catch {
     igdbLogger.warn(
       { length: settings.notificationPreferences?.length ?? 0 },

@@ -1,3 +1,4 @@
+import type { NotificationLanguage } from "./notification-language.js";
 import { sql } from "drizzle-orm";
 import { sqliteTable, text, integer, real, uniqueIndex, index } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
@@ -1059,6 +1060,8 @@ export type NotificationPreferences = Record<
   NotificationEvent,
   { inApp: boolean; apprise: boolean }
 > & {
+  /** Language for external notifications; absent legacy values mean English. */
+  language?: NotificationLanguage;
   gameUpdates: {
     inApp: boolean;
     apprise: boolean;
@@ -1069,6 +1072,7 @@ export type NotificationPreferences = Record<
 };
 
 export const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
+  language: "en",
   gameReleased: { inApp: true, apprise: true },
   gameDelayed: { inApp: true, apprise: true },
   downloadCompleted: { inApp: true, apprise: true },
