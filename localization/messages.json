@@ -15451,7 +15451,7 @@
       "translations": {
         "es": "El modo API envía notificaciones a un servidor Apprise remoto. El modo CLI ejecuta el comando",
         "zh-Hans": "API 模式向远程 Apprise 服务器发送通知。CLI 模式在 QuestarrNG 内运行本地",
-        "hi": "API मोड दूरस्थ Apprise सर्वर को सूचनाएँ भेजता है। CLI मोड में QuestarrNG स्थानीय",
+        "hi": "API मोड दूरस्थ Apprise सर्वर को सूचनाएँ भेजता है। CLI मोड",
         "de": "Der API-Modus sendet Benachrichtigungen an einen entfernten Apprise-Server. Der CLI-Modus führt den Befehl",
         "ja": "API モードではリモートの Apprise サーバーに通知を送信します。CLI モードでは QuestarrNG 内でローカルの",
         "fr": "Le mode API envoie des notifications à un serveur Apprise distant. En mode CLI, la commande",
@@ -16914,7 +16914,7 @@
       "translations": {
         "es": "local dentro de QuestarrNG.",
         "zh-Hans": "命令。",
-        "hi": "कमांड चलाता है।",
+        "hi": "कमांड को QuestarrNG के भीतर स्थानीय रूप से चलाता है।",
         "de": "lokal innerhalb von QuestarrNG aus.",
         "ja": "コマンドを実行します。",
         "fr": "est exécutée localement dans QuestarrNG.",
