@@ -34,8 +34,10 @@ export default function PasswordSettings() {
     },
     onSuccess: () => {
       toast({
-        title: "Password Updated",
-        description: "Your password has been changed successfully.",
+        title: <InterfaceText source="interface.password_updated_ff566677" />,
+        description: (
+          <InterfaceText source="interface.your_password_has_been_changed_suc_5c02a986" />
+        ),
       });
       form.reset();
     },
