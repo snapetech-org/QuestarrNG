@@ -78,6 +78,13 @@ describe("UI catalog structure", () => {
     );
     expect(labels["Auto-Sync Wishlist"]?.id).toBe("Sinkronkan daftar keinginan secara otomatis");
   });
+
+  it("keeps translated connection-result labels semantically explicit", () => {
+    expect(labels["Connection failed"]?.ar).toBe("فشل الاتصال");
+    expect(labels["Connection successful"]?.ar).toBe("تم الاتصال بنجاح");
+    expect(labels["Connection successful"]?.de).toBe("Verbindung erfolgreich");
+    expect(labels["Connection successful"]?.["pt-BR"]).toBe("Conexão bem-sucedida");
+  });
 });
 
 describe("notification locale helpers", () => {
