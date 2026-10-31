@@ -28179,10 +28179,23 @@
       "historyEvidence": "merge-commit-in-fork-history",
       "mergeCommit": "63e07a32a20071d1992f73c0624a9c762420273e",
       "review": {
-        "status": "unreviewed",
-        "findings": [],
-        "acceptance": [],
-        "evidence": [],
+        "status": "implemented-unverified",
+        "findings": [
+          "QuestarrNG contains the isometric click-to-move infiltration game, pathfinding, guards, and accessible canvas. Upstream resolved the functional review findings for waypoint stopping, guard catch cooldowns, blocked path starts, pause behavior, and canvas labeling. Maintainers declined convention-only findings about same-directory imports, the letterbox background, and moving client-only types into the client-server shared boundary."
+        ],
+        "acceptance": [
+          "Game movement, pathfinding, guard vision, pause/restart, and accessible controls pass focused tests.",
+          "The running game is replayed in a browser and a screenshot is retained."
+        ],
+        "evidence": [
+          "client/src/game/infiltration-game.ts",
+          "client/src/game/pathfinding.ts",
+          "client/src/game/level.ts",
+          "client/src/game/__tests__/pathfinding.test.ts",
+          "client/src/pages/play.tsx",
+          "docs/upstream-resolution/evidence/validation-batch-86.md",
+          "https://github.com/Doezer/Questarr/pull/964"
+        ],
         "dependencies": []
       },
       "sourceChangedSinceReview": false
@@ -28199,11 +28212,26 @@
       "historyEvidence": "no-merge-commit",
       "mergeCommit": null,
       "review": {
-        "status": "unreviewed",
-        "findings": [],
-        "acceptance": [],
-        "evidence": [],
-        "dependencies": []
+        "status": "verified",
+        "findings": [
+          "The issue asks that igdbRateLimitPerSecond be constrained to 1\u20134 in the UI and server. QuestarrNG clamps the Settings input and validates the same integer range on save; PR #949 and Batch 83 already verify the implementation."
+        ],
+        "acceptance": [
+          "Client input and server validation both enforce integer limits 1 through 4 before persisting the setting."
+        ],
+        "evidence": [
+          "client/src/pages/settings.tsx",
+          "server/routes.ts",
+          "shared/schema.ts",
+          "client/__tests__/SettingsPage.test.tsx",
+          "server/__tests__/api_routes.test.ts",
+          "docs/upstream-resolution/evidence/validation-batch-83.md",
+          "docs/upstream-resolution/evidence/validation-batch-86.md",
+          "https://github.com/Doezer/Questarr/issues/965"
+        ],
+        "dependencies": [
+          "pr:949"
+        ]
       },
       "sourceChangedSinceReview": false
     },
@@ -28219,10 +28247,18 @@
       "historyEvidence": "merge-commit-in-fork-history",
       "mergeCommit": "4d842f2fe99767a3c224796c3a4587953bb96239",
       "review": {
-        "status": "unreviewed",
-        "findings": [],
-        "acceptance": [],
-        "evidence": [],
+        "status": "verified",
+        "findings": [
+          "The requested SettingsPage JSDoc is present above the component and describes its responsibility. This documentation-only PR has no runtime behavior to port; its Dependency Review run failed during startup, while the PR was merged."
+        ],
+        "acceptance": [
+          "SettingsPage has a concise component-level description."
+        ],
+        "evidence": [
+          "client/src/pages/settings.tsx",
+          "docs/upstream-resolution/evidence/validation-batch-86.md",
+          "https://github.com/Doezer/Questarr/pull/966"
+        ],
         "dependencies": []
       },
       "sourceChangedSinceReview": false
@@ -28239,11 +28275,27 @@
       "historyEvidence": "merge-commit-in-fork-history",
       "mergeCommit": "f2b05057086fa3a9a1211e35e496fe27036d870d",
       "review": {
-        "status": "unreviewed",
-        "findings": [],
-        "acceptance": [],
-        "evidence": [],
-        "dependencies": []
+        "status": "implemented-unverified",
+        "findings": [
+          "QuestarrNG contains connected-room levels, locked-door/keycard progression, and a graded stealth-awareness meter. Upstream resolved the review findings for hiding the keycard halo, keeping locked doors solid to players without the keycard, preventing repeated stance keydowns, limiting status-region updates, and validating room membership. Convention-only import/style findings were declined with documented rationale."
+        ],
+        "acceptance": [
+          "Keycard and door collision states, room generation, guard awareness, movement stance, and announcements pass focused tests.",
+          "The running game is replayed in a browser and a screenshot is retained."
+        ],
+        "evidence": [
+          "client/src/game/detection.ts",
+          "client/src/game/infiltration-game.ts",
+          "client/src/game/level.ts",
+          "client/src/game/__tests__/detection.test.ts",
+          "client/src/game/__tests__/level.test.ts",
+          "client/src/pages/play.tsx",
+          "docs/upstream-resolution/evidence/validation-batch-86.md",
+          "https://github.com/Doezer/Questarr/pull/967"
+        ],
+        "dependencies": [
+          "pr:964"
+        ]
       },
       "sourceChangedSinceReview": false
     },
@@ -28259,10 +28311,20 @@
       "historyEvidence": "no-merge-commit",
       "mergeCommit": null,
       "review": {
-        "status": "unreviewed",
-        "findings": [],
-        "acceptance": [],
-        "evidence": [],
+        "status": "implemented-unverified",
+        "findings": [
+          "The issue's exact Cataclismo FitGirl mismatch is handled by resolving multi-file torrent content to the common top-level folder instead of the display name. A regression test uses the reported torrent name and Cataclismo [FitGirl Repack] root. The focused test has not been run on the current branch head."
+        ],
+        "acceptance": [
+          "For a multi-file torrent whose display name contains version/DLC text but whose files share the actual content folder, automatic import resolves that common root."
+        ],
+        "evidence": [
+          "server/downloaders/utils.ts",
+          "server/__tests__/downloaders_utils_manager.test.ts",
+          "server/downloaders/utils.ts#resolveDownloadRelativePath",
+          "docs/upstream-resolution/evidence/validation-batch-86.md",
+          "https://github.com/Doezer/Questarr/issues/968"
+        ],
         "dependencies": []
       },
       "sourceChangedSinceReview": false
@@ -28279,10 +28341,20 @@
       "historyEvidence": "merge-commit-in-fork-history",
       "mergeCommit": "3bb075b667d85b849fe5d8aa258857817f5614bd",
       "review": {
-        "status": "unreviewed",
-        "findings": [],
-        "acceptance": [],
-        "evidence": [],
+        "status": "implemented-unverified",
+        "findings": [
+          "Settings tabs compute left/right overflow and show edge fades only where more tabs can be scrolled. The observed element wraps the full-width tab content so ResizeObserver catches descendant overflow. Upstream CI, SAST, and Dependency Review succeeded; the UI behavior still needs a current mobile browser replay and screenshot."
+        ],
+        "acceptance": [
+          "On narrow screens, tab overflow is discoverable through edge fades that update on resize and scrolling, and disappear at each corresponding edge.",
+          "A mobile browser screenshot is retained."
+        ],
+        "evidence": [
+          "client/src/pages/settings.tsx",
+          "client/__tests__/SettingsPage.test.tsx",
+          "docs/upstream-resolution/evidence/validation-batch-86.md",
+          "https://github.com/Doezer/Questarr/pull/969"
+        ],
         "dependencies": []
       },
       "sourceChangedSinceReview": false

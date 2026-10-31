@@ -22,30 +22,29 @@ The live audit refreshed upstream main
 6b14c6943938fd22d9943368baca3c72b1fa957c. The sanitized source snapshot has
 235 issues and 1,011 pull requests (1,246 records total) and was generated at
 2026-10-31 04:04:24 UTC. The current ledger records 44 source-changed records;
-each needs renewed review against its current source. Batch 84 reviewed PRs
-#950–#957 and Batch 85 reviewed PRs #958–#963; all 14 source digests matched
-the refreshed snapshot.
+each needs renewed review against its current source. Batches 84–86 reviewed
+PRs #950–#964 plus #966–#967 and #969, and issues #965 and #968; all 20
+reviewed digests matched the refreshed snapshot.
 
 | Review status | Items |
 | --- | ---: |
-| verified | 699 |
+| verified | 701 |
 | superseded | 227 |
 | not-applicable | 14 |
-| implemented-unverified | 8 |
+| implemented-unverified | 12 |
 | needs-implementation | 0 |
-| unreviewed | 298 |
+| unreviewed | 292 |
 | **Total** | **1,246** |
 
-The ledger gives 948 records an assigned disposition. The eight
+The ledger gives 954 records an assigned disposition. The 12
 implemented-unverified items include four integrations awaiting live-service
 checks, DCO enforcement awaiting maintainer rollout, PR #933 awaiting an
-Inno Setup build and Windows installation/service-lifecycle checks, plus the
-new fallback-category and cookie-first auth changes from Batch 84. Forty-four
-source-changed records and 298 unreviewed records remain. Batch 84's new
-category notice and cookie-first auth behavior still need exact-head tests and
-browser evidence on compatible private ephemeral JIT capacity. These counts
-describe progress, not campaign completion. See the
-[Batch 85 review evidence](evidence/validation-batch-85.md).
+Inno Setup build and Windows installation/service-lifecycle checks, the two
+Batch 84 changes, and the Batch 86 game, FitGirl import, and settings-tab
+mobile behaviors. The 44 source-changed and 292 unreviewed records remain.
+Batch 84 and Batch 86 still need exact-head tests and browser evidence on
+compatible private ephemeral JIT capacity. These counts describe progress,
+not campaign completion. See [Batch 86 evidence](evidence/validation-batch-86.md).
 
 
 ## Project records
@@ -2402,3 +2401,21 @@ by focused validation in Batches 47, 58, 73, 79, 82, and 83. No source code
 changed in Batch 85, so no new test job was started. The full current-head
 validation gate remains outstanding, as do 298 unreviewed records and 44
 source-changed records. See [Batch 85 evidence](evidence/validation-batch-85.md).
+
+## Batch 86 — October 31, 2026
+
+Batch 86 reviewed PR #964, issue #965, PR #966, PR #967, issue #968, and PR
+#969. The IGDB rate-limit range is verified by the prior #949/Batch 83 evidence.
+The SettingsPage docstring requested by #966 is present. The /play game phases,
+the exact FitGirl content-root fix, and the settings-tab scroll fades are
+implemented in QuestarrNG; focused tests and, for visible client changes,
+browser screenshots remain pending on private JIT.
+
+The game PRs had successful upstream CI, SAST, and Dependency Review runs, and
+their functional review findings are present in the current code. The Settings
+tab PR also passed those checks. The standalone #966 Dependency Review job
+failed at startup; the request is documentation-only. Issue #968 has only an
+automated triage comment, but its exact Cataclismo example appears in a local
+regression test and the resolver selects the shared root folder. No batch
+source code changed; no test job was started.
+See [Batch 86 evidence](evidence/validation-batch-86.md).

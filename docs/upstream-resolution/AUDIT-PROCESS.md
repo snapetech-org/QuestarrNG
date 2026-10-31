@@ -31,31 +31,31 @@ deployment, database, security, and user-facing behavior where applicable.
 The live GitHub audit refreshed upstream main
 6b14c6943938fd22d9943368baca3c72b1fa957c. The sanitized source snapshot has
 235 issues and 1,011 pull requests (1,246 records total), with ledger
-generation time 2026-10-31 04:04:24 UTC. Batch 84 reviewed PRs #950–#957 and
-Batch 85 reviewed PRs #958–#963; all 14 digests matched the refreshed
-snapshot. PRs #950, #952, #953, #955, #958, and #960–#963 are verified; #956
-and #957 are superseded by current versions/policy; #959 is superseded by #947;
-#951 and #954 remain implemented-unverified pending private-JIT test and
+generation time 2026-10-31 04:04:24 UTC. Batches 84–86 reviewed PRs #950–#964,
+#966–#967, and #969 plus issues #965 and #968; all 20 digests matched the
+snapshot. PRs #950, #952–#953, #955, #958, #960–#963, and #966, plus issue #965,
+are verified; #956–#957 and #959 are superseded. PRs #951, #954, #964, #967, and
+#969 and issue #968 remain implemented-unverified pending exact-head tests or
 browser evidence.
 
 | Ledger status | Count | Meaning at this snapshot |
 | --- | ---: | --- |
-| verified | 699 | Acceptance checks have evidence showing the behavior is present and works. |
+| verified | 701 | Acceptance checks have evidence showing the behavior is present and works. |
 | superseded | 227 | A later request or implementation replaces the original; the relationship is recorded. |
 | not-applicable | 14 | The source does not call for an actionable QuestarrNG change; the reason is recorded. |
 | needs-implementation | 0 | An actionable behavior gap remains. |
-| implemented-unverified | 8 | Implementation exists, but a required verification remains outstanding. |
-| unreviewed | 298 | Source-by-source review and disposition are incomplete. |
+| implemented-unverified | 12 | Implementation exists, but a required verification remains outstanding. |
+| unreviewed | 292 | Source-by-source review and disposition are incomplete. |
 
 These are review states, separate from upstream's open, closed, or merged state.
-The ledger has 948 assigned dispositions and 44 source-changed records that
-must be re-reviewed. The eight implemented-unverified entries include four
+The ledger has 954 assigned dispositions and 44 source-changed records that
+must be re-reviewed. The 12 implemented-unverified entries include four
 live-service checks, DCO enforcement awaiting maintainer rollout, PR #933's
-Windows installer and service-lifecycle verification, and the two Batch 84
-changes. See the campaign README and linked batch evidence.
-The ledger capturedAt, forkHead, and upstreamHead fields identify inventory
-generation. Refresh the source snapshot before final review and revisit every
-item whose source changed.
+Windows installer and service-lifecycle verification, and six pending
+Batch 84/86 tests or browser checks. See the campaign README and linked batch
+evidence. The ledger capturedAt, forkHead, and upstreamHead fields identify
+inventory generation. Refresh the source snapshot before final review and
+revisit every item whose source changed.
 
 ## Records and source of truth
 

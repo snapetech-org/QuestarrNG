@@ -945,12 +945,12 @@ Snapshot: 2026-10-31T04:04:24.266Z. 1246 items. All ancestry observations requir
 | [pr #961](https://github.com/Doezer/Questarr/pull/961) | Fix clipboard copy buttons on non-secure (HTTP) contexts | MERGED | merge-commit-in-fork-history | verified |
 | [pr #962](https://github.com/Doezer/Questarr/pull/962) | Add SABnzbd archive password support for G4U-style releases | MERGED | merge-commit-in-fork-history | verified |
 | [pr #963](https://github.com/Doezer/Questarr/pull/963) | Add indexer priority sort option to download search results | MERGED | merge-commit-in-fork-history | verified |
-| [pr #964](https://github.com/Doezer/Questarr/pull/964) | Convert the /play ghost game into an isometric infiltration game | MERGED | merge-commit-in-fork-history | unreviewed |
-| [issue #965](https://github.com/Doezer/Questarr/issues/965) | Validate IGDB API rate limit on client and server | CLOSED | no-merge-commit | unreviewed |
-| [pr #966](https://github.com/Doezer/Questarr/pull/966) | 📝 Add docstrings to `claude/settings-tabs-reorg` | MERGED | merge-commit-in-fork-history | unreviewed |
-| [pr #967](https://github.com/Doezer/Questarr/pull/967) | Add multi-room levels, keycards and a stealth detection meter to the /play game | MERGED | merge-commit-in-fork-history | unreviewed |
-| [issue #968](https://github.com/Doezer/Questarr/issues/968) | Auto-import of FitGirl repacks failing | CLOSED | no-merge-commit | unreviewed |
-| [pr #969](https://github.com/Doezer/Questarr/pull/969) | Add scroll fade hints to Settings tab strip on mobile | MERGED | merge-commit-in-fork-history | unreviewed |
+| [pr #964](https://github.com/Doezer/Questarr/pull/964) | Convert the /play ghost game into an isometric infiltration game | MERGED | merge-commit-in-fork-history | implemented-unverified |
+| [issue #965](https://github.com/Doezer/Questarr/issues/965) | Validate IGDB API rate limit on client and server | CLOSED | no-merge-commit | verified |
+| [pr #966](https://github.com/Doezer/Questarr/pull/966) | 📝 Add docstrings to `claude/settings-tabs-reorg` | MERGED | merge-commit-in-fork-history | verified |
+| [pr #967](https://github.com/Doezer/Questarr/pull/967) | Add multi-room levels, keycards and a stealth detection meter to the /play game | MERGED | merge-commit-in-fork-history | implemented-unverified |
+| [issue #968](https://github.com/Doezer/Questarr/issues/968) | Auto-import of FitGirl repacks failing | CLOSED | no-merge-commit | implemented-unverified |
+| [pr #969](https://github.com/Doezer/Questarr/pull/969) | Add scroll fade hints to Settings tab strip on mobile | MERGED | merge-commit-in-fork-history | implemented-unverified |
 | [pr #970](https://github.com/Doezer/Questarr/pull/970) | chore(deps): bump node from `aadf416` to `f5d1cc4` | CLOSED | no-merge-commit | unreviewed |
 | [pr #971](https://github.com/Doezer/Questarr/pull/971) | chore(deps-dev): bump the dev-dependencies group with 6 updates | MERGED | merge-commit-in-fork-history | unreviewed |
 | [pr #972](https://github.com/Doezer/Questarr/pull/972) | chore(deps): bump github/codeql-action/upload-sarif from 4.37.7 to 4.37.8 in the all-actions group | MERGED | merge-commit-in-fork-history | unreviewed |
