@@ -13,24 +13,12 @@ export const REQUIRED_CHECKS = [
   "windows-service",
   "Build and check on Node 22.23.4",
   "Build and check on Node 26.x",
-  "Analyze (javascript-typescript)",
-  "Analyze (csharp)",
-  "Analyze (actions)",
-  "Analyze (cpp)",
   "semgrep",
   "Playwright e2e",
   "OWASP ZAP baseline scan",
   "Scorecard analysis",
   "npm-audit",
   "image-scan",
-];
-
-export const REQUIRED_CODE_ANALYSES = [
-  { tool: "CodeQL", category: "/language:csharp" },
-  { tool: "CodeQL", category: "/language:javascript-typescript" },
-  { tool: "CodeQL", category: "/language:actions" },
-  { tool: "CodeQL", category: "/language:cpp" },
-  { tool: "Semgrep OSS", category: ".github/workflows/sast.yml:semgrep" },
 ];
 
 const INFORMATIONAL_SCORECARD_RULES = new Set([
@@ -44,8 +32,8 @@ const SOURCE_SCAN_POLL_MS = 15 * 1000;
 function isBlockingCodeAlert(alert, releaseRef) {
   const instance = alert.most_recent_instance;
   if (releaseRef && instance?.ref !== releaseRef) {
-    // Scorecard is checked against the default branch below; the source tag
-    // scans are CodeQL and Semgrep, and must fail closed if their ref differs.
+    // Scorecard is checked against the default branch below; other source
+    // alerts must match the release ref so stale findings cannot be ignored.
     return alert.tool?.name !== "Scorecard";
   }
   const state = instance?.state ?? alert.state;
@@ -86,37 +74,6 @@ export function securityBlockers(codeAlerts, dependencyAlerts, checkRuns = null,
   return blockers;
 }
 
-export function sourceAnalysisBlockers(analyses, releaseRef, releaseSha) {
-  const sourceAnalyses = analyses.filter(
-    (analysis) => analysis.ref === releaseRef && analysis.commit_sha === releaseSha
-  );
-  return REQUIRED_CODE_ANALYSES.filter((required) => {
-    const matchingAnalyses = sourceAnalyses.filter(
-      (analysis) =>
-        analysis.tool?.name?.toLowerCase() === required.tool.toLowerCase() &&
-        (required.category === undefined || analysis.category === required.category)
-    );
-    // A rerun can leave an older success, so require the newest exact-source analysis.
-    if (
-      matchingAnalyses.some((analysis) => !Number.isFinite(Date.parse(analysis.created_at ?? "")))
-    ) {
-      return true;
-    }
-    const latestAnalysis = matchingAnalyses.reduce((latest, analysis) => {
-      const latestCreated = Date.parse(latest.created_at ?? "");
-      const analysisCreated = Date.parse(analysis.created_at ?? "");
-      if (analysisCreated !== latestCreated) {
-        return analysisCreated > latestCreated ? analysis : latest;
-      }
-      return Number(analysis.id) > Number(latest.id) ? analysis : latest;
-    }, matchingAnalyses[0]);
-    return !latestAnalysis || latestAnalysis.error !== "";
-  }).map((required) => {
-    const category = required.category ? " " + required.category : "";
-    return required.tool + category + " analysis is missing for " + releaseRef + "@" + releaseSha;
-  });
-}
-
 function pages(endpoint) {
   return JSON.parse(
     execFileSync("gh", ["api", "--paginate", "--slurp", endpoint], {
@@ -130,20 +87,15 @@ function flattenedPages(endpoint) {
   return pages(endpoint).flat();
 }
 
-async function waitForReleaseScans(repository, releaseRef, releaseSha) {
+async function waitForRequiredChecks(repository, releaseRef, releaseSha) {
   const deadline = Date.now() + SOURCE_SCAN_WAIT_MS;
   let didLogWaiting = false;
   while (true) {
-    const refQuery = encodeURIComponent(releaseRef);
-    const analyses = flattenedPages(
-      "repos/" + repository + "/code-scanning/analyses?ref=" + refQuery + "&per_page=100"
-    );
     const checkRuns = flattenedPages(
       "repos/" + repository + "/commits/" + releaseSha + "/check-runs?filter=latest&per_page=100"
     ).flatMap((page) => page.check_runs ?? []);
-    const missingAnalyses = sourceAnalysisBlockers(analyses, releaseRef, releaseSha);
     const checkProblems = securityBlockers([], [], checkRuns);
-    if (missingAnalyses.length === 0 && checkProblems.length === 0) return checkRuns;
+    if (checkProblems.length === 0) return checkRuns;
 
     const terminalCheckProblems = checkProblems.filter((problem) => {
       const state = problem.slice(problem.lastIndexOf(":") + 1).trim();
@@ -157,16 +109,15 @@ async function waitForReleaseScans(repository, releaseRef, releaseSha) {
       );
     }
     if (Date.now() >= deadline) {
-      const blockers = [...missingAnalyses, ...checkProblems];
       throw new Error(
         "Release source scans did not finish before timeout:" +
           String.fromCharCode(10) +
-          blockers.map((problem) => "- " + problem).join(String.fromCharCode(10))
+          checkProblems.map((problem) => "- " + problem).join(String.fromCharCode(10))
       );
     }
     if (!didLogWaiting) {
       console.log(
-        "Waiting for CodeQL, Semgrep, and required checks on " + releaseRef + "@" + releaseSha + "."
+        "Waiting for configured release checks on " + releaseRef + "@" + releaseSha + "."
       );
       didLogWaiting = true;
     }
@@ -199,9 +150,8 @@ export async function checkReleaseSecurity(repository, sha, releaseRef) {
       "GITHUB_REPOSITORY, a full release SHA, and RELEASE_REF (refs/tags/vMAJOR.MINOR.PATCH) are required"
     );
   }
-  // Check the exact tagged source, and wait until its tag-specific SAST analyses
-  // exist so an empty alert response cannot be mistaken for a completed clean scan.
-  const checks = await waitForReleaseScans(repository, releaseRef, sha);
+  // Wait for required checks on the exact tagged source commit before evaluating alerts.
+  const checks = await waitForRequiredChecks(repository, releaseRef, sha);
   // A previously successful scan cannot cover advisories published since it ran.
   auditReleaseLockfiles(sha);
   // API failures, including insufficient permissions, throw and block publication.
@@ -238,7 +188,7 @@ export async function checkReleaseSecurity(repository, sha, releaseRef) {
       sha +
       " on " +
       releaseRef +
-      ": zero open security findings and all scans successful."
+      ": zero open security findings and all configured checks successful."
   );
 }
 

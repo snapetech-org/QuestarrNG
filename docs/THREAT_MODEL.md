@@ -327,8 +327,9 @@ linked file as the source of truth.
 - **Secrets scanning / dependency hygiene:** GitHub secret scanning and push protection,
   `.github/workflows/ci.yml` (`secretlint`), `.github/dependabot.yml`, and
   `.github/workflows/dependency-review.yml`
-- **SAST:** CodeQL advanced setup in `.github/workflows/codeql.yml` (JavaScript/TypeScript,
-  C#, and GitHub Actions) plus Semgrep in `.github/workflows/sast.yml`
+- **SAST:** Semgrep in `.github/workflows/sast.yml` and
+  `.github/workflows/semgrep-community.yml`. The current change set removes
+  CodeQL workflows under the organization policy.
 - **Container image scanning:** Trivy builds a local production image in
   `.github/workflows/vulnerability-scan.yml` on main pushes, weekly, and pull
   requests that change image or dependency inputs. The tag-triggered
