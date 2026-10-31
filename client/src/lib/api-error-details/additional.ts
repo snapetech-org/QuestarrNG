@@ -695,7 +695,7 @@ const ADDITIONAL_API_ERROR_DETAIL_LABELS: Record<
     "Hash tidak ditemukan di VirusTotal dan opsi 'Blokir hash yang tidak dikenal' aktif",
   ],
   "ClamAV ran out of time before scanning every file. Review it before importing.": [
-    "ClamAV agotó el tiempo antes de analizar todos los archivos. Revísala antes de importarla.",
+    "ClamAV agotó el tiempo antes de analizar todos los archivos. Revisa la descarga antes de importarla.",
     "ClamAV 尚未扫描完所有文件就已超时。导入前请先检查。",
     "सभी फ़ाइलों को स्कैन करने से पहले ClamAV का समय समाप्त हो गया। आयात करने से पहले इसकी समीक्षा करें।",
     "ClamAV ging die Zeit aus, bevor alle Dateien geprüft waren. Prüfe den Download vor dem Import.",

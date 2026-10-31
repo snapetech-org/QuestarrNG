@@ -39,7 +39,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Failed to update SSL settings": "SSL-Einstellungen konnten nicht aktualisiert werden",
   "Failed to generate certificate": "Zertifikat konnte nicht erstellt werden",
   "Both certificate and private key files are required":
-    "Zertifikat- und privater Schlüsseldatei werden benötigt",
+    "Sowohl die Zertifikatsdatei als auch die Datei mit dem privaten Schlüssel werden benötigt.",
   "Invalid certificate file format (PEM expected)":
     "Ungültiges Zertifikatdateiformat (PEM erwartet)",
   "Invalid private key file format (PEM expected)":

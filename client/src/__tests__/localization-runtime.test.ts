@@ -68,7 +68,7 @@ describe("UI catalog structure", () => {
     expect(labels["Repair OK"]?.vi).toBe("Sửa chữa thành công");
     expect(labels["Mapping Deleted"]?.fr).toBe("Mappage supprimé");
     expect(labels["Mapping Deleted"]?.ko).toBe("매핑 삭제됨");
-    expect(labels["Auto-Unpack Archives"]?.hi).toBe("संग्रह फ़ाइलें अपने-आप निकालें");
+    expect(labels["Auto-Unpack Archives"]?.hi).toBe("आर्काइव फ़ाइलें अपने-आप निकालें");
     expect(labels["Auto-Unpack Archives"]?.de).toBe("Archive automatisch entpacken");
     expect(labels["Unpack:"]?.ja).toBe("展開：");
     expect(labels["Auto-Sync Wishlist"]?.de).toBe("Wunschliste automatisch synchronisieren");
