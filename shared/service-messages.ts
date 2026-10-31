@@ -68,9 +68,9 @@ export class ServiceMessageError extends Error implements ServiceMessageDescript
   readonly messageKey: ServiceMessageKey;
   readonly messageValues: ServiceMessageValues;
   readonly messageDetails?: Record<string, ServiceMessageDescriptor>;
-  constructor(key: ServiceMessageKey, values: Parameters) {
+  constructor(key: ServiceMessageKey, values: Parameters, options?: ErrorOptions) {
     const fragment = serviceMessage(key, values);
-    super(fragment.message);
+    super(fragment.message, options);
     this.name = "ServiceMessageError";
     this.messageKey = fragment.messageKey;
     this.messageValues = fragment.messageValues;

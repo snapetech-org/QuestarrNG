@@ -941,7 +941,6 @@ export class SynologyDownloadStationClient implements DownloaderClient {
         }),
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       return {
         success: false,
         ...serviceMessage("service.connection_failed", {

@@ -2817,6 +2817,51 @@ export const STABLE_INTERFACE_MESSAGES = {
   "service.download_url_required": "Download URL is required",
   "service.invalid_relative_download_path":
     "Invalid download path: use a relative path without parent-directory segments",
+  "service.no_error_details_available": "No error details available",
+  "service.download_torrent_failed": "Failed to download torrent: {status} {statusText}",
+  "service.magnet_add_failed": "Failed to add magnet link: {error}",
+  "service.download_torrent_file_failed": "Failed to download torrent file: {error}",
+  "service.deluge_invalid_password": "Deluge authentication failed: Invalid password",
+  "service.deluge_unexpected_auth_response": "Deluge authentication failed: Unexpected response",
+  "service.deluge_no_daemon_hosts": "No Deluge daemon hosts configured in Web UI",
+  "service.deluge_daemon_connect_failed": "Failed to connect Deluge Web UI to daemon",
+  "service.deluge_magnet_add_failed": "Failed to add magnet link to Deluge",
+  "service.deluge_download_add_failed": "Failed to add download to Deluge",
+  "service.deluge_authentication_failed":
+    "Authentication failed: Invalid password for Deluge - {error}",
+  "service.deluge_invalid_json": "Invalid JSON response from Deluge",
+  "service.deluge_rpc_error": "Deluge RPC error: {error}",
+  "service.deluge_rpc_error_without_details": "Deluge RPC error: Deluge RPC error",
+  "service.rtorrent_add_return_code": "Failed to add download (rTorrent returned code: {code})",
+  "service.indexer_download_failed": "Failed to download file from indexer: {error}",
+  "service.rtorrent_digest_algorithm_unsupported":
+    "Unsupported rTorrent Digest algorithm: {algorithm}. Configure rTorrent to advertise SHA-256.",
+  "service.rtorrent_digest_auth_failed": "Digest Authentication failed (wrong credentials)",
+  "service.rtorrent_digest_http_auth_failed":
+    "Digest Authentication failed (wrong credentials, or server may have switched to HTTPS)",
+  "service.rtorrent_digest_auth_error": "Digest Auth Error: {error}",
+  "service.rtorrent_authentication_failed":
+    "Authentication failed: Invalid credentials or web server authentication not configured for rTorrent - {error}",
+  "service.xml_rpc_fault": "XML-RPC Fault: {error}",
+  "service.xml_rpc_fault_without_details": "XML-RPC Fault occurred",
+  "service.transmission_authentication_failed":
+    "Authentication failed: Invalid username or password for Transmission - {error}",
+  "service.authentication_http_failed": "Authentication failed: {status} {statusText} - {error}",
+  "service.authentication_failed": "Authentication failed: {error}",
+  "service.qbittorrent_magnet_not_found":
+    "Magnet link was accepted by qBittorrent but the torrent was not found afterwards",
+  "service.qbittorrent_magnet_add_failed": "Failed to add magnet link to qBittorrent",
+  "service.redirected_magnet_hash_missing": "Could not extract hash from redirected magnet link",
+  "service.qbittorrent_download_not_added":
+    "Download was not added to qBittorrent (not found after adding)",
+  "service.qbittorrent_download_exists_or_invalid":
+    "Download already exists or invalid download (qBittorrent)",
+  "service.unknown_cause": "Unknown cause",
+  "service.fetch_failed_cause": "{error} ({cause})",
+  "service.indexer_connection_refused_error":
+    "{error} - The indexer refused the connection. Check if Prowlarr/Jackett is running and the port is correct.",
+  "service.torrent_error": "Torrent error",
+  "service.download_added_via_url": "Download added successfully (via URL)",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

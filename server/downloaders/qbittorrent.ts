@@ -1,4 +1,10 @@
-import { serviceErrorValue, serviceMessage } from "../../shared/service-messages.js";
+import {
+  ServiceMessageError,
+  type ServiceMessageFragment,
+  parseServiceMessageDescriptor,
+  serviceErrorValue,
+  serviceMessage,
+} from "../../shared/service-messages.js";
 import type {
   Downloader,
   DownloadStatus,
@@ -101,7 +107,6 @@ export class QBittorrentClient implements DownloaderClient {
         }),
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       return {
         success: false,
         ...serviceMessage("service.connection_failed", {
@@ -506,8 +511,7 @@ export class QBittorrentClient implements DownloaderClient {
             if (isMagnet) {
               return {
                 success: false,
-                message:
-                  "Magnet link was accepted by qBittorrent but the torrent was not found afterwards",
+                ...serviceMessage("service.qbittorrent_magnet_not_found", {}),
               };
             }
           } else {
@@ -536,7 +540,7 @@ export class QBittorrentClient implements DownloaderClient {
             if (isMagnet) {
               return {
                 success: false,
-                message: "Failed to add magnet link to qBittorrent",
+                ...serviceMessage("service.qbittorrent_magnet_add_failed", {}),
               };
             }
           }
@@ -551,7 +555,7 @@ export class QBittorrentClient implements DownloaderClient {
           if (isMagnet) {
             return {
               success: false,
-              message: `Failed to add magnet link: ${urlAddResponseText}`,
+              ...serviceMessage("service.magnet_add_failed", { error: urlAddResponseText }),
             };
           }
 
@@ -562,10 +566,9 @@ export class QBittorrentClient implements DownloaderClient {
         }
       } catch (error) {
         if (isMagnet) {
-          const errorMessage = error instanceof Error ? error.message : "Unknown error";
           return {
             success: false,
-            message: `Failed to add magnet link: ${errorMessage}`,
+            ...serviceMessage("service.magnet_add_failed", { error: serviceErrorValue(error) }),
           };
         }
 
@@ -639,7 +642,7 @@ export class QBittorrentClient implements DownloaderClient {
           if (!magnetHash) {
             // Should technically not happen if fetchWithMagnetDetection returns a magnet link that starts with magnet:
             // but extractHashFromUrl does stricter checking
-            throw new Error("Could not extract hash from redirected magnet link");
+            throw new ServiceMessageError("service.redirected_magnet_hash_missing", {});
           }
 
           downloadersLogger.info({ magnetHash }, "Adding redirected magnet link to qBittorrent");
@@ -655,7 +658,7 @@ export class QBittorrentClient implements DownloaderClient {
         if (!torrentResponse || !torrentResponse.ok) {
           const status = torrentResponse?.status || "unknown";
           const statusText = torrentResponse?.statusText || "No response";
-          throw new Error(`Failed to download torrent: ${status} ${statusText}`);
+          throw new ServiceMessageError("service.download_torrent_failed", { status, statusText });
         }
 
         const contentDisposition = torrentResponse.headers.get("content-disposition");
@@ -701,19 +704,24 @@ export class QBittorrentClient implements DownloaderClient {
           "Failed to download torrent file"
         );
 
-        let userFriendlyError = errorMessage;
+        let userFriendlyError: string | ServiceMessageFragment = serviceErrorValue(error);
         if (errorMessage === "fetch failed" && errorCause) {
-          userFriendlyError += ` (${errorCause.code || errorCause.message || "Unknown cause"})`;
+          userFriendlyError = serviceMessage("service.fetch_failed_cause", {
+            error: errorMessage,
+            cause:
+              errorCause.code || errorCause.message || serviceMessage("service.unknown_cause", {}),
+          });
 
           if (errorCause.code === "ECONNREFUSED") {
-            userFriendlyError +=
-              " - The indexer refused the connection. Check if Prowlarr/Jackett is running and the port is correct.";
+            userFriendlyError = serviceMessage("service.indexer_connection_refused_error", {
+              error: userFriendlyError,
+            });
           }
         }
 
         return {
           success: false,
-          message: `Failed to download torrent file: ${userFriendlyError}`,
+          ...serviceMessage("service.download_torrent_file_failed", { error: userFriendlyError }),
         };
       }
 
@@ -899,7 +907,7 @@ export class QBittorrentClient implements DownloaderClient {
           downloadersLogger.error({ hash }, "Download not found in qBittorrent after adding");
           return {
             success: false,
-            message: "Download was not added to qBittorrent (not found after adding)",
+            ...serviceMessage("service.qbittorrent_download_not_added", {}),
           };
         }
       } else if (uploadFails) {
@@ -913,7 +921,7 @@ export class QBittorrentClient implements DownloaderClient {
         return {
           success: true,
           ...(duplicateHash ? { id: duplicateHash } : {}),
-          message: "Download already exists or invalid download (qBittorrent)",
+          ...serviceMessage("service.qbittorrent_download_exists_or_invalid", {}),
         };
       } else if (response.status === 409) {
         downloadersLogger.warn(
@@ -1385,7 +1393,14 @@ export class QBittorrentClient implements DownloaderClient {
       seeders: swarmSeeders ?? connectedSeeders,
       leechers: swarmLeechers ?? connectedLeechers,
       ratio: torrent.ratio,
-      error: torrent.state === "error" ? torrent.error_string || "Torrent error" : undefined,
+      error:
+        torrent.state === "error"
+          ? torrent.error_string || serviceMessage("service.torrent_error", {}).message
+          : undefined,
+      errorI18n:
+        torrent.state === "error" && !torrent.error_string
+          ? parseServiceMessageDescriptor(serviceMessage("service.torrent_error", {}))
+          : undefined,
       category: torrent.category,
     };
   }
@@ -1461,17 +1476,21 @@ export class QBittorrentClient implements DownloaderClient {
       await logDownloaderDebugResponse("qBittorrent", "POST", url, response);
 
       if (!response.ok) {
-        const errorText = await response.text().catch(() => "No error details available");
-        throw new Error(
-          `Authentication failed: ${response.status} ${response.statusText} - ${errorText}`
-        );
+        const errorText = await response
+          .text()
+          .catch(() => serviceMessage("service.no_error_details_available", {}));
+        throw new ServiceMessageError("service.authentication_http_failed", {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText,
+        });
       }
 
       const responseText = await response.text();
       downloadersLogger.debug({ responseText }, "qBittorrent auth response");
 
       if (responseText && responseText !== "Ok." && responseText !== "") {
-        throw new Error(`Authentication failed: ${responseText}`);
+        throw new ServiceMessageError("service.authentication_failed", { error: responseText });
       }
 
       // Extract ALL cookies from response
@@ -1635,18 +1654,30 @@ export class QBittorrentClient implements DownloaderClient {
       await logDownloaderDebugResponse("qBittorrent", method, url, response);
 
       if (!response.ok && response.status !== 409) {
-        const errorText = await response.text().catch(() => "No error details available");
+        const errorText = await response
+          .text()
+          .catch(() => serviceMessage("service.no_error_details_available", {}));
         downloadersLogger.error(
           { status: response.status, statusText: response.statusText, errorText, path },
           "qBittorrent request failed after re-authentication"
         );
-        throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+        throw new ServiceMessageError("service.http_error_status", {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText,
+        });
       }
     }
 
     if (!response.ok && response.status !== 409) {
-      const errorText = await response.text().catch(() => "No error details available");
-      throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+      const errorText = await response
+        .text()
+        .catch(() => serviceMessage("service.no_error_details_available", {}));
+      throw new ServiceMessageError("service.http_error_status", {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText,
+      });
     }
 
     return response;

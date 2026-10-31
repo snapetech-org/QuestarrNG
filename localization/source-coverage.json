@@ -1263,6 +1263,619 @@
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "source-fallback",
       "directTargetCells": 12
+    },
+    {
+      "key": "service.no_error_details_available",
+      "source": "No error details available",
+      "kind": "app-owned torrent client transport/action",
+      "owners": [
+        "server/downloaders/deluge.ts",
+        "server/downloaders/qbittorrent.ts",
+        "server/downloaders/rtorrent.ts",
+        "server/downloaders/transmission.ts"
+      ],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.download_torrent_failed",
+      "source": "Failed to download torrent: {status} {statusText}",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/deluge.ts", "server/downloaders/qbittorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.magnet_add_failed",
+      "source": "Failed to add magnet link: {error}",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/qbittorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.download_torrent_file_failed",
+      "source": "Failed to download torrent file: {error}",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/qbittorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.deluge_invalid_password",
+      "source": "Deluge authentication failed: Invalid password",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/deluge.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.deluge_unexpected_auth_response",
+      "source": "Deluge authentication failed: Unexpected response",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/deluge.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.deluge_no_daemon_hosts",
+      "source": "No Deluge daemon hosts configured in Web UI",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/deluge.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.deluge_daemon_connect_failed",
+      "source": "Failed to connect Deluge Web UI to daemon",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/deluge.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.deluge_magnet_add_failed",
+      "source": "Failed to add magnet link to Deluge",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/deluge.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.deluge_download_add_failed",
+      "source": "Failed to add download to Deluge",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/deluge.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.deluge_authentication_failed",
+      "source": "Authentication failed: Invalid password for Deluge - {error}",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/deluge.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.deluge_invalid_json",
+      "source": "Invalid JSON response from Deluge",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/deluge.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.deluge_rpc_error",
+      "source": "Deluge RPC error: {error}",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/deluge.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.deluge_rpc_error_without_details",
+      "source": "Deluge RPC error: Deluge RPC error",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/deluge.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.rtorrent_add_return_code",
+      "source": "Failed to add download (rTorrent returned code: {code})",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/rtorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.indexer_download_failed",
+      "source": "Failed to download file from indexer: {error}",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/rtorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.rtorrent_digest_algorithm_unsupported",
+      "source": "Unsupported rTorrent Digest algorithm: {algorithm}. Configure rTorrent to advertise SHA-256.",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/rtorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.rtorrent_digest_auth_failed",
+      "source": "Digest Authentication failed (wrong credentials)",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/rtorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.rtorrent_digest_http_auth_failed",
+      "source": "Digest Authentication failed (wrong credentials, or server may have switched to HTTPS)",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/rtorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.rtorrent_digest_auth_error",
+      "source": "Digest Auth Error: {error}",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/rtorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.rtorrent_authentication_failed",
+      "source": "Authentication failed: Invalid credentials or web server authentication not configured for rTorrent - {error}",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/rtorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.xml_rpc_fault",
+      "source": "XML-RPC Fault: {error}",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/rtorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.xml_rpc_fault_without_details",
+      "source": "XML-RPC Fault occurred",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/rtorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.transmission_authentication_failed",
+      "source": "Authentication failed: Invalid username or password for Transmission - {error}",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/transmission.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.authentication_http_failed",
+      "source": "Authentication failed: {status} {statusText} - {error}",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/qbittorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.authentication_failed",
+      "source": "Authentication failed: {error}",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/qbittorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.qbittorrent_magnet_not_found",
+      "source": "Magnet link was accepted by qBittorrent but the torrent was not found afterwards",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/qbittorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.qbittorrent_magnet_add_failed",
+      "source": "Failed to add magnet link to qBittorrent",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/qbittorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.redirected_magnet_hash_missing",
+      "source": "Could not extract hash from redirected magnet link",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/qbittorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.qbittorrent_download_not_added",
+      "source": "Download was not added to qBittorrent (not found after adding)",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/qbittorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.qbittorrent_download_exists_or_invalid",
+      "source": "Download already exists or invalid download (qBittorrent)",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/qbittorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.unknown_cause",
+      "source": "Unknown cause",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/qbittorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.fetch_failed_cause",
+      "source": "{error} ({cause})",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/qbittorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.indexer_connection_refused_error",
+      "source": "{error} - The indexer refused the connection. Check if Prowlarr/Jackett is running and the port is correct.",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/qbittorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.torrent_error",
+      "source": "Torrent error",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/qbittorrent.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_deluge_remaining.test.ts",
+        "server/__tests__/downloaders_qbittorrent_remaining.test.ts",
+        "server/__tests__/downloaders_rtorrent_remaining.test.ts",
+        "server/__tests__/downloaders_transmission_remaining.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.download_added_via_url",
+      "source": "Download added successfully (via URL)",
+      "kind": "app-owned torrent client transport/action",
+      "owners": ["server/downloaders/deluge.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_typed_messages.test.ts",
+        "server/__tests__/downloaders_typed_messages.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
     }
   ],
   "codeUnits": [

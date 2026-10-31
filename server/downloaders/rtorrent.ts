@@ -1,4 +1,5 @@
 import {
+  ServiceMessageError,
   serviceErrorValue,
   serviceErrorResult,
   serviceMessage,
@@ -158,7 +159,7 @@ export class RTorrentClient implements DownloaderClient {
         }
         return {
           success: false,
-          message: `Failed to add download (rTorrent returned code: ${result})`,
+          ...serviceMessage("service.rtorrent_add_return_code", { code: String(result) }),
         };
       };
 
@@ -196,7 +197,10 @@ export class RTorrentClient implements DownloaderClient {
           { status, url: request.url },
           "Failed to download file from indexer"
         );
-        return { success: false, message: `Failed to download file from indexer: ${statusText}` };
+        return {
+          success: false,
+          ...serviceMessage("service.indexer_download_failed", { error: statusText }),
+        };
       }
 
       const arrayBuffer = await fetchResult.response.arrayBuffer();
@@ -237,7 +241,7 @@ export class RTorrentClient implements DownloaderClient {
 
       return {
         success: false,
-        message: `Failed to add download (rTorrent returned code: ${result})`,
+        ...serviceMessage("service.rtorrent_add_return_code", { code: String(result) }),
       };
     } catch (error) {
       downloadersLogger.error({ error, url: request.url }, "Failed to add download");
@@ -702,9 +706,7 @@ export class RTorrentClient implements DownloaderClient {
     const opaque = challenge.opaque;
     // RFC 2617 defaults to MD5 when `algorithm` is missing; never downgrade.
     if (algorithm.toUpperCase() !== "SHA-256") {
-      throw new Error(
-        `Unsupported rTorrent Digest algorithm: ${algorithm}. Configure rTorrent to advertise SHA-256.`
-      );
+      throw new ServiceMessageError("service.rtorrent_digest_algorithm_unsupported", { algorithm });
     }
     const hashAlgo = "sha256";
 
@@ -841,7 +843,9 @@ export class RTorrentClient implements DownloaderClient {
     await logDownloaderDebugResponse("rTorrent", method, url, response);
 
     if (!response.ok) {
-      const errorText = await response.text().catch(() => "No error details available");
+      const errorText = await response
+        .text()
+        .catch(() => serviceMessage("service.no_error_details_available", {}));
       if (response.status === 401) {
         const authHeader = response.headers.get("www-authenticate");
 
@@ -892,14 +896,21 @@ export class RTorrentClient implements DownloaderClient {
                 "rTorrent Digest Authentication failed"
               );
               const isHttp = url.startsWith("http://");
-              throw new Error(
-                `Digest Authentication failed (wrong credentials${isHttp ? ", or server may have switched to HTTPS" : ""})`
+              throw new ServiceMessageError(
+                isHttp
+                  ? "service.rtorrent_digest_http_auth_failed"
+                  : "service.rtorrent_digest_auth_failed",
+                {}
               );
             }
           } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "Unknown error";
             downloadersLogger.error({ error: errorMessage }, "Error processing Digest Auth");
-            throw new Error(`Digest Auth Error: ${errorMessage}`, { cause: error });
+            throw new ServiceMessageError(
+              "service.rtorrent_digest_auth_error",
+              { error: serviceErrorValue(error) },
+              { cause: error }
+            );
           }
         }
 
@@ -914,9 +925,9 @@ export class RTorrentClient implements DownloaderClient {
           },
           "rTorrent authentication failed - verify username, password, and web server authentication configuration"
         );
-        throw new Error(
-          `Authentication failed: Invalid credentials or web server authentication not configured for rTorrent - ${errorText}`
-        );
+        throw new ServiceMessageError("service.rtorrent_authentication_failed", {
+          error: errorText,
+        });
       }
       downloadersLogger.error(
         {
@@ -928,7 +939,11 @@ export class RTorrentClient implements DownloaderClient {
         },
         "rTorrent XML-RPC request failed"
       );
-      throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+      throw new ServiceMessageError("service.http_error_status", {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText,
+      });
     }
 
     const responseText = await response.text();
@@ -944,7 +959,10 @@ export class RTorrentClient implements DownloaderClient {
         unknown
       >;
       const faultString = fault["faultString"] as string;
-      throw new Error(faultString ? `XML-RPC Fault: ${faultString}` : "XML-RPC Fault occurred");
+      throw new ServiceMessageError(
+        faultString ? "service.xml_rpc_fault" : "service.xml_rpc_fault_without_details",
+        { error: faultString }
+      );
     }
 
     if (parsed.methodResponse?.params?.param) {

@@ -1,4 +1,5 @@
 import {
+  ServiceMessageError,
   serviceErrorValue,
   serviceErrorResult,
   serviceMessage,
@@ -786,7 +787,9 @@ export class TransmissionClient implements DownloaderClient {
         await logDownloaderDebugResponse("Transmission", method, url, retryResponse);
 
         if (!retryResponse.ok) {
-          const errorText = await retryResponse.text().catch(() => "No error details available");
+          const errorText = await retryResponse
+            .text()
+            .catch(() => serviceMessage("service.no_error_details_available", {}));
           if (retryResponse.status === 401) {
             downloadersLogger.error(
               {
@@ -798,9 +801,9 @@ export class TransmissionClient implements DownloaderClient {
               },
               "Transmission authentication failed - check username and password"
             );
-            throw new Error(
-              `Authentication failed: Invalid username or password for Transmission - ${errorText}`
-            );
+            throw new ServiceMessageError("service.transmission_authentication_failed", {
+              error: errorText,
+            });
           }
           downloadersLogger.error(
             {
@@ -812,9 +815,11 @@ export class TransmissionClient implements DownloaderClient {
             },
             "Transmission request failed after session ID retry"
           );
-          throw new Error(
-            `HTTP ${retryResponse.status}: ${retryResponse.statusText} - ${errorText}`
-          );
+          throw new ServiceMessageError("service.http_error_status", {
+            status: retryResponse.status,
+            statusText: retryResponse.statusText,
+            error: errorText,
+          });
         }
 
         return retryResponse.json();
@@ -822,7 +827,9 @@ export class TransmissionClient implements DownloaderClient {
     }
 
     if (!response.ok) {
-      const errorText = await response.text().catch(() => "No error details available");
+      const errorText = await response
+        .text()
+        .catch(() => serviceMessage("service.no_error_details_available", {}));
       if (response.status === 401) {
         const authHeader = response.headers.get("www-authenticate");
         downloadersLogger.error(
@@ -836,9 +843,9 @@ export class TransmissionClient implements DownloaderClient {
           },
           "Transmission authentication failed - check username and password"
         );
-        throw new Error(
-          `Authentication failed: Invalid username or password for Transmission - ${errorText}`
-        );
+        throw new ServiceMessageError("service.transmission_authentication_failed", {
+          error: errorText,
+        });
       }
       downloadersLogger.error(
         {
@@ -850,7 +857,11 @@ export class TransmissionClient implements DownloaderClient {
         },
         "Transmission request failed"
       );
-      throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+      throw new ServiceMessageError("service.http_error_status", {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText,
+      });
     }
 
     return response.json();
