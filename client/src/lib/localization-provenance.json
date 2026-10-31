@@ -248,7 +248,8 @@
         "fr-CA": "inherited",
         "zh-Hans": "machine-draft",
         "hi": "machine-draft",
-        "de": "machine-draft"
+        "de": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -7042,7 +7043,8 @@
       "sourceChecksum": "fnv1a32:e0cae336",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -7075,7 +7077,8 @@
       "sourceChecksum": "fnv1a32:12cb9427",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -8326,7 +8329,8 @@
         "es-419": "inherited",
         "fr-CA": "inherited",
         "hi": "machine-draft",
-        "de": "machine-draft"
+        "de": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -10287,7 +10291,8 @@
         "es-419": "inherited",
         "fr-CA": "inherited",
         "hi": "machine-draft",
-        "ja": "machine-draft"
+        "ja": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -10629,7 +10634,8 @@
       "translations": {
         "es-419": "inherited",
         "fr-CA": "inherited",
-        "ja": "machine-draft"
+        "ja": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -10723,7 +10729,8 @@
         "es": "machine-draft",
         "zh-Hans": "machine-draft",
         "de": "machine-draft",
-        "ja": "machine-draft"
+        "ja": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -11206,7 +11213,8 @@
       "translations": {
         "es-419": "inherited",
         "fr-CA": "inherited",
-        "ja": "machine-draft"
+        "ja": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -11252,7 +11260,8 @@
       "translations": {
         "es-419": "inherited",
         "fr-CA": "inherited",
-        "hi": "machine-draft"
+        "hi": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -11267,7 +11276,8 @@
         "es": "machine-draft",
         "zh-Hans": "machine-draft",
         "de": "machine-draft",
-        "ja": "machine-draft"
+        "ja": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -11279,7 +11289,8 @@
       "translations": {
         "es-419": "inherited",
         "fr-CA": "inherited",
-        "zh-Hans": "machine-draft"
+        "zh-Hans": "machine-draft",
+        "zh-Hant": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -11320,7 +11331,8 @@
       "sourceChecksum": "fnv1a32:af9f4ef2",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "ar": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -11365,7 +11377,8 @@
       "translations": {
         "es-419": "inherited",
         "fr-CA": "inherited",
-        "de": "machine-draft"
+        "de": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -11512,7 +11525,8 @@
       "translations": {
         "es-419": "inherited",
         "fr-CA": "inherited",
-        "hi": "machine-draft"
+        "hi": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -11728,7 +11742,8 @@
       "translations": {
         "es-419": "inherited",
         "fr-CA": "inherited",
-        "zh-Hans": "machine-draft"
+        "zh-Hans": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -11753,7 +11768,8 @@
       "sourceChecksum": "fnv1a32:de49995f",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -11766,7 +11782,8 @@
         "es-419": "inherited",
         "fr-CA": "inherited",
         "zh-Hans": "machine-draft",
-        "hi": "machine-draft"
+        "hi": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -11872,7 +11889,8 @@
         "es-419": "inherited",
         "fr-CA": "inherited",
         "de": "machine-draft",
-        "ja": "machine-draft"
+        "ja": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -12065,7 +12083,8 @@
       "sourceChecksum": "fnv1a32:52790adf",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -12121,7 +12140,8 @@
       "sourceChecksum": "fnv1a32:6f3faf70",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -12317,7 +12337,8 @@
         "es-419": "inherited",
         "fr-CA": "inherited",
         "de": "machine-draft",
-        "ja": "machine-draft"
+        "ja": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -12395,7 +12416,8 @@
         "zh-Hans": "machine-draft",
         "hi": "machine-draft",
         "de": "machine-draft",
-        "ja": "machine-draft"
+        "ja": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -12562,7 +12584,8 @@
       "sourceChecksum": "fnv1a32:508549b3",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -12803,7 +12826,8 @@
         "es-419": "inherited",
         "fr-CA": "inherited",
         "hi": "machine-draft",
-        "ja": "machine-draft"
+        "ja": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -12815,7 +12839,8 @@
       "translations": {
         "es-419": "inherited",
         "fr-CA": "inherited",
-        "ja": "machine-draft"
+        "ja": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -13403,7 +13428,8 @@
         "es-419": "inherited",
         "fr-CA": "inherited",
         "de": "machine-draft",
-        "ja": "machine-draft"
+        "ja": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -13517,7 +13543,8 @@
         "es-419": "inherited",
         "fr-CA": "inherited",
         "es": "machine-draft",
-        "zh-Hans": "machine-draft"
+        "zh-Hans": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -13744,7 +13771,8 @@
       "sourceChecksum": "fnv1a32:32eb3c82",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -13756,7 +13784,8 @@
       "translations": {
         "es-419": "inherited",
         "fr-CA": "inherited",
-        "es": "machine-draft"
+        "es": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -13812,7 +13841,8 @@
       "sourceChecksum": "fnv1a32:3f11744a",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -14226,7 +14256,8 @@
         "es-419": "inherited",
         "fr-CA": "inherited",
         "hi": "machine-draft",
-        "ja": "machine-draft"
+        "ja": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -14396,7 +14427,8 @@
       "translations": {
         "es-419": "inherited",
         "fr-CA": "inherited",
-        "zh-Hans": "machine-draft"
+        "zh-Hans": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -14641,7 +14673,8 @@
         "zh-Hans": "machine-draft",
         "hi": "machine-draft",
         "de": "machine-draft",
-        "ja": "machine-draft"
+        "ja": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -15345,7 +15378,8 @@
       "translations": {
         "es-419": "inherited",
         "fr-CA": "inherited",
-        "es": "machine-draft"
+        "es": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -15526,7 +15560,8 @@
       "translations": {
         "es-419": "inherited",
         "fr-CA": "inherited",
-        "ja": "machine-draft"
+        "ja": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -15656,7 +15691,8 @@
       "translations": {
         "es-419": "inherited",
         "fr-CA": "inherited",
-        "es": "machine-draft"
+        "es": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -15714,7 +15750,8 @@
       "sourceChecksum": "fnv1a32:71ef5835",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -15774,7 +15811,8 @@
       "sourceChecksum": "fnv1a32:a829b7af",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -15875,7 +15913,8 @@
       "sourceChecksum": "fnv1a32:8200edbd",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -15992,7 +16031,8 @@
       "translations": {
         "es-419": "inherited",
         "fr-CA": "inherited",
-        "es": "machine-draft"
+        "es": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -16656,7 +16696,8 @@
         "fr-CA": "inherited",
         "zh-Hans": "machine-draft",
         "hi": "machine-draft",
-        "ja": "machine-draft"
+        "ja": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -16886,7 +16927,8 @@
         "zh-Hans": "machine-draft",
         "hi": "machine-draft",
         "de": "machine-draft",
-        "ja": "machine-draft"
+        "ja": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -17107,7 +17149,8 @@
       "sourceChecksum": "fnv1a32:df03ede4",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -17188,7 +17231,8 @@
       "translations": {
         "es-419": "inherited",
         "fr-CA": "inherited",
-        "es": "machine-draft"
+        "es": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -17451,7 +17495,8 @@
       "sourceChecksum": "fnv1a32:5a204910",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -17495,7 +17540,8 @@
       "sourceChecksum": "fnv1a32:c3b29f0a",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -17564,7 +17610,8 @@
       "translations": {
         "es-419": "inherited",
         "fr-CA": "inherited",
-        "hi": "machine-draft"
+        "hi": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -17643,7 +17690,8 @@
       "translations": {
         "es-419": "inherited",
         "fr-CA": "inherited",
-        "de": "machine-draft"
+        "de": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -17869,7 +17917,8 @@
         "fr-CA": "inherited",
         "zh-Hans": "machine-draft",
         "de": "machine-draft",
-        "ja": "machine-draft"
+        "ja": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -18084,7 +18133,8 @@
       "sourceChecksum": "fnv1a32:ef00e2d7",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -18360,7 +18410,8 @@
         "fr-CA": "inherited",
         "hi": "machine-draft",
         "de": "machine-draft",
-        "ja": "machine-draft"
+        "ja": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -18419,7 +18470,8 @@
       "sourceChecksum": "fnv1a32:e04ecdcf",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -18444,7 +18496,8 @@
         "es-419": "inherited",
         "fr-CA": "inherited",
         "es": "machine-draft",
-        "zh-Hans": "machine-draft"
+        "zh-Hans": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -19035,7 +19088,8 @@
         "fr-CA": "inherited",
         "es": "machine-draft",
         "zh-Hans": "machine-draft",
-        "hi": "machine-draft"
+        "hi": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -19434,7 +19488,8 @@
         "fr-CA": "inherited",
         "es": "machine-draft",
         "zh-Hans": "machine-draft",
-        "hi": "machine-draft"
+        "hi": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -19764,7 +19819,8 @@
         "es-419": "inherited",
         "fr-CA": "inherited",
         "zh-Hans": "machine-draft",
-        "de": "machine-draft"
+        "de": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -20265,7 +20321,8 @@
       "translations": {
         "es-419": "inherited",
         "fr-CA": "inherited",
-        "zh-Hans": "machine-draft"
+        "zh-Hans": "machine-draft",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -20824,7 +20881,8 @@
       "sourceChecksum": "fnv1a32:058e88ae",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "fr": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",

@@ -24,6 +24,7 @@ import { PathMappingSettings } from "./PathMappingSettings";
 import { FileBrowser } from "./FileBrowser";
 import SecurityScanSettings from "./SecurityScanSettings";
 import { InterfaceText } from "@/components/InterfaceText";
+import { LocalizedCodeList } from "@/components/LocalizedCodeList";
 import { formatInterfaceMessage } from "@/lib/interface-locale";
 
 const IMPORT_PIPELINE_STEP_TEXT = [
@@ -458,8 +459,7 @@ export default function ImportSettings() {
                                 "For directory imports, place detected DLC, updates, and extras in"
                               }
                             />{" "}
-                            <code>dlc/</code>, <code>update/</code>
-                            <InterfaceText source={", and"} /> <code>extra/</code>{" "}
+                            <LocalizedCodeList values={["dlc/", "update/", "extra/"]} />{" "}
                             <InterfaceText
                               source={
                                 "subfolders inside the game folder. Single-file imports keep their existing layout."

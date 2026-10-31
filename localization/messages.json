@@ -425,7 +425,7 @@
         "hi": "तारीख, समय और संख्या प्रारूप",
         "de": "Datums-, Uhrzeit- und Zahlenformat",
         "ja": "日付・時刻・数値の表示形式",
-        "fr": "Dates, heures et nombres",
+        "fr": "Format des dates, des heures et des nombres",
         "pt-BR": "Datas, horas e números",
         "ar": "التاريخ والوقت والأرقام",
         "ko": "날짜, 시간 및 숫자",
@@ -433,7 +433,7 @@
         "vi": "Ngày, giờ và số",
         "id": "Tanggal, waktu, dan angka",
         "es-419": "Fechas, horas y números",
-        "fr-CA": "Dates, heures et nombres"
+        "fr-CA": "Format des dates, des heures et des nombres"
       }
     },
     "interface.choose_how_dates_times_and_numbers_54ff187b": {
@@ -12148,7 +12148,7 @@
         "hi": "इस लॉग प्रविष्टि के लिए पूरा पार्स किया गया डेटा सुरक्षित है।",
         "de": "Die vollständig analysierte Nutzlast dieses Protokolleintrags bleibt erhalten.",
         "ja": "このログ項目の解析済みデータ全体を保持しています。",
-        "fr": "La charge analysée complète de cette entrée de journal est conservée.",
+        "fr": "La charge utile analysée est conservée intégralement pour cette entrée de journal.",
         "pt-BR": "O conteúdo analisado completo desta linha de log foi mantido.",
         "ar": "تم الاحتفاظ بالبيانات الكاملة التي تم تحليلها لهذا الإدخال في السجل.",
         "ko": "이 로그 항목의 전체 파싱 데이터가 보존됩니다.",
@@ -12156,7 +12156,7 @@
         "vi": "Toàn bộ dữ liệu đã phân tích của dòng nhật ký này vẫn được giữ lại.",
         "id": "Muatan yang diurai penuh untuk entri log ini tetap disimpan.",
         "es-419": "Se conserva la carga completa analizada de esta entrada del registro.",
-        "fr-CA": "La charge analysée complète de cette entrée de journal est conservée."
+        "fr-CA": "La charge utile analysée est conservée intégralement pour cette entrée de journal."
       }
     },
     "interface.copy_raw_log_line_16ea97d6": {
@@ -12205,7 +12205,7 @@
         "hi": "पार्स किया गया डेटा कॉपी करें",
         "de": "Analysierte Nutzlast kopieren",
         "ja": "解析済みデータをコピー",
-        "fr": "Copier la charge analysée",
+        "fr": "Copier la charge utile analysée",
         "pt-BR": "Copiar conteúdo analisado",
         "ar": "نسخ البيانات التي تم تحليلها",
         "ko": "파싱된 데이터 복사",
@@ -12213,7 +12213,7 @@
         "vi": "Sao chép dữ liệu đã phân tích",
         "id": "Salin muatan yang diurai",
         "es-419": "Copiar datos analizados",
-        "fr-CA": "Copier la charge analysée"
+        "fr-CA": "Copier la charge utile analysée"
       }
     },
     "interface.copy_json_e595bc8e": {
@@ -14352,7 +14352,7 @@
         "hi": "• सीडर:",
         "de": "• Seeds:",
         "ja": "• シーダー:",
-        "fr": "• Graines:",
+        "fr": "• Seeders :",
         "pt-BR": "• Seeders:",
         "ar": "• الباذرون:",
         "ko": "• 시더:",
@@ -14360,7 +14360,7 @@
         "vi": "• Người chia sẻ:",
         "id": "• Seeder:",
         "es-419": "• Semillas:",
-        "fr-CA": "• Graines:"
+        "fr-CA": "• Seeders :"
       }
     },
     "interface.local_path_687498f9": {
@@ -17734,7 +17734,7 @@
         "hi": "तय करें कि कौन-सी घटनाएँ सूचनाएँ बनाएँ और वे कहाँ भेजी जाएँ।",
         "de": "Kontrollieren Sie, welche Ereignisse Benachrichtigungen erstellen und wohin sie gesendet werden.",
         "ja": "通知を作成するイベントと通知の送信先を設定します。",
-        "fr": "Contrôler quels événements créent des notifications et où ils sont envoyés.",
+        "fr": "Définissez quels événements créent des notifications et où ces notifications sont envoyées.",
         "pt-BR": "Controle quais eventos criam notificações e para onde são enviados.",
         "ar": "تحكّم في الأحداث التي تنشئ إشعارات وفي وجهة إرسالها.",
         "ko": "이벤트가 알림을 만들고 그들이 보낸 곳을 제어합니다.",
@@ -17742,7 +17742,7 @@
         "vi": "Điều khiển các sự kiện tạo thông báo và gửi chúng đến đâu.",
         "id": "Kontrol kejadian mana yang membuat pemberitahuan dan di mana mereka dikirim.",
         "es-419": "Controlar qué eventos crean notificaciones y dónde se envían.",
-        "fr-CA": "Contrôler quels événements créent des notifications et où ils sont envoyés."
+        "fr-CA": "Définissez quels événements créent des notifications et où ces notifications sont envoyées."
       }
     },
     "interface.copy_api_key_950de65b": {
@@ -18285,7 +18285,7 @@
         "hi": "कस्टम फ़ोल्डर बाइंडिंग",
         "de": "Benutzerdefinierte Ordnerbindungen",
         "ja": "カスタムフォルダーの関連付け",
-        "fr": "Reliures de dossiers personnalisées",
+        "fr": "Associations de dossiers personnalisées",
         "pt-BR": "Vínculos de pastas personalizados",
         "ar": "ارتباطات مجلدات مخصصة",
         "ko": "사용자 정의 폴더 바인딩",
@@ -18293,7 +18293,7 @@
         "vi": "Tự chọn",
         "id": "Pengikatan folder gubahan",
         "es-419": "Carpetas personalizadas",
-        "fr-CA": "Reliures de dossiers personnalisées"
+        "fr-CA": "Associations de dossiers personnalisées"
       }
     },
     "interface.customize_your_discovery_experienc_d7093477": {
@@ -18437,7 +18437,7 @@
         "hi": "डिफ़ॉल्ट 3 रूढ़िवादी होने के लिए है।",
         "de": "Der Standardwert ist vorsichtshalber 3.",
         "ja": "余裕を持たせるため、デフォルトは3です。",
-        "fr": "La valeur par défaut est 3 pour être conservateur.",
+        "fr": "Par prudence, la valeur par défaut est 3.",
         "pt-BR": "O padrão é 3 para ser conservador.",
         "ar": "القيمة الافتراضية هي 3 للحفاظ على هامش أمان.",
         "ko": "기본값은 3입니다.",
@@ -18445,7 +18445,7 @@
         "vi": "Mặc định là 3 để thận trọng.",
         "id": "Nilai default adalah 3 untuk menjaga keamanan.",
         "es-419": "El valor predeterminado es 3 para ser conservador.",
-        "fr-CA": "La valeur par défaut est 3 pour être conservateur."
+        "fr-CA": "Par prudence, la valeur par défaut est 3."
       }
     },
     "interface.default_sort_order_29fbe456": {
@@ -19254,7 +19254,7 @@
         "hi": "डाउनलोडर सफलतापूर्वक हटा दिया",
         "de": "Downloader erfolgreich gelöscht",
         "ja": "ダウンローダーを正常に削除しました",
-        "fr": "Télécharger supprimé avec succès",
+        "fr": "Téléchargeur supprimé avec succès",
         "pt-BR": "Downloader apagado com sucesso",
         "ar": "تم حذف برنامج التنزيل بنجاح",
         "ko": "Downloader는 성공적으로 삭제",
@@ -19262,7 +19262,7 @@
         "vi": "Bộ tải về đã xoá thành công",
         "id": "Pengunduh berhasil dihapus",
         "es-419": "Descargador eliminado con éxito",
-        "fr-CA": "Télécharger supprimé avec succès"
+        "fr-CA": "Téléchargeur supprimé avec succès"
       }
     },
     "interface.downloader_updated_successfully_827ea8ea": {
@@ -19330,7 +19330,7 @@
         "hi": "डाउनलोड अभी तक Questarr द्वारा ट्रैक नहीं किए गए हैं, खेल के अनुसार समूहित। उन्हें जोड़ने के लिए प्रत्येक के लिए एक खेल का चयन करें।",
         "de": "Downloads noch nicht von Questarr verfolgt, gruppiert nach Spiel. Wählen Sie ein Spiel für jeden, um sie zu verknüpfen.",
         "ja": "Questarrによってまだ追跡されていないダウンロード, ゲームによってグループ化. 各ゲームを選択してリンクします。",
-        "fr": "Téléchargements non encore suivis par Questarr, regroupés par jeu. Sélectionnez un jeu pour chaque lien.",
+        "fr": "Téléchargements non encore suivis par Questarr, regroupés par jeu. Pour chaque groupe, sélectionnez un jeu auquel associer les téléchargements.",
         "pt-BR": "Downloads ainda não rastreados por Questarr, agrupados por jogo. Selecione um jogo para cada um ligá-los.",
         "ar": "التنزيلات التي لم يتتبعها Questarr بعد، مجمّعة حسب اللعبة. اختر لعبة لكل تنزيل لربطه بها.",
         "ko": "아직 Questarr에서 추적하지 않는 다운로드를 게임별로 묶어 표시합니다. 각 다운로드에 연결할 게임을 선택하세요.",
@@ -19338,7 +19338,7 @@
         "vi": "Các lượt tải xuống chưa được Questarr theo dõi, được nhóm theo trò chơi. Hãy chọn một trò chơi cho từng lượt tải để liên kết.",
         "id": "Diunduh belum dilacak oleh Questarr, dikelompokkan oleh permainan. Pilih permainan untuk masing-masing untuk menghubungkan mereka.",
         "es-419": "Descargas todavía no rastreadas por Questarr, agrupadas por juego. Seleccione un juego para cada uno para vincularlos.",
-        "fr-CA": "Téléchargements non encore suivis par Questarr, regroupés par jeu. Sélectionnez un jeu pour chaque lien."
+        "fr-CA": "Téléchargements non encore suivis par Questarr, regroupés par jeu. Pour chaque groupe, sélectionnez un jeu auquel associer les téléchargements."
       }
     },
     "interface.drifted_a0f50be5": {
@@ -19349,7 +19349,7 @@
         "hi": "बहाव (Drifted)",
         "de": "Fehlende Pfade (",
         "ja": "見つからないパス (",
-        "fr": "Drifté (",
+        "fr": "Chemins introuvables (",
         "pt-BR": "Deslizado (",
         "ar": "دُفنت",
         "ko": "드리프트 (",
@@ -19357,7 +19357,7 @@
         "vi": "Bị trôi dạt (",
         "id": "Terdorong (",
         "es-419": "Rutas no encontradas (",
-        "fr-CA": "Drifté ("
+        "fr-CA": "Chemins introuvables ("
       }
     },
     "interface.e_g_404_c875c07b": {
@@ -19372,7 +19372,7 @@
         "pt-BR": "Por exemplo, 404",
         "ar": "مثلاً 404",
         "ko": "예. 404",
-        "zh-Hant": "例如,404個",
+        "zh-Hant": "例如：404",
         "vi": "ví dụ: 404",
         "id": "mis. 404",
         "es-419": "por ejemplo 404",
@@ -19427,7 +19427,7 @@
         "ja": "例：マイカスタムフィード",
         "fr": "par exemple, mon flux personnalisé",
         "pt-BR": "Por exemplo, meu feed personalizado",
-        "ar": "على سبيل المثال",
+        "ar": "مثلًا: موجزي المخصص",
         "ko": "예: 내 사용자 지정 피드",
         "zh-Hant": "例如：我的自訂 RSS 訂閱",
         "vi": "vd. Nguồn cấp tùy chỉnh của tôi",
@@ -19501,7 +19501,7 @@
         "hi": "इंडेक्सर संपादित करें",
         "de": "Indexer bearbeiten",
         "ja": "インデクサーを編集",
-        "fr": "Éditer l'index",
+        "fr": "Modifier l'indexeur",
         "pt-BR": "Editar o Indexador",
         "ar": "مؤشر إديت",
         "ko": "인덱서 편집",
@@ -19509,7 +19509,7 @@
         "vi": "Sửa bộ lập chỉ mục",
         "id": "Sunting Indexer",
         "es-419": "Editar Indexer",
-        "fr-CA": "Éditer l'index"
+        "fr-CA": "Modifier l'indexeur"
       }
     },
     "interface.edit_path_mapping_837f048a": {
@@ -19748,7 +19748,7 @@
         "hi": "SABnzbd API कुंजी दर्ज करें",
         "de": "Geben Sie den SABnzbd API-Schlüssel ein",
         "ja": "SABnzbd API キーを入力してください",
-        "fr": "Saisissez la touche API SABnzbd",
+        "fr": "Saisissez la clé API SABnzbd",
         "pt-BR": "Digite SABnzbd API chave",
         "ar": "Enter SABnzbd API المفتاح",
         "ko": "SABnzbd API 키 입력",
@@ -19756,7 +19756,7 @@
         "vi": "Nhập khoá SABnzbd API",
         "id": "Masuk SABnzbd API kunci",
         "es-419": "Introduzca la clave de API SABnzbd",
-        "fr-CA": "Saisissez la touche API SABnzbd"
+        "fr-CA": "Saisissez la clé API SABnzbd"
       }
     },
     "interface.enter_username_87af333f": {
@@ -20109,7 +20109,7 @@
         "hi": "मौजूदा खेल नीति",
         "de": "Bestehende Spielpolitik",
         "ja": "既存のゲームポリシー",
-        "fr": "Politique existante en matière de jeux",
+        "fr": "Gestion des jeux existants",
         "pt-BR": "Política de jogo existente",
         "ar": "سياسة اللعبة القائمة",
         "ko": "Existing 게임 정책",
@@ -20117,7 +20117,7 @@
         "vi": "Chính sách trò chơi tồn tại",
         "id": "Kebijakan permainan yang ada",
         "es-419": "Política de juego existente",
-        "fr-CA": "Politique existante en matière de jeux"
+        "fr-CA": "Gestion des jeux existants"
       }
     },
     "interface.exit_to_questarr_75ef9e6b": {
@@ -20147,7 +20147,7 @@
         "hi": "प्रायोगिक",
         "de": "Experimentell",
         "ja": "実験的",
-        "fr": "Expérience",
+        "fr": "Expérimental",
         "pt-BR": "Experimental",
         "ar": "التجارب",
         "ko": "실험적",
@@ -20155,7 +20155,7 @@
         "vi": "Thí nghiệm",
         "id": "Percobaan",
         "es-419": "Experimental",
-        "fr-CA": "Expérience"
+        "fr-CA": "Expérimental"
       }
     },
     "interface.experimental_feature_behavior_and_c81027bd": {
@@ -20166,7 +20166,7 @@
         "hi": "प्रायोगिक विशेषता: व्यवहार और परिणाम रिलीज़ के बीच बदल सकते हैं",
         "de": "Experimentelles Merkmal: Verhalten und Ergebnisse können sich zwischen den Releases ändern",
         "ja": "実験的特徴: 動作と結果はリリース間で変化する可能性があります",
-        "fr": "Caractéristiques expérimentales : le comportement et les résultats peuvent changer entre les versions",
+        "fr": "Fonctionnalité expérimentale : le comportement et les résultats peuvent changer d’une version à l’autre",
         "pt-BR": "Características experimentais: comportamento e resultados podem mudar entre os lançamentos.",
         "ar": "السمة التجريبية: قد يتغير السلوك والنتائج بين الإطلاقات",
         "ko": "Experimental 기능: 행동과 결과는 방출 사이 변화할지도 모릅니다",
@@ -20174,7 +20174,7 @@
         "vi": "Tính năng thí nghiệm: hành vi và kết quả có thể thay đổi giữa cách phát hành",
         "id": "Fitur percobaan: perilaku dan hasil mungkin berubah antara rilis",
         "es-419": "Función experimental: el comportamiento y los resultados pueden cambiar entre versiones",
-        "fr-CA": "Caractéristiques expérimentales : le comportement et les résultats peuvent changer entre les versions"
+        "fr-CA": "Fonctionnalité expérimentale : le comportement et les résultats peuvent changer d’une version à l’autre"
       }
     },
     "interface.experimental_jev_classifications_c_0385974c": {
@@ -20337,7 +20337,7 @@
         "hi": "ब्लैकलिस्ट रिलीज में विफल",
         "de": "Release konnte nicht auf die Blacklist gesetzt werden",
         "ja": "リリースをブラックリストに追加できませんでした",
-        "fr": "Échec de la publication de la liste noire",
+        "fr": "Impossible d’ajouter la version à la liste noire",
         "pt-BR": "Falha na lista negra de lançamento.",
         "ar": "تعذرت إضافة الإصدار إلى قائمة الحظر",
         "ko": "릴리스를 차단 목록에 추가하지 못했습니다",
@@ -20345,7 +20345,7 @@
         "vi": "Không thể đưa bản phát hành vào danh sách chặn",
         "id": "Gagal merilis daftar hitam",
         "es-419": "No se pudo bloquear el lanzamiento",
-        "fr-CA": "Échec de la publication de la liste noire"
+        "fr-CA": "Impossible d’ajouter la version à la liste noire"
       }
     },
     "interface.failed_to_create_bundle_a36f73d5": {
@@ -20660,7 +20660,7 @@
         "hi": "Discord वेबहुक को बचाने में विफल",
         "de": "Discord-Webhook konnte nicht gespeichert werden",
         "ja": "DiscordのWebhookを保存できなかった",
-        "fr": "Impossible d'enregistrer Discord webhook",
+        "fr": "Impossible d’enregistrer le webhook Discord",
         "pt-BR": "Não conseguiu salvar Discord webhook",
         "ar": "تعذّر حفظ رابط ويب هوك Discord",
         "ko": "Discord webhook 저장 실패",
@@ -20668,7 +20668,7 @@
         "vi": "Không thể lưu webhook Discord",
         "id": "Gagal menyimpan webhook Discord",
         "es-419": "No se pudo guardar el webhook de Discord",
-        "fr-CA": "Impossible d'enregistrer Discord webhook"
+        "fr-CA": "Impossible d’enregistrer le webhook Discord"
       }
     },
     "interface.failed_to_save_nexus_mods_api_key_c81a9c01": {
@@ -20755,7 +20755,7 @@
         "hi": "इंडेक्सर खोजे नहीं जा सके। कृपया अपना कॉन्फ़िगरेशन जाँचें।",
         "de": "Die Suche nach Indexern ist fehlgeschlagen. Bitte überprüfe deine Konfiguration.",
         "ja": "インデクサーの検索に失敗しました。設定を確認してください。",
-        "fr": "Échec de la recherche des indexeurs. Vérifiez votre configuration.",
+        "fr": "Échec de la recherche sur les indexeurs. Vérifiez votre configuration.",
         "pt-BR": "Não foi possível pesquisar os indexadores. Verifique sua configuração.",
         "ar": "تعذر البحث عن المفهرسات. تحقق من إعداداتك.",
         "ko": "인덱서를 검색하지 못했습니다. 설정을 확인하세요.",
@@ -20763,7 +20763,7 @@
         "vi": "Không thể tìm kiếm trình lập chỉ mục. Vui lòng kiểm tra cấu hình.",
         "id": "Gagal mencari pengindeks. Periksa konfigurasi Anda.",
         "es-419": "No se pudieron buscar indexadores. Revisa la configuración.",
-        "fr-CA": "Échec de la recherche des indexeurs. Vérifiez votre configuration."
+        "fr-CA": "Échec de la recherche sur les indexeurs. Vérifiez votre configuration."
       }
     },
     "interface.failed_to_unhide_game_96d87062": {
@@ -21078,7 +21078,7 @@
         "hi": "प्रोटोकॉल द्वारा फ़िल्टर डाउनलोड",
         "de": "Downloads nach Protokoll filtern",
         "ja": "プロトコルでダウンロードを絞り込む",
-        "fr": "Filtre téléchargements par protocole",
+        "fr": "Filtrer les téléchargements par protocole",
         "pt-BR": "Filtrar downloads pelo protocolo",
         "ar": "تصفية التنزيلات حسب البروتوكول",
         "ko": "필터 다운로드",
@@ -21086,7 +21086,7 @@
         "vi": "Bộ lọc tải về theo giao thức",
         "id": "Filter unduhan menurut protokol",
         "es-419": "Filtrar descargas por protocolo",
-        "fr-CA": "Filtre téléchargements par protocole"
+        "fr-CA": "Filtrer les téléchargements par protocole"
       }
     },
     "interface.filter_downloads_by_status_af79226b": {
@@ -21192,7 +21192,7 @@
         "hi": "निर्देशिका आयात में मिले DLC, अपडेट और अतिरिक्त सामग्री को इन उपफ़ोल्डरों में रखें:",
         "de": "Bei Verzeichnisimporten werden erkannte DLCs, Updates und Extras in den Unterordnern",
         "ja": "ディレクトリのインポートでは、検出した DLC、アップデート、追加ファイルを次のサブフォルダーに配置します：",
-        "fr": "Pour les importations de répertoire, placer DLC détecté, mises à jour et extras dans",
+        "fr": "Pour les importations de dossiers, placez les DLC, mises à jour et contenus supplémentaires détectés dans les sous-dossiers",
         "pt-BR": "Para importações de diretórios, coloque DLC detectado, atualizações e extras em",
         "ar": "بالنسبة للواردات من الدليل، والمكان المكتشف من الـ دي إل سي، والمستجدات، والإضافات في",
         "ko": "디렉토리 가져 오기를 위해 DLC, 업데이트 및 추가를 감지합니다.",
@@ -21200,7 +21200,7 @@
         "vi": "Đối với thư mục nhập khẩu, nơi phát hiện DLC, cập nhật và phụ thêm",
         "id": "Untuk impor direktori, tempat terdeteksi DLC, pemutakhiran, dan tambahan dalam",
         "es-419": "Para las importaciones de directorios, coloca el DLC, las actualizaciones y los extras detectados en",
-        "fr-CA": "Pour les importations de répertoire, placer DLC détecté, mises à jour et extras dans"
+        "fr-CA": "Pour les importations de dossiers, placez les DLC, mises à jour et contenus supplémentaires détectés dans les sous-dossiers"
       }
     },
     "interface.for_that_folder_below_with_it_off_7b4b9c66": {
@@ -21477,7 +21477,7 @@
         "hi": "इंडेक्सर पर गेम मिला",
         "de": "Spiel gefunden auf Indexer",
         "ja": "Indexerで見つけたゲーム",
-        "fr": "Jeu trouvé sur Indexer",
+        "fr": "Jeu trouvé sur un indexeur",
         "pt-BR": "Jogo encontrado no indexador",
         "ar": "تم العثور على اللعبة في المفهرس",
         "ko": "인덱서에서 게임을 찾았습니다",
@@ -21485,7 +21485,7 @@
         "vi": "Đã tìm thấy trò chơi trên trình lập chỉ mục",
         "id": "Game Ditemukan pada Indexer",
         "es-419": "Juego encontrado en Indexer",
-        "fr-CA": "Jeu trouvé sur Indexer"
+        "fr-CA": "Jeu trouvé sur un indexeur"
       }
     },
     "interface.game_matched_3cdd1df7": {
@@ -21876,7 +21876,7 @@
         "hi": "GitHub रिपॉज़िटरी केवल Questarr के अनुरक्षक को दिखाई देगी। रिपोर्ट को स्वचालित टेलीमेट्री रिपोर्ट के रूप में चिह्नित किया जाएगा, ताकि यह हाथ से भेजी गई रिपोर्ट से स्पष्ट रूप से अलग हो। सहायता कोड के रूप में आपको GitHub इश्यू नंबर मिलेगा।",
         "de": "Das GitHub-Repository ist nur für die Questarr-Verantwortlichen sichtbar und wird als automatischer Telemetriebericht gekennzeichnet, damit es klar von manuell eingereichten Berichten zu unterscheiden ist. Du erhältst eine GitHub-Issue-Nummer als Supportcode.",
         "ja": "な GitHub リポジトリ（閲覧できるのは Questarr のメンテナーのみ）です。このレポートには自動テレメトリーレポートの印が付き、手動で送信されたレポートと明確に区別されます。サポートコードとして Issue 番号が発行されます。",
-        "fr": "Le dépôt GitHub ne sera visible que par les responsables de Questarr et sera marqué comme rapport de télémétrie automatique afin de le distinguer clairement des rapports envoyés manuellement. Vous recevrez un numéro d’issue GitHub comme code d’assistance.",
+        "fr": "sur GitHub, visible uniquement par le mainteneur de Questarr. Ce rapport est signalé comme un rapport de télémétrie automatique pour le distinguer clairement d’un rapport envoyé manuellement. Vous recevrez un numéro de ticket comme code d’assistance.",
         "pt-BR": "O repositório do GitHub ficará visível apenas para os responsáveis pelo Questarr e será identificado como relatório automático de telemetria, para diferenciá-lo claramente dos relatórios enviados manualmente. Você receberá um número de issue do GitHub como código de suporte.",
         "ar": "لن يكون مستودع GitHub مرئيًا إلا لمسؤولي Questarr، وسيُعلَّم كتقرير قياس عن بُعد تلقائي لتمييزه بوضوح عن التقارير المُرسلة يدويًا. ستتلقى رقم GitHub Issue ليكون رمز الدعم الخاص بك.",
         "ko": "GitHub 저장소는 Questarr 관리자만 볼 수 있으며, 수동으로 제출한 보고서와 명확히 구분되도록 자동 텔레메트리 보고서로 표시됩니다. 지원 코드로 GitHub 이슈 번호가 제공됩니다.",
@@ -21884,7 +21884,7 @@
         "vi": "Kho lưu trữ trên GitHub chỉ hiển thị với người bảo trì Questarr và được đánh dấu là báo cáo telemetry tự động để phân biệt rõ với báo cáo gửi thủ công. Bạn sẽ nhận được số GitHub issue làm mã hỗ trợ.",
         "id": "Repositori GitHub hanya terlihat oleh pemelihara Questarr dan ditandai sebagai laporan telemetri otomatis agar jelas berbeda dari laporan yang dikirim secara manual. Anda akan menerima nomor GitHub issue sebagai kode dukungan.",
         "es-419": "El repositorio de GitHub solo será visible para el responsable de Questarr y se marcará como un informe de telemetría automático para distinguirlo claramente de los informes enviados manualmente. Recibirás el número de incidencia como código de soporte.",
-        "fr-CA": "Le dépôt GitHub ne sera visible que par les responsables de Questarr et sera marqué comme rapport de télémétrie automatique afin de le distinguer clairement des rapports envoyés manuellement. Vous recevrez un numéro d’issue GitHub comme code d’assistance."
+        "fr-CA": "sur GitHub, visible uniquement par le mainteneur de Questarr. Ce rapport est signalé comme un rapport de télémétrie automatique pour le distinguer clairement d’un rapport envoyé manuellement. Vous recevrez un numéro de ticket comme code d’assistance."
       }
     },
     "interface.github_repository_visible_only_to_8eb1c6bb": {
@@ -21895,7 +21895,7 @@
         "hi": "GitHub रिपॉज़िटरी केवल Questarr के अनुरक्षक को दिखाई देगी। सहायता कोड के रूप में आपको GitHub issue नंबर मिलेगा — सहायता टीम के साथ केवल वही नंबर साझा करें।",
         "de": "Das GitHub-Repository ist nur für die Questarr-Verantwortlichen sichtbar. Du erhältst eine GitHub-Issue-Nummer als Supportcode – teile nur diese Nummer mit dem Support.",
         "ja": "な GitHub リポジトリ（閲覧できるのは Questarr のメンテナーのみ）です。サポートコードとして Issue 番号が発行されます。サポートにはその番号だけを共有してください。",
-        "fr": "Le dépôt GitHub ne sera visible que par les responsables de Questarr. Vous recevrez un numéro d’issue GitHub comme code d’assistance : ne communiquez que ce numéro au support.",
+        "fr": "sur GitHub, visible uniquement par le mainteneur de Questarr. Vous recevrez un numéro de ticket comme code d’assistance ; ne communiquez que ce numéro au support.",
         "pt-BR": "O repositório do GitHub ficará visível apenas para os responsáveis pelo Questarr. Você receberá um número de issue do GitHub como código de suporte; compartilhe somente esse número com o suporte.",
         "ar": "لن يكون مستودع GitHub مرئيًا إلا لمسؤولي Questarr. ستتلقى رقم GitHub Issue ليكون رمز الدعم؛ شارك هذا الرقم فقط مع فريق الدعم.",
         "ko": "GitHub 저장소는 Questarr 관리자만 볼 수 있습니다. 지원 코드로 GitHub 이슈 번호가 제공됩니다. 지원팀에는 그 번호만 공유하세요.",
@@ -21903,7 +21903,7 @@
         "vi": "Kho lưu trữ trên GitHub chỉ hiển thị với người bảo trì Questarr. Bạn sẽ nhận được số GitHub issue làm mã hỗ trợ — chỉ chia sẻ số đó với bộ phận hỗ trợ.",
         "id": "Repositori GitHub hanya terlihat oleh pemelihara Questarr. Anda akan menerima nomor GitHub issue sebagai kode dukungan — bagikan nomor itu saja kepada tim dukungan.",
         "es-419": "El repositorio de GitHub solo será visible para el responsable de Questarr. Recibirás el número de incidencia como código de soporte; comparte únicamente ese número con el equipo de soporte.",
-        "fr-CA": "Le dépôt GitHub ne sera visible que par les responsables de Questarr. Vous recevrez un numéro d’issue GitHub comme code d’assistance : ne communiquez que ce numéro au support."
+        "fr-CA": "sur GitHub, visible uniquement par le mainteneur de Questarr. Vous recevrez un numéro de ticket comme code d’assistance ; ne communiquez que ce numéro au support."
       }
     },
     "interface.give_this_code_to_support_cc791e45": {
@@ -22883,7 +22883,7 @@
         "hi": "आयात में चुने गए प्लेटफार्मों तक सीमित हैं",
         "de": "Importe sind auf die im Einstellungs-Tab",
         "ja": "インポート対象は、設定の「",
-        "fr": "Les importations sont limitées aux plates-formes choisies",
+        "fr": "Les importations sont limitées aux plateformes choisies dans l’onglet",
         "pt-BR": "Importações são restritas às plataformas escolhidas no",
         "ar": "الواردات مقصورة على المنصات المختارة في",
         "ko": "수입은 선택한 플랫폼에 제한됩니다.",
@@ -22891,7 +22891,7 @@
         "vi": "Nhập vào các nền tảng được chọn",
         "id": "Impor dibatasi ke platform yang dipilih di",
         "es-419": "Las importaciones se limitan a las plataformas elegidas en las",
-        "fr-CA": "Les importations sont limitées aux plates-formes choisies"
+        "fr-CA": "Les importations sont limitées aux plateformes choisies dans l’onglet"
       }
     },
     "interface.in_a_game_folder_2f3586f7": {
@@ -23073,7 +23073,7 @@
         "hi": "प्राथमिकता बढ़ाएं",
         "de": "Erhöhung der Priorität",
         "ja": "優先度を高める",
-        "fr": "Priorité accrue",
+        "fr": "Augmenter la priorité",
         "pt-BR": "Aumente a prioridade.",
         "ar": "زيادة الأولوية",
         "ko": "우선순위 높이기",
@@ -23081,7 +23081,7 @@
         "vi": "Tăng ưu tiên",
         "id": "Meningkatkan prioritas",
         "es-419": "Aumentar prioridad",
-        "fr-CA": "Priorité accrue"
+        "fr-CA": "Augmenter la priorité"
       }
     },
     "interface.indexer_added_successfully_bef98cbb": {
@@ -23434,7 +23434,7 @@
         "hi": "कीकार्ड",
         "de": "Schlüsselkarte",
         "ja": "キーカード",
-        "fr": "Clavier",
+        "fr": "Carte d’accès",
         "pt-BR": "Cartão de chave",
         "ar": "بطاقة مفاتيح",
         "ko": "키카드",
@@ -23442,7 +23442,7 @@
         "vi": "Thẻ khoá",
         "id": "Kartu Kunci",
         "es-419": "Tarjeta de acceso",
-        "fr-CA": "Clavier"
+        "fr-CA": "Carte d’accès"
       }
     },
     "interface.keycard_acquired_9b94cf1e": {
@@ -23453,7 +23453,7 @@
         "hi": "कीकार्ड अधिग्रहित",
         "de": "Keycard erworben",
         "ja": "キーカード取得",
-        "fr": "Clavier acquis",
+        "fr": "Carte d’accès obtenue",
         "pt-BR": "Cartão de chave adquirido.",
         "ar": "بطاقة مفاتيح مكتسبة",
         "ko": "Keycard 인수",
@@ -23461,7 +23461,7 @@
         "vi": "Lấy thẻ khóa",
         "id": "Kartu Kunci diperoleh",
         "es-419": "Tarjeta de acceso adquirida",
-        "fr-CA": "Clavier acquis"
+        "fr-CA": "Carte d’accès obtenue"
       }
     },
     "interface.keys_are_romm_platform_slugs_value_1954c3a5": {
@@ -23548,7 +23548,7 @@
         "hi": "नवीनतम गेम रिलीज़",
         "de": "Neueste Game Releases",
         "ja": "最新のゲームリリース",
-        "fr": "Dernières sorties du jeu",
+        "fr": "Dernières sorties de jeux",
         "pt-BR": "Últimos lançamentos de jogos",
         "ar": "آخر إطلاقات لعبة",
         "ko": "최신 게임 출시",
@@ -23556,7 +23556,7 @@
         "vi": "Các bản phát hành trò chơi mới nhất",
         "id": "Permainan terakhir rilis",
         "es-419": "Últimas versiones del juego",
-        "fr-CA": "Dernières sorties du jeu"
+        "fr-CA": "Dernières sorties de jeux"
       }
     },
     "interface.latest_game_releases_listed_on_xre_a41d4cde": {
@@ -24232,7 +24232,7 @@
         "hi": "लॉग्स को इश्यू के रूप में सहेजने वाली",
         "de": "Logs werden als Problem in einem",
         "ja": "ログの Issue 保存先：",
-        "fr": "Les journaux sont stockés comme un problème dans un",
+        "fr": "Les journaux sont enregistrés sous forme de ticket dans un dépôt",
         "pt-BR": "Os registros são armazenados como um problema em um",
         "ar": "تم تخزين الاقزام كمسألة في",
         "ko": "로그는 다음의 이슈로 저장됩니다",
@@ -24240,7 +24240,7 @@
         "vi": "Nhật ký được lưu như là một vấn đề trong một",
         "id": "Log disimpan sebagai masalah dalam",
         "es-419": "Los registros se almacenan como un problema en un",
-        "fr-CA": "Les journaux sont stockés comme un problème dans un"
+        "fr-CA": "Les journaux sont enregistrés sous forme de ticket dans un dépôt"
       }
     },
     "interface.logs_uploaded_4461fe26": {
@@ -24517,7 +24517,7 @@
         "hi": "मिलान:",
         "de": "Übereinstimmung:",
         "ja": "一致:",
-        "fr": "Corrigé :",
+        "fr": "Correspondance :",
         "pt-BR": "Combinado:",
         "ar": "متطابق:",
         "ko": "일치:",
@@ -24525,7 +24525,7 @@
         "vi": "Khớp:",
         "id": "Cocok:",
         "es-419": "Combinado:",
-        "fr-CA": "Corrigé :"
+        "fr-CA": "Correspondance :"
       }
     },
     "interface.metadata_refresh_0a7467cb": {
@@ -24916,7 +24916,7 @@
         "hi": "समीक्षा आवश्यक (",
         "de": "Überprüfung erforderlich (",
         "ja": "要確認 (",
-        "fr": "Examen des besoins (",
+        "fr": "À examiner (",
         "pt-BR": "Precisa de revisão (",
         "ar": "استعراض الاحتياجات",
         "ko": "리뷰 (필수)",
@@ -24924,7 +24924,7 @@
         "vi": "Cần ôn lại (",
         "id": "Perlu Ulasan (",
         "es-419": "Requiere revisión (",
-        "fr-CA": "Examen des besoins ("
+        "fr-CA": "À examiner ("
       }
     },
     "interface.new_aad4ae31": {
@@ -26094,7 +26094,7 @@
         "hi": "अनाथ",
         "de": "Verwaist (",
         "ja": "孤立した (Orphaned)",
-        "fr": "Orphelins",
+        "fr": "Orphelins (",
         "pt-BR": "Órfão (",
         "ar": "يتيمة (",
         "ko": "고아 (",
@@ -26102,7 +26102,7 @@
         "vi": "Mồ côi (",
         "id": "Yatim piatu (",
         "es-419": "Huérfano (",
-        "fr-CA": "Orphelins"
+        "fr-CA": "Orphelins ("
       }
     },
     "interface.overview_total_games_rating_comple_096f3367": {
@@ -26398,7 +26398,7 @@
         "hi": "घुसपैठ रोकें",
         "de": "Unterbrechen Sie die Infiltration",
         "ja": "潜入を一時停止",
-        "fr": "Arrêter l'infiltration",
+        "fr": "Mettre l'infiltration en pause",
         "pt-BR": "Pause a infiltração.",
         "ar": "وقف التسلل",
         "ko": "침투를 일시",
@@ -26406,7 +26406,7 @@
         "vi": "Dừng việc xâm nhập",
         "id": "Jeda infiltrasi",
         "es-419": "Pausa la infiltración",
-        "fr-CA": "Arrêter l'infiltration"
+        "fr-CA": "Mettre l'infiltration en pause"
       }
     },
     "interface.pc_2e000424": {
@@ -26607,7 +26607,7 @@
         "hi": "प्लेटफार्म फ़ोल्डर बाइंडिंग (JSON)",
         "de": "Plattformordnerbindungen (JSON)",
         "ja": "プラットフォームフォルダ結合(JSON)",
-        "fr": "Reliures des dossiers de la plate-forme (JSON)",
+        "fr": "Associations entre plateformes et dossiers (JSON)",
         "pt-BR": "Vínculos de pastas da plataforma (JSON)",
         "ar": "ارتباطات مجلدات المنصة (JSON)",
         "ko": "플랫폼 폴더 바인딩 (JSON)",
@@ -26615,7 +26615,7 @@
         "vi": "Ánh xạ thư mục nền tảng (JSON)",
         "id": "Platform binding folder (JSON)",
         "es-419": "Vinculaciones de carpetas de plataforma (JSON)",
-        "fr-CA": "Reliures des dossiers de la plate-forme (JSON)"
+        "fr-CA": "Associations entre plateformes et dossiers (JSON)"
       }
     },
     "interface.platform_folders_0db7df8f": {
@@ -26702,7 +26702,7 @@
         "hi": "खेल",
         "de": "Spielen",
         "ja": "プレイ",
-        "fr": "jouer",
+        "fr": "en cours",
         "pt-BR": "Tocando",
         "ar": "اللعب",
         "ko": "플레이 중",
@@ -26710,7 +26710,7 @@
         "vi": "Đang chơi",
         "id": "Sedang dimainkan",
         "es-419": "jugando",
-        "fr-CA": "jouer"
+        "fr-CA": "en cours"
       }
     },
     "interface.please_provide_both_client_id_and_221276fd": {
@@ -26797,7 +26797,7 @@
         "hi": "डाउनलोड खोज को पहले से फ़िल्टर करें",
         "de": "Pre-Filter Download Suche",
         "ja": "事前フィルタのダウンロード検索",
-        "fr": "Pré-filtre Télécharger la recherche",
+        "fr": "Pré-filtrage de la recherche de téléchargement",
         "pt-BR": "Pré-filtrar a busca de downloads",
         "ar": "ما قبل التصفية",
         "ko": "Pre-filter 다운로드 검색",
@@ -26805,7 +26805,7 @@
         "vi": "Lọc trước kết quả tìm kiếm tải xuống",
         "id": "Penyaringan Awal Pencarian Unduhan",
         "es-419": "Prefiltrar la búsqueda de descargas",
-        "fr-CA": "Pré-filtre Télécharger la recherche"
+        "fr-CA": "Pré-filtrage de la recherche de téléchargement"
       }
     },
     "interface.pre_filter_results_to_this_platfor_ba76b71f": {
@@ -26968,7 +26968,7 @@
         "hi": "पिछला स्लाइड",
         "de": "Frühere Folie",
         "ja": "前のスライド",
-        "fr": "Diapo précédent",
+        "fr": "Diapo précédente",
         "pt-BR": "Deslize anterior",
         "ar": "الشريحة السابقة",
         "ko": "이전 슬라이드",
@@ -26976,7 +26976,7 @@
         "vi": "Slide trước",
         "id": "Seluncuran sebelumnya",
         "es-419": "diapositiva anterior",
-        "fr-CA": "Diapo précédent"
+        "fr-CA": "Diapo précédente"
       }
     },
     "interface.priority_must_be_a_whole_number_be_315bfac5": {
@@ -27158,7 +27158,7 @@
         "hi": "Prowlarr निदान विफल",
         "de": "Prowlarr Diagnose fehlgeschlagen",
         "ja": "Prowlarrの診断は失敗しました",
-        "fr": "Prowlarr le diagnostic a échoué",
+        "fr": "Le diagnostic Prowlarr a échoué",
         "pt-BR": "O diagnóstico de Prowlarr falhou.",
         "ar": "Prowlarr تشخيص فاشل",
         "ko": "Prowlarr 진단 실패",
@@ -27166,7 +27166,7 @@
         "vi": "Prowlarr chẩn đoán thất bại",
         "id": "Diagnosa Prowlarr gagal",
         "es-419": "El diagnóstico de Prowlarr falló",
-        "fr-CA": "Prowlarr le diagnostic a échoué"
+        "fr-CA": "Le diagnostic Prowlarr a échoué"
       }
     },
     "interface.prowlarr_management_api_404ed065": {
@@ -28279,7 +28279,7 @@
         "hi": "रिपोर्टों को इश्यू के रूप में सहेजने वाली",
         "de": "Berichte werden als Problem in einem",
         "ja": "レポートの Issue 保存先：",
-        "fr": "Les rapports sont stockés comme un problème dans un",
+        "fr": "Les rapports sont enregistrés sous forme de ticket dans un dépôt",
         "pt-BR": "Relatórios são armazenados como um problema em um",
         "ar": "التقارير مخزنة كمسألة في",
         "ko": "보고서는 문제로 저장됩니다.",
@@ -28287,7 +28287,7 @@
         "vi": "Báo cáo được lưu giữ như một vấn đề trong một",
         "id": "Laporan disimpan sebagai masalah dalam",
         "es-419": "Los informes se almacenan como un problema en un",
-        "fr-CA": "Les rapports sont stockés comme un problème dans un"
+        "fr-CA": "Les rapports sont enregistrés sous forme de ticket dans un dépôt"
       }
     },
     "interface.require_a_custom_binding_8cba8087": {
@@ -28659,7 +28659,7 @@
         "hi": "ROM आयातों को RomM पर भेजें",
         "de": "ROM-Importe an RomM weiterleiten",
         "ja": "ROMインポートをRomMにルーティング",
-        "fr": "Importations de route ROM vers RomM",
+        "fr": "Acheminer les importations de ROM vers RomM",
         "pt-BR": "Direcione as importações de ROM para o RomM",
         "ar": "وجّه استيراد ملفات ROM إلى RomM",
         "ko": "ROM 가져오기를 RomM으로 전달",
@@ -28667,7 +28667,7 @@
         "vi": "Chuyển hướng nhập ROM sang RomM",
         "id": "Impor ROM rute ke RomM",
         "es-419": "Dirigir las importaciones de ROM a RomM",
-        "fr-CA": "Importations de route ROM vers RomM"
+        "fr-CA": "Acheminer les importations de ROM vers RomM"
       }
     },
     "interface.rpc2_8e3dec32": {
@@ -29039,7 +29039,7 @@
         "hi": "सहेजें xREL.to विकल्प",
         "de": "Speichern Sie xREL.to Optionen",
         "ja": "xREL.toオプションを保存する",
-        "fr": "Enregistrer xREL.to options",
+        "fr": "Enregistrer les options xREL.to",
         "pt-BR": "Salvar opções do xREL.to",
         "ar": "حفظ خيارات xREL.to",
         "ko": "xREL.to 옵션 저장",
@@ -29047,7 +29047,7 @@
         "vi": "Lưu xREL.to tùy chọn",
         "id": "Simpan opsi xREL.to",
         "es-419": "Guardar opciones xREL.to",
-        "fr-CA": "Enregistrer xREL.to options"
+        "fr-CA": "Enregistrer les options xREL.to"
       }
     },
     "interface.saved_8a6979e4": {
@@ -29172,7 +29172,7 @@
         "hi": "स्कैन की प्रगति",
         "de": "Scanfortschritt",
         "ja": "スキャンの進捗",
-        "fr": "Analyse des progrès",
+        "fr": "Progression de l'analyse",
         "pt-BR": "Progresso da verificação",
         "ar": "تقدم الفحص",
         "ko": "스캔 진행",
@@ -29180,7 +29180,7 @@
         "vi": "Quá trình quét",
         "id": "Pindai Kemajuan",
         "es-419": "Progreso del escaneo",
-        "fr-CA": "Analyse des progrès"
+        "fr-CA": "Progression de l'analyse"
       }
     },
     "interface.scan_started_59685d55": {
@@ -29609,7 +29609,7 @@
         "hi": "सुरक्षा और स्कैनिंग",
         "de": "Sicherheit & Scannen",
         "ja": "セキュリティとスキャン",
-        "fr": "Sécurité & numérisation",
+        "fr": "Sécurité & analyse",
         "pt-BR": "Segurança e verificação",
         "ar": "الأمان والفحص",
         "ko": "보안 및 스캔",
@@ -29617,7 +29617,7 @@
         "vi": "Bảo mật và quét",
         "id": "Keamanan dan Pemindaian",
         "es-419": "Seguridad y análisis",
-        "fr-CA": "Sécurité & numérisation"
+        "fr-CA": "Sécurité & analyse"
       }
     },
     "interface.security_scan_configuration_update_8f7246b1": {
@@ -29685,7 +29685,7 @@
         "hi": "सीडर (अधिक से कम)",
         "de": "Seeder (absteigend)",
         "ja": "シーダー（多い順）",
-        "fr": "Seeders (du plus au moins élevé)",
+        "fr": "Seeders (du plus élevé au moins élevé)",
         "pt-BR": "Seeders (maior para menor)",
         "ar": "المشاركون في التوزيع (من الأعلى إلى الأقل)",
         "ko": "시더 (높은 순)",
@@ -29693,7 +29693,7 @@
         "vi": "Seeder (cao đến thấp)",
         "id": "Seeder (terbanyak ke tersedikit)",
         "es-419": "Seeders: de mayor a menor",
-        "fr-CA": "Seeders (du plus au moins élevé)"
+        "fr-CA": "Seeders (du plus élevé au moins élevé)"
       }
     },
     "interface.seeding_94df1b6c": {
@@ -29799,7 +29799,7 @@
         "hi": "API बेस URL चुनें",
         "de": "API-Basis-URL auswählen",
         "ja": "API のベース URL を選択",
-        "fr": "Sélectionnez la base d'API URL",
+        "fr": "Sélectionnez l'URL de base de l'API",
         "pt-BR": "Selecione a base da API URL",
         "ar": "اختر عنوان URL الأساسي لـ API",
         "ko": "API 기반 선택 URL",
@@ -29807,7 +29807,7 @@
         "vi": "Chọn URL cơ sở của API",
         "id": "Pilih basis API URL",
         "es-419": "Seleccionar la URL base de la API",
-        "fr-CA": "Sélectionnez la base d'API URL"
+        "fr-CA": "Sélectionnez l'URL de base de l'API"
       }
     },
     "interface.select_certificate_file_0c3b6284": {
@@ -29932,7 +29932,7 @@
         "hi": "निजी कुंजी फ़ाइल का चयन करें",
         "de": "Datei des privaten Schlüssels auswählen",
         "ja": "プライベートキーファイルを選択",
-        "fr": "Sélectionner un fichier clé privé",
+        "fr": "Sélectionner le fichier de clé privée",
         "pt-BR": "Selecionar arquivo de chave privada",
         "ar": "اختر ملف المفتاح الخاص",
         "ko": "개인 키 파일 선택",
@@ -29940,7 +29940,7 @@
         "vi": "Chọn tập tin khoá riêng",
         "id": "Pilih Berkas Kunci Pribadi",
         "es-419": "Seleccionar archivo clave privado",
-        "fr-CA": "Sélectionner un fichier clé privé"
+        "fr-CA": "Sélectionner le fichier de clé privée"
       }
     },
     "interface.select_protocol_4ae370d3": {
@@ -30312,7 +30312,7 @@
         "hi": "सेटिंग्स टैब। उस सूची को खाली करने के लिए सभी प्लेटफार्मों को योग्य बनाने के लिए छोड़ दें।",
         "de": "ausgewählten Plattformen beschränkt. Lassen Sie die Liste leer, um alle Plattformen zuzulassen.",
         "ja": "」タブで選択したプラットフォームに制限されます。リストを空にすると、すべてのプラットフォームが対象になります。",
-        "fr": "onglet de paramètres. Laissez cette liste vide pour rendre toutes les plateformes éligibles.",
+        "fr": "des paramètres. Laissez cette liste vide pour autoriser l’importation de toutes les plateformes.",
         "pt-BR": "Página de configurações. Deixe essa lista vazia para tornar todas as plataformas elegíveis.",
         "ar": "علامة تبويب الإعدادات. اترك هذه القائمة فارغة لإتاحة جميع المنصات.",
         "ko": "설정 탭입니다. 모든 플랫폼을 사용하려면 이 목록을 비워 두세요.",
@@ -30320,7 +30320,7 @@
         "vi": "thanh cài đặt. Để trống danh sách đó để làm cho mọi nền tảng đều đủ điều kiện.",
         "id": "tab pengaturan. Biarkan daftar itu kosong untuk membuat semua platform yang memenuhi syarat.",
         "es-419": "ficha de configuración. Deja esa lista vacía para que todas las plataformas sean elegibles.",
-        "fr-CA": "onglet de paramètres. Laissez cette liste vide pour rendre toutes les plateformes éligibles."
+        "fr-CA": "des paramètres. Laissez cette liste vide pour autoriser l’importation de toutes les plateformes."
       }
     },
     "interface.settings_updated_01a60387": {
@@ -30673,7 +30673,7 @@
         "hi": "फिल्टर के साथ दिखाया गया है",
         "de": "mit Filter dargestellt",
         "ja": "フィルターで示される)",
-        "fr": "montré avec filtre)",
+        "fr": "après filtrage)",
         "pt-BR": "mostrado com filtro)",
         "ar": "مبيّنة بالمرشح",
         "ko": "필터로 표시)",
@@ -30681,7 +30681,7 @@
         "vi": "Hiển thị với bộ lọc",
         "id": "ditampilkan dengan filter)",
         "es-419": "mostrado con filtro)",
-        "fr-CA": "montré avec filtre)"
+        "fr-CA": "après filtrage)"
       }
     },
     "interface.single_rom_placement_0ca4f2bc": {
@@ -31129,7 +31129,7 @@
         "hi": "(गेम के फ़ोल्डर के अंदर)। एकल-फ़ाइल आयात में मौजूदा लेआउट बना रहता है।",
         "de": "im Spielordner abgelegt. Einzeldateiimporte behalten ihr bestehendes Layout bei.",
         "ja": "（ゲームフォルダー内）。単一ファイルのインポートでは、既存の配置を維持します。",
-        "fr": "sous-dossiers dans le dossier de jeu. Les importations de fichiers uniques conservent leur disposition existante.",
+        "fr": "du dossier du jeu. Les importations d’un seul fichier conservent leur disposition actuelle.",
         "pt-BR": "Subpastas dentro da pasta de jogo. Importações de arquivo único mantêm seu layout existente.",
         "ar": "مجلدات فرعية داخل مجلد اللعبة. تحتفظ عمليات استيراد الملف الواحد بتخطيطها الحالي.",
         "ko": "게임 폴더 안에 하위 폴더. 단일 파일 가져 오기는 기존 레이아웃을 유지합니다.",
@@ -31137,7 +31137,7 @@
         "vi": "thư mục con bên trong thư mục trò chơi. Nhập đơn tập tin giữ bố trí tồn tại.",
         "id": "subfolder di dalam folder permainan. Impor berkas tunggal menjaga tata letak yang ada.",
         "es-419": "subcarpetas dentro de la carpeta del juego. Las importaciones de un solo fichero mantienen su disposición existente.",
-        "fr-CA": "sous-dossiers dans le dossier de jeu. Les importations de fichiers uniques conservent leur disposition existante."
+        "fr-CA": "du dossier du jeu. Les importations d’un seul fichier conservent leur disposition actuelle."
       }
     },
     "interface.support_code_ready_c72da6d6": {
@@ -31224,7 +31224,7 @@
         "hi": "सिंक विफल",
         "de": "Sync fehlgeschlagen",
         "ja": "同期失敗",
-        "fr": "Sync a échoué",
+        "fr": "Échec de la synchronisation",
         "pt-BR": "A sincronização falhou.",
         "ar": "(سينك) فشل",
         "ko": "동기화 실패",
@@ -31232,7 +31232,7 @@
         "vi": "Lỗi đồng bộ",
         "id": "Penyelarasan gagal",
         "es-419": "Error de sincronización",
-        "fr-CA": "Sync a échoué"
+        "fr-CA": "Échec de la synchronisation"
       }
     },
     "interface.sync_from_prowlarr_4d61275d": {
@@ -31262,7 +31262,7 @@
         "hi": "सिंक इंटरवल (घंटे)",
         "de": "Sync Interval (Stunden)",
         "ja": "同期間隔(時間)",
-        "fr": "Intervalle sync (heures)",
+        "fr": "Intervalle de synchronisation (heures)",
         "pt-BR": "Sincronizar intervalo (horas)",
         "ar": "فترات زمنية (ساعات)",
         "ko": "동기화 간격 (시간)",
@@ -31270,7 +31270,7 @@
         "vi": "Đồng bộ hai chiều (giờ)",
         "id": "Sync Interval (jam)",
         "es-419": "Intervalo de sincronización (horas)",
-        "fr-CA": "Intervalle sync (heures)"
+        "fr-CA": "Intervalle de synchronisation (heures)"
       }
     },
     "interface.sync_prowlarr_e920ee8d": {
@@ -32269,7 +32269,7 @@
         "hi": "TypeSafe सेटिंग्स सहेजी गईं",
         "de": "TypeSafe Einstellungen gespeichert",
         "ja": "TypeSafe の設定を保存しました",
-        "fr": "Paramètres de typeSafe enregistrés",
+        "fr": "Paramètres TypeSafe enregistrés",
         "pt-BR": "TypeSafe configurações salvas",
         "ar": "تم حفظ إعدادات TypeSafe",
         "ko": "TypeSafe 설정 저장",
@@ -32277,7 +32277,7 @@
         "vi": "Đã lưu cài đặt TypeSafe",
         "id": "Pengaturan TypeSafe disimpan",
         "es-419": "Ajustes de TypeSafe guardados",
-        "fr-CA": "Paramètres de typeSafe enregistrés"
+        "fr-CA": "Paramètres TypeSafe enregistrés"
       }
     },
     "interface.unable_to_connect_to_the_server_pl_89f3ed27": {
@@ -32934,7 +32934,7 @@
         "hi": "सहेजी गई कुंजी का उपयोग हो रहा है। इसे बदलने के लिए नई कुंजी दर्ज करें।",
         "de": "Verwenden Sie den gespeicherten Schlüssel. Geben Sie eine neue ein, um sie zu ersetzen.",
         "ja": "保存されたキーを使用して。 交換する新しいものをタイプして下さい。",
-        "fr": "En utilisant la clé enregistrée. Tapez un nouveau pour le remplacer.",
+        "fr": "La clé enregistrée est utilisée. Saisissez-en une nouvelle pour la remplacer.",
         "pt-BR": "Usando a chave salva. Digite um novo para substituí-lo.",
         "ar": "يُستخدم المفتاح المحفوظ. اكتب مفتاحًا جديدًا لاستبداله.",
         "ko": "저장된 키를 사용 중입니다. 바꾸려면 새 키를 입력하세요.",
@@ -32942,7 +32942,7 @@
         "vi": "Đang dùng khóa đã lưu. Nhập khóa mới để thay thế.",
         "id": "Menggunakan kunci yang disimpan. Ketik yang baru untuk menggantinya.",
         "es-419": "Usando la clave guardada. Escribe una nueva para reemplazarla.",
-        "fr-CA": "En utilisant la clé enregistrée. Tapez un nouveau pour le remplacer."
+        "fr-CA": "La clé enregistrée est utilisée. Saisissez-en une nouvelle pour la remplacer."
       }
     },
     "interface.v_f30c40c9": {
@@ -33485,7 +33485,7 @@
         "hi": "आपकी लाइब्रेरी फ़िल्टरिंग डिफॉल्ट्स को बचाया गया है।",
         "de": "Ihre Bibliotheksfilter-Standardwerte wurden gespeichert.",
         "ja": "ライブラリフィルタのデフォルトは保存されています。",
-        "fr": "Votre bibliothèque de filtrage par défaut a été enregistrée.",
+        "fr": "Vos valeurs par défaut de filtrage de la bibliothèque ont été enregistrées.",
         "pt-BR": "Seus padrões de filtragem de biblioteca foram salvos.",
         "ar": "تم حفظ الإعدادات الافتراضية لتصفية المكتبة.",
         "ko": "라이브러리 필터링 기본이 저장되었습니다.",
@@ -33493,7 +33493,7 @@
         "vi": "Mặc định lọc thư viện của bạn đã được lưu.",
         "id": "Perpustakaan penyaringan default Anda telah disimpan.",
         "es-419": "Se guardaron los valores predeterminados de los filtros de la biblioteca.",
-        "fr-CA": "Votre bibliothèque de filtrage par défaut a été enregistrée."
+        "fr-CA": "Vos valeurs par défaut de filtrage de la bibliothèque ont été enregistrées."
       }
     },
     "interface.your_password_has_been_changed_suc_5c02a986": {
@@ -34321,7 +34321,7 @@
         "hi": "स्वास्थ्य की जाँच करें {path}",
         "de": "Überprüfen Sie die Gesundheit von {path}",
         "ja": "健康チェック {path}",
-        "fr": "Revérifier la santé {path}",
+        "fr": "Revérifier l'état de {path}",
         "pt-BR": "Reverificar a saúde de {path}",
         "ar": "إعادة فحص الصحة {path}",
         "ko": "Recheck 건강 {path}",
@@ -34329,7 +34329,7 @@
         "vi": "Kiểm tra lại sức khỏe của {path}",
         "id": "Periksa ulang kesehatan {path}",
         "es-419": "Volver a comprobar el estado de {path}",
-        "fr-CA": "Revérifier la santé {path}"
+        "fr-CA": "Revérifier l'état de {path}"
       }
     },
     "interface.remove_download_record_downloadtit_c198790c": {
@@ -35252,7 +35252,7 @@
         "hi": "प्रवेश मार्ग पार करके गेट से अंदर जाएँ",
         "de": "Überquere den Zugangsweg und gehe durch das Tor",
         "ja": "進入路を横切ってゲートを通る",
-        "fr": "Traversez l’approche et passez le portail",
+        "fr": "Traversez la zone d’accès et franchissez le portail",
         "pt-BR": "Atravesse o acesso e passe pelo portão",
         "ar": "اعبر الممر وادخل من البوابة",
         "ko": "진입로를 지나 문으로 들어가세요",
@@ -35260,7 +35260,7 @@
         "vi": "Băng qua lối tiếp cận và đi qua cổng",
         "id": "Seberangi jalur masuk dan lewati gerbang",
         "es-419": "Cruza el acceso y atraviesa la puerta",
-        "fr-CA": "Traversez l’approche et passez le portail"
+        "fr-CA": "Traversez la zone d’accès et franchissez le portail"
       }
     },
     "interface.find_the_keycard_then_reach_the_co_da927c7e": {

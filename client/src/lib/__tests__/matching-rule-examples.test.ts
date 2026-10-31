@@ -5,6 +5,7 @@ import {
   evaluateReleases,
   type CustomFormat,
 } from "@shared/release-scoring";
+import { validateRommSlug } from "../../../../server/services/RommRouting";
 
 const locales: InterfaceLanguage[] = [
   "en",
@@ -52,5 +53,10 @@ describe("localized matching-rule examples", () => {
     expect(matches.get("ExampleGame-GOG")).toEqual(["example"]);
     expect(matches.get("ExampleGame.DRM-free")).toEqual(["example"]);
     expect(matches.get("ExampleGame-CODEX")).toEqual([]);
+
+    const slugHint = formatInterfaceMessage("interface.e_g_ps2_c7c4bde6", {}, locale);
+    const slug = slugHint.match(/ps2/i)?.[0];
+    expect(slug).toBeDefined();
+    expect(validateRommSlug(slug!)).toBe("ps2");
   });
 });

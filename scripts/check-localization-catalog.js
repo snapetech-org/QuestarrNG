@@ -131,6 +131,8 @@ for (const [id, message] of Object.entries(messages)) {
 
 // These examples are matching expressions/identifiers, so their tokens stay literal.
 const literalExamples = {
+  "interface.e_g_404_c875c07b": { tokens: ["404"], ignoreCase: false },
+  "interface.e_g_ps2_c7c4bde6": { tokens: ["ps2"], ignoreCase: true },
   "interface.e_g_gog_drm_free_df026737": { tokens: ["(GOG|DRM-free)"], ignoreCase: false },
   "interface.e_g_hypervisor_cam_sample_655a5dd1": {
     tokens: ["HYPERVISOR", "CAM", "SAMPLE"],
