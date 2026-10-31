@@ -2641,6 +2641,14 @@ export const STABLE_INTERFACE_MESSAGES = {
     "Identity provider sign-in failed. Check the provider and account admission settings.",
   "navigation.all_games_count_singular": "All Games: {count}",
   "downloads.more_options": "More download options",
+  "server.ssl_settings_updated_restart_required_32a8482f":
+    "SSL settings updated. Restart required.",
+  "server.certificate_generated_50a9f3d1": "Certificate generated",
+  "server.certificate_uploaded_successfully_f22f1f8d": "Certificate uploaded successfully",
+  "server.synced_indexers_from_prowlarr_added_added_update_a5975d7a":
+    "Synced indexers from Prowlarr: {added} added, {updated} updated",
+  "server.metadata_refresh_complete_updated_updated_failed_ebc6ce52":
+    "Metadata refresh complete: {updated} updated, {failed} failed.",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

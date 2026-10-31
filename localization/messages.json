@@ -42425,6 +42425,101 @@
         "es-419": "Más opciones de descarga",
         "fr-CA": "Plus d’options de téléchargement"
       }
+    },
+    "server.ssl_settings_updated_restart_required_32a8482f": {
+      "source": "SSL settings updated. Restart required.",
+      "translations": {
+        "es": "La configuración SSL se actualizó. Se requiere reiniciar.",
+        "zh-Hans": "SSL 设置已更新。需要重新启动。",
+        "hi": "SSL सेटिंग्स अपडेट की गईं। पुनः आरंभ करना आवश्यक है।",
+        "de": "SSL-Einstellungen aktualisiert. Neustart erforderlich.",
+        "ja": "SSL 設定を更新しました。再起動が必要です。",
+        "fr": "Paramètres SSL mis à jour. Redémarrage requis.",
+        "pt-BR": "Configurações de SSL atualizadas. É necessário reiniciar.",
+        "ar": "تم تحديث إعدادات SSL. يلزم إعادة التشغيل.",
+        "ko": "SSL 설정이 업데이트되었습니다. 다시 시작해야 합니다.",
+        "zh-Hant": "SSL 設定已更新。需要重新啟動。",
+        "vi": "Đã cập nhật cài đặt SSL. Cần khởi động lại.",
+        "id": "Pengaturan SSL diperbarui. Perlu dimulai ulang.",
+        "es-419": "La configuración SSL se actualizó. Se requiere reiniciar.",
+        "fr-CA": "Paramètres SSL mis à jour. Redémarrage requis."
+      }
+    },
+    "server.certificate_generated_50a9f3d1": {
+      "source": "Certificate generated",
+      "translations": {
+        "es": "Certificado generado",
+        "zh-Hans": "证书已生成",
+        "hi": "प्रमाणपत्र जनरेट किया गया",
+        "de": "Zertifikat erstellt",
+        "ja": "証明書を生成しました",
+        "fr": "Certificat généré",
+        "pt-BR": "Certificado gerado",
+        "ar": "تم إنشاء الشهادة",
+        "ko": "인증서가 생성되었습니다",
+        "zh-Hant": "憑證已產生",
+        "vi": "Đã tạo chứng chỉ",
+        "id": "Sertifikat dibuat",
+        "es-419": "Certificado generado",
+        "fr-CA": "Certificat généré"
+      }
+    },
+    "server.certificate_uploaded_successfully_f22f1f8d": {
+      "source": "Certificate uploaded successfully",
+      "translations": {
+        "es": "Certificado cargado correctamente",
+        "zh-Hans": "证书已成功上传",
+        "hi": "प्रमाणपत्र सफलतापूर्वक अपलोड किया गया",
+        "de": "Zertifikat erfolgreich hochgeladen",
+        "ja": "証明書をアップロードしました",
+        "fr": "Certificat téléversé avec succès",
+        "pt-BR": "Certificado enviado com sucesso",
+        "ar": "تم رفع الشهادة بنجاح",
+        "ko": "인증서가 업로드되었습니다",
+        "zh-Hant": "憑證已成功上傳",
+        "vi": "Đã tải chứng chỉ lên thành công",
+        "id": "Sertifikat berhasil diunggah",
+        "es-419": "Certificado cargado correctamente",
+        "fr-CA": "Certificat téléversé avec succès"
+      }
+    },
+    "server.synced_indexers_from_prowlarr_added_added_update_a5975d7a": {
+      "source": "Synced indexers from Prowlarr: {added} added, {updated} updated",
+      "translations": {
+        "es": "Índices de Prowlarr sincronizados: {added} añadidos, {updated} actualizados",
+        "zh-Hans": "已同步 Prowlarr 索引器：新增 {added} 个，更新 {updated} 个",
+        "hi": "Prowlarr से इंडेक्सर सिंक हुए: {added} जोड़े गए, {updated} अपडेट किए गए",
+        "de": "Prowlarr-Indexer synchronisiert: {added} hinzugefügt, {updated} aktualisiert",
+        "ja": "Prowlarr のインデクサーを同期しました：{added} 件を追加、{updated} 件を更新",
+        "fr": "Indexeurs Prowlarr synchronisés : {added} ajoutés, {updated} mis à jour",
+        "pt-BR": "Indexadores do Prowlarr sincronizados: {added} adicionados, {updated} atualizados",
+        "ar": "تمت مزامنة مفهرسات Prowlarr: أُضيف {added} وتم تحديث {updated}",
+        "ko": "Prowlarr 인덱서 동기화 완료: {added}개 추가, {updated}개 업데이트",
+        "zh-Hant": "已同步 Prowlarr 索引器：新增 {added} 個，更新 {updated} 個",
+        "vi": "Đã đồng bộ bộ lập chỉ mục từ Prowlarr: thêm {added}, cập nhật {updated}",
+        "id": "Indexer Prowlarr disinkronkan: {added} ditambahkan, {updated} diperbarui",
+        "es-419": "Índices de Prowlarr sincronizados: {added} añadidos, {updated} actualizados",
+        "fr-CA": "Indexeurs Prowlarr synchronisés : {added} ajoutés, {updated} mis à jour"
+      }
+    },
+    "server.metadata_refresh_complete_updated_updated_failed_ebc6ce52": {
+      "source": "Metadata refresh complete: {updated} updated, {failed} failed.",
+      "translations": {
+        "es": "Actualización de metadatos completa: {updated} actualizados, {failed} fallidos.",
+        "zh-Hans": "元数据刷新完成：更新 {updated} 项，失败 {failed} 项。",
+        "hi": "मेटाडेटा रीफ़्रेश पूरा हुआ: {updated} अपडेट किए गए, {failed} विफल रहे।",
+        "de": "Metadatenaktualisierung abgeschlossen: {updated} aktualisiert, {failed} fehlgeschlagen.",
+        "ja": "メタデータの更新が完了しました：{updated} 件を更新、{failed} 件に失敗しました。",
+        "fr": "Actualisation des métadonnées terminée : {updated} mises à jour, {failed} échecs.",
+        "pt-BR": "Atualização de metadados concluída: {updated} atualizados, {failed} falharam.",
+        "ar": "اكتمل تحديث البيانات الوصفية: تم تحديث {updated} وتعذر تحديث {failed}.",
+        "ko": "메타데이터 새로 고침 완료: {updated}개 업데이트, {failed}개 실패.",
+        "zh-Hant": "中繼資料更新完成：已更新 {updated} 項，{failed} 項失敗。",
+        "vi": "Đã làm mới siêu dữ liệu: cập nhật {updated}, thất bại {failed}.",
+        "id": "Pembaruan metadata selesai: {updated} berhasil diperbarui, {failed} gagal.",
+        "es-419": "Actualización de metadatos completa: {updated} actualizados, {failed} fallidos.",
+        "fr-CA": "Actualisation des métadonnées terminée : {updated} mises à jour, {failed} échecs."
+      }
     }
   }
 }

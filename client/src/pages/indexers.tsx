@@ -243,7 +243,12 @@ export default function IndexersPage() {
       setProwlarrDiagnostics(null);
       toast({
         title: "Sync successful",
-        description: data.message,
+        description: (
+          <InterfaceText
+            source="server.synced_indexers_from_prowlarr_added_added_update_a5975d7a"
+            values={{ added: data.results.added, updated: data.results.updated }}
+          />
+        ),
       });
     },
     onSettled: async () => {

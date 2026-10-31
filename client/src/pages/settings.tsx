@@ -35,6 +35,7 @@ import { Label } from "@/components/ui/label";
 import { PathBrowser } from "@/components/PathBrowser";
 import { BilingualLocaleName } from "@/components/BilingualLocaleName";
 import { InterfaceLanguageSelect } from "@/components/InterfaceLanguageSelect";
+import { InterfaceText } from "@/components/InterfaceText";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { apiFetch, apiRequest, clearSearchCache, throwIfResNotOk } from "@/lib/queryClient";
@@ -93,7 +94,6 @@ import { parseJsonStringArray, CANONICAL_PLATFORMS } from "@shared/title-utils";
 import PlatformsSettings from "@/components/PlatformsSettings";
 import ImportSettings from "@/components/ImportSettings";
 import { IgdbHelpPopover, IgdbTestConnectionButton } from "@/components/IgdbCredentialsHelper";
-import { InterfaceText } from "@/components/InterfaceText";
 
 interface CertInfo {
   subject: string;
@@ -826,7 +826,7 @@ export default function SettingsPage() {
     onSuccess: (data) => {
       toast({
         title: "Certificate Uploaded",
-        description: data.message,
+        description: <InterfaceText source="server.certificate_uploaded_successfully_f22f1f8d" />,
       });
       setSslCertPath(data.certPath);
       setSslKeyPath(data.keyPath);
@@ -856,10 +856,12 @@ export default function SettingsPage() {
       });
       return res.json();
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast({
         title: "SSL Settings Saved",
-        description: data.message,
+        description: (
+          <InterfaceText source="server.ssl_settings_updated_restart_required_32a8482f" />
+        ),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/settings/ssl"] });
     },
@@ -880,7 +882,7 @@ export default function SettingsPage() {
     onSuccess: (data) => {
       toast({
         title: "Certificate Generated",
-        description: data.message,
+        description: <InterfaceText source="server.certificate_generated_50a9f3d1" />,
       });
       setSslCertPath(data.certPath);
       setSslKeyPath(data.keyPath);
@@ -1069,7 +1071,12 @@ export default function SettingsPage() {
     onSuccess: (data) => {
       toast({
         title: "Metadata Refresh",
-        description: data.message,
+        description: (
+          <InterfaceText
+            source="server.metadata_refresh_complete_updated_updated_failed_ebc6ce52"
+            values={{ updated: data.updatedCount, failed: data.errorCount }}
+          />
+        ),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/games"] });
     },
