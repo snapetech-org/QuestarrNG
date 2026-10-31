@@ -25,4 +25,4 @@ jobs:
       github.event.pull_request.base.ref == 'main'
     permissions:
       contents: read
-    uses: snapetech-org/QuestarrNG/.github/workflows/fork-safe-validation.yml@9d3f2023c637ae0e58f30bbb84fc6d60baa7bc97
+    uses: snapetech-org/QuestarrNG/.github/workflows/fork-safe-validation.yml@16bc2056c4ecfe4c90bbcef9a619237dd9650d56
