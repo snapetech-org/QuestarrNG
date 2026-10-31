@@ -258,7 +258,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Failed to fetch journal entries": "Gagal mengambil entri jurnal",
   "Invalid journal entry": "Entri jurnal tidak valid",
   "Journal entry not found": "Entri jurnal tidak ditemukan",
-  "Failed to fetch milestones": "Gagal mengambil pencapaian",
+  "Failed to fetch milestones": "Gagal mengambil tonggak",
   "Invalid milestone": "Pencapaian tidak valid",
   "Milestone not found": "Pencapaian tidak ditemukan",
   "Invalid milestone update": "Pembaruan pencapaian tidak valid",

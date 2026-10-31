@@ -259,7 +259,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Failed to fetch journal entries": "गेम जर्नल प्रविष्टियाँ प्राप्त नहीं की जा सकीं",
   "Invalid journal entry": "जर्नल प्रविष्टि अमान्य है",
   "Journal entry not found": "जर्नल प्रविष्टि नहीं मिली",
-  "Failed to fetch milestones": "माइलस्टोन प्राप्त नहीं किए जा सके",
+  "Failed to fetch milestones": "मील के पत्थर प्राप्त नहीं किए जा सके",
   "Invalid milestone": "माइलस्टोन अमान्य है",
   "Milestone not found": "माइलस्टोन नहीं मिला",
   "Invalid milestone update": "माइलस्टोन अपडेट अमान्य है",
