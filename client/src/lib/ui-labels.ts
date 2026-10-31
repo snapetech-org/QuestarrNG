@@ -10173,7 +10173,7 @@ export const UI_LABELS = {
     "fr-CA": "Déclenché par",
   },
   "interface.started_97b5823e": {
-    es: "Inicio",
+    es: "Iniciado",
     "zh-Hans": "开始时间",
     hi: "शुरू हुआ",
     de: "Gestartet",
@@ -10185,7 +10185,7 @@ export const UI_LABELS = {
     "zh-Hant": "開始時間",
     vi: "Bắt đầu",
     id: "Dimulai",
-    "es-419": "Inicio",
+    "es-419": "Iniciado",
     "fr-CA": "Début",
   },
   "interface.created_09de135b": {
@@ -15172,7 +15172,7 @@ export const UI_LABELS = {
     "fr-CA": "Copiez votre nouvelle clé maintenant — elle ne sera plus affichée.",
   },
   "interface.could_not_add_folder_39f33de8": {
-    es: "No puedo añadir la carpeta",
+    es: "No se pudo añadir la carpeta",
     "zh-Hans": "无法添加文件夹",
     hi: "फ़ोल्डर जोड़ें नहीं",
     de: "Kann keinen Ordner hinzufügen",
@@ -15184,11 +15184,11 @@ export const UI_LABELS = {
     "zh-Hant": "無法新增資料夾",
     vi: "Không thể thêm thư mục",
     id: "Tak bisa Tambah Folder",
-    "es-419": "No puedo añadir la carpeta",
+    "es-419": "No se pudo añadir la carpeta",
     "fr-CA": "Impossible d'ajouter un dossier",
   },
   "interface.could_not_change_the_category_85f1741e": {
-    es: "No podía cambiar la categoría",
+    es: "No se pudo cambiar la categoría",
     "zh-Hans": "无法更改类别",
     hi: "श्रेणी को नहीं बदल सकता",
     de: "Kann die Kategorie nicht ändern",
@@ -15200,11 +15200,11 @@ export const UI_LABELS = {
     "zh-Hant": "無法更改類別",
     vi: "Không thể thay đổi phân loại",
     id: "Tidak dapat mengubah kategori",
-    "es-419": "No podía cambiar la categoría",
+    "es-419": "No se pudo cambiar la categoría",
     "fr-CA": "Impossible de changer la catégorie",
   },
   "interface.could_not_create_api_key_58ace79e": {
-    es: "No podría crear clave API",
+    es: "No se pudo crear la clave de API",
     "zh-Hans": "无法创建 API 密钥",
     hi: "नहीं बना सकता API कुंजी",
     de: "Kann keinen API-Schlüssel erstellen",
@@ -15216,11 +15216,11 @@ export const UI_LABELS = {
     "zh-Hant": "無法建立 API 金鑰",
     vi: "Không thể tạo khóa API",
     id: "Tak bisa membuat kunci API",
-    "es-419": "No podría crear clave API",
+    "es-419": "No se pudo crear la clave de API",
     "fr-CA": "Impossible de créer la clé API",
   },
   "interface.could_not_link_real_debrid_be750164": {
-    es: "No podía vincular a Real-Debrid",
+    es: "No se pudo vincular Real-Debrid",
     "zh-Hans": "无法链接 Real-Debrid",
     hi: "लिंक नहीं Real-Debrid",
     de: "Konnte Real-Debrid nicht verbinden",
@@ -15232,7 +15232,7 @@ export const UI_LABELS = {
     "zh-Hant": "無法連結 Real-Debrid",
     vi: "Không thể liên kết Real-Debrid",
     id: "Tidak dapat menaut Real-Debrid",
-    "es-419": "No podía vincular a Real-Debrid",
+    "es-419": "No se pudo vincular Real-Debrid",
     "fr-CA": "Impossible de relier Real-Debrid",
   },
   "interface.could_not_load_api_keys_refresh_th_46d17f24": {
@@ -15253,7 +15253,7 @@ export const UI_LABELS = {
     "fr-CA": "Impossible de charger les clés API. Actualisez la page pour réessayer.",
   },
   "interface.could_not_load_platform_list_from_20649c44": {
-    es: "No podía cargar la lista de plataformas de IGDB.",
+    es: "No se pudo cargar la lista de plataformas de IGDB.",
     "zh-Hans": "无法从 IGDB 装入平台列表 。",
     hi: "IGDB से प्लेटफॉर्म सूची लोड नहीं कर सका।",
     de: "Es konnte keine Plattformliste von IGDB geladen werden.",
@@ -15265,7 +15265,7 @@ export const UI_LABELS = {
     "zh-Hant": "無法從 IGDB 裝入平臺列表 。",
     vi: "Không thể tải danh sách nền tảng từ IGDB.",
     id: "Tak bisa memuat daftar platform dari IGDB.",
-    "es-419": "No podía cargar la lista de plataformas de IGDB.",
+    "es-419": "No se pudo cargar la lista de plataformas de IGDB.",
     "fr-CA": "Impossible de charger la liste des plateformes depuis IGDB.",
   },
   "interface.could_not_revoke_api_key_b29ba530": {
@@ -15689,7 +15689,7 @@ export const UI_LABELS = {
     "fr-CA": "Mot de passe d’archive par défaut (facultatif)",
   },
   "interface.default_is_3_to_be_conservative_44697800": {
-    es: "Default es 3 para ser conservador.",
+    es: "El valor predeterminado es 3 para ser conservador.",
     "zh-Hans": "默认为3为保守.",
     hi: "डिफ़ॉल्ट 3 रूढ़िवादी होने के लिए है।",
     de: "Default ist 3 konservativ zu sein.",
@@ -15701,7 +15701,7 @@ export const UI_LABELS = {
     "zh-Hant": "預設為3為保守.",
     vi: "Mặc định là 3 để thận trọng.",
     id: "Nilai default adalah 3 untuk menjaga keamanan.",
-    "es-419": "Default es 3 para ser conservador.",
+    "es-419": "El valor predeterminado es 3 para ser conservador.",
     "fr-CA": "La valeur par défaut est 3 pour être conservateur.",
   },
   "interface.default_sort_order_29fbe456": {
@@ -15820,7 +15820,7 @@ export const UI_LABELS = {
     "fr-CA": "Détection",
   },
   "interface.detection_threshold_137b1cf7": {
-    es: "Detección Umbral",
+    es: "Umbral de detección",
     "zh-Hans": "检测阈值",
     hi: "जांच थ्रेसहोल्ड",
     de: "Nachweisschwelle",
@@ -15832,7 +15832,7 @@ export const UI_LABELS = {
     "zh-Hant": "檢測閾值",
     vi: "Ngưỡng dò phát hiện",
     id: "Ambang Deteksi",
-    "es-419": "Detección Umbral",
+    "es-419": "Umbral de detección",
     "fr-CA": "Seuil de détection",
   },
   "interface.deutsch_german_0cb6a1e3": {
@@ -16463,7 +16463,7 @@ export const UI_LABELS = {
       "Téléchargements non encore suivis par Questarr, regroupés par jeu. Sélectionnez un jeu pour chaque lien.",
   },
   "interface.drifted_a0f50be5": {
-    es: "Secado (",
+    es: "Rutas no encontradas (",
     "zh-Hans": "漂流(",
     hi: "बहाव (Drifted)",
     de: "angetrieben ()",
@@ -16475,7 +16475,7 @@ export const UI_LABELS = {
     "zh-Hant": "漂流(",
     vi: "Bị trôi dạt (",
     id: "Terdorong (",
-    "es-419": "Secado (",
+    "es-419": "Rutas no encontradas (",
     "fr-CA": "Drifté (",
   },
   "interface.e_g_404_c875c07b": {
@@ -17977,7 +17977,7 @@ export const UI_LABELS = {
     "fr-CA": "Filtrer les téléchargements…",
   },
   "interface.filtered_to_games_only_master_game_929b86c8": {
-    es: "Filtrado a juegos solamente (master game). Datos de",
+    es: "Filtrado a juegos solamente (master_game). Datos de",
     "zh-Hans": "仅被过滤到游戏(master game). 数据来自",
     hi: "केवल खेलों के लिए फ़िल्टर्ड (master game). डेटा से",
     de: "Gefiltert nur nach Spielen (master game). Daten aus",
@@ -17989,7 +17989,7 @@ export const UI_LABELS = {
     "zh-Hant": "僅被過濾到遊戲(master game). 資料來自",
     vi: "Đã lọc vào trò chơi chỉ (chủ  Trò chơi). Dữ liệu từ",
     id: "Disaring ke game saja (master _ game). Data dari",
-    "es-419": "Filtrado a juegos solamente (master game). Datos de",
+    "es-419": "Filtrado a juegos solamente (master_game). Datos de",
     "fr-CA": "Filtré aux jeux uniquement (master_game). Données de",
   },
   "interface.filters_0b3aa6ec": {
@@ -18028,7 +18028,7 @@ export const UI_LABELS = {
       "Trouvez des jeux dont les fichiers de bibliothèque ont disparu, et des dossiers de bibliothèque qui ne correspondent plus à aucun jeu.",
   },
   "interface.for_directory_imports_place_detect_2a0f3d16": {
-    es: "Para las importaciones de directorios, lugar detectado DLC, actualizaciones y extras en",
+    es: "Para las importaciones de directorios, coloca el DLC, las actualizaciones y los extras detectados en",
     "zh-Hans": "对于目录的导入, 将检测到的 DLC、 更新和额外信息输入",
     hi: "निर्देशिका आयात के लिए, जगह में डीएलसी, अद्यतन और अतिरिक्त पता चला",
     de: "Bei Verzeichnisimporten können Sie DLC, Updates und Extras in",
@@ -18041,11 +18041,11 @@ export const UI_LABELS = {
     vi: "Đối với thư mục nhập khẩu, nơi phát hiện DLC, cập nhật và phụ thêm",
     id: "Untuk impor direktori, tempat terdeteksi DLC, pemutakhiran, dan tambahan dalam",
     "es-419":
-      "Para las importaciones de directorios, lugar detectado DLC, actualizaciones y extras en",
+      "Para las importaciones de directorios, coloca el DLC, las actualizaciones y los extras detectados en",
     "fr-CA": "Pour les importations de répertoire, placer DLC détecté, mises à jour et extras dans",
   },
   "interface.for_that_folder_below_with_it_off_7b4b9c66": {
-    es: "para esa carpeta abajo. Con él apagado (el predeterminado), la eliminación de un juego con sus archivos salta cualquier cosa descubierto aquí.",
+    es: "para esa carpeta abajo. Con él desactivado (el valor predeterminado), al eliminar un juego con sus archivos se omitirá cualquier cosa descubierta aquí.",
     "zh-Hans":
       "下面的文件夹。 由于它关闭( 默认) , 删除一个带有文件的游戏会跳过在此发现的任何东西 。",
     hi: "को उस फ़ोल्डर के लिए चालू करते हैं। इसे बंद रखने पर (डिफ़ॉल्ट रूप से), गेम और उसकी फ़ाइलें हटाते समय यहाँ खोजी गई कोई भी चीज़ नहीं हटाई जाएगी।",
@@ -18061,7 +18061,7 @@ export const UI_LABELS = {
     vi: "cho thư mục bên dưới. Tắt (mặc định), gỡ bỏ một trò chơi với tập tin của nó bỏ bất cứ điều gì được phát hiện ở đây.",
     id: "untuk folder di bawah itu. Dengan mematikan (baku), menghapus permainan dengan file yang melewati apa pun yang ditemukan di sini.",
     "es-419":
-      "para esa carpeta abajo. Con él apagado (el predeterminado), la eliminación de un juego con sus archivos salta cualquier cosa descubierto aquí.",
+      "para esa carpeta abajo. Con él desactivado (el valor predeterminado), al eliminar un juego con sus archivos se omitirá cualquier cosa descubierta aquí.",
     "fr-CA":
       "pour ce dossier ci-dessous. Si cette option reste désactivée (par défaut), les éléments trouvés ici ne seront pas supprimés lorsque vous supprimerez un jeu avec ses fichiers.",
   },
@@ -18323,7 +18323,7 @@ export const UI_LABELS = {
     "fr-CA": "Packs de jeux et extensions",
   },
   "interface.game_released_18094b4e": {
-    es: "Juego liberado",
+    es: "Juego publicado",
     "zh-Hans": "游戏已发行",
     hi: "खेल जारी",
     de: "Game veröffentlicht",
@@ -18335,7 +18335,7 @@ export const UI_LABELS = {
     "zh-Hant": "遊戲已發行",
     vi: "Trò chơi đã phát hành",
     id: "Permainan Dirilis",
-    "es-419": "Juego liberado",
+    "es-419": "Juego publicado",
     "fr-CA": "Jeu publié",
   },
   "interface.game_removed_from_collection_fe837373": {
@@ -18502,7 +18502,7 @@ export const UI_LABELS = {
     "fr-CA": "Générer un certificat autosigné si vous n'en avez pas.",
   },
   "interface.generate_self_signed_certificate_e87bee34": {
-    es: "Generar un certificado de autor-Firmado",
+    es: "Generar certificado autofirmado",
     "zh-Hans": "生成自签名证书",
     hi: "जनरेट स्व-Signed प्रमाणपत्र",
     de: "Generieren Sie ein selbstsigniertes Zertifikat",
@@ -18514,7 +18514,7 @@ export const UI_LABELS = {
     "zh-Hant": "生成自簽名證書",
     vi: "Tạo chứng nhận tự ký",
     id: "Hasilkan Sertifikat Self-Ditandatangani",
-    "es-419": "Generar un certificado de autor-Firmado",
+    "es-419": "Generar certificado autofirmado",
     "fr-CA": "Générer un certificat auto-signé",
   },
   "interface.generating_a5bfb869": {
@@ -18688,7 +18688,7 @@ export const UI_LABELS = {
     "fr-CA": "Allez",
   },
   "interface.go_to_root_4ebc54c8": {
-    es: "Ve a Root",
+    es: "Ir a la raíz",
     "zh-Hans": "转到根",
     hi: "रूट पर जाएं",
     de: "Gehe zu Root",
@@ -18700,7 +18700,7 @@ export const UI_LABELS = {
     "zh-Hant": "轉到根",
     vi: "Tới gốc",
     id: "Pergi ke Akar",
-    "es-419": "Ve a Root",
+    "es-419": "Ir a la raíz",
     "fr-CA": "Aller à la racine",
   },
   "interface.gog_87f5b164": {
@@ -18986,7 +18986,7 @@ export const UI_LABELS = {
     "fr-CA": "Cacher la clé API",
   },
   "interface.hide_client_secret_d9c64ef4": {
-    es: "Ocultar al cliente secreto",
+    es: "Ocultar secreto del cliente",
     "zh-Hans": "隐藏客户端秘密",
     hi: "ग्राहक रहस्य छुपाएं",
     de: "Kundengeheimnis ausblenden",
@@ -18998,7 +18998,7 @@ export const UI_LABELS = {
     "zh-Hant": "隱藏客戶端秘密",
     vi: "Ẩn bí mật khách hàng",
     id: "Sembunyikan rahasia klien",
-    "es-419": "Ocultar al cliente secreto",
+    "es-419": "Ocultar secreto del cliente",
     "fr-CA": "Cacher le secret du client",
   },
   "interface.hide_owned_games_f9184573": {
@@ -19133,7 +19133,7 @@ export const UI_LABELS = {
       "Fréquence de recherche de nouveaux jeux dans votre liste de souhaits Steam (1 à 168 heures)",
   },
   "interface.how_often_to_search_for_new_releas_c8e6b9e4": {
-    es: "¿Con qué frecuencia buscar nuevas liberaciones (1-168 horas)",
+    es: "Frecuencia de búsqueda de nuevos lanzamientos (1-168 horas)",
     "zh-Hans": "搜索新版本的次数(1-168小时)",
     hi: "अक्सर नए रिलीज़ की खोज कैसे करें (1-168 घंटे)",
     de: "Wie oft man nach neuen Releases sucht (1-168 Stunden)",
@@ -19145,11 +19145,11 @@ export const UI_LABELS = {
     "zh-Hant": "搜尋新版本的次數(1-168小時)",
     vi: "Tần suất tìm kiếm bản phát hành mới (1–168 giờ)",
     id: "Seberapa sering mencari rilis baru (1-168 jam)",
-    "es-419": "¿Con qué frecuencia buscar nuevas liberaciones (1-168 horas)",
+    "es-419": "Frecuencia de búsqueda de nuevos lanzamientos (1-168 horas)",
     "fr-CA": "Combien de fois rechercher de nouvelles versions (1-168 heures)",
   },
   "interface.how_the_import_pipeline_works_adb89eb1": {
-    es: "Cómo funciona el oleoducto de importación",
+    es: "Cómo funciona el proceso de importación",
     "zh-Hans": "进口管道如何运作",
     hi: "आयात पाइपलाइन कैसे काम करती है",
     de: "Wie die Importpipeline funktioniert",
@@ -19161,7 +19161,7 @@ export const UI_LABELS = {
     "zh-Hant": "進口管道如何運作",
     vi: "Đường ống dẫn nhập khẩu hoạt động như thế nào",
     id: "Cara kerja pipeline impor",
-    "es-419": "Cómo funciona el oleoducto de importación",
+    "es-419": "Cómo funciona el proceso de importación",
     "fr-CA": "Comment fonctionne le pipeline d'importation",
   },
   "interface.how_to_get_credentials_00b8f980": {
@@ -19424,7 +19424,7 @@ export const UI_LABELS = {
     "fr-CA": "IGDB n'a retourné aucune plate-forme. Essayez encore dans quelques secondes.",
   },
   "interface.igdb_search_6cfd8781": {
-    es: "IGDB Buscar",
+    es: "Búsqueda de IGDB",
     "zh-Hans": "IGDB 搜索",
     hi: "IGDB खोज",
     de: "IGDB-Suche",
@@ -19436,11 +19436,11 @@ export const UI_LABELS = {
     "zh-Hant": "IGDB 搜尋",
     vi: "Tìm kiếm IGDB",
     id: "Pencarian IGDB",
-    "es-419": "IGDB Buscar",
+    "es-419": "Búsqueda de IGDB",
     "fr-CA": "Recherche IGDB",
   },
   "interface.igdb_settings_updated_e90c8d8f": {
-    es: "Configuración de IGDB Actualizado",
+    es: "Configuración de IGDB actualizada",
     "zh-Hans": "IGDB 设置已更新",
     hi: "IGDB सेटिंग्स अद्यतन",
     de: "IGDB-Einstellungen aktualisiert",
@@ -19452,7 +19452,7 @@ export const UI_LABELS = {
     "zh-Hant": "IGDB 設定已更新",
     vi: "Thiết lập IGDB đã cập nhật",
     id: "Pengaturan IGDB Diperbarui",
-    "es-419": "Configuración de IGDB Actualizado",
+    "es-419": "Configuración de IGDB actualizada",
     "fr-CA": "Mise à jour des paramètres de l'IGDB",
   },
   "interface.igdb_users_89e3204b": {
@@ -19632,7 +19632,7 @@ export const UI_LABELS = {
     "fr-CA": "Inclure les sorties Scene",
   },
   "interface.include_this_group_6a29c96a": {
-    es: "Incluido este grupo",
+    es: "Incluir este grupo",
     "zh-Hans": "包含此组",
     hi: "इस समूह को शामिल करें",
     de: "Diese Gruppe einschließen",
@@ -19644,7 +19644,7 @@ export const UI_LABELS = {
     "zh-Hant": "包含此組",
     vi: "Bao gồm nhóm này",
     id: "Sertakan grup ini",
-    "es-419": "Incluido este grupo",
+    "es-419": "Incluir este grupo",
     "fr-CA": "Inclure ce groupe",
   },
   "interface.include_unreleased_upcoming_delaye_b8e84e2f": {
@@ -19664,7 +19664,7 @@ export const UI_LABELS = {
     "fr-CA": "Inclure dans la recherche les jeux pas encore sortis (à venir ou reportés)",
   },
   "interface.increase_priority_e705913f": {
-    es: "Aumento de la prioridad",
+    es: "Aumentar prioridad",
     "zh-Hans": "增加优先事项",
     hi: "प्राथमिकता बढ़ाएं",
     de: "Erhöhung der Priorität",
@@ -19676,11 +19676,11 @@ export const UI_LABELS = {
     "zh-Hant": "增加優先事項",
     vi: "Tăng ưu tiên",
     id: "Meningkatkan prioritas",
-    "es-419": "Aumento de la prioridad",
+    "es-419": "Aumentar prioridad",
     "fr-CA": "Priorité accrue",
   },
   "interface.indexer_added_successfully_bef98cbb": {
-    es: "Indexer añadido con éxito",
+    es: "Indexador añadido con éxito",
     "zh-Hans": "成功添加索引器",
     hi: "इंडेक्सर ने सफलतापूर्वक जोड़ा",
     de: "Indexer erfolgreich hinzugefügt",
@@ -19692,11 +19692,11 @@ export const UI_LABELS = {
     "zh-Hant": "成功新增索引器",
     vi: "Đã thêm bộ lập chỉ mục thành công",
     id: "Indexer ditambahkan dengan sukses",
-    "es-419": "Indexer añadido con éxito",
+    "es-419": "Indexador añadido con éxito",
     "fr-CA": "Indexer ajouté avec succès",
   },
   "interface.indexer_deleted_successfully_90fe81c6": {
-    es: "Indexer eliminado con éxito",
+    es: "Indexador eliminado con éxito",
     "zh-Hans": "索引器已成功删除",
     hi: "इंडेक्सर सफलतापूर्वक हटा दिया गया",
     de: "Indexer erfolgreich gelöscht",
@@ -19708,7 +19708,7 @@ export const UI_LABELS = {
     "zh-Hant": "索引器已成功刪除",
     vi: "Bộ phụ lục đã xoá thành công",
     id: "Pengindeks berhasil dihapus",
-    "es-419": "Indexer eliminado con éxito",
+    "es-419": "Indexador eliminado con éxito",
     "fr-CA": "Indexer supprimé avec succès",
   },
   "interface.indexer_error_s_d4280d7e": {
@@ -19744,7 +19744,7 @@ export const UI_LABELS = {
     "fr-CA": "Priorité de l'indexeur",
   },
   "interface.indexer_updated_successfully_23654644": {
-    es: "Indexer actualizado con éxito",
+    es: "Indexador actualizado con éxito",
     "zh-Hans": "成功更新索引器",
     hi: "इंडेक्सर ने सफलतापूर्वक अपडेट किया",
     de: "Indexer erfolgreich aktualisiert",
@@ -19756,7 +19756,7 @@ export const UI_LABELS = {
     "zh-Hant": "成功更新索引器",
     vi: "Đã cập nhật trình lập chỉ mục thành công",
     id: "Pengindeks berhasil diperbarui",
-    "es-419": "Indexer actualizado con éxito",
+    "es-419": "Indexador actualizado con éxito",
     "fr-CA": "Indexer mis à jour avec succès",
   },
   "interface.infiltration_game_click_a_tile_to_57ec1751": {
@@ -19987,7 +19987,7 @@ export const UI_LABELS = {
     "fr-CA": "Clavier",
   },
   "interface.keycard_acquired_9b94cf1e": {
-    es: "Keycard adquirido",
+    es: "Tarjeta de acceso adquirida",
     "zh-Hans": "已获取密钥卡",
     hi: "कीकार्ड अधिग्रहित",
     de: "Keycard erworben",
@@ -19999,7 +19999,7 @@ export const UI_LABELS = {
     "zh-Hant": "已獲取金鑰卡",
     vi: "Lấy thẻ khóa",
     id: "Kartu Kunci diperoleh",
-    "es-419": "Keycard adquirido",
+    "es-419": "Tarjeta de acceso adquirida",
     "fr-CA": "Clavier acquis",
   },
   "interface.keys_are_romm_platform_slugs_value_1954c3a5": {
@@ -20154,7 +20154,7 @@ export const UI_LABELS = {
     "fr-CA": "Échec de la vérification de l’état de la bibliothèque",
   },
   "interface.library_root_cf631108": {
-    es: "Biblioteca Root",
+    es: "Raíz de la biblioteca",
     "zh-Hans": "库根",
     hi: "पुस्तकालय रूट",
     de: "Bibliothek Root",
@@ -20166,7 +20166,7 @@ export const UI_LABELS = {
     "zh-Hant": "庫根",
     vi: "Gốc thư viện",
     id: "Akar Pustaka",
-    "es-419": "Biblioteca Root",
+    "es-419": "Raíz de la biblioteca",
     "fr-CA": "La racine de la bibliothèque",
   },
   "interface.limit_this_mapping_to_a_configured_1275384f": {
@@ -20223,7 +20223,7 @@ export const UI_LABELS = {
     "fr-CA": "Lien",
   },
   "interface.link_download_5edeffbf": {
-    es: "Descargar enlace",
+    es: "Vincular descarga",
     "zh-Hans": "下载链接",
     hi: "लिंक डाउनलोड",
     de: "Download-Link",
@@ -20235,7 +20235,7 @@ export const UI_LABELS = {
     "zh-Hant": "下載連結",
     vi: "Liên kết tải xuống",
     id: "Tautan unduhan",
-    "es-419": "Descargar enlace",
+    "es-419": "Vincular descarga",
     "fr-CA": "Lien de téléchargement",
   },
   "interface.link_real_debrid_with_its_account_189ec9cb": {
@@ -20388,7 +20388,7 @@ export const UI_LABELS = {
     "fr-CA": "Chargement des fichiers...",
   },
   "interface.loading_platform_list_12ea57e0": {
-    es: "Lista de plataformas de carga...",
+    es: "Cargando lista de plataformas...",
     "zh-Hans": "正在装入平台列表...",
     hi: "मंच सूची लोड हो रहा है...",
     de: "Ladeplattformliste...",
@@ -20400,7 +20400,7 @@ export const UI_LABELS = {
     "zh-Hant": "正在裝入平臺列表...",
     vi: "Đang nạp danh sách nền tảng...",
     id: "Memuat daftar platform...",
-    "es-419": "Lista de plataformas de carga...",
+    "es-419": "Cargando lista de plataformas...",
     "fr-CA": "Chargement de la liste des plateformes...",
   },
   "interface.loading_platforms_ac32a60f": {
@@ -20452,7 +20452,7 @@ export const UI_LABELS = {
     "fr-CA": "Chargement...",
   },
   "interface.local_clamav_deep_scan_b54a871c": {
-    es: "Local ClamAV (Escáneo profundo)",
+    es: "ClamAV local (Escaneo profundo)",
     "zh-Hans": "本地 ClamAV (深扫描)",
     hi: "स्थानीय ClamaV (डीप स्कैन)",
     de: "Lokales ClamAV (Deep Scan)",
@@ -20464,7 +20464,7 @@ export const UI_LABELS = {
     "zh-Hant": "本地 ClamAV (深掃描)",
     vi: "ClamAV cục bộ (quét sâu)",
     id: "ClamAV Lokal (Pemindaian Mendalam)",
-    "es-419": "Local ClamAV (Escáneo profundo)",
+    "es-419": "ClamAV local (Escaneo profundo)",
     "fr-CA": "ClamAV local (Scannage profond)",
   },
   "interface.local_path_ffd136ef": {
@@ -20646,7 +20646,7 @@ export const UI_LABELS = {
     "fr-CA": "Échec de l’authentification",
   },
   "interface.logout_failed_2e7223b0": {
-    es: "Falló la sesión",
+    es: "Error al cerrar sesión",
     "zh-Hans": "注销失败",
     hi: "लॉग इन",
     de: "Logout fehlgeschlagen",
@@ -20658,7 +20658,7 @@ export const UI_LABELS = {
     "zh-Hant": "登出失敗",
     vi: "Đăng xuất thất bại",
     id: "Log keluar gagal",
-    "es-419": "Falló la sesión",
+    "es-419": "Error al cerrar sesión",
     "fr-CA": "La déconnexion a échoué",
   },
   "interface.logs_are_stored_as_an_issue_in_a_738f4d2d": {
@@ -20844,7 +20844,7 @@ export const UI_LABELS = {
     "fr-CA": "Mappage supprimé",
   },
   "interface.mapping_updated_d56de47e": {
-    es: "Actualizado",
+    es: "Asignación actualizada",
     "zh-Hans": "映射已更新",
     hi: "मैपिंग अद्यतन",
     de: "Mapping aktualisiert",
@@ -20856,7 +20856,7 @@ export const UI_LABELS = {
     "zh-Hant": "對應已更新",
     vi: "Đã cập nhật ánh xạ",
     id: "Pemetaan Diperbarui",
-    "es-419": "Actualizado",
+    "es-419": "Asignación actualizada",
     "fr-CA": "Mise à jour de la cartographie",
   },
   "interface.master_switch_for_the_import_engin_fe54870a": {
@@ -20876,7 +20876,7 @@ export const UI_LABELS = {
     "fr-CA": "Commutateur principal pour le moteur d'importation.",
   },
   "interface.match_failed_b54a8033": {
-    es: "Partido fracasado",
+    es: "Error de coincidencia",
     "zh-Hans": "匹配失败",
     hi: "मिलान विफल",
     de: "Match fehlgeschlagen",
@@ -20888,7 +20888,7 @@ export const UI_LABELS = {
     "zh-Hant": "匹配失敗",
     vi: "Lỗi khớp",
     id: "Gagal Match",
-    "es-419": "Partido fracasado",
+    "es-419": "Error de coincidencia",
     "fr-CA": "La correspondance a échoué",
   },
   "interface.matched_59209d86": {
@@ -22025,7 +22025,7 @@ export const UI_LABELS = {
     "fr-CA": "Invalidée",
   },
   "interface.number_of_columns_in_the_game_grid_f3a0e2ed": {
-    es: "Número de columnas en la red de juego (2–10).",
+    es: "Número de columnas en la cuadrícula de juegos (2–10).",
     "zh-Hans": "游戏网格中的列数(2–10).",
     hi: "खेल ग्रिड (2-10) में स्तंभों की संख्या।",
     de: "Anzahl der Spalten im Spielraster (2–10).",
@@ -22037,7 +22037,7 @@ export const UI_LABELS = {
     "zh-Hant": "遊戲網格中的列數(2–10).",
     vi: "Số cột trong lưới trò chơi (2–10).",
     id: "Jumlah kolom dalam kotak permainan (2-10).",
-    "es-419": "Número de columnas en la red de juego (2–10).",
+    "es-419": "Número de columnas en la cuadrícula de juegos (2–10).",
     "fr-CA": "Nombre de colonnes dans la grille de jeu (2–10).",
   },
   "interface.nzb_67be7e69": {
@@ -22253,7 +22253,7 @@ export const UI_LABELS = {
       "Ou ouvrez un problème public GitHub avec ce numéro prérempli pour que le responsable puisse le consulter :",
   },
   "interface.orphaned_d769ea62": {
-    es: "Huérfano",
+    es: "Huérfano (",
     "zh-Hans": "孤儿",
     hi: "अनाथ",
     de: "Verwaist (",
@@ -22265,7 +22265,7 @@ export const UI_LABELS = {
     "zh-Hant": "孤兒",
     vi: "Mồ côi (",
     id: "Yatim piatu (",
-    "es-419": "Huérfano",
+    "es-419": "Huérfano (",
     "fr-CA": "Orphelins",
   },
   "interface.overview_total_games_rating_comple_096f3367": {
@@ -22413,7 +22413,7 @@ export const UI_LABELS = {
     "fr-CA": "Chemin",
   },
   "interface.path_mapping_has_been_removed_db1e80cc": {
-    es: "Se ha eliminado la cartografía.",
+    es: "Se ha eliminado la asignación de rutas.",
     "zh-Hans": "路径映射已被移除 。",
     hi: "पथ मानचित्रण हटा दिया गया है।",
     de: "Path Mapping wurde entfernt.",
@@ -22425,11 +22425,11 @@ export const UI_LABELS = {
     "zh-Hant": "路徑對映已被移除 。",
     vi: "Đã xóa ánh xạ đường dẫn.",
     id: "Pemetaan tapak telah dihapus.",
-    "es-419": "Se ha eliminado la cartografía.",
+    "es-419": "Se ha eliminado la asignación de rutas.",
     "fr-CA": "La cartographie du chemin a été supprimée.",
   },
   "interface.path_mapping_has_been_updated_f8f73665": {
-    es: "Se ha actualizado la cartografía.",
+    es: "Se ha actualizado la asignación de rutas.",
     "zh-Hans": "路径映射已经更新 。",
     hi: "पथ मानचित्रण अद्यतन किया गया है।",
     de: "Path Mapping wurde aktualisiert.",
@@ -22441,11 +22441,11 @@ export const UI_LABELS = {
     "zh-Hant": "路徑對映已經更新 。",
     vi: "Đã cập nhật ánh xạ đường dẫn.",
     id: "Pemetaan tapak telah diperbarui.",
-    "es-419": "Se ha actualizado la cartografía.",
+    "es-419": "Se ha actualizado la asignación de rutas.",
     "fr-CA": "La cartographie du chemin a été mise à jour.",
   },
   "interface.path_mappings_6cbc2a75": {
-    es: "Mappings Path",
+    es: "Asignaciones de rutas",
     "zh-Hans": "路径映射",
     hi: "पथ मैपिंग",
     de: "Bahnkartierungen",
@@ -22457,7 +22457,7 @@ export const UI_LABELS = {
     "zh-Hant": "路徑對映",
     vi: "Ánh xạ đường dẫn",
     id: "Pemetaan Path",
-    "es-419": "Mappings Path",
+    "es-419": "Asignaciones de rutas",
     "fr-CA": "Cartographie des chemins",
   },
   "interface.path_mappings_translate_paths_betw_de0176f4": {
@@ -22593,7 +22593,7 @@ export const UI_LABELS = {
     "fr-CA": "Importation manuelle en attente",
   },
   "interface.periodically_import_new_games_from_a19f2184": {
-    es: "Importar periódicamente nuevos juegos de su lista de Steam",
+    es: "Importar periódicamente nuevos juegos de su lista de deseos de Steam",
     "zh-Hans": "定期从您的 Steam Wishlist 导入新游戏",
     hi: "समय-समय पर अपने से नए गेम आयात करें Steam Wishlist",
     de: "Importieren Sie regelmäßig neue Spiele von Ihrer Steam-Wishlist",
@@ -22605,11 +22605,11 @@ export const UI_LABELS = {
     "zh-Hant": "定期從您的 Steam Wishlist 匯入新遊戲",
     vi: "Định kỳ nhập trò chơi mới từ danh sách yêu thích Steam",
     id: "Secara periodikal mengimpor game baru dari Steam Wishlist Anda",
-    "es-419": "Importar periódicamente nuevos juegos de su lista de Steam",
+    "es-419": "Importar periódicamente nuevos juegos de su lista de deseos de Steam",
     "fr-CA": "Importer périodiquement de nouveaux jeux de votre liste de souhaits Steam",
   },
   "interface.periodically_search_indexers_for_w_e1414b87": {
-    es: "Índices de búsqueda periódica de juegos buscados",
+    es: "Buscar periódicamente en los indexadores juegos deseados",
     "zh-Hans": "定期搜索通缉游戏索引器",
     hi: "वांछित खेलों के लिए आवधिक रूप से खोज अनुक्रमक",
     de: "Suchen Sie regelmäßig Indexer nach gesuchten Spielen",
@@ -22621,7 +22621,7 @@ export const UI_LABELS = {
     "zh-Hant": "定期在索引器中搜尋想要的遊戲",
     vi: "Định kỳ tìm kiếm trò chơi mong muốn trên các bộ lập chỉ mục",
     id: "Cari game yang diinginkan di pengindeks secara berkala",
-    "es-419": "Índices de búsqueda periódica de juegos buscados",
+    "es-419": "Buscar periódicamente en los indexadores juegos deseados",
     "fr-CA": "Recherche périodique d'indexeurs pour les jeux recherchés",
   },
   "interface.permits_sending_passwords_and_api_045a78d1": {
@@ -22665,7 +22665,7 @@ export const UI_LABELS = {
       "Mode persistant : une clé de configuration préconfigurée dans votre serveur API Apprise.",
   },
   "interface.personal_api_key_11685eee": {
-    es: "Personal API Clave",
+    es: "Clave de API personal",
     "zh-Hans": "个人 API 密钥",
     hi: "व्यक्तिगत API कुंजी",
     de: "Persönlicher API Key",
@@ -22677,7 +22677,7 @@ export const UI_LABELS = {
     "zh-Hant": "個人 API 金鑰",
     vi: "Cá nhân API Khóa:",
     id: "Kunci API Pribadi",
-    "es-419": "Personal API Clave",
+    "es-419": "Clave de API personal",
     "fr-CA": "Clé API personnelle",
   },
   "interface.platform_filter_0fc47450": {
@@ -22697,7 +22697,7 @@ export const UI_LABELS = {
     "fr-CA": "Filtre de plate-forme",
   },
   "interface.platform_folder_bindings_json_5e4de255": {
-    es: "Carpetas de plataforma (JSON)",
+    es: "Vinculaciones de carpetas de plataforma (JSON)",
     "zh-Hans": "平台文件夹绑定( JSON)",
     hi: "प्लेटफार्म फ़ोल्डर बाइंडिंग (JSON)",
     de: "Plattformordnerbindungen (JSON)",
@@ -22709,7 +22709,7 @@ export const UI_LABELS = {
     "zh-Hant": "平臺資料夾繫結( JSON)",
     vi: "Ánh xạ thư mục nền tảng (JSON)",
     id: "Platform binding folder (JSON)",
-    "es-419": "Carpetas de plataforma (JSON)",
+    "es-419": "Vinculaciones de carpetas de plataforma (JSON)",
     "fr-CA": "Reliures des dossiers de la plate-forme (JSON)",
   },
   "interface.platform_folders_0db7df8f": {
@@ -22729,7 +22729,7 @@ export const UI_LABELS = {
     "fr-CA": "Dossiers des plateformes",
   },
   "interface.platform_preferences_updated_783458f7": {
-    es: "Actualización de las preferencias de la plataforma.",
+    es: "Preferencias de plataforma actualizadas.",
     "zh-Hans": "平台首选更新.",
     hi: "प्लेटफ़ॉर्म वरीयताओं को अद्यतन किया गया।",
     de: "Plattformpräferenzen aktualisiert.",
@@ -22741,7 +22741,7 @@ export const UI_LABELS = {
     "zh-Hant": "平臺首選更新.",
     vi: "Thiết lập nền tảng đã được cập nhật.",
     id: "Preferensi platform diperbarui",
-    "es-419": "Actualización de las preferencias de la plataforma.",
+    "es-419": "Preferencias de plataforma actualizadas.",
     "fr-CA": "Mise à jour des préférences de la plateforme.",
   },
   "interface.platform_slug_mappings_8f8209d4": {
@@ -23129,7 +23129,7 @@ export const UI_LABELS = {
     "fr-CA": "Traitement",
   },
   "interface.progress_1a36a166": {
-    es: "Progresos",
+    es: "Progreso",
     "zh-Hans": "进展",
     hi: "प्रगति",
     de: "Fortschritt",
@@ -23141,7 +23141,7 @@ export const UI_LABELS = {
     "zh-Hant": "進展",
     vi: "Quá trình",
     id: "Kemajuan",
-    "es-419": "Progresos",
+    "es-419": "Progreso",
     "fr-CA": "Progrès accomplis",
   },
   "interface.protocol_4a57ebd5": {
@@ -23177,7 +23177,7 @@ export const UI_LABELS = {
     "fr-CA": "ProtonDB",
   },
   "interface.prowlarr_diagnostics_failed_ca6f2553": {
-    es: "Prowlarr diagnóstico falló",
+    es: "El diagnóstico de Prowlarr falló",
     "zh-Hans": "Prowlarr 诊断失败",
     hi: "Prowlarr निदान विफल",
     de: "Prowlarr Diagnose fehlgeschlagen",
@@ -23189,7 +23189,7 @@ export const UI_LABELS = {
     "zh-Hant": "Prowlarr 診斷失敗",
     vi: "Prowlarr chẩn đoán thất bại",
     id: "Diagnosa Prowlarr gagal",
-    "es-419": "Prowlarr diagnóstico falló",
+    "es-419": "El diagnóstico de Prowlarr falló",
     "fr-CA": "Prowlarr le diagnostic a échoué",
   },
   "interface.prowlarr_management_api_404ed065": {
@@ -24416,7 +24416,7 @@ export const UI_LABELS = {
     "fr-CA": "slug de plateforme RomM",
   },
   "interface.romm_rom_library_root_2622260b": {
-    es: "RomM ROM root biblioteca",
+    es: "Raíz de la biblioteca de ROM de RomM",
     "zh-Hans": "RomM ROM 库根",
     hi: "RomM रोम लाइब्रेरी रूट",
     de: "RomM Wurzel der ROM-Bibliothek",
@@ -24428,7 +24428,7 @@ export const UI_LABELS = {
     "zh-Hant": "RomM ROM 庫根",
     vi: "RomM Gốc thư viện ROM",
     id: "Akar pustaka ROM RomM",
-    "es-419": "RomM ROM root biblioteca",
+    "es-419": "Raíz de la biblioteca de ROM de RomM",
     "fr-CA": "RomM racine de la bibliothèque ROM",
   },
   "interface.root_folder_added_37d16b49": {
@@ -24464,7 +24464,7 @@ export const UI_LABELS = {
     "fr-CA": "Dossier racine supprimé",
   },
   "interface.route_rom_imports_to_romm_a0a2b6a0": {
-    es: "Ruta ROM importa a RomM",
+    es: "Dirigir las importaciones de ROM a RomM",
     "zh-Hans": "路线 ROM 导入到 RomM",
     hi: "रूट रॉम को आयात करता है RomM",
     de: "Einfuhren von Route-ROM nach RomM",
@@ -24476,7 +24476,7 @@ export const UI_LABELS = {
     "zh-Hant": "將 ROM 匯入導向 RomM",
     vi: "Chuyển hướng nhập ROM sang RomM",
     id: "Impor ROM rute ke RomM",
-    "es-419": "Ruta ROM importa a RomM",
+    "es-419": "Dirigir las importaciones de ROM a RomM",
     "fr-CA": "Importations de route ROM vers RomM",
   },
   "interface.rpc2_8e3dec32": {
@@ -24848,7 +24848,7 @@ export const UI_LABELS = {
     "fr-CA": "Enregistrement…",
   },
   "interface.scan_6d148508": {
-    es: "Escáneos",
+    es: "Escanear",
     "zh-Hans": "扫描",
     hi: "स्कैन",
     de: "Scannen",
@@ -24860,11 +24860,11 @@ export const UI_LABELS = {
     "zh-Hant": "掃描",
     vi: "Quét",
     id: "Pindai",
-    "es-419": "Escáneos",
+    "es-419": "Escanear",
     "fr-CA": "Analyse",
   },
   "interface.scan_all_ff8062db": {
-    es: "Escáner todos",
+    es: "Escanear todo",
     "zh-Hans": "全部扫描",
     hi: "स्कैन करें",
     de: "Alle Scans",
@@ -24876,7 +24876,7 @@ export const UI_LABELS = {
     "zh-Hant": "全部掃描",
     vi: "Quét tất cả",
     id: "Pindai Semua",
-    "es-419": "Escáner todos",
+    "es-419": "Escanear todo",
     "fr-CA": "Tout scanner",
   },
   "interface.scan_failed_to_start_25f8aa66": {
@@ -24896,7 +24896,7 @@ export const UI_LABELS = {
     "fr-CA": "Impossible de démarrer l’analyse",
   },
   "interface.scan_progress_9e34bd0b": {
-    es: "Progresos en la exploración",
+    es: "Progreso del escaneo",
     "zh-Hans": "扫描进度",
     hi: "स्कैन की प्रगति",
     de: "Scanfortschritt",
@@ -24908,7 +24908,7 @@ export const UI_LABELS = {
     "zh-Hant": "掃描進度",
     vi: "Quá trình quét",
     id: "Pindai Kemajuan",
-    "es-419": "Progresos en la exploración",
+    "es-419": "Progreso del escaneo",
     "fr-CA": "Analyse des progrès",
   },
   "interface.scan_started_59685d55": {
@@ -25589,7 +25589,7 @@ export const UI_LABELS = {
     "fr-CA": "Sélectionner un dossier racine",
   },
   "interface.select_the_key_and_copy_it_manuall_ff6a6e4b": {
-    es: "Seleccione la clave y copiarla manualmente.",
+    es: "Selecciona la clave y cópiala manualmente.",
     "zh-Hans": "选择密钥并手动复制 。",
     hi: "कुंजी का चयन करें और इसे मैन्युअल रूप से कॉपी करें।",
     de: "Wählen Sie den Schlüssel und kopieren Sie ihn manuell.",
@@ -25601,7 +25601,7 @@ export const UI_LABELS = {
     "zh-Hant": "選擇金鑰並手動複製 。",
     vi: "Chọn chìa khóa và sao chép bằng tay.",
     id: "Pilih kunci dan salin secara manual.",
-    "es-419": "Seleccione la clave y copiarla manualmente.",
+    "es-419": "Selecciona la clave y cópiala manualmente.",
     "fr-CA": "Sélectionnez la clé et copiez-la manuellement.",
   },
   "interface.select_the_torznab_categories_to_s_977a8233": {
@@ -26056,7 +26056,7 @@ export const UI_LABELS = {
     "fr-CA": "Afficher la clé API",
   },
   "interface.show_client_secret_22fa105d": {
-    es: "Mostrar secreto cliente",
+    es: "Mostrar secreto del cliente",
     "zh-Hans": "显示客户端秘密",
     hi: "क्लाइंट रहस्य दिखाएं",
     de: "Client Secret anzeigen",
@@ -26068,7 +26068,7 @@ export const UI_LABELS = {
     "zh-Hant": "顯示客戶端秘密",
     vi: "Hiển thị bí mật trình khách",
     id: "Tampilkan rahasia klien",
-    "es-419": "Mostrar secreto cliente",
+    "es-419": "Mostrar secreto del cliente",
     "fr-CA": "Afficher le secret du client",
   },
   "interface.show_hidden_games_57e5aa6b": {
@@ -26168,7 +26168,7 @@ export const UI_LABELS = {
     "fr-CA": "Afficher l’URL du webhook",
   },
   "interface.shown_ce294716": {
-    es: "demostrado",
+    es: "mostrado",
     "zh-Hans": "显示",
     hi: "दिखाया गया",
     de: "gezeigt",
@@ -26180,7 +26180,7 @@ export const UI_LABELS = {
     "zh-Hant": "顯示",
     vi: "đã hiển thị",
     id: "ditampilkan",
-    "es-419": "demostrado",
+    "es-419": "mostrado",
     "fr-CA": "montré",
   },
   "interface.shown_with_filter_ef00e2d7": {
@@ -26200,7 +26200,7 @@ export const UI_LABELS = {
     "fr-CA": "montré avec filtre)",
   },
   "interface.single_rom_placement_0ca4f2bc": {
-    es: "Colocación en ROM",
+    es: "Colocación de ROM única",
     "zh-Hans": "单个ROM 投放",
     hi: "सिंगल रॉम प्लेसमेंट",
     de: "Einzelplatzierung von ROM",
@@ -26212,7 +26212,7 @@ export const UI_LABELS = {
     "zh-Hant": "單個ROM 投放",
     vi: "Đặt chỗ & đơn ROM",
     id: "penempatan ROM tunggal",
-    "es-419": "Colocación en ROM",
+    "es-419": "Colocación de ROM única",
     "fr-CA": "Placement en ROM unique",
   },
   "interface.size_largest_first_0b67b169": {
@@ -26329,7 +26329,7 @@ export const UI_LABELS = {
     "fr-CA": "Repéré. Le rapport d’incident a été envoyé — retour au point de départ.",
   },
   "interface.ssl_port_b0c2ea40": {
-    es: "SSL Puerto",
+    es: "Puerto SSL",
     "zh-Hans": "SSL 端口",
     hi: "SSL पोर्ट",
     de: "SSL-Port",
@@ -26341,7 +26341,7 @@ export const UI_LABELS = {
     "zh-Hant": "SSL 埠",
     vi: "Cổng SSL",
     id: "Port SSL",
-    "es-419": "SSL Puerto",
+    "es-419": "Puerto SSL",
     "fr-CA": "Port SSL",
   },
   "interface.ssl_settings_saved_72f6d77d": {
@@ -26687,7 +26687,7 @@ export const UI_LABELS = {
     "fr-CA": "Synchroniser depuis Prowlarr",
   },
   "interface.sync_interval_hours_58ef5e61": {
-    es: "Sync Interval (horas)",
+    es: "Intervalo de sincronización (horas)",
     "zh-Hans": "同步间距( 小时)",
     hi: "सिंक इंटरवल (घंटे)",
     de: "Sync Interval (Stunden)",
@@ -26699,7 +26699,7 @@ export const UI_LABELS = {
     "zh-Hant": "同步間距( 小時)",
     vi: "Đồng bộ hai chiều (giờ)",
     id: "Sync Interval (jam)",
-    "es-419": "Sync Interval (horas)",
+    "es-419": "Intervalo de sincronización (horas)",
     "fr-CA": "Intervalle sync (heures)",
   },
   "interface.sync_prowlarr_e920ee8d": {
@@ -27031,7 +27031,7 @@ export const UI_LABELS = {
       "Ces téléchargements nécessitent votre attention avant de pouvoir être ajoutés à votre bibliothèque.",
   },
   "interface.these_filters_will_be_used_as_defa_2bcc838e": {
-    es: "Estos filtros se utilizarán como predeterminados cuando abra el diálogo de descarga manual, y se aplicará a las auto-búsquedas.",
+    es: "Estos filtros se utilizarán como predeterminados cuando abras el diálogo de descarga manual, y se aplicarán a las búsquedas automáticas.",
     "zh-Hans": "当您打开手动下载对话框时, 这些过滤器将被用作默认值, 并应用到自动搜索中 。",
     hi: "जब आप मैनुअल डाउनलोड संवाद खोलते हैं तो इन फिल्टरों को डिफ़ॉल्ट के रूप में इस्तेमाल किया जाएगा और ऑटो-खोजों पर लागू किया जाएगा।",
     de: "Diese Filter werden als Standard verwendet, wenn Sie den manuellen Download-Dialog öffnen und auf die automatische Suche angewendet.",
@@ -27045,7 +27045,7 @@ export const UI_LABELS = {
     vi: "Những bộ lọc này sẽ được dùng làm mặc định khi bạn mở hộp thoại tải về bằng tay, và áp dụng cho các tìm kiếm tự động.",
     id: "Filter ini akan digunakan sebagai bawaan ketika Anda membuka dialog unduh manual, dan diterapkan ke pencarian otomatis.",
     "es-419":
-      "Estos filtros se utilizarán como predeterminados cuando abra el diálogo de descarga manual, y se aplicará a las auto-búsquedas.",
+      "Estos filtros se utilizarán como predeterminados cuando abras el diálogo de descarga manual, y se aplicarán a las búsquedas automáticas.",
     "fr-CA":
       "Ces filtres seront utilisés par défaut lorsque vous ouvrez la boîte de dialogue de téléchargement manuelle, et appliqués aux recherches automatiques.",
   },
@@ -27583,7 +27583,7 @@ export const UI_LABELS = {
     "fr-CA": "Intégration TypeSafe désactivée",
   },
   "interface.typesafe_settings_saved_d705a7f2": {
-    es: "Ajustes TipoSafe guardados",
+    es: "Ajustes de TypeSafe guardados",
     "zh-Hans": "类型安全设置已保存",
     hi: "TypeSafe सेटिंग्स बचाया",
     de: "TypeSafe Einstellungen gespeichert",
@@ -27595,7 +27595,7 @@ export const UI_LABELS = {
     "zh-Hant": "型別安全設定已儲存",
     vi: "Đã lưu cài đặt TypeSafe",
     id: "Pengaturan TypeSafe disimpan",
-    "es-419": "Ajustes TipoSafe guardados",
+    "es-419": "Ajustes de TypeSafe guardados",
     "fr-CA": "Paramètres de typeSafe enregistrés",
   },
   "interface.unable_to_connect_to_the_server_pl_89f3ed27": {
@@ -27938,7 +27938,7 @@ export const UI_LABELS = {
     "fr-CA": "Chargement en cours",
   },
   "interface.uploading_diagnostic_report_42a6f60b": {
-    es: "Subir el informe de diagnóstico...",
+    es: "Subiendo el informe de diagnóstico…",
     "zh-Hans": "正在上传诊断报告...",
     hi: "नैदानिक रिपोर्ट अपलोड करना...",
     de: "Hochladen des Diagnoseberichts...",
@@ -27950,7 +27950,7 @@ export const UI_LABELS = {
     "zh-Hant": "正在上傳診斷報告...",
     vi: "Đang tải lên báo cáo chuẩn đoán...",
     id: "Mengunggah laporan diagnostik...",
-    "es-419": "Subir el informe de diagnóstico...",
+    "es-419": "Subiendo el informe de diagnóstico…",
     "fr-CA": "Envoi du rapport de diagnostic...",
   },
   "interface.uploading_logs_65eb1eeb": {
@@ -28018,7 +28018,7 @@ export const UI_LABELS = {
     "fr-CA": "Utilisez un chemin de destination relatif au dossier partagé, par exemple",
   },
   "interface.use_ssl_9cb78972": {
-    es: "Uso SSL",
+    es: "Usar SSL",
     "zh-Hans": "使用 SSL",
     hi: "SSL का उपयोग करें",
     de: "SSL verwenden",
@@ -28030,7 +28030,7 @@ export const UI_LABELS = {
     "zh-Hant": "使用 SSL",
     vi: "Dùng SSL",
     id: "Gunakan SSL",
-    "es-419": "Uso SSL",
+    "es-419": "Usar SSL",
     "fr-CA": "Utiliser SSL",
   },
   "interface.use_the_mirror_if_your_ip_is_block_a4f8c682": {
@@ -28150,7 +28150,7 @@ export const UI_LABELS = {
     "fr-CA": "Utiliser l'entrée manuelle à la place",
   },
   "interface.using_the_saved_key_type_a_new_one_d7e5b4d5": {
-    es: "Usando la llave salvada. Escribe uno nuevo para reemplazarlo.",
+    es: "Usando la clave guardada. Escribe una nueva para reemplazarla.",
     "zh-Hans": "使用已保存的密钥 。 输入新的一个来替换它。",
     hi: "बचाया कुंजी का उपयोग करना। इसे बदलने के लिए एक नया टाइप करें।",
     de: "Verwenden Sie den gespeicherten Schlüssel. Geben Sie eine neue ein, um sie zu ersetzen.",
@@ -28162,7 +28162,7 @@ export const UI_LABELS = {
     "zh-Hant": "使用已儲存的金鑰 。 輸入新的一個來替換它。",
     vi: "Đang dùng khóa đã lưu. Nhập khóa mới để thay thế.",
     id: "Menggunakan kunci yang disimpan. Ketik yang baru untuk menggantinya.",
-    "es-419": "Usando la llave salvada. Escribe uno nuevo para reemplazarlo.",
+    "es-419": "Usando la clave guardada. Escribe una nueva para reemplazarla.",
     "fr-CA": "En utilisant la clé enregistrée. Tapez un nouveau pour le remplacer.",
   },
   "interface.v_f30c40c9": {
@@ -28549,7 +28549,7 @@ export const UI_LABELS = {
     "fr-CA": "Wikipédia",
   },
   "interface.xrel_to_options_have_been_saved_0a43e00e": {
-    es: "xREL.to opciones se han salvado.",
+    es: "Las opciones de xREL.to se han guardado.",
     "zh-Hans": "xREL.to 选项已保存 。",
     hi: "xREL.to विकल्प बचाया गया है।",
     de: "xREL.to Optionen wurden gespeichert.",
@@ -28561,7 +28561,7 @@ export const UI_LABELS = {
     "zh-Hant": "xREL.to 選項已儲存 。",
     vi: "xREL.to tùy chọn đã được lưu.",
     id: "pilihan xREL.to telah disimpan.",
-    "es-419": "xREL.to opciones se han salvado.",
+    "es-419": "Las opciones de xREL.to se han guardado.",
     "fr-CA": "Les options xREL.to ont été enregistrées.",
   },
   "interface.you_are_using_a_self_signed_certif_5b0da1ed": {
@@ -29131,7 +29131,7 @@ export const UI_LABELS = {
     "fr-CA": "Téléchargeur : {downloaderName}",
   },
   "interface.edit_mapping_for_path_ddb1e915": {
-    es: "Editar mapa para {path}",
+    es: "Editar asignación para {path}",
     "zh-Hans": "编辑映射 {path}",
     hi: "के लिए मैपिंग संपादित करें {path}",
     de: "Edit Mapping für {path}",
@@ -29143,7 +29143,7 @@ export const UI_LABELS = {
     "zh-Hant": "編輯對映 {path}",
     vi: "Sửa ánh xạ cho {path}",
     id: "Sunting pemetaan untuk {path}",
-    "es-419": "Editar mapa para {path}",
+    "es-419": "Editar asignación para {path}",
     "fr-CA": "Modifier le mappage de {path}",
   },
   "interface.edit_name_4688b082": {
@@ -29915,7 +29915,7 @@ export const UI_LABELS = {
     "fr-CA": "Résultats de recherche : {count}",
   },
   "interface.indexer_errors_count_7e2cd7f4": {
-    es: "Errores de índice: {count}",
+    es: "Errores de indexador: {count}",
     "zh-Hans": "索引错误 : {count}",
     hi: "सूचक त्रुटि: {count}",
     de: "Indexerfehler: {count}",
@@ -29927,7 +29927,7 @@ export const UI_LABELS = {
     "zh-Hant": "索引錯誤 : {count}",
     vi: "Lỗi bộ lập chỉ mục: {count}",
     id: "Galat pengindeks: {count}",
-    "es-419": "Errores de índice: {count}",
+    "es-419": "Errores de indexador: {count}",
     "fr-CA": "Erreurs d'indexeur  : {count}",
   },
   "interface.requested_editions_and_add_ons_ad3615f7": {
@@ -34026,7 +34026,7 @@ export const UI_LABELS = {
     "fr-CA": "Semble être une vidéo, de la musique ou un livre",
   },
   "interface.platform_marker_matches_fa1479b1": {
-    es: "La plataforma indicada coincide",
+    es: "Coincidencias de marcador de plataforma",
     "zh-Hans": "平台标记匹配",
     hi: "प्लेटफ़ॉर्म मार्कर मेल खाता है",
     de: "Plattformkennzeichnung stimmt überein",
@@ -34038,7 +34038,7 @@ export const UI_LABELS = {
     "zh-Hant": "平台標記相符",
     vi: "Nhãn nền tảng khớp",
     id: "Penanda platform cocok",
-    "es-419": "La plataforma indicada coincide",
+    "es-419": "Coincidencias de marcador de plataforma",
     "fr-CA": "L’indication de plateforme correspond",
   },
   "interface.wrong_platform_169bff79": {
@@ -35316,7 +35316,7 @@ export const UI_LABELS = {
     "fr-CA": "Liste noire des versions enregistrée",
   },
   "interface.scanning_it_for_games_now_e5e1d1af": {
-    es: "Ahora se está buscando juegos en ella.",
+    es: "Ahora se están buscando juegos en ella.",
     "zh-Hans": "正在扫描其中的游戏。",
     hi: "अब इसमें गेम स्कैन किए जा रहे हैं।",
     de: "Der Ordner wird jetzt nach Spielen durchsucht.",
@@ -35328,7 +35328,7 @@ export const UI_LABELS = {
     "zh-Hant": "正在其中掃描遊戲。",
     vi: "Đang quét thư mục để tìm trò chơi.",
     id: "Memindainya untuk mencari game sekarang.",
-    "es-419": "Ahora se está buscando juegos en ella.",
+    "es-419": "Ahora se están buscando juegos en ella.",
     "fr-CA": "Recherche de jeux dans ce dossier.",
   },
   "interface.game_updates_available_on_indexers_bb776a95": {
@@ -35903,7 +35903,7 @@ export const UI_LABELS = {
     "fr-CA": "Vérification manuelle",
   },
   "interface.if_questarr_cannot_determine_the_c_39a453cf": {
-    es: 'Si Questarr no puede determinar el destino correcto —por ejemplo, porque se desconoce el identificador de la plataforma—, la descarga se marca como "manual review required". Puedes resolverlo desde la página Descargas.',
+    es: 'Si Questarr no puede determinar el destino correcto —por ejemplo, porque se desconoce el identificador de la plataforma—, la descarga se marca como "Revisión manual requerida". Puedes resolverlo desde la página Descargas.',
     "zh-Hans":
       '如果 Questarr 无法确定正确的目标位置（例如平台标识未知），下载会标记为 "manual review required"。你可以在“下载”页面处理。',
     hi: 'यदि Questarr सही गंतव्य निर्धारित नहीं कर पाता — जैसे प्लेटफ़ॉर्म स्लग अज्ञात हो — तो डाउनलोड को "manual review required" के रूप में चिह्नित किया जाता है। आप इसे डाउनलोड पेज से ठीक कर सकते हैं।',
@@ -35919,7 +35919,7 @@ export const UI_LABELS = {
     vi: 'Nếu Questarr không xác định được đích phù hợp — chẳng hạn không biết slug nền tảng — lượt tải sẽ được đánh dấu là "manual review required". Bạn có thể xử lý tại trang Tải xuống.',
     id: 'Jika Questarr tidak dapat menentukan tujuan yang benar — misalnya karena slug platform tidak diketahui — unduhan akan ditandai "manual review required". Anda dapat menanganinya dari halaman Unduhan.',
     "es-419":
-      'Si Questarr no puede determinar el destino correcto —por ejemplo, porque se desconoce el identificador de la plataforma—, la descarga se marca como "manual review required". Puedes resolverlo desde la página Descargas.',
+      'Si Questarr no puede determinar el destino correcto —por ejemplo, porque se desconoce el identificador de la plataforma—, la descarga se marca como "Revisión manual requerida". Puedes resolverlo desde la página Descargas.',
     "fr-CA":
       'Si Questarr ne peut pas déterminer la destination correcte — par exemple si l’identifiant de plateforme est inconnu — le téléchargement est marqué "manual review required". Vous pouvez le résoudre depuis la page Téléchargements.',
   },

@@ -1,5 +1,7 @@
 import { useToast } from "@/hooks/use-toast";
 import React from "react";
+import { useInterfaceLanguage } from "@/lib/interface-locale";
+import { getNotificationLabel } from "@/lib/notification-locale";
 import {
   Toast,
   ToastClose,
@@ -11,9 +13,10 @@ import {
 
 export function Toaster() {
   const { toasts } = useToast();
+  const { language, tId } = useInterfaceLanguage();
 
   return (
-    <ToastProvider>
+    <ToastProvider label={getNotificationLabel("notification", language)}>
       {toasts.map(function ({ id, title, description, action, ...props }) {
         return (
           <Toast key={id} {...props}>
@@ -22,11 +25,11 @@ export function Toaster() {
               {description && <ToastDescription>{description}</ToastDescription>}
             </div>
             {action}
-            <ToastClose />
+            <ToastClose aria-label={tId("interface.dismiss_265915f3")} />
           </Toast>
         );
       })}
-      <ToastViewport />
+      <ToastViewport label={`${getNotificationLabel("Notifications", language)} ({hotkey})`} />
     </ToastProvider>
   );
 }
