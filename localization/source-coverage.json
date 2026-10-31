@@ -2587,6 +2587,271 @@
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "source-fallback",
       "directTargetCells": 12
+    },
+    {
+      "key": "service.indexer_http_error",
+      "source": "HTTP {status}: {statusText}",
+      "kind": "app-owned indexer/search service",
+      "owners": ["server/indexer-caps.ts"],
+      "coverage": [
+        "server/__tests__/indexer-caps.test.ts",
+        "server/__tests__/search.test.ts",
+        "client/__tests__/GameDownloadDialog.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.indexer_http_key_withheld",
+      "source": "HTTP {status}: {statusText} (API key withheld for this HTTP feed; it was not sent because this indexer uses plain HTTP: enable 'Allow insecure LAN connection' on the indexer, or switch it to HTTPS)",
+      "kind": "app-owned indexer/search service",
+      "owners": ["server/indexer-caps.ts"],
+      "coverage": [
+        "server/__tests__/indexer-caps.test.ts",
+        "server/__tests__/search.test.ts",
+        "client/__tests__/GameDownloadDialog.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.indexer_http_key_check",
+      "source": "HTTP {status}: {statusText} (check the indexer API key; re-sync from Prowlarr if its key changed).",
+      "kind": "app-owned indexer/search service",
+      "owners": ["server/indexer-caps.ts"],
+      "coverage": [
+        "server/__tests__/indexer-caps.test.ts",
+        "server/__tests__/search.test.ts",
+        "client/__tests__/GameDownloadDialog.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.indexer_http_body",
+      "source": "{statusMessage} - {error}",
+      "kind": "app-owned indexer/search service",
+      "owners": ["server/torznab.ts"],
+      "coverage": [
+        "server/__tests__/indexer-caps.test.ts",
+        "server/__tests__/search.test.ts",
+        "client/__tests__/GameDownloadDialog.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.indexer_disabled",
+      "source": "Indexer {indexer} is disabled",
+      "kind": "app-owned indexer/search service",
+      "owners": ["server/torznab.ts"],
+      "coverage": [
+        "server/__tests__/indexer-caps.test.ts",
+        "server/__tests__/search.test.ts",
+        "client/__tests__/GameDownloadDialog.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.indexer_search_failed",
+      "source": "Failed to search indexer {indexer}: {error}",
+      "kind": "app-owned indexer/search service",
+      "owners": ["server/torznab.ts"],
+      "coverage": [
+        "server/__tests__/indexer-caps.test.ts",
+        "server/__tests__/search.test.ts",
+        "client/__tests__/GameDownloadDialog.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.no_enabled_indexers",
+      "source": "No enabled indexers available",
+      "kind": "app-owned indexer/search service",
+      "owners": ["server/torznab.ts"],
+      "coverage": [
+        "server/__tests__/indexer-caps.test.ts",
+        "server/__tests__/search.test.ts",
+        "client/__tests__/GameDownloadDialog.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.unsafe_url_detected",
+      "source": "Unsafe URL detected: {url}",
+      "kind": "app-owned indexer/search service",
+      "owners": ["server/newznab.ts", "server/torznab.ts"],
+      "coverage": [
+        "server/__tests__/indexer-caps.test.ts",
+        "server/__tests__/search.test.ts",
+        "client/__tests__/GameDownloadDialog.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.unsafe_url_detected_without_url",
+      "source": "Unsafe URL detected",
+      "kind": "app-owned indexer/search service",
+      "owners": ["server/newznab.ts", "server/torznab.ts"],
+      "coverage": [
+        "server/__tests__/indexer-caps.test.ts",
+        "server/__tests__/search.test.ts",
+        "client/__tests__/GameDownloadDialog.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.torznab_response_invalid",
+      "source": "Invalid Torznab response format",
+      "kind": "app-owned indexer/search service",
+      "owners": ["server/torznab.ts"],
+      "coverage": [
+        "server/__tests__/indexer-caps.test.ts",
+        "server/__tests__/search.test.ts",
+        "client/__tests__/GameDownloadDialog.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.indexer_response_parse_failed",
+      "source": "Failed to parse response: {error}",
+      "kind": "app-owned indexer/search service",
+      "owners": ["server/torznab.ts"],
+      "coverage": [
+        "server/__tests__/indexer-caps.test.ts",
+        "server/__tests__/search.test.ts",
+        "client/__tests__/GameDownloadDialog.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.newznab_search_failed",
+      "source": "Newznab search failed for {indexer}: {error}",
+      "kind": "app-owned indexer/search service",
+      "owners": ["server/newznab.ts"],
+      "coverage": [
+        "server/__tests__/indexer-caps.test.ts",
+        "server/__tests__/search.test.ts",
+        "client/__tests__/GameDownloadDialog.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.newznab_connection_failed",
+      "source": "Connection failed: {error}",
+      "kind": "app-owned indexer/search service",
+      "owners": ["server/newznab.ts"],
+      "coverage": [
+        "server/__tests__/indexer-caps.test.ts",
+        "server/__tests__/search.test.ts",
+        "client/__tests__/GameDownloadDialog.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.newznab_response_invalid",
+      "source": "Invalid Newznab response",
+      "kind": "app-owned indexer/search service",
+      "owners": ["server/newznab.ts"],
+      "coverage": [
+        "server/__tests__/indexer-caps.test.ts",
+        "server/__tests__/search.test.ts",
+        "client/__tests__/GameDownloadDialog.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.unknown_error_reason",
+      "source": "Unknown error: {reason}",
+      "kind": "app-owned indexer/search service",
+      "owners": ["server/torznab.ts"],
+      "coverage": [
+        "server/__tests__/indexer-caps.test.ts",
+        "server/__tests__/search.test.ts",
+        "client/__tests__/GameDownloadDialog.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.no_indexers_configured",
+      "source": "No indexers configured",
+      "kind": "app-owned indexer/search service",
+      "owners": ["server/search.ts"],
+      "coverage": [
+        "server/__tests__/indexer-caps.test.ts",
+        "server/__tests__/search.test.ts",
+        "client/__tests__/GameDownloadDialog.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.json_catalog_search_failed",
+      "source": "{indexer}: JSON catalog search failed; use Test Connection for details",
+      "kind": "app-owned indexer/search service",
+      "owners": ["server/search.ts"],
+      "coverage": [
+        "server/__tests__/indexer-caps.test.ts",
+        "server/__tests__/search.test.ts",
+        "client/__tests__/GameDownloadDialog.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.connection_test_server_unreachable",
+      "source": "Could not reach the server to test the connection.",
+      "kind": "app-owned indexer/search service",
+      "owners": ["client/src/components/IgdbCredentialsHelper.tsx"],
+      "coverage": ["client/src/__tests__/IgdbCredentialsHelper.test.tsx"],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
     }
   ],
   "codeUnits": [
@@ -2607,6 +2872,13 @@
         "shared/__tests__/service-message-descriptor.test.ts"
       ],
       "codeStatus": "implemented; nullable metadata blocks legacy matching for provider errors; exact source matching required for localization"
+    },
+    {
+      "name": "Newznab caps success result",
+      "owners": ["server/newznab.ts"],
+      "keys": ["interface.connection_successful_515fb6d9"],
+      "coverage": ["server/__tests__/newznab.test.ts"],
+      "codeStatus": "implemented; reuses existing translated source ID; private JIT validation pending"
     }
   ],
   "retirementCandidates": [
@@ -2616,5 +2888,6 @@
       "replacedBy": ["service.apprise_test_failed", "typed ApiErrorDescription body"],
       "reason": "Error moved from flattened title interpolation to a reactive owned/raw description; retire only after frozen input is finished and all consumers are checked."
     }
-  ]
+  ],
+  "initialServiceAudit": "localization/source-message-audit.json"
 }

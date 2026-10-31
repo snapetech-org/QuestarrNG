@@ -78,19 +78,40 @@ export class ServiceMessageError extends Error implements ServiceMessageDescript
   }
 }
 export function serviceErrorValue(error: unknown): string | ServiceMessageFragment {
-  if (error instanceof ServiceMessageError)
-    return { message: error.message, ...serviceErrorMetadata(error) } as ServiceMessageFragment;
+  if (error instanceof ServiceMessageError) {
+    const descriptor = matchingServiceMessageDescriptor(error.message, error);
+    if (descriptor) return { message: error.message, ...descriptor };
+  }
   return error instanceof Error
     ? error.message
     : serviceMessage("interface.unknown_error_ce512b43", {});
 }
 export function serviceErrorMetadata(error: unknown): ServiceMessageMetadata {
   if (!(error instanceof ServiceMessageError)) return {};
-  return {
-    messageKey: error.messageKey,
-    messageValues: error.messageValues,
-    ...(error.messageDetails ? { messageDetails: error.messageDetails } : {}),
-  };
+  return matchingServiceMessageDescriptor(error.message, error) ?? {};
+}
+/** Retain explicit matching metadata; never infer ownership from a bare diagnostic. */
+export function serviceMessageValue(
+  message: string,
+  metadata: unknown
+): string | ServiceMessageFragment {
+  const descriptor = matchingServiceMessageDescriptor(message, metadata);
+  return descriptor ? { message, ...descriptor } : message;
+}
+/** Preserve a producer's exact wire text and cause, failing closed if its source changed. */
+export function serviceMessageError(
+  fragment: ServiceMessageFragment,
+  options?: ErrorOptions
+): Error {
+  const descriptor = matchingServiceMessageDescriptor(fragment.message, fragment);
+  if (!descriptor) return new Error(fragment.message, options);
+  const parameters = Object.fromEntries(
+    Object.entries(descriptor.messageValues).map(([name, value]) => {
+      const nested = descriptor.messageDetails?.[name];
+      return [name, nested ? { message: String(value), ...nested } : value];
+    })
+  );
+  return new ServiceMessageError(descriptor.messageKey, parameters, options);
 }
 /** Only app-owned error classes carry descriptors; provider Error text stays opaque. */
 export function serviceErrorResult(

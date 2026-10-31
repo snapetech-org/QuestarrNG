@@ -1,3 +1,4 @@
+import { serviceMessage, parseServiceMessageDescriptor } from "../../shared/service-messages.js";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import type { Indexer } from "@shared/schema";
 import type { SearchItem } from "../search.js";
@@ -93,6 +94,45 @@ const makeNewznabResponse = (items: object[], errors: string[] = []) => ({
 });
 
 describe("Search Module - searchAllIndexers", () => {
+  it("keeps error metadata aligned across Torznab, Newznab and catalog aggregation", async () => {
+    const typed = serviceMessage("service.torznab_response_invalid", {});
+    const indexer = "Name العربية: {error}";
+    vi.mocked(storage.getEnabledIndexers).mockResolvedValue([
+      makeTorznabIndexer(),
+      makeNewznabIndexer(),
+      makeTorznabIndexer({ id: "catalog", protocol: "json-catalog", name: indexer }),
+    ]);
+    vi.mocked(torznabClient.searchMultipleIndexers).mockResolvedValue({
+      results: { items: [], total: 0, offset: 0 },
+      errors: [typed.message, typed.message],
+      errorI18n: [typed, null],
+    });
+    vi.mocked(newznabClient.searchMultipleIndexers).mockResolvedValue({
+      results: { items: [], total: 0, offset: 0 },
+      errors: [{ indexer, error: typed.message, errorI18n: null }],
+    } as never);
+    vi.mocked(jsonCatalogClient.search).mockRejectedValue(
+      new Error("https://private.example?token=secret")
+    );
+    const result = await searchAllIndexers({ query: "Game" });
+    expect(result.errors).toEqual([
+      typed.message,
+      typed.message,
+      `${indexer}: ${typed.message}`,
+      `${indexer}: JSON catalog search failed; use Test Connection for details`,
+    ]);
+    expect(result.errorI18n).toHaveLength(4);
+    expect(parseServiceMessageDescriptor(result.errorI18n?.[0])?.messageKey).toBe(typed.messageKey);
+    expect(result.errorI18n?.[1]).toBeNull();
+    const named = parseServiceMessageDescriptor(result.errorI18n?.[2]);
+    expect(named?.messageValues).toEqual({ client: indexer, error: typed.message });
+    expect(named?.messageDetails).toBeUndefined();
+    expect(parseServiceMessageDescriptor(result.errorI18n?.[3])?.messageKey).toBe(
+      "service.json_catalog_search_failed"
+    );
+    expect(JSON.stringify(result)).not.toContain("secret");
+  });
+
   it("routes catalogs through the aggregated search without sending them to Torznab", async () => {
     const indexer = makeTorznabIndexer({ protocol: "json-catalog" });
     vi.mocked(storage.getEnabledIndexers).mockResolvedValue([indexer]);
@@ -143,6 +183,7 @@ describe("Search Module - searchAllIndexers", () => {
       total: 0,
       offset: 0,
       errors: ["No indexers configured"],
+      errorI18n: [{ messageKey: "service.no_indexers_configured", messageValues: {} }],
     });
   });
 

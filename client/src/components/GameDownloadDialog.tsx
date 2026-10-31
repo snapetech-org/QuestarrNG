@@ -4,8 +4,8 @@ import {
   useRegionalPreference,
 } from "@/lib/regional-format";
 import { getInterfaceCollator, formatInterfaceMessage } from "@/lib/interface-locale";
-import { ApiErrorDetailText } from "@/components/ApiErrorDetailText";
 import { ServiceMessageText } from "@/components/ServiceMessageText";
+import type { ServiceMessageDescriptor } from "@shared/service-messages";
 import React, { useState, useEffect, useMemo, useCallback, useRef, useId } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -138,6 +138,7 @@ interface SearchResult {
   offset: number;
   blacklistedCount?: number;
   errors?: string[];
+  errorI18n?: Array<ServiceMessageDescriptor | null>;
 }
 
 const SMALL_EXTRA_MAX_MAIN_SIZE_RATIO = 0.25;
@@ -2043,7 +2044,8 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
             <ul className="text-sm space-y-1">
               {searchResults.errors.map((error, index) => (
                 <li key={index} className="text-muted-foreground">
-                  • <ApiErrorDetailText source={error} />
+                  •{" "}
+                  <ServiceMessageText message={error} metadata={searchResults.errorI18n?.[index]} />
                 </li>
               ))}
             </ul>

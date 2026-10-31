@@ -2918,6 +2918,28 @@ export const STABLE_INTERFACE_MESSAGES = {
   "service.apprise_server_responded": "Server responded with {status}: {error}",
   "service.apprise_reach_failed": "Failed to reach Apprise server",
   "service.apprise_test_failed": "Apprise test failed",
+  "service.indexer_http_error": "HTTP {status}: {statusText}",
+  "service.indexer_http_key_withheld":
+    "HTTP {status}: {statusText} (API key withheld for this HTTP feed; it was not sent because this indexer uses plain HTTP: enable 'Allow insecure LAN connection' on the indexer, or switch it to HTTPS)",
+  "service.indexer_http_key_check":
+    "HTTP {status}: {statusText} (check the indexer API key; re-sync from Prowlarr if its key changed).",
+  "service.indexer_http_body": "{statusMessage} - {error}",
+  "service.indexer_disabled": "Indexer {indexer} is disabled",
+  "service.indexer_search_failed": "Failed to search indexer {indexer}: {error}",
+  "service.no_enabled_indexers": "No enabled indexers available",
+  "service.unsafe_url_detected": "Unsafe URL detected: {url}",
+  "service.unsafe_url_detected_without_url": "Unsafe URL detected",
+  "service.torznab_response_invalid": "Invalid Torznab response format",
+  "service.indexer_response_parse_failed": "Failed to parse response: {error}",
+  "service.newznab_search_failed": "Newznab search failed for {indexer}: {error}",
+  "service.newznab_connection_failed": "Connection failed: {error}",
+  "service.newznab_response_invalid": "Invalid Newznab response",
+  "service.unknown_error_reason": "Unknown error: {reason}",
+  "service.no_indexers_configured": "No indexers configured",
+  "service.json_catalog_search_failed":
+    "{indexer}: JSON catalog search failed; use Test Connection for details",
+  "service.connection_test_server_unreachable":
+    "Could not reach the server to test the connection.",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

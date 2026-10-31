@@ -697,7 +697,7 @@ async function handleAggregatedIndexerSearch(req: Request, res: Response) {
       return res.status(400).json({ error: "Search query required" });
     }
 
-    const { items, total, errors } = await searchAllIndexers({
+    const { items, total, errors, errorI18n } = await searchAllIndexers({
       query: query.trim(),
       category: categories,
       limit: pageLimit,
@@ -775,6 +775,7 @@ async function handleAggregatedIndexerSearch(req: Request, res: Response) {
       offset,
       ...(blacklistedCount > 0 ? { blacklistedCount } : {}),
       errors: errors.length > 0 ? errors : undefined,
+      errorI18n: errors.length > 0 ? errorI18n : undefined,
     });
   } catch (error) {
     routesLogger.error({ error }, "Error searching indexers");

@@ -168,10 +168,10 @@ export function IgdbTestConnectionButton({
         error instanceof ApiError ? (
           <ApiErrorDescription
             error={error}
-            fallbackSource="Could not reach the server to test the connection."
+            fallbackSource="service.connection_test_server_unreachable"
           />
         ) : (
-          <InterfaceText source="Could not reach the server to test the connection." />
+          <InterfaceText source="service.connection_test_server_unreachable" />
         )
       );
     }
@@ -207,7 +207,7 @@ export function IgdbTestConnectionButton({
       {state === "error" && (
         <p className="flex items-center gap-1.5 text-xs text-destructive">
           <XCircle className="h-3.5 w-3.5 shrink-0" />
-          {errorMessage ?? <InterfaceText source="Connection failed." />}
+          {errorMessage ?? <InterfaceText source="interface.connection_failed_e3bd2c48" />}
         </p>
       )}
     </div>

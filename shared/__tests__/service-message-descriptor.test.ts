@@ -11,9 +11,42 @@ import {
   serviceErrorBody,
   serviceErrorResult,
   serviceMessage,
+  serviceMessageValue,
+  serviceMessageError,
 } from "../service-messages.js";
 
 describe("typed service message descriptors", () => {
+  it("fails closed when a typed error's text or a producer fragment no longer matches its source", () => {
+    const error = new ServiceMessageError("service.no_enabled_indexers", {});
+    error.message = "Provider diagnostic: Download paused successfully";
+    expect(serviceErrorMetadata(error)).toEqual({});
+    expect(serviceErrorValue(error)).toBe(error.message);
+    const fragment = serviceMessage("service.no_enabled_indexers", {});
+    const cause = new Error("provider cause");
+    const raw = serviceMessageError({ ...fragment, message: error.message }, { cause });
+    expect(raw).not.toBeInstanceOf(ServiceMessageError);
+    expect(raw.message).toBe(error.message);
+    expect(raw.cause).toBe(cause);
+  });
+  it("retains explicit matching search metadata without promoting lookalike values", () => {
+    const fragment = serviceMessage("service.indexer_disabled", {
+      indexer: "Name العربية: {error}",
+    });
+    expect(serviceMessageValue(fragment.message, fragment)).toEqual(fragment);
+    expect(serviceMessageValue(fragment.message, null)).toBe(fragment.message);
+    expect(
+      serviceMessageValue(fragment.message, {
+        ...fragment,
+        messageValues: { indexer: "different" },
+      })
+    ).toBe(fragment.message);
+    const cause = new Error("provider cause");
+    const error = serviceMessageError(fragment, { cause });
+    expect(error).toBeInstanceOf(ServiceMessageError);
+    expect(error.cause).toBe(cause);
+    expect(serviceErrorValue(error)).toEqual(fragment);
+  });
+
   it("retains exact English for parameterized source fallback templates in RTL locales", () => {
     const provider = "Provider العربية: /stage/{error} – 404";
     const fragment = serviceMessage("service.nzb_sabnzbd_add_failed", { error: provider });
