@@ -43603,6 +43603,386 @@
         "vi": "{provider} setup guide (opens in a new tab)",
         "id": "{provider} setup guide (opens in a new tab)"
       }
+    },
+    "service.nzb_added": {
+      "source": "NZB added successfully",
+      "translations": {
+        "es": "NZB added successfully",
+        "es-419": "NZB added successfully",
+        "zh-Hans": "NZB added successfully",
+        "hi": "NZB added successfully",
+        "de": "NZB added successfully",
+        "ja": "NZB added successfully",
+        "fr": "NZB added successfully",
+        "fr-CA": "NZB added successfully",
+        "pt-BR": "NZB added successfully",
+        "ar": "NZB added successfully",
+        "ko": "NZB added successfully",
+        "zh-Hant": "NZB added successfully",
+        "vi": "NZB added successfully",
+        "id": "NZB added successfully"
+      }
+    },
+    "service.nzb_added_duplicate_or_merged": {
+      "source": "NZB added successfully (likely duplicate or merged)",
+      "translations": {
+        "es": "NZB added successfully (likely duplicate or merged)",
+        "es-419": "NZB added successfully (likely duplicate or merged)",
+        "zh-Hans": "NZB added successfully (likely duplicate or merged)",
+        "hi": "NZB added successfully (likely duplicate or merged)",
+        "de": "NZB added successfully (likely duplicate or merged)",
+        "ja": "NZB added successfully (likely duplicate or merged)",
+        "fr": "NZB added successfully (likely duplicate or merged)",
+        "fr-CA": "NZB added successfully (likely duplicate or merged)",
+        "pt-BR": "NZB added successfully (likely duplicate or merged)",
+        "ar": "NZB added successfully (likely duplicate or merged)",
+        "ko": "NZB added successfully (likely duplicate or merged)",
+        "zh-Hant": "NZB added successfully (likely duplicate or merged)",
+        "vi": "NZB added successfully (likely duplicate or merged)",
+        "id": "NZB added successfully (likely duplicate or merged)"
+      }
+    },
+    "service.nzb_already_exists": {
+      "source": "NZB already exists: {error}",
+      "translations": {
+        "es": "NZB already exists: {error}",
+        "es-419": "NZB already exists: {error}",
+        "zh-Hans": "NZB already exists: {error}",
+        "hi": "NZB already exists: {error}",
+        "de": "NZB already exists: {error}",
+        "ja": "NZB already exists: {error}",
+        "fr": "NZB already exists: {error}",
+        "fr-CA": "NZB already exists: {error}",
+        "pt-BR": "NZB already exists: {error}",
+        "ar": "NZB already exists: {error}",
+        "ko": "NZB already exists: {error}",
+        "zh-Hant": "NZB already exists: {error}",
+        "vi": "NZB already exists: {error}",
+        "id": "NZB already exists: {error}"
+      }
+    },
+    "service.nzb_add_rejected": {
+      "source": "Failed to add NZB - SABnzbd returned success:false",
+      "translations": {
+        "es": "Failed to add NZB - SABnzbd returned success:false",
+        "es-419": "Failed to add NZB - SABnzbd returned success:false",
+        "zh-Hans": "Failed to add NZB - SABnzbd returned success:false",
+        "hi": "Failed to add NZB - SABnzbd returned success:false",
+        "de": "Failed to add NZB - SABnzbd returned success:false",
+        "ja": "Failed to add NZB - SABnzbd returned success:false",
+        "fr": "Failed to add NZB - SABnzbd returned success:false",
+        "fr-CA": "Failed to add NZB - SABnzbd returned success:false",
+        "pt-BR": "Failed to add NZB - SABnzbd returned success:false",
+        "ar": "Failed to add NZB - SABnzbd returned success:false",
+        "ko": "Failed to add NZB - SABnzbd returned success:false",
+        "zh-Hant": "Failed to add NZB - SABnzbd returned success:false",
+        "vi": "Failed to add NZB - SABnzbd returned success:false",
+        "id": "Failed to add NZB - SABnzbd returned success:false"
+      }
+    },
+    "service.nzb_add_invalid_id": {
+      "source": "Failed to add NZB (ID is 0 or negative)",
+      "translations": {
+        "es": "Failed to add NZB (ID is 0 or negative)",
+        "es-419": "Failed to add NZB (ID is 0 or negative)",
+        "zh-Hans": "Failed to add NZB (ID is 0 or negative)",
+        "hi": "Failed to add NZB (ID is 0 or negative)",
+        "de": "Failed to add NZB (ID is 0 or negative)",
+        "ja": "Failed to add NZB (ID is 0 or negative)",
+        "fr": "Failed to add NZB (ID is 0 or negative)",
+        "fr-CA": "Failed to add NZB (ID is 0 or negative)",
+        "pt-BR": "Failed to add NZB (ID is 0 or negative)",
+        "ar": "Failed to add NZB (ID is 0 or negative)",
+        "ko": "Failed to add NZB (ID is 0 or negative)",
+        "zh-Hant": "Failed to add NZB (ID is 0 or negative)",
+        "vi": "Failed to add NZB (ID is 0 or negative)",
+        "id": "Failed to add NZB (ID is 0 or negative)"
+      }
+    },
+    "service.nzb_paused": {
+      "source": "NZB paused",
+      "translations": {
+        "es": "NZB paused",
+        "es-419": "NZB paused",
+        "zh-Hans": "NZB paused",
+        "hi": "NZB paused",
+        "de": "NZB paused",
+        "ja": "NZB paused",
+        "fr": "NZB paused",
+        "fr-CA": "NZB paused",
+        "pt-BR": "NZB paused",
+        "ar": "NZB paused",
+        "ko": "NZB paused",
+        "zh-Hant": "NZB paused",
+        "vi": "NZB paused",
+        "id": "NZB paused"
+      }
+    },
+    "service.nzb_resumed": {
+      "source": "NZB resumed",
+      "translations": {
+        "es": "NZB resumed",
+        "es-419": "NZB resumed",
+        "zh-Hans": "NZB resumed",
+        "hi": "NZB resumed",
+        "de": "NZB resumed",
+        "ja": "NZB resumed",
+        "fr": "NZB resumed",
+        "fr-CA": "NZB resumed",
+        "pt-BR": "NZB resumed",
+        "ar": "NZB resumed",
+        "ko": "NZB resumed",
+        "zh-Hant": "NZB resumed",
+        "vi": "NZB resumed",
+        "id": "NZB resumed"
+      }
+    },
+    "service.nzb_removed": {
+      "source": "NZB removed",
+      "translations": {
+        "es": "NZB removed",
+        "es-419": "NZB removed",
+        "zh-Hans": "NZB removed",
+        "hi": "NZB removed",
+        "de": "NZB removed",
+        "ja": "NZB removed",
+        "fr": "NZB removed",
+        "fr-CA": "NZB removed",
+        "pt-BR": "NZB removed",
+        "ar": "NZB removed",
+        "ko": "NZB removed",
+        "zh-Hant": "NZB removed",
+        "vi": "NZB removed",
+        "id": "NZB removed"
+      }
+    },
+    "service.nzb_pause_failed": {
+      "source": "Failed to pause NZB",
+      "translations": {
+        "es": "Failed to pause NZB",
+        "es-419": "Failed to pause NZB",
+        "zh-Hans": "Failed to pause NZB",
+        "hi": "Failed to pause NZB",
+        "de": "Failed to pause NZB",
+        "ja": "Failed to pause NZB",
+        "fr": "Failed to pause NZB",
+        "fr-CA": "Failed to pause NZB",
+        "pt-BR": "Failed to pause NZB",
+        "ar": "Failed to pause NZB",
+        "ko": "Failed to pause NZB",
+        "zh-Hant": "Failed to pause NZB",
+        "vi": "Failed to pause NZB",
+        "id": "Failed to pause NZB"
+      }
+    },
+    "service.nzb_resume_failed": {
+      "source": "Failed to resume NZB",
+      "translations": {
+        "es": "Failed to resume NZB",
+        "es-419": "Failed to resume NZB",
+        "zh-Hans": "Failed to resume NZB",
+        "hi": "Failed to resume NZB",
+        "de": "Failed to resume NZB",
+        "ja": "Failed to resume NZB",
+        "fr": "Failed to resume NZB",
+        "fr-CA": "Failed to resume NZB",
+        "pt-BR": "Failed to resume NZB",
+        "ar": "Failed to resume NZB",
+        "ko": "Failed to resume NZB",
+        "zh-Hant": "Failed to resume NZB",
+        "vi": "Failed to resume NZB",
+        "id": "Failed to resume NZB"
+      }
+    },
+    "service.nzb_remove_failed": {
+      "source": "Failed to remove NZB",
+      "translations": {
+        "es": "Failed to remove NZB",
+        "es-419": "Failed to remove NZB",
+        "zh-Hans": "Failed to remove NZB",
+        "hi": "Failed to remove NZB",
+        "de": "Failed to remove NZB",
+        "ja": "Failed to remove NZB",
+        "fr": "Failed to remove NZB",
+        "fr-CA": "Failed to remove NZB",
+        "pt-BR": "Failed to remove NZB",
+        "ar": "Failed to remove NZB",
+        "ko": "Failed to remove NZB",
+        "zh-Hant": "Failed to remove NZB",
+        "vi": "Failed to remove NZB",
+        "id": "Failed to remove NZB"
+      }
+    },
+    "service.nzb_fetch_failed": {
+      "source": "Failed to fetch NZB: {error}",
+      "translations": {
+        "es": "Failed to fetch NZB: {error}",
+        "es-419": "Failed to fetch NZB: {error}",
+        "zh-Hans": "Failed to fetch NZB: {error}",
+        "hi": "Failed to fetch NZB: {error}",
+        "de": "Failed to fetch NZB: {error}",
+        "ja": "Failed to fetch NZB: {error}",
+        "fr": "Failed to fetch NZB: {error}",
+        "fr-CA": "Failed to fetch NZB: {error}",
+        "pt-BR": "Failed to fetch NZB: {error}",
+        "ar": "Failed to fetch NZB: {error}",
+        "ko": "Failed to fetch NZB: {error}",
+        "zh-Hant": "Failed to fetch NZB: {error}",
+        "vi": "Failed to fetch NZB: {error}",
+        "id": "Failed to fetch NZB: {error}"
+      }
+    },
+    "service.nzb_sabnzbd_add_failed": {
+      "source": "Failed to add NZB to SABnzbd: {error}",
+      "translations": {
+        "es": "Failed to add NZB to SABnzbd: {error}",
+        "es-419": "Failed to add NZB to SABnzbd: {error}",
+        "zh-Hans": "Failed to add NZB to SABnzbd: {error}",
+        "hi": "Failed to add NZB to SABnzbd: {error}",
+        "de": "Failed to add NZB to SABnzbd: {error}",
+        "ja": "Failed to add NZB to SABnzbd: {error}",
+        "fr": "Failed to add NZB to SABnzbd: {error}",
+        "fr-CA": "Failed to add NZB to SABnzbd: {error}",
+        "pt-BR": "Failed to add NZB to SABnzbd: {error}",
+        "ar": "Failed to add NZB to SABnzbd: {error}",
+        "ko": "Failed to add NZB to SABnzbd: {error}",
+        "zh-Hant": "Failed to add NZB to SABnzbd: {error}",
+        "vi": "Failed to add NZB to SABnzbd: {error}",
+        "id": "Failed to add NZB to SABnzbd: {error}"
+      }
+    },
+    "service.sabnzbd_version_missing": {
+      "source": "Invalid SABnzbd response - missing version field",
+      "translations": {
+        "es": "Invalid SABnzbd response - missing version field",
+        "es-419": "Invalid SABnzbd response - missing version field",
+        "zh-Hans": "Invalid SABnzbd response - missing version field",
+        "hi": "Invalid SABnzbd response - missing version field",
+        "de": "Invalid SABnzbd response - missing version field",
+        "ja": "Invalid SABnzbd response - missing version field",
+        "fr": "Invalid SABnzbd response - missing version field",
+        "fr-CA": "Invalid SABnzbd response - missing version field",
+        "pt-BR": "Invalid SABnzbd response - missing version field",
+        "ar": "Invalid SABnzbd response - missing version field",
+        "ko": "Invalid SABnzbd response - missing version field",
+        "zh-Hant": "Invalid SABnzbd response - missing version field",
+        "vi": "Invalid SABnzbd response - missing version field",
+        "id": "Invalid SABnzbd response - missing version field"
+      }
+    },
+    "service.unsafe_url_blocked": {
+      "source": "Unsafe URL blocked: {url}",
+      "translations": {
+        "es": "Unsafe URL blocked: {url}",
+        "es-419": "Unsafe URL blocked: {url}",
+        "zh-Hans": "Unsafe URL blocked: {url}",
+        "hi": "Unsafe URL blocked: {url}",
+        "de": "Unsafe URL blocked: {url}",
+        "ja": "Unsafe URL blocked: {url}",
+        "fr": "Unsafe URL blocked: {url}",
+        "fr-CA": "Unsafe URL blocked: {url}",
+        "pt-BR": "Unsafe URL blocked: {url}",
+        "ar": "Unsafe URL blocked: {url}",
+        "ko": "Unsafe URL blocked: {url}",
+        "zh-Hant": "Unsafe URL blocked: {url}",
+        "vi": "Unsafe URL blocked: {url}",
+        "id": "Unsafe URL blocked: {url}"
+      }
+    },
+    "service.http_error": {
+      "source": "HTTP {status}: {error}",
+      "translations": {
+        "es": "HTTP {status}: {error}",
+        "es-419": "HTTP {status}: {error}",
+        "zh-Hans": "HTTP {status}: {error}",
+        "hi": "HTTP {status}: {error}",
+        "de": "HTTP {status}: {error}",
+        "ja": "HTTP {status}: {error}",
+        "fr": "HTTP {status}: {error}",
+        "fr-CA": "HTTP {status}: {error}",
+        "pt-BR": "HTTP {status}: {error}",
+        "ar": "HTTP {status}: {error}",
+        "ko": "HTTP {status}: {error}",
+        "zh-Hant": "HTTP {status}: {error}",
+        "vi": "HTTP {status}: {error}",
+        "id": "HTTP {status}: {error}"
+      }
+    },
+    "service.http_error_status": {
+      "source": "HTTP {status}: {statusText} - {error}",
+      "translations": {
+        "es": "HTTP {status}: {statusText} - {error}",
+        "es-419": "HTTP {status}: {statusText} - {error}",
+        "zh-Hans": "HTTP {status}: {statusText} - {error}",
+        "hi": "HTTP {status}: {statusText} - {error}",
+        "de": "HTTP {status}: {statusText} - {error}",
+        "ja": "HTTP {status}: {statusText} - {error}",
+        "fr": "HTTP {status}: {statusText} - {error}",
+        "fr-CA": "HTTP {status}: {statusText} - {error}",
+        "pt-BR": "HTTP {status}: {statusText} - {error}",
+        "ar": "HTTP {status}: {statusText} - {error}",
+        "ko": "HTTP {status}: {statusText} - {error}",
+        "zh-Hant": "HTTP {status}: {statusText} - {error}",
+        "vi": "HTTP {status}: {statusText} - {error}",
+        "id": "HTTP {status}: {statusText} - {error}"
+      }
+    },
+    "service.no_error_details": {
+      "source": "No error details",
+      "translations": {
+        "es": "No error details",
+        "es-419": "No error details",
+        "zh-Hans": "No error details",
+        "hi": "No error details",
+        "de": "No error details",
+        "ja": "No error details",
+        "fr": "No error details",
+        "fr-CA": "No error details",
+        "pt-BR": "No error details",
+        "ar": "No error details",
+        "ko": "No error details",
+        "zh-Hant": "No error details",
+        "vi": "No error details",
+        "id": "No error details"
+      }
+    },
+    "service.nzbget_fault": {
+      "source": "NZBGet Fault: {error} ({code})",
+      "translations": {
+        "es": "NZBGet Fault: {error} ({code})",
+        "es-419": "NZBGet Fault: {error} ({code})",
+        "zh-Hans": "NZBGet Fault: {error} ({code})",
+        "hi": "NZBGet Fault: {error} ({code})",
+        "de": "NZBGet Fault: {error} ({code})",
+        "ja": "NZBGet Fault: {error} ({code})",
+        "fr": "NZBGet Fault: {error} ({code})",
+        "fr-CA": "NZBGet Fault: {error} ({code})",
+        "pt-BR": "NZBGet Fault: {error} ({code})",
+        "ar": "NZBGet Fault: {error} ({code})",
+        "ko": "NZBGet Fault: {error} ({code})",
+        "zh-Hant": "NZBGet Fault: {error} ({code})",
+        "vi": "NZBGet Fault: {error} ({code})",
+        "id": "NZBGet Fault: {error} ({code})"
+      }
+    },
+    "service.archive_password_https": {
+      "source": "Refusing to send the archive password over an insecure connection. Enable SSL for this {client} downloader, or remove the archive password.",
+      "translations": {
+        "es": "Refusing to send the archive password over an insecure connection. Enable SSL for this {client} downloader, or remove the archive password.",
+        "es-419": "Refusing to send the archive password over an insecure connection. Enable SSL for this {client} downloader, or remove the archive password.",
+        "zh-Hans": "Refusing to send the archive password over an insecure connection. Enable SSL for this {client} downloader, or remove the archive password.",
+        "hi": "Refusing to send the archive password over an insecure connection. Enable SSL for this {client} downloader, or remove the archive password.",
+        "de": "Refusing to send the archive password over an insecure connection. Enable SSL for this {client} downloader, or remove the archive password.",
+        "ja": "Refusing to send the archive password over an insecure connection. Enable SSL for this {client} downloader, or remove the archive password.",
+        "fr": "Refusing to send the archive password over an insecure connection. Enable SSL for this {client} downloader, or remove the archive password.",
+        "fr-CA": "Refusing to send the archive password over an insecure connection. Enable SSL for this {client} downloader, or remove the archive password.",
+        "pt-BR": "Refusing to send the archive password over an insecure connection. Enable SSL for this {client} downloader, or remove the archive password.",
+        "ar": "Refusing to send the archive password over an insecure connection. Enable SSL for this {client} downloader, or remove the archive password.",
+        "ko": "Refusing to send the archive password over an insecure connection. Enable SSL for this {client} downloader, or remove the archive password.",
+        "zh-Hant": "Refusing to send the archive password over an insecure connection. Enable SSL for this {client} downloader, or remove the archive password.",
+        "vi": "Refusing to send the archive password over an insecure connection. Enable SSL for this {client} downloader, or remove the archive password.",
+        "id": "Refusing to send the archive password over an insecure connection. Enable SSL for this {client} downloader, or remove the archive password."
+      }
     }
   }
 }

@@ -2718,6 +2718,27 @@ export const STABLE_INTERFACE_MESSAGES = {
   "service.realdebrid_connect_failed": "Could not connect to Real-Debrid.",
   "service.realdebrid_add_failed": "Could not add this magnet to Real-Debrid.",
   "auth.provider_setup_guide_label": "{provider} setup guide (opens in a new tab)",
+  "service.nzb_added": "NZB added successfully",
+  "service.nzb_added_duplicate_or_merged": "NZB added successfully (likely duplicate or merged)",
+  "service.nzb_already_exists": "NZB already exists: {error}",
+  "service.nzb_add_rejected": "Failed to add NZB - SABnzbd returned success:false",
+  "service.nzb_add_invalid_id": "Failed to add NZB (ID is 0 or negative)",
+  "service.nzb_paused": "NZB paused",
+  "service.nzb_resumed": "NZB resumed",
+  "service.nzb_removed": "NZB removed",
+  "service.nzb_pause_failed": "Failed to pause NZB",
+  "service.nzb_resume_failed": "Failed to resume NZB",
+  "service.nzb_remove_failed": "Failed to remove NZB",
+  "service.nzb_fetch_failed": "Failed to fetch NZB: {error}",
+  "service.nzb_sabnzbd_add_failed": "Failed to add NZB to SABnzbd: {error}",
+  "service.sabnzbd_version_missing": "Invalid SABnzbd response - missing version field",
+  "service.unsafe_url_blocked": "Unsafe URL blocked: {url}",
+  "service.http_error": "HTTP {status}: {error}",
+  "service.http_error_status": "HTTP {status}: {statusText} - {error}",
+  "service.no_error_details": "No error details",
+  "service.nzbget_fault": "NZBGet Fault: {error} ({code})",
+  "service.archive_password_https":
+    "Refusing to send the archive password over an insecure connection. Enable SSL for this {client} downloader, or remove the archive password.",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

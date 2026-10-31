@@ -289,6 +289,310 @@
       "codeStatus": "implemented; focused producer/client/route checks passed",
       "targetStatus": "source-fallback",
       "directTargetCells": 12
+    },
+    {
+      "key": "service.nzb_added",
+      "source": "NZB added successfully",
+      "kind": "app-owned NZB/service",
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_nzbget_remaining.test.ts",
+        "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
+        "shared/__tests__/archive-password.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.nzb_added_duplicate_or_merged",
+      "source": "NZB added successfully (likely duplicate or merged)",
+      "kind": "app-owned NZB/service",
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_nzbget_remaining.test.ts",
+        "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
+        "shared/__tests__/archive-password.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.nzb_already_exists",
+      "source": "NZB already exists: {error}",
+      "kind": "app-owned NZB/service",
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_nzbget_remaining.test.ts",
+        "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
+        "shared/__tests__/archive-password.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.nzb_add_rejected",
+      "source": "Failed to add NZB - SABnzbd returned success:false",
+      "kind": "app-owned NZB/service",
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_nzbget_remaining.test.ts",
+        "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
+        "shared/__tests__/archive-password.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.nzb_add_invalid_id",
+      "source": "Failed to add NZB (ID is 0 or negative)",
+      "kind": "app-owned NZB/service",
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_nzbget_remaining.test.ts",
+        "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
+        "shared/__tests__/archive-password.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.nzb_paused",
+      "source": "NZB paused",
+      "kind": "app-owned NZB/service",
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_nzbget_remaining.test.ts",
+        "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
+        "shared/__tests__/archive-password.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.nzb_resumed",
+      "source": "NZB resumed",
+      "kind": "app-owned NZB/service",
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_nzbget_remaining.test.ts",
+        "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
+        "shared/__tests__/archive-password.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.nzb_removed",
+      "source": "NZB removed",
+      "kind": "app-owned NZB/service",
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_nzbget_remaining.test.ts",
+        "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
+        "shared/__tests__/archive-password.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.nzb_pause_failed",
+      "source": "Failed to pause NZB",
+      "kind": "app-owned NZB/service",
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_nzbget_remaining.test.ts",
+        "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
+        "shared/__tests__/archive-password.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.nzb_resume_failed",
+      "source": "Failed to resume NZB",
+      "kind": "app-owned NZB/service",
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_nzbget_remaining.test.ts",
+        "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
+        "shared/__tests__/archive-password.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.nzb_remove_failed",
+      "source": "Failed to remove NZB",
+      "kind": "app-owned NZB/service",
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_nzbget_remaining.test.ts",
+        "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
+        "shared/__tests__/archive-password.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.nzb_fetch_failed",
+      "source": "Failed to fetch NZB: {error}",
+      "kind": "app-owned NZB/service",
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_nzbget_remaining.test.ts",
+        "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
+        "shared/__tests__/archive-password.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.nzb_sabnzbd_add_failed",
+      "source": "Failed to add NZB to SABnzbd: {error}",
+      "kind": "app-owned NZB/service",
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_nzbget_remaining.test.ts",
+        "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
+        "shared/__tests__/archive-password.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.sabnzbd_version_missing",
+      "source": "Invalid SABnzbd response - missing version field",
+      "kind": "app-owned NZB/service",
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_nzbget_remaining.test.ts",
+        "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
+        "shared/__tests__/archive-password.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.unsafe_url_blocked",
+      "source": "Unsafe URL blocked: {url}",
+      "kind": "app-owned NZB/service",
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_nzbget_remaining.test.ts",
+        "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
+        "shared/__tests__/archive-password.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.http_error",
+      "source": "HTTP {status}: {error}",
+      "kind": "app-owned NZB/service",
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_nzbget_remaining.test.ts",
+        "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
+        "shared/__tests__/archive-password.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.http_error_status",
+      "source": "HTTP {status}: {statusText} - {error}",
+      "kind": "app-owned NZB/service",
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_nzbget_remaining.test.ts",
+        "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
+        "shared/__tests__/archive-password.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.no_error_details",
+      "source": "No error details",
+      "kind": "app-owned NZB/service",
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_nzbget_remaining.test.ts",
+        "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
+        "shared/__tests__/archive-password.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.nzbget_fault",
+      "source": "NZBGet Fault: {error} ({code})",
+      "kind": "app-owned NZB/service",
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_nzbget_remaining.test.ts",
+        "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
+        "shared/__tests__/archive-password.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.archive_password_https",
+      "source": "Refusing to send the archive password over an insecure connection. Enable SSL for this {client} downloader, or remove the archive password.",
+      "kind": "app-owned NZB/service",
+      "owners": [
+        "server/downloaders/nzbget.ts",
+        "server/downloaders/sabnzbd.ts",
+        "shared/archive-password.ts"
+      ],
+      "coverage": [
+        "server/__tests__/downloaders_nzbget_remaining.test.ts",
+        "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
+        "shared/__tests__/archive-password.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; 82 focused local cases passed before policy clarification; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
     }
   ],
   "codeUnits": [

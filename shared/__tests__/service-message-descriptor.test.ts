@@ -14,6 +14,15 @@ import {
 } from "../service-messages.js";
 
 describe("typed service message descriptors", () => {
+  it("retains exact English for parameterized source fallback templates in RTL locales", () => {
+    const provider = "Provider العربية: /stage/{error} – 404";
+    const fragment = serviceMessage("service.nzb_sabnzbd_add_failed", { error: provider });
+    const stored = serializeServiceMessageDescriptor(fragment);
+    expect(fragment.message).toBe(`Failed to add NZB to SABnzbd: ${provider}`);
+    expect(localizeServiceMessage(fragment.message, stored, "ar")).toBe(fragment.message);
+    expect(localizeServiceMessage(fragment.message, stored, "fr")).toBe(fragment.message);
+    expect(fragment.messageDetails).toBeUndefined();
+  });
   it("preserves typed versus provider ownership in result and HTTP error bodies", () => {
     const typed = new ServiceMessageError("service.realdebrid_authorization_code_expired", {});
     const fallback = serviceMessage("service.realdebrid_authorization_failed", {});
