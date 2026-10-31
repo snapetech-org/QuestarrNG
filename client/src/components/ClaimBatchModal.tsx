@@ -64,7 +64,7 @@ interface ClaimBatchModalProps {
 
 const CATEGORY_LABELS: Record<DownloadCategory, string> = {
   main: "Main",
-  update: "Update",
+  update: "Updates",
   dlc: "DLC",
   packs: "Packs/Addons",
   extra: "Extra",

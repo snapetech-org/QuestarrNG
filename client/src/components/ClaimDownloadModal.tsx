@@ -202,7 +202,7 @@ export default function ClaimDownloadModal({
                 <InterfaceText source={"Main"} />
               </SelectItem>
               <SelectItem value="update">
-                <InterfaceText source={"Update"} />
+                <InterfaceText source={"Updates"} />
               </SelectItem>
               <SelectItem value="dlc">
                 <InterfaceText source={"DLC"} />

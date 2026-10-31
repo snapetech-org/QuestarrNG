@@ -15,7 +15,7 @@ import { InterfaceText } from "@/components/InterfaceText";
 const CATEGORY_OPTIONS: Array<{ value: GameFileCategory; label: string }> = [
   { value: "main", label: "Main game" },
   { value: "dlc", label: "DLC" },
-  { value: "update", label: "Update" },
+  { value: "update", label: "Updates" },
   { value: "extra", label: "Extra" },
 ];
 

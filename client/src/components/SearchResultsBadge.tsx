@@ -18,7 +18,7 @@ const SearchResultsBadge = memo(
     const labelKey = updatesAvailable
       ? "Game updates available on indexers"
       : "Downloads available on indexers";
-    const resultKey = updatesAvailable ? "Update" : "Results";
+    const resultKey = updatesAvailable ? "Updates" : "Results";
     const Icon = updatesAvailable ? ArrowUpCircle : Search;
 
     if (variant === "overlay") {

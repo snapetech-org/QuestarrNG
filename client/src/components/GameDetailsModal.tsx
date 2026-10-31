@@ -188,7 +188,7 @@ function scoreColor(score: number): string {
 const EXPANSION_CATEGORY_LABELS: Record<string, string> = {
   main: "Main",
   dlc: "DLC",
-  update: "Update",
+  update: "Updates",
   extra: "Extra",
   packs: "Packs",
 };

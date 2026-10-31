@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import GameDetailsModal from "../src/components/GameDetailsModal";
 import { Toaster } from "@/components/ui/toaster";
 import { setInterfaceLanguage } from "@/lib/interface-locale";
+import { serviceMessage, serializeServiceMessageDescriptor } from "@shared/service-messages";
 
 // Mocking external dependencies
 vi.mock("socket.io-client", () => ({
@@ -1004,8 +1005,9 @@ describe("GameDetailsModal", () => {
       });
     });
 
-    it("localizes fixed persisted errors and keeps downloader errors in English fallback", async () => {
+    it("localizes tagged persisted errors and keeps legacy and provider text raw", async () => {
       setInterfaceLanguage("es");
+      const taggedError = serviceMessage("service.realdebrid_staging_failed", {});
       const downloads = [
         {
           id: "dl-fixed-error",
@@ -1027,6 +1029,17 @@ describe("GameDetailsModal", () => {
           downloadHash: "runtime-error",
           errorMessage: "Connection refused by qBittorrent at 10.0.0.7",
         },
+        {
+          id: "dl-tagged-error",
+          downloadTitle: "Tagged Game-SKIDROW",
+          status: "failed",
+          downloadType: "torrent",
+          downloaderName: "qBittorrent",
+          fileSize: null,
+          downloadHash: "tagged-error",
+          errorMessage: taggedError.message,
+          errorMessageI18n: serializeServiceMessageDescriptor(taggedError),
+        },
       ];
       const qc = createQueryClient();
       qc.setQueryData(["/api/games/1/downloads"], downloads);
@@ -1042,7 +1055,10 @@ describe("GameDetailsModal", () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByText("No se pudo encontrar el juego")).toBeInTheDocument();
+        expect(screen.getByText("Could not resolve game")).toHaveAttribute("lang", "und");
+        expect(
+          screen.getByText("Falló la preparación de los archivos de Real-Debrid.")
+        ).toHaveAttribute("lang", "es");
         expect(
           screen.getByText("Connection refused by qBittorrent at 10.0.0.7")
         ).toBeInTheDocument();
