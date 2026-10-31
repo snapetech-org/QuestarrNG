@@ -1,4 +1,4 @@
-import { localizeServiceResultMessage } from "@/lib/service-message-locale";
+import { ServiceMessageText } from "@/components/ServiceMessageText";
 import type { ServiceMessageResult } from "@shared/service-messages";
 import { useMemo, useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -355,11 +355,14 @@ export default function DownloadersPage() {
     },
     onSuccess: (data) => {
       if (data.success) {
-        toast({ title: "Connection successful", description: localizeServiceResultMessage(data) });
+        toast({
+          title: "Connection successful",
+          description: <ServiceMessageText message={data.message} metadata={data} />,
+        });
       } else {
         toast({
           title: "Connection failed",
-          description: localizeServiceResultMessage(data),
+          description: <ServiceMessageText message={data.message} metadata={data} />,
           variant: "destructive",
         });
       }

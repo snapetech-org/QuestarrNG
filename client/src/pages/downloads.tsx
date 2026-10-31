@@ -1,3 +1,5 @@
+import { getDownloadStatusSource } from "@/lib/download-status-locale";
+import { ServiceMessageText } from "@/components/ServiceMessageText";
 import {
   formatRegionalNumber,
   formatRegionalPercent,
@@ -121,25 +123,6 @@ const STATUS_COLORS: Record<DownloadStatusType, string> = {
   manual_review_required: "text-yellow-400",
   imported: "text-green-600",
 };
-
-const DOWNLOAD_STATUS_LABELS: Record<DownloadStatusType, string> = {
-  downloading: "Downloading",
-  seeding: "Seeding",
-  completed: "Completed",
-  paused: "Paused",
-  error: "Error",
-  repairing: "Repairing...",
-  unpacking: "Unpacking...",
-  completed_pending_import: "Pending Import",
-  manual_review_required: "Manual Review Required",
-  imported: "Imported",
-};
-
-function getDownloadStatusSource(status: string): string {
-  return Object.hasOwn(DOWNLOAD_STATUS_LABELS, status)
-    ? DOWNLOAD_STATUS_LABELS[status as DownloadStatusType]
-    : status;
-}
 
 function DownloadStatusText({ status }: { status: string }) {
   const source = getDownloadStatusSource(status);
@@ -1104,7 +1087,8 @@ export default function Downloads() {
                       className="text-sm text-destructive mt-2"
                       data-testid={`text-error-${download.id}`}
                     >
-                      <InterfaceText source={"Error:"} /> {download.error}
+                      <InterfaceText source={"Error:"} />{" "}
+                      <ServiceMessageText message={download.error} metadata={download.errorI18n} />
                     </div>
                   )}
                 </div>

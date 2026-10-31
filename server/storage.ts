@@ -365,7 +365,12 @@ export interface IStorage {
   getDownloadsByGameId(
     gameId: string
   ): Promise<(GameDownload & { downloaderName: string | null })[]>;
-  updateGameDownloadStatus(id: string, status: string, errorMessage?: string | null): Promise<void>;
+  updateGameDownloadStatus(
+    id: string,
+    status: string,
+    errorMessage?: string | null,
+    errorMessageI18n?: string | null
+  ): Promise<void>;
   // Resolves a temporary correlation-tag hash (from an async qBittorrent add)
   // to the real torrent hash once it becomes known. No-op if the record already
   // has a real hash or doesn't exist. If another row already tracks the same
@@ -1415,6 +1420,7 @@ export class MemStorage implements IStorage {
       gameId,
       status: "manual_review_required",
       errorMessage: null,
+      errorMessageI18n: null,
     };
     this.gameDownloads.set(id, updated);
     return updated;
@@ -1453,7 +1459,8 @@ export class MemStorage implements IStorage {
   async updateGameDownloadStatus(
     id: string,
     status: string,
-    errorMessage?: string | null
+    errorMessage?: string | null,
+    errorMessageI18n?: string | null
   ): Promise<void> {
     const gd = this.gameDownloads.get(id);
     if (gd) {
@@ -1461,7 +1468,11 @@ export class MemStorage implements IStorage {
         ...gd,
         status,
         completedAt: status === "completed" ? new Date() : null,
-        ...(errorMessage !== undefined ? { errorMessage } : {}),
+        ...(errorMessage !== undefined
+          ? { errorMessage, errorMessageI18n: errorMessageI18n ?? null }
+          : errorMessageI18n !== undefined
+            ? { errorMessageI18n }
+            : {}),
       });
     }
   }
@@ -1508,6 +1519,7 @@ export class MemStorage implements IStorage {
       status: insertGameDownload.status || "downloading",
       downloadType: insertGameDownload.downloadType || "torrent",
       errorMessage: insertGameDownload.errorMessage ?? null,
+      errorMessageI18n: insertGameDownload.errorMessageI18n ?? null,
       fileSize: insertGameDownload.fileSize ?? null,
       category: insertGameDownload.category ?? null,
       addedAt: new Date(),
@@ -1650,6 +1662,7 @@ export class MemStorage implements IStorage {
       type: insertNotification.type,
       title: insertNotification.title,
       message: insertNotification.message,
+      messageI18n: insertNotification.messageI18n ?? null,
       link: insertNotification.link ?? null,
       read: false,
       createdAt: new Date(),
@@ -3322,7 +3335,7 @@ export class DatabaseStorage implements IStorage {
     // overwriting the first pick.
     const [updated] = await db
       .update(gameDownloads)
-      .set({ gameId, status: "manual_review_required", errorMessage: null })
+      .set({ gameId, status: "manual_review_required", errorMessage: null, errorMessageI18n: null })
       .where(
         and(
           eq(gameDownloads.id, id),
@@ -3381,6 +3394,7 @@ export class DatabaseStorage implements IStorage {
         downloadTitle: gameDownloads.downloadTitle,
         status: gameDownloads.status,
         errorMessage: gameDownloads.errorMessage,
+        errorMessageI18n: gameDownloads.errorMessageI18n,
         seerrExternalRequestId: gameDownloads.seerrExternalRequestId,
         fileSize: gameDownloads.fileSize,
         category: gameDownloads.category,
@@ -3398,7 +3412,8 @@ export class DatabaseStorage implements IStorage {
   async updateGameDownloadStatus(
     id: string,
     status: string,
-    errorMessage?: string | null
+    errorMessage?: string | null,
+    errorMessageI18n?: string | null
   ): Promise<void> {
     const updates: Partial<typeof gameDownloads.$inferInsert> = {
       status: status as (typeof gameDownloads.$inferInsert)["status"],
@@ -3406,6 +3421,9 @@ export class DatabaseStorage implements IStorage {
     };
     if (errorMessage !== undefined) {
       updates.errorMessage = errorMessage;
+      updates.errorMessageI18n = errorMessageI18n ?? null;
+    } else if (errorMessageI18n !== undefined) {
+      updates.errorMessageI18n = errorMessageI18n;
     }
     await db.update(gameDownloads).set(updates).where(eq(gameDownloads.id, id));
   }

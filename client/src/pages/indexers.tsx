@@ -1,4 +1,4 @@
-import { localizeServiceResultMessage } from "@/lib/service-message-locale";
+import { ServiceMessageText } from "@/components/ServiceMessageText";
 import type { ServiceMessageResult } from "@shared/service-messages";
 import { isSameProwlarrUrl } from "@shared/prowlarr-url";
 import { useCallback, useMemo, useState, useEffect } from "react";
@@ -395,11 +395,14 @@ export default function IndexersPage() {
     },
     onSuccess: (data) => {
       if (data.success) {
-        toast({ title: "Connection successful", description: localizeServiceResultMessage(data) });
+        toast({
+          title: "Connection successful",
+          description: <ServiceMessageText message={data.message} metadata={data} />,
+        });
       } else {
         toast({
           title: "Connection failed",
-          description: localizeServiceResultMessage(data),
+          description: <ServiceMessageText message={data.message} metadata={data} />,
           variant: "destructive",
         });
       }

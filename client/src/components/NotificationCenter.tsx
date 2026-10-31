@@ -63,7 +63,8 @@ export function NotificationCenter() {
       const localizedMessage = localizeNotificationMessage(
         notification.title,
         notification.message,
-        language
+        language,
+        notification.messageI18n
       );
       toast({
         title: (

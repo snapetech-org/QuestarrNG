@@ -1,4 +1,4 @@
-import { serviceMessage } from "../../shared/service-messages.js";
+import { parseServiceMessageDescriptor, serviceMessage } from "../../shared/service-messages.js";
 import type {
   Downloader,
   DownloadStatus,
@@ -658,6 +658,10 @@ export class SynologyDownloadStationClient implements DownloaderClient {
         ? transfer.size_uploaded / transfer.size_downloaded
         : undefined;
     const trackerSwarmCounts = this.getTrackerSwarmCounts(task.additional?.tracker);
+    const error =
+      task.status === "error"
+        ? serviceMessage("service.client_reported_error", { client: "Synology Download Station" })
+        : undefined;
 
     return {
       id: task.id,
@@ -675,7 +679,7 @@ export class SynologyDownloadStationClient implements DownloaderClient {
       seeders: trackerSwarmCounts.seeders,
       leechers: trackerSwarmCounts.leechers,
       ratio,
-      error: task.status === "error" ? "Synology Download Station reported an error" : undefined,
+      ...(error ? { error: error.message, errorI18n: parseServiceMessageDescriptor(error) } : {}),
     };
   }
 

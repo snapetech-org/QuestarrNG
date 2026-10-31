@@ -9,6 +9,7 @@ import { INTERFACE_LANGUAGE_OPTIONS } from "@/lib/interface-locale";
 import { localizeServiceResultMessage } from "@/lib/service-message-locale";
 
 const values = {
+  game: 'A Game ": Provider',
   client: "qBittorrent",
   version: "4.6.5-beta",
   name: "My Indexer العربية",

@@ -1,3 +1,9 @@
+import {
+  matchingServiceMessageDescriptor,
+  parseServiceMessageDescriptor,
+  serializeServiceMessageDescriptor,
+  serviceMessage,
+} from "../shared/service-messages.js";
 import { storage } from "./storage.js";
 import { normalizeDownloadHash } from "./download-hash.js";
 import { igdbClient, IGDB_EARLY_ACCESS_STATUS } from "./igdb.js";
@@ -1250,11 +1256,18 @@ async function runDownloadStatusCheck() {
               "downloading";
             let newGameStatus: "wanted" | "downloading" | "owned" = "downloading";
             let newErrorMessage: string | null = null;
+            let newErrorMessageI18n: string | null = null;
             let isDefinitiveError = false;
 
             if (remoteDownload.status === "error") {
-              const remoteError =
-                remoteDownload.error?.trim() || "Aborted by downloader (no details provided)";
+              const fallback = serviceMessage("service.download_aborted_without_details", {});
+              const remoteError = remoteDownload.error?.trim() || fallback.message;
+              newErrorMessageI18n = serializeServiceMessageDescriptor(
+                matchingServiceMessageDescriptor(
+                  remoteError,
+                  remoteDownload.error?.trim() ? remoteDownload.errorI18n : fallback
+                )
+              );
               const now = Date.now();
               const errorSince = downloadErrorSince.get(download.id) ?? now;
               downloadErrorSince.set(download.id, errorSince);
@@ -1294,7 +1307,9 @@ async function runDownloadStatusCheck() {
 
             const previousErrorMessage = download.errorMessage ?? null;
             const shouldUpdateStatus = download.status !== newDownloadStatus;
-            const shouldUpdateErrorMessage = previousErrorMessage !== newErrorMessage;
+            const shouldUpdateErrorMessage =
+              previousErrorMessage !== newErrorMessage ||
+              (download.errorMessageI18n ?? null) !== newErrorMessageI18n;
             const shouldPersistDownloadUpdate = shouldUpdateStatus || shouldUpdateErrorMessage;
 
             // Only update if tracked status or error details changed.
@@ -1302,7 +1317,8 @@ async function runDownloadStatusCheck() {
               await storage.updateGameDownloadStatus(
                 download.id,
                 newDownloadStatus,
-                newErrorMessage
+                newErrorMessage,
+                newErrorMessageI18n
               );
               igdbLogger.debug(
                 {
@@ -1324,13 +1340,21 @@ async function runDownloadStatusCheck() {
               const gameTitle = game?.title ?? download.downloadTitle;
               const settings = await storage.getUserSettings(game?.userId ?? "");
               const prefs = resolvePrefs(settings);
-              const message = `Download aborted for "${gameTitle}": ${newErrorMessage}`;
+              const errorDescriptor = parseServiceMessageDescriptor(newErrorMessageI18n);
+              const messageFragment = serviceMessage("service.notification_download_aborted", {
+                game: gameTitle,
+                error: errorDescriptor
+                  ? { message: newErrorMessage ?? "", ...errorDescriptor }
+                  : (newErrorMessage ?? ""),
+              });
+              const message = messageFragment.message;
 
               if (prefs.downloadFailed.inApp) {
                 const notification = await storage.addNotification({
                   type: "error",
                   title: "Download Aborted",
                   message,
+                  messageI18n: serializeServiceMessageDescriptor(messageFragment),
                   link: `modal:game:${download.gameId}`,
                   userId: game?.userId ?? undefined,
                 });

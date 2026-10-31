@@ -1,3 +1,4 @@
+import { localizeServiceMessage } from "./service-messages.js";
 import { getNotificationCatalogIndex, getNotificationTitle } from "./notification-locale.js";
 import { normalizeNotificationLanguage } from "./notification-language.js";
 
@@ -561,10 +562,16 @@ export function matchNotification(
 export function localizeOutboundNotification(
   title: string,
   message: string,
-  locale: unknown
+  locale: unknown,
+  metadata?: unknown
 ): { title: string; message: string } {
   const language = normalizeNotificationLanguage(locale);
   if (language === "en") return { title, message };
+  if (metadata !== null && metadata !== undefined)
+    return {
+      title: getNotificationTitle(title, language),
+      message: localizeServiceMessage(message, metadata, language),
+    };
   const match = matchNotification(title, message);
   const template = match ? MESSAGES[match.key][getNotificationCatalogIndex(language)] : undefined;
   const translatedMessage =

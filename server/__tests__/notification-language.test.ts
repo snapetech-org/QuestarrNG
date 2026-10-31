@@ -1,3 +1,4 @@
+import { serviceMessage } from "../../shared/service-messages.js";
 import { describe, expect, it, vi } from "vitest";
 import {
   NOTIFICATION_LANGUAGES,
@@ -53,6 +54,17 @@ describe("notification language preference", () => {
 });
 
 describe("outbound notification rendering", () => {
+  it("does not fall through to legacy matching or expose an unrelated translated source", () => {
+    for (const metadata of [
+      "bad JSON",
+      serviceMessage("service.connected_named", { name: "UNRELATED PROVIDER" }),
+    ]) {
+      const result = localizeOutboundNotification(title, message, "de", metadata);
+      expect(result.message).toBe(message);
+      expect(result.message).not.toContain("UNRELATED PROVIDER");
+    }
+  });
+
   it.each(NOTIFICATION_LANGUAGES.filter((locale) => locale !== "en"))(
     "renders source-bound titles and bodies in %s",
     (locale) => {

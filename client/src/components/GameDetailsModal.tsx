@@ -1,3 +1,4 @@
+import { getDownloadStatusSource } from "@/lib/download-status-locale";
 import {
   formatRegionalNumber,
   getRegionalLocale,
@@ -342,18 +343,9 @@ function DownloadStatusIcon({ status }: { status: string }) {
   }
 }
 
-const TRACKED_DOWNLOAD_STATUS_LABELS: Record<string, string> = {
-  completed: "Completed",
-  downloading: "Downloading",
-  failed: "Aborted",
-  paused: "Paused",
-};
-
 function TrackedDownloadStatus({ status }: { status: string }) {
-  const source = Object.hasOwn(TRACKED_DOWNLOAD_STATUS_LABELS, status)
-    ? TRACKED_DOWNLOAD_STATUS_LABELS[status]
-    : undefined;
-  return source ? (
+  const source = getDownloadStatusSource(status);
+  return source !== status ? (
     <InterfaceText source={source} />
   ) : (
     <span lang="und" dir="auto">
@@ -1726,7 +1718,11 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                               </span>
                               {dl.errorMessage && (
                                 <span className="text-xs text-red-400 break-words max-w-full">
-                                  <ApiErrorDetailText source={dl.errorMessage} />
+                                  <ApiErrorDetailText
+                                    source={dl.errorMessage}
+                                    metadata={dl.errorMessageI18n}
+                                    legacyApiFallback={false}
+                                  />
                                 </span>
                               )}
                             </div>

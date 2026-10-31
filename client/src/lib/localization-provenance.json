@@ -24976,6 +24976,282 @@
         "es-419": "es",
         "fr-CA": "fr"
       }
+    },
+    "service.realdebrid_magnet_unreadable": {
+      "sourceChecksum": "fnv1a32:85ddf89e",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.realdebrid_torrent_incomplete": {
+      "sourceChecksum": "fnv1a32:ca8ebde5",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.realdebrid_torrent_unsafe": {
+      "sourceChecksum": "fnv1a32:64400c88",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.realdebrid_torrent_unavailable": {
+      "sourceChecksum": "fnv1a32:b4a8ce98",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.realdebrid_files_copy_failed": {
+      "sourceChecksum": "fnv1a32:9e208ca3",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.realdebrid_staging_failed": {
+      "sourceChecksum": "fnv1a32:0b954386",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.client_reported_error": {
+      "sourceChecksum": "fnv1a32:2f16f354",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.download_aborted_without_details": {
+      "sourceChecksum": "fnv1a32:ef138c17",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.notification_download_aborted": {
+      "sourceChecksum": "fnv1a32:30a17fed",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "downloads.status.manual_review_required": {
+      "sourceChecksum": "fnv1a32:dd69fdca",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "downloads.status.pending_import": {
+      "sourceChecksum": "fnv1a32:2c7812d9",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "downloads.status.game_link_required": {
+      "sourceChecksum": "fnv1a32:0fd1db76",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
     }
   }
 }

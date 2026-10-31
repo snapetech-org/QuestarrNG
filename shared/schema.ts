@@ -1,3 +1,4 @@
+import type { ServiceMessageDescriptor } from "./service-messages.js";
 import type { NotificationLanguage } from "./notification-language.js";
 import { sql } from "drizzle-orm";
 import { sqliteTable, text, integer, real, uniqueIndex, index } from "drizzle-orm/sqlite-core";
@@ -384,6 +385,7 @@ export const gameDownloads = sqliteTable(
     downloadTitle: text("download_title").notNull(),
     status: text("status").notNull().default("downloading"),
     errorMessage: text("error_message"),
+    errorMessageI18n: text("error_message_i18n"),
     // Correlates only downloads created while a SeerrNG request owns the game.
     // Cancellation must never infer request ownership from gameId alone.
     seerrExternalRequestId: text("seerr_external_request_id"),
@@ -561,6 +563,7 @@ export const notifications = sqliteTable("notifications", {
   type: text("type").notNull(),
   title: text("title").notNull(),
   message: text("message").notNull(),
+  messageI18n: text("message_i18n"),
   link: text("link"),
   read: integer("read", { mode: "boolean" }).notNull().default(false),
   createdAt: integer("created_at", { mode: "timestamp_ms" }).default(
@@ -1183,6 +1186,7 @@ export interface DownloadStatus {
   age?: number | undefined; // Age in days
   // Common fields
   error?: string | undefined;
+  errorI18n?: ServiceMessageDescriptor | undefined;
   category?: string | undefined;
   // Questarr tracking fields
   trackedByQuestarr?: boolean; // True if the download was initiated through Questarr

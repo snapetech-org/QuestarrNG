@@ -1,4 +1,10 @@
-import { serviceMessage } from "../../shared/service-messages.js";
+import {
+  parseServiceMessageDescriptor,
+  serviceErrorValue,
+  type ServiceMessageDescriptor,
+  type ServiceMessageFragment,
+  serviceMessage,
+} from "../../shared/service-messages.js";
 import { constants as fsConstants } from "node:fs";
 import * as fs from "node:fs/promises";
 import { createWriteStream } from "node:fs";
@@ -80,6 +86,7 @@ interface StagingTask {
   lastSampleAt: number;
   lastSampleBytes: number;
   error?: string;
+  errorI18n?: ServiceMessageDescriptor | undefined;
   controller: AbortController;
 }
 
@@ -90,11 +97,11 @@ const recentTorrentCache = new Map<
 >();
 const TORRENT_STATUS_CACHE_MS = 90 * 1000;
 const MAX_STAGING_FILES = 100;
-const TERMINAL_ERRORS = new Map<string, string>([
-  ["magnet_error", "Real-Debrid could not read this magnet link."],
-  ["error", "Real-Debrid could not complete this torrent."],
-  ["virus", "Real-Debrid blocked this torrent as unsafe."],
-  ["dead", "Real-Debrid marked this torrent as unavailable."],
+const TERMINAL_ERRORS = new Map<string, ServiceMessageFragment>([
+  ["magnet_error", serviceMessage("service.realdebrid_magnet_unreadable", {})],
+  ["error", serviceMessage("service.realdebrid_torrent_incomplete", {})],
+  ["virus", serviceMessage("service.realdebrid_torrent_unsafe", {})],
+  ["dead", serviceMessage("service.realdebrid_torrent_unavailable", {})],
 ]);
 
 const taskKey = (downloaderId: string, torrentId: string) => `${downloaderId}:${torrentId}`;
@@ -336,13 +343,15 @@ export class RealDebridClient implements DownloaderClient {
       };
     }
     if (task?.state === "failed") {
+      const fallback = serviceMessage("service.realdebrid_files_copy_failed", {});
       return {
         id: torrent.id,
         name: torrent.original_filename || torrent.filename || "Real-Debrid download",
         downloadType: "torrent",
         status: "error",
         progress: Number(torrent.progress) || 0,
-        error: task.error || "Real-Debrid files could not be copied to QuestarrNG.",
+        error: task.error || fallback.message,
+        errorI18n: task.error ? task.errorI18n : parseServiceMessageDescriptor(fallback),
         category: this.downloader.category ?? undefined,
         trackedByQuestarr: true,
       };
@@ -362,6 +371,7 @@ export class RealDebridClient implements DownloaderClient {
         trackedByQuestarr: true,
       };
     }
+    const terminalError = TERMINAL_ERRORS.get(torrent.status);
     return {
       id: torrent.id,
       name: torrent.original_filename || torrent.filename || `Real-Debrid torrent ${torrent.id}`,
@@ -376,7 +386,8 @@ export class RealDebridClient implements DownloaderClient {
       downloadSpeed: Number(torrent.speed) || 0,
       size: Number(torrent.bytes) || undefined,
       seeders: Number(torrent.seeders) || undefined,
-      error: TERMINAL_ERRORS.get(torrent.status),
+      error: terminalError?.message,
+      errorI18n: parseServiceMessageDescriptor(terminalError),
       category: this.downloader.category ?? undefined,
     };
   }
@@ -595,7 +606,12 @@ export class RealDebridClient implements DownloaderClient {
     void this.stageTorrent(torrent, task).catch((error: unknown) => {
       if (task.controller.signal.aborted) return;
       task.state = "failed";
-      task.error = error instanceof Error ? error.message : "Real-Debrid staging failed.";
+      const value =
+        error instanceof Error
+          ? serviceErrorValue(error)
+          : serviceMessage("service.realdebrid_staging_failed", {});
+      task.error = typeof value === "string" ? value : value.message;
+      task.errorI18n = typeof value === "string" ? undefined : parseServiceMessageDescriptor(value);
       downloadersLogger.error(
         { downloaderId: this.downloader.id, torrentId: torrent.id, error },
         "Could not copy Real-Debrid torrent into the local import staging area"

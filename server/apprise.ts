@@ -360,7 +360,8 @@ class AppriseClient {
   private async localize(
     title: string,
     message: string,
-    userId?: string | null
+    userId?: string | null,
+    metadata?: unknown
   ): Promise<{ title: string; message: string }> {
     if (!userId) return { title, message };
     try {
@@ -370,7 +371,8 @@ class AppriseClient {
       return localizeOutboundNotification(
         title,
         message,
-        readNotificationLanguage(settings?.notificationPreferences)
+        readNotificationLanguage(settings?.notificationPreferences),
+        metadata
       );
     } catch (error) {
       appriseLogger.warn({ error }, "Could not load notification language, using English");
@@ -383,7 +385,12 @@ class AppriseClient {
 
     const translated = {
       ...notification,
-      ...(await this.localize(notification.title, notification.message, notification.userId)),
+      ...(await this.localize(
+        notification.title,
+        notification.message,
+        notification.userId,
+        notification.messageI18n
+      )),
     };
     if (this.settings.mode === "cli") {
       await this.sendViaCli(translated);

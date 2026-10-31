@@ -1,3 +1,4 @@
+import { localizeServiceMessage, matchingServiceMessageDescriptor } from "@shared/service-messages";
 import type { ReactNode } from "react";
 import type { InterfaceLanguage } from "@/lib/interface-locale";
 import {
@@ -34,8 +35,19 @@ function formatTemplate(
 export function localizeNotificationMessage(
   title: string,
   message: string,
-  language: InterfaceLanguage
+  language: InterfaceLanguage,
+  metadata?: unknown
 ): LocalizedNotificationMessage {
+  if (metadata !== null && metadata !== undefined) {
+    const descriptor = matchingServiceMessageDescriptor(message, metadata);
+    const text = localizeServiceMessage(message, descriptor, language);
+    const translated = descriptor && language !== "en" && text !== message;
+    return {
+      content: text,
+      language: translated ? language : "en",
+      direction: translated ? getNotificationTextDirection(language) : "auto",
+    };
+  }
   if (language !== "en") {
     const match = matchNotification(title, message);
     if (match) {

@@ -1,3 +1,4 @@
+import { localizeServiceMessage } from "../../shared/service-messages.js";
 import { describe, expect, it, vi } from "vitest";
 import type { Downloader } from "../../shared/schema.js";
 import { RealDebridClient } from "../downloaders/realdebrid.js";
@@ -20,6 +21,19 @@ function client() {
   return { instance, request };
 }
 describe("Real-Debrid connection message metadata", () => {
+  it.each(["magnet_error", "error", "virus", "dead"])(
+    "tags the fixed %s status without changing the game name",
+    (status) => {
+      const { instance } = client();
+      const source = (
+        instance as unknown as {
+          asStatus: (value: unknown) => { name: string; error: string; errorI18n: unknown };
+        }
+      ).asStatus({ id: "torrent", filename: 'Game ": Provider', status, progress: 0 });
+      expect(source.name).toBe('Game ": Provider');
+      expect(localizeServiceMessage(source.error, source.errorI18n, "de")).not.toBe(source.error);
+    }
+  );
   it.each(["My User العربية", undefined])(
     "preserves account/path values when the account is %s",
     async (username) => {

@@ -25,7 +25,8 @@ export function NotificationItem({ notification, onRead, onClick }: Notification
   const localizedMessage = localizeNotificationMessage(
     notification.title,
     notification.message,
-    language
+    language,
+    notification.messageI18n
   );
   const getIcon = () => {
     switch (notification.type) {

@@ -106,6 +106,13 @@
       "when": 1791890613969,
       "tag": "0015_integration_request_selection",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1793474782091,
+      "tag": "0016_localized_error_metadata",
+      "breakpoints": true
     }
   ]
 }

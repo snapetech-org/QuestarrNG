@@ -1,9 +1,23 @@
+import { serviceMessage } from "@shared/service-messages";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { localizeNotificationMessage } from "@/lib/notification-messages";
 import { NOTIFICATION_LOCALES, getNotificationTitle } from "@/lib/notification-locale";
 
 describe("localizeNotificationMessage", () => {
+  it("does not fall through to legacy matching or an unrelated key when metadata mismatches", () => {
+    const message = "Download finished for A Game";
+    for (const metadata of [
+      "bad JSON",
+      serviceMessage("service.connected_named", { name: "UNRELATED PROVIDER" }),
+    ]) {
+      const result = localizeNotificationMessage("Download Completed", message, "de", metadata);
+      expect(result.content).toBe(message);
+      expect(result.language).toBe("en");
+      expect(String(result.content)).not.toContain("UNRELATED PROVIDER");
+    }
+  });
+
   it("localizes the fixed unknown-error fallback but preserves arbitrary backend details", () => {
     const fallback = localizeNotificationMessage(
       "Auto-delete failed",

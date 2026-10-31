@@ -1,3 +1,7 @@
+import {
+  serviceMessage,
+  serializeServiceMessageDescriptor,
+} from "../../shared/service-messages.js";
 import { beforeAll, afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { execFile } from "child_process";
 import fs from "fs";
@@ -81,6 +85,34 @@ describe("Apprise client", () => {
     expect(payload.body).not.toBe(saved.message);
     expect(saved.message).toBe("Download finished for A Game");
     expect(storage.getUserSettings).toHaveBeenCalledWith("user-1");
+  });
+
+  it("localizes stored nested app errors before mocked delivery while preserving user values", async () => {
+    vi.mocked(storage.getUserSettings).mockResolvedValue({
+      notificationPreferences: '{"language":"es"}',
+    } as never);
+    vi.mocked(safeFetch).mockResolvedValue({ ok: true } as never);
+    appriseClient.configure({ mode: "api", apiUrl: "http://apprise:8000", key: "key" });
+    const game = 'Game ": provider /a/path العربية';
+    const fragment = serviceMessage("service.notification_download_aborted", {
+      game,
+      error: serviceMessage("service.client_reported_error", {
+        client: "Synology Download Station",
+      }),
+    });
+    const saved = {
+      ...notification,
+      userId: "user-1",
+      title: "Download Aborted",
+      message: fragment.message,
+      messageI18n: serializeServiceMessageDescriptor(fragment),
+    };
+    await appriseClient.send(saved);
+    const body = JSON.parse(String(vi.mocked(safeFetch).mock.calls[0]?.[1]?.body)).body;
+    expect(body).toContain(game);
+    expect(body).toContain("informó");
+    expect(body).not.toContain("reported an error");
+    expect(saved.message).toBe(fragment.message);
   });
 
   it("falls back to English when preference lookup fails", async () => {

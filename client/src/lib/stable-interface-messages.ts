@@ -2665,6 +2665,18 @@ export const STABLE_INTERFACE_MESSAGES = {
     "Connected to Real-Debrid. Downloads will be copied into QuestarrNG at {path}.",
   "service.realdebrid_connected_user":
     "Connected to Real-Debrid as {username}. Downloads will be copied into QuestarrNG at {path}.",
+  "service.realdebrid_magnet_unreadable": "Real-Debrid could not read this magnet link.",
+  "service.realdebrid_torrent_incomplete": "Real-Debrid could not complete this torrent.",
+  "service.realdebrid_torrent_unsafe": "Real-Debrid blocked this torrent as unsafe.",
+  "service.realdebrid_torrent_unavailable": "Real-Debrid marked this torrent as unavailable.",
+  "service.realdebrid_files_copy_failed": "Real-Debrid files could not be copied to QuestarrNG.",
+  "service.realdebrid_staging_failed": "Real-Debrid staging failed.",
+  "service.client_reported_error": "{client} reported an error",
+  "service.download_aborted_without_details": "Aborted by downloader (no details provided)",
+  "service.notification_download_aborted": 'Download aborted for "{game}": {error}',
+  "downloads.status.manual_review_required": "Manual Review Required",
+  "downloads.status.pending_import": "Pending Import",
+  "downloads.status.game_link_required": "Game Link Required",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

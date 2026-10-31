@@ -1,0 +1,21 @@
+[
+  "service.connected_successfully",
+  "service.connected_successfully_version",
+  "service.connected_version",
+  "service.connected_named",
+  "service.connection_failed",
+  "service.connection_failed_at",
+  "service.json_catalog_valid",
+  "service.realdebrid_connected",
+  "service.realdebrid_connected_user",
+  "interface.unknown_error_ce512b43",
+  "service.realdebrid_magnet_unreadable",
+  "service.realdebrid_torrent_incomplete",
+  "service.realdebrid_torrent_unsafe",
+  "service.realdebrid_torrent_unavailable",
+  "service.realdebrid_files_copy_failed",
+  "service.realdebrid_staging_failed",
+  "service.client_reported_error",
+  "service.download_aborted_without_details",
+  "service.notification_download_aborted"
+]
