@@ -166,7 +166,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Provide a config key or notification URLs": "設定キーまたは通知URLを指定してください",
   "Notification URLs are required in CLI mode": "CLIモードでは通知URLが必要です",
   "API URL must use http:// or https://": "API URLにはhttp://またはhttps://を使用してください",
-  "API URL is not a valid URL": "API URLが正しくありません",
+  "API URL is not a valid URL": "API URLが有効なURLではありません",
   "Failed to update Apprise settings": "Apprise設定を更新できませんでした",
   "Apprise test failed": "Appriseのテストに失敗しました",
   "Failed to fetch security scan settings": "セキュリティスキャン設定を取得できませんでした",

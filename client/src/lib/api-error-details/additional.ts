@@ -608,7 +608,7 @@ const ADDITIONAL_API_ERROR_DETAIL_LABELS: Record<
     "압축 파일에 추출되지 않는 심볼릭 링크 또는 하드 링크가 있습니다.",
     "封存檔包含符號連結或硬連結，因此不會解壓縮。",
     "Kho lưu trữ chứa liên kết tượng trưng hoặc liên kết cứng nên sẽ không được giải nén.",
-    "Arsip berisi tautan simbolis atau keras yang tidak akan diekstrak.",
+    "Arsip berisi tautan simbolis atau tautan keras yang tidak akan diekstrak.",
   ],
   "Archive contains a file path outside the extraction directory.": [
     "El archivo comprimido contiene una ruta fuera de la carpeta de extracción.",
