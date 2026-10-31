@@ -1,3 +1,4 @@
+import { serviceMessage } from "../../shared/service-messages.js";
 import type { Downloader, DownloadStatus, DownloadDetails } from "../../shared/schema.js";
 import { resolveArchivePassword } from "../../shared/archive-password.js";
 import { downloadersLogger } from "../logger.js";
@@ -287,14 +288,24 @@ export class NZBGetClient implements DownloaderClient {
   async testConnection(): Promise<{ success: boolean; message: string }> {
     try {
       const version = await this.makeXMLRPCRequest("version");
-      return { success: true, message: `Connected to NZBGet v${version}` };
+      return {
+        success: true,
+        ...serviceMessage("service.connected_version", {
+          client: "NZBGet",
+          version: String(version),
+        }),
+      };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
       const baseUrl = this.getBaseUrl();
       downloadersLogger.error({ error, url: baseUrl }, "NZBGet connection test failed");
       return {
         success: false,
-        message: `Failed to connect to NZBGet at ${baseUrl}: ${errorMessage}`,
+        ...serviceMessage("service.connection_failed_at", {
+          client: "NZBGet",
+          url: baseUrl,
+          error: errorMessage,
+        }),
       };
     }
   }

@@ -1,3 +1,4 @@
+import { serviceMessage } from "../../shared/service-messages.js";
 import type {
   Downloader,
   DownloadStatus,
@@ -925,12 +926,20 @@ export class SynologyDownloadStationClient implements DownloaderClient {
     try {
       await this.authenticate();
       await this.logout();
-      return { success: true, message: "Connected successfully to Synology Download Station" };
+      return {
+        success: true,
+        ...serviceMessage("service.connected_successfully", {
+          client: "Synology Download Station",
+        }),
+      };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
       return {
         success: false,
-        message: `Failed to connect to Synology Download Station: ${errorMessage}`,
+        ...serviceMessage("service.connection_failed", {
+          client: "Synology Download Station",
+          error: errorMessage,
+        }),
       };
     }
   }

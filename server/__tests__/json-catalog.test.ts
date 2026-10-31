@@ -58,7 +58,11 @@ describe("JSON download catalogs", () => {
     });
     expect(safeFetch).toHaveBeenCalledTimes(1);
     safeFetch.mockResolvedValueOnce(catalog([]));
-    expect(await jsonCatalogClient.testConnection(indexer)).toMatchObject({ success: true });
+    expect(await jsonCatalogClient.testConnection(indexer)).toMatchObject({
+      success: true,
+      messageKey: "service.json_catalog_valid",
+      messageValues: { count: 0 },
+    });
     expect(await jsonCatalogClient.search(indexer, { query: "Example" })).toMatchObject({
       total: 0,
     });

@@ -2654,6 +2654,17 @@ export const STABLE_INTERFACE_MESSAGES = {
     "Choose the language for external notifications. This preference is separate from this browser's interface language.",
   "notifications.apprise_delivery_help":
     "Forward notifications through a self-hosted Apprise API server or the local Apprise CLI.",
+  "service.connected_successfully": "Connected successfully to {client}",
+  "service.connected_successfully_version": "Connected successfully to {client} {version}",
+  "service.connected_version": "Connected to {client} v{version}",
+  "service.connected_named": "Successfully connected to {name}",
+  "service.connection_failed": "Failed to connect to {client}: {error}",
+  "service.connection_failed_at": "Failed to connect to {client} at {url}: {error}",
+  "service.json_catalog_valid": "Valid JSON catalog with {count} releases",
+  "service.realdebrid_connected":
+    "Connected to Real-Debrid. Downloads will be copied into QuestarrNG at {path}.",
+  "service.realdebrid_connected_user":
+    "Connected to Real-Debrid as {username}. Downloads will be copied into QuestarrNG at {path}.",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

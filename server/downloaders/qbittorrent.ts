@@ -1,3 +1,4 @@
+import { serviceMessage } from "../../shared/service-messages.js";
 import type {
   Downloader,
   DownloadStatus,
@@ -93,10 +94,22 @@ export class QBittorrentClient implements DownloaderClient {
     try {
       await this.authenticate();
       const version = await this.getAppVersion();
-      return { success: true, message: `Connected successfully to qBittorrent ${version}` };
+      return {
+        success: true,
+        ...serviceMessage("service.connected_successfully_version", {
+          client: "qBittorrent",
+          version: String(version),
+        }),
+      };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to connect to qBittorrent: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.connection_failed", {
+          client: "qBittorrent",
+          error: errorMessage,
+        }),
+      };
     }
   }
 

@@ -42577,6 +42577,177 @@
         "es-419": "Reenvía las notificaciones mediante un servidor Apprise API autoalojado o la CLI local de Apprise.",
         "fr-CA": "Transférez les notifications via un serveur Apprise API auto-hébergé ou l’interface en ligne de commande Apprise locale."
       }
+    },
+    "service.connected_successfully": {
+      "source": "Connected successfully to {client}",
+      "translations": {
+        "es": "Conexión correcta con {client}",
+        "zh-Hans": "已成功连接到 {client}",
+        "hi": "{client} से कनेक्शन सफल हुआ",
+        "de": "Verbindung zu {client} erfolgreich hergestellt",
+        "ja": "{client} に接続しました",
+        "fr": "Connexion à {client} réussie",
+        "pt-BR": "Conexão com {client} estabelecida",
+        "ar": "تم الاتصال بـ {client} بنجاح",
+        "ko": "{client}에 연결했습니다",
+        "zh-Hant": "已成功連線至 {client}",
+        "vi": "Đã kết nối thành công với {client}",
+        "id": "Berhasil terhubung ke {client}",
+        "es-419": "Conexión correcta con {client}",
+        "fr-CA": "Connexion à {client} réussie"
+      }
+    },
+    "service.connected_successfully_version": {
+      "source": "Connected successfully to {client} {version}",
+      "translations": {
+        "es": "Conexión correcta con {client} {version}",
+        "zh-Hans": "已成功连接到 {client} {version}",
+        "hi": "{client} {version} से कनेक्शन सफल हुआ",
+        "de": "Verbindung zu {client} {version} erfolgreich hergestellt",
+        "ja": "{client} {version} に接続しました",
+        "fr": "Connexion à {client} {version} réussie",
+        "pt-BR": "Conexão com {client} {version} estabelecida",
+        "ar": "تم الاتصال بـ {client} {version} بنجاح",
+        "ko": "{client} {version}에 연결했습니다",
+        "zh-Hant": "已成功連線至 {client} {version}",
+        "vi": "Đã kết nối thành công với {client} {version}",
+        "id": "Berhasil terhubung ke {client} {version}",
+        "es-419": "Conexión correcta con {client} {version}",
+        "fr-CA": "Connexion à {client} {version} réussie"
+      }
+    },
+    "service.connected_version": {
+      "source": "Connected to {client} v{version}",
+      "translations": {
+        "es": "Conectado a {client} v{version}",
+        "zh-Hans": "已连接到 {client} v{version}",
+        "hi": "{client} v{version} से कनेक्ट है",
+        "de": "Mit {client} v{version} verbunden",
+        "ja": "{client} v{version} に接続しました",
+        "fr": "Connecté à {client} v{version}",
+        "pt-BR": "Conectado ao {client} v{version}",
+        "ar": "متصل بـ {client} v{version}",
+        "ko": "{client} v{version}에 연결했습니다",
+        "zh-Hant": "已連線至 {client} v{version}",
+        "vi": "Đã kết nối với {client} v{version}",
+        "id": "Terhubung ke {client} v{version}",
+        "es-419": "Conectado a {client} v{version}",
+        "fr-CA": "Connecté à {client} v{version}"
+      }
+    },
+    "service.connected_named": {
+      "source": "Successfully connected to {name}",
+      "translations": {
+        "es": "Conexión correcta con {name}",
+        "zh-Hans": "已成功连接到 {name}",
+        "hi": "{name} से कनेक्शन सफल हुआ",
+        "de": "Verbindung zu {name} erfolgreich hergestellt",
+        "ja": "{name} に接続しました",
+        "fr": "Connexion à {name} réussie",
+        "pt-BR": "Conexão com {name} estabelecida",
+        "ar": "تم الاتصال بـ {name} بنجاح",
+        "ko": "{name}에 연결했습니다",
+        "zh-Hant": "已成功連線至 {name}",
+        "vi": "Đã kết nối thành công với {name}",
+        "id": "Berhasil terhubung ke {name}",
+        "es-419": "Conexión correcta con {name}",
+        "fr-CA": "Connexion à {name} réussie"
+      }
+    },
+    "service.connection_failed": {
+      "source": "Failed to connect to {client}: {error}",
+      "translations": {
+        "es": "No se pudo conectar con {client}: {error}",
+        "zh-Hans": "无法连接到 {client}：{error}",
+        "hi": "{client} से कनेक्ट नहीं हो सका: {error}",
+        "de": "Verbindung zu {client} fehlgeschlagen: {error}",
+        "ja": "{client} に接続できませんでした: {error}",
+        "fr": "Échec de la connexion à {client} : {error}",
+        "pt-BR": "Falha ao conectar ao {client}: {error}",
+        "ar": "تعذر الاتصال بـ {client}: {error}",
+        "ko": "{client} 연결 실패: {error}",
+        "zh-Hant": "無法連線至 {client}：{error}",
+        "vi": "Không thể kết nối với {client}: {error}",
+        "id": "Gagal terhubung ke {client}: {error}",
+        "es-419": "No se pudo conectar con {client}: {error}",
+        "fr-CA": "Échec de la connexion à {client} : {error}"
+      }
+    },
+    "service.connection_failed_at": {
+      "source": "Failed to connect to {client} at {url}: {error}",
+      "translations": {
+        "es": "No se pudo conectar con {client} en {url}: {error}",
+        "zh-Hans": "无法通过 {url} 连接到 {client}：{error}",
+        "hi": "{url} पर {client} से कनेक्ट नहीं हो सका: {error}",
+        "de": "Verbindung zu {client} unter {url} fehlgeschlagen: {error}",
+        "ja": "{url} の {client} に接続できませんでした: {error}",
+        "fr": "Échec de la connexion à {client} à l’adresse {url} : {error}",
+        "pt-BR": "Falha ao conectar ao {client} em {url}: {error}",
+        "ar": "تعذر الاتصال بـ {client} على {url}: {error}",
+        "ko": "{url}의 {client} 연결 실패: {error}",
+        "zh-Hant": "無法透過 {url} 連線至 {client}：{error}",
+        "vi": "Không thể kết nối với {client} tại {url}: {error}",
+        "id": "Gagal terhubung ke {client} di {url}: {error}",
+        "es-419": "No se pudo conectar con {client} en {url}: {error}",
+        "fr-CA": "Échec de la connexion à {client} à l’adresse {url} : {error}"
+      }
+    },
+    "service.json_catalog_valid": {
+      "source": "Valid JSON catalog with {count} releases",
+      "translations": {
+        "es": "Catálogo JSON válido; lanzamientos: {count}",
+        "zh-Hans": "JSON 目录有效，包含 {count} 个发布资源",
+        "hi": "मान्य JSON कैटलॉग; रिलीज़ की संख्या: {count}",
+        "de": "Gültiger JSON-Katalog. Anzahl der Releases: {count}",
+        "ja": "有効な JSON カタログです。{count} 件のリリースがあります",
+        "fr": "Catalogue JSON valide ; nombre de publications : {count}",
+        "pt-BR": "Catálogo JSON válido; total de lançamentos: {count}",
+        "ar": "كتالوج JSON صالح؛ عدد الإصدارات: {count}",
+        "ko": "릴리스 {count}개가 포함된 유효한 JSON 카탈로그",
+        "zh-Hant": "JSON 目錄有效，包含 {count} 個發佈資源",
+        "vi": "Danh mục JSON hợp lệ với {count} bản phát hành",
+        "id": "Katalog JSON valid dengan {count} rilis",
+        "es-419": "Catálogo JSON válido; lanzamientos: {count}",
+        "fr-CA": "Catalogue JSON valide ; nombre de publications : {count}"
+      }
+    },
+    "service.realdebrid_connected": {
+      "source": "Connected to Real-Debrid. Downloads will be copied into QuestarrNG at {path}.",
+      "translations": {
+        "es": "Conectado a Real-Debrid. Las descargas se copiarán a QuestarrNG en {path}.",
+        "zh-Hans": "已连接到 Real-Debrid。下载内容将复制到 QuestarrNG 的 {path}。",
+        "hi": "Real-Debrid से कनेक्ट है। डाउनलोड QuestarrNG में {path} पर कॉपी किए जाएँगे।",
+        "de": "Mit Real-Debrid verbunden. Downloads werden nach QuestarrNG unter {path} kopiert.",
+        "ja": "Real-Debrid に接続しました。ダウンロードは QuestarrNG の {path} にコピーされます。",
+        "fr": "Connecté à Real-Debrid. Les téléchargements seront copiés dans QuestarrNG à l’emplacement {path}.",
+        "pt-BR": "Conectado ao Real-Debrid. Os downloads serão copiados para o QuestarrNG em {path}.",
+        "ar": "تم الاتصال بـ Real-Debrid. ستُنسخ التنزيلات إلى QuestarrNG في {path}.",
+        "ko": "Real-Debrid에 연결했습니다. 다운로드가 QuestarrNG의 {path}에 복사됩니다.",
+        "zh-Hant": "已連線至 Real-Debrid。下載內容將複製到 QuestarrNG 的 {path}。",
+        "vi": "Đã kết nối với Real-Debrid. Nội dung tải xuống sẽ được sao chép vào QuestarrNG tại {path}.",
+        "id": "Terhubung ke Real-Debrid. Unduhan akan disalin ke QuestarrNG di {path}.",
+        "es-419": "Conectado a Real-Debrid. Las descargas se copiarán a QuestarrNG en {path}.",
+        "fr-CA": "Connecté à Real-Debrid. Les téléchargements seront copiés dans QuestarrNG à l’emplacement {path}."
+      }
+    },
+    "service.realdebrid_connected_user": {
+      "source": "Connected to Real-Debrid as {username}. Downloads will be copied into QuestarrNG at {path}.",
+      "translations": {
+        "es": "Conectado a Real-Debrid como {username}. Las descargas se copiarán a QuestarrNG en {path}.",
+        "zh-Hans": "已作为 {username} 连接到 Real-Debrid。下载内容将复制到 QuestarrNG 的 {path}。",
+        "hi": "{username} के रूप में Real-Debrid से कनेक्ट है। डाउनलोड QuestarrNG में {path} पर कॉपी किए जाएँगे।",
+        "de": "Als {username} mit Real-Debrid verbunden. Downloads werden nach QuestarrNG unter {path} kopiert.",
+        "ja": "{username} として Real-Debrid に接続しました。ダウンロードは QuestarrNG の {path} にコピーされます。",
+        "fr": "Connecté à Real-Debrid en tant que {username}. Les téléchargements seront copiés dans QuestarrNG à l’emplacement {path}.",
+        "pt-BR": "Conectado ao Real-Debrid como {username}. Os downloads serão copiados para o QuestarrNG em {path}.",
+        "ar": "تم الاتصال بـ Real-Debrid باسم {username}. ستُنسخ التنزيلات إلى QuestarrNG في {path}.",
+        "ko": "{username}(으)로 Real-Debrid에 연결했습니다. 다운로드가 QuestarrNG의 {path}에 복사됩니다.",
+        "zh-Hant": "已以 {username} 的身分連線至 Real-Debrid。下載內容將複製到 QuestarrNG 的 {path}。",
+        "vi": "Đã kết nối với Real-Debrid dưới tên {username}. Nội dung tải xuống sẽ được sao chép vào QuestarrNG tại {path}.",
+        "id": "Terhubung ke Real-Debrid sebagai {username}. Unduhan akan disalin ke QuestarrNG di {path}.",
+        "es-419": "Conectado a Real-Debrid como {username}. Las descargas se copiarán a QuestarrNG en {path}.",
+        "fr-CA": "Connecté à Real-Debrid en tant que {username}. Les téléchargements seront copiés dans QuestarrNG à l’emplacement {path}."
+      }
     }
   }
 }

@@ -1,3 +1,4 @@
+import { serviceMessage } from "../shared/service-messages.js";
 import { type Indexer } from "@shared/schema";
 import {
   DEFAULT_GAME_CATEGORIES,
@@ -565,7 +566,10 @@ export class TorznabClient {
       };
 
       await this.searchGames(indexer, testParams);
-      return { success: true, message: `Successfully connected to ${indexer.name}` };
+      return {
+        success: true,
+        ...serviceMessage("service.connected_named", { name: indexer.name }),
+      };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
       return { success: false, message: errorMessage };

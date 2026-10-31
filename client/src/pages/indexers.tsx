@@ -1,3 +1,5 @@
+import { localizeServiceResultMessage } from "@/lib/service-message-locale";
+import type { ServiceMessageResult } from "@shared/service-messages";
 import { isSameProwlarrUrl } from "@shared/prowlarr-url";
 import { useCallback, useMemo, useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -374,7 +376,7 @@ export default function IndexersPage() {
           headers,
         });
         await throwIfResNotOk(response);
-        return response.json() as Promise<{ success: boolean; message: string }>;
+        return response.json() as Promise<ServiceMessageResult>;
       } else if (data.formData) {
         // Test with form data (new indexer)
         const response = await apiFetch(`/api/indexers/test`, {
@@ -383,7 +385,7 @@ export default function IndexersPage() {
           body: JSON.stringify(data.formData),
         });
         await throwIfResNotOk(response);
-        return response.json() as Promise<{ success: boolean; message: string }>;
+        return response.json() as Promise<ServiceMessageResult>;
       } else {
         throw new Error("Either id or formData must be provided");
       }
@@ -393,9 +395,13 @@ export default function IndexersPage() {
     },
     onSuccess: (data) => {
       if (data.success) {
-        toast({ title: "Connection successful", description: data.message });
+        toast({ title: "Connection successful", description: localizeServiceResultMessage(data) });
       } else {
-        toast({ title: "Connection failed", description: data.message, variant: "destructive" });
+        toast({
+          title: "Connection failed",
+          description: localizeServiceResultMessage(data),
+          variant: "destructive",
+        });
       }
     },
     onError: (error) => {

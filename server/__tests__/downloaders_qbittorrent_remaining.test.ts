@@ -439,10 +439,14 @@ describe("qbittorrent remaining regression coverage", () => {
     await expect(guardedClient.testConnection()).resolves.toEqual({
       success: true,
       message: "Connected successfully to qBittorrent 4.6.0",
+      messageKey: "service.connected_successfully_version",
+      messageValues: { client: "qBittorrent", version: "4.6.0" },
     });
     await expect(guardedClient.testConnection()).resolves.toEqual({
       success: false,
       message: "Failed to connect to qBittorrent: offline",
+      messageKey: "service.connection_failed",
+      messageValues: { client: "qBittorrent", error: "offline" },
     });
 
     await expect(guardedClient.addDownload({ url: "", title: "Missing URL" })).resolves.toEqual({

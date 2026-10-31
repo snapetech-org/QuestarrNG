@@ -24769,6 +24769,213 @@
         "es-419": "es",
         "fr-CA": "fr"
       }
+    },
+    "service.connected_successfully": {
+      "sourceChecksum": "fnv1a32:feb22787",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.connected_successfully_version": {
+      "sourceChecksum": "fnv1a32:5b73d101",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.connected_version": {
+      "sourceChecksum": "fnv1a32:7657babe",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.connected_named": {
+      "sourceChecksum": "fnv1a32:d2b44ccd",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.connection_failed": {
+      "sourceChecksum": "fnv1a32:78409dd5",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.connection_failed_at": {
+      "sourceChecksum": "fnv1a32:eb7517d3",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.json_catalog_valid": {
+      "sourceChecksum": "fnv1a32:14dc1e75",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.realdebrid_connected": {
+      "sourceChecksum": "fnv1a32:395449d6",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
+    },
+    "service.realdebrid_connected_user": {
+      "sourceChecksum": "fnv1a32:ead49ec6",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
     }
   }
 }

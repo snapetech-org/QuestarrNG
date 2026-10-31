@@ -6,4 +6,4 @@ action: none
 breaking: false
 ---
 
-QuestarrNG adds twelve interface languages with English fallback, preserving game titles and external values. Notifications and common API errors are translated. A separate language setting controls email, push, and chat messages through Apprise; existing users keep English. Arabic sidebar placement, settings direction, and labels are corrected. Native-speaker review remains outstanding.
+QuestarrNG adds twelve interface languages with English fallback and preserves external values. Notifications, connection tests, and common API errors use localized text. A separate language setting controls Apprise messages; existing users keep English. Arabic sidebar placement, settings direction, and notification labels are corrected. Native review remains outstanding.

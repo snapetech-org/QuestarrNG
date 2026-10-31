@@ -1,3 +1,4 @@
+import { serviceMessage } from "../../shared/service-messages.js";
 import type {
   Downloader,
   DownloadStatus,
@@ -55,7 +56,13 @@ export class RTorrentClient implements DownloaderClient {
         },
         "rTorrent connection test successful"
       );
-      return { success: true, message: `Connected to rTorrent v${version}` };
+      return {
+        success: true,
+        ...serviceMessage("service.connected_version", {
+          client: "rTorrent",
+          version: String(version),
+        }),
+      };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
       downloadersLogger.error(
@@ -71,7 +78,10 @@ export class RTorrentClient implements DownloaderClient {
       if (errorMessage.includes("Authentication failed")) {
         return { success: false, message: errorMessage };
       }
-      return { success: false, message: `Failed to connect to rTorrent: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.connection_failed", { client: "rTorrent", error: errorMessage }),
+      };
     }
   }
 

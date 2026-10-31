@@ -1,3 +1,5 @@
+import { localizeServiceResultMessage } from "@/lib/service-message-locale";
+import type { ServiceMessageResult } from "@shared/service-messages";
 import { useMemo, useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiFetch, throwIfResNotOk, queryClient } from "@/lib/queryClient";
@@ -334,7 +336,7 @@ export default function DownloadersPage() {
           headers,
         });
         await throwIfResNotOk(response);
-        return response.json() as Promise<{ success: boolean; message: string }>;
+        return response.json() as Promise<ServiceMessageResult>;
       } else if (data.formData) {
         // Test with form data (new downloader)
         const response = await apiFetch(`/api/downloaders/test`, {
@@ -343,7 +345,7 @@ export default function DownloadersPage() {
           body: JSON.stringify(data.formData),
         });
         await throwIfResNotOk(response);
-        return response.json() as Promise<{ success: boolean; message: string }>;
+        return response.json() as Promise<ServiceMessageResult>;
       } else {
         throw new Error("Either id or formData must be provided");
       }
@@ -353,9 +355,13 @@ export default function DownloadersPage() {
     },
     onSuccess: (data) => {
       if (data.success) {
-        toast({ title: "Connection successful", description: data.message });
+        toast({ title: "Connection successful", description: localizeServiceResultMessage(data) });
       } else {
-        toast({ title: "Connection failed", description: data.message, variant: "destructive" });
+        toast({
+          title: "Connection failed",
+          description: localizeServiceResultMessage(data),
+          variant: "destructive",
+        });
       }
     },
     onError: (error) => {

@@ -684,6 +684,8 @@ describe("SynologyDownloadStationClient", () => {
       expect(result).toEqual({
         success: true,
         message: "Connected successfully to Synology Download Station",
+        messageKey: "service.connected_successfully",
+        messageValues: { client: "Synology Download Station" },
       });
       expect(fetchMock.mock.calls[1][0]).toContain("auth.cgi");
       expect(fetchMock.mock.calls[2][0]).toContain("method=logout");

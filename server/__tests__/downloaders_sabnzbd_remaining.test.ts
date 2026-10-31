@@ -123,6 +123,12 @@ describe("sabnzbd remaining regression coverage", () => {
       success: false,
       message:
         "Failed to connect to SABnzbd at http://sab.local: HTTP 500: Broken - No error details",
+      messageKey: "service.connection_failed_at",
+      messageValues: {
+        client: "SABnzbd",
+        url: "http://sab.local",
+        error: "HTTP 500: Broken - No error details",
+      },
     });
 
     safeFetchMock.mockResolvedValueOnce({

@@ -1,3 +1,4 @@
+import { serviceMessage } from "../shared/service-messages.js";
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import type { Indexer } from "../shared/schema.js";
@@ -103,7 +104,7 @@ export const jsonCatalogClient = {
       const catalog = await readCatalog(indexer.url, true);
       return {
         success: true,
-        message: `Valid JSON catalog with ${catalog.downloads.length} releases`,
+        ...serviceMessage("service.json_catalog_valid", { count: catalog.downloads.length }),
       };
     } catch (error) {
       return {
