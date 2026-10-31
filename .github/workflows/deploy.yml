@@ -1,7 +1,7 @@
+# ng-runner-policy: private-jit-only-v1
 name: Deploy Web App
 
 on:
-  # Allow manual trigger for on-demand deployment
   workflow_dispatch:
     inputs:
       environment:
@@ -48,7 +48,7 @@ jobs:
   # ci.yml) so a fresh advisory published after `main` was merged still
   # blocks the release.
   sca-gate:
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-sca-gate"]}}', github.run_id)) }}
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -77,7 +77,7 @@ jobs:
         run: npm run check:licenses
 
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-build-and-push"]}}', github.run_id)) }}
     environment: ${{ inputs.environment == 'test' && 'test' || 'dev' }}
     needs: sca-gate
     permissions:

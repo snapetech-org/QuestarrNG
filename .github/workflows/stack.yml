@@ -1,25 +1,19 @@
+# ng-runner-policy: private-jit-only-v1
 name: Real stack
 
 # The production build of Questarr against real qBittorrent, Transmission and SABnzbd daemons
 # and a fake Torznab/Newznab indexer: setup, connection tests, a grab from the library, the
 # client's download and the import into the library (tests/stack/).
 
-# Slow (real daemons, a minute per download check), so it runs weekly and on demand, plus on
-# pull requests that change the journey itself.
+# Slow (real daemons, a minute per download check), so it runs on release tags or on demand.
 on:
-  schedule:
-    - cron: "0 6 * * 1"
   workflow_dispatch:
-  pull_request:
-    branches: [main, release/*]
-    paths:
-      - ".github/workflows/stack.yml"
-      - "playwright.stack.config.ts"
-      - "tests/stack/**"
-
+  push:
+    tags:
+      - '**'
 concurrency:
   group: stack-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -27,7 +21,7 @@ permissions:
 jobs:
   stack:
     name: Real-stack journey
-    runs-on: ubuntu-24.04
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-stack"]}}', github.run_id)) }}
     timeout-minutes: 25
 
     steps:

@@ -1,16 +1,15 @@
+# ng-runner-policy: private-jit-only-v1
 name: DAST
 
 on:
   push:
-    branches: [main]
-  schedule:
-    # Weekly, so newly merged endpoints get scanned even between releases.
-    - cron: "0 7 * * 1"
+    tags:
+      - '**'
   workflow_dispatch:
 
 concurrency:
   group: ng-scan-dast-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -20,7 +19,7 @@ jobs:
     name: OWASP ZAP baseline scan
     # ZAP's action starts a container; the repository JIT runner intentionally
     # has no Docker daemon, so this scan runs on a Docker-capable hosted runner.
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-zap-baseline"]}}', github.run_id)) }}
     timeout-minutes: 20
 
     steps:
