@@ -8,10 +8,31 @@ import {
   serializeServiceMessageDescriptor,
   serviceErrorMetadata,
   serviceErrorValue,
+  serviceErrorBody,
+  serviceErrorResult,
   serviceMessage,
 } from "../service-messages.js";
 
 describe("typed service message descriptors", () => {
+  it("preserves typed versus provider ownership in result and HTTP error bodies", () => {
+    const typed = new ServiceMessageError("service.realdebrid_authorization_code_expired", {});
+    const fallback = serviceMessage("service.realdebrid_authorization_failed", {});
+    expect(serviceErrorResult(typed, fallback)).toMatchObject({
+      success: false,
+      message: typed.message,
+      messageKey: typed.messageKey,
+    });
+    const tagged = serviceErrorBody(typed, fallback);
+    expect(parseServiceMessageDescriptor(tagged.errorI18n)?.messageKey).toBe(typed.messageKey);
+    expect(serviceErrorBody(new Error(typed.message), fallback)).toEqual({
+      error: typed.message,
+      errorI18n: null,
+    });
+    expect(serviceErrorBody({ messageKey: typed.messageKey }, fallback).error).toBe(
+      fallback.message
+    );
+    expect(serviceErrorBody(undefined, fallback).errorI18n).not.toBeNull();
+  });
   it("round-trips explicit nested errors without parsing a game's punctuation", () => {
     const game = 'Game ": provider error {error} /srv/Stage العربية';
     const error = new ServiceMessageError("service.client_reported_error", {

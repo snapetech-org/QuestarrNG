@@ -1,4 +1,5 @@
 import { ServiceMessageText } from "@/components/ServiceMessageText";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import type { ServiceMessageResult } from "@shared/service-messages";
 import { useMemo, useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -398,7 +399,7 @@ export default function DownloadersPage() {
     onError: (error) => {
       toast({
         title: "Could not link Real-Debrid",
-        description: error instanceof Error ? error.message : "Try again.",
+        description: <ApiErrorDescription error={error} fallbackSource="Try again." />,
         variant: "destructive",
       });
     },
@@ -438,7 +439,9 @@ export default function DownloadersPage() {
         setRealDebridAuth(null);
         toast({
           title: "Real-Debrid account linking stopped",
-          description: error instanceof Error ? error.message : "Start the connection again.",
+          description: (
+            <ApiErrorDescription error={error} fallbackSource="Start the connection again." />
+          ),
           variant: "destructive",
         });
       }

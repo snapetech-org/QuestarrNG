@@ -1,3 +1,4 @@
+import { ServiceMessageError } from "../../shared/service-messages.js";
 import { randomUUID } from "node:crypto";
 import type { Downloader } from "../../shared/schema.js";
 import { storage } from "../storage.js";
@@ -75,11 +76,10 @@ const postForm = async <T>(url: string, form: URLSearchParams): Promise<T> => {
     body = undefined;
   }
   if (!response.ok) {
-    const message =
-      body && typeof body === "object" && "error" in body && typeof body.error === "string"
-        ? body.error
-        : "Real-Debrid authorization failed.";
-    throw new Error(message.slice(0, 160));
+    if (body && typeof body === "object" && "error" in body && typeof body.error === "string") {
+      throw new Error(body.error.slice(0, 160));
+    }
+    throw new ServiceMessageError("service.realdebrid_authorization_failed", {});
   }
   return body as T;
 };
@@ -101,7 +101,7 @@ export async function getRealDebridAccessToken(downloader: Downloader): Promise<
   let credentials = parseCredentials(downloader.password);
   if (!credentials) {
     accessTokenCache.delete(downloader.id);
-    throw new Error("Connect a Real-Debrid account in Downloaders before using this client.");
+    throw new ServiceMessageError("service.realdebrid_connect_account_required", {});
   }
   const cached = accessTokenCache.get(downloader.id);
   if (
@@ -121,14 +121,14 @@ export async function getRealDebridAccessToken(downloader: Downloader): Promise<
     try {
       token = await exchangeRefreshToken(credentials!);
     } catch {
-      throw new Error("Real-Debrid authorization expired. Reconnect the account in Downloaders.");
+      throw new ServiceMessageError("service.realdebrid_authorization_expired", {});
     }
     if (
       typeof token.access_token !== "string" ||
       !Number.isFinite(token.expires_in) ||
       token.expires_in! <= 0
     ) {
-      throw new Error("Real-Debrid did not return a usable access token.");
+      throw new ServiceMessageError("service.realdebrid_access_token_missing", {});
     }
     if (
       typeof token.refresh_token === "string" &&
@@ -138,7 +138,7 @@ export async function getRealDebridAccessToken(downloader: Downloader): Promise<
       const saved = await storage.updateDownloader(downloader.id, {
         password: JSON.stringify(credentials),
       });
-      if (!saved) throw new Error("Real-Debrid account settings could not be saved.");
+      if (!saved) throw new ServiceMessageError("service.realdebrid_account_save_failed", {});
       // Keep this client snapshot in sync with the persisted rotating token so
       // later calls in the same manager cycle can continue using the cache.
       downloader.password = JSON.stringify(credentials);
@@ -169,7 +169,8 @@ export async function startRealDebridDeviceAuth(downloaderId: string) {
     timeoutMs: 15000,
     requireHttps: true,
   });
-  if (!response.ok) throw new Error("Real-Debrid could not start account authorization.");
+  if (!response.ok)
+    throw new ServiceMessageError("service.realdebrid_authorization_start_failed", {});
   const payload = (await response.json()) as {
     device_code?: unknown;
     user_code?: unknown;
@@ -188,7 +189,7 @@ export async function startRealDebridDeviceAuth(downloaderId: string) {
     !Number.isFinite(payload.interval) ||
     !Number.isFinite(payload.expires_in)
   ) {
-    throw new Error("Real-Debrid returned incomplete account authorization details.");
+    throw new ServiceMessageError("service.realdebrid_authorization_details_incomplete", {});
   }
   const handle = randomUUID();
   const intervalSeconds = Math.max(2, Math.min(30, Math.floor(Number(payload.interval))));
@@ -218,11 +219,11 @@ export async function pollRealDebridDeviceAuth(
 ): Promise<{ status: "pending" | "connected"; waitSeconds?: number }> {
   const state = pendingDeviceAuth.get(handle);
   if (!state || state.downloaderId !== downloader.id) {
-    throw new Error("Real-Debrid authorization session expired. Start again.");
+    throw new ServiceMessageError("service.realdebrid_authorization_session_expired", {});
   }
   if (Date.now() >= state.expiresAt) {
     pendingDeviceAuth.delete(handle);
-    throw new Error("Real-Debrid authorization code expired. Start again.");
+    throw new ServiceMessageError("service.realdebrid_authorization_code_expired", {});
   }
   if (state.polling || Date.now() < state.nextPollAt) {
     return {
@@ -245,7 +246,7 @@ export async function pollRealDebridDeviceAuth(
       if (response.status === 403 || response.status === 404) {
         return { status: "pending", waitSeconds: state.intervalSeconds };
       }
-      throw new Error("Real-Debrid account authorization could not be checked.");
+      throw new ServiceMessageError("service.realdebrid_authorization_check_failed", {});
     }
     const credentialResponse = (await response.json()) as {
       client_id?: unknown;
@@ -255,7 +256,7 @@ export async function pollRealDebridDeviceAuth(
       typeof credentialResponse.client_id !== "string" ||
       typeof credentialResponse.client_secret !== "string"
     ) {
-      throw new Error("Real-Debrid did not issue account credentials.");
+      throw new ServiceMessageError("service.realdebrid_credentials_missing", {});
     }
     const credentials = {
       clientId: credentialResponse.client_id,
@@ -272,13 +273,13 @@ export async function pollRealDebridDeviceAuth(
       })
     );
     if (typeof token.refresh_token !== "string" || !token.refresh_token) {
-      throw new Error("Real-Debrid did not return a refresh token.");
+      throw new ServiceMessageError("service.realdebrid_refresh_token_missing", {});
     }
     credentials.refreshToken = token.refresh_token;
     const saved = await storage.updateDownloader(downloader.id, {
       password: JSON.stringify(credentials),
     });
-    if (!saved) throw new Error("Real-Debrid credentials could not be saved.");
+    if (!saved) throw new ServiceMessageError("service.realdebrid_credentials_save_failed", {});
     accessTokenCache.delete(downloader.id);
     pendingDeviceAuth.delete(handle);
     return { status: "connected" };

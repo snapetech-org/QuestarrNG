@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import type { Downloader } from "../../shared/schema.js";
+import { ServiceMessageError } from "../../shared/service-messages.js";
 
 const mocks = vi.hoisted(() => ({
   safeFetch: vi.fn(),
@@ -58,6 +59,26 @@ describe("RealDebridClient", () => {
     ).resolves.toMatchObject({ success: false });
     expect(mocks.safeFetch).not.toHaveBeenCalled();
   });
+
+  it.each([true, false])(
+    "retains authentication error ownership through client results: %s",
+    async (typed) => {
+      const appError = new ServiceMessageError("service.realdebrid_authorization_expired", {});
+      mocks.getRealDebridAccessToken.mockRejectedValue(
+        typed ? appError : new Error(appError.message)
+      );
+      const client = new RealDebridClient(makeDownloader());
+      for (const result of [
+        await client.testConnection(),
+        await client.addDownload({ url: "magnet:?xt=urn:btih:abc", title: "Game" }),
+      ]) {
+        expect(result).toMatchObject({ success: false, message: appError.message });
+        if (typed) expect(result).toHaveProperty("messageKey", appError.messageKey);
+        else expect(result).not.toHaveProperty("messageKey");
+      }
+      expect(mocks.safeFetch).not.toHaveBeenCalled();
+    }
+  );
 
   it("selects all files when a newly added torrent is waiting for file selection", async () => {
     const client = new RealDebridClient(makeDownloader());

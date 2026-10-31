@@ -48,6 +48,8 @@ import { parseJsonObject } from "../shared/json-object-utils.js";
 import {
   localizeServiceMessage,
   matchingServiceMessageDescriptor,
+  serviceMessage,
+  serviceErrorBody,
 } from "../shared/service-messages.js";
 import { readNotificationLanguage } from "../shared/notification-language.js";
 import { torznabClient } from "./torznab.js";
@@ -4370,7 +4372,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json(authorization);
       } catch (error) {
         routesLogger.warn({ error }, "Could not start Real-Debrid authorization");
-        return res.status(502).json({ error: "Real-Debrid account linking could not be started." });
+        return res
+          .status(502)
+          .json(
+            serviceErrorBody(undefined, serviceMessage("service.realdebrid_link_start_failed", {}))
+          );
       }
     }
   );
@@ -4395,9 +4401,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json(result);
       } catch (error) {
         routesLogger.warn({ error }, "Real-Debrid account linking did not complete");
-        return res.status(400).json({
-          error: error instanceof Error ? error.message : "Real-Debrid authorization failed.",
-        });
+        return res
+          .status(400)
+          .json(
+            serviceErrorBody(error, serviceMessage("service.realdebrid_authorization_failed", {}))
+          );
       }
     }
   );

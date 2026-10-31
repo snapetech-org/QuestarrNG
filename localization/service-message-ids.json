@@ -31,5 +31,21 @@
   "service.download_add_failed_without_details",
   "service.download_already_exists",
   "service.download_queued",
-  "service.download_unconfirmed"
+  "service.download_unconfirmed",
+  "service.realdebrid_connect_account_required",
+  "service.realdebrid_authorization_expired",
+  "service.realdebrid_access_token_missing",
+  "service.realdebrid_account_save_failed",
+  "service.realdebrid_authorization_start_failed",
+  "service.realdebrid_authorization_details_incomplete",
+  "service.realdebrid_authorization_session_expired",
+  "service.realdebrid_authorization_code_expired",
+  "service.realdebrid_authorization_check_failed",
+  "service.realdebrid_credentials_missing",
+  "service.realdebrid_refresh_token_missing",
+  "service.realdebrid_credentials_save_failed",
+  "service.realdebrid_authorization_failed",
+  "service.realdebrid_link_start_failed",
+  "service.realdebrid_connect_failed",
+  "service.realdebrid_add_failed"
 ]

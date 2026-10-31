@@ -31,6 +31,17 @@ import { DownloaderManager } from "../downloaders.js";
 import { xrelClient } from "../xrel.js";
 import { readLastLogLines } from "../log-file.js";
 import type { Downloader, Indexer, Game } from "../../shared/schema.js";
+import {
+  ServiceMessageError,
+  parseServiceMessageDescriptor,
+} from "../../shared/service-messages.js";
+
+const realDebridAuthMocks = vi.hoisted(() => ({ start: vi.fn(), poll: vi.fn() }));
+vi.mock("../downloaders/realdebrid-auth.js", () => ({
+  startRealDebridDeviceAuth: realDebridAuthMocks.start,
+  pollRealDebridDeviceAuth: realDebridAuthMocks.poll,
+  getRealDebridAccessToken: vi.fn(),
+}));
 
 vi.mock("../log-file.js", () => ({
   getLogFilePath: vi.fn(() => "/tmp/server.log"),
@@ -107,6 +118,50 @@ describe("API Routes - Additional Coverage", () => {
     app = express();
     app.use(express.json());
     await registerRoutes(app);
+  });
+
+  describe("Real-Debrid auth response ownership", () => {
+    it.each([true, false])(
+      "preserves poll wire text and explicit metadata ownership: %s",
+      async (typed) => {
+        vi.mocked(storage.getDownloader).mockResolvedValueOnce({
+          ...testDownloader,
+          type: "realdebrid",
+        });
+        const appError = new ServiceMessageError(
+          "service.realdebrid_authorization_code_expired",
+          {}
+        );
+        realDebridAuthMocks.poll.mockRejectedValueOnce(
+          typed ? appError : new Error(appError.message)
+        );
+        const result = await request(app).post("/api/downloaders/dl-1/realdebrid/auth/poll").send({
+          handle: "00000000-0000-4000-8000-000000000001",
+        });
+        expect(result.status).toBe(400);
+        expect(result.body.error).toBe(appError.message);
+        if (typed)
+          expect(parseServiceMessageDescriptor(result.body.errorI18n)?.messageKey).toBe(
+            appError.messageKey
+          );
+        else expect(result.body.errorI18n).toBeNull();
+      }
+    );
+
+    it("keeps the start route's fixed fallback rather than exposing the logged provider error", async () => {
+      vi.mocked(storage.getDownloader).mockResolvedValueOnce({
+        ...testDownloader,
+        type: "realdebrid",
+      });
+      realDebridAuthMocks.start.mockRejectedValueOnce(new Error("Private provider detail"));
+      const result = await request(app).post("/api/downloaders/dl-1/realdebrid/auth/start");
+      expect(result.status).toBe(502);
+      expect(result.body.error).toBe("Real-Debrid account linking could not be started.");
+      expect(parseServiceMessageDescriptor(result.body.errorI18n)?.messageKey).toBe(
+        "service.realdebrid_link_start_failed"
+      );
+      expect(JSON.stringify(result.body)).not.toContain("Private provider detail");
+    });
   });
 
   describe("GET /api/downloaders/:id", () => {

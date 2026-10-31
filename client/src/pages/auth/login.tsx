@@ -17,7 +17,7 @@ import {
 import { Lock, User } from "lucide-react";
 import { GitHubVersionLink } from "@/components/GitHubVersionLink";
 import { withBasePath } from "@/lib/app-path";
-import { useInterfaceLanguage } from "@/lib/interface-locale";
+import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
 import { apiFetch } from "@/lib/queryClient";
 import { getOidcProviderPresentation } from "@/lib/oidc-provider";
 
@@ -198,9 +198,19 @@ export default function LoginPage() {
                   href={oidcPresentation.setupUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`${t(oidcPresentation.labelKey)} identity provider setup guide (opens in a new tab)`}
+                  lang={languageFor("auth.provider_setup_guide_label")}
+                  dir={directionFor("auth.provider_setup_guide_label")}
+                  aria-label={formatInterfaceMessage("auth.provider_setup_guide_label", {
+                    provider: t(oidcPresentation.labelKey),
+                  })}
                 >
-                  {t("interface.provider_setup_guide_9f61fa39")} <span aria-hidden="true">↗</span>
+                  <span
+                    lang={languageFor("interface.provider_setup_guide_9f61fa39")}
+                    dir={directionFor("interface.provider_setup_guide_9f61fa39")}
+                  >
+                    {t("interface.provider_setup_guide_9f61fa39")}
+                  </span>{" "}
+                  <span aria-hidden="true">↗</span>
                 </a>
               </div>
             )}

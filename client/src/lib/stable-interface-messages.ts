@@ -2694,6 +2694,30 @@ export const STABLE_INTERFACE_MESSAGES = {
     "qBittorrent accepted the request, but the download is not confirmed yet. Check qBittorrent before retrying to avoid creating a duplicate.",
   "claims.downloads_linked": "Downloads linked to games: {count}",
   "claims.some_downloads_failed": "Some downloads failed to link ({count} linked)",
+  "service.realdebrid_connect_account_required":
+    "Connect a Real-Debrid account in Downloaders before using this client.",
+  "service.realdebrid_authorization_expired":
+    "Real-Debrid authorization expired. Reconnect the account in Downloaders.",
+  "service.realdebrid_access_token_missing": "Real-Debrid did not return a usable access token.",
+  "service.realdebrid_account_save_failed": "Real-Debrid account settings could not be saved.",
+  "service.realdebrid_authorization_start_failed":
+    "Real-Debrid could not start account authorization.",
+  "service.realdebrid_authorization_details_incomplete":
+    "Real-Debrid returned incomplete account authorization details.",
+  "service.realdebrid_authorization_session_expired":
+    "Real-Debrid authorization session expired. Start again.",
+  "service.realdebrid_authorization_code_expired":
+    "Real-Debrid authorization code expired. Start again.",
+  "service.realdebrid_authorization_check_failed":
+    "Real-Debrid account authorization could not be checked.",
+  "service.realdebrid_credentials_missing": "Real-Debrid did not issue account credentials.",
+  "service.realdebrid_refresh_token_missing": "Real-Debrid did not return a refresh token.",
+  "service.realdebrid_credentials_save_failed": "Real-Debrid credentials could not be saved.",
+  "service.realdebrid_authorization_failed": "Real-Debrid authorization failed.",
+  "service.realdebrid_link_start_failed": "Real-Debrid account linking could not be started.",
+  "service.realdebrid_connect_failed": "Could not connect to Real-Debrid.",
+  "service.realdebrid_add_failed": "Could not add this magnet to Real-Debrid.",
+  "auth.provider_setup_guide_label": "{provider} setup guide (opens in a new tab)",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

@@ -2,6 +2,16 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
 import { withBasePath } from "@/lib/app-path";
 import { getInterfaceLanguage } from "@/lib/interface-locale";
 import { getLocalizedApiErrorMessage } from "@/lib/api-error-locale";
+import { localizeServiceMessage } from "@shared/service-messages";
+
+export function getApiErrorMetadata(data: unknown): { present: boolean; value: unknown } {
+  if (data === null || typeof data !== "object") return { present: false, value: undefined };
+  const fields = data as Record<string, unknown>;
+  if (Object.hasOwn(fields, "errorI18n")) return { present: true, value: fields.errorI18n };
+  if (["messageKey", "messageValues", "messageDetails"].some((key) => Object.hasOwn(fields, key)))
+    return { present: true, value: fields };
+  return { present: false, value: undefined };
+}
 
 export class ApiError extends Error {
   status: number;
@@ -33,7 +43,10 @@ export async function throwIfResNotOk(res: Response) {
       responseData?.error || responseData?.message || res.statusText || String(res.status);
     const detail = typeof raw === "string" ? raw : JSON.stringify(raw);
     const code = typeof responseData?.errorCode === "string" ? responseData.errorCode : undefined;
-    const message = getLocalizedApiErrorMessage(code, res.status, detail, getInterfaceLanguage());
+    const metadata = getApiErrorMetadata(data);
+    const message = metadata.present
+      ? localizeServiceMessage(detail, metadata.value, getInterfaceLanguage())
+      : getLocalizedApiErrorMessage(code, res.status, detail, getInterfaceLanguage());
     throw new ApiError(res.status, message, data, code);
   }
 }

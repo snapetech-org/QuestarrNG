@@ -92,6 +92,23 @@ export function serviceErrorMetadata(error: unknown): ServiceMessageMetadata {
     ...(error.messageDetails ? { messageDetails: error.messageDetails } : {}),
   };
 }
+/** Only app-owned error classes carry descriptors; provider Error text stays opaque. */
+export function serviceErrorResult(
+  error: unknown,
+  fallback: ServiceMessageFragment
+): ServiceMessageResult {
+  if (error instanceof Error)
+    return { success: false, message: error.message, ...serviceErrorMetadata(error) };
+  return { success: false, ...fallback };
+}
+/** A nullable descriptor explicitly distinguishes raw provider errors from legacy API text. */
+export function serviceErrorBody(error: unknown, fallback: ServiceMessageFragment) {
+  const result = serviceErrorResult(error, fallback);
+  return {
+    error: result.message,
+    errorI18n: serializeServiceMessageDescriptor(result),
+  };
+}
 /** Nullable persisted metadata is optional; old rows and invalid JSON retain raw text. */
 export function parseServiceMessageDescriptor(
   value: unknown,
@@ -175,7 +192,7 @@ export function localizeServiceMessage(
   if (!descriptor || sourceText(descriptor.messageKey, descriptor.messageValues) !== message)
     return message;
   const template = SERVICE_MESSAGE_TRANSLATIONS[descriptor.messageKey][language];
-  if (!template) return message;
+  if (!template || template === SERVICE_MESSAGE_SOURCES[descriptor.messageKey]) return message;
   return template.replace(PLACEHOLDER, (placeholder, name: string) => {
     const raw = descriptor.messageValues[name];
     if (raw === undefined) return placeholder;

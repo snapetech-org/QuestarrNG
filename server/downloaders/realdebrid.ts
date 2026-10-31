@@ -1,6 +1,7 @@
 import {
   parseServiceMessageDescriptor,
   serviceErrorValue,
+  serviceErrorResult,
   type ServiceMessageDescriptor,
   type ServiceMessageFragment,
   serviceMessage,
@@ -207,10 +208,7 @@ export class RealDebridClient implements DownloaderClient {
             })),
       };
     } catch (error) {
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : "Could not connect to Real-Debrid.",
-      };
+      return serviceErrorResult(error, serviceMessage("service.realdebrid_connect_failed", {}));
     }
   }
 
@@ -266,11 +264,7 @@ export class RealDebridClient implements DownloaderClient {
       }
       return { success: true, id: added.id, message: "Torrent sent to Real-Debrid." };
     } catch (error) {
-      return {
-        success: false,
-        message:
-          error instanceof Error ? error.message : "Could not add this magnet to Real-Debrid.",
-      };
+      return serviceErrorResult(error, serviceMessage("service.realdebrid_add_failed", {}));
     }
   }
 

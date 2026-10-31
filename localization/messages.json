@@ -43280,6 +43280,329 @@
         "vi": "Some downloads failed to link ({count} linked)",
         "id": "Some downloads failed to link ({count} linked)"
       }
+    },
+    "service.realdebrid_connect_account_required": {
+      "source": "Connect a Real-Debrid account in Downloaders before using this client.",
+      "translations": {
+        "es": "Connect a Real-Debrid account in Downloaders before using this client.",
+        "es-419": "Connect a Real-Debrid account in Downloaders before using this client.",
+        "zh-Hans": "Connect a Real-Debrid account in Downloaders before using this client.",
+        "hi": "Connect a Real-Debrid account in Downloaders before using this client.",
+        "de": "Connect a Real-Debrid account in Downloaders before using this client.",
+        "ja": "Connect a Real-Debrid account in Downloaders before using this client.",
+        "fr": "Connect a Real-Debrid account in Downloaders before using this client.",
+        "fr-CA": "Connect a Real-Debrid account in Downloaders before using this client.",
+        "pt-BR": "Connect a Real-Debrid account in Downloaders before using this client.",
+        "ar": "Connect a Real-Debrid account in Downloaders before using this client.",
+        "ko": "Connect a Real-Debrid account in Downloaders before using this client.",
+        "zh-Hant": "Connect a Real-Debrid account in Downloaders before using this client.",
+        "vi": "Connect a Real-Debrid account in Downloaders before using this client.",
+        "id": "Connect a Real-Debrid account in Downloaders before using this client."
+      }
+    },
+    "service.realdebrid_authorization_expired": {
+      "source": "Real-Debrid authorization expired. Reconnect the account in Downloaders.",
+      "translations": {
+        "es": "Real-Debrid authorization expired. Reconnect the account in Downloaders.",
+        "es-419": "Real-Debrid authorization expired. Reconnect the account in Downloaders.",
+        "zh-Hans": "Real-Debrid authorization expired. Reconnect the account in Downloaders.",
+        "hi": "Real-Debrid authorization expired. Reconnect the account in Downloaders.",
+        "de": "Real-Debrid authorization expired. Reconnect the account in Downloaders.",
+        "ja": "Real-Debrid authorization expired. Reconnect the account in Downloaders.",
+        "fr": "Real-Debrid authorization expired. Reconnect the account in Downloaders.",
+        "fr-CA": "Real-Debrid authorization expired. Reconnect the account in Downloaders.",
+        "pt-BR": "Real-Debrid authorization expired. Reconnect the account in Downloaders.",
+        "ar": "Real-Debrid authorization expired. Reconnect the account in Downloaders.",
+        "ko": "Real-Debrid authorization expired. Reconnect the account in Downloaders.",
+        "zh-Hant": "Real-Debrid authorization expired. Reconnect the account in Downloaders.",
+        "vi": "Real-Debrid authorization expired. Reconnect the account in Downloaders.",
+        "id": "Real-Debrid authorization expired. Reconnect the account in Downloaders."
+      }
+    },
+    "service.realdebrid_access_token_missing": {
+      "source": "Real-Debrid did not return a usable access token.",
+      "translations": {
+        "es": "Real-Debrid did not return a usable access token.",
+        "es-419": "Real-Debrid did not return a usable access token.",
+        "zh-Hans": "Real-Debrid did not return a usable access token.",
+        "hi": "Real-Debrid did not return a usable access token.",
+        "de": "Real-Debrid did not return a usable access token.",
+        "ja": "Real-Debrid did not return a usable access token.",
+        "fr": "Real-Debrid did not return a usable access token.",
+        "fr-CA": "Real-Debrid did not return a usable access token.",
+        "pt-BR": "Real-Debrid did not return a usable access token.",
+        "ar": "Real-Debrid did not return a usable access token.",
+        "ko": "Real-Debrid did not return a usable access token.",
+        "zh-Hant": "Real-Debrid did not return a usable access token.",
+        "vi": "Real-Debrid did not return a usable access token.",
+        "id": "Real-Debrid did not return a usable access token."
+      }
+    },
+    "service.realdebrid_account_save_failed": {
+      "source": "Real-Debrid account settings could not be saved.",
+      "translations": {
+        "es": "Real-Debrid account settings could not be saved.",
+        "es-419": "Real-Debrid account settings could not be saved.",
+        "zh-Hans": "Real-Debrid account settings could not be saved.",
+        "hi": "Real-Debrid account settings could not be saved.",
+        "de": "Real-Debrid account settings could not be saved.",
+        "ja": "Real-Debrid account settings could not be saved.",
+        "fr": "Real-Debrid account settings could not be saved.",
+        "fr-CA": "Real-Debrid account settings could not be saved.",
+        "pt-BR": "Real-Debrid account settings could not be saved.",
+        "ar": "Real-Debrid account settings could not be saved.",
+        "ko": "Real-Debrid account settings could not be saved.",
+        "zh-Hant": "Real-Debrid account settings could not be saved.",
+        "vi": "Real-Debrid account settings could not be saved.",
+        "id": "Real-Debrid account settings could not be saved."
+      }
+    },
+    "service.realdebrid_authorization_start_failed": {
+      "source": "Real-Debrid could not start account authorization.",
+      "translations": {
+        "es": "Real-Debrid could not start account authorization.",
+        "es-419": "Real-Debrid could not start account authorization.",
+        "zh-Hans": "Real-Debrid could not start account authorization.",
+        "hi": "Real-Debrid could not start account authorization.",
+        "de": "Real-Debrid could not start account authorization.",
+        "ja": "Real-Debrid could not start account authorization.",
+        "fr": "Real-Debrid could not start account authorization.",
+        "fr-CA": "Real-Debrid could not start account authorization.",
+        "pt-BR": "Real-Debrid could not start account authorization.",
+        "ar": "Real-Debrid could not start account authorization.",
+        "ko": "Real-Debrid could not start account authorization.",
+        "zh-Hant": "Real-Debrid could not start account authorization.",
+        "vi": "Real-Debrid could not start account authorization.",
+        "id": "Real-Debrid could not start account authorization."
+      }
+    },
+    "service.realdebrid_authorization_details_incomplete": {
+      "source": "Real-Debrid returned incomplete account authorization details.",
+      "translations": {
+        "es": "Real-Debrid returned incomplete account authorization details.",
+        "es-419": "Real-Debrid returned incomplete account authorization details.",
+        "zh-Hans": "Real-Debrid returned incomplete account authorization details.",
+        "hi": "Real-Debrid returned incomplete account authorization details.",
+        "de": "Real-Debrid returned incomplete account authorization details.",
+        "ja": "Real-Debrid returned incomplete account authorization details.",
+        "fr": "Real-Debrid returned incomplete account authorization details.",
+        "fr-CA": "Real-Debrid returned incomplete account authorization details.",
+        "pt-BR": "Real-Debrid returned incomplete account authorization details.",
+        "ar": "Real-Debrid returned incomplete account authorization details.",
+        "ko": "Real-Debrid returned incomplete account authorization details.",
+        "zh-Hant": "Real-Debrid returned incomplete account authorization details.",
+        "vi": "Real-Debrid returned incomplete account authorization details.",
+        "id": "Real-Debrid returned incomplete account authorization details."
+      }
+    },
+    "service.realdebrid_authorization_session_expired": {
+      "source": "Real-Debrid authorization session expired. Start again.",
+      "translations": {
+        "es": "Real-Debrid authorization session expired. Start again.",
+        "es-419": "Real-Debrid authorization session expired. Start again.",
+        "zh-Hans": "Real-Debrid authorization session expired. Start again.",
+        "hi": "Real-Debrid authorization session expired. Start again.",
+        "de": "Real-Debrid authorization session expired. Start again.",
+        "ja": "Real-Debrid authorization session expired. Start again.",
+        "fr": "Real-Debrid authorization session expired. Start again.",
+        "fr-CA": "Real-Debrid authorization session expired. Start again.",
+        "pt-BR": "Real-Debrid authorization session expired. Start again.",
+        "ar": "Real-Debrid authorization session expired. Start again.",
+        "ko": "Real-Debrid authorization session expired. Start again.",
+        "zh-Hant": "Real-Debrid authorization session expired. Start again.",
+        "vi": "Real-Debrid authorization session expired. Start again.",
+        "id": "Real-Debrid authorization session expired. Start again."
+      }
+    },
+    "service.realdebrid_authorization_code_expired": {
+      "source": "Real-Debrid authorization code expired. Start again.",
+      "translations": {
+        "es": "Real-Debrid authorization code expired. Start again.",
+        "es-419": "Real-Debrid authorization code expired. Start again.",
+        "zh-Hans": "Real-Debrid authorization code expired. Start again.",
+        "hi": "Real-Debrid authorization code expired. Start again.",
+        "de": "Real-Debrid authorization code expired. Start again.",
+        "ja": "Real-Debrid authorization code expired. Start again.",
+        "fr": "Real-Debrid authorization code expired. Start again.",
+        "fr-CA": "Real-Debrid authorization code expired. Start again.",
+        "pt-BR": "Real-Debrid authorization code expired. Start again.",
+        "ar": "Real-Debrid authorization code expired. Start again.",
+        "ko": "Real-Debrid authorization code expired. Start again.",
+        "zh-Hant": "Real-Debrid authorization code expired. Start again.",
+        "vi": "Real-Debrid authorization code expired. Start again.",
+        "id": "Real-Debrid authorization code expired. Start again."
+      }
+    },
+    "service.realdebrid_authorization_check_failed": {
+      "source": "Real-Debrid account authorization could not be checked.",
+      "translations": {
+        "es": "Real-Debrid account authorization could not be checked.",
+        "es-419": "Real-Debrid account authorization could not be checked.",
+        "zh-Hans": "Real-Debrid account authorization could not be checked.",
+        "hi": "Real-Debrid account authorization could not be checked.",
+        "de": "Real-Debrid account authorization could not be checked.",
+        "ja": "Real-Debrid account authorization could not be checked.",
+        "fr": "Real-Debrid account authorization could not be checked.",
+        "fr-CA": "Real-Debrid account authorization could not be checked.",
+        "pt-BR": "Real-Debrid account authorization could not be checked.",
+        "ar": "Real-Debrid account authorization could not be checked.",
+        "ko": "Real-Debrid account authorization could not be checked.",
+        "zh-Hant": "Real-Debrid account authorization could not be checked.",
+        "vi": "Real-Debrid account authorization could not be checked.",
+        "id": "Real-Debrid account authorization could not be checked."
+      }
+    },
+    "service.realdebrid_credentials_missing": {
+      "source": "Real-Debrid did not issue account credentials.",
+      "translations": {
+        "es": "Real-Debrid did not issue account credentials.",
+        "es-419": "Real-Debrid did not issue account credentials.",
+        "zh-Hans": "Real-Debrid did not issue account credentials.",
+        "hi": "Real-Debrid did not issue account credentials.",
+        "de": "Real-Debrid did not issue account credentials.",
+        "ja": "Real-Debrid did not issue account credentials.",
+        "fr": "Real-Debrid did not issue account credentials.",
+        "fr-CA": "Real-Debrid did not issue account credentials.",
+        "pt-BR": "Real-Debrid did not issue account credentials.",
+        "ar": "Real-Debrid did not issue account credentials.",
+        "ko": "Real-Debrid did not issue account credentials.",
+        "zh-Hant": "Real-Debrid did not issue account credentials.",
+        "vi": "Real-Debrid did not issue account credentials.",
+        "id": "Real-Debrid did not issue account credentials."
+      }
+    },
+    "service.realdebrid_refresh_token_missing": {
+      "source": "Real-Debrid did not return a refresh token.",
+      "translations": {
+        "es": "Real-Debrid did not return a refresh token.",
+        "es-419": "Real-Debrid did not return a refresh token.",
+        "zh-Hans": "Real-Debrid did not return a refresh token.",
+        "hi": "Real-Debrid did not return a refresh token.",
+        "de": "Real-Debrid did not return a refresh token.",
+        "ja": "Real-Debrid did not return a refresh token.",
+        "fr": "Real-Debrid did not return a refresh token.",
+        "fr-CA": "Real-Debrid did not return a refresh token.",
+        "pt-BR": "Real-Debrid did not return a refresh token.",
+        "ar": "Real-Debrid did not return a refresh token.",
+        "ko": "Real-Debrid did not return a refresh token.",
+        "zh-Hant": "Real-Debrid did not return a refresh token.",
+        "vi": "Real-Debrid did not return a refresh token.",
+        "id": "Real-Debrid did not return a refresh token."
+      }
+    },
+    "service.realdebrid_credentials_save_failed": {
+      "source": "Real-Debrid credentials could not be saved.",
+      "translations": {
+        "es": "Real-Debrid credentials could not be saved.",
+        "es-419": "Real-Debrid credentials could not be saved.",
+        "zh-Hans": "Real-Debrid credentials could not be saved.",
+        "hi": "Real-Debrid credentials could not be saved.",
+        "de": "Real-Debrid credentials could not be saved.",
+        "ja": "Real-Debrid credentials could not be saved.",
+        "fr": "Real-Debrid credentials could not be saved.",
+        "fr-CA": "Real-Debrid credentials could not be saved.",
+        "pt-BR": "Real-Debrid credentials could not be saved.",
+        "ar": "Real-Debrid credentials could not be saved.",
+        "ko": "Real-Debrid credentials could not be saved.",
+        "zh-Hant": "Real-Debrid credentials could not be saved.",
+        "vi": "Real-Debrid credentials could not be saved.",
+        "id": "Real-Debrid credentials could not be saved."
+      }
+    },
+    "service.realdebrid_authorization_failed": {
+      "source": "Real-Debrid authorization failed.",
+      "translations": {
+        "es": "Real-Debrid authorization failed.",
+        "es-419": "Real-Debrid authorization failed.",
+        "zh-Hans": "Real-Debrid authorization failed.",
+        "hi": "Real-Debrid authorization failed.",
+        "de": "Real-Debrid authorization failed.",
+        "ja": "Real-Debrid authorization failed.",
+        "fr": "Real-Debrid authorization failed.",
+        "fr-CA": "Real-Debrid authorization failed.",
+        "pt-BR": "Real-Debrid authorization failed.",
+        "ar": "Real-Debrid authorization failed.",
+        "ko": "Real-Debrid authorization failed.",
+        "zh-Hant": "Real-Debrid authorization failed.",
+        "vi": "Real-Debrid authorization failed.",
+        "id": "Real-Debrid authorization failed."
+      }
+    },
+    "service.realdebrid_link_start_failed": {
+      "source": "Real-Debrid account linking could not be started.",
+      "translations": {
+        "es": "Real-Debrid account linking could not be started.",
+        "es-419": "Real-Debrid account linking could not be started.",
+        "zh-Hans": "Real-Debrid account linking could not be started.",
+        "hi": "Real-Debrid account linking could not be started.",
+        "de": "Real-Debrid account linking could not be started.",
+        "ja": "Real-Debrid account linking could not be started.",
+        "fr": "Real-Debrid account linking could not be started.",
+        "fr-CA": "Real-Debrid account linking could not be started.",
+        "pt-BR": "Real-Debrid account linking could not be started.",
+        "ar": "Real-Debrid account linking could not be started.",
+        "ko": "Real-Debrid account linking could not be started.",
+        "zh-Hant": "Real-Debrid account linking could not be started.",
+        "vi": "Real-Debrid account linking could not be started.",
+        "id": "Real-Debrid account linking could not be started."
+      }
+    },
+    "service.realdebrid_connect_failed": {
+      "source": "Could not connect to Real-Debrid.",
+      "translations": {
+        "es": "Could not connect to Real-Debrid.",
+        "es-419": "Could not connect to Real-Debrid.",
+        "zh-Hans": "Could not connect to Real-Debrid.",
+        "hi": "Could not connect to Real-Debrid.",
+        "de": "Could not connect to Real-Debrid.",
+        "ja": "Could not connect to Real-Debrid.",
+        "fr": "Could not connect to Real-Debrid.",
+        "fr-CA": "Could not connect to Real-Debrid.",
+        "pt-BR": "Could not connect to Real-Debrid.",
+        "ar": "Could not connect to Real-Debrid.",
+        "ko": "Could not connect to Real-Debrid.",
+        "zh-Hant": "Could not connect to Real-Debrid.",
+        "vi": "Could not connect to Real-Debrid.",
+        "id": "Could not connect to Real-Debrid."
+      }
+    },
+    "service.realdebrid_add_failed": {
+      "source": "Could not add this magnet to Real-Debrid.",
+      "translations": {
+        "es": "Could not add this magnet to Real-Debrid.",
+        "es-419": "Could not add this magnet to Real-Debrid.",
+        "zh-Hans": "Could not add this magnet to Real-Debrid.",
+        "hi": "Could not add this magnet to Real-Debrid.",
+        "de": "Could not add this magnet to Real-Debrid.",
+        "ja": "Could not add this magnet to Real-Debrid.",
+        "fr": "Could not add this magnet to Real-Debrid.",
+        "fr-CA": "Could not add this magnet to Real-Debrid.",
+        "pt-BR": "Could not add this magnet to Real-Debrid.",
+        "ar": "Could not add this magnet to Real-Debrid.",
+        "ko": "Could not add this magnet to Real-Debrid.",
+        "zh-Hant": "Could not add this magnet to Real-Debrid.",
+        "vi": "Could not add this magnet to Real-Debrid.",
+        "id": "Could not add this magnet to Real-Debrid."
+      }
+    },
+    "auth.provider_setup_guide_label": {
+      "source": "{provider} setup guide (opens in a new tab)",
+      "translations": {
+        "es": "{provider} setup guide (opens in a new tab)",
+        "es-419": "{provider} setup guide (opens in a new tab)",
+        "zh-Hans": "{provider} setup guide (opens in a new tab)",
+        "hi": "{provider} setup guide (opens in a new tab)",
+        "de": "{provider} setup guide (opens in a new tab)",
+        "ja": "{provider} setup guide (opens in a new tab)",
+        "fr": "{provider} setup guide (opens in a new tab)",
+        "fr-CA": "{provider} setup guide (opens in a new tab)",
+        "pt-BR": "{provider} setup guide (opens in a new tab)",
+        "ar": "{provider} setup guide (opens in a new tab)",
+        "ko": "{provider} setup guide (opens in a new tab)",
+        "zh-Hant": "{provider} setup guide (opens in a new tab)",
+        "vi": "{provider} setup guide (opens in a new tab)",
+        "id": "{provider} setup guide (opens in a new tab)"
+      }
     }
   }
 }

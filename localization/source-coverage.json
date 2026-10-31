@@ -23,6 +23,292 @@
       "codeStatus": "implemented; download-item count with independent group selection count",
       "targetStatus": "source-fallback",
       "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_connect_account_required",
+      "source": "Connect a Real-Debrid account in Downloaders before using this client.",
+      "kind": "app-owned auth/service",
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid-auth.test.ts",
+        "server/downloaders/realdebrid.test.ts",
+        "server/__tests__/api_routes_extended.test.ts",
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; focused producer/client/route checks passed",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_authorization_expired",
+      "source": "Real-Debrid authorization expired. Reconnect the account in Downloaders.",
+      "kind": "app-owned auth/service",
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid-auth.test.ts",
+        "server/downloaders/realdebrid.test.ts",
+        "server/__tests__/api_routes_extended.test.ts",
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; focused producer/client/route checks passed",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_access_token_missing",
+      "source": "Real-Debrid did not return a usable access token.",
+      "kind": "app-owned auth/service",
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid-auth.test.ts",
+        "server/downloaders/realdebrid.test.ts",
+        "server/__tests__/api_routes_extended.test.ts",
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; focused producer/client/route checks passed",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_account_save_failed",
+      "source": "Real-Debrid account settings could not be saved.",
+      "kind": "app-owned auth/service",
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid-auth.test.ts",
+        "server/downloaders/realdebrid.test.ts",
+        "server/__tests__/api_routes_extended.test.ts",
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; focused producer/client/route checks passed",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_authorization_start_failed",
+      "source": "Real-Debrid could not start account authorization.",
+      "kind": "app-owned auth/service",
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid-auth.test.ts",
+        "server/downloaders/realdebrid.test.ts",
+        "server/__tests__/api_routes_extended.test.ts",
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; focused producer/client/route checks passed",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_authorization_details_incomplete",
+      "source": "Real-Debrid returned incomplete account authorization details.",
+      "kind": "app-owned auth/service",
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid-auth.test.ts",
+        "server/downloaders/realdebrid.test.ts",
+        "server/__tests__/api_routes_extended.test.ts",
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; focused producer/client/route checks passed",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_authorization_session_expired",
+      "source": "Real-Debrid authorization session expired. Start again.",
+      "kind": "app-owned auth/service",
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid-auth.test.ts",
+        "server/downloaders/realdebrid.test.ts",
+        "server/__tests__/api_routes_extended.test.ts",
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; focused producer/client/route checks passed",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_authorization_code_expired",
+      "source": "Real-Debrid authorization code expired. Start again.",
+      "kind": "app-owned auth/service",
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid-auth.test.ts",
+        "server/downloaders/realdebrid.test.ts",
+        "server/__tests__/api_routes_extended.test.ts",
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; focused producer/client/route checks passed",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_authorization_check_failed",
+      "source": "Real-Debrid account authorization could not be checked.",
+      "kind": "app-owned auth/service",
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid-auth.test.ts",
+        "server/downloaders/realdebrid.test.ts",
+        "server/__tests__/api_routes_extended.test.ts",
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; focused producer/client/route checks passed",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_credentials_missing",
+      "source": "Real-Debrid did not issue account credentials.",
+      "kind": "app-owned auth/service",
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid-auth.test.ts",
+        "server/downloaders/realdebrid.test.ts",
+        "server/__tests__/api_routes_extended.test.ts",
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; focused producer/client/route checks passed",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_refresh_token_missing",
+      "source": "Real-Debrid did not return a refresh token.",
+      "kind": "app-owned auth/service",
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid-auth.test.ts",
+        "server/downloaders/realdebrid.test.ts",
+        "server/__tests__/api_routes_extended.test.ts",
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; focused producer/client/route checks passed",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_credentials_save_failed",
+      "source": "Real-Debrid credentials could not be saved.",
+      "kind": "app-owned auth/service",
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid-auth.test.ts",
+        "server/downloaders/realdebrid.test.ts",
+        "server/__tests__/api_routes_extended.test.ts",
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; focused producer/client/route checks passed",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_authorization_failed",
+      "source": "Real-Debrid authorization failed.",
+      "kind": "app-owned auth/service",
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid-auth.test.ts",
+        "server/downloaders/realdebrid.test.ts",
+        "server/__tests__/api_routes_extended.test.ts",
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; focused producer/client/route checks passed",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_link_start_failed",
+      "source": "Real-Debrid account linking could not be started.",
+      "kind": "app-owned auth/service",
+      "owners": ["server/routes.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid-auth.test.ts",
+        "server/downloaders/realdebrid.test.ts",
+        "server/__tests__/api_routes_extended.test.ts",
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; focused producer/client/route checks passed",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_connect_failed",
+      "source": "Could not connect to Real-Debrid.",
+      "kind": "app-owned auth/service",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid-auth.test.ts",
+        "server/downloaders/realdebrid.test.ts",
+        "server/__tests__/api_routes_extended.test.ts",
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; focused producer/client/route checks passed",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.realdebrid_add_failed",
+      "source": "Could not add this magnet to Real-Debrid.",
+      "kind": "app-owned auth/service",
+      "owners": ["server/downloaders/realdebrid.ts"],
+      "coverage": [
+        "server/downloaders/realdebrid-auth.test.ts",
+        "server/downloaders/realdebrid.test.ts",
+        "server/__tests__/api_routes_extended.test.ts",
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; focused producer/client/route checks passed",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "auth.provider_setup_guide_label",
+      "source": "{provider} setup guide (opens in a new tab)",
+      "kind": "interface accessible label",
+      "owners": ["client/src/pages/auth/login.tsx"],
+      "coverage": ["client/__tests__/LoginSetupGuide.test.tsx"],
+      "codeStatus": "implemented; focused producer/client/route checks passed",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    }
+  ],
+  "codeUnits": [
+    {
+      "name": "source-bound API error transport and opaque toast rendering",
+      "owners": [
+        "shared/service-messages.ts",
+        "client/src/lib/queryClient.ts",
+        "client/src/components/ApiErrorDescription.tsx",
+        "client/src/pages/downloaders.tsx",
+        "server/routes.ts"
+      ],
+      "coverage": [
+        "server/downloaders/realdebrid-auth.test.ts",
+        "server/downloaders/realdebrid.test.ts",
+        "server/__tests__/api_routes_extended.test.ts",
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; nullable metadata blocks legacy matching for provider errors; exact source matching required for localization"
     }
   ]
 }
