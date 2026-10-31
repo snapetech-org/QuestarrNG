@@ -360,9 +360,12 @@ export default function SearchPage() {
     if (compatibleDownloaders.length === 0) {
       toast({
         title: "No compatible downloaders",
-        description: formatInterfaceMessage("interface.please_configure_a_type_downloader_18aae4bb", {
-          type: t(isUsenet ? "Usenet" : "Torrent"),
-        }),
+        description: formatInterfaceMessage(
+          "interface.please_configure_a_type_downloader_18aae4bb",
+          {
+            type: t(isUsenet ? "Usenet" : "Torrent"),
+          }
+        ),
         variant: "destructive",
       });
       return;
@@ -538,7 +541,9 @@ export default function SearchPage() {
         <div>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-base font-semibold" data-testid="text-search-results-count">
-              {formatInterfaceMessage("interface.search_results_count_b51a3250", { count: totalResults })}
+              {formatInterfaceMessage("interface.search_results_count_b51a3250", {
+                count: totalResults,
+              })}
               {!!(dateFrom || dateTo) && filteredAndSortedItems.length !== allItems.length && (
                 <span className="text-muted-foreground font-normal text-sm ms-2">
                   ({filteredAndSortedItems.length} <InterfaceText source={"shown with filter)"} />
@@ -600,9 +605,12 @@ export default function SearchPage() {
                     className="h-5 w-5 text-destructive/70 hover:text-destructive"
                     onClick={() => removeGameMutation.mutate(game.id)}
                     disabled={removeGameMutation.isPending}
-                    aria-label={formatInterfaceMessage("interface.remove_title_from_library_1a8c679c", {
-                      title: String(game.title ?? ""),
-                    })}
+                    aria-label={formatInterfaceMessage(
+                      "interface.remove_title_from_library_1a8c679c",
+                      {
+                        title: String(game.title ?? ""),
+                      }
+                    )}
                     data-testid={`button-remove-game-${game.id}`}
                   >
                     <Trash2 className="h-3 w-3" />
@@ -747,9 +755,12 @@ export default function SearchPage() {
                                 disabled={downloaders.length === 0}
                                 className="h-8 w-8"
                                 data-testid={`button-download-${index}`}
-                                aria-label={formatInterfaceMessage("interface.start_download_for_title_8ab69bd2", {
-                                  title: String(download.title ?? ""),
-                                })}
+                                aria-label={formatInterfaceMessage(
+                                  "interface.start_download_for_title_8ab69bd2",
+                                  {
+                                    title: String(download.title ?? ""),
+                                  }
+                                )}
                               >
                                 <Download className="h-4 w-4" />
                               </Button>

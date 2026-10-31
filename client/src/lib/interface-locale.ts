@@ -9,7 +9,11 @@ import {
 export const INTERFACE_LANGUAGE_OPTIONS = [
   { value: "en", nativeName: "English", englishName: undefined },
   { value: "es", nativeName: "Español", englishName: "Spanish" },
-  { value: "es-419", nativeName: "Español (Latinoamérica)", englishName: "Spanish (Latin America)" },
+  {
+    value: "es-419",
+    nativeName: "Español (Latinoamérica)",
+    englishName: "Spanish (Latin America)",
+  },
   { value: "zh-Hans", nativeName: "简体中文", englishName: "Simplified Chinese" },
   { value: "hi", nativeName: "हिन्दी", englishName: "Hindi" },
   { value: "de", nativeName: "Deutsch", englishName: "German" },
@@ -48,7 +52,31 @@ export const INTERFACE_LANGUAGE_FALLBACKS = {
   es: {
     default: "es",
     latinAmerica: "es-419",
-    latinAmericaRegions: ["419", "ar", "bo", "br", "bz", "cl", "co", "cr", "cu", "do", "ec", "gt", "hn", "mx", "ni", "pa", "pe", "pr", "py", "sv", "us", "uy", "ve"],
+    latinAmericaRegions: [
+      "419",
+      "ar",
+      "bo",
+      "br",
+      "bz",
+      "cl",
+      "co",
+      "cr",
+      "cu",
+      "do",
+      "ec",
+      "gt",
+      "hn",
+      "mx",
+      "ni",
+      "pa",
+      "pe",
+      "pr",
+      "py",
+      "sv",
+      "us",
+      "uy",
+      "ve",
+    ],
   },
   fr: { default: "fr", regions: { ca: "fr-CA" } },
   pt: {
@@ -65,18 +93,20 @@ export const INTERFACE_LANGUAGE_FALLBACKS = {
 
 function availableInterfaceLanguage(value: string): InterfaceLanguage | undefined {
   const normalized = value.toLowerCase();
-  return INTERFACE_LANGUAGE_OPTIONS.find((option) => option.value.toLowerCase() === normalized)?.value;
+  return INTERFACE_LANGUAGE_OPTIONS.find((option) => option.value.toLowerCase() === normalized)
+    ?.value;
 }
 
 function localeRegion(subtags: string[]): string | undefined {
-  return subtags.find((subtag) => subtag === "419" || /^[a-z]{2}$/u.test(subtag));
+  return subtags.slice(1).find((subtag) => subtag === "419" || /^[a-z]{2}$/u.test(subtag));
 }
 
 export function resolveInterfaceLanguage(candidate: string): InterfaceLanguage | undefined {
   const normalized = candidate.trim().replaceAll("_", "-").toLowerCase();
   if (!normalized) return undefined;
   const subtags = normalized.split("-");
-  const base = subtags[0];
+  const base = subtags[0] ?? "";
+  if (!base) return undefined;
   const region = localeRegion(subtags);
 
   if (base === "zh") {
@@ -106,7 +136,9 @@ export function resolveInterfaceLanguage(candidate: string): InterfaceLanguage |
 
   if (base === "fr") {
     const preferred =
-      region === "ca" ? INTERFACE_LANGUAGE_FALLBACKS.fr.regions.ca : INTERFACE_LANGUAGE_FALLBACKS.fr.default;
+      region === "ca"
+        ? INTERFACE_LANGUAGE_FALLBACKS.fr.regions.ca
+        : INTERFACE_LANGUAGE_FALLBACKS.fr.default;
     return availableInterfaceLanguage(preferred) ?? availableInterfaceLanguage("fr");
   }
 
@@ -152,10 +184,7 @@ function readLanguage(): InterfaceLanguage {
   }
 }
 
-const UI_LABELS_BY_ID = UI_LABELS as Record<
-  string,
-  Partial<Record<InterfaceLanguage, string>>
->;
+const UI_LABELS_BY_ID = UI_LABELS as Record<string, Partial<Record<InterfaceLanguage, string>>>;
 
 const SOURCE_TO_MESSAGE_ID = new Map<string, StableInterfaceMessageId>(
   Object.entries(STABLE_INTERFACE_MESSAGES).map(([id, source]) => [
@@ -274,7 +303,6 @@ export function formatInterfaceSelectMessage(
     language
   );
 }
-
 
 function applyDocumentLanguage() {
   if (typeof document === "undefined") return;

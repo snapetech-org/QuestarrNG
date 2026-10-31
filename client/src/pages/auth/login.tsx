@@ -106,7 +106,10 @@ export default function LoginPage() {
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel lang={languageFor("interface.username_1c08d4d9")} dir={directionFor("interface.username_1c08d4d9")}>
+                    <FormLabel
+                      lang={languageFor("interface.username_1c08d4d9")}
+                      dir={directionFor("interface.username_1c08d4d9")}
+                    >
                       {t("interface.username_1c08d4d9")}
                     </FormLabel>
                     <FormControl>
@@ -133,7 +136,10 @@ export default function LoginPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel lang={languageFor("interface.password_2cc30838")} dir={directionFor("interface.password_2cc30838")}>
+                    <FormLabel
+                      lang={languageFor("interface.password_2cc30838")}
+                      dir={directionFor("interface.password_2cc30838")}
+                    >
                       {t("interface.password_2cc30838")}
                     </FormLabel>
                     <FormControl>
@@ -168,9 +174,7 @@ export default function LoginPage() {
             </form>
             {oidcFailed && (
               <p className="text-sm text-destructive" role="alert">
-                {t(
-                  "interface.identity_provider_sign_in_failed_c_86dc0d0c"
-                )}
+                {t("interface.identity_provider_sign_in_failed_c_86dc0d0c")}
               </p>
             )}
             {oidcEnabled && (
@@ -186,7 +190,8 @@ export default function LoginPage() {
                       href={withBasePath(`/oidc-provider-icons.svg#oidc-${oidcPresentation.icon}`)}
                     />
                   </svg>
-                  {t("interface.continue_with_5b5c8ac4")} <bdi dir="auto">{t(oidcPresentation.labelKey)}</bdi>
+                  {t("interface.continue_with_5b5c8ac4")}{" "}
+                  <bdi dir="auto">{t(oidcPresentation.labelKey)}</bdi>
                 </Button>
                 <a
                   className="block text-center text-sm text-muted-foreground underline underline-offset-4"

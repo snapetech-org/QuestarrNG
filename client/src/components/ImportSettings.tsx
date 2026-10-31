@@ -920,7 +920,9 @@ export default function ImportSettings() {
                       when: "Use when you do not care about seeding after import, or when disk space is tight.",
                     },
                     {
-                      icon: <ArrowRight className="h-4 w-4 text-purple-500 shrink-0 mt-0.5 rtl:rotate-180" />,
+                      icon: (
+                        <ArrowRight className="h-4 w-4 text-purple-500 shrink-0 mt-0.5 rtl:rotate-180" />
+                      ),
                       label: "Symlink",
                       desc: "Creates a symbolic link at the destination pointing back to the original file in your download folder. The file is not duplicated or moved.",
                       when: "Use when you want your library to reflect downloads without copying files. The torrent keeps seeding.",

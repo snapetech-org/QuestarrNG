@@ -53,7 +53,11 @@ const CompactRssFeedItem = ({ item }: CompactRssFeedItemProps) => {
             lang={languageFor("interface.matched_title_3fa18293")}
             dir={directionFor("interface.matched_title_3fa18293")}
           >
-            {formatInterfaceMessage("interface.matched_title_3fa18293", { title: item.igdbGameName }, language)}
+            {formatInterfaceMessage(
+              "interface.matched_title_3fa18293",
+              { title: item.igdbGameName },
+              language
+            )}
           </div>
         )}
 
@@ -64,7 +68,10 @@ const CompactRssFeedItem = ({ item }: CompactRssFeedItemProps) => {
             {item.pubDate ? (
               <RegionalRelativeTime date={new Date(item.pubDate)} />
             ) : (
-              <span lang={languageFor("interface.unknown_date_6888dd2f")} dir={directionFor("interface.unknown_date_6888dd2f")}>
+              <span
+                lang={languageFor("interface.unknown_date_6888dd2f")}
+                dir={directionFor("interface.unknown_date_6888dd2f")}
+              >
                 {t("interface.unknown_date_6888dd2f")}
               </span>
             )}

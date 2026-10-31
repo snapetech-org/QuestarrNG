@@ -162,7 +162,9 @@ const GameCard = ({
       className={`group hover-elevate transition-all duration-200 mx-auto min-w-0 w-full max-w-full cursor-pointer flex flex-col h-full overflow-hidden sm:max-w-[225px] ${game.hidden ? "opacity-60 grayscale" : ""}`}
       data-testid={`card-game-${game.id}`}
       role="group"
-      aria-label={formatInterfaceMessage("interface.game_card_for_title_da08dee8", { title: game.title })}
+      aria-label={formatInterfaceMessage("interface.game_card_for_title_da08dee8", {
+        title: game.title,
+      })}
       lang={languageFor("interface.game_card_for_title_da08dee8")}
       dir={directionFor("interface.game_card_for_title_da08dee8")}
     >
@@ -171,7 +173,9 @@ const GameCard = ({
             improving initial page load speed, especially on pages with many carousels. */}
         <img
           src={coverSrc(game.coverUrl)}
-          alt={formatInterfaceMessage("interface.cover_art_for_title_44c4687e", { title: game.title })}
+          alt={formatInterfaceMessage("interface.cover_art_for_title_44c4687e", {
+            title: game.title,
+          })}
           lang={languageFor("interface.cover_art_for_title_44c4687e")}
           dir={directionFor("interface.cover_art_for_title_44c4687e")}
           className="thumbnail-image rounded-t-md"
@@ -202,7 +206,10 @@ const GameCard = ({
           )}
           {game.hidden && (
             <Badge variant="secondary" className="text-xs bg-gray-500 text-white">
-              <span lang={languageFor("interface.hidden_3c2dfe59")} dir={directionFor("interface.hidden_3c2dfe59")}>
+              <span
+                lang={languageFor("interface.hidden_3c2dfe59")}
+                dir={directionFor("interface.hidden_3c2dfe59")}
+              >
                 {t("interface.hidden_3c2dfe59")}
               </span>
             </Badge>
@@ -265,7 +272,9 @@ const GameCard = ({
                       void handleDownloadClick();
                     }}
                     disabled={addGameMutation.isPending}
-                    aria-label={formatInterfaceMessage("interface.download_title_5de658d1", { title: game.title })}
+                    aria-label={formatInterfaceMessage("interface.download_title_5de658d1", {
+                      title: game.title,
+                    })}
                     lang={languageFor("interface.download_title_5de658d1")}
                     dir={directionFor("interface.download_title_5de658d1")}
                     data-testid={`button-download-${game.id}`}
@@ -278,7 +287,10 @@ const GameCard = ({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p lang={languageFor("interface.download_6964bb19")} dir={directionFor("interface.download_6964bb19")}>
+                  <p
+                    lang={languageFor("interface.download_6964bb19")}
+                    dir={directionFor("interface.download_6964bb19")}
+                  >
                     {t("interface.download_6964bb19")}
                   </p>
                 </TooltipContent>
@@ -336,7 +348,10 @@ const GameCard = ({
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              <p lang={languageFor("interface.igdb_score_39719cbd")} dir={directionFor("interface.igdb_score_39719cbd")}>
+              <p
+                lang={languageFor("interface.igdb_score_39719cbd")}
+                dir={directionFor("interface.igdb_score_39719cbd")}
+              >
                 {t("interface.igdb_score_39719cbd")}
               </p>
             </TooltipContent>
@@ -347,9 +362,12 @@ const GameCard = ({
                 <div
                   className="flex items-center gap-1 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   role="img"
-                  aria-label={formatInterfaceMessage("interface.my_rating_rating_out_of_10_f3d2beef", {
-                    rating: game.userRating,
-                  })}
+                  aria-label={formatInterfaceMessage(
+                    "interface.my_rating_rating_out_of_10_f3d2beef",
+                    {
+                      rating: game.userRating,
+                    }
+                  )}
                   lang={languageFor("interface.my_rating_rating_out_of_10_f3d2beef")}
                   dir={directionFor("interface.my_rating_rating_out_of_10_f3d2beef")}
                   tabIndex={0}
@@ -359,7 +377,10 @@ const GameCard = ({
                 </div>
               </TooltipTrigger>
               <TooltipContent>
-                <p lang={languageFor("interface.my_rating_809bd9fc")} dir={directionFor("interface.my_rating_809bd9fc")}>
+                <p
+                  lang={languageFor("interface.my_rating_809bd9fc")}
+                  dir={directionFor("interface.my_rating_809bd9fc")}
+                >
                   {t("interface.my_rating_809bd9fc")}
                 </p>
               </TooltipContent>
@@ -370,7 +391,9 @@ const GameCard = ({
               <div
                 className="flex items-center gap-1 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 role="img"
-                aria-label={formatInterfaceMessage("interface.release_date_date_e2610e34", { date: releaseYear })}
+                aria-label={formatInterfaceMessage("interface.release_date_date_e2610e34", {
+                  date: releaseYear,
+                })}
                 lang={languageFor("interface.release_date_date_e2610e34")}
                 dir={directionFor("interface.release_date_date_e2610e34")}
                 tabIndex={0}
@@ -385,7 +408,10 @@ const GameCard = ({
                   {releaseFullDate}
                 </p>
               ) : (
-                <p lang={languageFor("interface.release_date_1d144bfe")} dir={directionFor("interface.release_date_1d144bfe")}>
+                <p
+                  lang={languageFor("interface.release_date_1d144bfe")}
+                  dir={directionFor("interface.release_date_1d144bfe")}
+                >
                   {t("interface.release_date_1d144bfe")}
                 </p>
               )}
@@ -410,7 +436,9 @@ const GameCard = ({
               e.stopPropagation();
             }}
             role="toolbar"
-            aria-label={formatInterfaceMessage("interface.actions_for_title_f9d3c417", { title: game.title })}
+            aria-label={formatInterfaceMessage("interface.actions_for_title_f9d3c417", {
+              title: game.title,
+            })}
             lang={languageFor("interface.actions_for_title_f9d3c417")}
             dir={directionFor("interface.actions_for_title_f9d3c417")}
             tabIndex={0}
@@ -421,7 +449,9 @@ const GameCard = ({
               className={mobileActionButtonClass}
               onClick={() => void handleDownloadClick()}
               disabled={addGameMutation.isPending}
-              aria-label={formatInterfaceMessage("interface.download_title_5de658d1", { title: game.title })}
+              aria-label={formatInterfaceMessage("interface.download_title_5de658d1", {
+                title: game.title,
+              })}
               lang={languageFor("interface.download_title_5de658d1")}
               dir={directionFor("interface.download_title_5de658d1")}
               data-testid={`button-download-${game.id}`}
@@ -446,19 +476,27 @@ const GameCard = ({
               }}
               disabled={addGameMutation.isPending}
               data-testid={`button-track-${game.id}`}
-              aria-label={formatInterfaceMessage("interface.track_title_c799ab04", { title: game.title })}
+              aria-label={formatInterfaceMessage("interface.track_title_c799ab04", {
+                title: game.title,
+              })}
               lang={languageFor("interface.track_title_c799ab04")}
               dir={directionFor("interface.track_title_c799ab04")}
             >
               {addGameMutation.isPending ? (
                 <>
                   <Loader2 className="h-3 w-3 me-2 animate-spin" />
-                  <span lang={languageFor("interface.tracking_0f7e9712")} dir={directionFor("interface.tracking_0f7e9712")}>
+                  <span
+                    lang={languageFor("interface.tracking_0f7e9712")}
+                    dir={directionFor("interface.tracking_0f7e9712")}
+                  >
                     {t("interface.tracking_0f7e9712")}
                   </span>
                 </>
               ) : (
-                <span lang={languageFor("interface.track_game_164dac9e")} dir={directionFor("interface.track_game_164dac9e")}>
+                <span
+                  lang={languageFor("interface.track_game_164dac9e")}
+                  dir={directionFor("interface.track_game_164dac9e")}
+                >
                   {t("interface.track_game_164dac9e")}
                 </span>
               )}

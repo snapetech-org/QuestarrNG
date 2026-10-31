@@ -1,3 +1,4 @@
+import console from "node:console";
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
@@ -6,19 +7,14 @@ import ts from "typescript";
 
 const root = process.cwd();
 const failures = [];
-const [
-  manifestSource,
-  provenanceSource,
-  interfaceSource,
-  localeMapSource,
-  regionalFormatSource,
-] = await Promise.all([
-  readFile(path.join(root, "localization/messages.json"), "utf8"),
-  readFile(path.join(root, "client/src/lib/localization-provenance.json"), "utf8"),
-  readFile(path.join(root, "client/src/lib/interface-locale.ts"), "utf8"),
-  readFile(path.join(root, "localization/locale-map.json"), "utf8"),
-  readFile(path.join(root, "client/src/lib/regional-format.ts"), "utf8"),
-]);
+const [manifestSource, provenanceSource, interfaceSource, localeMapSource, regionalFormatSource] =
+  await Promise.all([
+    readFile(path.join(root, "localization/messages.json"), "utf8"),
+    readFile(path.join(root, "client/src/lib/localization-provenance.json"), "utf8"),
+    readFile(path.join(root, "client/src/lib/interface-locale.ts"), "utf8"),
+    readFile(path.join(root, "localization/locale-map.json"), "utf8"),
+    readFile(path.join(root, "client/src/lib/regional-format.ts"), "utf8"),
+  ]);
 const manifest = JSON.parse(manifestSource);
 const provenance = JSON.parse(provenanceSource);
 const localeMap = JSON.parse(localeMapSource);
@@ -42,9 +38,7 @@ function placeholders(value) {
 
 function parse(source, fileName) {
   const kind =
-    fileName.endsWith(".tsx") || fileName.endsWith(".jsx")
-      ? ts.ScriptKind.TSX
-      : ts.ScriptKind.TS;
+    fileName.endsWith(".tsx") || fileName.endsWith(".jsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
   return ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, true, kind);
 }
 
@@ -110,7 +104,9 @@ for (const [id, message] of Object.entries(messages)) {
     continue;
   }
   if (sourceToId.has(message.source)) {
-    failures.push("Duplicate English source text for " + id + " and " + sourceToId.get(message.source));
+    failures.push(
+      "Duplicate English source text for " + id + " and " + sourceToId.get(message.source)
+    );
   }
   sourceToId.set(message.source, id);
   const translations = message.translations ?? {};
@@ -120,7 +116,9 @@ for (const [id, message] of Object.entries(messages)) {
       failures.push("Missing " + locale + " translation for " + id);
       continue;
     }
-    if (JSON.stringify(placeholders(translation)) !== JSON.stringify(placeholders(message.source))) {
+    if (
+      JSON.stringify(placeholders(translation)) !== JSON.stringify(placeholders(message.source))
+    ) {
       failures.push("Placeholder mismatch for " + id + " in " + locale);
     }
   }
@@ -141,7 +139,9 @@ const optionValues = ts.isArrayLiteralExpression(languageOptions)
   : [];
 const expectedOptions = ["en", ...targetLanguages];
 if (JSON.stringify(optionValues) !== JSON.stringify(expectedOptions)) {
-  failures.push("Interface selector locales must match English plus localization/messages.json targetLanguages in order.");
+  failures.push(
+    "Interface selector locales must match English plus localization/messages.json targetLanguages in order."
+  );
 }
 
 if (provenance.schemaVersion !== 2 || provenance.checksumAlgorithm !== "fnv1a32-utf16-code-units") {
@@ -169,7 +169,9 @@ if (
   failures.push("The locale rollout map must contain 37 unique choices including English.");
 }
 if (JSON.stringify(enabledMapTags) !== JSON.stringify(enabledManifestTags)) {
-  failures.push("Available locale-map entries must match English plus the complete selector catalogs.");
+  failures.push(
+    "Available locale-map entries must match English plus the complete selector catalogs."
+  );
 }
 if (plannedLocaleCount !== localeRows.length - enabledManifestTags.length) {
   failures.push("Every locale outside the selector must be explicitly marked translation-needed.");
@@ -207,7 +209,9 @@ for (const locale of localeRows) {
   }
   if (locale.reviewStatus === "inherited") {
     if (!locale.translationSource || !enabledManifestTags.includes(locale.translationSource)) {
-      failures.push("Inherited locale " + locale.tag + " must identify an enabled translation source.");
+      failures.push(
+        "Inherited locale " + locale.tag + " must identify an enabled translation source."
+      );
     }
   }
 }
@@ -224,7 +228,9 @@ const fallbackReferences = [
 ].filter(Boolean);
 for (const fallback of fallbackReferences) {
   if (!localeTagSet.has(fallback)) {
-    failures.push("Regional fallback references a locale missing from localization/locale-map.json: " + fallback);
+    failures.push(
+      "Regional fallback references a locale missing from localization/locale-map.json: " + fallback
+    );
   }
 }
 if (!validStatuses.has(provenance.defaultStatus)) {
@@ -238,7 +244,9 @@ for (const id of ids) {
     continue;
   }
   if (record.sourceChecksum !== checksum(messages[id].source)) {
-    failures.push("Source changed for " + id + "; review translations and update its provenance checksum.");
+    failures.push(
+      "Source changed for " + id + "; review translations and update its provenance checksum."
+    );
   }
   const translationStatuses = record.translations ?? {};
   const translationSources = record.translationSources ?? {};
@@ -247,23 +255,45 @@ for (const id of ids) {
       failures.push("Provenance locale " + locale + " is not declared for " + id);
     }
     if (!validStatuses.has(status)) {
-      failures.push("Unknown translation provenance status " + status + " for " + id + " (" + locale + ").");
+      failures.push(
+        "Unknown translation provenance status " + status + " for " + id + " (" + locale + ")."
+      );
     }
     if (status === "inherited") {
       const parent = translationSources[locale];
       if (!parent || !targetLanguages.includes(parent)) {
-        failures.push("Inherited translation " + id + " (" + locale + ") must name a supported parent locale.");
+        failures.push(
+          "Inherited translation " + id + " (" + locale + ") must name a supported parent locale."
+        );
       } else if (messages[id].translations[locale] !== messages[id].translations[parent]) {
-        failures.push("Inherited translation " + id + " (" + locale + ") must match its recorded parent " + parent + ".");
+        failures.push(
+          "Inherited translation " +
+            id +
+            " (" +
+            locale +
+            ") must match its recorded parent " +
+            parent +
+            "."
+        );
       }
     }
   }
   for (const [locale, parent] of Object.entries(translationSources)) {
     if (translationStatuses[locale] !== "inherited") {
-      failures.push("Translation source for " + id + " (" + locale + ") requires inherited provenance.");
+      failures.push(
+        "Translation source for " + id + " (" + locale + ") requires inherited provenance."
+      );
     }
     if (!targetLanguages.includes(parent)) {
-      failures.push("Translation source " + parent + " for " + id + " (" + locale + ") is not a supported locale.");
+      failures.push(
+        "Translation source " +
+          parent +
+          " for " +
+          id +
+          " (" +
+          locale +
+          ") is not a supported locale."
+      );
     }
   }
 }
@@ -277,7 +307,9 @@ const generator = spawnSync(
   { cwd: root, encoding: "utf8" }
 );
 if (generator.status !== 0) {
-  failures.push((generator.stdout + generator.stderr).trim() || "Generated localization catalogs are stale.");
+  failures.push(
+    (generator.stdout + generator.stderr).trim() || "Generated localization catalogs are stale."
+  );
 }
 
 async function sourceFiles(directory) {
@@ -315,7 +347,8 @@ for (const filePath of await sourceFiles(path.join(root, "client/src"))) {
   const source = await readFile(filePath, "utf8");
   const sourceFile = parse(source, filePath);
   const relativePath = path.relative(root, filePath);
-  const physicalInlineLayout = /(?<![A-Za-z0-9_-])(?:-?ml-[^\s"'\x60<>]+|-?mr-[^\s"'\x60<>]+|-?pl-[^\s"'\x60<>]+|-?pr-[^\s"'\x60<>]+|text-(?:left|right)|border-[lr](?:-[^\s"'\x60<>]+)?|rounded-[lr](?:-[^\s"'\x60<>]+)?)(?=$|[\s"'\x60<>])/gu;
+  const physicalInlineLayout =
+    /(?<![A-Za-z0-9_-])(?:-?ml-[^\s"'\x60<>]+|-?mr-[^\s"'\x60<>]+|-?pl-[^\s"'\x60<>]+|-?pr-[^\s"'\x60<>]+|text-(?:left|right)|border-[lr](?:-[^\s"'\x60<>]+)?|rounded-[lr](?:-[^\s"'\x60<>]+)?)(?=$|[\s"'\x60<>])/gu;
   for (const match of source.matchAll(physicalInlineLayout)) {
     const position = sourceFile.getLineAndCharacterOfPosition(match.index ?? 0);
     failures.push(
@@ -325,7 +358,8 @@ for (const filePath of await sourceFiles(path.join(root, "client/src"))) {
         " uses a physical inline layout utility; use a logical start/end utility."
     );
   }
-  const physicalPosition = /(?<![A-Za-z0-9_-])(-?)(left|right)-(?:([0-9]+(?:\.[0-9]+)?(?:\/[0-9]+)?)|(\[[^\]]+\])|(full|auto))(?=$|[\s"'\x60<>])/gu;
+  const physicalPosition =
+    /(?<![A-Za-z0-9_-])(-?)(left|right)-(?:([0-9]+(?:\.[0-9]+)?(?:\/[0-9]+)?)|(\[[^\]]+\])|(full|auto))(?=$|[\s"'\x60<>])/gu;
   for (const match of source.matchAll(physicalPosition)) {
     const value = match[3] ?? match[4] ?? match[5];
     if (value === "1/2" || value === "[50%]") continue;
@@ -356,7 +390,11 @@ for (const filePath of await sourceFiles(path.join(root, "client/src"))) {
         checkReference(unwrap(node.arguments[0]));
       }
       if (
-        ["formatInterfacePluralMessage", "formatRegionalPluralMessage", "formatInterfaceSelectMessage"].includes(callee) &&
+        [
+          "formatInterfacePluralMessage",
+          "formatRegionalPluralMessage",
+          "formatInterfaceSelectMessage",
+        ].includes(callee) &&
         node.arguments[1] &&
         ts.isObjectLiteralExpression(node.arguments[1])
       ) {
@@ -367,10 +405,7 @@ for (const filePath of await sourceFiles(path.join(root, "client/src"))) {
       for (const attribute of node.attributes.properties) {
         if (!ts.isJsxAttribute(attribute)) continue;
         const name = attribute.name.getText(sourceFile);
-        if (
-          name === "source" ||
-          /^data-i18n-(?:title|placeholder|aria-label|alt)$/u.test(name)
-        ) {
+        if (name === "source" || /^data-i18n-(?:title|placeholder|aria-label|alt)$/u.test(name)) {
           if (attribute.initializer && ts.isStringLiteral(attribute.initializer)) {
             checkReference(attribute.initializer);
           }

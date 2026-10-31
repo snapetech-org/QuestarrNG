@@ -474,7 +474,9 @@ export default function Downloads() {
                     key={s}
                     onClick={() => setStatusFilter(s)}
                     className={`flex items-center gap-1 hover:underline transition-colors ${STATUS_COLORS[s]}`}
-                    aria-label={formatInterfaceMessage("interface.filter_by_s_1aabcf5d", { s: String(s ?? "") })}
+                    aria-label={formatInterfaceMessage("interface.filter_by_s_1aabcf5d", {
+                      s: String(s ?? ""),
+                    })}
                     data-i18n-aria-label={"Filter by {s}"}
                     data-i18n-aria-label-values={JSON.stringify({ s: String(s ?? "") })}
                   >
@@ -755,9 +757,12 @@ export default function Downloads() {
                           variant="outline"
                           className="capitalize"
                           data-testid={`badge-downloader-${download.id}`}
-                          aria-label={formatInterfaceMessage("interface.downloader_downloadername_c71397a8", {
-                            downloaderName: String(download.downloaderName ?? ""),
-                          })}
+                          aria-label={formatInterfaceMessage(
+                            "interface.downloader_downloadername_c71397a8",
+                            {
+                              downloaderName: String(download.downloaderName ?? ""),
+                            }
+                          )}
                         >
                           {download.downloaderName}
                         </Badge>
@@ -782,10 +787,13 @@ export default function Downloads() {
                           <Badge
                             variant="outline"
                             data-testid={`badge-size-${download.id}`}
-                            aria-label={formatInterfaceMessage("interface.downloaded_size_of_size2_d3e68289", {
-                              size: String(formatBytes(download.downloaded || 0) ?? ""),
-                              size2: String(formatBytes(download.size!) ?? ""),
-                            })}
+                            aria-label={formatInterfaceMessage(
+                              "interface.downloaded_size_of_size2_d3e68289",
+                              {
+                                size: String(formatBytes(download.downloaded || 0) ?? ""),
+                                size2: String(formatBytes(download.size!) ?? ""),
+                              }
+                            )}
                           >
                             {formatBytes(download.downloaded || 0)} / {formatBytes(download.size!)}
                           </Badge>
@@ -820,9 +828,12 @@ export default function Downloads() {
                           <Badge
                             variant="outline"
                             data-testid={`badge-download-speed-${download.id}`}
-                            aria-label={formatInterfaceMessage("interface.download_speed_value_2c5a1835", {
-                              value: String(formatSpeed(download.downloadSpeed!) ?? ""),
-                            })}
+                            aria-label={formatInterfaceMessage(
+                              "interface.download_speed_value_2c5a1835",
+                              {
+                                value: String(formatSpeed(download.downloadSpeed!) ?? ""),
+                              }
+                            )}
                           >
                             ↓ {formatSpeed(download.downloadSpeed!)}
                           </Badge>
@@ -832,9 +843,12 @@ export default function Downloads() {
                             <Badge
                               variant="outline"
                               data-testid={`badge-upload-speed-${download.id}`}
-                              aria-label={formatInterfaceMessage("interface.upload_speed_value_4f019642", {
-                                value: String(formatSpeed(download.uploadSpeed!) ?? ""),
-                              })}
+                              aria-label={formatInterfaceMessage(
+                                "interface.upload_speed_value_4f019642",
+                                {
+                                  value: String(formatSpeed(download.uploadSpeed!) ?? ""),
+                                }
+                              )}
                             >
                               ↑ {formatSpeed(download.uploadSpeed!)}
                             </Badge>
@@ -905,15 +919,18 @@ export default function Downloads() {
                             <Badge
                               variant="outline"
                               data-testid={`badge-ratio-${download.id}`}
-                              aria-label={formatInterfaceMessage("interface.share_ratio_value_face49ce", {
-                                value: String(
-                                  formatRegionalNumber(
-                                    download.ratio ?? 0,
-                                    { minimumFractionDigits: 2, maximumFractionDigits: 2 },
-                                    regionalPreference
-                                  ) ?? ""
-                                ),
-                              })}
+                              aria-label={formatInterfaceMessage(
+                                "interface.share_ratio_value_face49ce",
+                                {
+                                  value: String(
+                                    formatRegionalNumber(
+                                      download.ratio ?? 0,
+                                      { minimumFractionDigits: 2, maximumFractionDigits: 2 },
+                                      regionalPreference
+                                    ) ?? ""
+                                  ),
+                                }
+                              )}
                             >
                               <InterfaceText source={"Ratio:"} />{" "}
                               {formatRegionalNumber(
@@ -950,9 +967,12 @@ export default function Downloads() {
                               <Button
                                 variant="outline"
                                 size="icon"
-                                aria-label={formatInterfaceMessage("interface.resume_value_bc003aeb", {
-                                  value: String((download.name || "download") ?? ""),
-                                })}
+                                aria-label={formatInterfaceMessage(
+                                  "interface.resume_value_bc003aeb",
+                                  {
+                                    value: String((download.name || "download") ?? ""),
+                                  }
+                                )}
                                 onClick={() => handleResume(download)}
                                 disabled={resumeMutation.isPending}
                                 data-testid={`button-resume-${download.id}`}
@@ -972,9 +992,12 @@ export default function Downloads() {
                               <Button
                                 variant="outline"
                                 size="icon"
-                                aria-label={formatInterfaceMessage("interface.pause_value_f8941440", {
-                                  value: String((download.name || "download") ?? ""),
-                                })}
+                                aria-label={formatInterfaceMessage(
+                                  "interface.pause_value_f8941440",
+                                  {
+                                    value: String((download.name || "download") ?? ""),
+                                  }
+                                )}
                                 onClick={() => handlePause(download)}
                                 disabled={pauseMutation.isPending}
                                 data-testid={`button-pause-${download.id}`}
@@ -996,9 +1019,12 @@ export default function Downloads() {
                         <Button
                           variant="outline"
                           size="icon"
-                          aria-label={formatInterfaceMessage("interface.options_for_value_0c5a914b", {
-                            value: String((download.name || "download") ?? ""),
-                          })}
+                          aria-label={formatInterfaceMessage(
+                            "interface.options_for_value_0c5a914b",
+                            {
+                              value: String((download.name || "download") ?? ""),
+                            }
+                          )}
                           data-testid={`button-menu-${download.id}`}
                         >
                           <MoreHorizontal className="h-4 w-4" />
@@ -1059,15 +1085,18 @@ export default function Downloads() {
                   <Progress
                     value={download.progress}
                     className="h-2"
-                    aria-label={formatInterfaceMessage("interface.download_progress_progress_a0ea5a37", {
-                      progress: String(
-                        formatRegionalPercent(
-                          download.progress,
-                          { minimumFractionDigits: 1, maximumFractionDigits: 1 },
-                          regionalPreference
-                        ) ?? ""
-                      ),
-                    })}
+                    aria-label={formatInterfaceMessage(
+                      "interface.download_progress_progress_a0ea5a37",
+                      {
+                        progress: String(
+                          formatRegionalPercent(
+                            download.progress,
+                            { minimumFractionDigits: 1, maximumFractionDigits: 1 },
+                            regionalPreference
+                          ) ?? ""
+                        ),
+                      }
+                    )}
                     data-testid={`progress-bar-${download.id}`}
                   />
                   {download.error && (

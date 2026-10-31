@@ -416,7 +416,10 @@ export default function WishlistPage() {
                 onClick={() => setShowUnreleased(!showUnreleased)}
               >
                 {showUnreleased ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
-                <span lang={languageFor("interface.unreleased_28ff5dad")} dir={directionFor("interface.unreleased_28ff5dad")}>
+                <span
+                  lang={languageFor("interface.unreleased_28ff5dad")}
+                  dir={directionFor("interface.unreleased_28ff5dad")}
+                >
                   {t("interface.unreleased_28ff5dad")}
                 </span>
               </Button>

@@ -117,7 +117,11 @@ export default function GameListsPage() {
       setListName("");
       toast({
         title: formatInterfaceMessage("interface.list_saved_e24d07fe", {}, language),
-        description: formatInterfaceMessage("interface.name_is_ready_d506004a", { name: list.name }, language),
+        description: formatInterfaceMessage(
+          "interface.name_is_ready_d506004a",
+          { name: list.name },
+          language
+        ),
       });
     },
     onError: () => {
@@ -443,7 +447,11 @@ export default function GameListsPage() {
             value={listName}
             onChange={(event) => setListName(event.target.value)}
             onKeyDown={(event) => event.key === "Enter" && saveList()}
-            placeholder={formatInterfaceMessage("interface.e_g_co_op_with_friends_fd21bcaa", {}, language)}
+            placeholder={formatInterfaceMessage(
+              "interface.e_g_co_op_with_friends_fd21bcaa",
+              {},
+              language
+            )}
             data-i18n-placeholder="interface.e_g_co_op_with_friends_fd21bcaa"
           />
           <DialogFooter>
@@ -469,7 +477,10 @@ export default function GameListsPage() {
           <DialogHeader>
             <DialogTitle>
               {selectedList ? (
-                <InterfaceText source="interface.add_games_to_list_d3414d8c" values={{ list: selectedList.name }} />
+                <InterfaceText
+                  source="interface.add_games_to_list_d3414d8c"
+                  values={{ list: selectedList.name }}
+                />
               ) : (
                 <InterfaceText source="interface.add_games_to_your_list_da32a1b9" />
               )}
@@ -481,10 +492,18 @@ export default function GameListsPage() {
           <div className="relative">
             <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              aria-label={formatInterfaceMessage("interface.search_library_games_af5524b1", {}, language)}
+              aria-label={formatInterfaceMessage(
+                "interface.search_library_games_af5524b1",
+                {},
+                language
+              )}
               data-i18n-aria-label="interface.search_library_games_af5524b1"
               className="ps-9"
-              placeholder={formatInterfaceMessage("interface.search_your_games_d29b6007", {}, language)}
+              placeholder={formatInterfaceMessage(
+                "interface.search_your_games_d29b6007",
+                {},
+                language
+              )}
               data-i18n-placeholder="interface.search_your_games_d29b6007"
               value={gameSearch}
               onChange={(event) => setGameSearch(event.target.value)}
@@ -511,7 +530,9 @@ export default function GameListsPage() {
                   const source = checked ? "Remove {game} from {list}" : "Add {game} to {list}";
                   const values = {
                     game: game.title,
-                    list: selectedList?.name ?? formatInterfaceMessage("interface.your_list_10c6b14a", {}, language),
+                    list:
+                      selectedList?.name ??
+                      formatInterfaceMessage("interface.your_list_10c6b14a", {}, language),
                   };
                   return (
                     <label key={game.id} className="flex cursor-pointer items-center gap-3 py-2.5">

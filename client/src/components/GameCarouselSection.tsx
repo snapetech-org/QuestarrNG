@@ -146,7 +146,10 @@ const GameCarouselSection = ({
         </div>
         <div className="flex items-center gap-2 text-muted-foreground p-4 border rounded-md">
           <AlertCircle className="h-5 w-5" />
-          <span lang={languageFor("interface.no_games_found_6eae7a0d")} dir={directionFor("interface.no_games_found_6eae7a0d")}>
+          <span
+            lang={languageFor("interface.no_games_found_6eae7a0d")}
+            dir={directionFor("interface.no_games_found_6eae7a0d")}
+          >
             {t("interface.no_games_found_6eae7a0d")}
           </span>
         </div>
@@ -179,7 +182,10 @@ const GameCarouselSection = ({
                 <RefreshCw className={cn("h-4 w-4", isFetching && "animate-spin")} />
               </Button>
             </TooltipTrigger>
-            <TooltipContent lang={languageFor("interface.refresh_0815aad4")} dir={directionFor("interface.refresh_0815aad4")}>
+            <TooltipContent
+              lang={languageFor("interface.refresh_0815aad4")}
+              dir={directionFor("interface.refresh_0815aad4")}
+            >
               {t("interface.refresh_0815aad4")}
             </TooltipContent>
           </Tooltip>

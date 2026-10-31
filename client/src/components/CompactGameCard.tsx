@@ -173,13 +173,17 @@ const CompactGameCard = ({
               type="button"
               onClick={handleDetailsClick}
               className="h-24 w-[4.5rem] shrink-0 overflow-hidden rounded-lg bg-muted"
-              aria-label={formatInterfaceMessage("interface.view_details_for_title_0a6aaff1", { title: game.title })}
+              aria-label={formatInterfaceMessage("interface.view_details_for_title_0a6aaff1", {
+                title: game.title,
+              })}
               lang={languageFor("interface.view_details_for_title_0a6aaff1")}
               dir={directionFor("interface.view_details_for_title_0a6aaff1")}
             >
               <img
                 src={coverSrc(game.coverUrl)}
-                alt={formatInterfaceMessage("interface.cover_art_for_title_44c4687e", { title: game.title })}
+                alt={formatInterfaceMessage("interface.cover_art_for_title_44c4687e", {
+                  title: game.title,
+                })}
                 lang={languageFor("interface.cover_art_for_title_44c4687e")}
                 dir={directionFor("interface.cover_art_for_title_44c4687e")}
                 className="h-full w-full object-cover"
@@ -247,7 +251,10 @@ const CompactGameCard = ({
                     variant="secondary"
                     className="h-5 bg-gray-500 px-1.5 text-[10px] text-white"
                   >
-                    <span lang={languageFor("interface.hidden_3c2dfe59")} dir={directionFor("interface.hidden_3c2dfe59")}>
+                    <span
+                      lang={languageFor("interface.hidden_3c2dfe59")}
+                      dir={directionFor("interface.hidden_3c2dfe59")}
+                    >
                       {t("interface.hidden_3c2dfe59")}
                     </span>
                   </Badge>
@@ -293,9 +300,12 @@ const CompactGameCard = ({
                 <span
                   className="inline-flex items-center gap-1"
                   role="img"
-                  aria-label={formatInterfaceMessage("interface.igdb_rating_rating_out_of_10_fbf37993", {
-                    rating: ratingDisplay ?? t("interface.not_rated_9de37148"),
-                  })}
+                  aria-label={formatInterfaceMessage(
+                    "interface.igdb_rating_rating_out_of_10_fbf37993",
+                    {
+                      rating: ratingDisplay ?? t("interface.not_rated_9de37148"),
+                    }
+                  )}
                   lang={languageFor("interface.igdb_rating_rating_out_of_10_fbf37993")}
                   dir={directionFor("interface.igdb_rating_rating_out_of_10_fbf37993")}
                 >
@@ -329,7 +339,9 @@ const CompactGameCard = ({
                 <span
                   className="inline-flex items-center gap-1"
                   role="img"
-                  aria-label={formatInterfaceMessage("interface.release_date_date_e2610e34", { date: releaseYear })}
+                  aria-label={formatInterfaceMessage("interface.release_date_date_e2610e34", {
+                    date: releaseYear,
+                  })}
                   lang={languageFor("interface.release_date_date_e2610e34")}
                   dir={directionFor("interface.release_date_date_e2610e34")}
                 >
@@ -348,7 +360,9 @@ const CompactGameCard = ({
                 className="h-10 w-10"
                 onClick={handleDownloadClick}
                 disabled={addGameMutation.isPending}
-                aria-label={formatInterfaceMessage("interface.download_title_5de658d1", { title: game.title })}
+                aria-label={formatInterfaceMessage("interface.download_title_5de658d1", {
+                  title: game.title,
+                })}
                 lang={languageFor("interface.download_title_5de658d1")}
                 dir={directionFor("interface.download_title_5de658d1")}
               >
@@ -371,7 +385,9 @@ const CompactGameCard = ({
               size="icon"
               className="h-10 w-10"
               onClick={handleDetailsClick}
-              aria-label={formatInterfaceMessage("interface.view_details_for_title_0a6aaff1", { title: game.title })}
+              aria-label={formatInterfaceMessage("interface.view_details_for_title_0a6aaff1", {
+                title: game.title,
+              })}
               lang={languageFor("interface.view_details_for_title_0a6aaff1")}
               dir={directionFor("interface.view_details_for_title_0a6aaff1")}
             >
@@ -452,7 +468,9 @@ const CompactGameCard = ({
           >
             <img
               src={coverSrc(game.coverUrl)}
-              alt={formatInterfaceMessage("interface.cover_art_for_title_44c4687e", { title: game.title })}
+              alt={formatInterfaceMessage("interface.cover_art_for_title_44c4687e", {
+                title: game.title,
+              })}
               lang={languageFor("interface.cover_art_for_title_44c4687e")}
               dir={directionFor("interface.cover_art_for_title_44c4687e")}
               className="w-full h-full object-cover"
@@ -540,9 +558,12 @@ const CompactGameCard = ({
                   aria-label={
                     game.userRating == null
                       ? t("interface.rate_this_game_b97d58a1")
-                      : formatInterfaceMessage("interface.my_rating_rating_10_click_to_chang_26204fee", {
-                          rating: game.userRating,
-                        })
+                      : formatInterfaceMessage(
+                          "interface.my_rating_rating_10_click_to_chang_26204fee",
+                          {
+                            rating: game.userRating,
+                          }
+                        )
                   }
                   lang={languageFor(
                     game.userRating == null
@@ -603,7 +624,10 @@ const CompactGameCard = ({
                       userRatingMutation.mutate({ gameId: game.id, userRating: null });
                     }}
                   >
-                    <span lang={languageFor("interface.clear_rating_0479d557")} dir={directionFor("interface.clear_rating_0479d557")}>
+                    <span
+                      lang={languageFor("interface.clear_rating_0479d557")}
+                      dir={directionFor("interface.clear_rating_0479d557")}
+                    >
                       {t("interface.clear_rating_0479d557")}
                     </span>
                   </Button>
@@ -677,7 +701,10 @@ const CompactGameCard = ({
           )}
           {game.hidden && (
             <Badge variant="secondary" className="text-[9px] h-4 px-1 bg-gray-500 text-white">
-              <span lang={languageFor("interface.hidden_3c2dfe59")} dir={directionFor("interface.hidden_3c2dfe59")}>
+              <span
+                lang={languageFor("interface.hidden_3c2dfe59")}
+                dir={directionFor("interface.hidden_3c2dfe59")}
+              >
                 {t("interface.hidden_3c2dfe59")}
               </span>
             </Badge>
@@ -707,7 +734,9 @@ const CompactGameCard = ({
                     void handleDownloadClick();
                   }}
                   disabled={addGameMutation.isPending}
-                  aria-label={formatInterfaceMessage("interface.download_title_5de658d1", { title: game.title })}
+                  aria-label={formatInterfaceMessage("interface.download_title_5de658d1", {
+                    title: game.title,
+                  })}
                   lang={languageFor("interface.download_title_5de658d1")}
                   dir={directionFor("interface.download_title_5de658d1")}
                 >
@@ -719,7 +748,10 @@ const CompactGameCard = ({
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <span lang={languageFor("interface.download_6964bb19")} dir={directionFor("interface.download_6964bb19")}>
+                <span
+                  lang={languageFor("interface.download_6964bb19")}
+                  dir={directionFor("interface.download_6964bb19")}
+                >
                   {t("interface.download_6964bb19")}
                 </span>
               </TooltipContent>
@@ -785,7 +817,10 @@ const CompactGameCard = ({
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <span lang={languageFor("interface.view_details_136a35ae")} dir={directionFor("interface.view_details_136a35ae")}>
+              <span
+                lang={languageFor("interface.view_details_136a35ae")}
+                dir={directionFor("interface.view_details_136a35ae")}
+              >
                 {t("interface.view_details_136a35ae")}
               </span>
             </TooltipContent>

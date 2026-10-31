@@ -165,9 +165,12 @@ export default function RssFeedList() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-primary hover:underline flex items-center gap-1 mt-2"
-                  aria-label={formatInterfaceMessage("interface.view_original_article_for_title_730db17a", {
-                    title: String(item.title ?? ""),
-                  })}
+                  aria-label={formatInterfaceMessage(
+                    "interface.view_original_article_for_title_730db17a",
+                    {
+                      title: String(item.title ?? ""),
+                    }
+                  )}
                   data-i18n-aria-label={"View original article for {title}"}
                   data-i18n-aria-label-values={JSON.stringify({ title: String(item.title ?? "") })}
                 >

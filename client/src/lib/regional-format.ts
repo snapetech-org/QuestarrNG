@@ -35,7 +35,11 @@ export const REGIONAL_FORMAT_OPTIONS = [
   { value: "system", label: "Use browser settings" },
   { value: "en", nativeName: "English", englishName: "English" },
   { value: "es", nativeName: "Español", englishName: "Spanish" },
-  { value: "es-419", nativeName: "Español (Latinoamérica)", englishName: "Spanish (Latin America)" },
+  {
+    value: "es-419",
+    nativeName: "Español (Latinoamérica)",
+    englishName: "Spanish (Latin America)",
+  },
   { value: "zh-CN", nativeName: "简体中文", englishName: "Chinese (Simplified)" },
   { value: "hi-IN", nativeName: "हिन्दी", englishName: "Hindi" },
   { value: "de", nativeName: "Deutsch", englishName: "German" },
@@ -264,7 +268,10 @@ export function formatRegionalDate(
   options?: Intl.DateTimeFormatOptions,
   preference = getRegionalPreference()
 ): string {
-  return new Intl.DateTimeFormat(getCurrentLocale(preference), options).format(date);
+  return new Intl.DateTimeFormat(getCurrentLocale(preference), {
+    ...options,
+    timeZone: "UTC",
+  }).format(date);
 }
 
 export function formatRegionalPercent(
@@ -295,16 +302,17 @@ export function formatRegionalUnit(
 }
 
 /** Parse a plain numeric field using the selected locale's digits and separators. */
-export function parseRegionalNumber(
-  input: string,
-  locale = getCurrentLocale()
-): number | null {
+export function parseRegionalNumber(input: string, locale = getCurrentLocale()): number | null {
   const value = input.trim();
   if (!value) return null;
 
   const parts = new Intl.NumberFormat(locale).formatToParts(-1234567890123.5);
-  const groupToken = parts.find((part) => part.type === "group")?.value;
-  const decimalToken = parts.find((part) => part.type === "decimal")?.value ?? ".";
+  const groupToken = value.includes("\u066c")
+    ? "\u066c"
+    : parts.find((part) => part.type === "group")?.value;
+  const decimalToken = value.includes("\u066b")
+    ? "\u066b"
+    : (parts.find((part) => part.type === "decimal")?.value ?? ".");
   const minusToken = parts.find((part) => part.type === "minusSign")?.value ?? "-";
   const digitFormatter = new Intl.NumberFormat(locale, { useGrouping: false });
   let normalized = value.replace(/[\u200e\u200f\u061c]/gu, "");
@@ -314,6 +322,8 @@ export function parseRegionalNumber(
     if (localizedDigit !== String(digit)) {
       normalized = normalized.replaceAll(localizedDigit, String(digit));
     }
+    normalized = normalized.replaceAll(String.fromCharCode(0x0660 + digit), String(digit));
+    normalized = normalized.replaceAll(String.fromCharCode(0x06f0 + digit), String(digit));
   }
   if (minusToken !== "-") normalized = normalized.replaceAll(minusToken, "-");
   normalized = normalized.replace("−", "-");

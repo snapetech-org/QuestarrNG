@@ -166,9 +166,12 @@ export default function InstalledVersionField({
               variant="outline"
               size="sm"
               className="h-8 px-2.5 text-xs"
-              aria-label={formatInterfaceMessage("interface.set_installed_version_to_version_b6f4ba58", {
-                version: String(version ?? ""),
-              })}
+              aria-label={formatInterfaceMessage(
+                "interface.set_installed_version_to_version_b6f4ba58",
+                {
+                  version: String(version ?? ""),
+                }
+              )}
               disabled={mutation.isPending}
               // Keep focus in the input: its blur would otherwise save the typed draft and
               // disable these buttons before the click lands.

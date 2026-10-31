@@ -696,12 +696,8 @@ export default function DiscoverPage() {
               </h1>
               <p
                 className="text-muted-foreground text-sm mt-0.5"
-                lang={languageFor(
-                  "interface.explore_popular_games_new_releases_320e855e"
-                )}
-                dir={directionFor(
-                  "interface.explore_popular_games_new_releases_320e855e"
-                )}
+                lang={languageFor("interface.explore_popular_games_new_releases_320e855e")}
+                dir={directionFor("interface.explore_popular_games_new_releases_320e855e")}
               >
                 {t("interface.explore_popular_games_new_releases_320e855e")}
               </p>

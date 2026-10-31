@@ -30,7 +30,7 @@ describe("localization infrastructure", () => {
 
     const oneCount = new Intl.NumberFormat("ar").format(1);
     expect(formatInterfacePluralMessage(1, forms, {}, "ar")).toBe(
-      translateInterfaceMessage(forms.one, "ar").replace("{count}", oneCount)
+      translateInterfaceMessage(forms.one, "ar").replace("{count}", `\u2068${oneCount}\u2069`)
     );
     expect(formatInterfacePluralMessage(2, forms, {}, "ar")).toBe(
       translateInterfaceMessage(forms.two, "ar")
@@ -71,12 +71,7 @@ describe("localization infrastructure", () => {
       )
     ).toBe("Download Example");
     expect(
-      formatInterfaceSelectMessage(
-        "unknown",
-        { other: "interface.cancel_35afca3b" },
-        {},
-        "en"
-      )
+      formatInterfaceSelectMessage("unknown", { other: "interface.cancel_35afca3b" }, {}, "en")
     ).toBe("Cancel");
   });
 

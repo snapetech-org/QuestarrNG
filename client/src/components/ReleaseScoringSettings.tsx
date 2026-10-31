@@ -162,7 +162,11 @@ export default function ReleaseScoringSettings({
             </CardDescription>
           </div>
           <Badge variant={enabled ? "default" : "outline"}>
-            {enabled ? <InterfaceText source="interface.enabled_9c86e43e" /> : <InterfaceText source="interface.off_0dc6b4aa" />}
+            {enabled ? (
+              <InterfaceText source="interface.enabled_9c86e43e" />
+            ) : (
+              <InterfaceText source="interface.off_0dc6b4aa" />
+            )}
           </Badge>
         </div>
       </CardHeader>
@@ -385,9 +389,12 @@ export default function ReleaseScoringSettings({
               variant="outline"
               size="sm"
               disabled={formats.length >= 50}
-              onClick={() => setFormats((current) => [...current, newFormat(t("interface.new_format_b446762c"))])}
+              onClick={() =>
+                setFormats((current) => [...current, newFormat(t("interface.new_format_b446762c"))])
+              }
             >
-              <Plus className="me-2 h-4 w-4" /> <InterfaceText source="interface.add_format_d4df950f" />
+              <Plus className="me-2 h-4 w-4" />{" "}
+              <InterfaceText source="interface.add_format_d4df950f" />
             </Button>
           </div>
           {formats.length === 0 ? (
@@ -522,7 +529,9 @@ export default function ReleaseScoringSettings({
                             maxLength={500}
                             value={spec.value}
                             placeholder={
-                              spec.mode === "regex" ? t("interface.e_g_gog_drm_free_df026737") : t("interface.text_to_match_744e05ce")
+                              spec.mode === "regex"
+                                ? t("interface.e_g_gog_drm_free_df026737")
+                                : t("interface.text_to_match_744e05ce")
                             }
                             onChange={(event) =>
                               updateSpec(format.id, index, { value: event.target.value })
@@ -585,7 +594,8 @@ export default function ReleaseScoringSettings({
                         })
                       }
                     >
-                      <Plus className="me-2 h-4 w-4" /> <InterfaceText source="interface.add_condition_4c29d229" />
+                      <Plus className="me-2 h-4 w-4" />{" "}
+                      <InterfaceText source="interface.add_condition_4c29d229" />
                     </Button>
                   </div>
                 </div>
@@ -596,8 +606,7 @@ export default function ReleaseScoringSettings({
 
         {(validationMessage || !isValid) && (
           <p role="alert" className="text-sm text-destructive">
-            {validationMessage ??
-              t("interface.complete_each_custom_format_condit_74039cef")}
+            {validationMessage ?? t("interface.complete_each_custom_format_condit_74039cef")}
           </p>
         )}
         <div className="flex justify-end border-t pt-4">

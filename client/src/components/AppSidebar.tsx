@@ -29,10 +29,7 @@ import {
 } from "@/components/navigation-items";
 import { withBasePath } from "@/lib/app-path";
 import { cn } from "@/lib/utils";
-import {
-  getInterfaceLanguageDirection,
-  useInterfaceLanguage,
-} from "@/lib/interface-locale";
+import { getInterfaceLanguageDirection, useInterfaceLanguage } from "@/lib/interface-locale";
 import {
   formatRegionalNumber,
   formatRegionalPluralMessage,
@@ -52,15 +49,8 @@ const EMPTY_GAMES: Game[] = [];
 export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<AppSidebarProps>) {
   const { logout, user } = useAuth();
   const { data: appConfig } = useQuery<Config>({ queryKey: ["/api/config"] });
-  const {
-    language,
-    t,
-    tId,
-    languageFor,
-    directionFor,
-    languageForId,
-    directionForId,
-  } = useInterfaceLanguage();
+  const { language, t, tId, languageFor, directionFor, languageForId, directionForId } =
+    useInterfaceLanguage();
   const regionalPreference = useRegionalPreference();
 
   const navigationText = (item: AppNavItem) =>
@@ -216,7 +206,10 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel lang={languageFor("interface.navigation_d08919c3")} dir={directionFor("interface.navigation_d08919c3")}>
+          <SidebarGroupLabel
+            lang={languageFor("interface.navigation_d08919c3")}
+            dir={directionFor("interface.navigation_d08919c3")}
+          >
             {t("interface.navigation_d08919c3")}
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -331,7 +324,10 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel lang={languageFor("interface.management_da9fd136")} dir={directionFor("interface.management_da9fd136")}>
+          <SidebarGroupLabel
+            lang={languageFor("interface.management_da9fd136")}
+            dir={directionFor("interface.management_da9fd136")}
+          >
             {t("interface.management_da9fd136")}
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -360,7 +356,10 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel lang={languageFor("interface.activity_9e75940c")} dir={directionFor("interface.activity_9e75940c")}>
+          <SidebarGroupLabel
+            lang={languageFor("interface.activity_9e75940c")}
+            dir={directionFor("interface.activity_9e75940c")}
+          >
             {t("interface.activity_9e75940c")}
           </SidebarGroupLabel>
           <SidebarGroupContent>

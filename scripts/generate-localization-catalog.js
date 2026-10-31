@@ -1,6 +1,8 @@
+import console from "node:console";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
+import * as prettier from "prettier";
 
 const root = process.cwd();
 const manifestPath = path.join(root, "localization/messages.json");
@@ -30,6 +32,17 @@ const outputs = new Map([
       " as const;\n",
   ],
 ]);
+for (const [relativePath, source] of outputs) {
+  const prettierConfig = (await prettier.resolveConfig(path.join(root, relativePath))) ?? {};
+  outputs.set(
+    relativePath,
+    await prettier.format(source, {
+      ...prettierConfig,
+      filepath: path.join(root, relativePath),
+      parser: "typescript",
+    })
+  );
+}
 
 const checkOnly = process.argv.includes("--check");
 let failed = false;

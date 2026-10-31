@@ -120,7 +120,11 @@ export default function MobileBottomNav({
             >
               <MoreHorizontal className="h-5 w-5" />
             </span>
-            <span className="leading-4" lang={languageFor("navigation.more")} dir={directionFor("navigation.more")}>
+            <span
+              className="leading-4"
+              lang={languageFor("navigation.more")}
+              dir={directionFor("navigation.more")}
+            >
               {t("navigation.more")}
             </span>
           </button>

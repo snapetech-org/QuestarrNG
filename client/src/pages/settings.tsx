@@ -182,7 +182,10 @@ function SettingsSaveButton({
         {pending ? (
           <>
             <RefreshCw className="h-4 w-4 motion-safe:animate-spin" />
-            <span lang={languageFor("interface.saving_1ee0c88f")} dir={directionFor("interface.saving_1ee0c88f")}>
+            <span
+              lang={languageFor("interface.saving_1ee0c88f")}
+              dir={directionFor("interface.saving_1ee0c88f")}
+            >
               {t("interface.saving_1ee0c88f")}
             </span>
           </>
@@ -1509,7 +1512,10 @@ export default function SettingsPage() {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="theme-select" className="text-sm font-medium">
-                      <span lang={languageFor("interface.select_theme_9ef7e3d8")} dir={directionFor("interface.select_theme_9ef7e3d8")}>
+                      <span
+                        lang={languageFor("interface.select_theme_9ef7e3d8")}
+                        dir={directionFor("interface.select_theme_9ef7e3d8")}
+                      >
                         {t("interface.select_theme_9ef7e3d8")}
                       </span>
                     </Label>
@@ -1558,12 +1564,8 @@ export default function SettingsPage() {
                     </Select>
                     <p
                       className="text-xs text-muted-foreground"
-                      lang={languageFor(
-                        "interface.purely_cosmetic_changes_the_visual_963dcc6c"
-                      )}
-                      dir={directionFor(
-                        "interface.purely_cosmetic_changes_the_visual_963dcc6c"
-                      )}
+                      lang={languageFor("interface.purely_cosmetic_changes_the_visual_963dcc6c")}
+                      dir={directionFor("interface.purely_cosmetic_changes_the_visual_963dcc6c")}
                     >
                       {t("interface.purely_cosmetic_changes_the_visual_963dcc6c")}
                     </p>
@@ -1618,16 +1620,10 @@ export default function SettingsPage() {
                 </CardTitle>
                 <CardDescription>
                   <span
-                    lang={languageFor(
-                      "interface.choose_how_dates_times_and_numbers_54ff187b"
-                    )}
-                    dir={directionFor(
-                      "interface.choose_how_dates_times_and_numbers_54ff187b"
-                    )}
+                    lang={languageFor("interface.choose_how_dates_times_and_numbers_54ff187b")}
+                    dir={directionFor("interface.choose_how_dates_times_and_numbers_54ff187b")}
                   >
-                    {t(
-                      "interface.choose_how_dates_times_and_numbers_54ff187b"
-                    )}
+                    {t("interface.choose_how_dates_times_and_numbers_54ff187b")}
                   </span>
                 </CardDescription>
               </CardHeader>
@@ -1882,7 +1878,9 @@ export default function SettingsPage() {
                     {Object.entries(blacklistByGame).map(([gameId, entries]) => (
                       <div key={gameId}>
                         <h4 className="text-sm font-semibold mb-2">
-                          {entries[0]?.gameTitle ?? <InterfaceText source="interface.unknown_game_6b8a9739" />}
+                          {entries[0]?.gameTitle ?? (
+                            <InterfaceText source="interface.unknown_game_6b8a9739" />
+                          )}
                         </h4>
                         <div className="space-y-2">
                           {entries.map((entry) => (
@@ -2201,9 +2199,12 @@ export default function SettingsPage() {
                             </td>
                             <td className="py-3 px-3 sm:px-6 text-center">
                               <Switch
-                                aria-label={formatInterfaceMessage("interface.in_app_label_3479d69a", {
-                                  label: String(label ?? ""),
-                                })}
+                                aria-label={formatInterfaceMessage(
+                                  "interface.in_app_label_3479d69a",
+                                  {
+                                    label: String(label ?? ""),
+                                  }
+                                )}
                                 checked={notifPrefs[key].inApp}
                                 onCheckedChange={(checked) =>
                                   handleNotifPrefChange(key, "inApp", checked)
@@ -2224,9 +2225,12 @@ export default function SettingsPage() {
                                 }
                               >
                                 <Switch
-                                  aria-label={formatInterfaceMessage("interface.apprise_label_c780bd91", {
-                                    label: String(label ?? ""),
-                                  })}
+                                  aria-label={formatInterfaceMessage(
+                                    "interface.apprise_label_c780bd91",
+                                    {
+                                      label: String(label ?? ""),
+                                    }
+                                  )}
                                   checked={notifPrefs[key].apprise}
                                   onCheckedChange={(checked) =>
                                     handleNotifPrefChange(key, "apprise", checked)

@@ -486,8 +486,7 @@ function rawToastCopy(): Set<string> {
 describe("interface source coverage", () => {
   it("catalogs every fixed interface string reference", () => {
     const uncatalogued = [...interfaceSourceKeys()].filter(
-      (source) =>
-        !hasCatalogMessage(source) && !INTENTIONALLY_UNTRANSLATED_SOURCE_KEYS.has(source)
+      (source) => !hasCatalogMessage(source) && !INTENTIONALLY_UNTRANSLATED_SOURCE_KEYS.has(source)
     );
 
     expect(uncatalogued).toEqual([]);
@@ -503,8 +502,7 @@ describe("interface source coverage", () => {
 
   it("catalogs fixed toast copy and translates it in the shared toast hook", () => {
     const uncatalogued = [...rawToastCopy()].filter(
-      (source) =>
-        !hasCatalogMessage(source) && !INTENTIONALLY_UNTRANSLATED_SOURCE_KEYS.has(source)
+      (source) => !hasCatalogMessage(source) && !INTENTIONALLY_UNTRANSLATED_SOURCE_KEYS.has(source)
     );
     const toastHook = readFileSync(resolve(CLIENT_SOURCE_ROOT, "hooks/use-toast.ts"), "utf8");
 

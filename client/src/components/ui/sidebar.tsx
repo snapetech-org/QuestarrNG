@@ -190,7 +190,10 @@ function Sidebar({
           side={side}
         >
           <SheetHeader className="sr-only">
-            <SheetTitle lang={languageFor("interface.sidebar_a2e5d767")} dir={directionFor("interface.sidebar_a2e5d767")}>
+            <SheetTitle
+              lang={languageFor("interface.sidebar_a2e5d767")}
+              dir={directionFor("interface.sidebar_a2e5d767")}
+            >
               {t("interface.sidebar_a2e5d767")}
             </SheetTitle>
             <SheetDescription

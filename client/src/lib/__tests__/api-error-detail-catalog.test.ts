@@ -9,7 +9,7 @@ import {
 } from "@/lib/api-error-details/source-messages";
 import { ADDITIONAL_API_ERROR_DETAIL_SOURCE_MESSAGES } from "@/lib/api-error-details/additional-source-messages";
 import { getApiErrorDetailLabel } from "@/lib/api-error-details";
-import { UI_LABELS } from "@/lib/ui-labels";
+import { hasInterfaceMessage } from "@/lib/interface-locale";
 import { API_ERROR_DETAIL_LABELS as spanish } from "@/lib/api-error-details/es";
 import { API_ERROR_DETAIL_LABELS as simplifiedChinese } from "@/lib/api-error-details/zh-Hans";
 import { API_ERROR_DETAIL_LABELS as hindi } from "@/lib/api-error-details/hi";
@@ -110,10 +110,9 @@ describe("API error detail source catalog", () => {
       }
     }
 
-    const catalogKeys = new Set(Object.keys(UI_LABELS));
     const listedKeys = new Set<string>(API_ERROR_DETAIL_SOURCE_MESSAGES);
     const missing = [...fixedErrors].filter(
-      (message) => !catalogKeys.has(message) && !listedKeys.has(message)
+      (message) => !hasInterfaceMessage(message) && !listedKeys.has(message)
     );
     const stale = API_ERROR_DETAIL_SOURCE_MESSAGES.filter((message) => !source.includes(message));
 

@@ -36,7 +36,10 @@ function StatusBadge({ status }: { status: string }) {
     return (
       <Badge className="bg-emerald-900/40 text-emerald-400 border-emerald-700/50 gap-1">
         <CheckCircle className="w-3 h-3" aria-hidden="true" />
-        <span lang={languageFor("interface.completed_ec88aab2")} dir={directionFor("interface.completed_ec88aab2")}>
+        <span
+          lang={languageFor("interface.completed_ec88aab2")}
+          dir={directionFor("interface.completed_ec88aab2")}
+        >
           {t("interface.completed_ec88aab2")}
         </span>
       </Badge>
@@ -46,7 +49,10 @@ function StatusBadge({ status }: { status: string }) {
     return (
       <Badge className="bg-amber-900/40 text-amber-400 border-amber-700/50 gap-1">
         <AlertTriangle className="w-3 h-3" aria-hidden="true" />
-        <span lang={languageFor("interface.with_errors_58377360")} dir={directionFor("interface.with_errors_58377360")}>
+        <span
+          lang={languageFor("interface.with_errors_58377360")}
+          dir={directionFor("interface.with_errors_58377360")}
+        >
           {t("interface.with_errors_58377360")}
         </span>
       </Badge>
@@ -56,7 +62,10 @@ function StatusBadge({ status }: { status: string }) {
     return (
       <Badge className="bg-red-900/40 text-red-400 border-red-700/50 gap-1">
         <XCircle className="w-3 h-3" aria-hidden="true" />
-        <span lang={languageFor("interface.failed_5579c3d4")} dir={directionFor("interface.failed_5579c3d4")}>
+        <span
+          lang={languageFor("interface.failed_5579c3d4")}
+          dir={directionFor("interface.failed_5579c3d4")}
+        >
           {t("interface.failed_5579c3d4")}
         </span>
       </Badge>
@@ -66,7 +75,10 @@ function StatusBadge({ status }: { status: string }) {
     return (
       <Badge className="bg-blue-900/40 text-blue-400 border-blue-700/50 gap-1">
         <Loader2 className="w-3 h-3 animate-spin" aria-hidden="true" />
-        <span lang={languageFor("interface.in_progress_2948b425")} dir={directionFor("interface.in_progress_2948b425")}>
+        <span
+          lang={languageFor("interface.in_progress_2948b425")}
+          dir={directionFor("interface.in_progress_2948b425")}
+        >
           {t("interface.in_progress_2948b425")}
         </span>
       </Badge>
@@ -75,7 +87,10 @@ function StatusBadge({ status }: { status: string }) {
   return (
     <Badge className="bg-slate-800 text-slate-400 border-slate-700 gap-1">
       <Clock className="w-3 h-3" aria-hidden="true" />
-      <span lang={languageFor("interface.pending_3352afdc")} dir={directionFor("interface.pending_3352afdc")}>
+      <span
+        lang={languageFor("interface.pending_3352afdc")}
+        dir={directionFor("interface.pending_3352afdc")}
+      >
         {t("interface.pending_3352afdc")}
       </span>
     </Badge>
@@ -312,7 +327,10 @@ export default function ImportHistoryPage() {
                   </span>
                 )
               ) : (
-                <span lang={languageFor("interface.task_detail_ad64fa95")} dir={directionFor("interface.task_detail_ad64fa95")}>
+                <span
+                  lang={languageFor("interface.task_detail_ad64fa95")}
+                  dir={directionFor("interface.task_detail_ad64fa95")}
+                >
                   {t("interface.task_detail_ad64fa95")}
                 </span>
               )}
@@ -336,12 +354,8 @@ export default function ImportHistoryPage() {
                 <StatusBadge status={selectedTask.status} />
                 <span
                   className="text-xs text-slate-500"
-                  lang={languageFor(
-                    "interface.total_total_added_added_skipped_sk_21cf07a0"
-                  )}
-                  dir={directionFor(
-                    "interface.total_total_added_added_skipped_sk_21cf07a0"
-                  )}
+                  lang={languageFor("interface.total_total_added_added_skipped_sk_21cf07a0")}
+                  dir={directionFor("interface.total_total_added_added_skipped_sk_21cf07a0")}
                 >
                   {formatInterfaceMessage(
                     "interface.total_total_added_added_skipped_sk_21cf07a0",

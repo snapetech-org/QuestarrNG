@@ -420,9 +420,12 @@ export function PathMappingSettings() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      aria-label={formatInterfaceMessage("interface.edit_mapping_for_path_ddb1e915", {
-                        path: String(mapping.remotePath ?? ""),
-                      })}
+                      aria-label={formatInterfaceMessage(
+                        "interface.edit_mapping_for_path_ddb1e915",
+                        {
+                          path: String(mapping.remotePath ?? ""),
+                        }
+                      )}
                       onClick={() => openEditDialog(mapping)}
                     >
                       <Pencil className="h-4 w-4" />
@@ -430,9 +433,12 @@ export function PathMappingSettings() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      aria-label={formatInterfaceMessage("interface.delete_mapping_for_path_00d2c9f4", {
-                        path: String(mapping.remotePath ?? ""),
-                      })}
+                      aria-label={formatInterfaceMessage(
+                        "interface.delete_mapping_for_path_00d2c9f4",
+                        {
+                          path: String(mapping.remotePath ?? ""),
+                        }
+                      )}
                       className="text-destructive hover:text-destructive"
                       onClick={() => deleteMutation.mutate(mapping.id)}
                     >

@@ -69,8 +69,16 @@ export default function StatsPage() {
       { key: "Wanted", name: t("interface.wanted_4237dc0e"), value: stats.statusBreakdown.wanted },
       { key: "Owned", name: t("interface.owned_8922a21e"), value: stats.statusBreakdown.owned },
       { key: "Playing", name: t("navigation.playing"), value: stats.statusBreakdown.playing },
-      { key: "Completed", name: t("interface.completed_ec88aab2"), value: stats.statusBreakdown.completed },
-      { key: "Downloading", name: t("interface.downloading_8d063a47"), value: stats.statusBreakdown.downloading },
+      {
+        key: "Completed",
+        name: t("interface.completed_ec88aab2"),
+        value: stats.statusBreakdown.completed,
+      },
+      {
+        key: "Downloading",
+        name: t("interface.downloading_8d063a47"),
+        value: stats.statusBreakdown.downloading,
+      },
     ].filter((item) => item.value > 0);
   }, [stats.statusBreakdown, t]);
 
@@ -207,7 +215,10 @@ export default function StatsPage() {
           <CardHeader>
             <CardTitle className="text-lg font-medium flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-primary" />
-              <span lang={languageFor("interface.status_breakdown_2dd0dd1c")} dir={directionFor("interface.status_breakdown_2dd0dd1c")}>
+              <span
+                lang={languageFor("interface.status_breakdown_2dd0dd1c")}
+                dir={directionFor("interface.status_breakdown_2dd0dd1c")}
+              >
                 {t("interface.status_breakdown_2dd0dd1c")}
               </span>
             </CardTitle>
@@ -259,7 +270,10 @@ export default function StatsPage() {
           <CardHeader>
             <CardTitle className="text-lg font-medium flex items-center gap-2">
               <LayoutGrid className="w-5 h-5 text-primary" />
-              <span lang={languageFor("interface.quick_info_c8098f68")} dir={directionFor("interface.quick_info_c8098f68")}>
+              <span
+                lang={languageFor("interface.quick_info_c8098f68")}
+                dir={directionFor("interface.quick_info_c8098f68")}
+              >
                 {t("interface.quick_info_c8098f68")}
               </span>
             </CardTitle>
@@ -270,7 +284,10 @@ export default function StatsPage() {
                 <Tags className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 <div>
                   <p className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
-                    <span lang={languageFor("interface.top_genre_cc7e50f3")} dir={directionFor("interface.top_genre_cc7e50f3")}>
+                    <span
+                      lang={languageFor("interface.top_genre_cc7e50f3")}
+                      dir={directionFor("interface.top_genre_cc7e50f3")}
+                    >
                       {t("interface.top_genre_cc7e50f3")}
                     </span>
                   </p>
@@ -280,7 +297,10 @@ export default function StatsPage() {
                         {stats.topGenre.name}
                       </span>
                     ) : (
-                      <span lang={languageFor("interface.n_a_79db7a01")} dir={directionFor("interface.n_a_79db7a01")}>
+                      <span
+                        lang={languageFor("interface.n_a_79db7a01")}
+                        dir={directionFor("interface.n_a_79db7a01")}
+                      >
                         {t("interface.n_a_79db7a01")}
                       </span>
                     )}
@@ -292,7 +312,10 @@ export default function StatsPage() {
                 <Gamepad2 className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 <div>
                   <p className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
-                    <span lang={languageFor("interface.top_platform_55121747")} dir={directionFor("interface.top_platform_55121747")}>
+                    <span
+                      lang={languageFor("interface.top_platform_55121747")}
+                      dir={directionFor("interface.top_platform_55121747")}
+                    >
                       {t("interface.top_platform_55121747")}
                     </span>
                   </p>
@@ -302,7 +325,10 @@ export default function StatsPage() {
                         {stats.topPlatform.name}
                       </span>
                     ) : (
-                      <span lang={languageFor("interface.n_a_79db7a01")} dir={directionFor("interface.n_a_79db7a01")}>
+                      <span
+                        lang={languageFor("interface.n_a_79db7a01")}
+                        dir={directionFor("interface.n_a_79db7a01")}
+                      >
                         {t("interface.n_a_79db7a01")}
                       </span>
                     )}
@@ -314,7 +340,10 @@ export default function StatsPage() {
                 <Building2 className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                 <div>
                   <p className="text-xs text-muted-foreground uppercase font-semibold tracking-wider">
-                    <span lang={languageFor("interface.top_publisher_7dcd1cec")} dir={directionFor("interface.top_publisher_7dcd1cec")}>
+                    <span
+                      lang={languageFor("interface.top_publisher_7dcd1cec")}
+                      dir={directionFor("interface.top_publisher_7dcd1cec")}
+                    >
                       {t("interface.top_publisher_7dcd1cec")}
                     </span>
                   </p>
@@ -324,7 +353,10 @@ export default function StatsPage() {
                         {stats.topPublisher.name}
                       </span>
                     ) : (
-                      <span lang={languageFor("interface.n_a_79db7a01")} dir={directionFor("interface.n_a_79db7a01")}>
+                      <span
+                        lang={languageFor("interface.n_a_79db7a01")}
+                        dir={directionFor("interface.n_a_79db7a01")}
+                      >
                         {t("interface.n_a_79db7a01")}
                       </span>
                     )}

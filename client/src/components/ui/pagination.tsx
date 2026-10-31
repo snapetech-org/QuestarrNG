@@ -68,7 +68,10 @@ const PaginationPrevious = ({
       {...props}
     >
       <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
-      <span lang={languageFor("interface.previous_ead1fb48")} dir={directionFor("interface.previous_ead1fb48")}>
+      <span
+        lang={languageFor("interface.previous_ead1fb48")}
+        dir={directionFor("interface.previous_ead1fb48")}
+      >
         {t("interface.previous_ead1fb48")}
       </span>
     </PaginationLink>
@@ -87,7 +90,10 @@ const PaginationNext = ({ className, ...props }: React.ComponentProps<typeof Pag
       className={cn("gap-1 pe-2.5", className)}
       {...props}
     >
-      <span lang={languageFor("interface.next_dce2da08")} dir={directionFor("interface.next_dce2da08")}>
+      <span
+        lang={languageFor("interface.next_dce2da08")}
+        dir={directionFor("interface.next_dce2da08")}
+      >
         {t("interface.next_dce2da08")}
       </span>
       <ChevronRight className="h-4 w-4 rtl:rotate-180" />

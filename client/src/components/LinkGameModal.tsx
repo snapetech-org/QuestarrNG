@@ -70,9 +70,7 @@ export default function LinkGameModal({
     onSuccess: () => {
       toast({
         title: localizedText("interface.game_linked_5437aae0"),
-        description: localizedText(
-          "interface.continue_by_reviewing_the_import_s_a709a813"
-        ),
+        description: localizedText("interface.continue_by_reviewing_the_import_s_a709a813"),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/imports/pending"] });
       onOpenChange(false);
@@ -101,9 +99,7 @@ export default function LinkGameModal({
   } else if (games.length === 0) {
     resultsContent = (
       <div className="flex items-center justify-center h-full text-sm text-muted-foreground px-4 text-center">
-        {localizedText(
-          "interface.no_games_found_try_a_different_sea_f654fc2c"
-        )}
+        {localizedText("interface.no_games_found_try_a_different_sea_f654fc2c")}
       </div>
     );
   } else {
@@ -152,16 +148,15 @@ export default function LinkGameModal({
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle lang={languageFor("interface.link_to_a_game_b17ad089")} dir={directionFor("interface.link_to_a_game_b17ad089")}>
+          <DialogTitle
+            lang={languageFor("interface.link_to_a_game_b17ad089")}
+            dir={directionFor("interface.link_to_a_game_b17ad089")}
+          >
             {t("interface.link_to_a_game_b17ad089")}
           </DialogTitle>
           <DialogDescription
-            lang={languageFor(
-              "interface.the_game_originally_linked_to_titl_4fda6a26"
-            )}
-            dir={directionFor(
-              "interface.the_game_originally_linked_to_titl_4fda6a26"
-            )}
+            lang={languageFor("interface.the_game_originally_linked_to_titl_4fda6a26")}
+            dir={directionFor("interface.the_game_originally_linked_to_titl_4fda6a26")}
           >
             {formatInterfaceMessage(
               "interface.the_game_originally_linked_to_titl_4fda6a26",
@@ -206,7 +201,10 @@ export default function LinkGameModal({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            <span lang={languageFor("interface.cancel_35afca3b")} dir={directionFor("interface.cancel_35afca3b")}>
+            <span
+              lang={languageFor("interface.cancel_35afca3b")}
+              dir={directionFor("interface.cancel_35afca3b")}
+            >
               {t("interface.cancel_35afca3b")}
             </span>
           </Button>
@@ -215,7 +213,10 @@ export default function LinkGameModal({
             onClick={() => selectedGameId && linkMutation.mutate(selectedGameId)}
           >
             {linkMutation.isPending && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
-            <span lang={languageFor("interface.link_game_167e02e9")} dir={directionFor("interface.link_game_167e02e9")}>
+            <span
+              lang={languageFor("interface.link_game_167e02e9")}
+              dir={directionFor("interface.link_game_167e02e9")}
+            >
               {t("interface.link_game_167e02e9")}
             </span>
           </Button>

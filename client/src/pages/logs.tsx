@@ -245,7 +245,11 @@ const LogLineRow = memo(function LogLineRow({
       ].join(" ")}
       onClick={() => onSelect(line)}
       data-testid="log-line-row"
-      aria-label={formatInterfaceMessage("interface.inspect_log_message_991b5716", { message: line.msg }, language)}
+      aria-label={formatInterfaceMessage(
+        "interface.inspect_log_message_991b5716",
+        { message: line.msg },
+        language
+      )}
       lang={languageFor("interface.inspect_log_message_991b5716")}
       dir={directionFor("interface.inspect_log_message_991b5716")}
     >
@@ -291,7 +295,11 @@ const LogLineCard = memo(function LogLineCard({
       ].join(" ")}
       onClick={() => onSelect(line)}
       data-testid="log-line-row"
-      aria-label={formatInterfaceMessage("interface.inspect_log_message_991b5716", { message: line.msg }, language)}
+      aria-label={formatInterfaceMessage(
+        "interface.inspect_log_message_991b5716",
+        { message: line.msg },
+        language
+      )}
       lang={languageFor("interface.inspect_log_message_991b5716")}
       dir={directionFor("interface.inspect_log_message_991b5716")}
     >
@@ -447,7 +455,10 @@ function LogInspector({
                   dir={directionFor("interface.copy_raw_log_line_16ea97d6")}
                 >
                   <Copy className="me-1 h-4 w-4" />
-                  <span lang={languageFor("interface.copy_raw_adfbe522")} dir={directionFor("interface.copy_raw_adfbe522")}>
+                  <span
+                    lang={languageFor("interface.copy_raw_adfbe522")}
+                    dir={directionFor("interface.copy_raw_adfbe522")}
+                  >
                     {t("interface.copy_raw_adfbe522")}
                   </span>
                 </Button>
@@ -462,7 +473,10 @@ function LogInspector({
                   dir={directionFor("interface.copy_parsed_payload_12cb9427")}
                 >
                   <Copy className="me-1 h-4 w-4" />
-                  <span lang={languageFor("interface.copy_json_e595bc8e")} dir={directionFor("interface.copy_json_e595bc8e")}>
+                  <span
+                    lang={languageFor("interface.copy_json_e595bc8e")}
+                    dir={directionFor("interface.copy_json_e595bc8e")}
+                  >
                     {t("interface.copy_json_e595bc8e")}
                   </span>
                 </Button>
@@ -494,7 +508,9 @@ function LogInspector({
                         lang={line.time ? "und" : languageFor("interface.no_timestamp_b045a976")}
                         dir={line.time ? "auto" : directionFor("interface.no_timestamp_b045a976")}
                       >
-                        {line.time ? formatDateTime(line.time) : t("interface.no_timestamp_b045a976")}
+                        {line.time
+                          ? formatDateTime(line.time)
+                          : t("interface.no_timestamp_b045a976")}
                       </p>
                     </div>
                     <div>
@@ -568,7 +584,10 @@ function LogInspector({
 
                 <section className="rounded-lg border border-border bg-black/20 p-4">
                   <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-zinc-400">
-                    <span lang={languageFor("interface.raw_ndjson_00787ad7")} dir={directionFor("interface.raw_ndjson_00787ad7")}>
+                    <span
+                      lang={languageFor("interface.raw_ndjson_00787ad7")}
+                      dir={directionFor("interface.raw_ndjson_00787ad7")}
+                    >
                       {t("interface.raw_ndjson_00787ad7")}
                     </span>
                   </h3>
@@ -779,7 +798,10 @@ export default function LogsPage() {
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
             <ScrollText className="h-6 w-6" />
-            <span lang={languageFor("interface.server_logs_b6f4597d")} dir={directionFor("interface.server_logs_b6f4597d")}>
+            <span
+              lang={languageFor("interface.server_logs_b6f4597d")}
+              dir={directionFor("interface.server_logs_b6f4597d")}
+            >
               {t("interface.server_logs_b6f4597d")}
             </span>
           </h1>
@@ -813,14 +835,20 @@ export default function LogsPage() {
             {autoScroll ? (
               <>
                 <PauseCircle className="me-1 h-4 w-4" />
-                <span lang={languageFor("interface.pause_44f9bf2d")} dir={directionFor("interface.pause_44f9bf2d")}>
+                <span
+                  lang={languageFor("interface.pause_44f9bf2d")}
+                  dir={directionFor("interface.pause_44f9bf2d")}
+                >
                   {t("interface.pause_44f9bf2d")}
                 </span>
               </>
             ) : (
               <>
                 <PlayCircle className="me-1 h-4 w-4" />
-                <span lang={languageFor("interface.resume_454d1d8a")} dir={directionFor("interface.resume_454d1d8a")}>
+                <span
+                  lang={languageFor("interface.resume_454d1d8a")}
+                  dir={directionFor("interface.resume_454d1d8a")}
+                >
                   {t("interface.resume_454d1d8a")}
                 </span>
               </>
@@ -836,7 +864,10 @@ export default function LogsPage() {
             dir={directionFor("interface.copy_log_lines_2ec889e1")}
           >
             <Copy className="me-1 h-4 w-4" />
-            <span lang={languageFor("interface.copy_658f3664")} dir={directionFor("interface.copy_658f3664")}>
+            <span
+              lang={languageFor("interface.copy_658f3664")}
+              dir={directionFor("interface.copy_658f3664")}
+            >
               {t("interface.copy_658f3664")}
             </span>
           </Button>
@@ -850,7 +881,10 @@ export default function LogsPage() {
             dir={directionFor("interface.clear_log_lines_be68a65f")}
           >
             <Trash2 className="me-1 h-4 w-4" />
-            <span lang={languageFor("interface.clear_04a57fc2")} dir={directionFor("interface.clear_04a57fc2")}>
+            <span
+              lang={languageFor("interface.clear_04a57fc2")}
+              dir={directionFor("interface.clear_04a57fc2")}
+            >
               {t("interface.clear_04a57fc2")}
             </span>
           </Button>
@@ -864,7 +898,10 @@ export default function LogsPage() {
             dir={directionFor("interface.send_logs_to_support_755fbd30")}
           >
             <Send className="me-1 h-4 w-4" />
-            <span lang={languageFor("interface.send_logs_be96d4fe")} dir={directionFor("interface.send_logs_be96d4fe")}>
+            <span
+              lang={languageFor("interface.send_logs_be96d4fe")}
+              dir={directionFor("interface.send_logs_be96d4fe")}
+            >
               {t("interface.send_logs_be96d4fe")}
             </span>
           </Button>
@@ -889,19 +926,39 @@ export default function LogsPage() {
             >
               {t("interface.all_levels_a3c66913")}
             </SelectItem>
-            <SelectItem value="10" lang={languageFor("interface.trace_bed443ff")} dir={directionFor("interface.trace_bed443ff")}>
+            <SelectItem
+              value="10"
+              lang={languageFor("interface.trace_bed443ff")}
+              dir={directionFor("interface.trace_bed443ff")}
+            >
               {t("interface.trace_bed443ff")}
             </SelectItem>
-            <SelectItem value="20" lang={languageFor("interface.debug_c9b7d6e9")} dir={directionFor("interface.debug_c9b7d6e9")}>
+            <SelectItem
+              value="20"
+              lang={languageFor("interface.debug_c9b7d6e9")}
+              dir={directionFor("interface.debug_c9b7d6e9")}
+            >
               {t("interface.debug_c9b7d6e9")}
             </SelectItem>
-            <SelectItem value="30" lang={languageFor("interface.info_8e9d280a")} dir={directionFor("interface.info_8e9d280a")}>
+            <SelectItem
+              value="30"
+              lang={languageFor("interface.info_8e9d280a")}
+              dir={directionFor("interface.info_8e9d280a")}
+            >
               {t("interface.info_8e9d280a")}
             </SelectItem>
-            <SelectItem value="40" lang={languageFor("interface.warn_3ca5bb4e")} dir={directionFor("interface.warn_3ca5bb4e")}>
+            <SelectItem
+              value="40"
+              lang={languageFor("interface.warn_3ca5bb4e")}
+              dir={directionFor("interface.warn_3ca5bb4e")}
+            >
               {t("interface.warn_3ca5bb4e")}
             </SelectItem>
-            <SelectItem value="50" lang={languageFor("interface.error_41edeb2e")} dir={directionFor("interface.error_41edeb2e")}>
+            <SelectItem
+              value="50"
+              lang={languageFor("interface.error_41edeb2e")}
+              dir={directionFor("interface.error_41edeb2e")}
+            >
               {t("interface.error_41edeb2e")}
             </SelectItem>
           </SelectContent>
@@ -991,13 +1048,22 @@ export default function LogsPage() {
                     >
                       {t("interface.level_4155597d")}
                     </span>
-                    <span lang={languageFor("interface.module_c4fc60bd")} dir={directionFor("interface.module_c4fc60bd")}>
+                    <span
+                      lang={languageFor("interface.module_c4fc60bd")}
+                      dir={directionFor("interface.module_c4fc60bd")}
+                    >
                       {t("interface.module_c4fc60bd")}
                     </span>
-                    <span lang={languageFor("interface.message_ae0ed984")} dir={directionFor("interface.message_ae0ed984")}>
+                    <span
+                      lang={languageFor("interface.message_ae0ed984")}
+                      dir={directionFor("interface.message_ae0ed984")}
+                    >
                       {t("interface.message_ae0ed984")}
                     </span>
-                    <span lang={languageFor("interface.context_bd317f1c")} dir={directionFor("interface.context_bd317f1c")}>
+                    <span
+                      lang={languageFor("interface.context_bd317f1c")}
+                      dir={directionFor("interface.context_bd317f1c")}
+                    >
                       {t("interface.context_bd317f1c")}
                     </span>
                   </div>

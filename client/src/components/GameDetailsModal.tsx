@@ -555,7 +555,10 @@ function StarRatingInput({
             <span className="sr-only"> ({value}/10)</span>
           </>
         ) : (
-          <span lang={languageFor("interface.not_rated_9de37148")} dir={directionFor("interface.not_rated_9de37148")}>
+          <span
+            lang={languageFor("interface.not_rated_9de37148")}
+            dir={directionFor("interface.not_rated_9de37148")}
+          >
             {t("interface.not_rated_9de37148")}
           </span>
         )}
@@ -1175,7 +1178,9 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
             <div className="flex-shrink-0">
               <img
                 src={game.coverUrl}
-                alt={formatInterfaceMessage("interface.title_cover_c9fae4f4", { title: String(game.title ?? "") })}
+                alt={formatInterfaceMessage("interface.title_cover_c9fae4f4", {
+                  title: String(game.title ?? ""),
+                })}
                 lang="und"
                 dir="auto"
                 className="w-20 sm:w-32 object-cover rounded-lg shadow-md"
@@ -1356,7 +1361,10 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                 <div>
                   <h3 className="font-semibold mb-2 flex items-center gap-2">
                     <Gamepad2 className="w-4 h-4" />
-                    <span lang={languageFor("interface.about_58e096de")} dir={directionFor("interface.about_58e096de")}>
+                    <span
+                      lang={languageFor("interface.about_58e096de")}
+                      dir={directionFor("interface.about_58e096de")}
+                    >
                       {t("interface.about_58e096de")}
                     </span>
                   </h3>
@@ -1452,7 +1460,10 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                 <div>
                   <h3 className="font-semibold mb-2 flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4" />
-                    <span lang={languageFor("interface.crack_status_9d161165")} dir={directionFor("interface.crack_status_9d161165")}>
+                    <span
+                      lang={languageFor("interface.crack_status_9d161165")}
+                      dir={directionFor("interface.crack_status_9d161165")}
+                    >
                       {t("interface.crack_status_9d161165")}
                     </span>
                   </h3>
@@ -1557,7 +1568,10 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                   <div>
                     <h3 className="font-semibold mb-2 flex items-center gap-2">
                       <Tag className="w-4 h-4" />
-                      <span lang={languageFor("interface.genres_65d70ee9")} dir={directionFor("interface.genres_65d70ee9")}>
+                      <span
+                        lang={languageFor("interface.genres_65d70ee9")}
+                        dir={directionFor("interface.genres_65d70ee9")}
+                      >
                         {t("interface.genres_65d70ee9")}
                       </span>
                     </h3>
@@ -1573,7 +1587,10 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                   <div>
                     <h3 className="font-semibold mb-2 flex items-center gap-2">
                       <Monitor className="w-4 h-4" />
-                      <span lang={languageFor("interface.platforms_c06da773")} dir={directionFor("interface.platforms_c06da773")}>
+                      <span
+                        lang={languageFor("interface.platforms_c06da773")}
+                        dir={directionFor("interface.platforms_c06da773")}
+                      >
                         {t("interface.platforms_c06da773")}
                       </span>
                     </h3>
@@ -1632,12 +1649,8 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                     </Select>
                     <p
                       className="mt-1 text-xs text-muted-foreground"
-                      lang={languageFor(
-                        "interface.overrides_the_account_platform_for_4d0354db"
-                      )}
-                      dir={directionFor(
-                        "interface.overrides_the_account_platform_for_4d0354db"
-                      )}
+                      lang={languageFor("interface.overrides_the_account_platform_for_4d0354db")}
+                      dir={directionFor("interface.overrides_the_account_platform_for_4d0354db")}
                     >
                       {t("interface.overrides_the_account_platform_for_4d0354db")}
                     </p>
@@ -1775,9 +1788,12 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                     <button
                       key={index}
                       type="button"
-                      aria-label={formatInterfaceMessage("interface.open_screenshot_value_2d23d24a", {
-                        value: String(index + 1),
-                      })}
+                      aria-label={formatInterfaceMessage(
+                        "interface.open_screenshot_value_2d23d24a",
+                        {
+                          value: String(index + 1),
+                        }
+                      )}
                       className="shadcn-card overflow-hidden cursor-pointer hover-elevate rounded-xl border bg-card border-card-border text-card-foreground shadow-sm"
                       onClick={() => setSelectedScreenshotIndex(index)}
                       data-testid={`screenshot-${index}`}
@@ -2351,7 +2367,11 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
               )}
               <img
                 src={screenshots[selectedScreenshotIndex]}
-                alt={formatInterfaceMessage("interface.screenshot_of_game_126a19fc", { game: game.title }, language)}
+                alt={formatInterfaceMessage(
+                  "interface.screenshot_of_game_126a19fc",
+                  { game: game.title },
+                  language
+                )}
                 lang={languageFor("interface.screenshot_of_game_126a19fc")}
                 dir={directionFor("interface.screenshot_of_game_126a19fc")}
                 className={cn(
@@ -2457,16 +2477,15 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
       <AlertDialog open={showRemoveConfirm} onOpenChange={setShowRemoveConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle lang={languageFor("interface.remove_game_095ea616")} dir={directionFor("interface.remove_game_095ea616")}>
+            <AlertDialogTitle
+              lang={languageFor("interface.remove_game_095ea616")}
+              dir={directionFor("interface.remove_game_095ea616")}
+            >
               {t("interface.remove_game_095ea616")}
             </AlertDialogTitle>
             <AlertDialogDescription
-              lang={languageFor(
-                "interface.this_will_remove_game_from_your_li_b280beb8"
-              )}
-              dir={directionFor(
-                "interface.this_will_remove_game_from_your_li_b280beb8"
-              )}
+              lang={languageFor("interface.this_will_remove_game_from_your_li_b280beb8")}
+              dir={directionFor("interface.this_will_remove_game_from_your_li_b280beb8")}
             >
               {formatInterfaceMessage(
                 "interface.this_will_remove_game_from_your_li_b280beb8",
@@ -2539,7 +2558,10 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
             </div>
           )}
           <AlertDialogFooter>
-            <AlertDialogCancel lang={languageFor("interface.cancel_35afca3b")} dir={directionFor("interface.cancel_35afca3b")}>
+            <AlertDialogCancel
+              lang={languageFor("interface.cancel_35afca3b")}
+              dir={directionFor("interface.cancel_35afca3b")}
+            >
               {t("interface.cancel_35afca3b")}
             </AlertDialogCancel>
             <AlertDialogAction
@@ -2555,7 +2577,10 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
               }}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              <span lang={languageFor("interface.remove_21a5901d")} dir={directionFor("interface.remove_21a5901d")}>
+              <span
+                lang={languageFor("interface.remove_21a5901d")}
+                dir={directionFor("interface.remove_21a5901d")}
+              >
                 {t("interface.remove_21a5901d")}
               </span>
             </AlertDialogAction>

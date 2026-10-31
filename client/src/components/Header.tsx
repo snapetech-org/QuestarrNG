@@ -122,7 +122,10 @@ export default function Header({
                   />
                 </TooltipTrigger>
                 <TooltipContent side="right">
-                  <p lang={languageFor("interface.toggle_sidebar_1824bc01")} dir={directionFor("interface.toggle_sidebar_1824bc01")}>
+                  <p
+                    lang={languageFor("interface.toggle_sidebar_1824bc01")}
+                    dir={directionFor("interface.toggle_sidebar_1824bc01")}
+                  >
                     {t("interface.toggle_sidebar_1824bc01")}
                   </p>
                 </TooltipContent>
@@ -162,7 +165,10 @@ export default function Header({
               )}
               {!isLoading && !isError && storageInfo.length === 0 && (
                 <span className="hidden text-xs text-muted-foreground opacity-50 sm:inline">
-                  <span lang={languageFor("interface.no_downloaders_3707f3b6")} dir={directionFor("interface.no_downloaders_3707f3b6")}>
+                  <span
+                    lang={languageFor("interface.no_downloaders_3707f3b6")}
+                    dir={directionFor("interface.no_downloaders_3707f3b6")}
+                  >
                     {t("interface.no_downloaders_3707f3b6")}
                   </span>
                 </span>
@@ -311,16 +317,10 @@ export default function Header({
           </AlertTitle>
           <AlertDescription className="flex items-center gap-2">
             <span
-              lang={languageFor(
-                "interface.igdb_credentials_are_required_the_e38cceec"
-              )}
-              dir={directionFor(
-                "interface.igdb_credentials_are_required_the_e38cceec"
-              )}
+              lang={languageFor("interface.igdb_credentials_are_required_the_e38cceec")}
+              dir={directionFor("interface.igdb_credentials_are_required_the_e38cceec")}
             >
-              {t(
-                "interface.igdb_credentials_are_required_the_e38cceec"
-              )}
+              {t("interface.igdb_credentials_are_required_the_e38cceec")}
             </span>
             <Link href="/settings">
               <span

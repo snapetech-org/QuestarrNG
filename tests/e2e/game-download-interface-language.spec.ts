@@ -936,38 +936,36 @@ test.describe("Game download interface language", () => {
   });
 });
 
-test(
-  "keeps a long mixed-direction game title accessible at 200% text scaling",
-  async ({ page }) => {
-    const longMixedTitle =
-      "لعبة استراتيجية طويلة — Space Questarr: Remastered / Edition 2026 — 日本語";
-    const downloadButton = await openLocalizedBundle(page, 1, "ar", undefined, longMixedTitle);
+test("keeps a long mixed-direction game title accessible at 200% text scaling", async ({
+  page,
+}) => {
+  const longMixedTitle =
+    "لعبة استراتيجية طويلة — Space Questarr: Remastered / Edition 2026 — 日本語";
+  const downloadButton = await openLocalizedBundle(page, 1, "ar", undefined, longMixedTitle);
 
-    await expectSeparatedDownloadAccessibleName(page, downloadButton, "تنزيل", longMixedTitle);
+  await expectSeparatedDownloadAccessibleName(page, downloadButton, "تنزيل", longMixedTitle);
 
-    await page.setViewportSize({ width: 640, height: 512 });
-    await page.evaluate(() => {
-      document.documentElement.style.fontSize = "200%";
-    });
+  await page.setViewportSize({ width: 640, height: 512 });
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = "200%";
+  });
 
-    await expect(downloadButton).toBeVisible();
-    await expect(downloadButton).toHaveAccessibleName("تنزيل " + longMixedTitle + " Full");
-    const hasDocumentOverflow = await page.evaluate(
-      () => document.documentElement.scrollWidth > document.documentElement.clientWidth
-    );
-    expect(hasDocumentOverflow).toBe(false);
+  await expect(downloadButton).toBeVisible();
+  await expect(downloadButton).toHaveAccessibleName("تنزيل " + longMixedTitle + " Full");
+  const hasDocumentOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+  );
+  expect(hasDocumentOverflow).toBe(false);
 
-    await page.keyboard.press("Tab");
-    const keyboardFocusRemainsInDialog = await page.evaluate(
-      () => Boolean(document.activeElement?.closest('[role="dialog"]'))
-    );
-    expect(keyboardFocusRemainsInDialog).toBe(true);
-  }
-);
+  await page.keyboard.press("Tab");
+  const keyboardFocusRemainsInDialog = await page.evaluate(() =>
+    Boolean(document.activeElement?.closest('[role="dialog"]'))
+  );
+  expect(keyboardFocusRemainsInDialog).toBe(true);
+});
 
 test("keeps the RTL import-history table and task sheet accessible", async ({ page }) => {
-  const longMixedTitle =
-    "لعبة استراتيجية طويلة — Questarr Import Review / Edition 2026 — 日本語";
+  const longMixedTitle = "لعبة استراتيجية طويلة — Questarr Import Review / Edition 2026 — 日本語";
   const task = {
     id: "rtl-import-task-1",
     taskType: "file_import",
@@ -1040,7 +1038,9 @@ test("keeps the RTL import-history table and task sheet accessible", async ({ pa
   await expect(taskSheet).not.toBeVisible();
 });
 
-test("localizes the RTL manual-import form while preserving game names and paths", async ({ page }) => {
+test("localizes the RTL manual-import form while preserving game names and paths", async ({
+  page,
+}) => {
   const gameTitle = "لعبة استراتيجية طويلة — Questarr 2026 / 日本語";
   const downloadTitle = gameTitle + ".zip";
 

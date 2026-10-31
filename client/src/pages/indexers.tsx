@@ -630,9 +630,12 @@ export default function IndexersPage() {
                       onClick={() => testConnectionMutation.mutate({ id: indexer.id })}
                       disabled={testingIndexerId === indexer.id}
                       title="Test connection"
-                      aria-label={formatInterfaceMessage("interface.test_connection_for_name_8d0baec5", {
-                        name: String(indexer.name ?? ""),
-                      })}
+                      aria-label={formatInterfaceMessage(
+                        "interface.test_connection_for_name_8d0baec5",
+                        {
+                          name: String(indexer.name ?? ""),
+                        }
+                      )}
                       data-testid={`button-test-indexer-${indexer.id}`}
                       data-i18n-title={"Test connection"}
                     >

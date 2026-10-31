@@ -205,9 +205,12 @@ export default function XrelReleasesPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="shrink-0 text-primary hover:underline inline-flex items-center gap-0.5 text-sm"
-                        aria-label={formatInterfaceMessage("interface.view_value_on_xrel_ecfcd495", {
-                          value: String(rel.ext_info?.title ?? rel.dirname ?? ""),
-                        })}
+                        aria-label={formatInterfaceMessage(
+                          "interface.view_value_on_xrel_ecfcd495",
+                          {
+                            value: String(rel.ext_info?.title ?? rel.dirname ?? ""),
+                          }
+                        )}
                         data-i18n-aria-label={"View {value} on xREL"}
                         data-i18n-aria-label-values={JSON.stringify({
                           value: String(rel.ext_info?.title ?? rel.dirname ?? ""),
@@ -274,9 +277,12 @@ export default function XrelReleasesPage() {
                             addGameMutation.isPending &&
                             addGameMutation.variables === rel.matchCandidate?.title
                           }
-                          title={formatInterfaceMessage("interface.add_value_to_wanted_list_791eb955", {
-                            value: String(rel.matchCandidate?.title ?? ""),
-                          })}
+                          title={formatInterfaceMessage(
+                            "interface.add_value_to_wanted_list_791eb955",
+                            {
+                              value: String(rel.matchCandidate?.title ?? ""),
+                            }
+                          )}
                         >
                           {addGameMutation.isPending &&
                           addGameMutation.variables === rel.matchCandidate?.title ? (

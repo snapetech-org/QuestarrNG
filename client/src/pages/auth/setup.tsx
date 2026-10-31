@@ -157,9 +157,7 @@ export default function SetupPage() {
           <CardHeader>
             <CardTitle>{t("interface.your_questarrng_setup_is_ready_08fc7690")}</CardTitle>
             <CardDescription>
-              {t(
-                "interface.choose_what_you_want_to_do_first_y_297e271a"
-              )}
+              {t("interface.choose_what_you_want_to_do_first_y_297e271a")}
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-3 sm:grid-cols-3">
@@ -182,9 +180,7 @@ export default function SetupPage() {
                 {isLoadingAcquisitionStatus
                   ? t("interface.checking_your_existing_acquisition_bd64ebbf")
                   : indexersStatusFailed || downloadersStatusFailed
-                    ? t(
-                        "interface.open_the_existing_indexer_and_down_8fd65ea9"
-                      )
+                    ? t("interface.open_the_existing_indexer_and_down_8fd65ea9")
                     : !hasEnabledIndexer
                       ? t("interface.add_an_indexer_to_search_for_game_ebd6bc3e")
                       : !hasEnabledDownloader
@@ -197,7 +193,9 @@ export default function SetupPage() {
               className="h-auto min-h-24 flex-col items-start whitespace-normal p-4 text-start"
               onClick={() => continueTo(routePaths.libraryImport)}
             >
-              <span className="font-semibold">{t("interface.organize_existing_downloads_e09b05e4")}</span>
+              <span className="font-semibold">
+                {t("interface.organize_existing_downloads_e09b05e4")}
+              </span>
               <span className="mt-1 text-xs font-normal opacity-80">
                 {t("interface.configure_library_imports_for_file_6d77e54d")}
               </span>
@@ -234,16 +232,10 @@ export default function SetupPage() {
               .
             </p>
             <p
-              lang={languageFor(
-                "interface.you_must_migrate_your_data_to_the_6216e94f"
-              )}
-              dir={directionFor(
-                "interface.you_must_migrate_your_data_to_the_6216e94f"
-              )}
+              lang={languageFor("interface.you_must_migrate_your_data_to_the_6216e94f")}
+              dir={directionFor("interface.you_must_migrate_your_data_to_the_6216e94f")}
             >
-              {t(
-                "interface.you_must_migrate_your_data_to_the_6216e94f"
-              )}
+              {t("interface.you_must_migrate_your_data_to_the_6216e94f")}
             </p>
             <a
               href="https://github.com/snapetech-org/QuestarrNG/blob/main/docs/MIGRATION.md"
@@ -306,7 +298,10 @@ export default function SetupPage() {
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel lang={languageFor("interface.username_1c08d4d9")} dir={directionFor("interface.username_1c08d4d9")}>
+                    <FormLabel
+                      lang={languageFor("interface.username_1c08d4d9")}
+                      dir={directionFor("interface.username_1c08d4d9")}
+                    >
                       {t("interface.username_1c08d4d9")}
                     </FormLabel>
                     <div className="relative">
@@ -333,7 +328,10 @@ export default function SetupPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel lang={languageFor("interface.password_2cc30838")} dir={directionFor("interface.password_2cc30838")}>
+                    <FormLabel
+                      lang={languageFor("interface.password_2cc30838")}
+                      dir={directionFor("interface.password_2cc30838")}
+                    >
                       {t("interface.password_2cc30838")}
                     </FormLabel>
                     <div className="relative">
@@ -350,12 +348,8 @@ export default function SetupPage() {
                       </FormControl>
                     </div>
                     <FormDescription
-                      lang={languageFor(
-                        "interface.at_least_8_characters_including_on_2a6832ca"
-                      )}
-                      dir={directionFor(
-                        "interface.at_least_8_characters_including_on_2a6832ca"
-                      )}
+                      lang={languageFor("interface.at_least_8_characters_including_on_2a6832ca")}
+                      dir={directionFor("interface.at_least_8_characters_including_on_2a6832ca")}
                     >
                       {t("interface.at_least_8_characters_including_on_2a6832ca")}
                     </FormDescription>
@@ -414,12 +408,8 @@ export default function SetupPage() {
                     </div>
                     <p
                       className="text-sm text-muted-foreground mb-4"
-                      lang={languageFor(
-                        "interface.igdb_credentials_are_required_to_d_db32487d"
-                      )}
-                      dir={directionFor(
-                        "interface.igdb_credentials_are_required_to_d_db32487d"
-                      )}
+                      lang={languageFor("interface.igdb_credentials_are_required_to_d_db32487d")}
+                      dir={directionFor("interface.igdb_credentials_are_required_to_d_db32487d")}
                     >
                       {t("interface.igdb_credentials_are_required_to_d_db32487d")}
                     </p>
@@ -430,7 +420,10 @@ export default function SetupPage() {
                     name="igdbClientId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel lang={languageFor("interface.client_id_96a12137")} dir={directionFor("interface.client_id_96a12137")}>
+                        <FormLabel
+                          lang={languageFor("interface.client_id_96a12137")}
+                          dir={directionFor("interface.client_id_96a12137")}
+                        >
                           {t("interface.client_id_96a12137")}
                         </FormLabel>
                         <FormControl>

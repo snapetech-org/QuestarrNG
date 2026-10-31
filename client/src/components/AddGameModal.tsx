@@ -289,12 +289,8 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
           {!compact && (
             <p className="text-xs text-muted-foreground">
               <span
-                lang={languageFor(
-                  "interface.include_titles_without_a_release_d_c3584b75"
-                )}
-                dir={directionFor(
-                  "interface.include_titles_without_a_release_d_c3584b75"
-                )}
+                lang={languageFor("interface.include_titles_without_a_release_d_c3584b75")}
+                dir={directionFor("interface.include_titles_without_a_release_d_c3584b75")}
               >
                 {t("interface.include_titles_without_a_release_d_c3584b75")}
               </span>
@@ -346,7 +342,9 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
       >
         <SelectTrigger
           className="h-8 w-full max-w-64 text-xs"
-          aria-label={formatInterfaceMessage("interface.target_platform_for_title_57b072f4", { title: game.title })}
+          aria-label={formatInterfaceMessage("interface.target_platform_for_title_57b072f4", {
+            title: game.title,
+          })}
           lang={languageFor("interface.target_platform_for_title_57b072f4")}
           dir={directionFor("interface.target_platform_for_title_57b072f4")}
         >
@@ -442,19 +440,18 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
               </h3>
               <p className="text-muted-foreground text-sm">
                 <span
-                  lang={languageFor(
-                    "interface.please_configure_igdb_credentials_46a3a94e"
-                  )}
-                  dir={directionFor(
-                    "interface.please_configure_igdb_credentials_46a3a94e"
-                  )}
+                  lang={languageFor("interface.please_configure_igdb_credentials_46a3a94e")}
+                  dir={directionFor("interface.please_configure_igdb_credentials_46a3a94e")}
                 >
                   {t("interface.please_configure_igdb_credentials_46a3a94e")}
                 </span>
               </p>
               <Link href="/settings">
                 <Button className="w-full" onClick={() => setOpen(false)}>
-                  <span lang={languageFor("interface.go_to_settings_a94624fd")} dir={directionFor("interface.go_to_settings_a94624fd")}>
+                  <span
+                    lang={languageFor("interface.go_to_settings_a94624fd")}
+                    dir={directionFor("interface.go_to_settings_a94624fd")}
+                  >
                     {t("interface.go_to_settings_a94624fd")}
                   </span>
                 </Button>
@@ -527,7 +524,9 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
                   >
                     <img
                       src={coverSrc(game.coverUrl)}
-                      alt={formatInterfaceMessage("interface.cover_art_for_title_44c4687e", { title: game.title })}
+                      alt={formatInterfaceMessage("interface.cover_art_for_title_44c4687e", {
+                        title: game.title,
+                      })}
                       lang={languageFor("interface.cover_art_for_title_44c4687e")}
                       dir={directionFor("interface.cover_art_for_title_44c4687e")}
                       className="w-14 h-20 object-cover rounded-md flex-shrink-0"
@@ -545,7 +544,10 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
                         {game.inCollection ? (
                           <Badge variant="default" className="text-xs flex-shrink-0 mt-0.5 gap-1">
                             <Check className="w-3 h-3" />
-                            <span lang={languageFor("interface.added_b35c3185")} dir={directionFor("interface.added_b35c3185")}>
+                            <span
+                              lang={languageFor("interface.added_b35c3185")}
+                              dir={directionFor("interface.added_b35c3185")}
+                            >
                               {t("interface.added_b35c3185")}
                             </span>
                           </Badge>
@@ -556,9 +558,12 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
                             disabled={addGameMutation.isPending}
                             className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center active:scale-95 transition-transform disabled:opacity-50"
                             data-testid={`button-add-${game.id}`}
-                            aria-label={formatInterfaceMessage("interface.add_title_to_collection_a7b5e227", {
-                              title: game.title,
-                            })}
+                            aria-label={formatInterfaceMessage(
+                              "interface.add_title_to_collection_a7b5e227",
+                              {
+                                title: game.title,
+                              }
+                            )}
                             lang={languageFor("interface.add_title_to_collection_a7b5e227")}
                             dir={directionFor("interface.add_title_to_collection_a7b5e227")}
                           >
@@ -658,19 +663,18 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
             </h3>
             <p className="text-muted-foreground max-w-sm">
               <span
-                lang={languageFor(
-                  "interface.please_configure_igdb_credentials_46a3a94e"
-                )}
-                dir={directionFor(
-                  "interface.please_configure_igdb_credentials_46a3a94e"
-                )}
+                lang={languageFor("interface.please_configure_igdb_credentials_46a3a94e")}
+                dir={directionFor("interface.please_configure_igdb_credentials_46a3a94e")}
               >
                 {t("interface.please_configure_igdb_credentials_46a3a94e")}
               </span>
             </p>
             <Link href="/settings">
               <Button onClick={() => setOpen(false)}>
-                <span lang={languageFor("interface.go_to_settings_a94624fd")} dir={directionFor("interface.go_to_settings_a94624fd")}>
+                <span
+                  lang={languageFor("interface.go_to_settings_a94624fd")}
+                  dir={directionFor("interface.go_to_settings_a94624fd")}
+                >
                   {t("interface.go_to_settings_a94624fd")}
                 </span>
               </Button>
@@ -739,7 +743,9 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
                     <div className="flex gap-4">
                       <img
                         src={coverSrc(game.coverUrl)}
-                        alt={formatInterfaceMessage("interface.cover_art_for_title_44c4687e", { title: game.title })}
+                        alt={formatInterfaceMessage("interface.cover_art_for_title_44c4687e", {
+                          title: game.title,
+                        })}
                         lang={languageFor("interface.cover_art_for_title_44c4687e")}
                         dir={directionFor("interface.cover_art_for_title_44c4687e")}
                         className="w-16 h-24 object-cover rounded-md flex-shrink-0"
@@ -839,9 +845,12 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
                               onClick={() => handleAddGame(game)}
                               disabled={addGameMutation.isPending}
                               data-testid={`button-add-${game.id}`}
-                              aria-label={formatInterfaceMessage("interface.add_title_to_collection_a7b5e227", {
-                                title: game.title,
-                              })}
+                              aria-label={formatInterfaceMessage(
+                                "interface.add_title_to_collection_a7b5e227",
+                                {
+                                  title: game.title,
+                                }
+                              )}
                               lang={languageFor("interface.add_title_to_collection_a7b5e227")}
                               dir={directionFor("interface.add_title_to_collection_a7b5e227")}
                             >

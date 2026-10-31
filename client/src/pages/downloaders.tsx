@@ -611,9 +611,12 @@ export default function DownloadersPage() {
                       onClick={() => testConnectionMutation.mutate({ id: downloader.id })}
                       disabled={testingDownloaderId === downloader.id}
                       title="Test connection"
-                      aria-label={formatInterfaceMessage("interface.test_connection_for_name_8d0baec5", {
-                        name: String(downloader.name ?? ""),
-                      })}
+                      aria-label={formatInterfaceMessage(
+                        "interface.test_connection_for_name_8d0baec5",
+                        {
+                          name: String(downloader.name ?? ""),
+                        }
+                      )}
                       className="h-11 w-11 md:h-9 md:w-9"
                       data-testid={`button-test-downloader-${downloader.id}`}
                       data-i18n-title={"Test connection"}

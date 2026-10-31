@@ -81,7 +81,9 @@ export default function BlacklistedReleasesList() {
         {Object.entries(entriesByGame).map(([gameId, gameEntries]) => (
           <div key={gameId}>
             <h4 className="text-sm font-semibold mb-2">
-              {gameEntries[0]?.gameTitle ?? <InterfaceText source="interface.unknown_game_6b8a9739" />}
+              {gameEntries[0]?.gameTitle ?? (
+                <InterfaceText source="interface.unknown_game_6b8a9739" />
+              )}
             </h4>
             <div className="space-y-2">
               {gameEntries.map((entry) => (

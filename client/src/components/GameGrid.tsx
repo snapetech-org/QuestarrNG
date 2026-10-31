@@ -242,7 +242,11 @@ export default function GameGrid({
           className="col-span-full grid items-center py-1 border-b border-border bg-muted/40"
           style={{ gridTemplateColumns: "subgrid" }}
         >
-          <span className={headerCellClass} lang={languageFor("interface.title_24d471a9")} dir={directionFor("interface.title_24d471a9")}>
+          <span
+            className={headerCellClass}
+            lang={languageFor("interface.title_24d471a9")}
+            dir={directionFor("interface.title_24d471a9")}
+          >
             {t("interface.title_24d471a9")}
           </span>
           <span

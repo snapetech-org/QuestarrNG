@@ -207,9 +207,7 @@ export default function ImportReviewModal({
     if (passwordRequired && !password) {
       toast({
         title: localizedText("interface.validation_error_f956c8d8"),
-        description: localizedText(
-          "interface.this_archive_is_password_protected_727f2e86"
-        ),
+        description: localizedText("interface.this_archive_is_password_protected_727f2e86"),
         variant: "destructive",
       });
       return;
@@ -219,10 +217,9 @@ export default function ImportReviewModal({
     if (libraryRoot && destinationPath === libraryRoot) {
       toast({
         title: localizedText("interface.validation_error_f956c8d8"),
-        description: localizedText(
-          "interface.destination_must_be_a_subfolder_in_2a1d69f4",
-          { path: libraryRoot }
-        ),
+        description: localizedText("interface.destination_must_be_a_subfolder_in_2a1d69f4", {
+          path: libraryRoot,
+        }),
         variant: "destructive",
       });
       return;
@@ -344,9 +341,7 @@ export default function ImportReviewModal({
                 role="note"
                 className="text-xs text-amber-400/90"
               >
-                {t(
-                  "interface.this_is_the_exact_file_or_folder_q_01c49a1c"
-                )}
+                {t("interface.this_is_the_exact_file_or_folder_q_01c49a1c")}
               </p>
             </div>
 
@@ -439,12 +434,8 @@ export default function ImportReviewModal({
                 {planData.hasArchive && (
                   <p
                     className="text-xs text-amber-400/80"
-                    lang={languageFor(
-                      "interface.archive_files_detected_consider_en_c51932b4"
-                    )}
-                    dir={directionFor(
-                      "interface.archive_files_detected_consider_en_c51932b4"
-                    )}
+                    lang={languageFor("interface.archive_files_detected_consider_en_c51932b4")}
+                    dir={directionFor("interface.archive_files_detected_consider_en_c51932b4")}
                   >
                     {t("interface.archive_files_detected_consider_en_c51932b4")}
                   </p>
@@ -453,7 +444,10 @@ export default function ImportReviewModal({
             )}
 
             <div className="space-y-2">
-              <Label lang={languageFor("interface.transfer_mode_e53bc979")} dir={directionFor("interface.transfer_mode_e53bc979")}>
+              <Label
+                lang={languageFor("interface.transfer_mode_e53bc979")}
+                dir={directionFor("interface.transfer_mode_e53bc979")}
+              >
                 {t("interface.transfer_mode_e53bc979")}
               </Label>
               <Select
@@ -466,10 +460,18 @@ export default function ImportReviewModal({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="move" lang={languageFor("interface.move_7f2c2a34")} dir={directionFor("interface.move_7f2c2a34")}>
+                  <SelectItem
+                    value="move"
+                    lang={languageFor("interface.move_7f2c2a34")}
+                    dir={directionFor("interface.move_7f2c2a34")}
+                  >
                     {t("interface.move_7f2c2a34")}
                   </SelectItem>
-                  <SelectItem value="copy" lang={languageFor("interface.copy_658f3664")} dir={directionFor("interface.copy_658f3664")}>
+                  <SelectItem
+                    value="copy"
+                    lang={languageFor("interface.copy_658f3664")}
+                    dir={directionFor("interface.copy_658f3664")}
+                  >
                     {t("interface.copy_658f3664")}
                   </SelectItem>
                   <SelectItem
@@ -491,38 +493,29 @@ export default function ImportReviewModal({
               {transferMode === "hardlink" && (
                 <p
                   className="text-xs text-muted-foreground"
-                  lang={languageFor(
-                    "interface.uses_a_hardlink_when_both_folders_73d30feb"
-                  )}
-                  dir={directionFor(
-                    "interface.uses_a_hardlink_when_both_folders_73d30feb"
-                  )}
+                  lang={languageFor("interface.uses_a_hardlink_when_both_folders_73d30feb")}
+                  dir={directionFor("interface.uses_a_hardlink_when_both_folders_73d30feb")}
                 >
-                  {t(
-                    "interface.uses_a_hardlink_when_both_folders_73d30feb"
-                  )}
+                  {t("interface.uses_a_hardlink_when_both_folders_73d30feb")}
                 </p>
               )}
               {transferMode === "symlink" && (
                 <p
                   className="text-xs text-muted-foreground"
-                  lang={languageFor(
-                    "interface.works_across_different_volumes_but_240a7fdd"
-                  )}
-                  dir={directionFor(
-                    "interface.works_across_different_volumes_but_240a7fdd"
-                  )}
+                  lang={languageFor("interface.works_across_different_volumes_but_240a7fdd")}
+                  dir={directionFor("interface.works_across_different_volumes_but_240a7fdd")}
                 >
-                  {t(
-                    "interface.works_across_different_volumes_but_240a7fdd"
-                  )}
+                  {t("interface.works_across_different_volumes_but_240a7fdd")}
                 </p>
               )}
             </div>
 
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label lang={languageFor("interface.unpack_archive_505028c1")} dir={directionFor("interface.unpack_archive_505028c1")}>
+                <Label
+                  lang={languageFor("interface.unpack_archive_505028c1")}
+                  dir={directionFor("interface.unpack_archive_505028c1")}
+                >
                   {t("interface.unpack_archive_505028c1")}
                 </Label>
                 <p
@@ -564,7 +557,10 @@ export default function ImportReviewModal({
 
           <DialogFooter>
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              <span lang={languageFor("interface.cancel_35afca3b")} dir={directionFor("interface.cancel_35afca3b")}>
+              <span
+                lang={languageFor("interface.cancel_35afca3b")}
+                dir={directionFor("interface.cancel_35afca3b")}
+              >
                 {t("interface.cancel_35afca3b")}
               </span>
             </Button>
@@ -575,7 +571,10 @@ export default function ImportReviewModal({
               disabled={skipMutation.isPending || confirmMutation.isPending}
             >
               {skipMutation.isPending && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
-              <span lang={languageFor("interface.skip_import_97b4a64b")} dir={directionFor("interface.skip_import_97b4a64b")}>
+              <span
+                lang={languageFor("interface.skip_import_97b4a64b")}
+                dir={directionFor("interface.skip_import_97b4a64b")}
+              >
                 {t("interface.skip_import_97b4a64b")}
               </span>
             </Button>
@@ -584,7 +583,10 @@ export default function ImportReviewModal({
               disabled={confirmMutation.isPending || skipMutation.isPending}
             >
               {confirmMutation.isPending && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
-              <span lang={languageFor("interface.confirm_import_f53eb8fc")} dir={directionFor("interface.confirm_import_f53eb8fc")}>
+              <span
+                lang={languageFor("interface.confirm_import_f53eb8fc")}
+                dir={directionFor("interface.confirm_import_f53eb8fc")}
+              >
                 {t("interface.confirm_import_f53eb8fc")}
               </span>
             </Button>

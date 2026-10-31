@@ -72,7 +72,9 @@ export default function StatusPicker({
       data-testid={testId}
       aria-label={
         gameTitle
-          ? formatInterfaceMessage("interface.change_status_for_title_4314f9e2", { title: gameTitle })
+          ? formatInterfaceMessage("interface.change_status_for_title_4314f9e2", {
+              title: gameTitle,
+            })
           : t("interface.change_status_30895671")
       }
       lang={languageFor(gameTitle ? "Change status for {title}" : "Change status")}
@@ -92,7 +94,10 @@ export default function StatusPicker({
         )}
         <span className="truncate">
           {!compact && (
-            <span lang={languageFor("interface.status_ca77496f")} dir={directionFor("interface.status_ca77496f")}>
+            <span
+              lang={languageFor("interface.status_ca77496f")}
+              dir={directionFor("interface.status_ca77496f")}
+            >
               {t("interface.status_ca77496f")}{" "}
             </span>
           )}

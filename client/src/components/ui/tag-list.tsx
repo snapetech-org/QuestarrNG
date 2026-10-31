@@ -61,7 +61,9 @@ export function TagList({
               badgeVariants({ variant: "outline" }),
               "cursor-pointer text-muted-foreground hover:text-foreground"
             )}
-            aria-label={formatInterfaceMessage("interface.show_count_more_items_4b683ae8", { count: overflow })}
+            aria-label={formatInterfaceMessage("interface.show_count_more_items_4b683ae8", {
+              count: overflow,
+            })}
             lang={languageFor("interface.show_count_more_items_4b683ae8")}
             dir={directionFor("interface.show_count_more_items_4b683ae8")}
           >

@@ -17,12 +17,14 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.home_52f50eae": "Home",
   "interface.help_b89df01a": "Help",
   "interface.interface_language_66eac25a": "Interface language",
-  "interface.choose_the_language_used_for_the_i_9e8c84a3": "Choose the language used for the interface.",
+  "interface.choose_the_language_used_for_the_i_9e8c84a3":
+    "Choose the language used for the interface.",
   "interface.save_indexer_first_to_load_categor_29a6e9ba": "Save indexer first to load categories",
   "interface.select_a_language_9e9b2e24": "Select a language",
   "interface.regional_format_8050949b": "Regional format",
   "interface.date_time_and_number_format_d853f2cd": "Date, time, and number format",
-  "interface.choose_how_dates_times_and_numbers_54ff187b": "Choose how dates, times, and numbers are displayed. This setting is separate from interface language.",
+  "interface.choose_how_dates_times_and_numbers_54ff187b":
+    "Choose how dates, times, and numbers are displayed. This setting is separate from interface language.",
   "interface.navigation_d08919c3": "Navigation",
   "interface.pages_7decab7f": "Pages",
   "interface.management_da9fd136": "Management",
@@ -115,9 +117,11 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.month_a8761ba5": "Month",
   "interface.week_55f2e27d": "Week",
   "interface.loading_calendar_178984ab": "Loading calendar...",
-  "interface.no_games_in_your_wishlist_add_game_610879cc": "No games in your wishlist. Add games to track their release dates.",
+  "interface.no_games_in_your_wishlist_add_game_610879cc":
+    "No games in your wishlist. Add games to track their release dates.",
   "interface.igdb_configuration_required_6ad1583e": "IGDB Configuration Required",
-  "interface.to_track_game_release_dates_and_vi_26aeca72": "To track game release dates and view the calendar, you need to configure your IGDB credentials in the settings.",
+  "interface.to_track_game_release_dates_and_vi_26aeca72":
+    "To track game release dates and view the calendar, you need to configure your IGDB credentials in the settings.",
   "interface.go_to_settings_a94624fd": "Go to Settings",
   "interface.no_releases_af6c37cc": "No releases",
   "interface.release_1036ae7e": "release",
@@ -148,10 +152,14 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.no_active_downloads_168de581": "No Active Downloads",
   "interface.no_downloads_match_the_current_fil_c678e7d7": "No downloads match the current filters",
   "interface.try_adjusting_the_filters_59e26b23": "Try adjusting the filters.",
-  "interface.use_the_search_page_to_find_and_do_ca2a780b": "Use the Search page to find and download games from your configured indexers.",
-  "interface.no_downloads_found_for_this_game_t_f25e68bc": "No downloads found for this game. Try configuring indexers in settings.",
-  "interface.all_count_results_are_blacklisted_5d2ee061": "All {count} results are blacklisted. Review the blacklist in game settings.",
-  "interface.this_result_is_blacklisted_review_acee2330": "This result is blacklisted. Review the blacklist in game settings.",
+  "interface.use_the_search_page_to_find_and_do_ca2a780b":
+    "Use the Search page to find and download games from your configured indexers.",
+  "interface.no_downloads_found_for_this_game_t_f25e68bc":
+    "No downloads found for this game. Try configuring indexers in settings.",
+  "interface.all_count_results_are_blacklisted_5d2ee061":
+    "All {count} results are blacklisted. Review the blacklist in game settings.",
+  "interface.this_result_is_blacklisted_review_acee2330":
+    "This result is blacklisted. Review the blacklist in game settings.",
   "interface.no_results_for_selected_platforms_520c8516": "No results for selected platforms:",
   "interface.show_all_results_1d30062d": "Show all results",
   "interface.release_information_c49a9eec": "Release Information",
@@ -163,9 +171,12 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.more_options_bff24c7e": "More options",
   "interface.indexer_errors_2a202d97": "Indexer Errors",
   "interface.download_with_updates_2852bf4a": "Download with Updates?",
-  "interface.count_updates_are_available_for_th_eadb6ead": "{count} updates are available for this game. Select which ones to download with the main game.",
-  "interface.one_update_is_available_for_this_g_dc952217": "One update is available for this game. Select whether to download it with the main game.",
-  "interface.two_updates_are_available_for_this_5acfa3df": "Two updates are available for this game. Select whether to download them with the main game.",
+  "interface.count_updates_are_available_for_th_eadb6ead":
+    "{count} updates are available for this game. Select which ones to download with the main game.",
+  "interface.one_update_is_available_for_this_g_dc952217":
+    "One update is available for this game. Select whether to download it with the main game.",
+  "interface.two_updates_are_available_for_this_5acfa3df":
+    "Two updates are available for this game. Select whether to download them with the main game.",
   "interface.available_updates_7c66d5bc": "Available Updates:",
   "interface.select_all_cd7e3b12": "Select All",
   "interface.deselect_all_e042f6fd": "Deselect All",
@@ -178,8 +189,10 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.download_with_count_updates_87ef73ee": "Download with {count} updates",
   "interface.download_with_one_update_83a099e8": "Download with one update",
   "interface.download_with_two_updates_e14ecfbf": "Download with two updates",
-  "interface.search_results_for_torrents_and_nz_688cb920": "Search results for torrents and NZBs matching this game.",
-  "interface.tip_enable_auto_download_in_settin_0f6b5a2f": "Tip: Enable auto-download in Settings to automatically download new releases.",
+  "interface.search_results_for_torrents_and_nz_688cb920":
+    "Search results for torrents and NZBs matching this game.",
+  "interface.tip_enable_auto_download_in_settin_0f6b5a2f":
+    "Tip: Enable auto-download in Settings to automatically download new releases.",
   "interface.download_6964bb19": "Download",
   "interface.main_game_d4518d6a": "Main Game",
   "interface.updates_483075a5": "Updates",
@@ -201,19 +214,25 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.login_55edebd2": "Login",
   "interface.questarrng_logo_c8b19c6a": "QuestarrNG Logo",
   "interface.upgrading_from_v1_0_08dfd0e0": "Upgrading from v1.0?",
-  "interface.if_you_are_upgrading_from_an_older_b29c9106": "If you are upgrading from an older version (PostgreSQL),",
+  "interface.if_you_are_upgrading_from_an_older_b29c9106":
+    "If you are upgrading from an older version (PostgreSQL),",
   "interface.do_not_create_a_new_account_393f0571": "do not create a new account",
-  "interface.you_must_migrate_your_data_to_the_6216e94f": "You must migrate your data to the new database format first, otherwise your library will be empty.",
+  "interface.you_must_migrate_your_data_to_the_6216e94f":
+    "You must migrate your data to the new database format first, otherwise your library will be empty.",
   "interface.read_migration_guide_d53088c9": "Read Migration Guide",
   "interface.initial_setup_a04f9a7a": "Initial Setup",
-  "interface.create_your_admin_account_to_get_s_bb28e574": "Create your admin account to get started",
+  "interface.create_your_admin_account_to_get_s_bb28e574":
+    "Create your admin account to get started",
   "interface.choose_a_username_bb3303d5": "Choose a username",
   "interface.username_must_be_at_least_3_charac_d1c3c390": "Username must be at least 3 characters",
   "interface.choose_a_password_d74f1a34": "Choose a password",
   "interface.password_must_be_at_least_8_charac_3c38435e": "Password must be at least 8 characters",
-  "interface.password_must_contain_at_least_one_46f51a5d": "Password must contain at least one letter",
-  "interface.password_must_contain_at_least_one_5966cea0": "Password must contain at least one number",
-  "interface.at_least_8_characters_including_on_2a6832ca": "At least 8 characters, including one letter and one number.",
+  "interface.password_must_contain_at_least_one_46f51a5d":
+    "Password must contain at least one letter",
+  "interface.password_must_contain_at_least_one_5966cea0":
+    "Password must contain at least one number",
+  "interface.at_least_8_characters_including_on_2a6832ca":
+    "At least 8 characters, including one letter and one number.",
   "interface.confirm_password_fbf2f740": "Confirm Password",
   "interface.confirm_your_password_0e47abbb": "Confirm your password",
   "interface.api_key_is_required_b5fa486d": "API key is required",
@@ -222,12 +241,14 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.current_password_is_required_e1775456": "Current password is required",
   "interface.host_is_required_e2810b22": "Host is required",
   "interface.name_is_required_446a223b": "Name is required",
-  "interface.real_debrid_needs_an_absolute_loca_6739d257": "Real-Debrid needs an absolute local staging path on the QuestarrNG server.",
+  "interface.real_debrid_needs_an_absolute_loca_6739d257":
+    "Real-Debrid needs an absolute local staging path on the QuestarrNG server.",
   "interface.type_is_required_a542112c": "Type is required",
   "interface.url_is_required_4d031c93": "URL is required",
   "interface.passwords_do_not_match_a8bf4976": "Passwords do not match",
   "interface.igdb_configuration_2007c8b1": "IGDB Configuration",
-  "interface.igdb_credentials_are_required_to_d_db32487d": "IGDB credentials are required to discover and import games.",
+  "interface.igdb_credentials_are_required_to_d_db32487d":
+    "IGDB credentials are required to discover and import games.",
   "interface.client_id_96a12137": "Client ID",
   "interface.igdb_client_id_397a9eef": "IGDB Client ID",
   "interface.client_secret_603b406a": "Client Secret",
@@ -243,7 +264,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.shelved_9ced02f2": "Shelved",
   "interface.completed_ec88aab2": "Completed",
   "interface.downloading_8d063a47": "Downloading",
-  "interface.failed_to_load_games_please_try_ag_acd660af": "Failed to load games. Please try again later.",
+  "interface.failed_to_load_games_please_try_ag_acd660af":
+    "Failed to load games. Please try again later.",
   "interface.no_games_found_6eae7a0d": "No games found.",
   "interface.refresh_games_8afd0f9f": "Refresh games",
   "interface.refresh_0815aad4": "Refresh",
@@ -252,8 +274,10 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.popular_games_3ecdb331": "Popular Games",
   "interface.recent_releases_2b5d7358": "Recent Releases",
   "interface.coming_soon_0f47ca99": "Coming Soon",
-  "interface.to_discover_and_browse_games_you_n_3d718cff": "To discover and browse games, you need to configure your IGDB credentials in the settings.",
-  "interface.explore_popular_games_new_releases_320e855e": "Explore popular games, new releases, and find your next adventure",
+  "interface.to_discover_and_browse_games_you_n_3d718cff":
+    "To discover and browse games, you need to configure your IGDB credentials in the settings.",
+  "interface.explore_popular_games_new_releases_320e855e":
+    "Explore popular games, new releases, and find your next adventure",
   "interface.discovery_settings_c74f6d62": "Discovery settings",
   "interface.discovery_settings_d4132182": "Discovery Settings",
   "interface.by_genre_16e7407b": "By Genre",
@@ -261,7 +285,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.by_platform_5b8c467f": "By Platform",
   "interface.select_platform_3f01db88": "Select platform",
   "interface.failed_to_load_genres_using_defaul_8360390f": "Failed to load genres, using defaults",
-  "interface.failed_to_load_platforms_using_def_19ae45bd": "Failed to load platforms, using defaults",
+  "interface.failed_to_load_platforms_using_def_19ae45bd":
+    "Failed to load platforms, using defaults",
   "interface.game_added_to_watchlist_904347b8": "Game added to watchlist!",
   "interface.game_is_already_in_your_collection_1d552e3d": "Game is already in your collection",
   "interface.failed_to_track_game_fff69db8": "Failed to track game",
@@ -270,7 +295,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.game_added_to_collection_successfu_0b0de90f": "Game added to collection successfully",
   "interface.failed_to_add_game_to_collection_c70d688f": "Failed to add game to collection",
   "interface.rss_feed_discovery_879db693": "RSS Feed Discovery",
-  "interface.track_releases_from_your_favorite_74df79c3": "Track releases from your favorite sites.",
+  "interface.track_releases_from_your_favorite_74df79c3":
+    "Track releases from your favorite sites.",
   "interface.early_access_3a5fe28e": "Early Access",
   "interface.hidden_3c2dfe59": "Hidden",
   "interface.hide_game_9185089d": "Hide Game",
@@ -293,7 +319,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.track_title_c799ab04": "Track {title}",
   "interface.tracking_0f7e9712": "Tracking...",
   "interface.track_game_164dac9e": "Track Game",
-  "interface.failed_to_add_game_to_library_befo_2d413451": "Failed to add game to library before downloading",
+  "interface.failed_to_add_game_to_library_befo_2d413451":
+    "Failed to add game to library before downloading",
   "interface.loading_game_details_53c74909": "Loading game details...",
   "interface.loading_download_dialog_d29cbd63": "Loading download dialog...",
   "interface.change_status_for_title_4314f9e2": "Change status for {title}",
@@ -304,7 +331,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.game_actions_57bffba4": "Game actions",
   "interface.view_details_136a35ae": "View details",
   "interface.rate_this_game_b97d58a1": "Rate this game",
-  "interface.my_rating_rating_10_click_to_chang_26204fee": "My rating: {rating}/10. Click to change.",
+  "interface.my_rating_rating_10_click_to_chang_26204fee":
+    "My rating: {rating}/10. Click to change.",
   "interface.clear_rating_0479d557": "Clear rating",
   "interface.count_more_1b6a0c82": "+{count} more",
   "interface.loading_modal_e1186d4e": "Loading modal",
@@ -315,14 +343,17 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.show_count_more_items_4b683ae8": "Show {count} more items",
   "interface.add_game_75fb4616": "Add Game",
   "interface.add_game_to_collection_227161e1": "Add Game to Collection",
-  "interface.search_for_games_to_add_to_your_co_3f62b09f": "Search for games to add to your collection",
-  "interface.please_configure_igdb_credentials_46a3a94e": "Please configure IGDB credentials in settings to search for and add games.",
+  "interface.search_for_games_to_add_to_your_co_3f62b09f":
+    "Search for games to add to your collection",
+  "interface.please_configure_igdb_credentials_46a3a94e":
+    "Please configure IGDB credentials in settings to search for and add games.",
   "interface.search_for_games_70015265": "Search for games...",
   "interface.search_games_1ca9688e": "Search games",
   "interface.searching_games_80b22ec2": "Searching games...",
   "interface.searching_games_d00f2efe": "Searching games…",
   "interface.type_at_least_3_characters_to_sear_e98eb685": "Type at least 3 characters to search.",
-  "interface.no_games_found_try_a_different_sea_b8cfa0be": "No games found. Try a different search term.",
+  "interface.no_games_found_try_a_different_sea_b8cfa0be":
+    "No games found. Try a different search term.",
   "interface.added_b35c3185": "Added",
   "interface.add_title_to_collection_a7b5e227": "Add {title} to collection",
   "interface.account_default_a3be6849": "Account default",
@@ -330,7 +361,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.release_year_filter_3b994a57": "Release year filter",
   "interface.platform_filter_8216ff70": "Platform filter",
   "interface.show_undated_games_first_cf4b82d4": "Show undated games first",
-  "interface.include_titles_without_a_release_d_c3584b75": "Include titles without a release date and place them before dated results.",
+  "interface.include_titles_without_a_release_d_c3584b75":
+    "Include titles without a release date and place them before dated results.",
   "interface.target_platform_for_title_57b072f4": "Target platform for {title}",
   "interface.game_management_b1319076": "Game Management",
   "interface.questarrng_logo_48dde88a": "QuestarrNG logo",
@@ -339,15 +371,18 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.checking_storage_f60685d6": "Checking storage...",
   "interface.error_f38d9cf1": "Error",
   "interface.no_downloaders_3707f3b6": "No downloaders",
-  "interface.storage_for_downloader_space_avail_f3f38303": "Storage for {downloader}: {space} available",
+  "interface.storage_for_downloader_space_avail_f3f38303":
+    "Storage for {downloader}: {space} available",
   "interface.free_disk_space_0fc774ae": "Free Disk Space",
   "interface.sync_steam_7b1a59d6": "Sync Steam",
   "interface.toggle_theme_8a1231d0": "Toggle theme",
   "interface.configuration_required_59dd2f26": "Configuration Required",
-  "interface.igdb_credentials_are_required_the_e38cceec": "IGDB credentials are required. The application will only function for existing games until configured.",
+  "interface.igdb_credentials_are_required_the_e38cceec":
+    "IGDB credentials are required. The application will only function for existing games until configured.",
   "interface.configure_in_settings_583e5b23": "Configure in Settings",
   "interface.steam_sync_c6095686": "Steam Sync",
-  "interface.synced_count_games_from_your_steam_7088fb6b": "Synced {count} games from your Steam Wishlist.",
+  "interface.synced_count_games_from_your_steam_7088fb6b":
+    "Synced {count} games from your Steam Wishlist.",
   "interface.sync_completed_successfully_adfc2778": "Sync completed successfully",
   "interface.sync_failed_f2f390af": "Sync Failed",
   "interface.could_not_reach_the_provider_e93d694a": "Could not reach the provider.",
@@ -374,7 +409,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.configure_grid_columns_0e899c02": "Configure grid columns",
   "interface.grid_columns_cbdbac6e": "Grid Columns",
   "interface.grid_columns_18fbc6ce": "Grid columns",
-  "interface.number_of_columns_in_the_game_grid_ad42677c": "Number of columns in the game grid ({min}-{max}).",
+  "interface.number_of_columns_in_the_game_grid_ad42677c":
+    "Number of columns in the game grid ({min}-{max}).",
   "interface.release_newest_b4bf46db": "Release (Newest)",
   "interface.release_oldest_559a9e04": "Release (Oldest)",
   "interface.recently_added_b6019d23": "Recently Added",
@@ -399,17 +435,21 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.no_games_match_your_search_1272b6c5": "No games match your search",
   "interface.no_wishlist_games_found_for_query_3646efde": "No wishlist games found for “{query}”.",
   "interface.no_games_match_your_filters_47abc208": "No games match your filters",
-  "interface.try_disabling_one_or_more_filters_3114f44a": "Try disabling one or more filters to see more games.",
+  "interface.try_disabling_one_or_more_filters_3114f44a":
+    "Try disabling one or more filters to see more games.",
   "interface.no_games_with_active_downloads_f4ada176": "No games with active downloads",
   "interface.no_games_with_search_results_6bfd4313": "No games with search results",
   "interface.no_released_games_in_your_wishlist_575e266b": "No released games in your wishlist",
-  "interface.all_your_wishlist_games_are_upcomi_45d86f39": "All your wishlist games are upcoming or unannounced. Enable 'Unreleased' to see them.",
+  "interface.all_your_wishlist_games_are_upcomi_45d86f39":
+    "All your wishlist games are upcoming or unannounced. Enable 'Unreleased' to see them.",
   "interface.try_adjusting_your_filters_980f508d": "Try adjusting your filters.",
   "interface.your_wishlist_is_empty_814231ee": "Your wishlist is empty",
-  "interface.keep_track_of_games_you_want_to_pl_0f2ce69c": "Keep track of games you want to play. Add them from the Discover page to get notified about releases and updates.",
+  "interface.keep_track_of_games_you_want_to_pl_0f2ce69c":
+    "Keep track of games you want to play. Add them from the Discover page to get notified about releases and updates.",
   "interface.find_games_4e5072d5": "Find Games",
   "interface.nothing_in_progress_f738bacc": "Nothing in progress",
-  "interface.mark_a_game_as_playing_from_your_l_fe661f82": "Mark a game as Playing from your Library to track it here — journal entries, screenshots, and milestones live on its details page.",
+  "interface.mark_a_game_as_playing_from_your_l_fe661f82":
+    "Mark a game as Playing from your Library to track it here — journal entries, screenshots, and milestones live on its details page.",
   "interface.failed_to_load_games_63f624fc": "Failed to load games",
   "interface.refresh_the_page_or_try_again_late_48c276fa": "Refresh the page or try again later.",
   "interface.go_to_library_c854220b": "Go to Library",
@@ -421,7 +461,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.failed_to_update_game_status_f2c0230a": "Failed to update game status",
   "interface.count_game_wanted_64a061b9": "{count} game wanted",
   "interface.count_game_in_progress_17a63518": "{count} game in progress",
-  "interface.no_games_currently_playing_found_f_12674d8f": "No games currently playing found for “{query}”.",
+  "interface.no_games_currently_playing_found_f_12674d8f":
+    "No games currently playing found for “{query}”.",
   "interface.discovery_downloads_6050b40a": "Discovery & Downloads",
   "interface.notifications_381d190f": "Notifications",
   "interface.integrations_e7fbaffa": "Integrations",
@@ -431,26 +472,37 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.select_theme_9ef7e3d8": "Select Theme",
   "interface.select_a_theme_96ebfc5f": "Select a theme",
   "interface.select_the_visual_theme_for_questa_42c0b096": "Select the visual theme for QuestarrNG",
-  "interface.configure_your_preferences_and_sys_639f0da3": "Configure your preferences and system settings",
+  "interface.configure_your_preferences_and_sys_639f0da3":
+    "Configure your preferences and system settings",
   "interface.content_filtering_9b867948": "Content Filtering",
-  "interface.control_which_games_appear_in_your_d04fb179": "Control which games appear in your library and discovery results",
+  "interface.control_which_games_appear_in_your_d04fb179":
+    "Control which games appear in your library and discovery results",
   "interface.save_content_filtering_cd8cd9ff": "Save Content Filtering",
   "interface.hide_erotic_content_0d0cc666": "Hide erotic content",
-  "interface.hide_games_flagged_with_an_explici_856de826": "Hide games flagged with an explicit/erotic theme from your library, search, and discovery pages",
+  "interface.hide_games_flagged_with_an_explici_856de826":
+    "Hide games flagged with an explicit/erotic theme from your library, search, and discovery pages",
   "interface.hide_age_restricted_content_a50eb2ad": "Hide age-restricted content",
-  "interface.hide_games_rated_esrb_adults_only_2710ba30": "Hide games rated ESRB Adults Only (AO) or PEGI 18 from your library, search, and discovery pages",
+  "interface.hide_games_rated_esrb_adults_only_2710ba30":
+    "Hide games rated ESRB Adults Only (AO) or PEGI 18 from your library, search, and discovery pages",
   "interface.library_filtering_b74ceb7e": "Library Filtering",
-  "interface.choose_which_games_are_hidden_by_d_a4754949": "Choose which games are hidden by default in your library",
+  "interface.choose_which_games_are_hidden_by_d_a4754949":
+    "Choose which games are hidden by default in your library",
   "interface.save_library_filtering_31b9f6dd": "Save Library Filtering",
   "interface.hide_shelved_games_by_default_7289fab5": "Hide shelved games by default",
-  "interface.keep_shelved_games_out_of_the_libr_067d9526": "Keep shelved games out of the library view unless you filter by the Shelved status",
-  "interface.hide_owned_games_in_has_results_fi_aa1ce40f": "Hide owned games in “Has Results” filter",
-  "interface.when_the_has_results_filter_is_act_0013a0df": "When the Has Results filter is active, skip games you already own",
+  "interface.keep_shelved_games_out_of_the_libr_067d9526":
+    "Keep shelved games out of the library view unless you filter by the Shelved status",
+  "interface.hide_owned_games_in_has_results_fi_aa1ce40f":
+    "Hide owned games in “Has Results” filter",
+  "interface.when_the_has_results_filter_is_act_0013a0df":
+    "When the Has Results filter is active, skip games you already own",
   "interface.saving_1ee0c88f": "Saving...",
   "interface.the_default_questarr_theme_a34dae8f": "The default Questarr theme",
-  "interface.a_cosmetic_retro_skin_with_navy_ti_45de7a8d": "A cosmetic retro skin with navy title bars, silver beveled buttons, square corners, and Tahoma type",
-  "interface.a_cosmetic_accent_color_unlocked_b_6da45e47": "A cosmetic accent color, unlocked by hacking the terminal in Ghost the Terminal",
-  "interface.purely_cosmetic_changes_the_visual_963dcc6c": "Purely cosmetic — changes the visual appearance, nothing else changes",
+  "interface.a_cosmetic_retro_skin_with_navy_ti_45de7a8d":
+    "A cosmetic retro skin with navy title bars, silver beveled buttons, square corners, and Tahoma type",
+  "interface.a_cosmetic_accent_color_unlocked_b_6da45e47":
+    "A cosmetic accent color, unlocked by hacking the terminal in Ghost the Terminal",
+  "interface.purely_cosmetic_changes_the_visual_963dcc6c":
+    "Purely cosmetic — changes the visual appearance, nothing else changes",
   "interface.overview_6a494fba": "Overview",
   "interface.journal_2edb7f18": "Journal",
   "interface.media_d10fcaa3": "Media",
@@ -487,11 +539,14 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.publishers_f94dc104": "Publishers",
   "interface.genres_65d70ee9": "Genres",
   "interface.automatic_download_target_23bf8f65": "Automatic download target",
-  "interface.overrides_the_account_platform_for_4d0354db": "Overrides the account platform for automatic release matching.",
+  "interface.overrides_the_account_platform_for_4d0354db":
+    "Overrides the account platform for automatic release matching.",
   "interface.screenshot_current_of_total_2a1e8d7d": "Screenshot {current} of {total}",
-  "interface.this_will_remove_game_from_your_li_b280beb8": "This will remove {game} from your library. This action cannot be undone.",
+  "interface.this_will_remove_game_from_your_li_b280beb8":
+    "This will remove {game} from your library. This action cannot be undone.",
   "interface.remove_from_download_client_2292f2b8": "Remove from download client",
-  "interface.removes_the_format_metadata_from_y_da6be94b": "Removes the {format} metadata from your downloader",
+  "interface.removes_the_format_metadata_from_y_da6be94b":
+    "Removes the {format} metadata from your downloader",
   "interface.delete_downloaded_files_from_disk_d71879bd": "Delete downloaded files from disk",
   "interface.permanently_removes_the_game_files_ffd66df5": "Permanently removes the game files",
   "interface.remove_21a5901d": "Remove",
@@ -505,9 +560,9 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.add_a_milestone_a288e551": "Add a milestone...",
   "interface.new_milestone_label_74d61b01": "New milestone label",
   "interface.add_milestone_36a90766": "Add milestone",
-  "interface.mark_label_complete_a837ab4b": "Mark \"{label}\" complete",
-  "interface.mark_label_incomplete_e499e4e8": "Mark \"{label}\" incomplete",
-  "interface.delete_milestone_label_27c6a0ec": "Delete milestone \"{label}\"",
+  "interface.mark_label_complete_a837ab4b": 'Mark "{label}" complete',
+  "interface.mark_label_incomplete_e499e4e8": 'Mark "{label}" incomplete',
+  "interface.delete_milestone_label_27c6a0ec": 'Delete milestone "{label}"',
   "interface.notes_0ff01b6a": "Notes",
   "interface.jot_down_a_thought_while_you_play_fdc764da": "Jot down a thought while you play...",
   "interface.new_journal_note_057d9fa2": "New journal note",
@@ -529,24 +584,30 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.failed_to_upload_screenshot_eb78cd62": "Failed to upload screenshot",
   "interface.failed_to_delete_screenshot_15050c90": "Failed to delete screenshot",
   "interface.game_linked_5437aae0": "Game Linked",
-  "interface.continue_by_reviewing_the_import_s_a709a813": "Continue by reviewing the import's source and destination paths.",
+  "interface.continue_by_reviewing_the_import_s_a709a813":
+    "Continue by reviewing the import's source and destination paths.",
   "interface.searching_2713de23": "Searching…",
-  "interface.no_games_found_try_a_different_sea_f654fc2c": "No games found. Try a different search, or add the game to your library first.",
+  "interface.no_games_found_try_a_different_sea_f654fc2c":
+    "No games found. Try a different search, or add the game to your library first.",
   "interface.link_to_a_game_b17ad089": "Link to a Game",
-  "interface.the_game_originally_linked_to_titl_4fda6a26": "The game originally linked to {title} could no longer be found. Select the correct game to continue importing this download.",
+  "interface.the_game_originally_linked_to_titl_4fda6a26":
+    "The game originally linked to {title} could no longer be found. Select the correct game to continue importing this download.",
   "interface.search_your_library_e2317bf3": "Search your library",
   "interface.search_by_title_612ec3e6": "Search by title…",
   "interface.link_game_167e02e9": "Link Game",
   "interface.failed_to_link_game_87d41db3": "Failed to Link Game",
   "interface.password_required_61aa76a1": "Password Required",
   "interface.review_import_f2b0ad8a": "Review Import",
-  "interface.title_is_a_password_protected_arch_164fd8c9": "{title} is a password-protected archive. Enter the password to extract and import it.",
-  "interface.manually_configure_the_import_for_1daa7327": "Manually configure the import for {title}.",
+  "interface.title_is_a_password_protected_arch_164fd8c9":
+    "{title} is a password-protected archive. Enter the password to extract and import it.",
+  "interface.manually_configure_the_import_for_1daa7327":
+    "Manually configure the import for {title}.",
   "interface.import_destination_f5fb664c": "Import destination",
   "interface.pc_game_library_d027b835": "PC game library",
   "interface.romm_rom_library_729f2cfd": "RomM ROM library",
   "interface.source_path_901bc31f": "Source Path",
-  "interface.optional_auto_resolved_from_downlo_c3c7ac1b": "(optional — auto-resolved from download client)",
+  "interface.optional_auto_resolved_from_downlo_c3c7ac1b":
+    "(optional — auto-resolved from download client)",
   "interface.auto_resolved_from_download_client_40761bc4": "Auto-resolved from download client",
   "interface.browse_source_directories_7eb8620b": "Browse source directories",
   "interface.destination_path_1f6ff88e": "Destination Path",
@@ -554,16 +615,20 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.download_contents_2604161d": "Download Contents",
   "interface.and_count_more_file_not_shown_a4a35a44": "…and {count} more file not shown",
   "interface.and_count_more_files_not_shown_9e72f6fd": "…and {count} more files not shown",
-  "interface.archive_files_detected_consider_en_c51932b4": "Archive files detected — consider enabling Unpack Archive below.",
+  "interface.archive_files_detected_consider_en_c51932b4":
+    "Archive files detected — consider enabling Unpack Archive below.",
   "interface.transfer_mode_e53bc979": "Transfer Mode",
   "interface.move_7f2c2a34": "Move",
   "interface.copy_658f3664": "Copy",
   "interface.hardlink_ffb8718c": "Hardlink",
   "interface.symlink_9b0a04f4": "Symlink",
-  "interface.uses_a_hardlink_when_both_folders_73d30feb": "Uses a hardlink when both folders are on the same volume and falls back to a copy otherwise. The imported file survives later source removal.",
-  "interface.works_across_different_volumes_but_240a7fdd": "Works across different volumes, but the link breaks if the source file is later removed or moved.",
+  "interface.uses_a_hardlink_when_both_folders_73d30feb":
+    "Uses a hardlink when both folders are on the same volume and falls back to a copy otherwise. The imported file survives later source removal.",
+  "interface.works_across_different_volumes_but_240a7fdd":
+    "Works across different volumes, but the link breaks if the source file is later removed or moved.",
   "interface.unpack_archive_505028c1": "Unpack Archive",
-  "interface.extract_zip_rar_7z_before_placing_2171d0e1": "Extract .zip, .rar, .7z before placing files.",
+  "interface.extract_zip_rar_7z_before_placing_2171d0e1":
+    "Extract .zip, .rar, .7z before placing files.",
   "interface.archive_password_18e15856": "Archive Password",
   "interface.optional_3f7db380": " (optional)",
   "interface.skip_import_97b4a64b": "Skip Import",
@@ -573,14 +638,18 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.import_skipped_b1a594b0": "Import skipped",
   "interface.failed_to_skip_import_c4cf8271": "Failed to skip import",
   "interface.import_confirmed_59dfe215": "Import Confirmed",
-  "interface.the_import_has_been_queued_for_exe_71265dc3": "The import has been queued for execution.",
+  "interface.the_import_has_been_queued_for_exe_71265dc3":
+    "The import has been queued for execution.",
   "interface.incorrect_password_aa2243e5": "Incorrect Password",
   "interface.import_failed_576fc6f1": "Import Failed",
   "interface.validation_error_f956c8d8": "Validation Error",
   "interface.destination_path_is_required_9a8601f7": "Destination path is required.",
-  "interface.this_archive_is_password_protected_727f2e86": "This archive is password-protected — enter a password to extract it.",
-  "interface.destination_must_be_a_subfolder_in_2a1d69f4": "Destination must be a subfolder inside {path}, not the root itself.",
-  "interface.detailed_insights_into_your_collec_02841828": "Detailed insights into your collection of {count} games.",
+  "interface.this_archive_is_password_protected_727f2e86":
+    "This archive is password-protected — enter a password to extract it.",
+  "interface.destination_must_be_a_subfolder_in_2a1d69f4":
+    "Destination must be a subfolder inside {path}, not the root itself.",
+  "interface.detailed_insights_into_your_collec_02841828":
+    "Detailed insights into your collection of {count} games.",
   "interface.share_to_discord_bfa374f1": "Share to Discord",
   "interface.share_4f856dd8": "Share",
   "interface.total_games_0d894a5a": "Total Games",
@@ -610,8 +679,10 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.my_score_5a685d11": "My Score",
   "interface.release_6d1e9b1e": "Release",
   "interface.type_d155d06d": "Type",
-  "interface.the_page_you_requested_could_not_b_09c782ad": "The page you requested could not be found.",
-  "interface.browse_and_manage_rss_feeds_to_aut_7b5c058b": "Browse and manage RSS feeds to automatically track releases.",
+  "interface.the_page_you_requested_could_not_b_09c782ad":
+    "The page you requested could not be found.",
+  "interface.browse_and_manage_rss_feeds_to_aut_7b5c058b":
+    "Browse and manage RSS feeds to automatically track releases.",
   "interface.matched_title_3fa18293": "Matched: {title}",
   "interface.view_original_article_for_title_730db17a": "View original article for {title}",
   "interface.downloaded_36a229f0": "Downloaded",
@@ -619,8 +690,10 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.failed_5579c3d4": "Failed",
   "interface.message_1_download_types_b72ee5fc": "1 download ({types})",
   "interface.count_downloads_types_cbb23901": "{count} downloads ({types})",
-  "interface.manage_torznab_and_newznab_indexer_65da8c99": "Manage Torznab and Newznab indexers for game discovery",
-  "interface.manage_download_clients_for_automa_2cdd3432": "Manage download clients for automated downloads. Downloads use priority order with automatic fallback; Real-Debrid files are copied back to QuestarrNG before import.",
+  "interface.manage_torznab_and_newznab_indexer_65da8c99":
+    "Manage Torznab and Newznab indexers for game discovery",
+  "interface.manage_download_clients_for_automa_2cdd3432":
+    "Manage download clients for automated downloads. Downloads use priority order with automatic fallback; Real-Debrid files are copied back to QuestarrNG before import.",
   "interface.with_errors_58377360": "With errors",
   "interface.in_progress_2948b425": "In progress",
   "interface.pending_3352afdc": "Pending",
@@ -634,11 +707,13 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.created_09de135b": "Created",
   "interface.duration_d4c7492d": "Duration",
   "interface.task_detail_ad64fa95": "Task detail",
-  "interface.total_total_added_added_skipped_sk_21cf07a0": "{total} total · {added} added · {skipped} skipped · {failed} failed",
+  "interface.total_total_added_added_skipped_sk_21cf07a0":
+    "{total} total · {added} added · {skipped} skipped · {failed} failed",
   "interface.no_item_level_detail_available_8d5ef01e": "No item-level detail available.",
   "interface.manual_f819f303": "Manual",
   "interface.log_details_74fe9c53": "Log details",
-  "interface.full_parsed_payload_retained_for_t_e0cae336": "Full parsed payload retained for this log entry.",
+  "interface.full_parsed_payload_retained_for_t_e0cae336":
+    "Full parsed payload retained for this log entry.",
   "interface.copy_raw_log_line_16ea97d6": "Copy raw log line",
   "interface.copy_raw_adfbe522": "Copy raw",
   "interface.copy_parsed_payload_12cb9427": "Copy parsed payload",
@@ -649,12 +724,15 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.module_c4fc60bd": "Module",
   "interface.message_ae0ed984": "Message",
   "interface.additional_metadata_bf9f8441": "Additional metadata",
-  "interface.no_additional_structured_metadata_3e35c234": "No additional structured metadata was present on this log line.",
+  "interface.no_additional_structured_metadata_3e35c234":
+    "No additional structured metadata was present on this log line.",
   "interface.structured_error_26a19c34": "Structured error",
-  "interface.no_structured_error_payload_was_pr_68ce48ba": "No structured error payload was present on this log line.",
+  "interface.no_structured_error_payload_was_pr_68ce48ba":
+    "No structured error payload was present on this log line.",
   "interface.raw_ndjson_00787ad7": "Raw NDJSON",
   "interface.server_logs_b6f4597d": "Server Logs",
-  "interface.real_time_server_output_count_line_9e1477d2": "Real-time server output — {count} lines displayed",
+  "interface.real_time_server_output_count_line_9e1477d2":
+    "Real-time server output — {count} lines displayed",
   "interface.pause_auto_scroll_ca2f1502": "Pause auto-scroll",
   "interface.resume_auto_scroll_1aa6c96d": "Resume auto-scroll",
   "interface.pause_44f9bf2d": "Pause",
@@ -690,7 +768,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.game_removed_from_library_c8cc4ace": "Game removed from library",
   "interface.failed_to_remove_game_52217143": "Failed to remove game",
   "interface.search_failed_643c7c26": "Search failed",
-  "interface.unable_to_search_indexers_please_c_05ed227a": "Unable to search indexers. Please check your configuration.",
+  "interface.unable_to_search_indexers_please_c_05ed227a":
+    "Unable to search indexers. Please check your configuration.",
   "interface.search_completed_7e30cbb4": "Search completed",
   "interface.found_count_results_0690bdda": "Found {count} results",
   "interface.no_results_found_a3156678": "No results found",
@@ -700,9 +779,11 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.download_started_successfully_79362cc5": "Download started successfully",
   "interface.failed_to_start_download_0508aacb": "Failed to start download",
   "interface.no_compatible_downloaders_496a53bc": "No compatible downloaders",
-  "interface.please_configure_a_type_downloader_18aae4bb": "Please configure a {type} downloader in settings.",
+  "interface.please_configure_a_type_downloader_18aae4bb":
+    "Please configure a {type} downloader in settings.",
   "interface.please_select_a_downloader_68c66ce5": "Please select a downloader",
-  "interface.password_must_be_200_characters_or_54434634": "Password must be 200 characters or fewer",
+  "interface.password_must_be_200_characters_or_54434634":
+    "Password must be 200 characters or fewer",
   "interface.enter_game_title_cba9342b": "Enter game title...",
   "interface.toggle_filters_f4e496fe": "Toggle filters",
   "interface.message_1_result_found_2d888469": "1 result found",
@@ -714,17 +795,22 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.release_name_68ad8e41": "Release Name",
   "interface.action_0a77a91f": "Action",
   "interface.check_size_071e13dc": "Check size",
-  "interface.ai_flagged_this_file_size_as_unusu_d3f30955": "AI flagged this file size as unusual for this type of release ({percent} plausible)",
+  "interface.ai_flagged_this_file_size_as_unusu_d3f30955":
+    "AI flagged this file size as unusual for this type of release ({percent} plausible)",
   "interface.peers_0326f84e": "peers",
   "interface.start_download_for_title_8ab69bd2": "Start download for {title}",
   "interface.configure_a_downloader_first_14107b71": "Configure a downloader first",
   "interface.start_download_3d514841": "Start download",
-  "interface.no_releases_match_the_selected_dat_f178dd25": "No releases match the selected date range. Try adjusting the filter.",
-  "interface.try_adjusting_your_search_terms_or_3be77ff9": "Try adjusting your search terms or check if your indexers are properly configured.",
+  "interface.no_releases_match_the_selected_dat_f178dd25":
+    "No releases match the selected date range. Try adjusting the filter.",
+  "interface.try_adjusting_your_search_terms_or_3be77ff9":
+    "Try adjusting your search terms or check if your indexers are properly configured.",
   "interface.start_searching_a1718a9f": "Start Searching",
-  "interface.enter_a_game_title_above_to_search_708dc202": "Enter a game title above to search across your configured indexers.",
+  "interface.enter_a_game_title_above_to_search_708dc202":
+    "Enter a game title above to search across your configured indexers.",
   "interface.start_download_6361b161": "Start Download",
-  "interface.configure_download_settings_for_ti_ba5e1a1d": "Configure download settings for: {title}",
+  "interface.configure_download_settings_for_ti_ba5e1a1d":
+    "Configure download settings for: {title}",
   "interface.downloader_2ca21a32": "Downloader",
   "interface.select_downloader_c88f5680": "Select downloader",
   "interface.category_optional_62084aac": "Category (Optional)",
@@ -732,9 +818,11 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.use_default_path_14eafa44": "Use default path",
   "interface.priority_1_10_40c5ba75": "Priority (1-10)",
   "interface.archive_password_optional_24812f75": "Archive Password (Optional)",
-  "interface.some_usenet_releases_ship_as_passw_7bcebd2a": "Some usenet releases ship as password-protected archives. SABnzbd and NZBGet will use this to unpack automatically.",
+  "interface.some_usenet_releases_ship_as_passw_7bcebd2a":
+    "Some usenet releases ship as password-protected archives. SABnzbd and NZBGet will use this to unpack automatically.",
   "interface.starting_6cac833d": "Starting...",
-  "interface.search_for_games_across_configured_47f97c02": "Search for games across configured indexers",
+  "interface.search_for_games_across_configured_47f97c02":
+    "Search for games across configured indexers",
   "interface.release_date_fe8488ec": "Release date:",
   "interface.from_18743595": "From",
   "interface.to_41f59644": "To",
@@ -744,25 +832,29 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.and_aa26483a": ", and",
   "interface.avoid_absolute_bd93d86c": "; avoid absolute",
   "interface.add_a_mapping_with_remote_path_cc89d7ac": ". Add a mapping with Remote path",
-  "interface.rate_limits_500_req_hour_20_000_re_4daa9116": ". Rate limits: 500 req/hour, 20,000 req/day.",
+  "interface.rate_limits_500_req_hour_20_000_re_4daa9116":
+    ". Rate limits: 500 req/hour, 20,000 req/day.",
   "interface.created_0a16de56": "· Created",
   "interface.currently_82bbd402": "· currently:",
   "interface.expires_a023da52": "· Expires",
   "interface.last_used_2c3a41c3": "· Last used",
   "interface.to_collection_9406fcfb": "” to collection",
-  "interface.will_stop_working_immediately_this_1587b328": "” will stop working immediately. This cannot be undone.",
+  "interface.will_stop_working_immediately_this_1587b328":
+    "” will stop working immediately. This cannot be undone.",
   "interface.optional_182d8232": "(optional)",
   "interface.required_2e184401": "(required)",
   "interface.leechers_0524269a": "• Leechers:",
   "interface.seeds_30df856b": "• Seeds:",
   "interface.local_path_687498f9": "→ Local path",
-  "interface.setting_too_high_may_result_in_api_1884d986": "⚠️ Setting too high may result in API blacklisting.",
+  "interface.setting_too_high_may_result_in_api_1884d986":
+    "⚠️ Setting too high may result in API blacklisting.",
   "interface.my_questarr_library_stats_6f07559d": "📊 My Questarr library stats",
   "interface.message_1_year_4d0a98a5": "1 year",
   "interface.message_180_days_e09dabbf": "180 days",
   "interface.message_30_days_7a572af9": "30 days",
   "interface.message_90_days_2d8a9817": "90 days",
-  "interface.abort_the_import_if_more_than_this_cfc4d5d2": "Abort the import if more than this many VirusTotal engines flag the file.",
+  "interface.abort_the_import_if_more_than_this_cfc4d5d2":
+    "Abort the import if more than this many VirusTotal engines flag the file.",
   "interface.access_59b4ae0b": "Access",
   "interface.accessible_874f483f": "Accessible",
   "interface.account_linked_8167a275": "Account linked",
@@ -777,19 +869,26 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.add_path_mapping_cb083fa1": "Add Path Mapping",
   "interface.add_root_folder_1817ba30": "Add Root Folder",
   "interface.add_stopped_ebc4769d": "Add Stopped",
-  "interface.add_the_indexer_first_then_edit_it_64c7a691": "Add the indexer first, then edit it to select categories.",
-  "interface.add_your_first_downloader_client_t_5ec1dede": "Add your first downloader client to enable automated downloads. Supported clients include Transmission, rTorrent, qBittorrent, Synology Download Station, Real-Debrid, SABnzbd, and NZBGet.",
+  "interface.add_the_indexer_first_then_edit_it_64c7a691":
+    "Add the indexer first, then edit it to select categories.",
+  "interface.add_your_first_downloader_client_t_5ec1dede":
+    "Add your first downloader client to enable automated downloads. Supported clients include Transmission, rTorrent, qBittorrent, Synology Download Station, Real-Debrid, SABnzbd, and NZBGet.",
   "interface.add_your_first_game_93e6e6f1": "Add your first game",
-  "interface.add_your_first_torznab_indexer_to_c5483271": "Add your first Torznab indexer to start discovering games. Popular options include Jackett, Prowlarr, or direct Torznab-compatible trackers.",
+  "interface.add_your_first_torznab_indexer_to_c5483271":
+    "Add your first Torznab indexer to start discovering games. Popular options include Jackett, Prowlarr, or direct Torznab-compatible trackers.",
   "interface.added_to_your_library_96ba12b0": "Added to your library.",
-  "interface.adding_a_category_avoids_conflicts_8e6333d5": "Adding a category avoids conflicts with unrelated downloads",
+  "interface.adding_a_category_avoids_conflicts_8e6333d5":
+    "Adding a category avoids conflicts with unrelated downloads",
   "interface.advanced_settings_ec0c41ac": "Advanced Settings",
-  "interface.after_a_successful_copy_or_move_im_668042bd": "After a successful copy or move import, remove the download from the client and delete source files.",
+  "interface.after_a_successful_copy_or_move_im_668042bd":
+    "After a successful copy or move import, remove the download from the client and delete source files.",
   "interface.age_d0f33c72": "Age:",
   "interface.ai_release_analysis_typesafe_c8e3c82c": "AI Release Analysis (TypeSafe)",
-  "interface.alert_when_a_wanted_game_appears_o_a4cfd2e6": "Alert when a wanted game appears on xREL.to (scene/P2P release list). API base URL and search options for the auto-check.",
+  "interface.alert_when_a_wanted_game_appears_o_a4cfd2e6":
+    "Alert when a wanted game appears on xREL.to (scene/P2P release list). API base URL and search options for the auto-check.",
   "interface.all_75afe364": "All",
-  "interface.all_downloads_are_already_linked_t_b083cdfe": "All downloads are already linked to games",
+  "interface.all_downloads_are_already_linked_t_b083cdfe":
+    "All downloads are already linked to games",
   "interface.all_genres_715851e8": "All Genres",
   "interface.all_integration_routes_a99944c8": "All integration routes",
   "interface.all_integrations_cd0902e7": "All integrations",
@@ -799,7 +898,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.allow_insecure_lan_207bc3af": "Allow insecure LAN",
   "interface.allow_insecure_lan_connection_30e18c31": "Allow insecure LAN connection",
   "interface.an_error_occurred_3c3ac06b": "An error occurred",
-  "interface.and_linked_to_their_folder_on_disk_5db670cc": "and linked to their folder on disk, but that folder stays outside your library root — it is never moved, renamed, or deleted by Questarr unless you turn on",
+  "interface.and_linked_to_their_folder_on_disk_5db670cc":
+    "and linked to their folder on disk, but that folder stays outside your library root — it is never moved, renamed, or deleted by Questarr unless you turn on",
   "interface.and_the_model_to_be8efa69": "and the model to",
   "interface.any_8eb61aed": "Any",
   "interface.any_client_using_9dbd9ef8": "Any client using “",
@@ -812,12 +912,16 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.api_key_expiration_70b1d721": "API key expiration",
   "interface.api_key_revoked_37f6fa7a": "API key revoked",
   "interface.api_keys_4a56d66d": "API Keys",
-  "interface.api_mode_sends_notifications_to_a_2b629ab9": "API mode sends notifications to a remote Apprise server. CLI mode runs the local",
+  "interface.api_mode_sends_notifications_to_a_2b629ab9":
+    "API mode sends notifications to a remote Apprise server. CLI mode runs the local",
   "interface.api_url_f74361be": "API URL",
   "interface.app_version_08303038": "App version",
-  "interface.application_maintenance_and_data_m_0b4352e2": "Application maintenance and data management tasks",
-  "interface.applied_automatically_to_every_dow_71511458": "Applied automatically to every download sent to this client. Some indexers (e.g. G4U) ship releases as password-protected archives — SABnzbd and NZBGet will use this to unpack them. You can still override it per-download in the search dialog.",
-  "interface.applies_immediately_and_affects_al_131c1b17": "Applies immediately and affects all configured downloaders. View the results on the Logs page.",
+  "interface.application_maintenance_and_data_m_0b4352e2":
+    "Application maintenance and data management tasks",
+  "interface.applied_automatically_to_every_dow_71511458":
+    "Applied automatically to every download sent to this client. Some indexers (e.g. G4U) ship releases as password-protected archives — SABnzbd and NZBGet will use this to unpack them. You can still override it per-download in the search dialog.",
+  "interface.applies_immediately_and_affects_al_131c1b17":
+    "Applies immediately and affects all configured downloaders. View the results on the Logs page.",
   "interface.apply_to_all_synced_indexers_74a01ea1": "Apply to all synced indexers",
   "interface.apprise_edd07871": "Apprise",
   "interface.apprise_api_b9af8b11": "Apprise API",
@@ -826,7 +930,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.apprise_settings_saved_186e24e9": "Apprise settings saved",
   "interface.ask_for_review_8a2a38cf": "Ask for review",
   "interface.authenticated_3be63798": "Authenticated",
-  "interface.authorize_questarrng_through_real_9643c6ad": "Authorize QuestarrNG through Real-Debrid's device sign-in.",
+  "interface.authorize_questarrng_through_real_9643c6ad":
+    "Authorize QuestarrNG through Real-Debrid's device sign-in.",
   "interface.auto_search_76b877ea": "Auto Search",
   "interface.auto_delete_source_after_import_8169ac6a": "Auto-delete source after import",
   "interface.auto_download_single_releases_82c7548f": "Auto-Download Single Releases",
@@ -834,30 +939,39 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.auto_search_download_c4876675": "Auto-Search & Download",
   "interface.auto_sync_wishlist_0ca589e5": "Auto-Sync Wishlist",
   "interface.auto_unpack_archives_0b62099a": "Auto-Unpack Archives",
-  "interface.automatically_download_when_only_o_fafb8c8f": "Automatically download when only one release is found",
-  "interface.automatically_extract_zip_rar_and_1c1745b0": "Automatically extract zip, rar, and 7z archives before importing.",
-  "interface.automatically_filter_the_download_6cbe1db8": "Automatically filter the download dialog to show only preferred groups, and only send availability/update notifications when a preferred group release is found",
-  "interface.automatically_import_all_your_inde_5e7f9269": "Automatically import all your indexers from Prowlarr. This will add new indexers and update existing ones.",
-  "interface.automatically_search_for_and_downl_99b054ff": "Automatically search for and download releases for wanted games",
+  "interface.automatically_download_when_only_o_fafb8c8f":
+    "Automatically download when only one release is found",
+  "interface.automatically_extract_zip_rar_and_1c1745b0":
+    "Automatically extract zip, rar, and 7z archives before importing.",
+  "interface.automatically_filter_the_download_6cbe1db8":
+    "Automatically filter the download dialog to show only preferred groups, and only send availability/update notifications when a preferred group release is found",
+  "interface.automatically_import_all_your_inde_5e7f9269":
+    "Automatically import all your indexers from Prowlarr. This will add new indexers and update existing ones.",
+  "interface.automatically_search_for_and_downl_99b054ff":
+    "Automatically search for and download releases for wanted games",
   "interface.automatically_send_error_reports_9fb91725": "Automatically send error reports",
   "interface.available_tokens_4d0f33b0": "Available tokens:",
   "interface.avg_1f98b89f": "avg.",
   "interface.bahasa_indonesia_indonesian_23c2625b": "Bahasa Indonesia — Indonesian",
-  "interface.base_path_or_endpoint_e_g_sabnzbd_ea18d9b8": "Base path or endpoint (e.g. \"/sabnzbd\" for reverse proxy)",
+  "interface.base_path_or_endpoint_e_g_sabnzbd_ea18d9b8":
+    'Base path or endpoint (e.g. "/sabnzbd" for reverse proxy)',
   "interface.begin_infiltration_3dabf887": "Begin infiltration",
   "interface.blacklist_release_27a09159": "Blacklist release",
   "interface.blacklisted_releases_a7ac765d": "Blacklisted Releases",
   "interface.add_blacklisted_term_d39bce18": "Add blacklisted term",
-  "interface.no_blacklisted_terms_configured_al_97e8f9e2": "No blacklisted terms configured. All release names will be considered.",
+  "interface.no_blacklisted_terms_configured_al_97e8f9e2":
+    "No blacklisted terms configured. All release names will be considered.",
   "interface.blacklisted_terms_639a63ea": "Blacklisted Terms",
-  "interface.block_files_virustotal_has_never_s_21a534f7": "Block files VirusTotal has never scanned before. Disabled by default so new legitimate releases aren't blocked.",
+  "interface.block_files_virustotal_has_never_s_21a534f7":
+    "Block files VirusTotal has never scanned before. Disabled by default so new legitimate releases aren't blocked.",
   "interface.block_unknown_hashes_7c00ac00": "Block Unknown Hashes",
   "interface.both_paths_are_required_f918d24d": "Both paths are required.",
   "interface.breadcrumb_d43fa44c": "breadcrumb",
   "interface.browse_for_folder_28fbe714": "Browse for folder",
   "interface.browse_for_library_root_folder_c340395f": "Browse for library root folder",
   "interface.browse_local_path_797dfb4f": "Browse local path",
-  "interface.browsers_will_show_a_security_warn_97a22b08": "Browsers will show a security warning for self-signed certificates.",
+  "interface.browsers_will_show_a_security_warn_97a22b08":
+    "Browsers will show a security warning for self-signed certificates.",
   "interface.bundle_downloaded_fbee20ca": "Bundle downloaded",
   "interface.but_questarr_accesses_that_share_a_94f8e8e2": "but Questarr accesses that share at",
   "interface.by_542bcc94": "by",
@@ -869,7 +983,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.category_43328c31": "Category:",
   "interface.certificate_file_crt_pem_aca73157": "Certificate File (.crt/.pem)",
   "interface.certificate_generated_7538dc71": "Certificate Generated",
-  "interface.certificate_generation_disabled_be_3f9d057b": "Certificate generation disabled because a non-self-signed certificate is detected.",
+  "interface.certificate_generation_disabled_be_3f9d057b":
+    "Certificate generation disabled because a non-self-signed certificate is detected.",
   "interface.certificate_path_crt_pem_6076795a": "Certificate Path (.crt/.pem)",
   "interface.certificate_status_4c867c32": "Certificate Status",
   "interface.certificate_uploaded_695b2298": "Certificate Uploaded",
@@ -877,15 +992,19 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.change_password_81c9aa8e": "Change Password",
   "interface.check_library_6ceac5f0": "Check Library",
   "interface.check_library_health_3d7ddab6": "Check Library Health",
-  "interface.choose_the_platforms_you_use_only_43848e7d": "Choose the platforms you use. Only these appear in platform filters across the app, and only these are eligible for import. Leave everything unchecked to show all platforms.",
-  "interface.choose_whether_shelved_and_complet_a4e89ead": "Choose whether shelved and completed games send these notifications. Applies to both In-App and Apprise. Games are still checked for available content.",
-  "interface.choose_which_stats_to_include_in_t_0b42974a": "Choose which stats to include in the image.",
+  "interface.choose_the_platforms_you_use_only_43848e7d":
+    "Choose the platforms you use. Only these appear in platform filters across the app, and only these are eligible for import. Leave everything unchecked to show all platforms.",
+  "interface.choose_whether_shelved_and_complet_a4e89ead":
+    "Choose whether shelved and completed games send these notifications. Applies to both In-App and Apprise. Games are still checked for available content.",
+  "interface.choose_which_stats_to_include_in_t_0b42974a":
+    "Choose which stats to include in the image.",
   "interface.claiming_50f8e629": "Claiming",
   "interface.claiming_869fc99d": "Claiming…",
   "interface.clamav_8dd3244b": "clamav",
   "interface.clear_all_797a9445": "Clear all",
   "interface.clear_cache_64d352e4": "Clear Cache",
-  "interface.clear_cached_torrent_nzb_search_re_42f576aa": "Clear cached torrent/NZB search results so the next search fetches fresh data from all configured indexers.",
+  "interface.clear_cached_torrent_nzb_search_re_42f576aa":
+    "Clear cached torrent/NZB search results so the next search fetches fresh data from all configured indexers.",
   "interface.clear_downloads_cache_aa621d65": "Clear Downloads Cache",
   "interface.cli_506a54a9": "CLI",
   "interface.close_cd86acc3": "Close",
@@ -900,21 +1019,27 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.completion_eb58d4c7": "Completion",
   "interface.confidence_d458ccd1": "confidence",
   "interface.config_key_052fb78c": "Config Key",
-  "interface.configure_a_torrent_or_usenet_clie_8fc3978c": "Configure a torrent or Usenet client for automated game downloads.",
-  "interface.configure_a_torznab_torrent_or_new_5f822a70": "Configure a Torznab (torrent) or Newznab (Usenet) indexer for game discovery and downloads.",
+  "interface.configure_a_torrent_or_usenet_clie_8fc3978c":
+    "Configure a torrent or Usenet client for automated game downloads.",
+  "interface.configure_a_torznab_torrent_or_new_5f822a70":
+    "Configure a Torznab (torrent) or Newznab (Usenet) indexer for game discovery and downloads.",
   "interface.configure_apprise_above_to_enable_896e8220": "Configure Apprise above to enable",
   "interface.configure_discord_webhook_30acf93a": "Configure Discord webhook",
   "interface.configure_download_settings_for_f79bfa8d": "Configure download settings for:",
-  "interface.configure_secure_access_to_questar_bb27de21": "Configure secure access to QuestarrNG. Requires server restart to apply changes.",
+  "interface.configure_secure_access_to_questar_bb27de21":
+    "Configure secure access to QuestarrNG. Requires server restart to apply changes.",
   "interface.configured_92d5201d": "Configured",
-  "interface.configured_via_ssl_port_environmen_23330d57": "Configured via SSL_PORT environment variable (e.g., in docker-compose.yml) - Default: 9898",
+  "interface.configured_via_ssl_port_environmen_23330d57":
+    "Configured via SSL_PORT environment variable (e.g., in docker-compose.yml) - Default: 9898",
   "interface.confirm_new_password_7a80272a": "Confirm New Password",
   "interface.connect_account_36d5a5ce": "Connect account",
-  "interface.connect_seerrng_or_another_integra_103bc971": "Connect SeerrNG or another integration client with a dedicated key. New keys expire automatically and can be restricted to the SeerrNG provider routes.",
+  "interface.connect_seerrng_or_another_integra_103bc971":
+    "Connect SeerrNG or another integration client with a dedicated key. New keys expire automatically and can be restricted to the SeerrNG provider routes.",
   "interface.connected_7bf69370": "Connected",
   "interface.connected_peers_60017005": "Connected Peers",
   "interface.connected_successfully_d0a96091": "Connected successfully.",
-  "interface.connected_account_credentials_are_6ce79549": "Connected. Account credentials are stored encrypted by QuestarrNG.",
+  "interface.connected_account_credentials_are_6ce79549":
+    "Connected. Account credentials are stored encrypted by QuestarrNG.",
   "interface.connection_error_4688ed83": "Connection Error",
   "interface.connection_failed_072cefb6": "Connection failed",
   "interface.connection_successful_515fb6d9": "Connection successful",
@@ -930,35 +1055,42 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.console_xbox_3475cb41": "Console > Xbox",
   "interface.console_xbox_360_6a1bc636": "Console > Xbox 360",
   "interface.console_xbox_one_6eb2da11": "Console > Xbox One",
-  "interface.content_filtering_preferences_have_113bca15": "Content filtering preferences have been saved.",
+  "interface.content_filtering_preferences_have_113bca15":
+    "Content filtering preferences have been saved.",
   "interface.content_types_to_show_e2593fad": "Content Types to Show",
-  "interface.control_which_events_create_notifi_716d0d76": "Control which events create notifications and where they are sent.",
+  "interface.control_which_events_create_notifi_716d0d76":
+    "Control which events create notifications and where they are sent.",
   "interface.copy_api_key_950de65b": "Copy API key",
   "interface.copy_redirect_uri_cb474d36": "Copy redirect URI",
   "interface.copy_support_code_73faae20": "Copy support code",
-  "interface.copy_your_new_key_now_it_will_not_a458815a": "Copy your new key now — it will not be shown again.",
+  "interface.copy_your_new_key_now_it_will_not_a458815a":
+    "Copy your new key now — it will not be shown again.",
   "interface.could_not_add_folder_39f33de8": "Could Not Add Folder",
   "interface.could_not_change_the_category_85f1741e": "Could not change the category",
   "interface.could_not_create_api_key_58ace79e": "Could not create API key",
   "interface.could_not_link_real_debrid_be750164": "Could not link Real-Debrid",
-  "interface.could_not_load_api_keys_refresh_th_46d17f24": "Could not load API keys. Refresh the page to try again.",
+  "interface.could_not_load_api_keys_refresh_th_46d17f24":
+    "Could not load API keys. Refresh the page to try again.",
   "interface.could_not_load_platform_list_from_20649c44": "Could not load platform list from IGDB.",
   "interface.could_not_revoke_api_key_b29ba530": "Could not revoke API key",
   "interface.could_not_update_delete_permission_daf261d2": "Could Not Update Delete Permission",
   "interface.could_not_update_import_settings_2aad92e0": "Could not update import settings.",
   "interface.could_not_update_platform_preferen_0393e7b1": "Could not update platform preferences.",
   "interface.could_not_update_romm_settings_80dd0170": "Could not update RomM settings.",
-  "interface.could_not_update_security_scan_set_dd061326": "Could not update security scan settings.",
+  "interface.could_not_update_security_scan_set_dd061326":
+    "Could not update security scan settings.",
   "interface.couldn_t_check_crack_status_e3ba0169": "Couldn't check crack status",
   "interface.couldn_t_load_report_f19f0c81": "Couldn't load report",
   "interface.cracked_4da0b498": "Cracked",
-  "interface.create_a_webhook_in_your_discord_s_8c8899d7": "Create a webhook in your Discord server under Channel Settings → Integrations.",
+  "interface.create_a_webhook_in_your_discord_s_8c8899d7":
+    "Create a webhook in your Discord server under Channel Settings → Integrations.",
   "interface.create_github_issue_45ec6e6f": "Create GitHub issue",
   "interface.create_key_2d2483de": "Create key",
   "interface.create_mapping_ecd026cb": "Create Mapping",
   "interface.created_by_09d3eb60": "Created By",
   "interface.creating_12186874": "Creating...",
-  "interface.credentials_configured_here_will_o_aa117045": "Credentials configured here will override environment variables (IGDB_CLIENT_ID, IGDB_CLIENT_SECRET).",
+  "interface.credentials_configured_here_will_o_aa117045":
+    "Credentials configured here will override environment variables (IGDB_CLIENT_ID, IGDB_CLIENT_SECRET).",
   "interface.critics_aa1934ca": "Critics",
   "interface.current_password_3f24a0d3": "Current Password",
   "interface.custom_folder_bindings_c4c6f148": "Custom folder bindings",
@@ -975,7 +1107,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.deletion_allowed_012aa56b": "Deletion Allowed",
   "interface.deluge_44f0cba1": "Deluge",
   "interface.destructive_643c1b03": "destructive",
-  "interface.detected_from_release_names_when_a_d434e253": "Detected from release names when a download finishes. Updates that are not newer than this version are not notified.",
+  "interface.detected_from_release_names_when_a_d434e253":
+    "Detected from release names when a download finishes. Updates that are not newer than this version are not notified.",
   "interface.detection_61ecb2cc": "Detection",
   "interface.detection_threshold_137b1cf7": "Detection Threshold",
   "interface.deutsch_german_0cb6a1e3": "Deutsch — German",
@@ -984,18 +1117,23 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.discord_c839636f": "Discord",
   "interface.discord_webhook_a696b3ce": "Discord Webhook",
   "interface.discord_webhook_saved_26b4f9c9": "Discord webhook saved",
-  "interface.discord_webhook_pushover_token_use_e14522ea": "discord://webhook/... pushover://token@user/",
+  "interface.discord_webhook_pushover_token_use_e14522ea":
+    "discord://webhook/... pushover://token@user/",
   "interface.discover_existing_games_ea0085f8": "Discover Existing Games",
   "interface.dismiss_265915f3": "Dismiss",
-  "interface.display_trending_mods_and_verify_i_57074f98": "Display trending mods and verify if your games have a Nexus Mods section.",
+  "interface.display_trending_mods_and_verify_i_57074f98":
+    "Display trending mods and verify if your games have a Nexus Mods section.",
   "interface.dl_44ce8b8d": "DL",
-  "interface.do_not_show_games_already_in_your_79575601": "Do not show games already in your \"Owned\" or \"Completed\" library.",
-  "interface.do_not_show_games_already_in_your_15184b66": "Do not show games already in your watchlist.",
+  "interface.do_not_show_games_already_in_your_79575601":
+    'Do not show games already in your "Owned" or "Completed" library.',
+  "interface.do_not_show_games_already_in_your_15184b66":
+    "Do not show games already in your watchlist.",
   "interface.done_8dd31791": "Done",
   "interface.download_aborted_68367a76": "Download Aborted",
   "interface.download_completed_3bc32bc4": "Download completed",
   "interface.download_completed_b5d6b524": "Download Completed",
-  "interface.download_details_including_files_t_e77b19ac": "Download details including files, trackers, and metadata",
+  "interface.download_details_including_files_t_e77b19ac":
+    "Download details including files, trackers, and metadata",
   "interface.download_error_942c0583": "Download error",
   "interface.download_failed_6e2ce5d6": "Download failed",
   "interface.download_linked_to_game_65f039ff": "Download linked to game",
@@ -1016,7 +1154,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.downloader_updated_successfully_827ea8ea": "Downloader updated successfully",
   "interface.downloading_4240ae03": "Downloading...",
   "interface.downloads_cache_cleared_43c5badc": "Downloads Cache Cleared",
-  "interface.downloads_not_yet_tracked_by_quest_89a25310": "Downloads not yet tracked by Questarr, grouped by game. Select a game for each to link them.",
+  "interface.downloads_not_yet_tracked_by_quest_89a25310":
+    "Downloads not yet tracked by Questarr, grouped by game. Select a game for each to link them.",
   "interface.drifted_a0f50be5": "Drifted (",
   "interface.e_g_404_c875c07b": "e.g. 404",
   "interface.e_g_codex_skidrow_empress_50f0eff0": "e.g. CODEX, SKIDROW, EMPRESS...",
@@ -1029,12 +1168,15 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.edit_path_mapping_837f048a": "Edit Path Mapping",
   "interface.empty_directory_0fab5909": "Empty directory",
   "interface.enable_auto_search_f8dd27e4": "Enable Auto-Search",
-  "interface.enable_https_see_settings_web_in_t_bb284471": "Enable HTTPS (see Settings → Web in Transmission)",
+  "interface.enable_https_see_settings_web_in_t_bb284471":
+    "Enable HTTPS (see Settings → Web in Transmission)",
   "interface.enable_post_processing_22186430": "Enable Post-Processing",
   "interface.enable_ssl_6b9b55bc": "Enable SSL",
   "interface.enabled_9c86e43e": "Enabled",
-  "interface.enter_a_new_key_to_override_the_cu_28153916": "Enter a new key to override the current one",
-  "interface.enter_a_new_url_to_replace_or_clea_66bd3381": "Enter a new URL to replace, or clear to remove",
+  "interface.enter_a_new_key_to_override_the_cu_28153916":
+    "Enter a new key to override the current one",
+  "interface.enter_a_new_url_to_replace_or_clea_66bd3381":
+    "Enter a new URL to replace, or clear to remove",
   "interface.enter_api_key_2b85154e": "Enter API key",
   "interface.enter_password_e283cfbe": "Enter password",
   "interface.enter_prowlarr_api_key_914cef27": "Enter Prowlarr API Key",
@@ -1044,7 +1186,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.enter_your_igdb_client_id_16fe6cb2": "Enter your IGDB Client ID",
   "interface.enter_your_igdb_client_secret_f5ba7737": "Enter your IGDB Client Secret",
   "interface.enter_your_nexus_mods_api_key_3ad3b8e3": "Enter your Nexus Mods API key",
-  "interface.enter_your_steamid64_to_sync_your_3ec224b1": "Enter your SteamID64 to sync your wishlist. You can find it on",
+  "interface.enter_your_steamid64_to_sync_your_3ec224b1":
+    "Enter your SteamID64 to sync your wishlist. You can find it on",
   "interface.environment_variable_4d013c7a": "Environment Variable",
   "interface.epic_games_b9c3787b": "Epic Games",
   "interface.error_df22b531": "ERROR",
@@ -1060,8 +1203,10 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.existing_game_policy_e24b427c": "Existing game policy",
   "interface.exit_to_questarr_75ef9e6b": "Exit to Questarr",
   "interface.experimental_de49995f": "Experimental",
-  "interface.experimental_feature_behavior_and_c81027bd": "Experimental feature: behavior and results may change between releases",
-  "interface.experimental_jev_classifications_c_0385974c": "Experimental: Jev classifications can be wrong, and how they are used may change between releases. Check flagged results before relying on them.",
+  "interface.experimental_feature_behavior_and_c81027bd":
+    "Experimental feature: behavior and results may change between releases",
+  "interface.experimental_jev_classifications_c_0385974c":
+    "Experimental: Jev classifications can be wrong, and how they are used may change between releases. Check flagged results before relying on them.",
   "interface.expires_after_9311682d": "Expires after",
   "interface.extra_7d069c89": "Extra",
   "interface.failed_to_access_directory_8c646530": "Failed to access directory.",
@@ -1075,11 +1220,13 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.failed_to_delete_indexer_64387ab7": "Failed to delete indexer",
   "interface.failed_to_disable_typesafe_integra_31c71c34": "Failed to disable TypeSafe integration",
   "interface.failed_to_fetch_categories_df0aca47": "Failed to fetch categories",
-  "interface.failed_to_load_configuration_pleas_232207fc": "Failed to load configuration. Please try again later.",
+  "interface.failed_to_load_configuration_pleas_232207fc":
+    "Failed to load configuration. Please try again later.",
   "interface.failed_to_load_directory_484520e8": "Failed to load directory",
   "interface.failed_to_load_download_details_eedc9c73": "Failed to load download details:",
   "interface.failed_to_load_files_9722817a": "Failed to load files.",
-  "interface.failed_to_load_the_current_setting_7d40132e": "Failed to load the current setting. Refresh the page to try again.",
+  "interface.failed_to_load_the_current_setting_7d40132e":
+    "Failed to load the current setting. Refresh the page to try again.",
   "interface.failed_to_pause_download_f171f331": "Failed to pause download",
   "interface.failed_to_remove_download_c5aa5a75": "Failed to remove download",
   "interface.failed_to_remove_download_record_46ae89e6": "Failed to remove download record",
@@ -1091,11 +1238,13 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.failed_to_save_the_installed_versi_f4256567": "Failed to save the installed version",
   "interface.failed_to_save_typesafe_settings_5ac02f0c": "Failed to save TypeSafe settings",
   "interface.failed_to_scan_downloads_c9896273": "Failed to scan downloads",
-  "interface.failed_to_search_indexers_please_c_6f3faf70": "Failed to search indexers. Please check your configuration.",
+  "interface.failed_to_search_indexers_please_c_6f3faf70":
+    "Failed to search indexers. Please check your configuration.",
   "interface.failed_to_unhide_game_96d87062": "Failed to unhide game",
   "interface.failed_to_update_download_target_3f62cc2f": "Failed to update download target",
   "interface.failed_to_update_downloader_fd61587d": "Failed to update downloader",
-  "interface.failed_to_update_downloader_debug_3763ef63": "Failed to update downloader debug logging",
+  "interface.failed_to_update_downloader_debug_3763ef63":
+    "Failed to update downloader debug logging",
   "interface.failed_to_update_indexer_94ebcdf9": "Failed to update indexer",
   "interface.fatal_1f906c99": "FATAL",
   "interface.feed_added_dcf977cb": "Feed added",
@@ -1106,20 +1255,27 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.fields_marked_are_required_3c9a5375": "Fields marked * are required.",
   "interface.file_download_initiated_1ac1735c": "File download initiated",
   "interface.files_27f593c8": "Files (",
-  "interface.files_have_been_imported_to_your_l_172a9e7f": "Files have been imported to your library",
+  "interface.files_have_been_imported_to_your_l_172a9e7f":
+    "Files have been imported to your library",
   "interface.filter_downloads_5e20d82e": "Filter downloads",
   "interface.filter_downloads_by_protocol_4a8ac4b1": "Filter downloads by protocol",
   "interface.filter_downloads_by_status_af79226b": "Filter downloads by status",
   "interface.filter_downloads_49190b0c": "Filter downloads...",
-  "interface.filtered_to_games_only_master_game_929b86c8": "Filtered to games only (master_game). Data from",
+  "interface.filtered_to_games_only_master_game_929b86c8":
+    "Filtered to games only (master_game). Data from",
   "interface.filters_0b3aa6ec": "Filters",
-  "interface.find_games_whose_library_files_hav_b5640cf7": "Find games whose library files have gone missing, and library folders that no longer match any game.",
-  "interface.for_directory_imports_place_detect_2a0f3d16": "For directory imports, place detected DLC, updates, and extras in",
-  "interface.for_that_folder_below_with_it_off_7b4b9c66": "for that folder below. With it off (the default), removing a game with its files skips anything discovered here.",
+  "interface.find_games_whose_library_files_hav_b5640cf7":
+    "Find games whose library files have gone missing, and library folders that no longer match any game.",
+  "interface.for_directory_imports_place_detect_2a0f3d16":
+    "For directory imports, place detected DLC, updates, and extras in",
+  "interface.for_that_folder_below_with_it_off_7b4b9c66":
+    "for that folder below. With it off (the default), removing a game with its files skips anything discovered here.",
   "interface.force_https_658cb10d": "Force HTTPS",
   "interface.force_started_226501c1": "Force started",
-  "interface.forced_downloads_do_not_abide_by_s_7e1fbb4f": "Forced downloads do not abide by seed restrictions",
-  "interface.forward_notifications_through_a_se_d6b7ff4a": "Forward notifications through a self-hosted",
+  "interface.forced_downloads_do_not_abide_by_s_7e1fbb4f":
+    "Forced downloads do not abide by seed restrictions",
+  "interface.forward_notifications_through_a_se_d6b7ff4a":
+    "Forward notifications through a self-hosted",
   "interface.found_64ff7b9f": "found",
   "interface.fran_ais_french_b011566e": "Français — French",
   "interface.free_space_7d17b1a1": "Free Space",
@@ -1139,19 +1295,24 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.game_updates_patches_and_hotfixes_4e0a4184": "Game updates, patches, and hotfixes",
   "interface.games_ce3e2b9c": "games",
   "interface.games_found_here_are_added_as_c9118cc6": "Games found here are added as",
-  "interface.games_with_a_configured_romm_platf_6785c6af": "Games with a configured RomM platform slug are imported into this library.",
+  "interface.games_with_a_configured_romm_platf_6785c6af":
+    "Games with a configured RomM platform slug are imported into this library.",
   "interface.general_config_2f202593": "General Config",
   "interface.general_config_settings_b9d44f94": "General Config settings",
-  "interface.generate_a_self_signed_certificate_0cfb613b": "Generate a self-signed certificate if you don't have one.",
+  "interface.generate_a_self_signed_certificate_0cfb613b":
+    "Generate a self-signed certificate if you don't have one.",
   "interface.generate_self_signed_certificate_e87bee34": "Generate Self-Signed Certificate",
   "interface.generating_a5bfb869": "Generating...",
   "interface.generation_failed_3d985fe4": "Generation Failed",
   "interface.genre_1c27eb60": "Genre",
   "interface.get_your_personal_api_key_on_the_af959ae9": "Get your personal API key on the",
-  "interface.ghost_mode_is_now_unlocked_find_it_4a364fe7": "Ghost Mode is now unlocked — find it under Settings → Appearance.",
+  "interface.ghost_mode_is_now_unlocked_find_it_4a364fe7":
+    "Ghost Mode is now unlocked — find it under Settings → Appearance.",
   "interface.ghost_the_terminal_5b3b1d25": "Ghost the Terminal",
-  "interface.github_repository_visible_only_to_6beca8d3": "GitHub repository visible only to the Questarr maintainer, marked as an automated telemetry report so it's clearly distinguished from a manually submitted one. You will receive an issue number as your support code.",
-  "interface.github_repository_visible_only_to_8eb1c6bb": "GitHub repository visible only to the Questarr maintainer. You will receive an issue number as your support code — share only that number with support.",
+  "interface.github_repository_visible_only_to_6beca8d3":
+    "GitHub repository visible only to the Questarr maintainer, marked as an automated telemetry report so it's clearly distinguished from a manually submitted one. You will receive an issue number as your support code.",
+  "interface.github_repository_visible_only_to_8eb1c6bb":
+    "GitHub repository visible only to the Questarr maintainer. You will receive an issue number as your support code — share only that number with support.",
   "interface.give_this_code_to_support_cc791e45": "Give this code to support:",
   "interface.go_41d0c56b": "Go",
   "interface.go_to_root_4ebc54c8": "Go to Root",
@@ -1160,14 +1321,18 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.group_s_ready_1e1a94f3": "group(s) ready",
   "interface.guard_detection_16e97615": "Guard detection",
   "interface.h_ed0c3757": "h",
-  "interface.hardlink_check_unavailable_configu_3c5cea26": "Hardlink check unavailable: configure at least one downloader path first.",
-  "interface.hardlink_keeps_torrents_seeding_wh_893f630a": "Hardlink keeps torrents seeding while importing.",
-  "interface.hardlink_not_available_on_this_set_2b61a180": "Hardlink not available on this setup — will fall back to copy.",
+  "interface.hardlink_check_unavailable_configu_3c5cea26":
+    "Hardlink check unavailable: configure at least one downloader path first.",
+  "interface.hardlink_keeps_torrents_seeding_wh_893f630a":
+    "Hardlink keeps torrents seeding while importing.",
+  "interface.hardlink_not_available_on_this_set_2b61a180":
+    "Hardlink not available on this setup — will fall back to copy.",
   "interface.hardlink_supported_dd69536c": "Hardlink supported.",
   "interface.has_search_results_7c5dd90f": "Has Search Results",
   "interface.hash_4ef356f1": "Hash",
   "interface.hastily_9f424c23": "Hastily",
-  "interface.help_improve_questarrng_by_automat_8a3e786a": "Help improve QuestarrNG by automatically sharing diagnostic data when something goes wrong",
+  "interface.help_improve_questarrng_by_automat_8a3e786a":
+    "Help improve QuestarrNG by automatically sharing diagnostic data when something goes wrong",
   "interface.help_maintain_this_fork_803fbbbb": "Help maintain this fork.",
   "interface.hidden_games_60ca9ff6": "Hidden Games (",
   "interface.hide_e10c7bcd": "Hide",
@@ -1180,30 +1345,40 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.hide_webhook_url_ad82b9c1": "Hide webhook URL",
   "interface.host_302af18f": "Host",
   "interface.how_it_works_37e3d2de": "How it works:",
-  "interface.how_often_to_check_your_steam_wish_9ed34c61": "How often to check your Steam Wishlist for new games (1-168 hours)",
-  "interface.how_often_to_search_for_new_releas_c8e6b9e4": "How often to search for new releases (1-168 hours)",
+  "interface.how_often_to_check_your_steam_wish_9ed34c61":
+    "How often to check your Steam Wishlist for new games (1-168 hours)",
+  "interface.how_often_to_search_for_new_releas_c8e6b9e4":
+    "How often to search for new releases (1-168 hours)",
   "interface.how_the_import_pipeline_works_adb89eb1": "How the import pipeline works",
   "interface.how_to_get_credentials_00b8f980": "How to get credentials",
   "interface.how_to_get_igdb_credentials_b30da690": "How to get IGDB credentials:",
-  "interface.how_to_sort_results_within_each_ca_a9b08aa8": "How to sort results within each category",
+  "interface.how_to_sort_results_within_each_ca_a9b08aa8":
+    "How to sort results within each category",
   "interface.http_port_will_be_disabled_64019f87": "HTTP Port Will Be Disabled",
   "interface.hypervisor_bypass_05479b04": "Hypervisor Bypass",
-  "interface.if_everything_runs_on_the_same_hos_9f3eda7c": "If everything runs on the same host (or in a single container with shared mounts), paths are already consistent and no mapping is required.",
-  "interface.if_questarr_and_your_download_clie_78dd4a43": "If Questarr and your download client are in different Docker containers (or on different machines), the same physical folder appears under different paths in each. For example, the download client might report",
-  "interface.if_questarr_and_your_download_clie_d3d607f9": "If Questarr and your download client run on the same machine and use identical paths, no mapping is needed - paths pass through unchanged.",
-  "interface.if_your_download_client_runs_on_a_e8af44b5": "If your download client runs on a different machine or volume than Questarr, configure",
+  "interface.if_everything_runs_on_the_same_hos_9f3eda7c":
+    "If everything runs on the same host (or in a single container with shared mounts), paths are already consistent and no mapping is required.",
+  "interface.if_questarr_and_your_download_clie_78dd4a43":
+    "If Questarr and your download client are in different Docker containers (or on different machines), the same physical folder appears under different paths in each. For example, the download client might report",
+  "interface.if_questarr_and_your_download_clie_d3d607f9":
+    "If Questarr and your download client run on the same machine and use identical paths, no mapping is needed - paths pass through unchanged.",
+  "interface.if_your_download_client_runs_on_a_e8af44b5":
+    "If your download client runs on a different machine or volume than Questarr, configure",
   "interface.igdb_4fd0803f": "IGDB",
   "interface.igdb_allows_4_requests_per_second_870ed676": "IGDB allows 4 requests per second.",
   "interface.igdb_api_f1a9398f": "IGDB API",
   "interface.igdb_api_rate_limit_requests_secon_e4b6912a": "IGDB API Rate Limit (requests/second)",
-  "interface.igdb_is_not_configured_yet_platfor_2d575e52": "IGDB is not configured yet — platform filters unavailable.",
-  "interface.igdb_returned_no_platforms_try_aga_0148b33f": "IGDB returned no platforms. Try again in a few seconds.",
+  "interface.igdb_is_not_configured_yet_platfor_2d575e52":
+    "IGDB is not configured yet — platform filters unavailable.",
+  "interface.igdb_returned_no_platforms_try_aga_0148b33f":
+    "IGDB returned no platforms. Try again in a few seconds.",
   "interface.igdb_search_6cfd8781": "IGDB Search",
   "interface.igdb_settings_updated_e90c8d8f": "IGDB Settings Updated",
   "interface.igdb_users_89e3204b": "IGDB Users",
   "interface.import_configuration_updated_cc9deb39": "Import configuration updated.",
   "interface.imported_d89d4365": "Imported",
-  "interface.imports_are_restricted_to_the_plat_817ac30c": "Imports are restricted to the platforms chosen in the",
+  "interface.imports_are_restricted_to_the_plat_817ac30c":
+    "Imports are restricted to the platforms chosen in the",
   "interface.in_a_game_folder_2f3586f7": "In a game folder",
   "interface.in_the_open_8c9562c7": "In the open",
   "interface.in_the_platform_folder_5755a2d8": "In the platform folder",
@@ -1212,14 +1387,16 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.include_p2p_releases_7af16935": "Include P2P releases",
   "interface.include_scene_releases_5240977b": "Include scene releases",
   "interface.include_this_group_6a29c96a": "Include this group",
-  "interface.include_unreleased_upcoming_delaye_b8e84e2f": "Include unreleased (upcoming/delayed) games in search",
+  "interface.include_unreleased_upcoming_delaye_b8e84e2f":
+    "Include unreleased (upcoming/delayed) games in search",
   "interface.increase_priority_e705913f": "Increase priority",
   "interface.indexer_added_successfully_bef98cbb": "Indexer added successfully",
   "interface.indexer_deleted_successfully_90fe81c6": "Indexer deleted successfully",
   "interface.indexer_error_s_d4280d7e": "indexer error(s)",
   "interface.indexer_priority_acb636d0": "Indexer Priority",
   "interface.indexer_updated_successfully_23654644": "Indexer updated successfully",
-  "interface.infiltration_game_click_a_tile_to_57ec1751": "Infiltration game. Click a tile to move, click the console to hack it, right-click to throw a distraction, Ctrl to crouch.",
+  "interface.infiltration_game_click_a_tile_to_57ec1751":
+    "Infiltration game. Click a tile to move, click the console to hack it, right-click to throw a distraction, Ctrl to crouch.",
   "interface.info_8fe1e625": "Info",
   "interface.info_0d076a45": "INFO",
   "interface.initial_state_02337fba": "Initial State",
@@ -1234,21 +1411,27 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.keep_prowlarr_s_priority_6e2049ff": "Keep Prowlarr's priority",
   "interface.keycard_32eb3c82": "Keycard",
   "interface.keycard_acquired_9b94cf1e": "Keycard acquired",
-  "interface.keys_are_romm_platform_slugs_value_1954c3a5": "Keys are RomM platform slugs; values are relative folders under the library root.",
+  "interface.keys_are_romm_platform_slugs_value_1954c3a5":
+    "Keys are RomM platform slugs; values are relative folders under the library root.",
   "interface.l_c90bfeab": "L",
   "interface.label_optional_e051b6f8": "Label (optional)",
   "interface.last_announce_b2d5447a": "Last announce:",
   "interface.latest_game_releases_3f11744a": "Latest game releases",
-  "interface.latest_game_releases_listed_on_xre_a41d4cde": "Latest game releases listed on xREL.to (scene/P2P). No download links — for reference only.",
-  "interface.leave_a_field_empty_to_keep_what_p_7b31e565": "Leave a field empty to keep what Prowlarr or the existing indexer already has.",
+  "interface.latest_game_releases_listed_on_xre_a41d4cde":
+    "Latest game releases listed on xREL.to (scene/P2P). No download links — for reference only.",
+  "interface.leave_a_field_empty_to_keep_what_p_7b31e565":
+    "Leave a field empty to keep what Prowlarr or the existing indexer already has.",
   "interface.library_health_check_28662e82": "Library Health Check",
   "interface.library_health_check_failed_df862b27": "Library Health Check Failed",
   "interface.library_root_cf631108": "Library Root",
-  "interface.limit_this_mapping_to_a_configured_1275384f": "Limit this mapping to a configured downloader, or leave it generic.",
-  "interface.lines_currently_displayed_in_the_l_cd483529": "lines currently displayed in the log viewer, with emails, IP addresses, and UUIDs replaced by placeholders.",
+  "interface.limit_this_mapping_to_a_configured_1275384f":
+    "Limit this mapping to a configured downloader, or leave it generic.",
+  "interface.lines_currently_displayed_in_the_l_cd483529":
+    "lines currently displayed in the log viewer, with emails, IP addresses, and UUIDs replaced by placeholders.",
   "interface.link_8e08e589": "Link",
   "interface.link_download_5edeffbf": "Link Download",
-  "interface.link_real_debrid_with_its_account_189ec9cb": "Link Real-Debrid with its account authorization flow, then choose a local path for QuestarrNG to stage completed files.",
+  "interface.link_real_debrid_with_its_account_189ec9cb":
+    "Link Real-Debrid with its account authorization flow, then choose a local path for QuestarrNG to stage completed files.",
   "interface.link_to_game_6a308240": "Link to Game",
   "interface.linking_3b084663": "Linking…",
   "interface.load_default_platform_mappings_30ebb582": "Load default platform mappings",
@@ -1265,19 +1448,25 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.local_path_ffd136ef": "Local Path",
   "interface.log_content_5eadd164": "Log content",
   "interface.log_full_downloader_responses_90b9d895": "Log full downloader responses",
-  "interface.log_payload_is_too_large_500_kb_tr_c878d383": "Log payload is too large (> 500 KB). Try clearing old logs first.",
-  "interface.log_server_could_not_reach_github_da64317d": "Log server could not reach GitHub. Try again in a moment.",
+  "interface.log_payload_is_too_large_500_kb_tr_c878d383":
+    "Log payload is too large (> 500 KB). Try clearing old logs first.",
+  "interface.log_server_could_not_reach_github_da64317d":
+    "Log server could not reach GitHub. Try again in a moment.",
   "interface.network_error_check_your_connectio_1c016fe0": "Network error — check your connection.",
-  "interface.rate_limit_reached_5_submissions_p_06b8fe23": "Rate limit reached (5 submissions per hour). Try again later.",
+  "interface.rate_limit_reached_5_submissions_p_06b8fe23":
+    "Rate limit reached (5 submissions per hour). Try again later.",
   "interface.unexpected_error_http_status_d172a1f9": "Unexpected error (HTTP {status}).",
-  "interface.log_upload_is_not_configured_for_t_8b70cdcc": "Log upload is not configured for this build.",
+  "interface.log_upload_is_not_configured_for_t_8b70cdcc":
+    "Log upload is not configured for this build.",
   "interface.logged_in_successfully_5a4335bb": "Logged in successfully",
   "interface.login_failed_b62966b7": "Login failed",
   "interface.logout_failed_2e7223b0": "Logout failed",
   "interface.logs_are_stored_as_an_issue_in_a_738f4d2d": "Logs are stored as an issue in a",
   "interface.logs_uploaded_4461fe26": "Logs uploaded",
-  "interface.looks_up_the_sha_256_hash_of_the_d_dccf985b": "Looks up the SHA-256 hash of the downloaded file against VirusTotal before import. Requires a free VirusTotal API key.",
-  "interface.lower_higher_priority_auto_fallbac_a20794d2": "Lower = higher priority. Auto-fallback if fails.",
+  "interface.looks_up_the_sha_256_hash_of_the_d_dccf985b":
+    "Looks up the SHA-256 hash of the downloaded file against VirusTotal before import. Requires a free VirusTotal API key.",
+  "interface.lower_higher_priority_auto_fallbac_a20794d2":
+    "Lower = higher priority. Auto-fallback if fails.",
   "interface.ltr_5494584d": "ltr",
   "interface.main_51707928": "Main",
   "interface.main_game_6af78d4a": "Main game",
@@ -1301,7 +1490,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.model_8285e8fa": "Model",
   "interface.monitor_and_manage_active_download_bc75a062": "Monitor and manage active downloads",
   "interface.more_pages_3067a408": "More pages",
-  "interface.most_recent_server_log_lines_aroun_be67035b": "most recent server log lines around the error, with emails, IP addresses, and UUIDs replaced by placeholders.",
+  "interface.most_recent_server_log_lines_aroun_be67035b":
+    "most recent server log lines around the error, with emails, IP addresses, and UUIDs replaced by placeholders.",
   "interface.multiple_releases_found_a2aaf35d": "Multiple Releases Found",
   "interface.my_library_b1cd94f4": "My Library",
   "interface.my_config_key_f7e6ee42": "my-config-key",
@@ -1324,11 +1514,13 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.nexus_mods_account_page_3ee8780d": "Nexus Mods account page",
   "interface.nexus_mods_api_key_saved_6dbc1a79": "Nexus Mods API key saved",
   "interface.nexusmods_25bab58d": "NexusMods",
-  "interface.no_api_keys_yet_create_one_to_conn_6ed98540": "No API keys yet. Create one to connect SeerrNG or another integration client.",
+  "interface.no_api_keys_yet_create_one_to_conn_6ed98540":
+    "No API keys yet. Create one to connect SeerrNG or another integration client.",
   "interface.no_blacklisted_releases_adc5cc70": "No blacklisted releases.",
   "interface.no_downloaders_configured_673ad26a": "No Downloaders Configured",
   "interface.no_files_found_49de8d15": "No files found",
-  "interface.no_files_reported_yet_for_this_dow_2cdfa355": "No files reported yet for this download",
+  "interface.no_files_reported_yet_for_this_dow_2cdfa355":
+    "No files reported yet for this download",
   "interface.no_game_releases_found_on_this_pag_11190156": "No game releases found on this page.",
   "interface.no_games_match_your_current_filter_89d315dd": "No games match your current filters",
   "interface.no_games_yet_58fc07a3": "No games yet",
@@ -1336,7 +1528,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.no_indexers_configured_7bb52c06": "No Indexers Configured",
   "interface.no_known_crack_yet_5a80e42d": "No known crack yet",
   "interface.no_library_match_found_00cb11c0": "No library match found",
-  "interface.no_library_matches_found_try_igdb_a4b1aaf7": "No library matches found — try IGDB Search",
+  "interface.no_library_matches_found_try_igdb_a4b1aaf7":
+    "No library matches found — try IGDB Search",
   "interface.no_manually_hidden_games_669dc230": "No manually hidden games.",
   "interface.no_mappings_defined_a58bae1c": "No mappings defined",
   "interface.no_matching_downloader_3c37bfcc": "No matching downloader",
@@ -1344,36 +1537,49 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.no_preference_a0a7792f": "No preference",
   "interface.no_results_for_6e128b57": "No results for “",
   "interface.no_root_folders_configured_yet_a9ad4b6b": "No root folders configured yet",
-  "interface.no_rss_feeds_configured_add_one_ab_a99af602": "No RSS feeds configured. Add one above!",
-  "interface.no_rss_items_found_make_sure_you_h_35ea381d": "No RSS items found. Make sure you have enabled feeds and refreshed.",
+  "interface.no_rss_feeds_configured_add_one_ab_a99af602":
+    "No RSS feeds configured. Add one above!",
+  "interface.no_rss_items_found_make_sure_you_h_35ea381d":
+    "No RSS items found. Make sure you have enabled feeds and refreshed.",
   "interface.no_tracker_information_available_cdf2c037": "No tracker information available",
-  "interface.no_valid_certificate_information_f_bfbc179d": "No valid certificate information found.",
+  "interface.no_valid_certificate_information_f_bfbc179d":
+    "No valid certificate information found.",
   "interface.normally_1cfe6579": "Normally",
   "interface.not_configured_1164a60e": "Not configured",
   "interface.not_configured_1e3ec8ee": "Not Configured",
-  "interface.note_results_are_filtered_to_games_cd1a77b1": "Note: Results are filtered to games only, so some pages may appear empty.",
+  "interface.note_results_are_filtered_to_games_cd1a77b1":
+    "Note: Results are filtered to games only, so some pages may appear empty.",
   "interface.notification_preferences_11868ae0": "Notification Preferences",
-  "interface.notification_preferences_could_not_08e0f79c": "Notification preferences could not be loaded, reset to defaults",
+  "interface.notification_preferences_could_not_08e0f79c":
+    "Notification preferences could not be loaded, reset to defaults",
   "interface.notification_urls_0b2b92f8": "Notification URLs",
   "interface.notify_for_completed_games_b03943d1": "Notify for completed games",
   "interface.notify_for_shelved_games_e4f94bc1": "Notify for shelved games",
   "interface.nuked_c05c1ecc": "Nuked",
-  "interface.number_of_columns_in_the_game_grid_f3a0e2ed": "Number of columns in the game grid (2–10).",
+  "interface.number_of_columns_in_the_game_grid_f3a0e2ed":
+    "Number of columns in the game grid (2–10).",
   "interface.nzb_67be7e69": "NZB",
   "interface.nzbget_e17c15cb": "NZBGet",
   "interface.objective_42da0bd8": "Objective",
   "interface.official_store_pages_bbd8cd9f": "Official & Store Pages",
   "interface.official_site_3e02b25b": "Official Site",
   "interface.old_nas_library_9fdba4b7": "Old NAS library",
-  "interface.one_apprise_url_per_line_build_url_948da4b4": "One Apprise URL per line. Build URLs at",
-  "interface.one_or_more_groups_could_not_be_cl_1b8e5361": "One or more groups could not be claimed. Check your downloads.",
-  "interface.only_needed_when_your_apprise_api_85738f38": "Only needed when your Apprise API server requires a login:",
-  "interface.only_show_torrents_with_at_least_t_9a913a40": "Only show torrents with at least this many seeders (0 = no minimum)",
+  "interface.one_apprise_url_per_line_build_url_948da4b4":
+    "One Apprise URL per line. Build URLs at",
+  "interface.one_or_more_groups_could_not_be_cl_1b8e5361":
+    "One or more groups could not be claimed. Check your downloads.",
+  "interface.only_needed_when_your_apprise_api_85738f38":
+    "Only needed when your Apprise API server requires a login:",
+  "interface.only_show_torrents_with_at_least_t_9a913a40":
+    "Only show torrents with at least this many seeders (0 = no minimum)",
   "interface.open_device_authorization_2612dcf4": "Open device authorization",
-  "interface.open_real_debrid_and_enter_this_on_cdb7aed0": "Open Real-Debrid and enter this one-time code:",
-  "interface.or_open_a_public_github_issue_with_08a5c511": "Or open a public GitHub issue with this number pre-filled so the maintainer can look it up:",
+  "interface.open_real_debrid_and_enter_this_on_cdb7aed0":
+    "Open Real-Debrid and enter this one-time code:",
+  "interface.or_open_a_public_github_issue_with_08a5c511":
+    "Or open a public GitHub issue with this number pre-filled so the maintainer can look it up:",
   "interface.orphaned_d769ea62": "Orphaned (",
-  "interface.overview_total_games_rating_comple_096f3367": "Overview (Total Games, Rating, Completion)",
+  "interface.overview_total_games_rating_comple_096f3367":
+    "Overview (Total Games, Rating, Completion)",
   "interface.overwrite_existing_files_5d129070": "Overwrite Existing Files",
   "interface.owned_e367307e": "owned",
   "interface.owned_games_shown_in_results_a5594405": "Owned games shown in results",
@@ -1385,7 +1591,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.path_mapping_has_been_removed_db1e80cc": "Path mapping has been removed.",
   "interface.path_mapping_has_been_updated_f8f73665": "Path mapping has been updated.",
   "interface.path_mappings_6cbc2a75": "Path Mappings",
-  "interface.path_mappings_translate_paths_betw_de0176f4": "Path mappings translate paths between what your download client reports and what Questarr can access on its own filesystem.",
+  "interface.path_mappings_translate_paths_betw_de0176f4":
+    "Path mappings translate paths between what your download client reports and what Questarr can access on its own filesystem.",
   "interface.path_fef99604": "Path:",
   "interface.paths_c0dbafa3": "paths.",
   "interface.pause_the_infiltration_87834e3b": "Pause the infiltration",
@@ -1393,10 +1600,14 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.pc_games_44793fb9": "PC > Games",
   "interface.pcgamingwiki_250e87cd": "PCGamingWiki",
   "interface.pending_manual_import_277dd6bb": "Pending Manual Import",
-  "interface.periodically_import_new_games_from_a19f2184": "Periodically import new games from your Steam Wishlist",
-  "interface.periodically_search_indexers_for_w_e1414b87": "Periodically search indexers for wanted games",
-  "interface.permits_sending_passwords_and_api_045a78d1": "Permits sending passwords and API keys over plain HTTP. Only enable this if the downloader is on a trusted LAN without TLS support and you accept the risk of credentials being intercepted.",
-  "interface.persistent_mode_a_config_key_pre_c_74521930": "Persistent mode: a config key pre-configured in your Apprise API server.",
+  "interface.periodically_import_new_games_from_a19f2184":
+    "Periodically import new games from your Steam Wishlist",
+  "interface.periodically_search_indexers_for_w_e1414b87":
+    "Periodically search indexers for wanted games",
+  "interface.permits_sending_passwords_and_api_045a78d1":
+    "Permits sending passwords and API keys over plain HTTP. Only enable this if the downloader is on a trusted LAN without TLS support and you accept the risk of credentials being intercepted.",
+  "interface.persistent_mode_a_config_key_pre_c_74521930":
+    "Persistent mode: a config key pre-configured in your Apprise API server.",
   "interface.personal_api_key_11685eee": "Personal API Key",
   "interface.platform_filter_0fc47450": "Platform Filter",
   "interface.platform_folder_bindings_json_5e4de255": "Platform folder bindings (JSON)",
@@ -1405,21 +1616,29 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.platform_slug_mappings_8f8209d4": "Platform slug mappings",
   "interface.play_again_new_layout_c57ad266": "Play again (new layout)",
   "interface.playing_71ef5835": "playing",
-  "interface.please_provide_both_client_id_and_221276fd": "Please provide both Client ID and Client Secret.",
+  "interface.please_provide_both_client_id_and_221276fd":
+    "Please provide both Client ID and Client Secret.",
   "interface.port_e2c53cc6": "Port",
-  "interface.portugu_s_brasil_brazilian_portugu_380a15a1": "Português (Brasil) — Brazilian Portuguese",
+  "interface.portugu_s_brasil_brazilian_portugu_380a15a1":
+    "Português (Brasil) — Brazilian Portuguese",
   "interface.post_import_category_optional_a2865b00": "Post-Import Category (Optional)",
   "interface.pre_filter_download_search_a829b7af": "Pre-filter Download Search",
-  "interface.pre_filter_results_to_this_platfor_ba76b71f": "Pre-filter results to this platform in the download dialog and auto-search. PC also matches releases with no explicit platform tag.",
+  "interface.pre_filter_results_to_this_platfor_ba76b71f":
+    "Pre-filter results to this platform in the download dialog and auto-search. PC also matches releases with no explicit platform tag.",
   "interface.preferred_platform_346a3f41": "Preferred Platform",
   "interface.add_preferred_release_group_da278743": "Add preferred release group",
-  "interface.no_preferred_groups_configured_all_5e4442b8": "No preferred groups configured. All groups will be considered equally.",
-  "interface.prioritize_releases_from_specific_712fee0a": "Prioritize releases from specific groups during auto-download. When matches are found, only those releases will be considered.",
+  "interface.no_preferred_groups_configured_all_5e4442b8":
+    "No preferred groups configured. All groups will be considered equally.",
+  "interface.prioritize_releases_from_specific_712fee0a":
+    "Prioritize releases from specific groups during auto-download. When matches are found, only those releases will be considered.",
   "interface.preferred_release_groups_e3e4ebd1": "Preferred Release Groups",
-  "interface.press_enter_or_click_to_add_a_grou_7a91bb6f": "Press Enter or click + to add a group. Comparison is case-insensitive.",
-  "interface.press_enter_or_click_to_add_a_term_dc1a9f1a": "Press Enter or click + to add a term. Comparison is case-insensitive.",
+  "interface.press_enter_or_click_to_add_a_grou_7a91bb6f":
+    "Press Enter or click + to add a group. Comparison is case-insensitive.",
+  "interface.press_enter_or_click_to_add_a_term_dc1a9f1a":
+    "Press Enter or click + to add a term. Comparison is case-insensitive.",
   "interface.previous_slide_8200edbd": "Previous slide",
-  "interface.priority_must_be_a_whole_number_be_315bfac5": "Priority must be a whole number between 1 and 100.",
+  "interface.priority_must_be_a_whole_number_be_315bfac5":
+    "Priority must be a whole number between 1 and 100.",
   "interface.priority_value_4f977928": "Priority value",
   "interface.private_62cb0d0c": "private",
   "interface.private_key_file_key_pem_b78112f6": "Private Key File (.key/.pem)",
@@ -1435,15 +1654,20 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.prowlarr_insecure_lan_warning_320ef104": "prowlarr-insecure-lan-warning",
   "interface.prowlarr_priority_error_7c9f497a": "prowlarr-priority-error",
   "interface.qbittorrent_21210163": "qBittorrent",
-  "interface.questarr_can_now_delete_files_in_t_82f4c616": "Questarr can now delete files in this folder when you remove a game with its files.",
-  "interface.questarr_detected_an_unexpected_er_5b4f16e5": "Questarr detected an unexpected error. Sending a diagnostic report helps the maintainer fix it. Please review what will be shared:",
+  "interface.questarr_can_now_delete_files_in_t_82f4c616":
+    "Questarr can now delete files in this folder when you remove a game with its files.",
+  "interface.questarr_detected_an_unexpected_er_5b4f16e5":
+    "Questarr detected an unexpected error. Sending a diagnostic report helps the maintainer fix it. Please review what will be shared:",
   "interface.questarr_library_stats_08801410": "Questarr Library Stats",
   "interface.questarr_only_6dac39f2": "Questarr only",
   "interface.questarrng_226f6e77": "QuestarrNG",
-  "interface.questarrng_checks_for_approval_aut_81679279": "QuestarrNG checks for approval automatically. This code expires after about 30 minutes.",
-  "interface.questarrng_local_staging_path_requ_dc8b7c54": "QuestarrNG Local Staging Path (Required)",
+  "interface.questarrng_checks_for_approval_aut_81679279":
+    "QuestarrNG checks for approval automatically. This code expires after about 30 minutes.",
+  "interface.questarrng_local_staging_path_requ_dc8b7c54":
+    "QuestarrNG Local Staging Path (Required)",
   "interface.questarrng_v_8ef70439": "QuestarrNG v",
-  "interface.quick_info_top_genre_platform_publ_4cc2fd00": "Quick Info (Top Genre, Platform, Publisher)",
+  "interface.quick_info_top_genre_platform_publ_4cc2fd00":
+    "Quick Info (Top Genre, Platform, Publisher)",
   "interface.rating_highest_78a14daf": "Rating (Highest)",
   "interface.ratings_216d42b9": "Ratings",
   "interface.ratio_f399df3a": "Ratio:",
@@ -1463,41 +1687,50 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.release_blacklisted_4a7201e8": "Release blacklisted",
   "interface.release_groups_saved_4393639d": "Release Groups Saved",
   "interface.release_group_names_9e7b0025": "Release Group Names",
-  "interface.hide_releases_whose_name_contains_a94dfb27": "Hide releases whose name contains any of these terms, across manual search, auto-search and AI-assisted results. Matching is case-insensitive and checks for the term anywhere in the release name.",
+  "interface.hide_releases_whose_name_contains_a94dfb27":
+    "Hide releases whose name contains any of these terms, across manual search, auto-search and AI-assisted results. Matching is case-insensitive and checks for the term anywhere in the release name.",
   "interface.release_name_blacklist_saved_1d794e31": "Release Name Blacklist Saved",
   "interface.release_name_blacklist_6bf0e0f6": "Release Name Blacklist",
   "interface.save_blacklist_2479f803": "Save Blacklist",
   "interface.save_groups_a0acac78": "Save Groups",
   "interface.release_removed_from_blacklist_6f60f401": "Release removed from blacklist",
   "interface.release_status_66998364": "Release Status",
-  "interface.your_blacklisted_release_name_term_6a0b290a": "Your blacklisted release name terms have been saved.",
-  "interface.your_preferred_release_group_setti_4fb1d7bd": "Your preferred release group settings have been saved.",
-  "interface.releases_hidden_from_search_result_583964af": "Releases hidden from search results. They will not appear in game download searches or be auto-downloaded.",
+  "interface.your_blacklisted_release_name_term_6a0b290a":
+    "Your blacklisted release name terms have been saved.",
+  "interface.your_preferred_release_group_setti_4fb1d7bd":
+    "Your preferred release group settings have been saved.",
+  "interface.releases_hidden_from_search_result_583964af":
+    "Releases hidden from search results. They will not appear in game download searches or be auto-downloaded.",
   "interface.remote_path_c9d354f2": "Remote Path",
   "interface.remove_delete_files_152d630d": "Remove & Delete Files",
   "interface.remove_completed_98c24ac0": "Remove Completed",
   "interface.remove_download_670a40d3": "Remove Download",
-  "interface.remove_downloads_from_downloader_a_73a6f025": "Remove downloads from downloader after completion",
+  "interface.remove_downloads_from_downloader_a_73a6f025":
+    "Remove downloads from downloader after completion",
   "interface.removing_27c5a214": "Removing...",
   "interface.rename_pattern_1445d3d5": "Rename Pattern",
   "interface.renew_self_signed_certificate_63c365e8": "Renew Self-Signed Certificate",
   "interface.renewing_851b7c90": "Renewing...",
   "interface.repair_7710e6aa": "Repair:",
   "interface.replace_existing_60d134c0": "Replace existing",
-  "interface.replace_files_already_present_at_t_40a1515b": "Replace files already present at the destination.",
+  "interface.replace_files_already_present_at_t_40a1515b":
+    "Replace files already present at the destination.",
   "interface.report_no_longer_available_0a0acebc": "Report no longer available",
   "interface.report_sent_b572f793": "Report sent",
   "interface.reports_are_stored_as_an_issue_in_5f23e7db": "Reports are stored as an issue in a",
   "interface.require_a_custom_binding_8cba8087": "Require a custom binding",
   "interface.required_848c8620": "required",
   "interface.required_for_dsm_login_78ac837c": "Required for DSM login.",
-  "interface.required_when_prowlarr_is_reached_3e92453f": "Required when Prowlarr is reached over plain HTTP, otherwise the API key is not sent and every indexer answers 401. Only for a trusted local network.",
-  "interface.required_found_in_sabnzbd_config_g_6a36c1a0": "Required. Found in SABnzbd Config → General → API Key.",
+  "interface.required_when_prowlarr_is_reached_3e92453f":
+    "Required when Prowlarr is reached over plain HTTP, otherwise the API key is not sent and every indexer answers 401. Only for a trusted local network.",
+  "interface.required_found_in_sabnzbd_config_g_6a36c1a0":
+    "Required. Found in SABnzbd Config → General → API Key.",
   "interface.reset_0ac8a560": "Reset",
   "interface.reset_to_defaults_4136fe9d": "Reset to Defaults",
   "interface.result_0a377624": "result",
   "interface.retry_8036af59": "Retry",
-  "interface.review_what_will_be_shared_before_6cd657c8": "Review what will be shared before confirming",
+  "interface.review_what_will_be_shared_before_6cd657c8":
+    "Review what will be shared before confirming",
   "interface.revoke_2219c453": "Revoke",
   "interface.revoke_this_api_key_1d1a24d3": "Revoke this API key?",
   "interface.romm_d42e27dc": "RomM",
@@ -1526,7 +1759,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.save_ssl_settings_5059ba7f": "Save SSL Settings",
   "interface.save_sync_settings_e411f1f4": "Save Sync Settings",
   "interface.save_telemetry_5d5b3467": "Save Telemetry",
-  "interface.save_this_downloader_first_then_op_321d8bbe": "Save this downloader first, then open it again to link the account.",
+  "interface.save_this_downloader_first_then_op_321d8bbe":
+    "Save this downloader first, then open it again to link the account.",
   "interface.save_xrel_to_options_df03ede4": "Save xREL.to options",
   "interface.saved_8a6979e4": "Saved",
   "interface.saving_d52892c3": "Saving",
@@ -1540,7 +1774,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.scan_unlinked_downloads_46053edb": "Scan Unlinked Downloads",
   "interface.scanned_16cba0ea": "scanned ·",
   "interface.scanning_downloads_b24fc117": "Scanning downloads…",
-  "interface.scans_downloads_for_malware_before_fb61b2ee": "Scans downloads for malware before they're unpacked or moved into your library.",
+  "interface.scans_downloads_for_malware_before_fb61b2ee":
+    "Scans downloads for malware before they're unpacked or moved into your library.",
   "interface.scene_c89b38b3": "Scene",
   "interface.scene_p2p_release_xrel_789e2d0b": "Scene/P2P Release (xREL)",
   "interface.scrubbing_pii_and_uploading_3fd0f6cc": "Scrubbing PII and uploading…",
@@ -1548,18 +1783,22 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.search_igdb_18312f35": "Search IGDB",
   "interface.search_igdb_283abae9": "Search IGDB…",
   "interface.search_interval_hours_f861e0a8": "Search Interval (hours)",
-  "interface.search_p2p_releases_when_checking_fc4f71a3": "Search P2P releases when checking for wanted games on xREL.to",
+  "interface.search_p2p_releases_when_checking_fc4f71a3":
+    "Search P2P releases when checking for wanted games on xREL.to",
   "interface.search_platforms_4fc4d2a5": "Search platforms",
   "interface.search_platforms_7b349c79": "Search platforms...",
-  "interface.search_results_cache_has_been_clea_af657a65": "Search results cache has been cleared. New searches will fetch fresh data.",
-  "interface.search_scene_releases_when_checkin_c56fadfd": "Search scene releases when checking for wanted games on xREL.to",
+  "interface.search_results_cache_has_been_clea_af657a65":
+    "Search results cache has been cleared. New searches will fetch fresh data.",
+  "interface.search_scene_releases_when_checkin_c56fadfd":
+    "Search scene releases when checking for wanted games on xREL.to",
   "interface.search_unreleased_games_d867b734": "Search Unreleased Games",
   "interface.search_your_library_e8b3904f": "Search your library…",
   "interface.original_a2fe7692": "Original",
   "interface.questarrng_video_game_management_1a51f232": "QuestarrNG - Video Game Management",
   "interface.security_scanning_5a204910": "Security & Scanning",
   "interface.security_scan_configuration_update_8f7246b1": "Security scan configuration updated.",
-  "interface.see_options_web_ui_use_https_inste_fbb4feea": "See Options → Web UI → 'Use HTTPS instead of HTTP' in qBittorrent",
+  "interface.see_options_web_ui_use_https_inste_fbb4feea":
+    "See Options → Web UI → 'Use HTTPS instead of HTTP' in qBittorrent",
   "interface.seed_d07208cc": "Seed",
   "interface.seeders_high_to_low_c3b29f0a": "Seeders (High to Low)",
   "interface.seeding_94df1b6c": "Seeding",
@@ -1578,7 +1817,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.select_protocol_4ae370d3": "Select protocol",
   "interface.select_root_folder_fea5b901": "Select Root Folder",
   "interface.select_the_key_and_copy_it_manuall_ff6a6e4b": "Select the key and copy it manually.",
-  "interface.select_the_torznab_categories_to_s_977a8233": "Select the Torznab categories to search. Leave empty to use all available categories.",
+  "interface.select_the_torznab_categories_to_s_977a8233":
+    "Select the Torznab categories to search. Leave empty to use all available categories.",
   "interface.self_signed_certificate_9ab26329": "Self-Signed Certificate",
   "interface.send_failed_9e8824cc": "Send failed",
   "interface.send_logs_27f0d51e": "Send logs",
@@ -1587,14 +1827,19 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.send_to_downloader_5d7a9ebb": "Send to downloader",
   "interface.sending_report_80416689": "Sending report…",
   "interface.sending_09d26e8d": "Sending...",
-  "interface.sends_the_api_key_over_plain_http_13981c90": "Sends the API key over plain HTTP (no encryption). Only enable this for a trusted local-network indexer that does not support HTTPS. Enabling this on an internet-facing indexer exposes your API key in clear text.",
-  "interface.separate_containers_questarr_downl_16724ed6": "Separate containers (Questarr + download client)",
+  "interface.sends_the_api_key_over_plain_http_13981c90":
+    "Sends the API key over plain HTTP (no encryption). Only enable this for a trusted local-network indexer that does not support HTTPS. Enabling this on an internet-facing indexer exposes your API key in clear text.",
+  "interface.separate_containers_questarr_downl_16724ed6":
+    "Separate containers (Questarr + download client)",
   "interface.server_or_the_local_16b6d96b": "server or the local",
-  "interface.set_a_webhook_url_to_enable_one_cl_75ba5398": "Set a webhook URL to enable one-click sharing of your library stats to a Discord channel.",
-  "interface.set_each_igdb_platform_s_romarr_ro_cf0cb310": "Set each IGDB platform's ROMarr/RomM folder slug. Blank slugs keep that system in the PC library.",
+  "interface.set_a_webhook_url_to_enable_one_cl_75ba5398":
+    "Set a webhook URL to enable one-click sharing of your library stats to a Discord channel.",
+  "interface.set_each_igdb_platform_s_romarr_ro_cf0cb310":
+    "Set each IGDB platform's ROMarr/RomM folder slug. Blank slugs keep that system in the PC library.",
   "interface.set_redirect_uri_to_795361ea": "Set Redirect URI to:",
   "interface.settings_saved_def3ff63": "Settings Saved",
-  "interface.settings_tab_leave_that_list_empty_8b95ecfd": "settings tab. Leave that list empty to make all platforms eligible.",
+  "interface.settings_tab_leave_that_list_empty_8b95ecfd":
+    "settings tab. Leave that list empty to make all platforms eligible.",
   "interface.settings_updated_01a60387": "Settings Updated",
   "interface.share_failed_184d1f1d": "Share failed",
   "interface.share_stats_1fcc9c2b": "Share Stats",
@@ -1617,18 +1862,24 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.single_rom_placement_0ca4f2bc": "Single ROM placement",
   "interface.size_largest_first_0b67b169": "Size (Largest First)",
   "interface.skip_c197c7e2": "Skip",
-  "interface.so_questarr_can_resolve_the_remote_6e3f96c6": "so Questarr can resolve the remote paths correctly.",
-  "interface.something_went_wrong_loading_this_20c90fb6": "Something went wrong loading this report.",
+  "interface.so_questarr_can_resolve_the_remote_6e3f96c6":
+    "so Questarr can resolve the remote paths correctly.",
+  "interface.something_went_wrong_loading_this_20c90fb6":
+    "Something went wrong loading this report.",
   "interface.sort_add_on_files_into_subfolders_62386462": "Sort add-on files into subfolders",
-  "interface.soundtracks_artbooks_and_bonus_con_1e636a4c": "Soundtracks, artbooks, and bonus content",
-  "interface.spotted_incident_report_filed_back_1f46399b": "Spotted. Incident report filed — back to the entry point.",
+  "interface.soundtracks_artbooks_and_bonus_con_1e636a4c":
+    "Soundtracks, artbooks, and bonus content",
+  "interface.spotted_incident_report_filed_back_1f46399b":
+    "Spotted. Incident report filed — back to the entry point.",
   "interface.ssl_port_b0c2ea40": "SSL Port",
   "interface.ssl_settings_saved_72f6d77d": "SSL Settings Saved",
   "interface.ssl_https_configuration_47a8cb29": "SSL/HTTPS Configuration",
   "interface.standing_5a062a15": "Standing",
-  "interface.start_building_your_library_by_add_c2b3e00a": "Start building your library by adding a game.",
+  "interface.start_building_your_library_by_add_c2b3e00a":
+    "Start building your library by adding a game.",
   "interface.stats_posted_to_discord_successful_06dcdded": "Stats posted to Discord successfully.",
-  "interface.status_breakdown_wanted_owned_play_a3dca0fc": "Status Breakdown (Wanted, Owned, Playing, Completed, Downloading)",
+  "interface.status_breakdown_wanted_owned_play_a3dca0fc":
+    "Status Breakdown (Wanted, Owned, Playing, Completed, Downloading)",
   "interface.stealth_status_7d68b31e": "Stealth status",
   "interface.steam_b6407b93": "Steam",
   "interface.steam_id_64_bit_8d9fc0cf": "Steam ID (64-bit)",
@@ -1636,18 +1887,22 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.steam_integration_a203ef31": "Steam Integration",
   "interface.steam_wishlist_synced_750680d8": "Steam Wishlist Synced",
   "interface.stopped_863f19ee": "Stopped",
-  "interface.streams_downloaded_files_through_a_2cf18b38": "Streams downloaded files through a ClamAV daemon for signature-based scanning.",
-  "interface.subfolders_inside_the_game_folder_51a5a9d2": "subfolders inside the game folder. Single-file imports keep their existing layout.",
+  "interface.streams_downloaded_files_through_a_2cf18b38":
+    "Streams downloaded files through a ClamAV daemon for signature-based scanning.",
+  "interface.subfolders_inside_the_game_folder_51a5a9d2":
+    "subfolders inside the game folder. Single-file imports keep their existing layout.",
   "interface.support_code_ready_c72da6d6": "Support code ready",
   "interface.support_on_ko_fi_087c1029": "Support on Ko-fi",
   "interface.support_questarrng_8c08fa7e": "Support QuestarrNG",
-  "interface.switch_to_grid_view_to_adjust_the_d1a4985d": "Switch to grid view to adjust the number of columns.",
+  "interface.switch_to_grid_view_to_adjust_the_d1a4985d":
+    "Switch to grid view to adjust the number of columns.",
   "interface.sync_failed_e04ecdcf": "Sync failed",
   "interface.sync_from_prowlarr_4d61275d": "Sync from Prowlarr",
   "interface.sync_interval_hours_58ef5e61": "Sync Interval (hours)",
   "interface.sync_prowlarr_e920ee8d": "Sync Prowlarr",
   "interface.sync_successful_494832bc": "Sync successful",
-  "interface.sync_your_steam_wishlist_with_ques_01ad32b4": "Sync your Steam Wishlist with QuestarrNG.",
+  "interface.sync_your_steam_wishlist_with_ques_01ad32b4":
+    "Sync your Steam Wishlist with QuestarrNG.",
   "interface.syncing_9a4eda24": "Syncing...",
   "interface.synology_download_station_7a3f7c69": "Synology Download Station",
   "interface.telemetry_6796a220": "Telemetry",
@@ -1662,43 +1917,61 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.testing_e29ac0e7": "Testing...",
   "interface.text_bde64e3e": "text",
   "interface.the_account_is_ready_for_downloads_93a66822": "The account is ready for downloads.",
-  "interface.the_remote_path_prefix_is_replaced_c9c401da": "The remote path prefix is replaced with the local path. If multiple mappings match, the most specific (longest) prefix wins. Downloader-scoped mappings only apply to the selected configured downloader.",
-  "interface.the_user_settings_table_hasn_t_bee_45679462": "The user settings table hasn't been created yet. Please run",
-  "interface.these_downloads_require_your_atten_81cdbdc8": "These downloads require your attention before they can be added to your library.",
-  "interface.these_filters_will_be_used_as_defa_2bcc838e": "These filters will be used as defaults when you open the manual download dialog, and applied to auto-searches.",
-  "interface.this_api_url_uses_http_so_the_logi_75641c9c": "This API URL uses http://, so the login is sent unencrypted. Use https:// unless Apprise runs on a network you trust.",
-  "interface.this_can_take_a_while_for_large_fo_760b1be1": "This can take a while for large folders.",
-  "interface.this_diagnostic_report_has_expired_91aabda2": "This diagnostic report has expired or was already sent. You can still send fresh logs from the Logs page at any time.",
-  "interface.this_download_requires_your_attent_f3da641a": "This download requires your attention before it can be added to your library.",
-  "interface.this_path_is_on_the_questarrng_ser_977b88c6": "This path is on the QuestarrNG server and must be writable by its process. Real-Debrid completes downloads in the cloud; QuestarrNG copies the selected files here before importing them. A premium account may be required for torrent downloads.",
-  "interface.this_prowlarr_url_uses_plain_http_b85a03ed": "This Prowlarr URL uses plain HTTP. Unless you tick the box above, Questarr will not send the API key and the synced indexers will answer 401.",
-  "interface.this_will_upload_your_current_serv_7d049388": "This will upload your current server logs so the Questarr maintainer can diagnose your issue. Please review what will be shared:",
+  "interface.the_remote_path_prefix_is_replaced_c9c401da":
+    "The remote path prefix is replaced with the local path. If multiple mappings match, the most specific (longest) prefix wins. Downloader-scoped mappings only apply to the selected configured downloader.",
+  "interface.the_user_settings_table_hasn_t_bee_45679462":
+    "The user settings table hasn't been created yet. Please run",
+  "interface.these_downloads_require_your_atten_81cdbdc8":
+    "These downloads require your attention before they can be added to your library.",
+  "interface.these_filters_will_be_used_as_defa_2bcc838e":
+    "These filters will be used as defaults when you open the manual download dialog, and applied to auto-searches.",
+  "interface.this_api_url_uses_http_so_the_logi_75641c9c":
+    "This API URL uses http://, so the login is sent unencrypted. Use https:// unless Apprise runs on a network you trust.",
+  "interface.this_can_take_a_while_for_large_fo_760b1be1":
+    "This can take a while for large folders.",
+  "interface.this_diagnostic_report_has_expired_91aabda2":
+    "This diagnostic report has expired or was already sent. You can still send fresh logs from the Logs page at any time.",
+  "interface.this_download_requires_your_attent_f3da641a":
+    "This download requires your attention before it can be added to your library.",
+  "interface.this_path_is_on_the_questarrng_ser_977b88c6":
+    "This path is on the QuestarrNG server and must be writable by its process. Real-Debrid completes downloads in the cloud; QuestarrNG copies the selected files here before importing them. A premium account may be required for torrent downloads.",
+  "interface.this_prowlarr_url_uses_plain_http_b85a03ed":
+    "This Prowlarr URL uses plain HTTP. Unless you tick the box above, Questarr will not send the API key and the synced indexers will answer 401.",
+  "interface.this_will_upload_your_current_serv_7d049388":
+    "This will upload your current server logs so the Questarr maintainer can diagnose your issue. Please review what will be shared:",
   "interface.ti_ng_vi_t_vietnamese_e845833d": "Tiếng Việt — Vietnamese",
   "interface.tier_140efbe9": "Tier:",
   "interface.time_to_beat_687ab063": "Time to Beat",
-  "interface.tls_certificate_checks_stay_enable_54c0df6e": "TLS certificate checks stay enabled. To trust a private certificate authority, configure the Questarr service with",
-  "interface.to_update_the_database_schema_then_ebf9e52e": "to update the database schema, then restart the server.",
+  "interface.tls_certificate_checks_stay_enable_54c0df6e":
+    "TLS certificate checks stay enabled. To trust a private certificate authority, configure the Questarr service with",
+  "interface.to_update_the_database_schema_then_ebf9e52e":
+    "to update the database schema, then restart the server.",
   "interface.toggle_sidebar_1824bc01": "Toggle Sidebar",
   "interface.tor_0b9b7702": "Tor",
   "interface.torrent_eb9280a5": "Torrent",
   "interface.torrent_c9da8ee5": "TORRENT",
   "interface.torznab_torrent_548aea18": "Torznab (Torrent)",
-  "interface.torznab_for_torrent_indexers_newzn_07aa0dd1": "Torznab for torrent indexers, Newznab for Usenet indexers, g4u.to for the g4u.to VIP API",
+  "interface.torznab_for_torrent_indexers_newzn_07aa0dd1":
+    "Torznab for torrent indexers, Newznab for Usenet indexers, g4u.to for the g4u.to VIP API",
   "interface.trace_2c7a184e": "TRACE",
   "interface.trackers_f2ac92b0": "Trackers (",
   "interface.transfer_mode_67e27e99": "Transfer mode",
   "interface.transfer_modes_738dca5e": "Transfer modes",
-  "interface.translate_download_client_paths_to_9b79be6f": "Translate download client paths to paths accessible by Questarr. Required when Questarr and your download client run on separate machines or containers with different volume mounts.",
+  "interface.translate_download_client_paths_to_9b79be6f":
+    "Translate download client paths to paths accessible by Questarr. Required when Questarr and your download client run on separate machines or containers with different volume mounts.",
   "interface.transmission_7aa4bf05": "Transmission",
   "interface.trending_mods_on_nexus_mods_ab546166": "Trending Mods on Nexus Mods",
-  "interface.try_adjusting_or_clearing_your_fil_8c522575": "Try adjusting or clearing your filters.",
+  "interface.try_adjusting_or_clearing_your_fil_8c522575":
+    "Try adjusting or clearing your filters.",
   "interface.try_again_213e90fa": "Try again",
   "interface.turn_on_https_support_cf51c935": "Turn on HTTPS support",
   "interface.twitch_8eb3c06a": "Twitch",
-  "interface.twitch_igdb_api_integration_for_ga_8cc71aab": "Twitch/IGDB API integration for game metadata.",
+  "interface.twitch_igdb_api_integration_for_ga_8cc71aab":
+    "Twitch/IGDB API integration for game metadata.",
   "interface.typesafe_integration_disabled_d9b6384e": "TypeSafe integration disabled",
   "interface.typesafe_settings_saved_d705a7f2": "TypeSafe settings saved",
-  "interface.unable_to_connect_to_the_server_pl_89f3ed27": "Unable to connect to the server. Please check your connection and refresh.",
+  "interface.unable_to_connect_to_the_server_pl_89f3ed27":
+    "Unable to connect to the server. Please check your connection and refresh.",
   "interface.unhide_864b2c8a": "Unhide",
   "interface.unhiding_30531d81": "Unhiding...",
   "interface.unique_devs_d75ebf8e": "Unique Devs",
@@ -1709,7 +1982,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.unpack_8a18984b": "Unpack:",
   "interface.unrated_only_afe55f26": "Unrated only",
   "interface.update_6e230e94": "Update",
-  "interface.update_all_games_in_your_library_w_0613a39f": "Update all games in your library with the latest information from IGDB.",
+  "interface.update_all_games_in_your_library_w_0613a39f":
+    "Update all games in your library with the latest information from IGDB.",
   "interface.update_failed_3da747d1": "Update Failed",
   "interface.update_password_ad705ecd": "Update Password",
   "interface.update_your_account_password_473e2b45": "Update your account password",
@@ -1723,16 +1997,20 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.uploading_logs_65eb1eeb": "Uploading logs…",
   "interface.uploading_dfcc9e32": "Uploading...",
   "interface.url_path_optional_140f1904": "URL Path (Optional)",
-  "interface.use_a_shared_folder_relative_desti_694f54a7": "Use a shared-folder-relative destination such as",
+  "interface.use_a_shared_folder_relative_desti_694f54a7":
+    "Use a shared-folder-relative destination such as",
   "interface.use_ssl_9cb78972": "Use SSL",
-  "interface.use_the_mirror_if_your_ip_is_block_a4f8c682": "Use the mirror if your IP is blocked by Cloudflare on the official API.",
-  "interface.use_the_path_as_mounted_inside_que_a3ae0209": "Use the path as mounted inside Questarr. Platform folders are created below it.",
+  "interface.use_the_mirror_if_your_ip_is_block_a4f8c682":
+    "Use the mirror if your IP is blocked by Cloudflare on the official API.",
+  "interface.use_the_path_as_mounted_inside_que_a3ae0209":
+    "Use the path as mounted inside Questarr. Platform folders are created below it.",
   "interface.use_the_platform_slug_0a176c91": "Use the platform slug",
   "interface.usenet_d2d3d95f": "Usenet",
   "interface.usenet_301f2fbf": "USENET",
   "interface.usenet_nzb_bdae3536": "Usenet (NZB)",
   "interface.using_manual_input_instead_807bf209": "Using manual input instead",
-  "interface.using_the_saved_key_type_a_new_one_d7e5b4d5": "Using the saved key. Type a new one to replace it.",
+  "interface.using_the_saved_key_type_a_new_one_d7e5b4d5":
+    "Using the saved key. Type a new one to replace it.",
   "interface.v_f30c40c9": "v",
   "interface.valid_certificate_b06fc822": "Valid Certificate",
   "interface.valid_until_93da469d": "Valid Until:",
@@ -1745,26 +2023,36 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.warn_8a7b9bf1": "WARN",
   "interface.warning_8019d0ef": "Warning:",
   "interface.webhook_url_42dadefb": "Webhook URL",
-  "interface.when_a_download_finishes_questarr_ac7cc33d": "When a download finishes, Questarr automatically runs through the following steps — no manual action needed unless a step requires your input.",
+  "interface.when_a_download_finishes_questarr_ac7cc33d":
+    "When a download finishes, Questarr automatically runs through the following steps — no manual action needed unless a step requires your input.",
   "interface.when_can_i_skip_it_cd94e6a1": "When can I skip it?",
   "interface.when_do_i_need_this_0963e03a": "When do I need this?",
-  "interface.when_https_redirect_is_enabled_the_32befb82": "When HTTPS redirect is enabled, the HTTP port will be disabled on the next server restart. Make sure you can access the server via HTTPS before restarting to avoid losing access.",
+  "interface.when_https_redirect_is_enabled_the_32befb82":
+    "When HTTPS redirect is enabled, the HTTP port will be disabled on the next server restart. Make sure you can access the server via HTTPS before restarting to avoid losing access.",
   "interface.when_to_use_824e95bd": "When to use:",
   "interface.when_you_do_not_need_this_16e02c06": "When you do not need this",
   "interface.when_you_need_this_9b525f2a": "When you need this",
-  "interface.when_your_download_client_and_ques_a556458c": "When your download client and Questarr are on different machines or Docker containers with different volume mounts. For example, if qBittorrent reports a completed file as",
+  "interface.when_your_download_client_and_ques_a556458c":
+    "When your download client and Questarr are on different machines or Docker containers with different volume mounts. For example, if qBittorrent reports a completed file as",
   "interface.where_files_are_placed_after_impor_ea670161": "Where files are placed after import.",
   "interface.while_questarr_mounts_that_folder_ca4e9ac9": "while Questarr mounts that folder at",
   "interface.wikipedia_a1f3dd10": "Wikipedia",
   "interface.xrel_to_options_have_been_saved_0a43e00e": "xREL.to options have been saved.",
-  "interface.you_are_using_a_self_signed_certif_5b0da1ed": "You are using a self-signed certificate. You can renew it if it's expired or about to expire.",
-  "interface.you_can_submit_up_to_5_log_bundles_a8a4edf9": "You can submit up to 5 log bundles per hour per IP address.",
-  "interface.your_auto_search_preferences_have_3e5bae85": "Your auto-search preferences have been saved.",
-  "interface.your_download_filter_rules_have_be_d6f08632": "Your download filter rules have been saved.",
-  "interface.your_library_filtering_defaults_ha_e91bb012": "Your library filtering defaults have been saved.",
-  "interface.your_password_has_been_changed_suc_5c02a986": "Your password has been changed successfully.",
+  "interface.you_are_using_a_self_signed_certif_5b0da1ed":
+    "You are using a self-signed certificate. You can renew it if it's expired or about to expire.",
+  "interface.you_can_submit_up_to_5_log_bundles_a8a4edf9":
+    "You can submit up to 5 log bundles per hour per IP address.",
+  "interface.your_auto_search_preferences_have_3e5bae85":
+    "Your auto-search preferences have been saved.",
+  "interface.your_download_filter_rules_have_be_d6f08632":
+    "Your download filter rules have been saved.",
+  "interface.your_library_filtering_defaults_ha_e91bb012":
+    "Your library filtering defaults have been saved.",
+  "interface.your_password_has_been_changed_suc_5c02a986":
+    "Your password has been changed successfully.",
   "interface.your_steam_id_has_been_saved_0a5d101e": "Your Steam ID has been saved.",
-  "interface.your_steam_wishlist_auto_sync_pref_5c0a8329": "Your Steam Wishlist auto-sync preferences have been saved.",
+  "interface.your_steam_wishlist_auto_sync_pref_5c0a8329":
+    "Your Steam Wishlist auto-sync preferences have been saved.",
   "interface.your_virustotal_api_key_538ed2a0": "Your VirusTotal API key",
   "interface.arabic_716f2ed7": "العربية — Arabic",
   "interface.hindi_95b10da8": "हिन्दी — Hindi",
@@ -1772,8 +2060,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.japanese_a09626a1": "日本語 — Japanese",
   "interface.chinese_simplified_4711ab60": "简体中文 — Chinese (Simplified)",
   "interface.chinese_traditional_1def26cf": "繁體中文 — Chinese (Traditional)",
-  "interface.add_value_to_wanted_list_791eb955": "Add \"{value}\" to wanted list",
-  "interface.added_title_to_your_wanted_list_abe8d624": "Added \"{title}\" to your wanted list",
+  "interface.add_value_to_wanted_list_791eb955": 'Add "{value}" to wanted list',
+  "interface.added_title_to_your_wanted_list_abe8d624": 'Added "{title}" to your wanted list',
   "interface.added_count_of_count2_downloads_44d1a855": "Added {count} of {count2} downloads",
   "interface.age_age_75686829": "Age: {age}",
   "interface.allow_deleting_files_in_path_f384e71d": "Allow deleting files in {path}",
@@ -1797,7 +2085,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.enable_path_0220093b": "Enable {path}",
   "interface.estimated_time_remaining_value_07a00335": "Estimated time remaining: {value}",
   "interface.filter_by_s_1aabcf5d": "Filter by {s}",
-  "interface.game_removed_but_files_were_not_de_744e986d": "Game removed, but files were not deleted ({reasonText}): {path}",
+  "interface.game_removed_but_files_were_not_de_744e986d":
+    "Game removed, but files were not deleted ({reasonText}): {path}",
   "interface.igdb_platform_igdbplatformid_107b1a4a": "IGDB platform {igdbPlatformId}",
   "interface.in_app_label_3479d69a": "In-App: {label}",
   "interface.local_staging_value_6192ac0c": "Local staging: {value}",
@@ -1812,7 +2101,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.repair_status_8bc6569c": "Repair: {status}",
   "interface.resume_value_bc003aeb": "Resume {value}",
   "interface.revoke_api_key_name_4e64cd95": "Revoke API key {name}",
-  "interface.romm_slug_for_platform_igdbplatfor_657a40cd": "RomM slug for platform {igdbPlatformId}",
+  "interface.romm_slug_for_platform_igdbplatfor_657a40cd":
+    "RomM slug for platform {igdbPlatformId}",
   "interface.scan_path_1e763d0d": "Scan {path}",
   "interface.set_installed_version_to_version_b6f4ba58": "Set installed version to {version}",
   "interface.share_ratio_value_face49ce": "Share ratio: {value}",
@@ -1822,7 +2112,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.unpack_status_66433ae7": "Unpack: {status}",
   "interface.upload_speed_value_4f019642": "Upload speed: {value}",
   "interface.view_value_on_xrel_ecfcd495": "View {value} on xREL",
-  "interface.showngames_of_totalgames_games_sho_a3741d93": "{shownGames} of {totalGames} games shown",
+  "interface.showngames_of_totalgames_games_sho_a3741d93":
+    "{shownGames} of {totalGames} games shown",
   "interface.grabs_grabs_6bfa9677": "{grabs} grabs",
   "interface.length_drifted_length2_orphaned_0fc153d0": "{length} drifted, {length2} orphaned",
   "interface.seeders_seeders_value_leechers_2f904bab": "{seeders} seeders, {value} leechers",
@@ -1831,7 +2122,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.title_cover_c9fae4f4": "{title} cover",
   "interface.title_screenshot_value_37287400": "{title} screenshot {value}",
   "interface.downloads_sent_count_9e81f8d5": "Downloads sent: {count}",
-  "interface.downloads_sent_count_to_downloader_b84ab382": "Downloads sent: {count} to {downloaderName}",
+  "interface.downloads_sent_count_to_downloader_b84ab382":
+    "Downloads sent: {count} to {downloaderName}",
   "interface.added_count_of_total_downloads_d4f77de2": "Added {count} of {total} downloads",
   "interface.downloads_failed_count_06987f18": "Downloads failed: {count}",
   "interface.zip_file_item_count_count_cc5cd1a3": "ZIP file item count: {count}",
@@ -1852,42 +2144,62 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.unpack_failed_09685ce8": "Unpack Failed",
   "interface.aborted_e9e04770": "Aborted",
   "interface.hacking_stay_in_range_411746f9": "Hacking — stay in range",
-  "interface.left_click_to_move_ctrl_to_crouch_c319c3ce": "Left click to move · Ctrl to crouch · right click to throw · Esc to pause",
-  "interface.you_start_outside_on_the_approach_90bf96e3": "You start outside, on the approach. One gate is cut through the facility's wall and it is the only way in — cross the open ground and it rolls back for you. Inside are connected rooms, patrolling guards, and one console worth hacking. The door to it is locked, so find the keycard first. Stay out of the vision cones — walls and crates break line of sight.",
-  "interface.cross_the_approach_and_get_through_058e88ae": "Cross the approach and get through the gate",
-  "interface.find_the_keycard_then_reach_the_co_da927c7e": "Find the keycard, then reach the console",
+  "interface.left_click_to_move_ctrl_to_crouch_c319c3ce":
+    "Left click to move · Ctrl to crouch · right click to throw · Esc to pause",
+  "interface.you_start_outside_on_the_approach_90bf96e3":
+    "You start outside, on the approach. One gate is cut through the facility's wall and it is the only way in — cross the open ground and it rolls back for you. Inside are connected rooms, patrolling guards, and one console worth hacking. The door to it is locked, so find the keycard first. Stay out of the vision cones — walls and crates break line of sight.",
+  "interface.cross_the_approach_and_get_through_058e88ae":
+    "Cross the approach and get through the gate",
+  "interface.find_the_keycard_then_reach_the_co_da927c7e":
+    "Find the keycard, then reach the console",
   "interface.reach_the_console_and_hack_it_unse_a2d91903": "Reach the console and hack it unseen",
   "interface.move_to_a_tile_f68433fa": "Move to a tile",
   "interface.walk_over_and_hack_93fe3f78": "Walk over and hack",
   "interface.throw_a_distraction_cdcf08a8": "Throw a distraction",
-  "interface.crouch_slower_quieter_harder_to_se_22edf30a": "Crouch — slower, quieter, harder to see",
+  "interface.crouch_slower_quieter_harder_to_se_22edf30a":
+    "Crouch — slower, quieter, harder to see",
   "interface.zoom_62399752": "Zoom",
   "interface.left_click_655c7c28": "Left click",
   "interface.click_console_f4b22712": "Click console",
   "interface.right_click_f_43966e8e": "Right click / F",
   "interface.scroll_25dca54c": "Scroll",
-  "interface.register_a_new_application_name_it_b30f72b5": "Register a new application (name it 'Questarr')",
-  "interface.select_application_integration_as_4126a229": "Select 'Application Integration' as category",
+  "interface.register_a_new_application_name_it_b30f72b5":
+    "Register a new application (name it 'Questarr')",
+  "interface.select_application_integration_as_4126a229":
+    "Select 'Application Integration' as category",
   "interface.copy_the_client_id_eaad3a2f": "Copy the Client ID",
-  "interface.click_new_secret_to_get_your_clien_f26c223c": "Click 'New Secret' to get your Client Secret",
-  "interface.questarr_can_t_ship_a_working_cred_df8b7046": "Questarr can't ship a working credential out of the box: Twitch requires every application to register its own Client ID/Secret, and a secret baked into Questarr's open-source code would be public the moment it's committed.",
+  "interface.click_new_secret_to_get_your_clien_f26c223c":
+    "Click 'New Secret' to get your Client Secret",
+  "interface.questarr_can_t_ship_a_working_cred_df8b7046":
+    "Questarr can't ship a working credential out of the box: Twitch requires every application to register its own Client ID/Secret, and a secret baked into Questarr's open-source code would be public the moment it's committed.",
   "interface.this_game_isn_t_in_your_library_ye_ff45435b": "This game isn't in your library yet.",
-  "interface.scan_extra_folders_on_disk_for_gam_9313e3ea": "Scan extra folders on disk for games you already own but haven't imported yet — separate from the Library Root above.",
-  "interface.optional_uses_typesafe_s_jev_model_19744054": "Optional. Uses TypeSafe's Jev model to classify release types (full game, DLC, update, repack...) and flag suspiciously small files in search results. Entirely optional and off by default — QuestarrNG works normally without it. Bring your own API key and endpoint (TypeSafe, OpenRouter, a self-hosted proxy, etc.).",
-  "interface.leave_blank_to_use_typesafe_s_defa_5525c7b7": "Leave blank to use TypeSafe's default endpoint.",
-  "interface.leave_blank_for_typesafe_s_default_f020a6c2": "Leave blank for TypeSafe's default model. Routing through OpenRouter? Set the API URL to",
-  "interface.only_increase_if_you_experience_sl_b93f27d4": "Only increase if you experience slow loading times and are confident your usage won't exceed the limit.",
-  "interface.only_required_if_this_client_s_web_d0b57524": "Only required if this client's web UI uses authentication.",
-  "interface.off_by_default_when_questarrng_det_3f062622": "Off by default. When QuestarrNG detects an unexpected server error, it will normally ask you first (see the 'Error Detected' notification below). Turn this on to skip that prompt and send a scrubbed diagnostic report automatically instead — no personal data, IP addresses, or file paths are included. Reports help the maintainer catch bugs users don't otherwise report. You can still send a one-off report manually from the Logs page at any time, whatever this setting is.",
-  "interface.log_downloader_response_status_hea_23f65347": "Log downloader response status, headers, and body (up to 10KB) from download clients (qBittorrent, Transmission, rTorrent, Deluge, Synology Download Station, sabnzbd, nzbget) at debug level. Response headers and bodies can contain sensitive data - enable this only while debugging and review logs carefully. Useful when diagnosing why a download isn't being added or tracked correctly - leave this off otherwise, as it can be noisy.",
+  "interface.scan_extra_folders_on_disk_for_gam_9313e3ea":
+    "Scan extra folders on disk for games you already own but haven't imported yet — separate from the Library Root above.",
+  "interface.optional_uses_typesafe_s_jev_model_19744054":
+    "Optional. Uses TypeSafe's Jev model to classify release types (full game, DLC, update, repack...) and flag suspiciously small files in search results. Entirely optional and off by default — QuestarrNG works normally without it. Bring your own API key and endpoint (TypeSafe, OpenRouter, a self-hosted proxy, etc.).",
+  "interface.leave_blank_to_use_typesafe_s_defa_5525c7b7":
+    "Leave blank to use TypeSafe's default endpoint.",
+  "interface.leave_blank_for_typesafe_s_default_f020a6c2":
+    "Leave blank for TypeSafe's default model. Routing through OpenRouter? Set the API URL to",
+  "interface.only_increase_if_you_experience_sl_b93f27d4":
+    "Only increase if you experience slow loading times and are confident your usage won't exceed the limit.",
+  "interface.only_required_if_this_client_s_web_d0b57524":
+    "Only required if this client's web UI uses authentication.",
+  "interface.off_by_default_when_questarrng_det_3f062622":
+    "Off by default. When QuestarrNG detects an unexpected server error, it will normally ask you first (see the 'Error Detected' notification below). Turn this on to skip that prompt and send a scrubbed diagnostic report automatically instead — no personal data, IP addresses, or file paths are included. Reports help the maintainer catch bugs users don't otherwise report. You can still send a one-off report manually from the Logs page at any time, whatever this setting is.",
+  "interface.log_downloader_response_status_hea_23f65347":
+    "Log downloader response status, headers, and body (up to 10KB) from download clients (qBittorrent, Transmission, rTorrent, Deluge, Synology Download Station, sabnzbd, nzbget) at debug level. Response headers and bodies can contain sensitive data - enable this only while debugging and review logs carefully. Useful when diagnosing why a download isn't being added or tracked correctly - leave this off otherwise, as it can be noisy.",
   "interface.mirror_recommended_feedc4c9": "Mirror — recommended",
   "interface.official_often_blocked_3df52efc": "Official — often blocked",
   "interface.open_the_twitch_developer_portal_4af70cbf": "Open the Twitch Developer Portal",
-  "interface.add_a_path_mapping_from_remote_to_f4fab976": ", add a path mapping from {remote} to {local}.",
+  "interface.add_a_path_mapping_from_remote_to_f4fab976":
+    ", add a path mapping from {remote} to {local}.",
   "interface.page_page_of_total_68752e9c": "Page {page} of {total}",
-  "interface.visible_of_total_categories_enable_1cb0ce7d": "{visible} of {total} categories enabled",
+  "interface.visible_of_total_categories_enable_1cb0ce7d":
+    "{visible} of {total} categories enabled",
   "interface.showing_visible_of_total_12567489": "Showing {visible} of {total}",
-  "interface.the_key_environment_variable_is_se_ea4b0641": "The {key} environment variable is set. Saving a key here will override it.",
+  "interface.the_key_environment_variable_is_se_ea4b0641":
+    "The {key} environment variable is set. Saving a key here will override it.",
   "interface.show_owned_games_in_search_results_d24ed461": "Show owned games in search results",
   "interface.genre_genre_8df65bb1": "Genre: {genre}",
   "interface.platform_platform_e0242b39": "Platform: {platform}",
@@ -1897,58 +2209,70 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.successfully_connected_to_clamav_6d0986a8": "Successfully connected to ClamAV.",
   "interface.an_unexpected_error_occurred_6944f87a": "An unexpected error occurred",
   "interface.game_hidden_fcfcd579": "Game hidden",
-  "interface.unable_to_reach_the_server_please_5b42b01b": "Unable to reach the server. Please check your connection and try again.",
+  "interface.unable_to_reach_the_server_please_5b42b01b":
+    "Unable to reach the server. Please check your connection and try again.",
   "interface.try_again_297dfdbc": "Try again.",
   "interface.start_the_connection_again_4965f552": "Start the connection again.",
   "interface.could_not_diagnose_prowlarr_22489042": "Could not diagnose Prowlarr.",
   "interface.downloader_debug_logging_enabled_16ccbdc5": "Downloader debug logging enabled",
   "interface.downloader_debug_logging_disabled_d87e11ec": "Downloader debug logging disabled",
-  "interface.full_downloader_responses_will_now_21f5388d": "Full downloader responses will now be written to the log at debug level.",
+  "interface.full_downloader_responses_will_now_21f5388d":
+    "Full downloader responses will now be written to the log at debug level.",
   "interface.library_is_in_sync_28c7d95c": "Library is in sync.",
   "navigation.custom_lists": "Custom Lists",
   "navigation.library_import": "Library Import",
-  "interface.make_your_own_collections_for_co_o_f9b430b2": "Make your own collections for co-op nights, favorites, or whatever you want to play next.",
+  "interface.make_your_own_collections_for_co_o_f9b430b2":
+    "Make your own collections for co-op nights, favorites, or whatever you want to play next.",
   "interface.create_list_68a5e16f": "Create list",
   "interface.your_lists_e6b69d5b": "Your lists",
   "interface.only_you_can_see_and_edit_these_li_5290448c": "Only you can see and edit these lists.",
   "interface.loading_lists_0f5444e0": "Loading lists…",
-  "interface.your_lists_will_show_up_here_start_54f8f253": "Your lists will show up here. Start with one for a group, mood, or goal.",
+  "interface.your_lists_will_show_up_here_start_54f8f253":
+    "Your lists will show up here. Start with one for a group, mood, or goal.",
   "interface.rename_list_9ff4b40d": "Rename {list}",
   "interface.delete_list_0b1eb62e": "Delete {list}",
   "interface.count_game_f99a7d26": "{count} game",
   "interface.count_games_43334ccf": "{count} games",
   "interface.add_games_4d93bb5f": "Add games",
   "interface.loading_games_178e383e": "Loading games…",
-  "interface.couldn_t_load_games_for_this_list_aacfefce": "Couldn't load games for this list. Try again in a moment.",
+  "interface.couldn_t_load_games_for_this_list_aacfefce":
+    "Couldn't load games for this list. Try again in a moment.",
   "interface.this_list_is_ready_for_games_24fa08c2": "This list is ready for games",
-  "interface.add_games_from_your_library_you_ca_7f35b7ff": "Add games from your library. You can keep them in other lists too.",
+  "interface.add_games_from_your_library_you_ca_7f35b7ff":
+    "Add games from your library. You can keep them in other lists too.",
   "interface.browse_library_940383f0": "Browse library",
   "interface.remove_game_from_list_6de06d01": "Remove {game} from {list}",
   "interface.start_a_custom_list_3ba74c41": "Start a custom list",
-  "interface.collect_games_for_a_co_op_night_a_4ed84827": "Collect games for a co-op night, a backlog goal, or any theme you like.",
+  "interface.collect_games_for_a_co_op_night_a_4ed84827":
+    "Collect games for a co-op night, a backlog goal, or any theme you like.",
   "interface.create_your_first_list_bba74742": "Create your first list",
   "interface.rename_list_1a427df5": "Rename list",
   "interface.create_a_list_7e0b53a2": "Create a list",
-  "interface.give_it_a_short_name_so_you_can_fi_200b9475": "Give it a short name so you can find the right games later.",
+  "interface.give_it_a_short_name_so_you_can_fi_200b9475":
+    "Give it a short name so you can find the right games later.",
   "interface.list_name_cf572358": "List name",
   "interface.e_g_co_op_with_friends_fd21bcaa": "e.g. Co-op with friends",
   "interface.save_name_7692acbb": "Save name",
   "interface.add_games_to_list_d3414d8c": "Add games to {list}",
   "interface.add_games_to_your_list_da32a1b9": "Add games to your list",
-  "interface.select_games_from_your_library_a_g_c2400527": "Select games from your library. A game can be in more than one list.",
+  "interface.select_games_from_your_library_a_g_c2400527":
+    "Select games from your library. A game can be in more than one list.",
   "interface.search_library_games_af5524b1": "Search library games",
   "interface.search_your_games_d29b6007": "Search your games…",
   "interface.loading_library_13afcbb2": "Loading library…",
-  "interface.add_games_to_your_library_before_b_711c63e0": "Add games to your library before building a list.",
+  "interface.add_games_to_your_library_before_b_711c63e0":
+    "Add games to your library before building a list.",
   "interface.no_games_match_that_search_bc31a1df": "No games match that search.",
   "interface.add_game_to_list_ab650989": "Add {game} to {list}",
   "interface.delete_this_list_9365d423": "Delete this list?",
-  "interface.the_games_stay_in_your_library_onl_370dbede": "The games stay in your library. Only this list and its membership are removed.",
+  "interface.the_games_stay_in_your_library_onl_370dbede":
+    "The games stay in your library. Only this list and its membership are removed.",
   "interface.delete_list_4e0c098a": "Delete list",
   "interface.list_saved_e24d07fe": "List saved",
   "interface.name_is_ready_d506004a": "“{name}” is ready.",
   "interface.couldn_t_save_list_b61bfc7c": "Couldn't save list",
-  "interface.check_the_name_and_try_again_list_d0830084": "Check the name and try again. List names must be unique.",
+  "interface.check_the_name_and_try_again_list_d0830084":
+    "Check the name and try again. List names must be unique.",
   "interface.couldn_t_delete_list_21203c26": "Couldn't delete list",
   "interface.couldn_t_update_this_list_bb74b78c": "Couldn't update this list",
   "interface.your_list_10c6b14a": "your list",
@@ -1970,82 +2294,107 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.not_listed_search_igdb_by_name_a6670652": "Not listed? Search IGDB by name",
   "interface.count_selected_90873ee5": "{count} selected",
   "interface.game_metadata_provider_required_ee3be4a2": "Game Metadata Provider Required",
-  "interface.configure_igdb_or_the_optional_raw_5c5d94b1": "Configure IGDB or the optional RAWG provider in Settings to discover and browse games.",
-  "interface.add_your_first_downloader_client_t_13fd49ee": "Add your first downloader client to enable automated downloads. Supported clients include Transmission, rTorrent, qBittorrent, Synology Download Station, Deluge, Real-Debrid, SABnzbd, and NZBGet.",
+  "interface.configure_igdb_or_the_optional_raw_5c5d94b1":
+    "Configure IGDB or the optional RAWG provider in Settings to discover and browse games.",
+  "interface.add_your_first_downloader_client_t_13fd49ee":
+    "Add your first downloader client to enable automated downloads. Supported clients include Transmission, rTorrent, qBittorrent, Synology Download Station, Deluge, Real-Debrid, SABnzbd, and NZBGet.",
   "interface.torznab_url_c6924f74": "Torznab URL",
-  "interface.showing_the_latest_shown_of_count_1e0667a5": "Showing the latest {shown} of {count} matching lines. Copy includes all matches.",
+  "interface.showing_the_latest_shown_of_count_1e0667a5":
+    "Showing the latest {shown} of {count} matching lines. Copy includes all matches.",
   "interface.count_lines_displayed_cae583fc": "{count} lines displayed",
   "interface.real_time_server_output_summary_8dd9dcd7": "Real-time server output — {summary}",
   "interface.settings_unavailable_cd654772": "Settings unavailable",
-  "interface.questarrng_applies_database_migrat_ca44c223": "QuestarrNG applies database migrations automatically at startup. Restart the current service or container to retry. For source installations, run",
-  "interface.from_the_project_directory_if_this_9f52b7e7": "from the project directory. If this persists, check the server logs and database connection.",
+  "interface.questarrng_applies_database_migrat_ca44c223":
+    "QuestarrNG applies database migrations automatically at startup. Restart the current service or container to retry. For source installations, run",
+  "interface.from_the_project_directory_if_this_9f52b7e7":
+    "from the project directory. If this persists, check the server logs and database connection.",
   "interface.could_not_load_blacklisted_release_0bc68193": "Could not load blacklisted releases.",
   "interface.page_page_68b30817": "Page {page}",
   "interface.pick_a_game_c1a9f0fb": "Pick a game",
   "interface.backlog_roulette_a636d178": "Backlog roulette",
-  "interface.too_many_games_nothing_to_play_let_6cb0fba3": "Too many games, nothing to play? Let fate choose tonight’s quest.",
+  "interface.too_many_games_nothing_to_play_let_6cb0fba3":
+    "Too many games, nothing to play? Let fate choose tonight’s quest.",
   "interface.pick_from_cd0562f8": "Pick from",
   "interface.owned_games_daef9331": "Owned games",
   "interface.currently_playing_11f33077": "Currently playing",
   "interface.all_visible_games_21a37c61": "All visible games",
-  "interface.your_current_search_and_filters_ap_d16bd663": "Your current search and filters apply. Hidden games stay out of the draw.",
+  "interface.your_current_search_and_filters_ap_d16bd663":
+    "Your current search and filters apply. Hidden games stay out of the draw.",
   "interface.tonight_s_quest_07b89764": "Tonight’s quest",
   "interface.eligible_options_count_f3ea0f53": "Eligible options: {count}",
   "interface.ready_for_another_quest_940cc507": "Ready for another quest?",
   "interface.no_games_in_this_draw_5859286a": "No games in this draw",
-  "interface.roll_again_to_pick_from_your_updat_4148ccba": "Roll again to pick from your updated list.",
-  "interface.choose_another_pool_or_adjust_your_6ba5536a": "Choose another pool or adjust your filters to find a game.",
+  "interface.roll_again_to_pick_from_your_updat_4148ccba":
+    "Roll again to pick from your updated list.",
+  "interface.choose_another_pool_or_adjust_your_6ba5536a":
+    "Choose another pool or adjust your filters to find a game.",
   "interface.roll_again_ba2a178a": "Roll again",
   "interface.view_game_a57efe9a": "View game",
   "interface.mark_as_playing_d108203e": "Mark as Playing",
   "interface.game_metadata_by_bc91010d": "Game metadata by",
   "interface.unknown_game_6b8a9739": "Unknown game",
-  "interface.specific_releases_you_blacklisted_062f6183": "Specific releases you blacklisted from a game's download results. Removing one takes effect immediately.",
+  "interface.specific_releases_you_blacklisted_062f6183":
+    "Specific releases you blacklisted from a game's download results. Removing one takes effect immediately.",
   "interface.updating_title_b02b8c3f": "Updating {title}…",
   "interface.howlongtobeat_estimates_668e1415": "HowLongToBeat estimates",
   "interface.view_title_on_hltb_bbe044e1": "View {title} on HLTB",
   "interface.label_hours_hours_e3cb1d93": "{label}: {hours} hours",
-  "interface.estimated_play_times_from_howlongt_5c844686": "Estimated play times from HowLongToBeat.",
-  "interface.showing_a_partial_file_list_becaus_eee2b030": "Showing a partial file list because the scan reached a safety limit.",
+  "interface.estimated_play_times_from_howlongt_5c844686":
+    "Estimated play times from HowLongToBeat.",
+  "interface.showing_a_partial_file_list_becaus_eee2b030":
+    "Showing a partial file list because the scan reached a safety limit.",
   "interface.label_points_98424930": "{label}: {points}",
   "interface.no_scoring_rules_matched_f0953af0": "No scoring rules matched",
-  "interface.added_groups_to_your_preferred_rel_b40e0049": "Added {groups} to your preferred release groups.",
+  "interface.added_groups_to_your_preferred_rel_b40e0049":
+    "Added {groups} to your preferred release groups.",
   "interface.filetype_file_download_initiated_dfece638": "{fileType} file download initiated",
   "interface.download_filetype_file_for_title_17ab11d6": "Download {fileType} file for {title}",
   "interface.extension_file_f5f04940": "{extension} file",
-  "interface.downloads_clamav_cannot_fully_scan_e84e5a81": "Downloads ClamAV cannot fully scan (because clamd is unavailable or a file exceeds its size limits) wait in Pending Manual Imports. Increase StreamMaxLength, MaxFileSize, and MaxScanSize in clamd.conf to scan larger game files.",
+  "interface.downloads_clamav_cannot_fully_scan_e84e5a81":
+    "Downloads ClamAV cannot fully scan (because clamd is unavailable or a file exceeds its size limits) wait in Pending Manual Imports. Increase StreamMaxLength, MaxFileSize, and MaxScanSize in clamd.conf to scan larger game files.",
   "interface.search_rawg_games_4d5f00ff": "Search RAWG games",
   "interface.dsm_7_commonly_uses_https_on_port_ce0f5781": "DSM 7 commonly uses HTTPS on port 5001",
-  "interface.enable_https_in_sabnzbd_config_gen_ea9a1ef1": "Enable HTTPS in SABnzbd (Config → General)",
-  "interface.enable_https_in_nzbget_settings_se_a13e0e06": "Enable HTTPS in NZBGet (Settings → Security)",
+  "interface.enable_https_in_sabnzbd_config_gen_ea9a1ef1":
+    "Enable HTTPS in SABnzbd (Config → General)",
+  "interface.enable_https_in_nzbget_settings_se_a13e0e06":
+    "Enable HTTPS in NZBGet (Settings → Security)",
   "interface.enable_https_7d7e94a3": "Enable HTTPS",
   "interface.username_optional_4da1faf4": "Username (Optional)",
-  "interface.creates_a_subdirectory_in_the_outp_ebed8330": "Creates a subdirectory in the output directory. Label for downloads in downloader",
-  "interface.optional_questarr_label_only_synol_bff73441": "Optional Questarr label only. Synology stores downloads by destination path.",
-  "interface.category_for_nzbs_in_downloader_pa_c8ccd9ee": "Category for NZBs in downloader (path is managed by category settings)",
+  "interface.creates_a_subdirectory_in_the_outp_ebed8330":
+    "Creates a subdirectory in the output directory. Label for downloads in downloader",
+  "interface.optional_questarr_label_only_synol_bff73441":
+    "Optional Questarr label only. Synology stores downloads by destination path.",
+  "interface.category_for_nzbs_in_downloader_pa_c8ccd9ee":
+    "Category for NZBs in downloader (path is managed by category settings)",
   "interface.label_for_downloads_in_downloader_bd4d188d": "Label for downloads in downloader",
   "interface.json_catalog_2c1a40d4": "JSON catalog",
   "interface.json_catalog_hydra_format_931fa886": "JSON catalog (Hydra format)",
-  "interface.or_a_public_https_json_catalog_con_0b1ca305": "or a public HTTPS JSON catalog containing torrent links.",
+  "interface.or_a_public_https_json_catalog_con_0b1ca305":
+    "or a public HTTPS JSON catalog containing torrent links.",
   "interface.catalog_https_url_7c6cfad4": "Catalog HTTPS URL",
   "interface.test_indexers_fb298fff": "Test indexers",
   "interface.sync_indexers_8ae22cc2": "Sync Indexers",
   "interface.verified_file_types_d9050498": "Verified file types",
-  "interface.only_releases_whose_torrent_file_l_20745ac3": "Only releases whose torrent file list contains these extensions pass. Magnets, Usenet, archives, and unavailable file lists are excluded. Checks inspect up to 20 releases per page.",
+  "interface.only_releases_whose_torrent_file_l_20745ac3":
+    "Only releases whose torrent file list contains these extensions pass. Magnets, Usenet, archives, and unavailable file lists are excluded. Checks inspect up to 20 releases per page.",
   "interface.loading_more_results_42aaa318": "Loading more results…",
   "interface.load_more_results_2600c090": "Load more results",
   "interface.rawg_game_database_bbb5daf9": "RAWG Game Database",
-  "interface.optional_game_search_and_discovery_deb5487e": "Optional game search and discovery provider. IGDB and its SeerrNG identity remain available alongside RAWG.",
+  "interface.optional_game_search_and_discovery_deb5487e":
+    "Optional game search and discovery provider. IGDB and its SeerrNG identity remain available alongside RAWG.",
   "interface.rawg_api_key_bda9facd": "RAWG API key",
   "interface.get_a_rawg_api_key_1b8fbe8c": "Get a RAWG API key",
-  "interface.the_key_is_encrypted_at_rest_rawg_124d64bf": ". The key is encrypted at rest. RAWG attribution appears in the app sidebar.",
+  "interface.the_key_is_encrypted_at_rest_rawg_124d64bf":
+    ". The key is encrypted at rest. RAWG attribution appears in the app sidebar.",
   "interface.remove_rawg_d29dbae0": "Remove RAWG",
   "interface.save_rawg_key_8a77d6d8": "Save RAWG key",
   "interface.release_scoring_7b864a9b": "Release Scoring",
-  "interface.rank_releases_by_title_match_quali_acb717ae": "Rank releases by title match, quality, platform, and your own rules. Rejected releases remain visible in manual search with the reason.",
+  "interface.rank_releases_by_title_match_quali_acb717ae":
+    "Rank releases by title match, quality, platform, and your own rules. Rejected releases remain visible in manual search with the reason.",
   "interface.off_0dc6b4aa": "Off",
   "interface.use_this_profile_5115d68d": "Use this profile",
-  "interface.auto_search_will_only_consider_acc_a9be7ca7": "Auto-search will only consider accepted releases while this is enabled.",
+  "interface.auto_search_will_only_consider_acc_a9be7ca7":
+    "Auto-search will only consider accepted releases while this is enabled.",
   "interface.profile_limits_and_preferences_d75c3081": "Profile limits and preferences",
   "interface.minimum_score_355c98c5": "Minimum score",
   "interface.preferred_protocol_5a068eba": "Preferred protocol",
@@ -2056,13 +2405,16 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.required_title_terms_4eb7d961": "Required title terms",
   "interface.one_per_line_e_g_9632168c": "One per line, e.g.",
   "interface.ignored_title_terms_d8b7775c": "Ignored title terms",
-  "interface.terms_are_whole_words_use_pattern_cb999547": "Terms are whole words. Use /pattern/ for a bounded RE2 regular expression.",
+  "interface.terms_are_whole_words_use_pattern_cb999547":
+    "Terms are whole words. Use /pattern/ for a bounded RE2 regular expression.",
   "interface.built_in_rule_weights_d71361b4": "Built-in rule weights",
-  "interface.locked_title_mismatch_and_sequel_c_c7559edb": "Locked title mismatch and sequel checks always reject their matches.",
+  "interface.locked_title_mismatch_and_sequel_c_c7559edb":
+    "Locked title mismatch and sequel checks always reject their matches.",
   "interface.always_enforced_accc58ca": "Always enforced",
   "interface.points_a9f0a4e6": "Points",
   "interface.custom_formats_b29cb34e": "Custom formats",
-  "interface.each_format_adds_points_when_its_c_1fd601cb": "Each format adds points when its conditions match; hard rejects exclude the release.",
+  "interface.each_format_adds_points_when_its_c_1fd601cb":
+    "Each format adds points when its conditions match; hard rejects exclude the release.",
   "interface.add_format_d4df950f": "Add format",
   "interface.no_custom_formats_yet_7ad2d7f3": "No custom formats yet.",
   "interface.hard_reject_00848d4f": "Hard reject",
@@ -2075,16 +2427,21 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.negate_be0c317b": "Negate",
   "interface.remove_condition_e85ec5a0": "Remove condition",
   "interface.add_condition_4c29d229": "Add condition",
-  "interface.complete_each_custom_format_condit_74039cef": "Complete each custom format condition with a valid value before saving.",
+  "interface.complete_each_custom_format_condit_74039cef":
+    "Complete each custom format condition with a valid value before saving.",
   "interface.save_release_scoring_3dab91a4": "Save Release Scoring",
-  "interface.check_the_scoring_profile_and_cust_5782a7b2": "Check the scoring profile and custom format conditions before saving.",
+  "interface.check_the_scoring_profile_and_cust_5782a7b2":
+    "Check the scoring profile and custom format conditions before saving.",
   "interface.release_scoring_saved_669d0e10": "Release scoring saved",
-  "interface.manual_and_automatic_searches_will_fbc27d33": "Manual and automatic searches will use this profile.",
-  "interface.your_profile_is_saved_and_scoring_9c5a735d": "Your profile is saved and scoring remains disabled.",
+  "interface.manual_and_automatic_searches_will_fbc27d33":
+    "Manual and automatic searches will use this profile.",
+  "interface.your_profile_is_saved_and_scoring_9c5a735d":
+    "Your profile is saved and scoring remains disabled.",
   "interface.could_not_save_release_scoring_30c243e4": "Could not save release scoring",
   "interface.title_matches_the_game_b5122983": "Title matches the game",
   "interface.title_contains_the_game_61a2b3ed": "Title contains the game",
-  "interface.title_continues_past_the_game_name_a18c63a4": "Title continues past the game name (possible spinoff)",
+  "interface.title_continues_past_the_game_name_a18c63a4":
+    "Title continues past the game name (possible spinoff)",
   "interface.title_is_a_sequel_of_the_game_c9fa96d7": "Title is a sequel of the game",
   "interface.title_does_not_match_the_game_75020e11": "Title does not match the game",
   "interface.indexer_category_is_games_50a4278b": "Indexer category is games",
@@ -2109,22 +2466,31 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.rawg_search_results_c60afcc8": "RAWG Search Results",
   "interface.upcoming_games_bcda5f20": "Upcoming Games",
   "interface.not_used_for_public_json_catalogs_b9d7aab7": "Not used for public JSON catalogs",
-  "interface.enter_a_new_key_to_replace_the_sav_7e6f88bb": "Enter a new key to replace the saved key",
+  "interface.enter_a_new_key_to_replace_the_sav_7e6f88bb":
+    "Enter a new key to replace the saved key",
   "interface.enter_your_rawg_api_key_c50336d4": "Enter your RAWG API key",
   "interface.any_type_or_e_g_nsp_xci_c59f3b99": "Any type, or e.g. nsp,xci",
   "interface.checking_qbittorrent_b5637f31": "Checking qBittorrent",
-  "interface.the_request_was_accepted_but_qbitt_b7adf1a8": "The request was accepted, but qBittorrent has not confirmed the download yet. Check qBittorrent before retrying to avoid a duplicate.",
-  "interface.saves_these_groups_in_settings_wit_ec5717dd": "Saves these groups in Settings without changing your automatic search filter.",
+  "interface.the_request_was_accepted_but_qbitt_b7adf1a8":
+    "The request was accepted, but qBittorrent has not confirmed the download yet. Check qBittorrent before retrying to avoid a duplicate.",
+  "interface.saves_these_groups_in_settings_wit_ec5717dd":
+    "Saves these groups in Settings without changing your automatic search filter.",
   "interface.downloading_selected_release_ce57aab5": "Downloading selected release...",
-  "interface.updates_are_selected_by_default_sm_f6ae09ba": "Updates are selected by default; small extras are optional and start unchecked.",
-  "interface.updates_are_selected_by_default_un_7f248453": "Updates are selected by default; uncheck any you don't want with the main game.",
-  "interface.each_suggested_extra_is_no_larger_3de2c351": "Each suggested extra is no larger than 25% of the main release size. Select any you'd like to download with the main game.",
+  "interface.updates_are_selected_by_default_sm_f6ae09ba":
+    "Updates are selected by default; small extras are optional and start unchecked.",
+  "interface.updates_are_selected_by_default_un_7f248453":
+    "Updates are selected by default; uncheck any you don't want with the main game.",
+  "interface.each_suggested_extra_is_no_larger_3de2c351":
+    "Each suggested extra is no larger than 25% of the main release size. Select any you'd like to download with the main game.",
   "interface.small_extras_optional_e891590e": "Small extras (optional)",
-  "interface.each_suggested_extra_is_25_or_less_aadcdbbf": "Each suggested extra is 25% or less of the {size} main release. Nothing here is selected automatically.",
+  "interface.each_suggested_extra_is_25_or_less_aadcdbbf":
+    "Each suggested extra is 25% or less of the {size} main release. Nothing here is selected automatically.",
   "interface.size_unavailable_456b6856": "Size unavailable",
   "interface.download_game_only_f1fb0335": "Download game only",
-  "interface.this_is_the_exact_file_or_folder_q_01c49a1c": "This is the exact file or folder Questarr will transfer. Move removes the source; choosing a parent downloads folder can include unrelated files.",
-  "interface.stored_path_is_outside_your_config_7d659846": "stored path is outside your configured library folder",
+  "interface.this_is_the_exact_file_or_folder_q_01c49a1c":
+    "This is the exact file or folder Questarr will transfer. Move removes the source; choosing a parent downloads folder can include unrelated files.",
+  "interface.stored_path_is_outside_your_config_7d659846":
+    "stored path is outside your configured library folder",
   "interface.deletion_failed_check_server_logs_022357e2": "deletion failed, check server logs",
   "interface.main_story_4bd0dc4d": "Main Story",
   "interface.main_extras_3eeb83fc": "Main + Extras",
@@ -2137,41 +2503,66 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.add_small_extras_e3e19107": "Add small extras?",
   "interface.preferred_groups_updated_12b95689": "Preferred groups updated",
   "interface.groups_already_saved_773444ce": "Groups already saved",
-  "interface.the_selected_groups_are_already_in_a14bca6c": "The selected groups are already in your preferred list.",
+  "interface.the_selected_groups_are_already_in_a14bca6c":
+    "The selected groups are already in your preferred list.",
   "interface.could_not_save_preferred_groups_a19746e7": "Could not save preferred groups",
   "interface.direct_download_unavailable_1c161ed6": "Direct download unavailable",
-  "interface.this_release_does_not_have_a_downl_a3dbe640": "This release does not have a downloadable file URL.",
-  "interface.import_configuration_updated_scann_f0bf1c0e": "Import configuration updated. Scanning your root folders for games now.",
-  "interface.creates_a_second_directory_entry_p_09a241b0": "Creates a second directory entry pointing to the same file on disk. Zero extra space used, and your torrent client continues seeding normally. Requires the source and destination to be on the same physical volume (same drive or mount point).",
-  "interface.best_choice_when_your_download_fol_e1362a9c": "Best choice when your download folder and library are on the same disk. Preferred for seedbox-style setups.",
-  "interface.duplicates_the_file_to_the_destina_ec729f96": "Duplicates the file to the destination. The original is kept intact so the torrent can continue seeding, but you use double the disk space.",
-  "interface.use_when_your_library_is_on_a_diff_2821c82e": "Use when your library is on a different drive or network share than your download folder, and you still want to keep seeding.",
-  "interface.moves_the_file_to_the_destination_51cf354d": "Moves the file to the destination and removes it from the download folder. No extra space used, but the torrent will stop seeding.",
-  "interface.use_when_you_do_not_care_about_see_4fca7ed3": "Use when you do not care about seeding after import, or when disk space is tight.",
-  "interface.creates_a_symbolic_link_at_the_des_a7b30b76": "Creates a symbolic link at the destination pointing back to the original file in your download folder. The file is not duplicated or moved.",
-  "interface.use_when_you_want_your_library_to_f814fb62": "Use when you want your library to reflect downloads without copying files. The torrent keeps seeding.",
-  "interface.master_switch_when_off_downloads_a_5d57136d": "Master switch. When off, downloads are marked completed without any file being moved or organised. Turn this off if you manage your own file organisation externally.",
-  "interface.when_enabled_zip_rar_and_7z_archiv_48067328": "When enabled, zip, rar, and 7z archives are extracted before the files are transferred to the library. The extracted folder is what gets imported, not the archive itself.",
-  "interface.destination_folder_for_imported_ga_491c6e32": "Destination folder for imported games. Example: /data/library or D:\\Games.",
-  "interface.how_files_are_transferred_to_the_l_e335dcbd": "How files are transferred to the library root. See Transfer Modes above. Hardlink is recommended when possible.",
-  "interface.limits_imports_to_the_platforms_ch_d365d52d": "Limits imports to the platforms chosen under Settings → Appearance → Platforms. If no platforms are checked, all platforms are eligible.",
-  "interface.controls_the_file_name_after_impor_31697de1": "Controls the file name after import. Tokens: {Title} = game title, {Region} = region tag from the release name, {Platform} = platform name, {Year} = release year. Example: {Title} ({Year}) ({Platform}).",
+  "interface.this_release_does_not_have_a_downl_a3dbe640":
+    "This release does not have a downloadable file URL.",
+  "interface.import_configuration_updated_scann_f0bf1c0e":
+    "Import configuration updated. Scanning your root folders for games now.",
+  "interface.creates_a_second_directory_entry_p_09a241b0":
+    "Creates a second directory entry pointing to the same file on disk. Zero extra space used, and your torrent client continues seeding normally. Requires the source and destination to be on the same physical volume (same drive or mount point).",
+  "interface.best_choice_when_your_download_fol_e1362a9c":
+    "Best choice when your download folder and library are on the same disk. Preferred for seedbox-style setups.",
+  "interface.duplicates_the_file_to_the_destina_ec729f96":
+    "Duplicates the file to the destination. The original is kept intact so the torrent can continue seeding, but you use double the disk space.",
+  "interface.use_when_your_library_is_on_a_diff_2821c82e":
+    "Use when your library is on a different drive or network share than your download folder, and you still want to keep seeding.",
+  "interface.moves_the_file_to_the_destination_51cf354d":
+    "Moves the file to the destination and removes it from the download folder. No extra space used, but the torrent will stop seeding.",
+  "interface.use_when_you_do_not_care_about_see_4fca7ed3":
+    "Use when you do not care about seeding after import, or when disk space is tight.",
+  "interface.creates_a_symbolic_link_at_the_des_a7b30b76":
+    "Creates a symbolic link at the destination pointing back to the original file in your download folder. The file is not duplicated or moved.",
+  "interface.use_when_you_want_your_library_to_f814fb62":
+    "Use when you want your library to reflect downloads without copying files. The torrent keeps seeding.",
+  "interface.master_switch_when_off_downloads_a_5d57136d":
+    "Master switch. When off, downloads are marked completed without any file being moved or organised. Turn this off if you manage your own file organisation externally.",
+  "interface.when_enabled_zip_rar_and_7z_archiv_48067328":
+    "When enabled, zip, rar, and 7z archives are extracted before the files are transferred to the library. The extracted folder is what gets imported, not the archive itself.",
+  "interface.destination_folder_for_imported_ga_491c6e32":
+    "Destination folder for imported games. Example: /data/library or D:\\Games.",
+  "interface.how_files_are_transferred_to_the_l_e335dcbd":
+    "How files are transferred to the library root. See Transfer Modes above. Hardlink is recommended when possible.",
+  "interface.limits_imports_to_the_platforms_ch_d365d52d":
+    "Limits imports to the platforms chosen under Settings → Appearance → Platforms. If no platforms are checked, all platforms are eligible.",
+  "interface.controls_the_file_name_after_impor_31697de1":
+    "Controls the file name after import. Tokens: {Title} = game title, {Region} = region tag from the release name, {Platform} = platform name, {Year} = release year. Example: {Title} ({Year}) ({Platform}).",
   "interface.enable_post_processing_ca659b3a": "Enable Post-Processing.",
-  "interface.set_library_root_to_where_you_want_99b25fed": "Set Library Root to where you want games stored (e.g. /data/library).",
-  "interface.set_transfer_mode_to_hardlink_if_t_003742d6": "Set Transfer Mode to Hardlink if the download folder is on the same volume, otherwise Copy.",
+  "interface.set_library_root_to_where_you_want_99b25fed":
+    "Set Library Root to where you want games stored (e.g. /data/library).",
+  "interface.set_transfer_mode_to_hardlink_if_t_003742d6":
+    "Set Transfer Mode to Hardlink if the download folder is on the same volume, otherwise Copy.",
   "interface.leave_path_mappings_empty_ee25d1bf": "Leave Path Mappings empty.",
-  "interface.set_library_root_to_the_path_quest_e767d766": "Set Library Root to the path Questarr uses to reach the library folder.",
-  "interface.add_a_path_mapping_so_the_download_ff52e77a": "Add a Path Mapping so the download client's reported path is translated to a path Questarr can read.",
-  "interface.set_transfer_mode_to_hardlink_if_a_60414789": "Set Transfer Mode to Hardlink (if all volumes are on the same device) or Copy.",
-  "interface.releases_hidden_from_search_result_ef1a7eb7": "Releases hidden from search results and never auto-downloaded. Terms hide any release whose name contains them, across manual search, auto-search and AI-assisted results (case-insensitive, matched anywhere in the name).",
+  "interface.set_library_root_to_the_path_quest_e767d766":
+    "Set Library Root to the path Questarr uses to reach the library folder.",
+  "interface.add_a_path_mapping_so_the_download_ff52e77a":
+    "Add a Path Mapping so the download client's reported path is translated to a path Questarr can read.",
+  "interface.set_transfer_mode_to_hardlink_if_a_60414789":
+    "Set Transfer Mode to Hardlink (if all volumes are on the same device) or Copy.",
+  "interface.releases_hidden_from_search_result_ef1a7eb7":
+    "Releases hidden from search results and never auto-downloaded. Terms hide any release whose name contains them, across manual search, auto-search and AI-assisted results (case-insensitive, matched anywhere in the name).",
   "interface.release_blacklist_saved_c88236ee": "Release Blacklist Saved",
   "interface.scanning_it_for_games_now_e5e1d1af": "Scanning it for games now.",
   "interface.game_updates_available_on_indexers_bb776a95": "Game updates available on indexers",
   "interface.save_your_changes_before_testing_bd9cddbd": "Save your changes before testing",
   "interface.crouched_2764046a": "Crouched",
   "interface.in_shadow_3d581f72": "In shadow",
-  "interface.server_response_invalid_please_res_4762a781": "Server response invalid. Please restart the server.",
-  "interface.your_igdb_credentials_and_rate_lim_d685848b": "Your IGDB credentials and rate limit have been saved.",
+  "interface.server_response_invalid_please_res_4762a781":
+    "Server response invalid. Please restart the server.",
+  "interface.your_igdb_credentials_and_rate_lim_d685848b":
+    "Your IGDB credentials and rate limit have been saved.",
   "interface.your_igdb_credentials_have_been_sa_9f12c505": "Your IGDB credentials have been saved.",
   "interface.your_igdb_rate_limit_has_been_save_f831cfe8": "Your IGDB rate limit has been saved.",
   "interface.rawg_settings_saved_c2b49e68": "RAWG settings saved",
@@ -2180,11 +2571,13 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.rawg_connection_failed_b0ac0447": "RAWG connection failed",
   "interface.rawg_provider_removed_ae977197": "RAWG provider removed",
   "interface.could_not_remove_rawg_settings_dc4a576d": "Could not remove RAWG settings",
-  "interface.telemetry_enabled_detected_errors_fc0b1985": "Telemetry enabled. Detected errors will be reported automatically.",
+  "interface.telemetry_enabled_detected_errors_fc0b1985":
+    "Telemetry enabled. Detected errors will be reported automatically.",
   "interface.telemetry_disabled_f9e44072": "Telemetry disabled.",
   "interface.across_library_2424f7f7": "across library",
   "interface.wanted_games_a4e21221": "wanted games",
-  "interface.this_downloader_does_not_expose_pe_2b5a077a": "This downloader does not expose per-file listing.",
+  "interface.this_downloader_does_not_expose_pe_2b5a077a":
+    "This downloader does not expose per-file listing.",
   "interface.saving_groups_644a06dd": "Saving groups...",
   "interface.add_to_preferred_groups_0d3d36d4": "Add to preferred groups",
   "interface.connection_failed_e3bd2c48": "Connection failed.",
@@ -2193,29 +2586,44 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.queued_9e437c74": "Queued",
   "interface.running_452925ec": "Running",
   "interface.path_translation_6acfa32d": "Path translation",
-  "interface.the_path_reported_by_your_download_8f34335b": "The path reported by your download client (e.g. /downloads/Game.zip) is translated to the path that Questarr can actually read on its host. Configure this in Path Mappings if Questarr and your download client run in separate containers or machines.",
+  "interface.the_path_reported_by_your_download_8f34335b":
+    "The path reported by your download client (e.g. /downloads/Game.zip) is translated to the path that Questarr can actually read on its host. Configure this in Path Mappings if Questarr and your download client run in separate containers or machines.",
   "interface.strategy_selection_58ae8362": "Strategy selection",
-  "interface.questarr_inspects_the_game_s_platf_67cb8572": "Questarr inspects the game's platform and routes the file to the configured library root.",
+  "interface.questarr_inspects_the_game_s_platf_67cb8572":
+    "Questarr inspects the game's platform and routes the file to the configured library root.",
   "interface.file_transfer_d442617a": "File transfer",
-  "interface.the_file_is_hardlinked_copied_move_00c49f49": "The file is hardlinked, copied, moved, or symlinked to its destination using the Transfer Mode you configured.",
+  "interface.the_file_is_hardlinked_copied_move_00c49f49":
+    "The file is hardlinked, copied, moved, or symlinked to its destination using the Transfer Mode you configured.",
   "interface.game_status_update_0f7f268c": "Game status update",
-  "interface.the_download_is_marked_imported_an_c93129c8": "The download is marked \"imported\" and the game is marked \"owned\" in your library.",
+  "interface.the_download_is_marked_imported_an_c93129c8":
+    'The download is marked "imported" and the game is marked "owned" in your library.',
   "interface.manual_review_1d0e98c5": "Manual review",
-  "interface.if_questarr_cannot_determine_the_c_39a453cf": "If Questarr cannot determine the correct destination — for example, because the platform slug is unknown — the download is flagged as \"manual review required\". You can resolve it from the Downloads page.",
+  "interface.if_questarr_cannot_determine_the_c_39a453cf":
+    'If Questarr cannot determine the correct destination — for example, because the platform slug is unknown — the download is flagged as "manual review required". You can resolve it from the Downloads page.',
   "interface.your_questarrng_setup_is_ready_08fc7690": "Your QuestarrNG setup is ready",
-  "interface.choose_what_you_want_to_do_first_y_297e271a": "Choose what you want to do first. You can configure the other game-management features later in Settings.",
+  "interface.choose_what_you_want_to_do_first_y_297e271a":
+    "Choose what you want to do first. You can configure the other game-management features later in Settings.",
   "interface.browse_game_catalog_96a51dd8": "Browse game catalog",
-  "interface.explore_and_track_games_without_se_8cd0c32b": "Explore and track games without setting up downloads.",
+  "interface.explore_and_track_games_without_se_8cd0c32b":
+    "Explore and track games without setting up downloads.",
   "interface.acquire_releases_2d1d08fb": "Acquire releases",
-  "interface.checking_your_existing_acquisition_bd64ebbf": "Checking your existing acquisition setup…",
-  "interface.open_the_existing_indexer_and_down_8fd65ea9": "Open the existing indexer and downloader settings to check acquisition readiness.",
-  "interface.add_an_indexer_to_search_for_game_ebd6bc3e": "Add an indexer to search for game releases.",
-  "interface.add_a_downloader_to_send_a_release_45192b09": "Add a downloader to send a release grab.",
-  "interface.search_for_releases_for_games_in_y_48726b11": "Search for releases for games in your library.",
+  "interface.checking_your_existing_acquisition_bd64ebbf":
+    "Checking your existing acquisition setup…",
+  "interface.open_the_existing_indexer_and_down_8fd65ea9":
+    "Open the existing indexer and downloader settings to check acquisition readiness.",
+  "interface.add_an_indexer_to_search_for_game_ebd6bc3e":
+    "Add an indexer to search for game releases.",
+  "interface.add_a_downloader_to_send_a_release_45192b09":
+    "Add a downloader to send a release grab.",
+  "interface.search_for_releases_for_games_in_y_48726b11":
+    "Search for releases for games in your library.",
   "interface.organize_existing_downloads_e09b05e4": "Organize existing downloads",
-  "interface.configure_library_imports_for_file_6d77e54d": "Configure library imports for files you already have.",
-  "interface.without_an_enabled_indexer_questar_fa8803f0": "Without an enabled indexer, QuestarrNG cannot search for game releases. You can still browse the game catalog and import files you already have. Add an indexer or connect Prowlarr when you want release search. Popular options include Jackett, Prowlarr, or direct Torznab-compatible trackers.",
-  "interface.without_an_enabled_downloader_ques_160097dc": "Without an enabled downloader, QuestarrNG cannot send a release grab to a client. You can still browse the game catalog and configure library imports for files you already have. Add a downloader when you are ready to acquire releases. Supported clients include Transmission, rTorrent, qBittorrent, Synology Download Station, Deluge, Real-Debrid, SABnzbd, and NZBGet.",
+  "interface.configure_library_imports_for_file_6d77e54d":
+    "Configure library imports for files you already have.",
+  "interface.without_an_enabled_indexer_questar_fa8803f0":
+    "Without an enabled indexer, QuestarrNG cannot search for game releases. You can still browse the game catalog and import files you already have. Add an indexer or connect Prowlarr when you want release search. Popular options include Jackett, Prowlarr, or direct Torznab-compatible trackers.",
+  "interface.without_an_enabled_downloader_ques_160097dc":
+    "Without an enabled downloader, QuestarrNG cannot send a release grab to a client. You can still browse the game catalog and configure library imports for files you already have. Add a downloader when you are ready to acquire releases. Supported clients include Transmission, rTorrent, qBittorrent, Synology Download Station, Deluge, Real-Debrid, SABnzbd, and NZBGet.",
   "interface.identity_provider_33991a28": "identity provider",
   "interface.google_e3b85fa6": "Google",
   "interface.microsoft_entra_id_7d4c3a54": "Microsoft Entra ID",
@@ -2229,9 +2637,10 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.apple_b6779c5f": "Apple",
   "interface.continue_with_5b5c8ac4": "Continue with",
   "interface.provider_setup_guide_9f61fa39": "Provider setup guide",
-  "interface.identity_provider_sign_in_failed_c_86dc0d0c": "Identity provider sign-in failed. Check the provider and account admission settings.",
+  "interface.identity_provider_sign_in_failed_c_86dc0d0c":
+    "Identity provider sign-in failed. Check the provider and account admission settings.",
   "navigation.all_games_count_singular": "All Games: {count}",
-  "downloads.more_options": "More download options"
+  "downloads.more_options": "More download options",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

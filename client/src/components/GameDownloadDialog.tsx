@@ -181,7 +181,9 @@ function ReleaseScoreBadge({
       ? `${rejection.code.replaceAll("_", " ")}: ${rejection.detail}`
       : rejection.code.replaceAll("_", " ")
   );
-  const title = [...scoreLines, ...rejectionLines].join(" · ") || t("interface.no_scoring_rules_matched_f0953af0");
+  const title =
+    [...scoreLines, ...rejectionLines].join(" · ") ||
+    t("interface.no_scoring_rules_matched_f0953af0");
   const scoreLabelSource = evaluation.accepted ? "Score {score}" : "Rejected · {score}";
   const ariaLabelSource = evaluation.accepted ? "Release score {score}" : "Rejected, score {score}";
   return (
@@ -384,7 +386,10 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
     if (days === undefined) return null;
     if (days === 0) return localizedText("interface.today_e7c0775e");
     return (
-      <span lang={languageFor("interface.today_e7c0775e")} dir={directionFor("interface.today_e7c0775e")}>
+      <span
+        lang={languageFor("interface.today_e7c0775e")}
+        dir={directionFor("interface.today_e7c0775e")}
+      >
         {formatAge(days, language, regionalPreference)}
       </span>
     );
@@ -399,7 +404,8 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
     emptyMessage: translateText("interface.no_items_found_21c9e00c"),
     emptyLang: languageFor("interface.no_items_found_21c9e00c"),
     emptyDir: directionFor("interface.no_items_found_21c9e00c"),
-    removeLabel: (label: string) => translateText("interface.remove_name_feab7316", { name: label }),
+    removeLabel: (label: string) =>
+      translateText("interface.remove_name_feab7316", { name: label }),
     removeLang: languageFor("interface.remove_name_feab7316"),
     removeDir: directionFor("interface.remove_name_feab7316"),
   });
@@ -954,9 +960,7 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
             ? {
                 description:
                   result.message ||
-                  localizedText(
-                    "interface.the_request_was_accepted_but_qbitt_b7adf1a8"
-                  ),
+                  localizedText("interface.the_request_was_accepted_but_qbitt_b7adf1a8"),
               }
             : {}),
         });
@@ -1122,7 +1126,9 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
       }
     } else {
       if (downloadFile(selectedMainDownload)) {
-        const fileType = isUsenetItem(selectedMainDownload) ? "NZB" : t("interface.torrent_eb9280a5");
+        const fileType = isUsenetItem(selectedMainDownload)
+          ? "NZB"
+          : t("interface.torrent_eb9280a5");
         toast({
           title: "Download started",
           description: formatInterfaceMessage(
@@ -1283,9 +1289,7 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
                 : localizedText("interface.add_to_preferred_groups_0d3d36d4")}
             </Button>
             <p className="text-xs text-muted-foreground">
-              {localizedText(
-                "interface.saves_these_groups_in_settings_wit_ec5717dd"
-              )}
+              {localizedText("interface.saves_these_groups_in_settings_wit_ec5717dd")}
             </p>
           </div>
         )}
@@ -1399,7 +1403,9 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
       {isSearching && (
         <div className="flex items-center justify-center py-8">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          <span className="ms-2 text-muted-foreground">{localizedText("interface.searching_a889b573")}</span>
+          <span className="ms-2 text-muted-foreground">
+            {localizedText("interface.searching_a889b573")}
+          </span>
         </div>
       )}
 
@@ -1410,16 +1416,11 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
             <CardDescription>
               {searchResults.blacklistedCount
                 ? searchResults.blacklistedCount === 1
-                  ? localizedText(
-                      "interface.this_result_is_blacklisted_review_acee2330"
-                    )
-                  : localizedText(
-                      "interface.all_count_results_are_blacklisted_5d2ee061",
-                      { count: searchResults.blacklistedCount }
-                    )
-                : localizedText(
-                    "interface.no_downloads_found_for_this_game_t_f25e68bc"
-                  )}
+                  ? localizedText("interface.this_result_is_blacklisted_review_acee2330")
+                  : localizedText("interface.all_count_results_are_blacklisted_5d2ee061", {
+                      count: searchResults.blacklistedCount,
+                    })
+                : localizedText("interface.no_downloads_found_for_this_game_t_f25e68bc")}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -1580,9 +1581,9 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
                                 variant="ghost"
                                 size="icon"
                                 className="h-9 w-9"
-                                aria-label={translateText("More download options")}
-                                lang={languageFor("More download options")}
-                                dir={directionFor("More download options")}
+                                aria-label={translateText("downloads.more_options")}
+                                lang={languageFor("downloads.more_options")}
+                                dir={directionFor("downloads.more_options")}
                               >
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
@@ -2053,29 +2054,18 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
             {hasUpdates ? (
               <>
                 {filteredCategorizedDownloads.update.length === 1
-                  ? localizedText(
-                      "interface.one_update_is_available_for_this_g_dc952217"
-                    )
+                  ? localizedText("interface.one_update_is_available_for_this_g_dc952217")
                   : filteredCategorizedDownloads.update.length === 2
-                    ? localizedText(
-                        "interface.two_updates_are_available_for_this_5acfa3df"
-                      )
-                    : localizedText(
-                        "interface.count_updates_are_available_for_th_eadb6ead",
-                        { count: filteredCategorizedDownloads.update.length }
-                      )}{" "}
+                    ? localizedText("interface.two_updates_are_available_for_this_5acfa3df")
+                    : localizedText("interface.count_updates_are_available_for_th_eadb6ead", {
+                        count: filteredCategorizedDownloads.update.length,
+                      })}{" "}
                 {hasRecommendedExtras
-                  ? localizedText(
-                      "interface.updates_are_selected_by_default_sm_f6ae09ba"
-                    )
-                  : localizedText(
-                      "interface.updates_are_selected_by_default_un_7f248453"
-                    )}
+                  ? localizedText("interface.updates_are_selected_by_default_sm_f6ae09ba")
+                  : localizedText("interface.updates_are_selected_by_default_un_7f248453")}
               </>
             ) : (
-              localizedText(
-                "interface.each_suggested_extra_is_no_larger_3de2c351"
-              )
+              localizedText("interface.each_suggested_extra_is_no_larger_3de2c351")
             )}
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -2083,7 +2073,9 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
         {filteredCategorizedDownloads.update.length > 0 && (
           <div className="my-4">
             <div className="flex items-center justify-between mb-2">
-              <div className="text-sm font-semibold">{localizedText("interface.available_updates_7c66d5bc")}</div>
+              <div className="text-sm font-semibold">
+                {localizedText("interface.available_updates_7c66d5bc")}
+              </div>
               <div className="flex gap-2">
                 <Button
                   variant="ghost"
@@ -2131,7 +2123,8 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
                             <>
                               <span>•</span>
                               <span className="text-green-600">
-                                {formatNumber(update.seeders)} {localizedText("interface.seeders_323953f8")}
+                                {formatNumber(update.seeders)}{" "}
+                                {localizedText("interface.seeders_323953f8")}
                               </span>
                             </>
                           )}
@@ -2157,10 +2150,9 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
               {localizedText("interface.small_extras_optional_e891590e")}
             </div>
             <div className="text-xs text-muted-foreground mb-2">
-              {localizedText(
-                "interface.each_suggested_extra_is_25_or_less_aadcdbbf",
-                { size: selectedMainDownload?.size ? formatBytes(selectedMainDownload.size) : "—" }
-              )}
+              {localizedText("interface.each_suggested_extra_is_25_or_less_aadcdbbf", {
+                size: selectedMainDownload?.size ? formatBytes(selectedMainDownload.size) : "—",
+              })}
             </div>
             <div className="border rounded-md">
               <ScrollArea style={{ height: Math.min(160, 24 + recommendedExtras.length * 64) }}>
@@ -2179,7 +2171,9 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
                       <label htmlFor={`extra-${index}`} className="flex-1 cursor-pointer text-sm">
                         <div className="font-medium">{extra.title}</div>
                         <div className="text-xs text-muted-foreground mt-1">
-                          {extra.size ? formatBytes(extra.size) : localizedText("interface.size_unavailable_456b6856")}
+                          {extra.size
+                            ? formatBytes(extra.size)
+                            : localizedText("interface.size_unavailable_456b6856")}
                         </div>
                       </label>
                     </div>
@@ -2210,7 +2204,9 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
           >
             <PackagePlus className="w-4 h-4 me-2" />
             {selectedExtraIndices.size > 0
-              ? formatInterfaceMessage("interface.download_with_name_7e640848", { name: selectedBundleAddonLabel })
+              ? formatInterfaceMessage("interface.download_with_name_7e640848", {
+                  name: selectedBundleAddonLabel,
+                })
               : selectedUpdateIndices.size === 1
                 ? localizedText("interface.download_with_one_update_83a099e8")
                 : selectedUpdateIndices.size === 2
@@ -2230,7 +2226,10 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
     return (
       <>
         <Drawer open={open} onOpenChange={onOpenChange} shouldScaleBackground={false}>
-          <DrawerContent className="h-[95vh] flex flex-col" dir={directionFor("interface.download_6964bb19")}>
+          <DrawerContent
+            className="h-[95vh] flex flex-col"
+            dir={directionFor("interface.download_6964bb19")}
+          >
             <DrawerHeader className="pt-2 pb-0 px-4 flex-shrink-0">
               <DrawerTitle className="text-base font-bold truncate">
                 {localizedText("interface.download_6964bb19")}{" "}
@@ -2276,9 +2275,7 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
             <DialogDescription>
               {localizedText("interface.search_results_for_torrents_and_nz_688cb920")}{" "}
               <span className="text-muted-foreground/80">
-                {localizedText(
-                  "interface.tip_enable_auto_download_in_settin_0f6b5a2f"
-                )}
+                {localizedText("interface.tip_enable_auto_download_in_settin_0f6b5a2f")}
               </span>
             </DialogDescription>
           </DialogHeader>
