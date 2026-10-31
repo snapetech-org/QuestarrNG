@@ -2677,6 +2677,7 @@ export const STABLE_INTERFACE_MESSAGES = {
   "downloads.status.manual_review_required": "Manual Review Required",
   "downloads.status.pending_import": "Pending Import",
   "downloads.status.game_link_required": "Game Link Required",
+  "imports.start_time": "Start time",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

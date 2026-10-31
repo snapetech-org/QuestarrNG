@@ -338,7 +338,7 @@ export const UI_LABELS = {
   },
   "interface.date_time_and_number_format_d853f2cd": {
     es: "Fechas, horas y números",
-    "zh-Hans": "日期、时间和数字",
+    "zh-Hans": "日期、时间和数字格式",
     hi: "तारीख, समय और संख्या",
     de: "Datum, Uhrzeit und Zahlen",
     ja: "日付・時刻・数値の表示形式",
@@ -10174,19 +10174,19 @@ export const UI_LABELS = {
   },
   "interface.started_97b5823e": {
     es: "Iniciado",
-    "zh-Hans": "开始时间",
+    "zh-Hans": "已启动",
     hi: "शुरू हुआ",
     de: "Gestartet",
     ja: "開始",
-    fr: "Début",
-    "pt-BR": "Início",
+    fr: "Démarré",
+    "pt-BR": "Iniciado",
     ar: "بدأ",
-    ko: "시작",
-    "zh-Hant": "開始時間",
-    vi: "Bắt đầu",
+    ko: "시작됨",
+    "zh-Hant": "已啟動",
+    vi: "Đã bắt đầu",
     id: "Dimulai",
     "es-419": "Iniciado",
-    "fr-CA": "Début",
+    "fr-CA": "Démarré",
   },
   "interface.created_09de135b": {
     es: "Creada",
@@ -11939,7 +11939,7 @@ export const UI_LABELS = {
   },
   "interface.the_001c5f98": {
     es: "—",
-    "zh-Hans": "- 那个",
+    "zh-Hans": "—",
     hi: "—",
     de: "— die",
     ja: "— と",
@@ -12067,7 +12067,7 @@ export const UI_LABELS = {
   },
   "interface.last_used_2c3a41c3": {
     es: "· Última utilización",
-    "zh-Hans": "最终使用",
+    "zh-Hans": "· 最后使用",
     hi: "· आखरी इस्तेमाल किया",
     de: "· Letzte Verwendung",
     ja: "・最後に使用",
@@ -15414,7 +15414,7 @@ export const UI_LABELS = {
   },
   "interface.create_a_webhook_in_your_discord_s_8c8899d7": {
     es: "Crear un Webhook en su servidor Discord bajo Configuración de Canal → Integraciónes.",
-    "zh-Hans": "在频道设置 ~ 集成 下创建您的 Discord 服务器的 Webhook 。",
+    "zh-Hans": "在您的 Discord 服务器中，前往频道设置 → 集成，创建一个 Webhook。",
     hi: "अपने आप में एक वेबहुक बनाएँ Discord चैनल सेटिंग → एकीकरण के तहत सर्वर।",
     de: "Erstellen Sie einen Webhook in Ihrem Discord-Server unter Channel Settings → Integrations.",
     ja: "チャンネル設定→インテグレーションでDiscordサーバーでwebhookを作成します。",
@@ -15578,7 +15578,7 @@ export const UI_LABELS = {
   },
   "interface.customize_your_discovery_experienc_d7093477": {
     es: "Personaliza tu experiencia de descubrimiento.",
-    "zh-Hans": "定制你的发现经验。",
+    "zh-Hans": "自定义你的发现体验。",
     hi: "अपने खोज अनुभव को अनुकूलित करें।",
     de: "Passen Sie Ihre Entdeckungserfahrung an.",
     ja: "あなたの発見の経験をカスタマイズして下さい。",
@@ -15690,7 +15690,7 @@ export const UI_LABELS = {
   },
   "interface.default_is_3_to_be_conservative_44697800": {
     es: "El valor predeterminado es 3 para ser conservador.",
-    "zh-Hans": "默认为3为保守.",
+    "zh-Hans": "默认为 3，以采取保守策略。",
     hi: "डिफ़ॉल्ट 3 रूढ़िवादी होने के लिए है।",
     de: "Default ist 3 konservativ zu sein.",
     ja: "デフォルトは3です。",
@@ -15981,7 +15981,7 @@ export const UI_LABELS = {
   },
   "interface.display_trending_mods_and_verify_i_57074f98": {
     es: "Mostrar mods de tendencia y verificar si tus juegos tienen una sección Nexus Mods.",
-    "zh-Hans": "显示趋势模式并验证您的游戏是否有 Nexus Mods 区域 。",
+    "zh-Hans": "显示热门模组并验证您的游戏是否有 Nexus Mods 部分。",
     hi: "ट्रेंडिंग मोड प्रदर्शित करें और सत्यापित करें कि आपके गेम में नेक्सस मोड सेक्शन है।",
     de: "Zeigen Sie trendige Mods an und überprüfen Sie, ob Ihre Spiele einen Nexus Mods-Bereich haben.",
     ja: "トレンドモッズを表示し、ゲームがネクサスモッズセクションを持っているかどうかを確認します。",
@@ -16157,7 +16157,7 @@ export const UI_LABELS = {
   },
   "interface.download_linked_to_game_65f039ff": {
     es: "Descarga vinculada al juego",
-    "zh-Hans": "下载链接到游戏",
+    "zh-Hans": "下载已关联到游戏",
     hi: "खेल से जुड़े डाउनलोड",
     de: "Download verknüpft mit Spiel",
     ja: "ゲームへのリンクのダウンロード",
@@ -16464,7 +16464,7 @@ export const UI_LABELS = {
   },
   "interface.drifted_a0f50be5": {
     es: "Rutas no encontradas (",
-    "zh-Hans": "漂流(",
+    "zh-Hans": "路径不存在 (",
     hi: "बहाव (Drifted)",
     de: "angetrieben ()",
     ja: "ドリフテッド (Drifted)",
@@ -16480,7 +16480,7 @@ export const UI_LABELS = {
   },
   "interface.e_g_404_c875c07b": {
     es: "por ejemplo 404",
-    "zh-Hans": "例如,404个",
+    "zh-Hans": "例如：404",
     hi: "उदाहरण के लिए 404",
     de: "z. B. 404",
     ja: "例:404",
@@ -16784,7 +16784,7 @@ export const UI_LABELS = {
   },
   "interface.enter_prowlarr_api_key_914cef27": {
     es: "Introduzca la clave de API de Prowlarr",
-    "zh-Hans": "输入 Prowlarr API 键",
+    "zh-Hans": "输入 Prowlarr API 密钥",
     hi: "Prowlarr API कुंजी",
     de: "Geben Sie Prowlarr API Key ein",
     ja: "Prowlarr API キーを入力してください",
@@ -16896,7 +16896,7 @@ export const UI_LABELS = {
   },
   "interface.enter_your_steamid64_to_sync_your_3ec224b1": {
     es: "Introduzca su SteamID64 para sincronizar su lista de deseos. Puedes encontrarlo.",
-    "zh-Hans": "输入您的 SteamID64 以同步您的愿望列表 。 你可以打开它",
+    "zh-Hans": "输入您的 SteamID64 以同步愿望单。您可以在以下网站找到它：",
     hi: "प्रवेश SteamID64 अपनी इच्छा सूची को सिंक करने के लिए। आप इसे देख सकते हैं",
     de: "Geben Sie Ihre SteamID64 ein, um Ihre Wunschliste zu synchronisieren. Sie finden es auf",
     ja: "SteamID64を入力してウィッシュリストを同期してください。SteamID64は次のページで確認できます：",
@@ -17104,7 +17104,7 @@ export const UI_LABELS = {
   },
   "interface.existing_game_policy_e24b427c": {
     es: "Política de juego existente",
-    "zh-Hans": "现行游戏政策",
+    "zh-Hans": "现有游戏策略",
     hi: "मौजूदा खेल नीति",
     de: "Bestehende Spielpolitik",
     ja: "既存のゲームポリシー",
@@ -17152,7 +17152,7 @@ export const UI_LABELS = {
   },
   "interface.experimental_feature_behavior_and_c81027bd": {
     es: "Función experimental: el comportamiento y los resultados pueden cambiar entre versiones",
-    "zh-Hans": "实验特征:释放之间可能发生行为和结果变化",
+    "zh-Hans": "实验性功能：行为和结果可能会在版本之间发生变化",
     hi: "अनुभवजन्य विशेषता: व्यवहार और परिणाम रिलीज के बीच बदल सकते हैं",
     de: "Experimentelles Merkmal: Verhalten und Ergebnisse können sich zwischen den Releases ändern",
     ja: "実験的特徴: 動作と結果はリリース間で変化する可能性があります",
@@ -17172,7 +17172,7 @@ export const UI_LABELS = {
   "interface.experimental_jev_classifications_c_0385974c": {
     es: "Experimental: Las clasificaciones de Jev pueden ser erróneas, y cómo se utilizan pueden cambiar entre versiones. Compruebe los resultados marcados antes de confiar en ellos.",
     "zh-Hans":
-      "实验:Jev分类可能是错误的,如何使用它们可能会在释放之间发生改变. 在依赖它们之前先检查标记的结果 。",
+      "实验性：Jev 分类可能是错误的，且其使用方式可能会在版本之间发生变化。在依赖它们之前，请先检查标记的结果。",
     hi: "प्रायोगिक: जेव वर्गीकरण गलत हो सकता है, और उनका उपयोग कैसे किया जाता है, रिलीज के बीच बदल सकता है। उन पर भरोसा करने से पहले ध्वजांकित परिणाम की जाँच करें।",
     de: "Experimentell: Jev-Klassifikationen können falsch sein, und wie sie verwendet werden, kann sich zwischen den Veröffentlichungen ändern. Überprüfen Sie markierte Ergebnisse, bevor Sie sich darauf verlassen.",
     ja: "実験的: Jev の分類は間違っている可能性があり、その使用方法はリリース間で変更される可能性があります。 それらに依存する前に、フラグが付けられた結果を確認してください。",
@@ -17626,7 +17626,7 @@ export const UI_LABELS = {
   },
   "interface.failed_to_save_typesafe_settings_5ac02f0c": {
     es: "No se pudo guardar la configuración de TypeSafe",
-    "zh-Hans": "保存类型安全设置失败",
+    "zh-Hans": "保存 TypeSafe 设置失败",
     hi: "टाइपसेफ सेटिंग्स को बचाने में विफल रहा",
     de: "Fehler beim Speichern der TypeSafe-Einstellungen",
     ja: "TypeSafe設定を保存できない",
@@ -17850,7 +17850,7 @@ export const UI_LABELS = {
   },
   "interface.fields_marked_are_required_3c9a5375": {
     es: "Se requieren campos marcados con *.",
-    "zh-Hans": "需要标有 * 的字段。",
+    "zh-Hans": "标有 * 的字段为必填项。",
     hi: "* चिह्नित फ़ील्ड आवश्यक हैं।",
     de: "Felder mit * sind erforderlich.",
     ja: "※印は必須項目です。",
@@ -17978,7 +17978,7 @@ export const UI_LABELS = {
   },
   "interface.filtered_to_games_only_master_game_929b86c8": {
     es: "Filtrado a juegos solamente (master_game). Datos de",
-    "zh-Hans": "仅被过滤到游戏(master game). 数据来自",
+    "zh-Hans": "已筛选为仅游戏 (master_game)。数据来自",
     hi: "केवल खेलों के लिए फ़िल्टर्ड (master game). डेटा से",
     de: "Gefiltert nur nach Spielen (master game). Daten aus",
     ja: "ゲームのみにフィルタリング(master game)。 データから",
@@ -18029,7 +18029,7 @@ export const UI_LABELS = {
   },
   "interface.for_directory_imports_place_detect_2a0f3d16": {
     es: "Para las importaciones de directorios, coloca el DLC, las actualizaciones y los extras detectados en",
-    "zh-Hans": "对于目录的导入, 将检测到的 DLC、 更新和额外信息输入",
+    "zh-Hans": "对于目录导入，请将检测到的 DLC、更新和附加内容放置在",
     hi: "निर्देशिका आयात के लिए, जगह में डीएलसी, अद्यतन और अतिरिक्त पता चला",
     de: "Bei Verzeichnisimporten können Sie DLC, Updates und Extras in",
     ja: "ディレクトリのインポート、検出された DLC の場所、更新および余分のために",
@@ -18487,7 +18487,7 @@ export const UI_LABELS = {
   },
   "interface.generate_a_self_signed_certificate_0cfb613b": {
     es: "Genera un certificado auto-firmado si no tienes uno.",
-    "zh-Hans": "如果没有签名, 则生成自签名证书 。",
+    "zh-Hans": "如果没有证书，请生成自签名证书。",
     hi: "यदि आपके पास कोई अधिकार नहीं है, तो एक स्व-signed प्रमाणपत्र उत्पन्न करें।",
     de: "Generieren Sie ein selbstsigniertes Zertifikat, wenn Sie keins haben.",
     ja: "自己署名証明書を 1 つを持っていない場合は生成します。",
@@ -18567,7 +18567,7 @@ export const UI_LABELS = {
   },
   "interface.get_your_personal_api_key_on_the_af959ae9": {
     es: "Obtener su clave de API personal en",
-    "zh-Hans": "获取您的个人 API 密钥",
+    "zh-Hans": "获取个人 API 密钥：",
     hi: "अपनी व्यक्तिगत API कुंजी पाने के लिए",
     de: "Holen Sie sich Ihren persönlichen API-Schlüssel auf der",
     ja: "パーソナル API キーを取得する",
@@ -18939,7 +18939,7 @@ export const UI_LABELS = {
   },
   "interface.hidden_games_60ca9ff6": {
     es: "Juegos ocultos (",
-    "zh-Hans": "隐藏游戏( O)",
+    "zh-Hans": "隐藏游戏 (",
     hi: "छिपे हुए गेम्स",
     de: "Hidden Games",
     ja: "隠されたゲーム (",
@@ -19134,7 +19134,7 @@ export const UI_LABELS = {
   },
   "interface.how_often_to_search_for_new_releas_c8e6b9e4": {
     es: "Frecuencia de búsqueda de nuevos lanzamientos (1-168 horas)",
-    "zh-Hans": "搜索新版本的次数(1-168小时)",
+    "zh-Hans": "搜索新发布资源的频率（1-168 小时）",
     hi: "अक्सर नए रिलीज़ की खोज कैसे करें (1-168 घंटे)",
     de: "Wie oft man nach neuen Releases sucht (1-168 Stunden)",
     ja: "新規リリースの検索頻度(1-168時間)",
@@ -19150,7 +19150,7 @@ export const UI_LABELS = {
   },
   "interface.how_the_import_pipeline_works_adb89eb1": {
     es: "Cómo funciona el proceso de importación",
-    "zh-Hans": "进口管道如何运作",
+    "zh-Hans": "导入管道如何运作",
     hi: "आयात पाइपलाइन कैसे काम करती है",
     de: "Wie die Importpipeline funktioniert",
     ja: "インポートパイプラインの仕組み",
@@ -19182,7 +19182,7 @@ export const UI_LABELS = {
   },
   "interface.how_to_get_igdb_credentials_b30da690": {
     es: "Cómo obtener credenciales de IGDB:",
-    "zh-Hans": "如何获得 IGDB 证书 :",
+    "zh-Hans": "如何获取 IGDB 凭据：",
     hi: "IGDB क्रेडेंशियल कैसे प्राप्त करें:",
     de: "So erhalten Sie IGDB-Anmeldeinformationen:",
     ja: "IGDBの資格情報を取得する方法:",
@@ -19198,7 +19198,7 @@ export const UI_LABELS = {
   },
   "interface.how_to_sort_results_within_each_ca_a9b08aa8": {
     es: "Cómo clasificar los resultados dentro de cada categoría",
-    "zh-Hans": "如何分类每个类别的结果",
+    "zh-Hans": "如何对每个类别内的结果进行排序",
     hi: "प्रत्येक श्रेणी के भीतर परिणाम कैसे क्रमबद्ध करें",
     de: "Wie man Ergebnisse innerhalb jeder Kategorie sortiert",
     ja: "各カテゴリ内で結果をソートする方法",
@@ -19665,7 +19665,7 @@ export const UI_LABELS = {
   },
   "interface.increase_priority_e705913f": {
     es: "Aumentar prioridad",
-    "zh-Hans": "增加优先事项",
+    "zh-Hans": "提高优先级",
     hi: "प्राथमिकता बढ़ाएं",
     de: "Erhöhung der Priorität",
     ja: "優先度を高める",
@@ -19729,7 +19729,7 @@ export const UI_LABELS = {
   },
   "interface.indexer_priority_acb636d0": {
     es: "Prioridad del indexador",
-    "zh-Hans": "索引优先级",
+    "zh-Hans": "索引器优先级",
     hi: "इंडेक्सर प्रायोरिटी",
     de: "Indexerpriorität",
     ja: "インデックス・プライオリティ",
@@ -19844,7 +19844,7 @@ export const UI_LABELS = {
   },
   "interface.issued_by_365db831": {
     es: "Publicado por:",
-    "zh-Hans": "发表者:",
+    "zh-Hans": "颁发者:",
     hi: "द्वारा जारी किया गया:",
     de: "Ausgestellt von:",
     ja: "で発行:",
@@ -19924,7 +19924,7 @@ export const UI_LABELS = {
   },
   "interface.keep_both_with_a_new_name_f75b51f7": {
     es: "Mantenga ambos con un nuevo nombre",
-    "zh-Hans": "两者都保留新名字",
+    "zh-Hans": "保留两者并使用新名称",
     hi: "दोनों को नए नाम से रखें",
     de: "Behalten Sie beide mit einem neuen Namen",
     ja: "新しく名前を付ける",
@@ -20055,7 +20055,7 @@ export const UI_LABELS = {
   },
   "interface.last_announce_b2d5447a": {
     es: "Último anuncio:",
-    "zh-Hans": "最后宣布时间 :",
+    "zh-Hans": "上次汇报：",
     hi: "अंतिम घोषणा:",
     de: "Letzte Ankündigung:",
     ja: "最終アナウンス:",
@@ -20501,7 +20501,7 @@ export const UI_LABELS = {
   },
   "interface.log_full_downloader_responses_90b9d895": {
     es: "Registrar las respuestas completas del cliente de descarga",
-    "zh-Hans": "日志完整下载回复",
+    "zh-Hans": "记录完整下载器响应",
     hi: "लॉग पूर्ण डाउनलोडर प्रतिक्रिया",
     de: "Vollständige Download-Antworten protokollieren",
     ja: "完全なダウンローダ応答を記録",
@@ -20716,7 +20716,7 @@ export const UI_LABELS = {
   },
   "interface.lower_higher_priority_auto_fallbac_a20794d2": {
     es: "Bajo = mayor prioridad. Auto-fallback si falla.",
-    "zh-Hans": "下等=优先级别较高. 失败时自动返回 。",
+    "zh-Hans": "数值越低，优先级越高。失败时自动回退。",
     hi: "निम्न = उच्च प्राथमिकता यदि विफल हो जाता है तो ऑटो-फॉलबैक।",
     de: "Niedriger = höhere Priorität. Auto-Fallback wenn fehlschlägt.",
     ja: "より低い = 高い優先順位。 失敗した場合の自動フォールバック。",
@@ -20909,7 +20909,7 @@ export const UI_LABELS = {
   },
   "interface.matched_48b4fef7": {
     es: "Combinado:",
-    "zh-Hans": "匹配时间 :",
+    "zh-Hans": "匹配：",
     hi: "मिलान:",
     de: "Übereinstimmung:",
     ja: "一致:",
@@ -21053,7 +21053,7 @@ export const UI_LABELS = {
   },
   "interface.model_8285e8fa": {
     es: "Modelo",
-    "zh-Hans": "型号",
+    "zh-Hans": "模型",
     hi: "आदर्श",
     de: "Modell",
     ja: "モデル",
@@ -21101,7 +21101,7 @@ export const UI_LABELS = {
   },
   "interface.most_recent_server_log_lines_aroun_be67035b": {
     es: "más recientes líneas de registro de servidores alrededor del error, con correos electrónicos, direcciones IP y UUIDs reemplazados por marcadores de posición.",
-    "zh-Hans": "最新的服务器日志行围绕错误,有电子邮件,IP地址,UUID被占位符所取代.",
+    "zh-Hans": "错误附近的最新服务器日志行，其中电子邮件、IP 地址和 UUID 已被占位符替换。",
     hi: "त्रुटि के आसपास हाल के सर्वर लॉग लाइन, ईमेल, आईपी पते और यूयूआईडी के साथ प्लेसहोल्डर द्वारा प्रतिस्थापित किया गया।",
     de: "Letzte Server-Loglinien um den Fehler herum, wobei E-Mails, IP-Adressen und UUIDs durch Platzhalter ersetzt werden.",
     ja: "エラーの周りの最新のサーバーログライン、メール、IPアドレス、およびUUIDはプレースホルダーに置き換えられます。",
@@ -21136,7 +21136,7 @@ export const UI_LABELS = {
   },
   "interface.my_library_b1cd94f4": {
     es: "Mi biblioteca",
-    "zh-Hans": "我的图书馆",
+    "zh-Hans": "我的游戏库",
     hi: "मेरी लाइब्रेरी",
     de: "Meine Bibliothek",
     ja: "私の図書館",
@@ -21248,7 +21248,7 @@ export const UI_LABELS = {
   },
   "interface.needs_review_527986ce": {
     es: "Requiere revisión (",
-    "zh-Hans": "需求审查",
+    "zh-Hans": "需要审查 (",
     hi: "आवश्यकता समीक्षा",
     de: "Bedarfsprüfung ()",
     ja: "ニーズレビュー (",
@@ -21376,7 +21376,7 @@ export const UI_LABELS = {
   },
   "interface.next_announce_ea1453c3": {
     es: "Siguiente anuncio:",
-    "zh-Hans": "接下来宣布:",
+    "zh-Hans": "下次汇报：",
     hi: "अगली घोषणा:",
     de: "Nächste Ankündigung:",
     ja: "次の発表:",
@@ -21392,7 +21392,7 @@ export const UI_LABELS = {
   },
   "interface.next_slide_bbe77cfd": {
     es: "Siguiente diapositiva",
-    "zh-Hans": "下一个幻灯片",
+    "zh-Hans": "下一张幻灯片",
     hi: "अगला स्लाइड",
     de: "Nächste Folie",
     ja: "次のスライド",
@@ -21456,7 +21456,7 @@ export const UI_LABELS = {
   },
   "interface.nexusmods_25bab58d": {
     es: "NexusMods",
-    "zh-Hans": "Nexus 模块",
+    "zh-Hans": "NexusMods",
     hi: "नेक्ससमोड",
     de: "NexusMods",
     ja: "ネクサスモッド",
@@ -21472,7 +21472,7 @@ export const UI_LABELS = {
   },
   "interface.no_api_keys_yet_create_one_to_conn_6ed98540": {
     es: "Aún no hay claves API. Crea una para conectar SeerrNG u otro cliente de integración.",
-    "zh-Hans": "还没有 API 密钥 。 创建一个连接SeerrNG或另一个集成客户端.",
+    "zh-Hans": "还没有 API 密钥。创建一个以连接 SeerrNG 或另一个集成客户端。",
     hi: "अभी कोई API कुंजी नहीं है। SeerrNG या किसी अन्य इंटीग्रेशन क्लाइंट से जुड़ने के लिए एक बनाएँ।",
     de: "Noch keine API Keys. Erstellen Sie einen, um SeerrNG oder einen anderen Integrationsclient zu verbinden.",
     ja: "API キーはまだありません。 SeerrNG または別の統合クライアントを接続するための 1 つを作成します。",
@@ -22610,7 +22610,7 @@ export const UI_LABELS = {
   },
   "interface.periodically_search_indexers_for_w_e1414b87": {
     es: "Buscar periódicamente en los indexadores juegos deseados",
-    "zh-Hans": "定期搜索通缉游戏索引器",
+    "zh-Hans": "定期在索引器中搜索想要的游戏",
     hi: "वांछित खेलों के लिए आवधिक रूप से खोज अनुक्रमक",
     de: "Suchen Sie regelmäßig Indexer nach gesuchten Spielen",
     ja: "欲望のゲームのための定期的な検索インデックス",
@@ -22730,7 +22730,7 @@ export const UI_LABELS = {
   },
   "interface.platform_preferences_updated_783458f7": {
     es: "Preferencias de plataforma actualizadas.",
-    "zh-Hans": "平台首选更新.",
+    "zh-Hans": "平台偏好已更新。",
     hi: "प्लेटफ़ॉर्म वरीयताओं को अद्यतन किया गया।",
     de: "Plattformpräferenzen aktualisiert.",
     ja: "プラットフォームの設定を更新しました。",
@@ -22762,7 +22762,7 @@ export const UI_LABELS = {
   },
   "interface.play_again_new_layout_c57ad266": {
     es: "Juega de nuevo (nueva distribución)",
-    "zh-Hans": "再次播放( 新布局 )",
+    "zh-Hans": "再玩一次（新布局）",
     hi: "फिर से खेलना (नया लेआउट)",
     de: "Wieder spielen (neues Layout)",
     ja: "再び再生(新しいレイアウト)",
@@ -22794,7 +22794,7 @@ export const UI_LABELS = {
   },
   "interface.please_provide_both_client_id_and_221276fd": {
     es: "Por favor, proporcione tanto el ID del cliente como el Secreto del Cliente.",
-    "zh-Hans": "请同时提供客户身份和客户秘密.",
+    "zh-Hans": "请同时提供客户端 ID 和客户端密钥。",
     hi: "कृपया क्लाइंट आईडी और क्लाइंट गुप्त दोनों प्रदान करें।",
     de: "Bitte geben Sie sowohl Client ID als auch Client Secret an.",
     ja: "クライアントIDとクライアントシークレットの両方を提供してください。",
@@ -22842,7 +22842,7 @@ export const UI_LABELS = {
   },
   "interface.post_import_category_optional_a2865b00": {
     es: "Categoría posterior a la importación (opcional)",
-    "zh-Hans": "进口后类别(备选)",
+    "zh-Hans": "导入后分类（可选）",
     hi: "पोस्ट-आयात श्रेणी (वैकल्पिक)",
     de: "Kategorie nach der Einfuhr (fakultativ)",
     ja: "ポストインポートカテゴリ(オプション)",
@@ -22980,7 +22980,7 @@ export const UI_LABELS = {
   },
   "interface.press_enter_or_click_to_add_a_grou_7a91bb6f": {
     es: "Pulse Enter o haga clic en + para añadir un grupo. La comparación no distingue entre mayúsculas y minúsculas.",
-    "zh-Hans": "按 Enter 键或点击 + 以添加组。 比较是忽略大小写。",
+    "zh-Hans": "按 Enter 键或点击 + 以添加组。比较时忽略大小写。",
     hi: "समूह जोड़ने के लिए Enter दबाएँ या + पर क्लिक करें। तुलना में बड़े और छोटे अक्षरों का अंतर नहीं किया जाता।",
     de: "Drücken Sie Enter oder klicken Sie auf +, um eine Gruppe hinzuzufügen. Der Vergleich ist fallunempfindlich.",
     ja: "Enter キーを押すか + をクリックしてグループを追加します。比較では大文字と小文字を区別しません。",
@@ -22999,7 +22999,7 @@ export const UI_LABELS = {
   },
   "interface.press_enter_or_click_to_add_a_term_dc1a9f1a": {
     es: "Pulse Enter o haga clic en + para añadir un término. La comparación no distingue entre mayúsculas y minúsculas.",
-    "zh-Hans": "按 Enter 或点击 + 添加一个术语。 比较是忽略大小写。",
+    "zh-Hans": "按 Enter 或点击 + 添加一个术语。比较时忽略大小写。",
     hi: "शब्द जोड़ने के लिए Enter दबाएँ या + पर क्लिक करें। तुलना में बड़े और छोटे अक्षरों का अंतर नहीं किया जाता।",
     de: "Drücken Sie Enter oder klicken Sie auf +, um einen Begriff hinzuzufügen. Der Vergleich ist fallunempfindlich.",
     ja: "Enter キーを押すか + をクリックして用語を追加します。比較では大文字と小文字を区別しません。",
@@ -23050,7 +23050,7 @@ export const UI_LABELS = {
   },
   "interface.priority_value_4f977928": {
     es: "Valor prioritario",
-    "zh-Hans": "优先价值",
+    "zh-Hans": "优先级值",
     hi: "प्राथमिकता मूल्य",
     de: "Prioritätswert",
     ja: "優先値",
@@ -23082,7 +23082,7 @@ export const UI_LABELS = {
   },
   "interface.private_key_file_key_pem_b78112f6": {
     es: "Archivo de clave privada (.key/.pem)",
-    "zh-Hans": "私密密钥文件 (. key/. pem)",
+    "zh-Hans": "私钥文件 (.key/.pem)",
     hi: "निजी कुंजी फ़ाइल (.key/.pem)",
     de: "Datei des privaten Schlüssels (.key/.pem)",
     ja: "プライベートキーファイル(.key/.pem)",
@@ -23274,7 +23274,7 @@ export const UI_LABELS = {
   },
   "interface.qbittorrent_21210163": {
     es: "qBittorrent",
-    "zh-Hans": "qBittorrent 数据",
+    "zh-Hans": "qBittorrent",
     hi: "qBittorrent",
     de: "qBittorrent",
     ja: "qBittorrent",
@@ -23290,7 +23290,7 @@ export const UI_LABELS = {
   },
   "interface.questarr_can_now_delete_files_in_t_82f4c616": {
     es: "Questarr ahora puede eliminar archivos en esta carpeta cuando se elimina un juego con sus archivos.",
-    "zh-Hans": "Questarr 现在可以删除此文件夹中带有文件的游戏的文件 。",
+    "zh-Hans": "当您移除游戏并删除其文件时，Questarr 现在可以删除此文件夹中的文件。",
     hi: "जब आप अपनी फ़ाइलों के साथ गेम को हटाते हैं तो Questarr अब इस फ़ोल्डर में फ़ाइलों को हटा सकता है।",
     de: "Questarr kann nun Dateien in diesem Ordner löschen, wenn Sie ein Spiel mit seinen Dateien entfernen.",
     ja: "Questarr は、そのファイルでゲームを削除したときに、このフォルダーにファイルを削除できるようになりました。",
@@ -23849,7 +23849,7 @@ export const UI_LABELS = {
   },
   "interface.release_status_66998364": {
     es: "Estado de lanzamiento",
-    "zh-Hans": "释放状态",
+    "zh-Hans": "发行状态",
     hi: "रिलीज की स्थिति",
     de: "Freigabestatus",
     ja: "リリースステータス",
@@ -23897,7 +23897,7 @@ export const UI_LABELS = {
   },
   "interface.releases_hidden_from_search_result_583964af": {
     es: "Los lanzamientos se ocultan de los resultados de búsqueda. No aparecerán en las búsquedas de descargas de juegos ni se descargarán automáticamente.",
-    "zh-Hans": "隐藏在搜索结果中的释放。 它们不会出现在游戏下载搜索中,也不会被自动下载.",
+    "zh-Hans": "已从搜索结果中隐藏的发行版本。它们不会出现在游戏下载搜索中，也不会被自动下载。",
     hi: "रिलीज़ खोज परिणामों में नहीं दिखेंगे, गेम डाउनलोड खोजों में दिखाई नहीं देंगे या अपने-आप डाउनलोड नहीं होंगे।",
     de: "Aus den Suchergebnissen verborgene Releases. Sie werden nicht in der Spiele-Download-Suche angezeigt oder automatisch heruntergeladen.",
     ja: "リリースは検索結果に表示されず、ゲームのダウンロード検索にも表示されず、自動ダウンロードもされません。",
@@ -24012,7 +24012,7 @@ export const UI_LABELS = {
   },
   "interface.rename_pattern_1445d3d5": {
     es: "Patrón de renombre",
-    "zh-Hans": "重命名图案",
+    "zh-Hans": "重命名模式",
     hi: "नाम पैटर्न",
     de: "Umbenennung",
     ja: "パターンの名前を変更",
@@ -24092,7 +24092,7 @@ export const UI_LABELS = {
   },
   "interface.replace_files_already_present_at_t_40a1515b": {
     es: "Reemplaza los archivos ya presentes en el destino.",
-    "zh-Hans": "替换目的地已经显示的文件 。",
+    "zh-Hans": "替换目的地已存在的文件。",
     hi: "पहले से ही गंतव्य पर मौजूद फ़ाइलों को बदलें।",
     de: "Ersetzen Sie Dateien, die bereits am Zielort vorhanden sind.",
     ja: "先に存在するファイルを置換します。",
@@ -24124,7 +24124,7 @@ export const UI_LABELS = {
   },
   "interface.report_sent_b572f793": {
     es: "Informe enviado",
-    "zh-Hans": "提交的报告",
+    "zh-Hans": "报告已发送",
     hi: "भेजे गए रिपोर्ट",
     de: "Versendeter Bericht",
     ja: "レポート送信",
@@ -24140,7 +24140,7 @@ export const UI_LABELS = {
   },
   "interface.reports_are_stored_as_an_issue_in_5f23e7db": {
     es: "Los informes se almacenan como un problema en un",
-    "zh-Hans": "报告作为一个问题储存在",
+    "zh-Hans": "报告以 issue 的形式存储，所在的",
     hi: "रिपोर्ट को एक मुद्दे के रूप में संग्रहीत किया जाता है",
     de: "Berichte werden als Problem in einem",
     ja: "レポートは問題として保存されます",
@@ -24156,7 +24156,7 @@ export const UI_LABELS = {
   },
   "interface.require_a_custom_binding_8cba8087": {
     es: "Requiere una unión personalizada",
-    "zh-Hans": "需要自定义约束",
+    "zh-Hans": "需要自定义绑定",
     hi: "एक कस्टम बंधन की आवश्यकता है",
     de: "Benötigen Sie eine Custom Binding",
     ja: "カスタムバインディングが必要です",
@@ -24369,7 +24369,7 @@ export const UI_LABELS = {
   },
   "interface.romm_import_configuration_updated_3d0b690e": {
     es: "Configuración de importación RomM actualizada.",
-    "zh-Hans": "更新 RomM 导入配置 。",
+    "zh-Hans": "RomM 导入配置已更新。",
     hi: "RomM आयात विन्यास अद्यतन।",
     de: "RomM Import Konfiguration aktualisiert.",
     ja: "RomM のインポート設定が更新されました。",
@@ -24465,7 +24465,7 @@ export const UI_LABELS = {
   },
   "interface.route_rom_imports_to_romm_a0a2b6a0": {
     es: "Dirigir las importaciones de ROM a RomM",
-    "zh-Hans": "路线 ROM 导入到 RomM",
+    "zh-Hans": "将 ROM 导入路由至 RomM",
     hi: "रूट रॉम को आयात करता है RomM",
     de: "Einfuhren von Route-ROM nach RomM",
     ja: "RomMへのルートROMの輸入",
@@ -24961,7 +24961,7 @@ export const UI_LABELS = {
   },
   "interface.scanned_16cba0ea": {
     es: "escaneado ·",
-    "zh-Hans": "扫描 ?",
+    "zh-Hans": "已扫描 ·",
     hi: "स्कैन",
     de: "gescannt ·",
     ja: "スキャンされた ·",
@@ -25028,7 +25028,7 @@ export const UI_LABELS = {
   },
   "interface.scene_p2p_release_xrel_789e2d0b": {
     es: "Escena/P2P Lanzamiento (xREL)",
-    "zh-Hans": "场景/P2P发布(xREL).",
+    "zh-Hans": "Scene/P2P 发布 (xREL)",
     hi: "दृश्य / P2P रिलीज (xREL)",
     de: "Szene/P2P Release (xREL)",
     ja: "シーン/P2Pリリース(xREL)",
@@ -25382,7 +25382,7 @@ export const UI_LABELS = {
   },
   "interface.seerrng_only_f43364a3": {
     es: "SeerrNG sólo",
-    "zh-Hans": "SeerrNG 仅限",
+    "zh-Hans": "仅限 SeerrNG",
     hi: "SeerrNG केवल",
     de: "Nur SeerrNG",
     ja: "SeerrNG のみ",
@@ -25398,7 +25398,7 @@ export const UI_LABELS = {
   },
   "interface.seerrng_provider_only_df1ed502": {
     es: "Solo proveedor de SeerrNG",
-    "zh-Hans": "SeerrNG 仅提供商",
+    "zh-Hans": "仅限 SeerrNG 提供方接口",
     hi: "केवल SeerrNG प्रदाता",
     de: "Nur SeerrNG-Anbieter",
     ja: "SeerrNGプロバイダのみ",
@@ -25878,7 +25878,7 @@ export const UI_LABELS = {
   },
   "interface.settings_tab_leave_that_list_empty_8b95ecfd": {
     es: "ficha de configuración. Deja esa lista vacía para que todas las plataformas sean elegibles.",
-    "zh-Hans": "设置标签。 保留该列表为空,以使所有平台都符合条件.",
+    "zh-Hans": "设置页中选择的平台。将列表留空可允许所有平台。",
     hi: "सेटिंग्स टैब। उस सूची को खाली करने के लिए सभी प्लेटफार्मों को योग्य बनाने के लिए छोड़ दें।",
     de: "Tab Einstellungen. Lassen Sie diese Liste leer, um alle Plattformen förderfähig zu machen.",
     ja: "設定タブ。 対象となるすべてのプラットフォームを作るために空のリストを残してください。",
@@ -25993,7 +25993,7 @@ export const UI_LABELS = {
   },
   "interface.shelved_5951cb52": {
     es: "archivado",
-    "zh-Hans": "存档",
+    "zh-Hans": "已搁置",
     hi: "रोककर रखे गए",
     de: "zurückgestellt",
     ja: "保留中",
@@ -26009,7 +26009,7 @@ export const UI_LABELS = {
   },
   "interface.shelved_games_shown_38cc4cfc": {
     es: "Juegos archivados mostrados",
-    "zh-Hans": "已显示归档游戏",
+    "zh-Hans": "已显示已搁置的游戏",
     hi: "संग्रहित गेम दिखाए गए",
     de: "Archivierte Spiele anzeigen",
     ja: "保留中のゲームを表示中",
@@ -26057,7 +26057,7 @@ export const UI_LABELS = {
   },
   "interface.show_client_secret_22fa105d": {
     es: "Mostrar secreto del cliente",
-    "zh-Hans": "显示客户端秘密",
+    "zh-Hans": "显示客户端密钥",
     hi: "क्लाइंट रहस्य दिखाएं",
     de: "Client Secret anzeigen",
     ja: "クライアントシークレットを表示する",
@@ -26217,7 +26217,7 @@ export const UI_LABELS = {
   },
   "interface.size_largest_first_0b67b169": {
     es: "Tamaño (mayor primero)",
-    "zh-Hans": "大小( 最大第一)",
+    "zh-Hans": "大小（最大优先）",
     hi: "आकार (सबसे बड़ा पहला)",
     de: "Größe (größte zuerst)",
     ja: "サイズ(最も大きい最初に)",
@@ -26249,7 +26249,7 @@ export const UI_LABELS = {
   },
   "interface.so_questarr_can_resolve_the_remote_6e3f96c6": {
     es: "para que Questarr pueda resolver los caminos remotos correctamente.",
-    "zh-Hans": "因此Questarr 可以正确解决远程路径.",
+    "zh-Hans": "以便 Questarr 能够正确解析远程路径。",
     hi: "इसलिए Questarr दूरस्थ पथ को सही ढंग से हल कर सकता है।",
     de: "Questarr kann die entfernten Pfade korrekt auflösen.",
     ja: "Questarr はリモートパスを正しく解決できます。",
@@ -26281,7 +26281,7 @@ export const UI_LABELS = {
   },
   "interface.sort_add_on_files_into_subfolders_62386462": {
     es: "Ordenar archivos adicionales en subcarpetas",
-    "zh-Hans": "将添加的文件排序为子文件夹",
+    "zh-Hans": "将附加内容文件分类放入子文件夹",
     hi: "ऐड-ऑन फ़ाइलों को सबफ़ोल्डर्स में क्रमबद्ध करें",
     de: "Sortieren von Add-on-Dateien in Unterordnern",
     ja: "サブフォルダにアドオンファイルをソートする",
@@ -26608,7 +26608,7 @@ export const UI_LABELS = {
   },
   "interface.support_on_ko_fi_087c1029": {
     es: "Apoyo a Ko-fi",
-    "zh-Hans": "关于Ko-fi的支持",
+    "zh-Hans": "在 Ko-fi 上支持",
     hi: "को-फाई पर समर्थन",
     de: "Unterstützung für Ko-Fi",
     ja: "Kofiのサポート",
@@ -26672,7 +26672,7 @@ export const UI_LABELS = {
   },
   "interface.sync_from_prowlarr_4d61275d": {
     es: "Sincronización de Prowlarr",
-    "zh-Hans": "同步从 Prowlarr",
+    "zh-Hans": "从 Prowlarr 同步",
     hi: "Prowlarr से सिंक",
     de: "Sync von Prowlarr",
     ja: "Prowlarrから同期",
@@ -26688,7 +26688,7 @@ export const UI_LABELS = {
   },
   "interface.sync_interval_hours_58ef5e61": {
     es: "Intervalo de sincronización (horas)",
-    "zh-Hans": "同步间距( 小时)",
+    "zh-Hans": "同步间隔（小时）",
     hi: "सिंक इंटरवल (घंटे)",
     de: "Sync Interval (Stunden)",
     ja: "同期間隔(時間)",
@@ -26736,7 +26736,7 @@ export const UI_LABELS = {
   },
   "interface.sync_your_steam_wishlist_with_ques_01ad32b4": {
     es: "Sincroniza tu lista de deseos de Steam con QuestarrNG.",
-    "zh-Hans": "同步 Steam 希望列表为 QuestarrNG.",
+    "zh-Hans": "将您的 Steam 愿望单与 QuestarrNG 同步。",
     hi: "अपनी Steam विशलिस्ट को QuestarrNG के साथ सिंक करें।",
     de: "Synchronisieren Sie Ihre Steam-Wishlist mit QuestarrNG.",
     ja: "Steam のウィッシュリストを QuestarrNG と同期します。",
@@ -27013,7 +27013,7 @@ export const UI_LABELS = {
   },
   "interface.these_downloads_require_your_atten_81cdbdc8": {
     es: "Estas descargas requieren tu atención antes de que puedan ser agregadas a tu biblioteca.",
-    "zh-Hans": "这些下载需要您注意才能添加到您的图书馆中 。",
+    "zh-Hans": "这些下载需要您先处理，之后才能添加到游戏库。",
     hi: "लाइब्रेरी में जोड़ने से पहले इन डाउनलोडों पर आपका ध्यान देना ज़रूरी है।",
     de: "Diese Downloads erfordern Ihre Aufmerksamkeit, bevor sie Ihrer Bibliothek hinzugefügt werden können.",
     ja: "これらのダウンロードは、ライブラリに追加できる前に注意が必要です。",
@@ -27584,7 +27584,7 @@ export const UI_LABELS = {
   },
   "interface.typesafe_settings_saved_d705a7f2": {
     es: "Ajustes de TypeSafe guardados",
-    "zh-Hans": "类型安全设置已保存",
+    "zh-Hans": "TypeSafe 设置已保存",
     hi: "TypeSafe सेटिंग्स बचाया",
     de: "TypeSafe Einstellungen gespeichert",
     ja: "TypeSafe の設定を保存しました",
@@ -27600,7 +27600,7 @@ export const UI_LABELS = {
   },
   "interface.unable_to_connect_to_the_server_pl_89f3ed27": {
     es: "Incapaz de conectarse al servidor. Por favor, compruebe su conexión y refresque.",
-    "zh-Hans": "无法连接到服务器 。 请检查您的连接和刷新。",
+    "zh-Hans": "无法连接到服务器。请检查您的连接并刷新。",
     hi: "सर्वर से कनेक्ट करने में असमर्थ। कृपया अपने कनेक्शन की जांच करें और ताज़ा करें।",
     de: "Es kann keine Verbindung zum Server hergestellt werden. Bitte überprüfen Sie Ihre Verbindung und aktualisieren Sie.",
     ja: "サーバーに接続できません。 接続内容をご確認ください。",
@@ -27649,7 +27649,7 @@ export const UI_LABELS = {
   },
   "interface.unique_devs_d75ebf8e": {
     es: "Desarrolladores únicos",
-    "zh-Hans": "独一无二的 Devs",
+    "zh-Hans": "不同开发商数量",
     hi: "अनोखा देव",
     de: "Einzigartige Entwickler",
     ja: "ユニークなデベロッパー",
@@ -28151,7 +28151,7 @@ export const UI_LABELS = {
   },
   "interface.using_the_saved_key_type_a_new_one_d7e5b4d5": {
     es: "Usando la clave guardada. Escribe una nueva para reemplazarla.",
-    "zh-Hans": "使用已保存的密钥 。 输入新的一个来替换它。",
+    "zh-Hans": "使用已保存的密钥。输入新的密钥以替换它。",
     hi: "बचाया कुंजी का उपयोग करना। इसे बदलने के लिए एक नया टाइप करें।",
     de: "Verwenden Sie den gespeicherten Schlüssel. Geben Sie eine neue ein, um sie zu ersetzen.",
     ja: "保存されたキーを使用して。 交換する新しいものをタイプして下さい。",
@@ -28360,7 +28360,7 @@ export const UI_LABELS = {
   "interface.when_a_download_finishes_questarr_ac7cc33d": {
     es: "Cuando una descarga termina, Questarr se ejecuta automáticamente a través de los siguientes pasos: ninguna acción manual necesaria a menos que un paso requiera su entrada.",
     "zh-Hans":
-      "当一个下载完成后,Questarr会自动通过以下步骤运行——除非一个步骤需要您输入,否则不需要手动操作.",
+      "当一个下载完成后，Questarr 会自动执行以下步骤——除非某个步骤需要您输入，否则无需手动操作。",
     hi: "जब एक डाउनलोड खत्म होता है, तो Questarr स्वचालित रूप से निम्नलिखित चरणों के माध्यम से चलता है - कोई मैनुअल कार्रवाई की जरूरत नहीं है जब तक कि कोई कदम आपके इनपुट की आवश्यकता न हो।",
     de: "Wenn ein Download beendet ist, läuft Questarr automatisch durch die folgenden Schritte - keine manuelle Aktion erforderlich, es sei denn, ein Schritt erfordert Ihre Eingabe.",
     ja: "ダウンロードが完了すると Questarr が次の手順を自動で処理します。入力が必要な手順がある場合のみ、操作してください。",
@@ -28566,7 +28566,7 @@ export const UI_LABELS = {
   },
   "interface.you_are_using_a_self_signed_certif_5b0da1ed": {
     es: "Estás usando un certificado auto-firmado. Puedes renovarlo si está caducado o está a punto de expirar.",
-    "zh-Hans": "您正在使用自签证书 。 过期或即将过期的,可以续约.",
+    "zh-Hans": "您正在使用自签名证书。如果已过期或即将过期，您可以续期。",
     hi: "आप स्वयं हस्ताक्षरित प्रमाणपत्र का उपयोग कर रहे हैं। अगर यह समाप्त हो गया है या समाप्त होने के बारे में आप इसे नवीनीकृत कर सकते हैं।",
     de: "Sie verwenden ein selbstsigniertes Zertifikat. Sie können es erneuern, wenn es abgelaufen ist oder kurz vor dem Ablauf steht.",
     ja: "自己署名証明書を使用しています。 期限切れや期限切れの場合は更新できます。",
@@ -28585,7 +28585,7 @@ export const UI_LABELS = {
   },
   "interface.you_can_submit_up_to_5_log_bundles_a8a4edf9": {
     es: "Puede enviar hasta 5 paquetes de registro por hora por dirección IP.",
-    "zh-Hans": "每个IP地址每小时最多可以提交5个日志捆.",
+    "zh-Hans": "每个 IP 地址每小时最多可以提交 5 个日志包。",
     hi: "प्रति IP पते से हर घंटे अधिकतम 5 लॉग बंडल भेज सकते हैं",
     de: "Sie können bis zu 5 Log-Bundles pro Stunde pro IP-Adresse einreichen.",
     ja: "IP アドレスごとに最大 5 個のログバンドルを 1 時間まで送信できます。",
@@ -28633,7 +28633,7 @@ export const UI_LABELS = {
   },
   "interface.your_library_filtering_defaults_ha_e91bb012": {
     es: "Se guardaron los valores predeterminados de los filtros de la biblioteca.",
-    "zh-Hans": "您的库过滤默认已被保存 。",
+    "zh-Hans": "您的库过滤默认设置已保存。",
     hi: "आपकी लाइब्रेरी फ़िल्टरिंग डिफॉल्ट्स को बचाया गया है।",
     de: "Ihre Bibliothek Filterstandards wurden gespeichert.",
     ja: "ライブラリフィルタのデフォルトは保存されています。",
@@ -29308,7 +29308,7 @@ export const UI_LABELS = {
   },
   "interface.options_for_value_0c5a914b": {
     es: "Opciones para {value}",
-    "zh-Hans": "备选方案 {value}",
+    "zh-Hans": "{value} 的选项",
     hi: "विकल्प {value}",
     de: "Optionen für {value}",
     ja: "オプション {value}",
@@ -29340,7 +29340,7 @@ export const UI_LABELS = {
   },
   "interface.recheck_health_of_path_40380028": {
     es: "Volver a comprobar el estado de {path}",
-    "zh-Hans": "重新检查健康状况 {path}",
+    "zh-Hans": "重新检查 {path} 的健康状况",
     hi: "स्वास्थ्य की जाँच करें {path}",
     de: "Überprüfen Sie die Gesundheit von {path}",
     ja: "健康チェック {path}",
@@ -29388,7 +29388,7 @@ export const UI_LABELS = {
   },
   "interface.remove_title_from_blacklist_36f68958": {
     es: "Retirar {title} de la lista negra",
-    "zh-Hans": "删除 {title} 从黑名单",
+    "zh-Hans": "从黑名单中移除 {title}",
     hi: "निकालें {title} ब्लैकलिस्ट से",
     de: "Entfernen {title} von Blacklist",
     ja: "削除 {title} ブラックリストから",
@@ -29644,7 +29644,7 @@ export const UI_LABELS = {
   },
   "interface.length_drifted_length2_orphaned_0fc153d0": {
     es: "{length} a la deriva, {length2} huérfanos",
-    "zh-Hans": "{length} 漂浮着, {length2} 孤儿",
+    "zh-Hans": "{length} 个路径不存在，{length2} 个文件夹未关联游戏",
     hi: "{length} बहाव, {length2} अनाथन",
     de: "{length} treibend, {length2} verwaist",
     ja: "{length} 件がずれ、{length2} 件が未紐付け",
@@ -29916,7 +29916,7 @@ export const UI_LABELS = {
   },
   "interface.indexer_errors_count_7e2cd7f4": {
     es: "Errores de indexador: {count}",
-    "zh-Hans": "索引错误 : {count}",
+    "zh-Hans": "索引器错误：{count}",
     hi: "सूचक त्रुटि: {count}",
     de: "Indexerfehler: {count}",
     ja: "インデックスエラー: {count}",
@@ -33670,7 +33670,7 @@ export const UI_LABELS = {
   },
   "interface.match_52951b36": {
     es: "Coincidencia",
-    "zh-Hans": "匹配方式",
+    "zh-Hans": "匹配",
     hi: "मिलान",
     de: "Abgleich",
     ja: "照合方法",
@@ -36896,5 +36896,21 @@ export const UI_LABELS = {
     id: "Perlu menautkan game",
     "es-419": "Se requiere vincular un juego",
     "fr-CA": "Association à un jeu requise",
+  },
+  "imports.start_time": {
+    es: "Hora de inicio",
+    "zh-Hans": "开始时间",
+    hi: "शुरू होने का समय",
+    de: "Startzeit",
+    ja: "開始時刻",
+    fr: "Heure de début",
+    "pt-BR": "Horário de início",
+    ar: "وقت البدء",
+    ko: "시작 시간",
+    "zh-Hant": "開始時間",
+    vi: "Thời gian bắt đầu",
+    id: "Waktu mulai",
+    "es-419": "Hora de inicio",
+    "fr-CA": "Heure de début",
   },
 } as const;

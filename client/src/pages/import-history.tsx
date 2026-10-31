@@ -1,4 +1,8 @@
-import { getRegionalLocale } from "@/lib/regional-format";
+import {
+  formatRegionalUnit,
+  getRegionalLocale,
+  useRegionalPreference,
+} from "@/lib/regional-format";
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ClipboardList, CheckCircle, AlertTriangle, XCircle, Clock, Loader2 } from "lucide-react";
@@ -135,10 +139,12 @@ function formatDuration(
   if (!start) return "—";
   const end = toMs(completedAt) ?? Date.now();
   const secs = Math.round((end - start) / 1000);
-  if (secs < 60) return `${secs}s`;
+  const seconds = (value: number) => formatRegionalUnit(value, "second", { unitDisplay: "narrow" });
+  if (secs < 60) return seconds(secs);
   const mins = Math.floor(secs / 60);
   const rem = secs % 60;
-  return rem > 0 ? `${mins}m ${rem}s` : `${mins}m`;
+  const minutes = formatRegionalUnit(mins, "minute", { unitDisplay: "narrow" });
+  return rem > 0 ? `${minutes} ${seconds(rem)}` : minutes;
 }
 
 function formatDate(ts: Date | string | number | null | undefined): string {
@@ -150,6 +156,7 @@ function formatDate(ts: Date | string | number | null | undefined): string {
 type TaskWithItems = ImportTask & { items: ImportTaskItem[] };
 
 export default function ImportHistoryPage() {
+  useRegionalPreference();
   const queryClient = useQueryClient();
   const { language, t, languageFor, directionFor } = useInterfaceLanguage();
   const header = (source: string) => (
@@ -227,7 +234,7 @@ export default function ImportHistoryPage() {
                     {header("Status")}
                   </th>
                   <th className="text-start px-4 py-3 text-slate-400 font-medium">
-                    {header("Started")}
+                    {header("imports.start_time")}
                   </th>
                   <th className="text-start px-4 py-3 text-slate-400 font-medium">
                     {header("Created")}
