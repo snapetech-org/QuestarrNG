@@ -208,7 +208,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Failed to update TypeSafe settings": "Gagal memperbarui pengaturan TypeSafe",
   "Failed to clear TypeSafe settings": "Gagal menghapus pengaturan TypeSafe",
   "Failed to look up NexusMods game domain": "Gagal mencari domain game di NexusMods",
-  "Failed to fetch NexusMods trending mods": "Gagal mengambil mod populer NexusMods",
+  "Failed to fetch NexusMods trending mods": "Gagal mengambil mod yang sedang tren di NexusMods",
   "Not found": "Tidak ditemukan",
   "Failed to list API keys": "Gagal menampilkan kunci API",
   "Failed to create API key": "Gagal membuat kunci API",
