@@ -3,6 +3,17 @@ name: Deprecated Dependencies
 
 on:
   workflow_dispatch:
+    inputs:
+      action:
+        description: Required manual workflow action
+        type: choice
+        options: [ci]
+        required: true
+      runner_pool:
+        description: Required private JIT runner pool
+        type: choice
+        options: [private]
+        required: true
 
   push:
     tags:
@@ -16,6 +27,18 @@ permissions:
 
 jobs:
   check-deprecated:
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'ci' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        true
+      )
     runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-check-deprecated"]}}', github.run_id)) }}
 
     steps:

@@ -6,6 +6,17 @@ on:
     tags:
       - '**'
   workflow_dispatch:
+    inputs:
+      action:
+        description: Required manual workflow action
+        type: choice
+        options: [ci]
+        required: true
+      runner_pool:
+        description: Required private JIT runner pool
+        type: choice
+        options: [private]
+        required: true
 
 # Keep each run's result attached to its exact candidate; newer pushes must not
 # cancel builds already in progress.
@@ -19,8 +30,19 @@ permissions:
 jobs:
   release-notes:
     name: Release-note contract
-    if: github.event_name == 'pull_request' && github.event.pull_request.user.type != 'Bot'
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'ci' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        github.event_name == 'pull_request' && github.event.pull_request.user.type != 'Bot'
+      )
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-release-notes"]}}', github.run_id)) }}
     permissions:
       contents: read
 
@@ -56,7 +78,19 @@ jobs:
   # None of these steps needs native modules built, so lifecycle scripts (arbitrary code
   # from transitive deps) are skipped.
   sca-scan:
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'ci' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        true
+      )
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-sca-scan"]}}', github.run_id)) }}
     permissions:
       contents: read
       pull-requests: read
@@ -109,7 +143,19 @@ jobs:
         run: npm run check:licenses
 
   windows-service:
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'ci' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        true
+      )
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-windows-service"]}}', github.run_id)) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -186,7 +232,19 @@ jobs:
   # Pull requests run app tests on GitHub-hosted runners; only trusted main runs
   # use the isolated shared runner pool.
   test:
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'ci' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        true
+      )
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-test"]}}', github.run_id)) }}
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -253,7 +311,19 @@ jobs:
 
   build:
     name: Build and check on Node ${{ matrix.node-version }}
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'ci' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        true
+      )
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-{1}-build"]}}', github.run_id, strategy.job-index)) }}
 
     # PRs build on the minimum supported Node only (tests already run on 26.x);
     # pushes to main/release also build on 26.x.
@@ -304,10 +374,21 @@ jobs:
 
   docker-build:
     env:
-      BUILDKIT_EGRESS_PROXY: ${{ (vars.NG_HOSTED_FIRST != 'true' || vars.NG_FORCE_JIT == 'true' || github.run_attempt > 1) && (contains(fromJSON('["push","workflow_dispatch","schedule","release","repository_dispatch"]'), github.event_name) && (github.ref == 'refs/heads/main' || (github.ref_type == 'tag' && startsWith(github.ref_name, 'v')))) && 'http://10.0.2.100:3128' || '' }}
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+      BUILDKIT_EGRESS_PROXY: ${{ (contains(fromJSON('["push","workflow_dispatch","schedule","release","repository_dispatch"]'), github.event_name) && (github.ref == 'refs/heads/main' || (github.ref_type == 'tag' && startsWith(github.ref_name, 'v')))) && 'http://10.0.2.100:3128' || '' }}
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-docker-build"]}}', github.run_id)) }}
     needs: [sca-scan, build, test]
-    if: needs.sca-scan.outputs.docker == 'true'
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'ci' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        needs.sca-scan.outputs.docker == 'true'
+      )
 
     steps:
       - name: Harden the runner (Audit all outbound calls)

@@ -8,6 +8,17 @@ name: Real stack
 # Slow (real daemons, a minute per download check), so it runs on release tags or on demand.
 on:
   workflow_dispatch:
+    inputs:
+      action:
+        description: Required manual workflow action
+        type: choice
+        options: [ci]
+        required: true
+      runner_pool:
+        description: Required private JIT runner pool
+        type: choice
+        options: [private]
+        required: true
   push:
     tags:
       - '**'
@@ -21,6 +32,18 @@ permissions:
 jobs:
   stack:
     name: Real-stack journey
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'ci' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        true
+      )
     runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-stack"]}}', github.run_id)) }}
     timeout-minutes: 25
 

@@ -6,6 +6,17 @@ on:
     tags:
       - '**'
   workflow_dispatch:
+    inputs:
+      action:
+        description: Required manual workflow action
+        type: choice
+        options: [ci]
+        required: true
+      runner_pool:
+        description: Required private JIT runner pool
+        type: choice
+        options: [private]
+        required: true
 
 concurrency:
   group: ng-scan-dast-${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
@@ -19,6 +30,18 @@ jobs:
     name: OWASP ZAP baseline scan
     # ZAP's action starts a container; the repository JIT runner intentionally
     # has no Docker daemon, so this scan runs on a Docker-capable hosted runner.
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'ci' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        true
+      )
     runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-zap-baseline"]}}', github.run_id)) }}
     timeout-minutes: 20
 

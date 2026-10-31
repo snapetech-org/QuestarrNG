@@ -4,6 +4,16 @@ name: Deploy Web App
 on:
   workflow_dispatch:
     inputs:
+      action:
+        description: Required manual workflow action
+        type: choice
+        options: [publish]
+        required: true
+      runner_pool:
+        description: Required private JIT runner pool
+        type: choice
+        options: [private]
+        required: true
       environment:
         description: "Development or test image channel"
         required: true
@@ -48,6 +58,18 @@ jobs:
   # ci.yml) so a fresh advisory published after `main` was merged still
   # blocks the release.
   sca-gate:
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'publish' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        true
+      )
     runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-sca-gate"]}}', github.run_id)) }}
 
     steps:
@@ -77,6 +99,18 @@ jobs:
         run: npm run check:licenses
 
   build-and-push:
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'publish' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        true
+      )
     runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-build-and-push"]}}', github.run_id)) }}
     environment: ${{ inputs.environment == 'test' && 'test' || 'dev' }}
     needs: sca-gate

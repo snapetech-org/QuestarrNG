@@ -12,7 +12,7 @@ permissions:
 jobs:
   create-release:
     if: github.repository == 'snapetech-org/QuestarrNG'
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-create-release"]}}', github.run_id)) }}
     permissions:
       contents: write
 

@@ -7,7 +7,18 @@
 # Source repository: https://github.com/actions/dependency-review-action
 name: "Dependency Review"
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Required manual workflow action
+        type: choice
+        options: [ci]
+        required: true
+      runner_pool:
+        description: Required private JIT runner pool
+        type: choice
+        options: [private]
+        required: true
 concurrency:
   group: dependency-review-${{ github.event.pull_request.number }}
   cancel-in-progress: false
@@ -17,7 +28,18 @@ permissions:
 
 jobs:
   dependency-review:
-    if: github.event_name == 'pull_request'
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'ci' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        github.event_name == 'pull_request'
+      )
     runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-dependency-review"]}}', github.run_id)) }}
     steps:
       - name: Harden the runner (Audit all outbound calls)

@@ -7,6 +7,17 @@ name: Scorecard supply-chain security
 on:
   branch_protection_rule:
   workflow_dispatch:
+    inputs:
+      action:
+        description: Required manual workflow action
+        type: choice
+        options: [ci]
+        required: true
+      runner_pool:
+        description: Required private JIT runner pool
+        type: choice
+        options: [private]
+        required: true
   # To guarantee Maintained check is occasionally updated. See
   # https://github.com/ossf/scorecard/blob/main/docs/checks.md#maintained
   push:
@@ -26,7 +37,18 @@ jobs:
     # runner used by other main-branch jobs does not provide Docker.
     runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-analysis"]}}', github.run_id)) }}
     # `publish_results: true` only works when run from the default branch. conditional can be removed if disabled.
-    if: github.event.repository.default_branch == github.ref_name || github.event_name == 'pull_request'
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'ci' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        github.event.repository.default_branch == github.ref_name || github.event_name == 'pull_request'
+      )
     permissions:
       # Needed to upload the results to code-scanning dashboard.
       security-events: write

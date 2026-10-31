@@ -6,6 +6,16 @@ on:
     tags: ["v*"]
   workflow_dispatch:
     inputs:
+      action:
+        description: Required manual workflow action
+        type: choice
+        options: [smoke]
+        required: true
+      runner_pool:
+        description: Required private JIT runner pool
+        type: choice
+        options: [private]
+        required: true
       announce_release_tag:
         description: Announce an already-published release without rebuilding the image
         required: false
@@ -26,8 +36,19 @@ concurrency:
 
 jobs:
   release-security:
-    if: github.repository_id == '1388297896' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'smoke' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        github.repository_id == '1388297896' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+      )
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-release-security"]}}', github.run_id)) }}
     permissions:
       contents: read
       security-events: read
@@ -91,7 +112,18 @@ jobs:
         run: node scripts/check-release-security.mjs
 
   build-source-image:
-    if: github.repository_id == '1388297896' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'smoke' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        github.repository_id == '1388297896' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+      )
     needs: release-security
     strategy:
       fail-fast: false
@@ -99,11 +131,11 @@ jobs:
         include:
           - arch: amd64
             platform: linux/amd64
-            runner: ubuntu-24.04
+            runner: linux-x64
           - arch: arm64
             platform: linux/arm64
-            runner: ubuntu-24.04-arm
-    runs-on: ${{ matrix.runner == 'ubuntu-24.04' && fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-{1}-build-source-image"]}}', github.run_id, strategy.job-index)) || fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","arm64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-{1}-build-source-image"]}}', github.run_id, strategy.job-index)) }}
+            runner: linux-arm64
+    runs-on: ${{ matrix.runner == 'linux-x64' && fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-{1}-build-source-image"]}}', github.run_id, strategy.job-index)) || fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","arm64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-{1}-build-source-image"]}}', github.run_id, strategy.job-index)) }}
     permissions:
       contents: read
       packages: write
@@ -164,11 +196,22 @@ jobs:
           retention-days: 1
 
   publish:
-    if: github.repository_id == '1388297896' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'smoke' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        github.repository_id == '1388297896' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+      )
     needs: [release-security, build-source-image]
     env:
       TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db:2
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-publish"]}}', github.run_id)) }}
     permissions:
       contents: read
       packages: write
@@ -352,9 +395,20 @@ jobs:
           test "$(docker exec questarrng-rootless-smoke id -u)" = "1000"
 
   addon-smoke:
-    if: github.repository_id == '1388297896'
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'smoke' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        github.repository_id == '1388297896'
+      )
     needs: publish
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-addon-smoke"]}}', github.run_id)) }}
     permissions:
       contents: read
       packages: read
@@ -414,9 +468,20 @@ jobs:
       release_tag: ${{ github.ref_name }}
 
   release:
-    if: github.repository_id == '1388297896' && startsWith(github.ref, 'refs/tags/v')
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'smoke' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        github.repository_id == '1388297896' && startsWith(github.ref, 'refs/tags/v')
+      )
     needs: [publish, addon-smoke, build-windows-installer]
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-release"]}}', github.run_id)) }}
     permissions:
       actions: read
       contents: write
@@ -664,9 +729,20 @@ jobs:
 
   sync-release-metadata:
     name: Sync release metadata directly to main
-    if: github.repository_id == '1388297896' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && needs.release.result == 'success' && needs.publish.result == 'success'
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'smoke' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        github.repository_id == '1388297896' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && needs.release.result == 'success' && needs.publish.result == 'success'
+      )
     needs: [release, publish]
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-sync-release-metadata"]}}', github.run_id)) }}
     permissions:
       contents: write
     env:
@@ -713,10 +789,21 @@ jobs:
           git push origin HEAD:refs/heads/main
 
   finalize-release:
-    if: github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.finalize_release_tag != ''
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'smoke' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.finalize_release_tag != ''
+      )
     env:
       TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db:2
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-finalize-release"]}}', github.run_id)) }}
     permissions:
       actions: read
       contents: write
@@ -1082,9 +1169,20 @@ jobs:
 
   sync-finalized-metadata:
     name: Sync recovered release metadata directly to main
-    if: github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.finalize_release_tag != '' && needs['finalize-release'].result == 'success'
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'smoke' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.finalize_release_tag != '' && needs['finalize-release'].result == 'success'
+      )
     needs: [finalize-release]
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-sync-finalized-metadata"]}}', github.run_id)) }}
     permissions:
       contents: write
     env:
@@ -1134,8 +1232,19 @@ jobs:
   announce-release:
     name: Announce release to Discord
     needs: [release, finalize-release, sync-finalized-metadata]
-    if: ${{ always() && github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && ((inputs.finalize_release_tag == '' && inputs.announce_release_tag != '') || (inputs.finalize_release_tag != '' && needs['finalize-release'].result == 'success' && needs['sync-finalized-metadata'].result == 'success')) }}
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'smoke' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        always() && github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && ((inputs.finalize_release_tag == '' && inputs.announce_release_tag != '') || (inputs.finalize_release_tag != '' && needs['finalize-release'].result == 'success' && needs['sync-finalized-metadata'].result == 'success'))
+      )
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-announce-release"]}}', github.run_id)) }}
     environment:
       name: discord-release
     permissions:
