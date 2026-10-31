@@ -269,7 +269,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Screenshot not found": "スクリーンショットが見つかりません",
   "Screenshot file not found": "スクリーンショットファイルが見つかりません",
   "Failed to fetch screenshot": "スクリーンショットを取得できませんでした",
-  "Invalid caption": "captionが無効です",
+  "Invalid caption": "キャプションが無効です",
   "Failed to update screenshot": "スクリーンショットを更新できませんでした",
   "steamAppId must be a positive integer": "steamAppIdは正の整数である必要があります",
   "Authentication required": "認証が必要です",

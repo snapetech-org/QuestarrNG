@@ -283,7 +283,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Screenshot not found": "Capture d’écran introuvable",
   "Screenshot file not found": "Fichier de capture d’écran introuvable",
   "Failed to fetch screenshot": "Impossible de récupérer la capture d’écran",
-  "Invalid caption": "Le champ caption est invalide",
+  "Invalid caption": "La légende est invalide",
   "Failed to update screenshot": "Impossible de mettre à jour la capture d’écran",
   "steamAppId must be a positive integer": "steamAppId doit être un entier positif",
   "Authentication required": "Authentification requise",

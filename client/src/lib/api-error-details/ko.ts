@@ -247,7 +247,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
     "탐색할 수 있도록 구성된 라이브러리 경로가 없습니다",
   "Invalid path: absolute host paths are not allowed":
     "잘못된 경로: 호스트의 절대 경로는 허용되지 않습니다",
-  "Invalid path: traversal detected": "잘못된 경로: 경로 이동이 감지되었습니다",
+  "Invalid path: traversal detected": "잘못된 경로: 디렉터리 트래버설이 감지되었습니다",
   "Steam ID is required": "Steam ID가 필요합니다",
   "Invalid Steam ID format (must be 17 digits starting with 7656)":
     "Steam ID 형식이 올바르지 않습니다(7656으로 시작하는 17자리여야 함)",

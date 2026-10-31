@@ -6,4 +6,4 @@ action: none
 breaking: false
 ---
 
-QuestarrNG adds interface text in twelve languages with English fallback; game titles and external values stay intact. Delayed-release, content-available, import-recovery, and review-flagged notifications have translated titles and messages. 58 fixed API errors and five success messages are translated; dynamic domains and counts stay intact. Native-speaker review remains outstanding.
+QuestarrNG adds interface text in twelve languages with English fallback. Game titles and external values stay intact. Release, content-available, import-recovery, and review notifications have translated titles and messages. API-key, screenshot-caption, token, and directory-traversal errors use consistent localized terms. Native-speaker review remains outstanding.
