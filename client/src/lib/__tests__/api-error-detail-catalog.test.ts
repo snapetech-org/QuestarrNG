@@ -244,4 +244,10 @@ describe("API error detail source catalog", () => {
       "Der Zertifikatsinhalt konnte nicht geparst werden"
     );
   });
+
+  it("uses the Hindi API key term from the in-app revoke action", () => {
+    expect(getApiErrorDetailLabel("Failed to revoke API key", "hi")).toBe(
+      "API कुंजी रद्द नहीं की जा सकी"
+    );
+  });
 });

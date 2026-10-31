@@ -213,7 +213,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Failed to list API keys": "API कुंजियाँ सूचीबद्ध नहीं की जा सकीं",
   "Failed to create API key": "API key बनाई नहीं जा सकी",
   "API key not found": "API key नहीं मिली",
-  "Failed to revoke API key": "API key रद्द नहीं की जा सकी",
+  "Failed to revoke API key": "API कुंजी रद्द नहीं की जा सकी",
   Unauthorized: "अनधिकृत अनुरोध",
   "Failed to fetch platform mappings": "प्लेटफ़ॉर्म मैपिंग प्राप्त नहीं की जा सकीं",
   "Failed to create platform mapping": "प्लेटफ़ॉर्म मैपिंग बनाई नहीं जा सकी",
