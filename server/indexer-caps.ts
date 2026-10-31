@@ -38,6 +38,13 @@ export const DEFAULT_GAME_CATEGORIES: readonly IndexerCapsCategory[] = Object.fr
 // search-adjacent code path hang too long before falling back to defaults.
 export const CAPS_DISCOVERY_TIMEOUT_MS = 15000;
 
+export type CapsCategorySource = "discovered" | "fallback";
+
+export interface CapsCategoryDiscoveryResult<T> {
+  categories: T[];
+  source: CapsCategorySource;
+}
+
 // Default search categories used when an indexer has no categories
 // configured at all. 4000: PC Games, 1000: Console Games.
 export const DEFAULT_SEARCH_CATEGORY_IDS = ["4000", "1000"] as const;
@@ -187,7 +194,7 @@ export async function discoverCapsCategories<T>(options: {
   fallback: readonly T[];
   logger: CapsDiscoveryLogger;
   protocolName: string;
-}): Promise<T[]> {
+}): Promise<CapsCategoryDiscoveryResult<T>> {
   await options.assertAllowed();
 
   // One overall deadline shared across every caps URL candidate, not a
@@ -221,7 +228,7 @@ export async function discoverCapsCategories<T>(options: {
       const xmlText = await response.text();
       const categories = options.parseCaps(xmlText);
       if (categories.length > 0) {
-        return categories;
+        return { categories, source: "discovered" };
       }
       // Parsed successfully but no categories were listed -- not worth
       // retrying other URL variants for, but also not a hard failure.
@@ -235,5 +242,5 @@ export async function discoverCapsCategories<T>(options: {
     { indexer: options.indexer.name, error: lastError },
     `${options.protocolName} caps discovery failed for all URL variants; falling back to default game categories`
   );
-  return [...options.fallback];
+  return { categories: [...options.fallback], source: "fallback" };
 }

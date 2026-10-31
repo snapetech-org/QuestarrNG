@@ -133,7 +133,7 @@ describe("AuthProvider", () => {
     expect(setLocationMock).not.toHaveBeenCalledWith("/setup");
   });
 
-  it("loads the authenticated user from /api/auth/me when a token exists", async () => {
+  it("prefers the cookie session over a legacy localStorage token", async () => {
     localStorage.setItem("token", "existing-token");
     mockApiFetch.mockImplementation(async (url: string) => {
       if (url.includes("/api/auth/status")) return jsonResponse(200, { hasUsers: true });
@@ -148,6 +148,31 @@ describe("AuthProvider", () => {
     await waitFor(() => {
       expect(screen.getByTestId("user")).toHaveTextContent("tester");
     });
+    expect(mockApiFetch.mock.calls.filter(([url]) => url === "/api/auth/me")).toHaveLength(1);
+    expect(mockSetBearerToken).not.toHaveBeenCalledWith("existing-token");
+    expect(localStorage.getItem("token")).toBeNull();
+  });
+
+  it("uses a legacy bearer token only after the cookie session is rejected", async () => {
+    localStorage.setItem("token", "legacy-token");
+    mockApiFetch.mockImplementation(async (url: string) => {
+      if (url.includes("/api/auth/status")) return jsonResponse(200, { hasUsers: true });
+      if (url.includes("/api/auth/me")) {
+        return mockApiFetch.mock.calls.filter(([callUrl]) => callUrl === "/api/auth/me").length === 1
+          ? jsonResponse(401, {})
+          : jsonResponse(200, { id: "u2", username: "legacyuser" });
+      }
+      return jsonResponse(404, {});
+    });
+
+    renderAuth(createClient());
+
+    await waitFor(() => {
+      expect(screen.getByTestId("user")).toHaveTextContent("legacyuser");
+    });
+    expect(mockApiFetch.mock.calls.filter(([url]) => url === "/api/auth/me")).toHaveLength(2);
+    expect(mockSetBearerToken).toHaveBeenLastCalledWith("legacy-token");
+    expect(localStorage.getItem("token")).toBeNull();
   });
 
   it("clears the in-memory bearer session when /api/auth/me returns 401", async () => {
@@ -160,7 +185,7 @@ describe("AuthProvider", () => {
 
     renderAuth(createClient());
 
-    // Migrated once synchronously on mount (with the legacy token)...
+    // The cookie-only attempt is followed by one legacy bearer attempt...
     await waitFor(() => {
       expect(mockSetBearerToken).toHaveBeenCalledWith("stale-token");
     });
@@ -252,7 +277,7 @@ describe("AuthProvider", () => {
 
     renderAuth(createClient());
 
-    // Migrated on mount.
+    // The legacy token is used only after the cookie-only request is rejected.
     await waitFor(() => {
       expect(mockSetBearerToken).toHaveBeenCalledWith("stale-legacy-token");
     });

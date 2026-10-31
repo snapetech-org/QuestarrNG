@@ -19,7 +19,11 @@ vi.mock("../ssrf.js", () => ({
   safeFetch: vi.fn(),
 }));
 vi.mock("../steam-routes.js", () => ({
-  steamRoutes: (_req: unknown, _res: unknown, next: () => void) => next(),
+  steamRoutes: (
+    _req: import("express").Request,
+    _res: import("express").Response,
+    next: import("express").NextFunction
+  ) => next(),
 }));
 
 vi.mock("../auth.js", () => ({

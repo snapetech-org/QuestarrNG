@@ -16,6 +16,7 @@ import {
   useInterfaceLanguage,
 } from "@/lib/interface-locale";
 import type { InterfaceLanguage } from "@/lib/interface-locale";
+import { UI_LABELS } from "@/lib/ui-labels";
 
 describe("browser interface language detection", () => {
   it.each([
@@ -236,6 +237,21 @@ describe("browser interface language detection", () => {
     } finally {
       setItem.mockRestore();
       setInterfaceLanguage("en");
+    }
+  });
+});
+
+describe("indexer category fallback notice localization", () => {
+  const source =
+    "The provider did not return its category list. These are suggestions; confirm the categories with your provider before selecting them.";
+
+  it("provides a translation in every supported interface language", () => {
+    const labels = UI_LABELS as Record<string, Partial<Record<InterfaceLanguage, string>>>;
+
+    for (const { value: language } of INTERFACE_LANGUAGE_OPTIONS) {
+      if (language === "en") continue;
+      expect(getInterfaceTextLanguage(source, language)).toBe(language);
+      expect(labels[source]?.[language]).toBeTruthy();
     }
   });
 });

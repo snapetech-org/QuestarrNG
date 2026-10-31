@@ -261,6 +261,19 @@ describe("NewznabClient", () => {
       );
     });
 
+    it("reports whether category results came from caps discovery", async () => {
+      (isSafeUrl as Mock).mockResolvedValue(true);
+      (safeFetch as Mock).mockResolvedValue({
+        ok: true,
+        text: async () => mockCapsXml,
+      });
+
+      const result = await newznabClient.getCategoriesResult(mockIndexer);
+
+      expect(result.source).toBe("discovered");
+      expect(result.categories).toHaveLength(5);
+    });
+
     it("falls back to default game categories instead of throwing when caps discovery fails entirely", async () => {
       (isSafeUrl as Mock).mockResolvedValue(true);
       (safeFetch as Mock).mockRejectedValue(new Error("ECONNREFUSED"));
@@ -268,6 +281,15 @@ describe("NewznabClient", () => {
       const categories = await newznabClient.getCategories(mockIndexer);
 
       expect(categories).toEqual(DEFAULT_GAME_CATEGORIES);
+    });
+
+    it("marks default categories as suggestions when caps discovery fails", async () => {
+      (isSafeUrl as Mock).mockResolvedValue(true);
+      (safeFetch as Mock).mockRejectedValue(new Error("ECONNREFUSED"));
+
+      const result = await newznabClient.getCategoriesResult(mockIndexer);
+
+      expect(result).toEqual({ categories: DEFAULT_GAME_CATEGORIES, source: "fallback" });
     });
 
     it("tries a second caps URL variant when the first one fails outright", async () => {

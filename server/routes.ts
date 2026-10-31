@@ -4208,8 +4208,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       if (indexer.protocol === "json-catalog") return res.json([]);
       const categoriesClient = isUsenetProtocol(indexer.protocol) ? newznabClient : torznabClient;
-      const categories = await categoriesClient.getCategories(indexer);
-      return res.json(categories);
+      const result = await categoriesClient.getCategoriesResult(indexer);
+      res.setHeader("X-Questarr-Category-Source", result.source);
+      return res.json(result.categories);
     } catch (error) {
       routesLogger.error({ error }, "error getting categories");
       return res.status(500).json({ error: "Failed to get categories" });

@@ -2,6 +2,7 @@ import { XMLParser } from "fast-xml-parser";
 import { type Indexer } from "@shared/schema";
 import {
   DEFAULT_GAME_CATEGORIES,
+  type CapsCategoryDiscoveryResult,
   discoverCapsCategories,
   formatIndexerHttpError,
   indexerAllowsApiKey,
@@ -380,7 +381,9 @@ class NewznabClient {
    * Get available categories from a Newznab indexer. See
    * discoverCapsCategories for the retry/fallback behavior.
    */
-  async getCategories(indexer: Indexer): Promise<NewznabCategory[]> {
+  async getCategoriesResult(
+    indexer: Indexer
+  ): Promise<CapsCategoryDiscoveryResult<NewznabCategory>> {
     return discoverCapsCategories({
       indexer,
       buildApiUrl: this.buildApiUrl.bind(this),
@@ -394,6 +397,10 @@ class NewznabClient {
       logger: routesLogger,
       protocolName: "newznab",
     });
+  }
+
+  async getCategories(indexer: Indexer): Promise<NewznabCategory[]> {
+    return (await this.getCategoriesResult(indexer)).categories;
   }
 
   /**

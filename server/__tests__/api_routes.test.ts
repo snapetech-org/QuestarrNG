@@ -1845,9 +1845,13 @@ describe("API Routes - Extended Coverage", () => {
     describe("GET /api/indexers/:id/categories", () => {
       it("should return categories", async () => {
         vi.mocked(storage.getIndexer).mockResolvedValue({ id: "idx-1" } as unknown as Indexer);
-        vi.mocked(torznabClient.getCategories).mockResolvedValue([]);
+        vi.mocked(torznabClient.getCategoriesResult).mockResolvedValue({
+          categories: [],
+          source: "discovered",
+        });
         const response = await request(app).get("/api/indexers/idx-1/categories");
         expect(response.status).toBe(200);
+        expect(response.headers["x-questarr-category-source"]).toBe("discovered");
       });
 
       it("should return 404 for missing indexer", async () => {
@@ -1861,11 +1865,14 @@ describe("API Routes - Extended Coverage", () => {
           id: "g4u-1",
           protocol: "g4u",
         } as unknown as Indexer);
-        vi.mocked(newznabClient.getCategories).mockResolvedValue([]);
+        vi.mocked(newznabClient.getCategoriesResult).mockResolvedValue({
+          categories: [],
+          source: "discovered",
+        });
         const response = await request(app).get("/api/indexers/g4u-1/categories");
         expect(response.status).toBe(200);
-        expect(newznabClient.getCategories).toHaveBeenCalled();
-        expect(torznabClient.getCategories).not.toHaveBeenCalled();
+        expect(newznabClient.getCategoriesResult).toHaveBeenCalled();
+        expect(torznabClient.getCategoriesResult).not.toHaveBeenCalled();
       });
     });
 

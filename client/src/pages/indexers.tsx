@@ -126,6 +126,7 @@ export default function IndexersPage() {
   const [testingIndexerId, setTestingIndexerId] = useState<string | null>(null);
   const [availableCategories, setAvailableCategories] = useState<MultiSelectOption[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
+  const [categoriesSource, setCategoriesSource] = useState<"discovered" | "fallback" | null>(null);
   const [diagnosingProwlarr, setDiagnosingProwlarr] = useState(false);
   const [prowlarrDiagnostics, setProwlarrDiagnostics] = useState<{
     management: { success: boolean; status?: number; version?: string; error?: string };
@@ -434,10 +435,16 @@ export default function IndexersPage() {
 
   const fetchCategories = async (indexerId: string) => {
     setLoadingCategories(true);
+    setCategoriesSource(null);
     try {
       const response = await apiFetch(`/api/indexers/${indexerId}/categories`);
       if (response.ok) {
         const categories = (await response.json()) as { id: string; name: string }[];
+        setCategoriesSource(
+          response.headers?.get("X-Questarr-Category-Source") === "fallback"
+            ? "fallback"
+            : "discovered"
+        );
         setAvailableCategories(
           categories.map((cat) => ({
             label: `${cat.name} (${cat.id})`,
@@ -445,6 +452,7 @@ export default function IndexersPage() {
           }))
         );
       } else {
+        setCategoriesSource(null);
         toast({
           title: "Failed to fetch categories",
           description: "Using manual input instead",
@@ -453,6 +461,7 @@ export default function IndexersPage() {
         setAvailableCategories([]);
       }
     } catch (error) {
+      setCategoriesSource(null);
       console.error("Error fetching categories:", error);
       toast({
         title: "Failed to fetch categories",
@@ -499,6 +508,7 @@ export default function IndexersPage() {
       allowInsecureLan: false,
     });
     setAvailableCategories([]);
+    setCategoriesSource(null);
     setIsDialogOpen(true);
   };
 
@@ -977,6 +987,19 @@ export default function IndexersPage() {
                           />
                         )}
                       </FormDescription>
+                      {categoriesSource === "fallback" && (
+                        <div
+                          role="status"
+                          data-testid="category-fallback-notice"
+                          className="rounded-md border border-amber-500/30 bg-amber-50 px-3 py-2 text-sm text-amber-950 dark:bg-amber-950/30 dark:text-amber-100"
+                        >
+                          <InterfaceText
+                            source={
+                              "The provider did not return its category list. These are suggestions; confirm the categories with your provider before selecting them."
+                            }
+                          />
+                        </div>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}

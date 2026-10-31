@@ -249,12 +249,28 @@ describe("API Routes - Additional Coverage", () => {
   describe("GET /api/indexers/:id/categories", () => {
     it("returns categories for a torznab indexer", async () => {
       vi.mocked(storage.getIndexer).mockResolvedValue(testIndexer);
-      vi.mocked(torznabClient.getCategories).mockResolvedValue([
-        { id: "1000", name: "Games" },
-      ] as never);
+      vi.mocked(torznabClient.getCategoriesResult).mockResolvedValue({
+        categories: [{ id: "1000", name: "Games" }],
+        source: "discovered",
+      });
       const res = await request(app).get("/api/indexers/idx-1/categories");
       expect(res.status).toBe(200);
       expect(res.body).toEqual([{ id: "1000", name: "Games" }]);
+      expect(res.headers["x-questarr-category-source"]).toBe("discovered");
+    });
+
+    it("labels fallback categories as suggestions while preserving the array response", async () => {
+      vi.mocked(storage.getIndexer).mockResolvedValue(testIndexer);
+      vi.mocked(torznabClient.getCategoriesResult).mockResolvedValue({
+        categories: [{ id: "1000", name: "Console" }],
+        source: "fallback",
+      });
+
+      const res = await request(app).get("/api/indexers/idx-1/categories");
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual([{ id: "1000", name: "Console" }]);
+      expect(res.headers["x-questarr-category-source"]).toBe("fallback");
     });
 
     it("returns 404 when the indexer is missing", async () => {

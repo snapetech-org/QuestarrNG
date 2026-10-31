@@ -2,6 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import request from "supertest";
 import express from "express";
+import type { NextFunction, Request, Response } from "express";
 import { registerRoutes } from "../routes.js";
 import { storage } from "../storage.js";
 import { rssService } from "../rss.js";
@@ -16,7 +17,7 @@ vi.mock("../torznab.js");
 vi.mock("../downloaders.js");
 vi.mock("../prowlarr.js");
 vi.mock("../steam-routes.js", () => ({
-  steamRoutes: (_req: unknown, _res: unknown, next: () => void) => next(),
+  steamRoutes: (_req: Request, _res: Response, next: NextFunction) => next(),
 }));
 
 vi.mock("../ssrf.js", () => ({
@@ -25,11 +26,11 @@ vi.mock("../ssrf.js", () => ({
 }));
 
 vi.mock("../auth.js", () => ({
-  authenticateToken: (req: any, res: any, next: any) => {
+  authenticateToken: (req: Request & { user?: unknown }, _res: Response, next: NextFunction) => {
     req.user = { id: 1, username: "testuser" };
     next();
   },
-  optionalAuthenticateToken: (_req: any, _res: any, next: any) => {
+  optionalAuthenticateToken: (_req: Request, _res: Response, next: NextFunction) => {
     next();
   },
   hashPassword: vi.fn(),
@@ -65,13 +66,13 @@ vi.mock("../logger.js", () => ({
 }));
 
 vi.mock("../middleware.js", () => ({
-  igdbRateLimiter: (req: any, res: any, next: any) => next(),
-  sensitiveEndpointLimiter: (req: any, res: any, next: any) => next(),
-  authRateLimiter: (req: any, res: any, next: any) => next(),
-  scanRateLimiter: (req: any, res: any, next: any) => next(),
-  integrationRateLimiter: (req: any, res: any, next: any) => next(),
-  validateRequest: (req: any, res: any, next: any) => next(),
-  validate: () => (req: any, res: any, next: any) => next(),
+  igdbRateLimiter: (_req: Request, _res: Response, next: NextFunction) => next(),
+  sensitiveEndpointLimiter: (_req: Request, _res: Response, next: NextFunction) => next(),
+  authRateLimiter: (_req: Request, _res: Response, next: NextFunction) => next(),
+  scanRateLimiter: (_req: Request, _res: Response, next: NextFunction) => next(),
+  integrationRateLimiter: (_req: Request, _res: Response, next: NextFunction) => next(),
+  validateRequest: (_req: Request, _res: Response, next: NextFunction) => next(),
+  validate: () => (_req: Request, _res: Response, next: NextFunction) => next(),
   sanitizeSearchQuery: [],
   sanitizeGameId: [],
   sanitizeIgdbId: [],

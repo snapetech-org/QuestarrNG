@@ -12,6 +12,13 @@ Choose the indexer type, enter its base URL and API key, and save it. Use
 indexer supports them. For a Prowlarr-managed tracker, use the final URL that
 Prowlarr serves; QuestarrNG does not follow redirects during sync.
 
+When you edit a Torznab or Newznab indexer, QuestarrNG loads the categories
+reported by its provider. If the provider is unavailable or returns no
+categories, QuestarrNG offers common game categories as suggestions and shows
+a notice. Confirm that the provider supports those category IDs before
+selecting them; the response body remains the same category list for API
+clients.
+
 Lower indexer priority numbers are preferred when results are sorted by
 priority and when duplicate releases are reconciled. The priority control lets
 you clear the number while entering a replacement; a blank draft keeps the

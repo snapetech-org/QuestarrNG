@@ -600,6 +600,19 @@ describe("TorznabClient — getCategories", () => {
     expect(categories).toEqual([{ id: "2000", name: "Movies" }]);
   });
 
+  it("reports discovered category provenance", async () => {
+    mockFetchResponse(
+      `<?xml version="1.0"?><caps><categories><category id="2000" name="Movies"/></categories></caps>`
+    );
+
+    const result = await client.getCategoriesResult(makeIndexer());
+
+    expect(result).toEqual({
+      categories: [{ id: "2000", name: "Movies" }],
+      source: "discovered",
+    });
+  });
+
   it("parses multiple categories and falls back to a default name", async () => {
     mockFetchResponse(
       `<?xml version="1.0"?><caps><categories>` +
@@ -659,6 +672,14 @@ describe("TorznabClient — getCategories", () => {
 
     const categories = await client.getCategories(makeIndexer());
     expect(categories).toEqual(DEFAULT_GAME_CATEGORIES);
+  });
+
+  it("marks default categories as suggestions when caps discovery is empty", async () => {
+    mockFetchResponse(`<?xml version="1.0"?><caps></caps>`);
+
+    const result = await client.getCategoriesResult(makeIndexer());
+
+    expect(result).toEqual({ categories: DEFAULT_GAME_CATEGORIES, source: "fallback" });
   });
 
   it("falls back to the default game categories instead of throwing when every caps URL variant is non-ok", async () => {

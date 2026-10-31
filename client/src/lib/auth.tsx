@@ -23,27 +23,15 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 type FetchUserError = Error & { status?: number };
 
-/**
- * Auth is primarily cookie-based (httpOnly JWT cookie set by the server on
- * login/setup, sent automatically via credentials: "include"). This runs
- * once, synchronously, before anything else in AuthProvider mounts: it
- * migrates a session that logged in before this change (localStorage-token
- * only, no cookie yet) into an in-memory bearer token for the current tab,
- * and scrubs the token out of localStorage immediately so it's no longer
- * sitting in persistent storage. New logins never write here again -- from
- * their perspective, everything after this migration is cookie-only.
- */
-function migrateLegacyLocalStorageToken(): void {
-  const legacyToken = localStorage.getItem("token");
-  if (legacyToken) {
-    setBearerToken(legacyToken);
-    localStorage.removeItem("token");
-  } else {
-    // Deterministically reset the in-memory bearer token on every mount
-    // (rather than only ever setting it), so a stale value from a prior
-    // AuthProvider instance -- e.g. across remounts, or between tests --
-    // can never leak into a session that has no legacy token to migrate.
-    setBearerToken(null);
+/** Remove a pre-cookie session token from persistent storage before any API request. */
+function takeLegacyLocalStorageToken(): string | null {
+  if (typeof localStorage === "undefined") return null;
+  try {
+    const legacyToken = localStorage.getItem("token");
+    if (legacyToken) localStorage.removeItem("token");
+    return legacyToken;
+  } catch {
+    return null;
   }
 }
 
@@ -58,17 +46,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Runs during render, before any child effect (including React Query's
-  // own fetch-triggering effects) can fire -- see
-  // migrateLegacyLocalStorageToken's doc comment for why that ordering
-  // matters. Guarded by a ref (rather than a useState lazy initializer) so
-  // a second render of this same component instance -- e.g. under
-  // React.StrictMode's dev-only double-invocation -- can't run the
-  // migration twice and clobber a just-migrated bearer token back to null.
+  // Keep an old bearer token only as a fallback candidate. The first
+  // /api/auth/me request must be cookie-only so a stale token cannot override
+  // a valid cookie belonging to the current account.
+  const pendingLegacyTokenRef = useRef<string | null>(null);
+  const activeLegacyTokenRef = useRef<string | null>(null);
   const migrationRanRef = useRef(false);
   if (!migrationRanRef.current) {
     migrationRanRef.current = true;
-    migrateLegacyLocalStorageToken();
+    pendingLegacyTokenRef.current = takeLegacyLocalStorageToken();
+    activeLegacyTokenRef.current = null;
+    setBearerToken(null);
   }
 
   const {
@@ -98,18 +86,34 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const { isLoading: isFetchingUser, data: meData } = useQuery({
     queryKey: ["/api/auth/me"],
     queryFn: async () => {
-      // No Authorization header needed for the common case -- the httpOnly
-      // auth cookie is sent automatically. apiFetch also attaches an
-      // in-memory bearer token here if migrateLegacyLocalStorageToken found
-      // one for this tab.
-      const res = await apiFetch("/api/auth/me");
+      const legacyToken = activeLegacyTokenRef.current ?? pendingLegacyTokenRef.current;
+
+      // Prefer the httpOnly cookie on every check. A validated legacy bearer
+      // remains available in memory only if the cookie request is rejected.
+      setBearerToken(null);
+      let res = await apiFetch("/api/auth/me");
 
       if (res.ok) {
+        pendingLegacyTokenRef.current = null;
+        activeLegacyTokenRef.current = null;
         return await res.json();
+      }
+
+      if ((res.status === 401 || res.status === 403) && legacyToken) {
+        setBearerToken(legacyToken);
+        const legacyRes = await apiFetch("/api/auth/me");
+        if (legacyRes.ok) {
+          pendingLegacyTokenRef.current = null;
+          activeLegacyTokenRef.current = legacyToken;
+          return await legacyRes.json();
+        }
+        res = legacyRes;
       }
 
       if (res.status === 401 || res.status === 403) {
         setBearerToken(null);
+        pendingLegacyTokenRef.current = null;
+        activeLegacyTokenRef.current = null;
         // Drop every other cached query (stale authenticated data from a
         // prior session) but deliberately spare "/api/auth/status" and this
         // query itself -- removing a query while its fetch is in flight
@@ -159,12 +163,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // compatibility with non-browser bearer clients, but the browser
       // client itself never persists it.
       //
-      // Also clear any in-memory bearer token migrated from a pre-cookie
-      // session (see migrateLegacyLocalStorageToken): the Authorization
-      // header takes priority over the cookie on every subsequent request,
-      // so a stale/invalid migrated bearer left in place would keep
-      // clobbering this fresh, valid cookie session on every later
-      // /api/auth/me check.
+      // A successful login replaces any legacy bearer-only session with the
+      // fresh httpOnly cookie session.
+      pendingLegacyTokenRef.current = null;
+      activeLegacyTokenRef.current = null;
       setBearerToken(null);
       // Keep the "/api/auth/me" cache in step with the new session: cancel any
       // in-flight check first so a late 401 from before login can't land on
@@ -209,6 +211,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
       return;
     }
+    pendingLegacyTokenRef.current = null;
+    activeLegacyTokenRef.current = null;
     setBearerToken(null);
     disconnectSocket();
     setUser(null);

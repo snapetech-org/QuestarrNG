@@ -1,6 +1,7 @@
 import { type Indexer } from "@shared/schema";
 import {
   DEFAULT_GAME_CATEGORIES,
+  type CapsCategoryDiscoveryResult,
   discoverCapsCategories,
   formatIndexerHttpError,
   indexerAllowsApiKey,
@@ -644,7 +645,9 @@ export class TorznabClient {
    * Get available categories from an indexer. See discoverCapsCategories
    * for the retry/fallback behavior.
    */
-  async getCategories(indexer: Indexer): Promise<{ id: string; name: string }[]> {
+  async getCategoriesResult(
+    indexer: Indexer
+  ): Promise<CapsCategoryDiscoveryResult<{ id: string; name: string }>> {
     return discoverCapsCategories({
       indexer,
       buildApiUrl: this.buildApiUrl.bind(this),
@@ -659,6 +662,10 @@ export class TorznabClient {
       logger: torznabLogger,
       protocolName: "torznab",
     });
+  }
+
+  async getCategories(indexer: Indexer): Promise<{ id: string; name: string }[]> {
+    return (await this.getCategoriesResult(indexer)).categories;
   }
 }
 
