@@ -2458,15 +2458,15 @@
         "hi": "सभी इंडेक्सर",
         "de": "Alle Indexer",
         "ja": "すべてのインデクサー",
-        "fr": "Tous les indexers",
+        "fr": "Tous les indexeurs",
         "pt-BR": "Todos os indexadores",
-        "ar": "كل الفهارس",
+        "ar": "كل أدوات الفهرسة",
         "ko": "모든 인덱서",
         "zh-Hant": "所有索引器",
-        "vi": "Tất cả indexer",
-        "id": "Semua indexer",
+        "vi": "Tất cả các trình lập chỉ mục",
+        "id": "Semua pengindeks",
         "es-419": "Todos los indexadores",
-        "fr-CA": "Tous les indexers"
+        "fr-CA": "Tous les indexeurs"
       }
     },
     "interface.release_groups_bde920fa": {
@@ -15014,15 +15014,15 @@
       "translations": {
         "es": "Todas las descargas ya están vinculadas a juegos",
         "zh-Hans": "所有下载已链接到游戏",
-        "hi": "सभी डाउनलोड पहले से ही खेल से जुड़े हुए हैं",
+        "hi": "सभी डाउनलोड पहले से ही गेम से जुड़े हुए हैं।",
         "de": "Alle Downloads sind bereits mit Spielen verknüpft",
         "ja": "すべてのダウンロードは既にゲームにリンクされています",
         "fr": "Tous les téléchargements sont déjà liés à des jeux",
         "pt-BR": "Todos os downloads já estão ligados a jogos.",
-        "ar": "جميع التحميلات مرتبطة بالألعاب",
-        "ko": "모든 다운로드는 이미 게임에 연결",
+        "ar": "جميع التنزيلات مرتبطة بالفعل بالألعاب.",
+        "ko": "모든 다운로드가 이미 게임에 연결되어 있습니다.",
         "zh-Hant": "所有下載已連結到遊戲",
-        "vi": "Mọi việc tải về đã được liên kết đến trò chơi",
+        "vi": "Tất cả các lượt tải xuống đều đã được liên kết với trò chơi.",
         "id": "Semua unduhan telah dikaitkan dengan game",
         "es-419": "Todas las descargas ya están vinculadas a juegos",
         "fr-CA": "Tous les téléchargements sont déjà liés à des jeux"
@@ -15055,7 +15055,7 @@
         "hi": "सभी एकीकरण मार्ग",
         "de": "Alle Integrationsrouten",
         "ja": "すべての統合ルート",
-        "fr": "Toutes les voies d'intégration",
+        "fr": "Toutes les routes d’intégration",
         "pt-BR": "Todas as rotas de integração",
         "ar": "جميع طرق التكامل",
         "ko": "모든 통합 경로",
@@ -15063,7 +15063,7 @@
         "vi": "Tất cả các tuyến tích hợp",
         "id": "Semua rute integrasi",
         "es-419": "Todas las rutas de integración",
-        "fr-CA": "Toutes les voies d'intégration"
+        "fr-CA": "Toutes les routes d’intégration"
       }
     },
     "interface.all_integrations_cd0902e7": {
@@ -15075,12 +15075,12 @@
         "de": "Alle Integrationen",
         "ja": "すべての統合",
         "fr": "Toutes les intégrations",
-        "pt-BR": "Todas as integrações.",
+        "pt-BR": "Todas as integrações",
         "ar": "جميع التكاملات",
         "ko": "모든 통합",
         "zh-Hant": "所有整合",
         "vi": "Tất cả các tích hợp",
-        "id": "Semua integrasinya",
+        "id": "Semua integrasi",
         "es-419": "Todas las integraciones",
         "fr-CA": "Toutes les intégrations"
       }
@@ -15116,7 +15116,7 @@
         "pt-BR": "Tudo em um (host único)",
         "ar": "متكامل (مضيف واحد)",
         "ko": "올인원 (단일 호스트)",
-        "zh-Hant": "全方位（單一主機）",
+        "zh-Hant": "一體式（單一主機）",
         "vi": "Tất cả trong một (một máy chủ)",
         "id": "Serba ada (satu host)",
         "es-419": "Todo en uno (un único host)",
@@ -37116,7 +37116,7 @@
         "ja": "すべてのゲーム、{count}件",
         "fr": "Tous les jeux, {count} jeux",
         "pt-BR": "Todos os jogos, {count} jogos",
-        "ar": "كل الألعاب، {count} لعبة",
+        "ar": "كل الألعاب ({count})",
         "ko": "모든 게임, {count}개",
         "zh-Hant": "所有遊戲，共 {count} 款",
         "vi": "Tất cả trò chơi, {count} trò chơi",
