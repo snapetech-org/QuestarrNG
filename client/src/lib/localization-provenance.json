@@ -24746,6 +24746,29 @@
         "es-419": "es",
         "fr-CA": "fr"
       }
+    },
+    "notifications.apprise_delivery_help": {
+      "sourceChecksum": "fnv1a32:4780985a",
+      "translations": {
+        "es": "machine-draft",
+        "zh-Hans": "machine-draft",
+        "hi": "machine-draft",
+        "de": "machine-draft",
+        "ja": "machine-draft",
+        "fr": "machine-draft",
+        "pt-BR": "machine-draft",
+        "ar": "machine-draft",
+        "ko": "machine-draft",
+        "zh-Hant": "machine-draft",
+        "vi": "machine-draft",
+        "id": "machine-draft",
+        "es-419": "inherited",
+        "fr-CA": "inherited"
+      },
+      "translationSources": {
+        "es-419": "es",
+        "fr-CA": "fr"
+      }
     }
   }
 }

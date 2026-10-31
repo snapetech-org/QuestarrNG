@@ -2652,6 +2652,8 @@ export const STABLE_INTERFACE_MESSAGES = {
   "notifications.delivery_language": "Notification language",
   "notifications.delivery_language_help":
     "Choose the language for external notifications. This preference is separate from this browser's interface language.",
+  "notifications.apprise_delivery_help":
+    "Forward notifications through a self-hosted Apprise API server or the local Apprise CLI.",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

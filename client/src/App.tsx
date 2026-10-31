@@ -1,3 +1,4 @@
+import { InterfaceDirectionProvider } from "@/components/InterfaceDirectionProvider";
 import { Router as WouterRouter, Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -250,9 +251,11 @@ function AppShell() {
 
 function App() {
   return (
-    <WouterRouter {...(routerBase !== undefined ? { base: routerBase } : {})}>
-      <AppShell />
-    </WouterRouter>
+    <InterfaceDirectionProvider>
+      <WouterRouter {...(routerBase !== undefined ? { base: routerBase } : {})}>
+        <AppShell />
+      </WouterRouter>
+    </InterfaceDirectionProvider>
   );
 }
 

@@ -1966,15 +1966,7 @@ export default function SettingsPage() {
                   )}
                 </div>
                 <CardDescription>
-                  <InterfaceText source={"Forward notifications through a self-hosted"} />{" "}
-                  <span className="font-medium">
-                    <InterfaceText source={"Apprise API"} />
-                  </span>{" "}
-                  <InterfaceText source={"server or the local"} />{" "}
-                  <span className="font-medium">
-                    <InterfaceText source={"Apprise CLI"} />
-                  </span>
-                  .
+                  <InterfaceText source="notifications.apprise_delivery_help" />
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -2021,6 +2013,7 @@ export default function SettingsPage() {
                     </Label>
                     <Input
                       id="apprise-api-url"
+                      dir="ltr"
                       type="text"
                       placeholder="http://apprise:8000"
                       value={appriseApiUrl}
@@ -2038,6 +2031,7 @@ export default function SettingsPage() {
                     </Label>
                     <Input
                       id="apprise-key"
+                      dir="ltr"
                       type="text"
                       placeholder="my-config-key"
                       value={appriseKey}
@@ -2115,6 +2109,7 @@ export default function SettingsPage() {
                   </Label>
                   <Textarea
                     id="apprise-urls"
+                    dir="ltr"
                     placeholder={"discord://webhook/...\npushover://token@user/"}
                     value={appriseUrls}
                     onChange={(e) => setAppriseUrls(e.target.value)}
@@ -2232,7 +2227,7 @@ export default function SettingsPage() {
                                 aria-label={formatInterfaceMessage(
                                   "interface.in_app_label_3479d69a",
                                   {
-                                    label: String(label ?? ""),
+                                    label: t(label),
                                   }
                                 )}
                                 checked={notifPrefs[key].inApp}
@@ -2258,7 +2253,7 @@ export default function SettingsPage() {
                                   aria-label={formatInterfaceMessage(
                                     "interface.apprise_label_c780bd91",
                                     {
-                                      label: String(label ?? ""),
+                                      label: t(label),
                                     }
                                   )}
                                   checked={notifPrefs[key].apprise}
