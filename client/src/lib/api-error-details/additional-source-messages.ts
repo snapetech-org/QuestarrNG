@@ -6,6 +6,7 @@ export const ADDITIONAL_API_ERROR_DETAIL_SOURCE_MESSAGES = [
   "Port must be between 1 and 65535",
   "Invalid password",
   "No PONG reply from ClamAV",
+  "ClamAV test failed",
   "Could not reach Twitch — check your network connection.",
   "Invalid Client ID or Client Secret.",
   "Could not reach IGDB — check your network connection.",

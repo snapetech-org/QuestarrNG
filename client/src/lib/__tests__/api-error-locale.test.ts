@@ -178,4 +178,13 @@ describe("getLocalizedApiErrorMessage", () => {
     ).toBe("إعدادات SSL غير صالحة: \u2068ملف الشهادة غير موجود\u2069");
     expect(getLocalizedApiErrorDetail("Transmission returned HTTP 503", "es")).toBeUndefined();
   });
+
+  it("localizes fixed ClamAV connectivity-test errors", () => {
+    expect(getLocalizedApiErrorDetail("ClamAV test failed", "es")).toBe(
+      "La prueba de ClamAV falló"
+    );
+    expect(getLocalizedApiErrorDetail("No PONG reply from ClamAV", "zh-Hans")).toBe(
+      "ClamAV 未返回 PONG 响应"
+    );
+  });
 });
