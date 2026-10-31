@@ -7678,7 +7678,7 @@
     "interface.all_your_wishlist_games_are_upcomi_45d86f39": {
       "source": "All your wishlist games are upcoming or unannounced. Enable 'Unreleased' to see them.",
       "translations": {
-        "es": "Todos los juegos de tu lista son próximos o no tienen fecha. Activa «Sin lanzamiento» para verlos.",
+        "es": "Todos los juegos de tu lista están por salir o aún no se han anunciado. Activa «Sin lanzamiento» para verlos.",
         "zh-Hans": "愿望单中的游戏都尚未发行或尚未公布。启用“尚未发行”即可查看。",
         "hi": "आपकी विशलिस्ट के सभी गेम आने वाले हैं या उनकी घोषणा नहीं हुई है। देखने के लिए 'अभी जारी नहीं' चालू करें।",
         "de": "Alle Spiele deiner Wunschliste erscheinen demnächst oder sind noch nicht angekündigt. Aktiviere „Noch nicht erschienen“, um sie zu sehen.",
@@ -7690,7 +7690,7 @@
         "zh-Hant": "願望清單中的遊戲都尚未發行或尚未公布。啟用「尚未發行」即可查看。",
         "vi": "Tất cả trò chơi trong danh sách yêu thích đều sắp ra mắt hoặc chưa được công bố. Bật “Chưa phát hành” để xem.",
         "id": "Semua game di wishlist Anda akan datang atau belum diumumkan. Aktifkan “Belum dirilis” untuk melihatnya.",
-        "es-419": "Todos los juegos de tu lista son próximos o no tienen fecha. Activa «Sin lanzamiento» para verlos.",
+        "es-419": "Todos los juegos de tu lista están por salir o aún no se han anunciado. Activa «Sin lanzamiento» para verlos.",
         "fr-CA": "Tous les jeux de votre liste sont à venir ou non annoncés. Activez « Non sortis » pour les afficher."
       }
     },
@@ -14101,7 +14101,7 @@
       "source": ", and",
       "translations": {
         "es": ", y",
-        "zh-Hans": ",以及",
+        "zh-Hans": "，以及",
         "hi": ", और",
         "de": ", und",
         "ja": "と",
@@ -14109,7 +14109,7 @@
         "pt-BR": ", e",
         "ar": "و",
         "ko": "·",
-        "zh-Hant": ",以及",
+        "zh-Hant": "，以及",
         "vi": ", và",
         "id": ", dan",
         "es-419": ", y",
@@ -15189,7 +15189,7 @@
         "de": "Ein Fehler ist aufgetreten",
         "ja": "エラーが発生しました",
         "fr": "Une erreur s'est produite",
-        "pt-BR": "Um erro ocorreu.",
+        "pt-BR": "Ocorreu um erro.",
         "ar": "وقع خطأ",
         "ko": "오류가 발생했습니다.",
         "zh-Hant": "發生了錯誤",
@@ -33766,17 +33766,17 @@
       "source": "Allow deleting files in {path}",
       "translations": {
         "es": "Permitir borrar archivos en {path}",
-        "zh-Hans": "允许删除文件 {path}",
-        "hi": "फाइलों को हटाने की अनुमति दें {path}",
-        "de": "Löschen von Dateien in {path}",
-        "ja": "ファイルを削除できるようにする {path}",
+        "zh-Hans": "允许删除 {path} 中的文件",
+        "hi": "{path} में फ़ाइलें हटाने की अनुमति दें",
+        "de": "Dateien in {path} löschen erlauben",
+        "ja": "{path} 内のファイル削除を許可する",
         "fr": "Autorise la suppression des fichiers dans {path}",
         "pt-BR": "Permitir apagar arquivos em {path}",
-        "ar": "السماح بحذف الملفات {path}",
+        "ar": "السماح بحذف الملفات داخل {path}",
         "ko": "{path}에서 파일 삭제 허용",
-        "zh-Hant": "允許刪除檔案 {path}",
+        "zh-Hant": "允許刪除 {path} 中的檔案",
         "vi": "Cho phép xóa tệp trong {path}",
-        "id": "Ijinkan penghapusan berkas di {path}",
+        "id": "Izinkan penghapusan berkas di {path}",
         "es-419": "Permitir borrar archivos en {path}",
         "fr-CA": "Autorise la suppression des fichiers dans {path}"
       }
