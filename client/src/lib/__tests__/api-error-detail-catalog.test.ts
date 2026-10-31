@@ -250,4 +250,26 @@ describe("API error detail source catalog", () => {
       "API कुंजी रद्द नहीं की जा सकी"
     );
   });
+
+  it("uses the Hindi API key term consistently across API-key errors", () => {
+    expect(getApiErrorDetailLabel("Failed to create API key", "hi")).toBe(
+      "API कुंजी नहीं बनाई जा सकी"
+    );
+    expect(getApiErrorDetailLabel("API key not found", "hi")).toBe("API कुंजी नहीं मिली");
+  });
+
+  it("uses the in-app Traditional Chinese term for RSS subscriptions", () => {
+    const rssTranslations = [
+      ["Failed to fetch RSS feeds", "無法取得 RSS 訂閱"],
+      ["Failed to add RSS feed", "無法新增 RSS 訂閱"],
+      ["Feed not found", "找不到 RSS 訂閱"],
+      ["Failed to update RSS feed", "無法更新 RSS 訂閱"],
+      ["Failed to delete RSS feed", "無法刪除 RSS 訂閱"],
+      ["Failed to refresh RSS feeds", "無法重新整理 RSS 訂閱"],
+    ] as const;
+
+    for (const [source, translation] of rssTranslations) {
+      expect(getApiErrorDetailLabel(source, "zh-Hant")).toBe(translation);
+    }
+  });
 });
