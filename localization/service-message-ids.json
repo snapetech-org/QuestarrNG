@@ -17,5 +17,6 @@
   "service.realdebrid_staging_failed",
   "service.client_reported_error",
   "service.download_aborted_without_details",
-  "service.notification_download_aborted"
+  "service.notification_download_aborted",
+  "interface.my_questarr_library_stats_6f07559d"
 ]

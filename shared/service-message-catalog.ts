@@ -21,6 +21,7 @@ export const SERVICE_MESSAGE_SOURCES = {
   "service.client_reported_error": "{client} reported an error",
   "service.download_aborted_without_details": "Aborted by downloader (no details provided)",
   "service.notification_download_aborted": 'Download aborted for "{game}": {error}',
+  "interface.my_questarr_library_stats_6f07559d": "📊 My Questarr library stats",
 } as const;
 export const SERVICE_MESSAGE_TRANSLATIONS = {
   "service.connected_successfully": {
@@ -330,6 +331,22 @@ export const SERVICE_MESSAGE_TRANSLATIONS = {
     id: "Unduhan {game} dibatalkan: {error}",
     "es-419": "Se interrumpió la descarga de {game}: {error}",
     "fr-CA": "Le téléchargement de {game} a été interrompu : {error}",
+  },
+  "interface.my_questarr_library_stats_6f07559d": {
+    es: "📊 Estadísticas de mi biblioteca de Questarr",
+    "zh-Hans": "📊 我的 Questarr 游戏库统计",
+    hi: "📊 मेरी Questarr गेम लाइब्रेरी के आँकड़े",
+    de: "📊 Statistiken meiner Questarr-Bibliothek",
+    ja: "📊 Questarr ライブラリの統計",
+    fr: "📊 Statistiques de ma bibliothèque Questarr",
+    "pt-BR": "📊 Estatísticas da minha biblioteca do Questarr",
+    ar: "📊 إحصاءات مكتبة Questarr الخاصة بي",
+    ko: "📊 내 Questarr 게임 라이브러리 통계",
+    "zh-Hant": "📊 我的 Questarr 遊戲庫統計",
+    vi: "📊 Thống kê thư viện Questarr của tôi",
+    id: "📊 Statistik pustaka Questarr saya",
+    "es-419": "📊 Estadísticas de mi biblioteca de Questarr",
+    "fr-CA": "📊 Statistiques de ma bibliothèque Questarr",
   },
 } as const;
 export type ServiceMessageKey = keyof typeof SERVICE_MESSAGE_SOURCES;

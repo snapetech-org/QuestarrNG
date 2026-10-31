@@ -21,6 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { LibraryStats } from "@/lib/stats";
 import { InterfaceText } from "@/components/InterfaceText";
+import { serviceMessage } from "@shared/service-messages";
 
 interface ShareDiscordDialogProps {
   open: boolean;
@@ -108,7 +109,7 @@ export default function ShareDiscordDialog({
       if (!dataUrl) return;
       const res = await apiRequest("POST", "/api/stats/discord-share", {
         image: dataUrl,
-        message: "📊 My Questarr library stats",
+        ...serviceMessage("interface.my_questarr_library_stats_6f07559d", {}),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));

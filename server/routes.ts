@@ -45,6 +45,11 @@ import {
 } from "../shared/schema.js";
 import { isUsenetDownloaderType } from "../shared/downloader-types.js";
 import { parseJsonObject } from "../shared/json-object-utils.js";
+import {
+  localizeServiceMessage,
+  matchingServiceMessageDescriptor,
+} from "../shared/service-messages.js";
+import { readNotificationLanguage } from "../shared/notification-language.js";
 import { torznabClient } from "./torznab.js";
 import { newznabClient } from "./newznab.js";
 import { rssService } from "./rss.js";
@@ -6556,7 +6561,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         const imageBuffer = Buffer.from(base64Data, "base64");
         const formData = new FormData();
-        if (message) formData.append("content", message);
+        if (message) {
+          let content = message;
+          // Only the explicit app heading follows the notification preference.
+          // Arbitrary user/API messages, even English lookalikes, stay unchanged.
+          const descriptor = matchingServiceMessageDescriptor(message, req.body);
+          if (descriptor?.messageKey === "interface.my_questarr_library_stats_6f07559d") {
+            try {
+              const settings = await storage.getUserSettings(req.user!.id);
+              content = localizeServiceMessage(
+                message,
+                descriptor,
+                readNotificationLanguage(settings?.notificationPreferences)
+              );
+            } catch (error) {
+              routesLogger.warn(
+                { error },
+                "Could not load Discord heading language, using English"
+              );
+            }
+          }
+          formData.append("content", content);
+        }
         formData.append(
           "file",
           new Blob([imageBuffer], { type: "image/png" }),
