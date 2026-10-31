@@ -210,7 +210,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Failed to look up NexusMods game domain": "NexusMods गेम डोमेन नहीं खोजा जा सका",
   "Failed to fetch NexusMods trending mods": "NexusMods के ट्रेंडिंग मॉड प्राप्त नहीं किए जा सके",
   "Not found": "नहीं मिला",
-  "Failed to list API keys": "API keys सूचीबद्ध नहीं की जा सकीं",
+  "Failed to list API keys": "API कुंजियाँ सूचीबद्ध नहीं की जा सकीं",
   "Failed to create API key": "API key बनाई नहीं जा सकी",
   "API key not found": "API key नहीं मिली",
   "Failed to revoke API key": "API key रद्द नहीं की जा सकी",
