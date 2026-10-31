@@ -3,8 +3,8 @@
 ## Scope and ownership
 
 Review every issue and pull request in Doezer/Questarr, including closed issues,
-merged PRs, and closed unmerged PRs. The refreshed inventory has **1,163
-records**: 232 issues and 931 PRs. Implement actionable behavior that is missing
+merged PRs, and closed unmerged PRs. The refreshed inventory has **1,246
+records**: 235 issues and 1,011 PRs. Implement actionable behavior that is missing
 from QuestarrNG, verify behavior that already exists, and record an
 evidence-backed disposition for every source item. The user confirmed the full
 historical scope on October 12, 2026.
@@ -19,33 +19,32 @@ behavior when implementing upstream requests.
 ## Current ledger snapshot
 
 The live audit refreshed upstream main
-`0b538fe4b0a2269edcc8fd3e71e2bbc240291868` and confirmed 232 issues and 931
-pull requests. The sanitized source list and inventory were regenerated from
-the live GitHub audit on October 14, 2026. The ledger's `capturedAt` is
-03:40:13 UTC; it records generation time, not an individual GitHub request
-timestamp. Batch 83 reviewed PRs #942–#943, issue #944, and PRs #945–#949; all
-eight source digests matched the refreshed snapshot. Review status is
-independent of GitHub's open, closed, or merged state.
+6b14c6943938fd22d9943368baca3c72b1fa957c. The sanitized source snapshot has
+235 issues and 1,011 pull requests (1,246 records total) and was generated at
+2026-10-31 04:04:24 UTC. The current ledger records 44 source-changed records;
+each needs renewed review against its current source. Batch 84 reviewed PRs
+#950–#957, and all eight source digests matched the refreshed snapshot.
 
-| Review status            |     Items |
-| ------------------------ | --------: |
-| `verified`               |       690 |
-| `superseded`             |       224 |
-| `not-applicable`         |        14 |
-| `implemented-unverified` |         6 |
-| `needs-implementation`   |         0 |
-| `unreviewed`             |       229 |
-| **Total**                | **1,163** |
+| Review status | Items |
+| --- | ---: |
+| verified | 694 |
+| superseded | 226 |
+| not-applicable | 14 |
+| implemented-unverified | 8 |
+| needs-implementation | 0 |
+| unreviewed | 304 |
+| **Total** | **1,246** |
 
-The ledger gives 934 items an assigned disposition. Four implemented
-integrations still need live-service verification, the DCO workflow needs
-maintainer rollout before it can enforce sign-off on pull requests, and PR #933
-still needs an Inno Setup build plus Windows installation and service-lifecycle
-verification. No currently identified item needs implementation, and 229 are
-unreviewed. The latest refresh retains one changed-source flag: PR #1194's body
-changed after its snapshot and still needs review. These counts describe the
-ledger, not completion of the campaign. Batch 83 is the latest completed
-review; see [validation evidence](evidence/validation-batch-83.md).
+The ledger gives 942 records an assigned disposition. The eight
+implemented-unverified items include four integrations awaiting live-service
+checks, DCO enforcement awaiting maintainer rollout, PR #933 awaiting an
+Inno Setup build and Windows installation/service-lifecycle checks, plus the
+new fallback-category and cookie-first auth changes from Batch 84. Forty-four
+source-changed records and 304 unreviewed records remain. Batch 84's code-level
+and browser validation is blocked until compatible private ephemeral JIT
+capacity and current workflow-run state are confirmed. These counts describe
+progress, not campaign completion. See [Batch 84 evidence](evidence/validation-batch-84.md).
+
 
 ## Project records
 
@@ -1951,7 +1950,9 @@ drop-in [Buildx](https://github.com/step-security/setup-buildx-action),
 [build/push](https://github.com/step-security/docker-build-push-action)
 wrappers at newer releases, preserving the existing workflow hardening;
 metadata-action and artifact uploads match the requested levels, while
-Scorecard and CodeQL are newer. All workflow references remain full-SHA pinned.
+Scorecard remains newer. CodeQL workflow and upload action invocations have
+since been removed under the organization owner directive; remaining workflow
+action references stay full-SHA pinned.
 
 Batch 64 validation passed 599 tests across 13 focused files, TypeScript
 checking, repository-wide lint and formatting, the production build, and the
@@ -2357,3 +2358,27 @@ Issue #944 already had the requested 5,000-file and five-second scan caps, `{ fi
 Focused validation passed 628 tests across 15 files with no skips. TypeScript, lint, formatting, secret scanning, and the production build passed; the build reported the existing large-chunk advisory. The app used port 5101 because port 5100 belonged to another process. The disposable server, database, script, and scratch directory were removed, the existing Playwright auth state and `dist/` were preserved, and no NFS scratch was used. See [Batch 83 validation evidence](evidence/validation-batch-83.md).
 
 The ledger now records 690 verified, 224 superseded, 14 not applicable, 6 implemented-unverified, 0 needs-implementation, and 229 unreviewed items. PR #1194 remains the only source-changed record. The campaign remains incomplete and must not be merged to `main`.
+
+## Batch 84 — October 31, 2026
+
+Batch 84 reviewed PRs #950–#957 against the refreshed upstream snapshot. Four
+items are verified using prior focused validation evidence (#950, #952, #953,
+and #955); two dependency/action updates are superseded by current QuestarrNG
+versions and the CodeQL removal directive (#956–#957). The category-fallback
+provenance notice (#951) and cookie-first legacy-token migration (#954) are
+implemented but await tests and browser evidence on a compatible private
+ephemeral JIT runner.
+
+The batch adds an explicit discovered/fallback category-source response
+header, a localized accessible warning for provider fallback categories, and
+regression coverage. Browser authentication now prefers the httpOnly cookie and
+uses a legacy localStorage bearer only after an unauthorized cookie response.
+Express test middleware mocks use Request, Response, and NextFunction types.
+QuestarrNG workflow files no longer invoke CodeQL; the organization-wide audit
+is still in progress.
+
+The GitHub REST API was rate-limited during the live-run check, and no online
+Linux x64 runner with the QuestarrNG labels was available. The active JIT
+broker was left running; no workflow was dispatched or retried. The records
+that need fresh validation remain implemented-unverified. See
+[Batch 84 evidence](evidence/validation-batch-84.md).
