@@ -42486,7 +42486,7 @@
     "server.synced_indexers_from_prowlarr_added_added_update_a5975d7a": {
       "source": "Synced indexers from Prowlarr: {added} added, {updated} updated",
       "translations": {
-        "es": "Índices de Prowlarr sincronizados: {added} añadidos, {updated} actualizados",
+        "es": "Se sincronizaron los indexadores de Prowlarr: {added} añadidos, {updated} actualizados",
         "zh-Hans": "已同步 Prowlarr 索引器：新增 {added} 个，更新 {updated} 个",
         "hi": "Prowlarr से इंडेक्सर सिंक हुए: {added} जोड़े गए, {updated} अपडेट किए गए",
         "de": "Prowlarr-Indexer synchronisiert: {added} hinzugefügt, {updated} aktualisiert",
@@ -42498,7 +42498,7 @@
         "zh-Hant": "已同步 Prowlarr 索引器：新增 {added} 個，更新 {updated} 個",
         "vi": "Đã đồng bộ bộ lập chỉ mục từ Prowlarr: thêm {added}, cập nhật {updated}",
         "id": "Indexer Prowlarr disinkronkan: {added} ditambahkan, {updated} diperbarui",
-        "es-419": "Índices de Prowlarr sincronizados: {added} añadidos, {updated} actualizados",
+        "es-419": "Se sincronizaron los indexadores de Prowlarr: {added} añadidos, {updated} actualizados",
         "fr-CA": "Indexeurs Prowlarr synchronisés : {added} ajoutés, {updated} mis à jour"
       }
     },
