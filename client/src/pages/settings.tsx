@@ -1,3 +1,4 @@
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import { normalizeNotificationLanguage } from "@shared/notification-language";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -672,10 +673,6 @@ export default function SettingsPage() {
   const testAppriseMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", "/api/settings/apprise/test");
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error((body as { error?: string }).error ?? "Test failed");
-      }
       return res.json();
     },
     onSuccess: () => {
@@ -683,9 +680,8 @@ export default function SettingsPage() {
     },
     onError: (err: Error) => {
       toast({
-        title: formatInterfaceMessage("interface.apprise_test_failed_error_da0c79c6", {
-          error: String(err.message ?? ""),
-        }),
+        title: formatInterfaceMessage("service.apprise_test_failed", {}),
+        description: <ApiErrorDescription error={err} fallbackSource="Unknown error" />,
         variant: "destructive",
       });
     },

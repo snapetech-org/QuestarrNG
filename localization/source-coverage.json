@@ -2475,6 +2475,118 @@
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "source-fallback",
       "directTargetCells": 12
+    },
+    {
+      "key": "service.apprise_unconfigured",
+      "source": "Apprise is not configured",
+      "kind": "app-owned Apprise test/CLI service",
+      "owners": ["server/apprise.ts"],
+      "coverage": [
+        "server/__tests__/apprise.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SettingsPage.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.apprise_notification_urls_missing",
+      "source": "No notification URLs provided",
+      "kind": "app-owned Apprise test/CLI service",
+      "owners": ["server/apprise.ts"],
+      "coverage": [
+        "server/__tests__/apprise.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SettingsPage.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.apprise_config_or_urls_missing",
+      "source": "No config key or notification URLs provided",
+      "kind": "app-owned Apprise test/CLI service",
+      "owners": ["server/apprise.ts"],
+      "coverage": [
+        "server/__tests__/apprise.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SettingsPage.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.apprise_cli_not_found",
+      "source": "Apprise CLI not found",
+      "kind": "app-owned Apprise test/CLI service",
+      "owners": ["server/apprise.ts"],
+      "coverage": [
+        "server/__tests__/apprise.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SettingsPage.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.apprise_cli_timeout",
+      "source": "Apprise CLI timed out",
+      "kind": "app-owned Apprise test/CLI service",
+      "owners": ["server/apprise.ts"],
+      "coverage": [
+        "server/__tests__/apprise.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SettingsPage.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.apprise_server_responded",
+      "source": "Server responded with {status}: {error}",
+      "kind": "app-owned Apprise test/CLI service",
+      "owners": ["server/apprise.ts"],
+      "coverage": [
+        "server/__tests__/apprise.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SettingsPage.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.apprise_reach_failed",
+      "source": "Failed to reach Apprise server",
+      "kind": "app-owned Apprise test/CLI service",
+      "owners": ["server/apprise.ts", "server/routes.ts"],
+      "coverage": [
+        "server/__tests__/apprise.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SettingsPage.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.apprise_test_failed",
+      "source": "Apprise test failed",
+      "kind": "app-owned Apprise test/CLI service",
+      "owners": ["server/routes.ts", "client/src/pages/settings.tsx"],
+      "coverage": [
+        "server/__tests__/apprise.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SettingsPage.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
     }
   ],
   "codeUnits": [
@@ -2495,6 +2607,14 @@
         "shared/__tests__/service-message-descriptor.test.ts"
       ],
       "codeStatus": "implemented; nullable metadata blocks legacy matching for provider errors; exact source matching required for localization"
+    }
+  ],
+  "retirementCandidates": [
+    {
+      "key": "interface.apprise_test_failed_error_da0c79c6",
+      "formerOwner": "client/src/pages/settings.tsx",
+      "replacedBy": ["service.apprise_test_failed", "typed ApiErrorDescription body"],
+      "reason": "Error moved from flattened title interpolation to a reactive owned/raw description; retire only after frozen input is finished and all consumers are checked."
     }
   ]
 }

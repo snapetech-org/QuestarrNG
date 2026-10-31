@@ -1,5 +1,7 @@
 import {
   serviceMessage,
+  serviceErrorBody,
+  parseServiceMessageDescriptor,
   serializeServiceMessageDescriptor,
 } from "../../shared/service-messages.js";
 import { beforeAll, afterAll, beforeEach, describe, expect, it, vi } from "vitest";
@@ -39,6 +41,42 @@ vi.mock("child_process", () => {
 });
 
 describe("Apprise client", () => {
+  it.each([
+    { props: { code: "ENOENT" }, key: "service.apprise_cli_not_found" },
+    { props: { killed: true }, key: "service.apprise_cli_timeout" },
+    { props: {}, key: undefined },
+  ])("tags only known CLI execution states: $key", async ({ props, key }) => {
+    vi.mocked(execFile).mockImplementation((...args) => {
+      const callback = args[3] as (error: Error, stdout: string, stderr: string) => void;
+      callback(
+        Object.assign(new Error("opaque provider error"), props),
+        "",
+        "Apprise CLI not found"
+      );
+      return {} as never;
+    });
+    appriseClient.configure({ mode: "cli", urls: "discord://example.invalid/mock-only" });
+    const result = await appriseClient.test();
+    expect(result.success).toBe(false);
+    const descriptor = parseServiceMessageDescriptor(result.errorI18n);
+    expect(descriptor?.messageKey).toBe(key);
+    if (!key) expect(result.error).toBe("Apprise CLI not found");
+  });
+
+  it("preserves the exact bounded HTTP diagnostic and captured provider body", async () => {
+    appriseClient.configure({ mode: "api", apiUrl: "http://apprise:8000", key: "key" });
+    const provider = "العربية {error} Apprise CLI not found ".repeat(20);
+    vi.mocked(safeFetch).mockResolvedValueOnce(new Response(provider, { status: 503 }));
+    const result = await appriseClient.test();
+    expect(result.error).toBe(`Server responded with 503: ${provider}`.slice(0, 200));
+    const descriptor = parseServiceMessageDescriptor(result.errorI18n);
+    expect(descriptor?.messageKey).toBe("service.apprise_server_responded");
+    expect(descriptor?.messageDetails).toBeUndefined();
+    expect(descriptor?.messageValues.error).toBe(
+      provider.slice(0, 200 - "Server responded with 503: ".length)
+    );
+  });
+
   const notification = {
     type: "info",
     title: "Questarr",
@@ -312,7 +350,7 @@ describe("Apprise client", () => {
     await expect(appriseClient.send(notification)).resolves.toBeUndefined();
     await expect(appriseClient.test()).resolves.toEqual({
       success: false,
-      error: "Apprise CLI not found",
+      ...serviceErrorBody(undefined, serviceMessage("service.apprise_cli_not_found", {})),
     });
   });
 
@@ -330,7 +368,7 @@ describe("Apprise client", () => {
 
     await expect(freshClient.test()).resolves.toEqual({
       success: false,
-      error: "Apprise CLI not found",
+      ...serviceErrorBody(undefined, serviceMessage("service.apprise_cli_not_found", {})),
     });
     expect(execFile).not.toHaveBeenCalled();
 

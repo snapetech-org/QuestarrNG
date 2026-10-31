@@ -2910,6 +2910,14 @@ export const STABLE_INTERFACE_MESSAGES = {
   "service.json_catalog_format_invalid":
     "Invalid JSON catalog: expected downloads with titles and URI lists",
   "service.json_catalog_request_failed": "Catalog request failed",
+  "service.apprise_unconfigured": "Apprise is not configured",
+  "service.apprise_notification_urls_missing": "No notification URLs provided",
+  "service.apprise_config_or_urls_missing": "No config key or notification URLs provided",
+  "service.apprise_cli_not_found": "Apprise CLI not found",
+  "service.apprise_cli_timeout": "Apprise CLI timed out",
+  "service.apprise_server_responded": "Server responded with {status}: {error}",
+  "service.apprise_reach_failed": "Failed to reach Apprise server",
+  "service.apprise_test_failed": "Apprise test failed",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

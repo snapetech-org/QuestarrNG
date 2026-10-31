@@ -1194,15 +1194,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(result.success ? 200 : 400).json(result);
       } catch (error) {
         routesLogger.error({ error }, "Failed to test IGDB credentials during setup");
-        return res
-          .status(500)
-          .json({
-            success: false,
-            ...serviceErrorBody(
-              undefined,
-              serviceMessage("service.igdb_credentials_test_failed", {})
-            ),
-          });
+        return res.status(500).json({
+          success: false,
+          ...serviceErrorBody(
+            undefined,
+            serviceMessage("service.igdb_credentials_test_failed", {})
+          ),
+        });
       }
     }
   );
@@ -5681,15 +5679,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(result.success ? 200 : 400).json(result);
       } catch (error) {
         routesLogger.error({ error }, "Failed to test IGDB credentials");
-        return res
-          .status(500)
-          .json({
-            success: false,
-            ...serviceErrorBody(
-              undefined,
-              serviceMessage("service.igdb_credentials_test_failed", {})
-            ),
-          });
+        return res.status(500).json({
+          success: false,
+          ...serviceErrorBody(
+            undefined,
+            serviceMessage("service.igdb_credentials_test_failed", {})
+          ),
+        });
       }
     }
   );
@@ -5944,11 +5940,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (result.success) {
         res.json({ success: true });
       } else {
-        res.status(502).json({ error: result.error ?? "Failed to reach Apprise server" });
+        res
+          .status(502)
+          .json(
+            result.error !== undefined
+              ? { error: result.error, errorI18n: result.errorI18n ?? null }
+              : serviceErrorBody(undefined, serviceMessage("service.apprise_reach_failed", {}))
+          );
       }
     } catch (error) {
       routesLogger.error({ error }, "Apprise test failed");
-      res.status(500).json({ error: "Apprise test failed" });
+      res
+        .status(500)
+        .json(serviceErrorBody(undefined, serviceMessage("service.apprise_test_failed", {})));
     }
   });
 

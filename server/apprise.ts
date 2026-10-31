@@ -1,3 +1,4 @@
+import { serviceMessage, serviceErrorBody } from "../shared/service-messages.js";
 import { readNotificationLanguage } from "../shared/notification-language.js";
 import { localizeOutboundNotification } from "../shared/notification-messages.js";
 import { execFile } from "child_process";
@@ -181,6 +182,18 @@ function formatCliError(error: unknown, stdout = "", stderr = ""): string {
     (error instanceof Error ? error.message : String(error));
 
   return message.length > 200 ? `${message.slice(0, 197)}...` : message;
+}
+
+function cliErrorBody(error: unknown, stdout = "", stderr = "") {
+  const execError = error as ExecFileError | undefined;
+  const key =
+    execError?.code === "ENOENT"
+      ? "service.apprise_cli_not_found"
+      : execError?.killed || execError?.signal
+        ? "service.apprise_cli_timeout"
+        : undefined;
+  const descriptor = key ? serviceErrorBody(undefined, serviceMessage(key, {})).errorI18n : null;
+  return { error: formatCliError(error, stdout, stderr), errorI18n: descriptor };
 }
 
 function runAppriseCli(args: string[]): Promise<ExecFileResult> {
@@ -400,16 +413,27 @@ class AppriseClient {
     await this.sendViaApi(translated);
   }
 
-  async test(userId?: string): Promise<{ success: boolean; error?: string }> {
+  async test(
+    userId?: string
+  ): Promise<{ success: boolean; error?: string; errorI18n?: string | null }> {
     if (!this.isConfigured()) {
-      return { success: false, error: "Apprise is not configured" };
+      return {
+        success: false,
+        ...serviceErrorBody(undefined, serviceMessage("service.apprise_unconfigured", {})),
+      };
     }
 
     const text = await this.localize("Questarr", "Test notification from Questarr", userId);
     if (this.settings.mode === "cli") {
       const urls = parseAppriseUrls(this.settings.urls);
       if (urls.length === 0) {
-        return { success: false, error: "No notification URLs provided" };
+        return {
+          success: false,
+          ...serviceErrorBody(
+            undefined,
+            serviceMessage("service.apprise_notification_urls_missing", {})
+          ),
+        };
       }
 
       try {
@@ -418,13 +442,19 @@ class AppriseClient {
       } catch (result) {
         const { error, stdout, stderr } =
           result instanceof AppriseCliError ? result : new AppriseCliError(result);
-        return { success: false, error: formatCliError(error, stdout, stderr) };
+        return { success: false, ...cliErrorBody(error, stdout, stderr) };
       }
     }
 
     const request = this.buildApiRequest(text.title, text.message, "info");
     if (!request) {
-      return { success: false, error: "No config key or notification URLs provided" };
+      return {
+        success: false,
+        ...serviceErrorBody(
+          undefined,
+          serviceMessage("service.apprise_config_or_urls_missing", {})
+        ),
+      };
     }
 
     try {
@@ -440,11 +470,21 @@ class AppriseClient {
       const text = await res.text().catch(() => "");
       return {
         success: false,
-        error: `Server responded with ${res.status}: ${text}`.slice(0, 200),
+        ...serviceErrorBody(
+          undefined,
+          serviceMessage("service.apprise_server_responded", {
+            status: res.status,
+            error: text.slice(0, Math.max(0, 200 - `Server responded with ${res.status}: `.length)),
+          })
+        ),
       };
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      return { success: false, error: message };
+      return {
+        success: false,
+        ...(error instanceof Error
+          ? serviceErrorBody(error, serviceMessage("service.apprise_reach_failed", {}))
+          : { error: String(error), errorI18n: null }),
+      };
     }
   }
 }

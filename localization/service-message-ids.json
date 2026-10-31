@@ -194,5 +194,13 @@
   "service.json_catalog_http_error",
   "service.json_catalog_size_limit",
   "service.json_catalog_format_invalid",
-  "service.json_catalog_request_failed"
+  "service.json_catalog_request_failed",
+  "service.apprise_unconfigured",
+  "service.apprise_notification_urls_missing",
+  "service.apprise_config_or_urls_missing",
+  "service.apprise_cli_not_found",
+  "service.apprise_cli_timeout",
+  "service.apprise_server_responded",
+  "service.apprise_reach_failed",
+  "service.apprise_test_failed"
 ]
