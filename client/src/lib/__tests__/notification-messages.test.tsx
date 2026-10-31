@@ -72,4 +72,12 @@ describe("localizeNotificationMessage", () => {
   it("localizes the Content Available notification title", () => {
     expect(getNotificationTitle("Content Available", "es")).toBe("Contenido disponible");
   });
+
+  it("localizes the Release Flagged for Review notification title", () => {
+    for (const locale of NOTIFICATION_LOCALES) {
+      expect(getNotificationTitle("Release Flagged for Review", locale)).not.toBe(
+        "Release Flagged for Review"
+      );
+    }
+  });
 });

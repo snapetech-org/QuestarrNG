@@ -24,6 +24,7 @@ type NotificationLabelKey =
   | "Content Available"
   | "Multiple Results Found"
   | "Multiple Releases Found"
+  | "Release Flagged for Review"
   | "Game Updates Available"
   | "Game Packs Available"
   | "Available on xREL.to"
@@ -372,6 +373,20 @@ const LABELS: Record<NotificationLabelKey, readonly string[]> = {
     "找到多個發行版本",
     "Tìm thấy nhiều bản phát hành",
     "Beberapa rilis ditemukan",
+  ],
+  "Release Flagged for Review": [
+    "Lanzamiento marcado para revisión",
+    "已标记待审核的发布内容",
+    "समीक्षा के लिए चिह्नित रिलीज़",
+    "Zur Überprüfung markierte Veröffentlichung",
+    "確認が必要なリリース",
+    "Publication signalée pour examen",
+    "Lançamento sinalizado para análise",
+    "إصدار معلَّم للمراجعة",
+    "검토 대상으로 표시된 릴리스",
+    "已標記待審查的發行項目",
+    "Bản phát hành được đánh dấu để xem xét",
+    "Rilisan ditandai untuk ditinjau",
   ],
   "Game Updates Available": [
     "Hay actualizaciones disponibles",
