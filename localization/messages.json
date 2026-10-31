@@ -45617,6 +45617,462 @@
         "vi": "Download added successfully (via URL)",
         "id": "Download added successfully (via URL)"
       }
+    },
+    "service.synology_api_unavailable": {
+      "source": "Synology API {api} is not available on this server",
+      "translations": {
+        "es": "Synology API {api} is not available on this server",
+        "es-419": "Synology API {api} is not available on this server",
+        "zh-Hans": "Synology API {api} is not available on this server",
+        "hi": "Synology API {api} is not available on this server",
+        "de": "Synology API {api} is not available on this server",
+        "ja": "Synology API {api} is not available on this server",
+        "fr": "Synology API {api} is not available on this server",
+        "fr-CA": "Synology API {api} is not available on this server",
+        "pt-BR": "Synology API {api} is not available on this server",
+        "ar": "Synology API {api} is not available on this server",
+        "ko": "Synology API {api} is not available on this server",
+        "zh-Hant": "Synology API {api} is not available on this server",
+        "vi": "Synology API {api} is not available on this server",
+        "id": "Synology API {api} is not available on this server"
+      }
+    },
+    "service.synology_api_info_missing": {
+      "source": "Synology API information has not been loaded",
+      "translations": {
+        "es": "Synology API information has not been loaded",
+        "es-419": "Synology API information has not been loaded",
+        "zh-Hans": "Synology API information has not been loaded",
+        "hi": "Synology API information has not been loaded",
+        "de": "Synology API information has not been loaded",
+        "ja": "Synology API information has not been loaded",
+        "fr": "Synology API information has not been loaded",
+        "fr-CA": "Synology API information has not been loaded",
+        "pt-BR": "Synology API information has not been loaded",
+        "ar": "Synology API information has not been loaded",
+        "ko": "Synology API information has not been loaded",
+        "zh-Hant": "Synology API information has not been loaded",
+        "vi": "Synology API information has not been loaded",
+        "id": "Synology API information has not been loaded"
+      }
+    },
+    "service.synology_task_api_unavailable": {
+      "source": "Synology Download Station Task API is not available on this server",
+      "translations": {
+        "es": "Synology Download Station Task API is not available on this server",
+        "es-419": "Synology Download Station Task API is not available on this server",
+        "zh-Hans": "Synology Download Station Task API is not available on this server",
+        "hi": "Synology Download Station Task API is not available on this server",
+        "de": "Synology Download Station Task API is not available on this server",
+        "ja": "Synology Download Station Task API is not available on this server",
+        "fr": "Synology Download Station Task API is not available on this server",
+        "fr-CA": "Synology Download Station Task API is not available on this server",
+        "pt-BR": "Synology Download Station Task API is not available on this server",
+        "ar": "Synology Download Station Task API is not available on this server",
+        "ko": "Synology Download Station Task API is not available on this server",
+        "zh-Hant": "Synology Download Station Task API is not available on this server",
+        "vi": "Synology Download Station Task API is not available on this server",
+        "id": "Synology Download Station Task API is not available on this server"
+      }
+    },
+    "service.synology_parameters_rejected": {
+      "source": "Synology rejected the request parameters",
+      "translations": {
+        "es": "Synology rejected the request parameters",
+        "es-419": "Synology rejected the request parameters",
+        "zh-Hans": "Synology rejected the request parameters",
+        "hi": "Synology rejected the request parameters",
+        "de": "Synology rejected the request parameters",
+        "ja": "Synology rejected the request parameters",
+        "fr": "Synology rejected the request parameters",
+        "fr-CA": "Synology rejected the request parameters",
+        "pt-BR": "Synology rejected the request parameters",
+        "ar": "Synology rejected the request parameters",
+        "ko": "Synology rejected the request parameters",
+        "zh-Hant": "Synology rejected the request parameters",
+        "vi": "Synology rejected the request parameters",
+        "id": "Synology rejected the request parameters"
+      }
+    },
+    "service.synology_permission_denied": {
+      "source": "Synology permission denied",
+      "translations": {
+        "es": "Synology permission denied",
+        "es-419": "Synology permission denied",
+        "zh-Hans": "Synology permission denied",
+        "hi": "Synology permission denied",
+        "de": "Synology permission denied",
+        "ja": "Synology permission denied",
+        "fr": "Synology permission denied",
+        "fr-CA": "Synology permission denied",
+        "pt-BR": "Synology permission denied",
+        "ar": "Synology permission denied",
+        "ko": "Synology permission denied",
+        "zh-Hant": "Synology permission denied",
+        "vi": "Synology permission denied",
+        "id": "Synology permission denied"
+      }
+    },
+    "service.synology_session_expired": {
+      "source": "Synology session expired",
+      "translations": {
+        "es": "Synology session expired",
+        "es-419": "Synology session expired",
+        "zh-Hans": "Synology session expired",
+        "hi": "Synology session expired",
+        "de": "Synology session expired",
+        "ja": "Synology session expired",
+        "fr": "Synology session expired",
+        "fr-CA": "Synology session expired",
+        "pt-BR": "Synology session expired",
+        "ar": "Synology session expired",
+        "ko": "Synology session expired",
+        "zh-Hant": "Synology session expired",
+        "vi": "Synology session expired",
+        "id": "Synology session expired"
+      }
+    },
+    "service.synology_destination_required": {
+      "source": "Synology rejected the request — a destination folder is required",
+      "translations": {
+        "es": "Synology rejected the request — a destination folder is required",
+        "es-419": "Synology rejected the request — a destination folder is required",
+        "zh-Hans": "Synology rejected the request — a destination folder is required",
+        "hi": "Synology rejected the request — a destination folder is required",
+        "de": "Synology rejected the request — a destination folder is required",
+        "ja": "Synology rejected the request — a destination folder is required",
+        "fr": "Synology rejected the request — a destination folder is required",
+        "fr-CA": "Synology rejected the request — a destination folder is required",
+        "pt-BR": "Synology rejected the request — a destination folder is required",
+        "ar": "Synology rejected the request — a destination folder is required",
+        "ko": "Synology rejected the request — a destination folder is required",
+        "zh-Hant": "Synology rejected the request — a destination folder is required",
+        "vi": "Synology rejected the request — a destination folder is required",
+        "id": "Synology rejected the request — a destination folder is required"
+      }
+    },
+    "service.synology_authentication_failed": {
+      "source": "Synology authentication failed",
+      "translations": {
+        "es": "Synology authentication failed",
+        "es-419": "Synology authentication failed",
+        "zh-Hans": "Synology authentication failed",
+        "hi": "Synology authentication failed",
+        "de": "Synology authentication failed",
+        "ja": "Synology authentication failed",
+        "fr": "Synology authentication failed",
+        "fr-CA": "Synology authentication failed",
+        "pt-BR": "Synology authentication failed",
+        "ar": "Synology authentication failed",
+        "ko": "Synology authentication failed",
+        "zh-Hant": "Synology authentication failed",
+        "vi": "Synology authentication failed",
+        "id": "Synology authentication failed"
+      }
+    },
+    "service.synology_task_limit": {
+      "source": "Synology maximum task limit reached",
+      "translations": {
+        "es": "Synology maximum task limit reached",
+        "es-419": "Synology maximum task limit reached",
+        "zh-Hans": "Synology maximum task limit reached",
+        "hi": "Synology maximum task limit reached",
+        "de": "Synology maximum task limit reached",
+        "ja": "Synology maximum task limit reached",
+        "fr": "Synology maximum task limit reached",
+        "fr-CA": "Synology maximum task limit reached",
+        "pt-BR": "Synology maximum task limit reached",
+        "ar": "Synology maximum task limit reached",
+        "ko": "Synology maximum task limit reached",
+        "zh-Hant": "Synology maximum task limit reached",
+        "vi": "Synology maximum task limit reached",
+        "id": "Synology maximum task limit reached"
+      }
+    },
+    "service.synology_destination_denied": {
+      "source": "Synology destination access denied",
+      "translations": {
+        "es": "Synology destination access denied",
+        "es-419": "Synology destination access denied",
+        "zh-Hans": "Synology destination access denied",
+        "hi": "Synology destination access denied",
+        "de": "Synology destination access denied",
+        "ja": "Synology destination access denied",
+        "fr": "Synology destination access denied",
+        "fr-CA": "Synology destination access denied",
+        "pt-BR": "Synology destination access denied",
+        "ar": "Synology destination access denied",
+        "ko": "Synology destination access denied",
+        "zh-Hant": "Synology destination access denied",
+        "vi": "Synology destination access denied",
+        "id": "Synology destination access denied"
+      }
+    },
+    "service.synology_destination_not_found": {
+      "source": "Synology destination was not found",
+      "translations": {
+        "es": "Synology destination was not found",
+        "es-419": "Synology destination was not found",
+        "zh-Hans": "Synology destination was not found",
+        "hi": "Synology destination was not found",
+        "de": "Synology destination was not found",
+        "ja": "Synology destination was not found",
+        "fr": "Synology destination was not found",
+        "fr-CA": "Synology destination was not found",
+        "pt-BR": "Synology destination was not found",
+        "ar": "Synology destination was not found",
+        "ko": "Synology destination was not found",
+        "zh-Hant": "Synology destination was not found",
+        "vi": "Synology destination was not found",
+        "id": "Synology destination was not found"
+      }
+    },
+    "service.synology_error_fields": {
+      "source": "{context} (code {code}): {details}",
+      "translations": {
+        "es": "{context} (code {code}): {details}",
+        "es-419": "{context} (code {code}): {details}",
+        "zh-Hans": "{context} (code {code}): {details}",
+        "hi": "{context} (code {code}): {details}",
+        "de": "{context} (code {code}): {details}",
+        "ja": "{context} (code {code}): {details}",
+        "fr": "{context} (code {code}): {details}",
+        "fr-CA": "{context} (code {code}): {details}",
+        "pt-BR": "{context} (code {code}): {details}",
+        "ar": "{context} (code {code}): {details}",
+        "ko": "{context} (code {code}): {details}",
+        "zh-Hant": "{context} (code {code}): {details}",
+        "vi": "{context} (code {code}): {details}",
+        "id": "{context} (code {code}): {details}"
+      }
+    },
+    "service.synology_error_code": {
+      "source": "{context} (code {code})",
+      "translations": {
+        "es": "{context} (code {code})",
+        "es-419": "{context} (code {code})",
+        "zh-Hans": "{context} (code {code})",
+        "hi": "{context} (code {code})",
+        "de": "{context} (code {code})",
+        "ja": "{context} (code {code})",
+        "fr": "{context} (code {code})",
+        "fr-CA": "{context} (code {code})",
+        "pt-BR": "{context} (code {code})",
+        "ar": "{context} (code {code})",
+        "ko": "{context} (code {code})",
+        "zh-Hant": "{context} (code {code})",
+        "vi": "{context} (code {code})",
+        "id": "{context} (code {code})"
+      }
+    },
+    "service.unsafe_url_blocked_without_url": {
+      "source": "Unsafe URL blocked",
+      "translations": {
+        "es": "Unsafe URL blocked",
+        "es-419": "Unsafe URL blocked",
+        "zh-Hans": "Unsafe URL blocked",
+        "hi": "Unsafe URL blocked",
+        "de": "Unsafe URL blocked",
+        "ja": "Unsafe URL blocked",
+        "fr": "Unsafe URL blocked",
+        "fr-CA": "Unsafe URL blocked",
+        "pt-BR": "Unsafe URL blocked",
+        "ar": "Unsafe URL blocked",
+        "ko": "Unsafe URL blocked",
+        "zh-Hant": "Unsafe URL blocked",
+        "vi": "Unsafe URL blocked",
+        "id": "Unsafe URL blocked"
+      }
+    },
+    "service.synology_http_error": {
+      "source": "{context}: HTTP {status} {statusText} - {error}",
+      "translations": {
+        "es": "{context}: HTTP {status} {statusText} - {error}",
+        "es-419": "{context}: HTTP {status} {statusText} - {error}",
+        "zh-Hans": "{context}: HTTP {status} {statusText} - {error}",
+        "hi": "{context}: HTTP {status} {statusText} - {error}",
+        "de": "{context}: HTTP {status} {statusText} - {error}",
+        "ja": "{context}: HTTP {status} {statusText} - {error}",
+        "fr": "{context}: HTTP {status} {statusText} - {error}",
+        "fr-CA": "{context}: HTTP {status} {statusText} - {error}",
+        "pt-BR": "{context}: HTTP {status} {statusText} - {error}",
+        "ar": "{context}: HTTP {status} {statusText} - {error}",
+        "ko": "{context}: HTTP {status} {statusText} - {error}",
+        "zh-Hant": "{context}: HTTP {status} {statusText} - {error}",
+        "vi": "{context}: HTTP {status} {statusText} - {error}",
+        "id": "{context}: HTTP {status} {statusText} - {error}"
+      }
+    },
+    "service.synology_query_apis_failed": {
+      "source": "Failed to query Synology APIs",
+      "translations": {
+        "es": "Failed to query Synology APIs",
+        "es-419": "Failed to query Synology APIs",
+        "zh-Hans": "Failed to query Synology APIs",
+        "hi": "Failed to query Synology APIs",
+        "de": "Failed to query Synology APIs",
+        "ja": "Failed to query Synology APIs",
+        "fr": "Failed to query Synology APIs",
+        "fr-CA": "Failed to query Synology APIs",
+        "pt-BR": "Failed to query Synology APIs",
+        "ar": "Failed to query Synology APIs",
+        "ko": "Failed to query Synology APIs",
+        "zh-Hant": "Failed to query Synology APIs",
+        "vi": "Failed to query Synology APIs",
+        "id": "Failed to query Synology APIs"
+      }
+    },
+    "service.synology_credentials_required": {
+      "source": "Synology Download Station requires a username and password",
+      "translations": {
+        "es": "Synology Download Station requires a username and password",
+        "es-419": "Synology Download Station requires a username and password",
+        "zh-Hans": "Synology Download Station requires a username and password",
+        "hi": "Synology Download Station requires a username and password",
+        "de": "Synology Download Station requires a username and password",
+        "ja": "Synology Download Station requires a username and password",
+        "fr": "Synology Download Station requires a username and password",
+        "fr-CA": "Synology Download Station requires a username and password",
+        "pt-BR": "Synology Download Station requires a username and password",
+        "ar": "Synology Download Station requires a username and password",
+        "ko": "Synology Download Station requires a username and password",
+        "zh-Hant": "Synology Download Station requires a username and password",
+        "vi": "Synology Download Station requires a username and password",
+        "id": "Synology Download Station requires a username and password"
+      }
+    },
+    "service.synology_authenticate_failed": {
+      "source": "Failed to authenticate with Synology Download Station",
+      "translations": {
+        "es": "Failed to authenticate with Synology Download Station",
+        "es-419": "Failed to authenticate with Synology Download Station",
+        "zh-Hans": "Failed to authenticate with Synology Download Station",
+        "hi": "Failed to authenticate with Synology Download Station",
+        "de": "Failed to authenticate with Synology Download Station",
+        "ja": "Failed to authenticate with Synology Download Station",
+        "fr": "Failed to authenticate with Synology Download Station",
+        "fr-CA": "Failed to authenticate with Synology Download Station",
+        "pt-BR": "Failed to authenticate with Synology Download Station",
+        "ar": "Failed to authenticate with Synology Download Station",
+        "ko": "Failed to authenticate with Synology Download Station",
+        "zh-Hant": "Failed to authenticate with Synology Download Station",
+        "vi": "Failed to authenticate with Synology Download Station",
+        "id": "Failed to authenticate with Synology Download Station"
+      }
+    },
+    "service.synology_logout_failed": {
+      "source": "Failed to log out from Synology Download Station",
+      "translations": {
+        "es": "Failed to log out from Synology Download Station",
+        "es-419": "Failed to log out from Synology Download Station",
+        "zh-Hans": "Failed to log out from Synology Download Station",
+        "hi": "Failed to log out from Synology Download Station",
+        "de": "Failed to log out from Synology Download Station",
+        "ja": "Failed to log out from Synology Download Station",
+        "fr": "Failed to log out from Synology Download Station",
+        "fr-CA": "Failed to log out from Synology Download Station",
+        "pt-BR": "Failed to log out from Synology Download Station",
+        "ar": "Failed to log out from Synology Download Station",
+        "ko": "Failed to log out from Synology Download Station",
+        "zh-Hant": "Failed to log out from Synology Download Station",
+        "vi": "Failed to log out from Synology Download Station",
+        "id": "Failed to log out from Synology Download Station"
+      }
+    },
+    "service.synology_method_failed": {
+      "source": "Synology {api}.{method} failed",
+      "translations": {
+        "es": "Synology {api}.{method} failed",
+        "es-419": "Synology {api}.{method} failed",
+        "zh-Hans": "Synology {api}.{method} failed",
+        "hi": "Synology {api}.{method} failed",
+        "de": "Synology {api}.{method} failed",
+        "ja": "Synology {api}.{method} failed",
+        "fr": "Synology {api}.{method} failed",
+        "fr-CA": "Synology {api}.{method} failed",
+        "pt-BR": "Synology {api}.{method} failed",
+        "ar": "Synology {api}.{method} failed",
+        "ko": "Synology {api}.{method} failed",
+        "zh-Hant": "Synology {api}.{method} failed",
+        "vi": "Synology {api}.{method} failed",
+        "id": "Synology {api}.{method} failed"
+      }
+    },
+    "service.synology_all_create_variants_failed": {
+      "source": "All Synology DS2 create-task variants failed",
+      "translations": {
+        "es": "All Synology DS2 create-task variants failed",
+        "es-419": "All Synology DS2 create-task variants failed",
+        "zh-Hans": "All Synology DS2 create-task variants failed",
+        "hi": "All Synology DS2 create-task variants failed",
+        "de": "All Synology DS2 create-task variants failed",
+        "ja": "All Synology DS2 create-task variants failed",
+        "fr": "All Synology DS2 create-task variants failed",
+        "fr-CA": "All Synology DS2 create-task variants failed",
+        "pt-BR": "All Synology DS2 create-task variants failed",
+        "ar": "All Synology DS2 create-task variants failed",
+        "ko": "All Synology DS2 create-task variants failed",
+        "zh-Hant": "All Synology DS2 create-task variants failed",
+        "vi": "All Synology DS2 create-task variants failed",
+        "id": "All Synology DS2 create-task variants failed"
+      }
+    },
+    "service.synology_destination_unconfigured": {
+      "source": "No download destination configured. Set a Download Path for this downloader in Questarr, or configure a default destination in Synology Download Station settings.",
+      "translations": {
+        "es": "No download destination configured. Set a Download Path for this downloader in Questarr, or configure a default destination in Synology Download Station settings.",
+        "es-419": "No download destination configured. Set a Download Path for this downloader in Questarr, or configure a default destination in Synology Download Station settings.",
+        "zh-Hans": "No download destination configured. Set a Download Path for this downloader in Questarr, or configure a default destination in Synology Download Station settings.",
+        "hi": "No download destination configured. Set a Download Path for this downloader in Questarr, or configure a default destination in Synology Download Station settings.",
+        "de": "No download destination configured. Set a Download Path for this downloader in Questarr, or configure a default destination in Synology Download Station settings.",
+        "ja": "No download destination configured. Set a Download Path for this downloader in Questarr, or configure a default destination in Synology Download Station settings.",
+        "fr": "No download destination configured. Set a Download Path for this downloader in Questarr, or configure a default destination in Synology Download Station settings.",
+        "fr-CA": "No download destination configured. Set a Download Path for this downloader in Questarr, or configure a default destination in Synology Download Station settings.",
+        "pt-BR": "No download destination configured. Set a Download Path for this downloader in Questarr, or configure a default destination in Synology Download Station settings.",
+        "ar": "No download destination configured. Set a Download Path for this downloader in Questarr, or configure a default destination in Synology Download Station settings.",
+        "ko": "No download destination configured. Set a Download Path for this downloader in Questarr, or configure a default destination in Synology Download Station settings.",
+        "zh-Hant": "No download destination configured. Set a Download Path for this downloader in Questarr, or configure a default destination in Synology Download Station settings.",
+        "vi": "No download destination configured. Set a Download Path for this downloader in Questarr, or configure a default destination in Synology Download Station settings.",
+        "id": "No download destination configured. Set a Download Path for this downloader in Questarr, or configure a default destination in Synology Download Station settings."
+      }
+    },
+    "service.download_fetch_failed": {
+      "source": "Failed to fetch download: {error}",
+      "translations": {
+        "es": "Failed to fetch download: {error}",
+        "es-419": "Failed to fetch download: {error}",
+        "zh-Hans": "Failed to fetch download: {error}",
+        "hi": "Failed to fetch download: {error}",
+        "de": "Failed to fetch download: {error}",
+        "ja": "Failed to fetch download: {error}",
+        "fr": "Failed to fetch download: {error}",
+        "fr-CA": "Failed to fetch download: {error}",
+        "pt-BR": "Failed to fetch download: {error}",
+        "ar": "Failed to fetch download: {error}",
+        "ko": "Failed to fetch download: {error}",
+        "zh-Hant": "Failed to fetch download: {error}",
+        "vi": "Failed to fetch download: {error}",
+        "id": "Failed to fetch download: {error}"
+      }
+    },
+    "service.synology_download_add_failed": {
+      "source": "Failed to add download to Synology Download Station: {error}",
+      "translations": {
+        "es": "Failed to add download to Synology Download Station: {error}",
+        "es-419": "Failed to add download to Synology Download Station: {error}",
+        "zh-Hans": "Failed to add download to Synology Download Station: {error}",
+        "hi": "Failed to add download to Synology Download Station: {error}",
+        "de": "Failed to add download to Synology Download Station: {error}",
+        "ja": "Failed to add download to Synology Download Station: {error}",
+        "fr": "Failed to add download to Synology Download Station: {error}",
+        "fr-CA": "Failed to add download to Synology Download Station: {error}",
+        "pt-BR": "Failed to add download to Synology Download Station: {error}",
+        "ar": "Failed to add download to Synology Download Station: {error}",
+        "ko": "Failed to add download to Synology Download Station: {error}",
+        "zh-Hant": "Failed to add download to Synology Download Station: {error}",
+        "vi": "Failed to add download to Synology Download Station: {error}",
+        "id": "Failed to add download to Synology Download Station: {error}"
+      }
     }
   }
 }

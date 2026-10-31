@@ -2862,6 +2862,35 @@ export const STABLE_INTERFACE_MESSAGES = {
     "{error} - The indexer refused the connection. Check if Prowlarr/Jackett is running and the port is correct.",
   "service.torrent_error": "Torrent error",
   "service.download_added_via_url": "Download added successfully (via URL)",
+  "service.synology_api_unavailable": "Synology API {api} is not available on this server",
+  "service.synology_api_info_missing": "Synology API information has not been loaded",
+  "service.synology_task_api_unavailable":
+    "Synology Download Station Task API is not available on this server",
+  "service.synology_parameters_rejected": "Synology rejected the request parameters",
+  "service.synology_permission_denied": "Synology permission denied",
+  "service.synology_session_expired": "Synology session expired",
+  "service.synology_destination_required":
+    "Synology rejected the request — a destination folder is required",
+  "service.synology_authentication_failed": "Synology authentication failed",
+  "service.synology_task_limit": "Synology maximum task limit reached",
+  "service.synology_destination_denied": "Synology destination access denied",
+  "service.synology_destination_not_found": "Synology destination was not found",
+  "service.synology_error_fields": "{context} (code {code}): {details}",
+  "service.synology_error_code": "{context} (code {code})",
+  "service.unsafe_url_blocked_without_url": "Unsafe URL blocked",
+  "service.synology_http_error": "{context}: HTTP {status} {statusText} - {error}",
+  "service.synology_query_apis_failed": "Failed to query Synology APIs",
+  "service.synology_credentials_required":
+    "Synology Download Station requires a username and password",
+  "service.synology_authenticate_failed": "Failed to authenticate with Synology Download Station",
+  "service.synology_logout_failed": "Failed to log out from Synology Download Station",
+  "service.synology_method_failed": "Synology {api}.{method} failed",
+  "service.synology_all_create_variants_failed": "All Synology DS2 create-task variants failed",
+  "service.synology_destination_unconfigured":
+    "No download destination configured. Set a Download Path for this downloader in Questarr, or configure a default destination in Synology Download Station settings.",
+  "service.download_fetch_failed": "Failed to fetch download: {error}",
+  "service.synology_download_add_failed":
+    "Failed to add download to Synology Download Station: {error}",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

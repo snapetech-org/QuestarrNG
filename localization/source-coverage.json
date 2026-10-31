@@ -1876,6 +1876,342 @@
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "source-fallback",
       "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_api_unavailable",
+      "source": "Synology API {api} is not available on this server",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_api_info_missing",
+      "source": "Synology API information has not been loaded",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_task_api_unavailable",
+      "source": "Synology Download Station Task API is not available on this server",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_parameters_rejected",
+      "source": "Synology rejected the request parameters",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_permission_denied",
+      "source": "Synology permission denied",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_session_expired",
+      "source": "Synology session expired",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_destination_required",
+      "source": "Synology rejected the request — a destination folder is required",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_authentication_failed",
+      "source": "Synology authentication failed",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_task_limit",
+      "source": "Synology maximum task limit reached",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_destination_denied",
+      "source": "Synology destination access denied",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_destination_not_found",
+      "source": "Synology destination was not found",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_error_fields",
+      "source": "{context} (code {code}): {details}",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_error_code",
+      "source": "{context} (code {code})",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.unsafe_url_blocked_without_url",
+      "source": "Unsafe URL blocked",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_http_error",
+      "source": "{context}: HTTP {status} {statusText} - {error}",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_query_apis_failed",
+      "source": "Failed to query Synology APIs",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_credentials_required",
+      "source": "Synology Download Station requires a username and password",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_authenticate_failed",
+      "source": "Failed to authenticate with Synology Download Station",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_logout_failed",
+      "source": "Failed to log out from Synology Download Station",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_method_failed",
+      "source": "Synology {api}.{method} failed",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_all_create_variants_failed",
+      "source": "All Synology DS2 create-task variants failed",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_destination_unconfigured",
+      "source": "No download destination configured. Set a Download Path for this downloader in Questarr, or configure a default destination in Synology Download Station settings.",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.download_fetch_failed",
+      "source": "Failed to fetch download: {error}",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.synology_download_add_failed",
+      "source": "Failed to add download to Synology Download Station: {error}",
+      "kind": "app-owned Synology API/service",
+      "owners": ["server/downloaders/synology.ts"],
+      "coverage": [
+        "server/__tests__/downloaders_synology_remaining.test.ts",
+        "server/__tests__/downloaders_clients_regression.test.ts",
+        "shared/__tests__/service-message-descriptor.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
     }
   ],
   "codeUnits": [

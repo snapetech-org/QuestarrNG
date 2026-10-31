@@ -1,5 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import {
+  ServiceMessageError,
+  serviceMessage,
+  parseServiceMessageDescriptor,
+} from "../../shared/service-messages.js";
+import type { ServiceMessageFragment } from "../../shared/service-messages.js";
 import type { Downloader } from "../../shared/schema.js";
 
 const safeFetchMock = vi.fn();
@@ -60,6 +66,108 @@ const createDownloader = (overrides: Partial<Downloader> = {}): Downloader => {
 };
 
 describe("synology remaining regression coverage", () => {
+  it.each([
+    [101, "service.synology_parameters_rejected"],
+    [105, "service.synology_permission_denied"],
+    [106, "service.synology_session_expired"],
+    [120, "service.synology_destination_required"],
+    [400, "service.synology_authentication_failed"],
+    [401, "service.synology_task_limit"],
+    [402, "service.synology_destination_denied"],
+    [403, "service.synology_destination_not_found"],
+  ] as const)("tags mapped Synology rejection %s with unchanged English", (code, key) => {
+    const client = new SynologyDownloadStationClient(createDownloader()) as unknown as {
+      buildSynologyError(
+        error: { code: number },
+        fallback: ServiceMessageFragment
+      ): ServiceMessageFragment;
+      buildSynologyErrorMessage(error: { code: number }, fallback: string): string;
+    };
+    const fallback = serviceMessage("service.synology_method_failed", {
+      api: "SYNO.API",
+      method: "create",
+    });
+    const result = client.buildSynologyError({ code }, fallback);
+    expect(result).toEqual(serviceMessage(key, {}));
+    expect(result.message).toBe(client.buildSynologyErrorMessage({ code }, fallback.message));
+  });
+
+  it("retains captured provider field details without reinterpreting a matching app diagnostic", () => {
+    const client = new SynologyDownloadStationClient(createDownloader()) as unknown as {
+      buildSynologyError(
+        error: { code: number; errors: { name: string; reason: string }[] },
+        fallback: ServiceMessageFragment
+      ): ServiceMessageFragment;
+    };
+    const name = "destination العربية: {context}";
+    const reason = "Synology permission denied";
+    const result = client.buildSynologyError(
+      { code: 105, errors: [{ name, reason }] },
+      serviceMessage("service.synology_method_failed", {
+        api: "SYNO.DownloadStation.Task",
+        method: "create",
+      })
+    );
+    const parsed = parseServiceMessageDescriptor(result);
+    expect(parsed?.messageKey).toBe("service.synology_error_fields");
+    expect(parsed?.messageValues.details).toBe(`${name}: ${reason}`);
+    expect(parsed?.messageDetails).toHaveProperty("context");
+    expect(parsed?.messageDetails).not.toHaveProperty("details");
+  });
+
+  it("retries DS2 variants only for the original request-API rejection marker", async () => {
+    const client = new SynologyDownloadStationClient(createDownloader()) as unknown as {
+      apiInfo: Record<string, { path: string; minVersion: number; maxVersion: number }>;
+      authenticate(): Promise<void>;
+      fetchJson(...args: unknown[]): Promise<unknown>;
+      requestApi(...args: unknown[]): Promise<unknown>;
+      requestTaskApi(...args: unknown[]): Promise<unknown>;
+      createUrlTask(...args: unknown[]): Promise<unknown>;
+    };
+    const descriptor = { path: "entry.cgi", minVersion: 1, maxVersion: 3 };
+    client.apiInfo = { "SYNO.API.Auth": descriptor, "SYNO.DownloadStation2.Task": descriptor };
+    vi.spyOn(client, "fetchJson").mockResolvedValue({ success: false, error: { code: 105 } });
+    const authError = await client.authenticate().catch((e) => e);
+    const apiError = await client
+      .requestApi("SYNO.DownloadStation2.Task", descriptor, 3, "create", { requiresAuth: false })
+      .catch((e) => e);
+    expect(authError).toBeInstanceOf(ServiceMessageError);
+    expect(apiError).toBeInstanceOf(ServiceMessageError);
+    expect(authError.constructor).not.toBe(apiError.constructor);
+    const task = vi
+      .spyOn(client, "requestTaskApi")
+      .mockRejectedValueOnce(apiError)
+      .mockResolvedValueOnce({ success: true });
+    await expect(
+      client.createUrlTask(
+        "SYNO.DownloadStation2.Task",
+        "magnet:?xt=urn:btih:abc",
+        "/volume1/games"
+      )
+    ).resolves.toEqual({ success: true });
+    expect(task).toHaveBeenCalledTimes(2);
+    for (const error of [
+      authError,
+      new ServiceMessageError("service.synology_http_error", {
+        context: "raw context",
+        status: 503,
+        statusText: "Offline",
+        error: "provider",
+      }),
+      new Error("Synology permission denied"),
+    ]) {
+      task.mockReset().mockRejectedValueOnce(error).mockResolvedValueOnce({ success: true });
+      await expect(
+        client.createUrlTask(
+          "SYNO.DownloadStation2.Task",
+          "magnet:?xt=urn:btih:abc",
+          "/volume1/games"
+        )
+      ).rejects.toBe(error);
+      expect(task).toHaveBeenCalledTimes(1);
+    }
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     safeFetchMock.mockReset();
@@ -405,7 +513,7 @@ describe("synology remaining regression coverage", () => {
       client.addDownload({ url: "http://indexer.local/broken.torrent", title: "Broken" })
     ).resolves.toEqual({
       success: false,
-      message: "Failed to fetch download: Service Unavailable",
+      ...serviceMessage("service.download_fetch_failed", { error: "Service Unavailable" }),
     });
 
     fetchWithMagnetDetectionMock.mockRejectedValueOnce("boom");
@@ -413,7 +521,9 @@ describe("synology remaining regression coverage", () => {
       client.addDownload({ url: "http://indexer.local/throw.torrent", title: "Thrown" })
     ).resolves.toEqual({
       success: false,
-      message: "Failed to add download to Synology Download Station: Unknown error",
+      ...serviceMessage("service.synology_download_add_failed", {
+        error: serviceMessage("interface.unknown_error_ce512b43", {}),
+      }),
     });
 
     vi.spyOn(privateClient, "getTask").mockResolvedValueOnce(null).mockResolvedValueOnce(null);
@@ -693,9 +803,7 @@ describe("synology remaining regression coverage", () => {
       client.addDownload({ url: "http://indexer.local/game.torrent", title: "Game" })
     ).resolves.toEqual({
       success: false,
-      message:
-        "No download destination configured. Set a Download Path for this downloader in " +
-        "Questarr, or configure a default destination in Synology Download Station settings.",
+      ...serviceMessage("service.synology_destination_unconfigured", {}),
     });
 
     expect(requestApiSpy).toHaveBeenCalledWith(
