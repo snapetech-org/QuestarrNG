@@ -16476,16 +16476,16 @@
       "source": "Category:",
       "translations": {
         "es": "Categoría:",
-        "zh-Hans": "类别 :",
+        "zh-Hans": "类别：",
         "hi": "श्रेणी:",
         "de": "Kategorie:",
         "ja": "カテゴリー:",
         "fr": "Catégorie:",
         "pt-BR": "Categoria:",
         "ar": "الفئة:",
-        "ko": "유형:",
-        "zh-Hant": "類別 :",
-        "vi": "Loại:",
+        "ko": "카테고리:",
+        "zh-Hant": "類別：",
+        "vi": "Danh mục:",
         "id": "Kategori:",
         "es-419": "Categoría:",
         "fr-CA": "Catégorie:"
@@ -16494,20 +16494,20 @@
     "interface.certificate_file_crt_pem_aca73157": {
       "source": "Certificate File (.crt/.pem)",
       "translations": {
-        "es": "Archivo de certificados (.crt/.pem)",
+        "es": "Archivo de certificado (.crt/.pem)",
         "zh-Hans": "证书文件 (.crt/.pem)",
         "hi": "प्रमाणपत्र फ़ाइल (.crt/.pem)",
         "de": "Zertifikatsdatei (.crt/.pem)",
         "ja": "証明書ファイル(.crt/.pem)",
-        "fr": "Dossier de certificat (.crt/.pem)",
+        "fr": "Fichier de certificat (.crt/.pem)",
         "pt-BR": "Arquivo de Certificados (.crt/.pem)",
         "ar": "ملف الشهادة (.crt/.pem)",
         "ko": "인증서 파일 (.crt/.pem)",
         "zh-Hant": "證書檔案 (.crt/.pem)",
         "vi": "Tệp chứng chỉ (.crt/.pem)",
-        "id": "Berkas Sertifikat (.crt / .pem)",
-        "es-419": "Archivo de certificados (.crt/.pem)",
-        "fr-CA": "Dossier de certificat (.crt/.pem)"
+        "id": "Berkas sertifikat (.crt/.pem)",
+        "es-419": "Archivo de certificado (.crt/.pem)",
+        "fr-CA": "Fichier de certificat (.crt/.pem)"
       }
     },
     "interface.certificate_generated_7538dc71": {
@@ -16515,34 +16515,34 @@
       "translations": {
         "es": "Certificado Generado",
         "zh-Hans": "证书已生成",
-        "hi": "प्रमाणित",
-        "de": "Generierte Zertifikate",
-        "ja": "証明書の生成",
-        "fr": "Certificat produit",
+        "hi": "प्रमाणपत्र बनाया गया",
+        "de": "Zertifikat erstellt",
+        "ja": "証明書を生成しました",
+        "fr": "Certificat généré",
         "pt-BR": "Certificado Gerado",
         "ar": "تم إنشاء الشهادة",
         "ko": "인증서 생성됨",
         "zh-Hant": "證書已生成",
-        "vi": "Đã tạo chứng nhận",
+        "vi": "Đã tạo chứng chỉ",
         "id": "Sertifikat Dihasilkan",
         "es-419": "Certificado Generado",
-        "fr-CA": "Certificat produit"
+        "fr-CA": "Certificat généré"
       }
     },
     "interface.certificate_generation_disabled_be_3f9d057b": {
       "source": "Certificate generation disabled because a non-self-signed certificate is detected.",
       "translations": {
         "es": "La generación de certificados está desactivada porque se detectó un certificado que no es autofirmado.",
-        "zh-Hans": "证书生成因检测到非自签名证书而禁用 。",
-        "hi": "प्रमाणपत्र पीढ़ी को अक्षम होने के कारण एक गैर-स्वयं हस्ताक्षरित प्रमाणपत्र का पता लगाया जाता है।",
+        "zh-Hans": "检测到非自签名证书，因此已禁用证书生成。",
+        "hi": "पता चला कि प्रमाणपत्र स्व-हस्ताक्षरित नहीं है, इसलिए प्रमाणपत्र बनाना अक्षम कर दिया गया है।",
         "de": "Zertifikatserzeugung deaktiviert, weil ein nicht selbstsigniertes Zertifikat erkannt wird.",
         "ja": "非自己署名証明書が検出されるため、証明書の生成が無効になっています。",
         "fr": "La génération du certificat est désactivée parce qu'un certificat non autosigné est détecté.",
-        "pt-BR": "Geração de certificados desabilitada porque um certificado não auto assinado é detectado.",
+        "pt-BR": "A geração de certificados foi desativada porque foi detectado um certificado não autoassinado.",
         "ar": "تم تعطيل إنشاء الشهادة بعد اكتشاف شهادة غير موقّعة ذاتيًا.",
         "ko": "자체 서명이 아닌 인증서가 감지되어 인증서 생성을 사용할 수 없습니다.",
-        "zh-Hant": "證書生成因檢測到非自簽名證書而禁用 。",
-        "vi": "Chứng nhận bị tắt vì phát hiện một chứng nhận không tự ký tên.",
+        "zh-Hant": "偵測到非自簽名憑證，因此已停用憑證產生。",
+        "vi": "Đã tắt chức năng tạo chứng chỉ vì phát hiện chứng chỉ không tự ký.",
         "id": "Pembuatan sertifikat dinonaktifkan karena sertifikat yang tidak ditandatangani sendiri terdeteksi.",
         "es-419": "La generación de certificados está desactivada porque se detectó un certificado que no es autofirmado.",
         "fr-CA": "La génération du certificat est désactivée parce qu'un certificat non autosigné est détecté."
@@ -16556,15 +16556,15 @@
         "hi": "प्रमाणपत्र पथ (.crt/.pem)",
         "de": "Zertifikatspfad (.crt/.pem)",
         "ja": "証明書パス(.crt/.pem)",
-        "fr": "Voie de certification (.crt/.pem)",
+        "fr": "Chemin du certificat (.crt/.pem)",
         "pt-BR": "Caminho do Certificado (.crt/.pem)",
         "ar": "مسار الشهادة (.crt/.pem)",
         "ko": "인증서 경로 (.crt/.pem)",
         "zh-Hant": "證書路徑(.crt/.pem)",
         "vi": "Đường dẫn chứng chỉ (.crt/.pem)",
-        "id": "Path Sertifikat (.crt / .pem)",
+        "id": "Jalur sertifikat (.crt/.pem)",
         "es-419": "Ruta del certificado (.crt/.pem)",
-        "fr-CA": "Voie de certification (.crt/.pem)"
+        "fr-CA": "Chemin du certificat (.crt/.pem)"
       }
     },
     "interface.certificate_status_4c867c32": {
@@ -16572,12 +16572,12 @@
       "translations": {
         "es": "Estado del certificado",
         "zh-Hans": "证书状态",
-        "hi": "प्रमाणपत्र",
-        "de": "Status der Bescheinigung",
+        "hi": "प्रमाणपत्र की स्थिति",
+        "de": "Zertifikatsstatus",
         "ja": "証明書の状態",
         "fr": "État du certificat",
         "pt-BR": "Status do certificado",
-        "ar": "الشهادة",
+        "ar": "حالة الشهادة",
         "ko": "인증서 상태",
         "zh-Hant": "證書狀態",
         "vi": "Trạng thái chứng nhận",
@@ -16594,7 +16594,7 @@
         "hi": "प्रमाणपत्र अपलोड हो गया",
         "de": "Zertifikat hochgeladen",
         "ja": "証明書をアップロードしました",
-        "fr": "Certificat importé",
+        "fr": "Certificat téléversé",
         "pt-BR": "Certificado enviado",
         "ar": "تم رفع الشهادة",
         "ko": "인증서 업로드 완료",
@@ -16602,26 +16602,26 @@
         "vi": "Đã tải chứng chỉ lên",
         "id": "Sertifikat diunggah",
         "es-419": "Certificado subido",
-        "fr-CA": "Certificat importé"
+        "fr-CA": "Certificat téléversé"
       }
     },
     "interface.change_a1de2fdd": {
       "source": "Change",
       "translations": {
-        "es": "Cambio",
-        "zh-Hans": "变动",
-        "hi": "परिवर्तन",
-        "de": "Änderung",
-        "ja": "アクセス",
-        "fr": "Changement",
-        "pt-BR": "Mudança",
-        "ar": "التغيير",
+        "es": "Cambiar",
+        "zh-Hans": "更改",
+        "hi": "बदलें",
+        "de": "Ändern",
+        "ja": "変更",
+        "fr": "Modifier",
+        "pt-BR": "Alterar",
+        "ar": "تغيير",
         "ko": "변경",
-        "zh-Hant": "變動",
+        "zh-Hant": "更改",
         "vi": "Thay đổi",
         "id": "Ubah",
-        "es-419": "Cambio",
-        "fr-CA": "Changement"
+        "es-419": "Cambiar",
+        "fr-CA": "Modifier"
       }
     },
     "interface.change_password_81c9aa8e": {
