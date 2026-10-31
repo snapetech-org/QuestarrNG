@@ -1,11 +1,45 @@
 # ng-runner-policy: private-jit-only-v1
 name: CI
+run-name: >-
+  ${{ (github.event_name == 'workflow_dispatch' && inputs.action == 'ci' && inputs.runner_pool == 'private' && inputs.pr_number != '' && inputs.pr_sha != '' && inputs.target_run_id != '' &&
+      format('owner-pr:{0}:{1}:{2}:action:{3}:pool:{4}', inputs.pr_number, inputs.pr_sha, inputs.target_run_id, inputs.action, inputs.runner_pool)) ||
+      (github.event_name == 'pull_request_target' && 'owner-pr-label-event') || github.workflow }}
 
 on:
   push:
     tags:
       - '**'
+  pull_request_target:
+    branches: [main]
+    types: [labeled]
   workflow_dispatch:
+    inputs:
+      action:
+        description: Requested action
+        required: true
+        default: ci
+        type: choice
+        options:
+          - ci
+      runner_pool:
+        description: Private runner pool
+        required: true
+        default: private
+        type: choice
+        options:
+          - private
+      pr_number:
+        description: Trusted owner PR number (set only by the metadata dispatcher)
+        required: false
+        type: string
+      pr_sha:
+        description: Exact owner PR head SHA
+        required: false
+        type: string
+      target_run_id:
+        description: Successful metadata-only pull_request_target run ID
+        required: false
+        type: string
 
 # Keep each run's result attached to its exact candidate; newer pushes must not
 # cancel builds already in progress.
@@ -56,7 +90,22 @@ jobs:
   # None of these steps needs native modules built, so lifecycle scripts (arbitrary code
   # from transitive deps) are skipped.
   sca-scan:
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    if: >-
+      github.event_name != 'pull_request_target' &&
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (inputs.pr_number == '' && inputs.pr_sha == '' && inputs.target_run_id == '') ||
+        ((github.actor == 'snapetech' || github.actor == 'github-actions[bot]') &&
+         inputs.action == 'ci' && inputs.runner_pool == 'private' && inputs.pr_number != '' && inputs.pr_sha != '' && inputs.target_run_id != '' &&
+         github.ref == 'refs/heads/main')
+      )
+    runs-on: >-
+      ${{ (github.event_name == 'workflow_dispatch' &&
+          (github.actor == 'snapetech' || github.actor == 'github-actions[bot]') &&
+          inputs.action == 'ci' && inputs.runner_pool == 'private' && inputs.pr_number != '' && inputs.pr_sha != '' && inputs.target_run_id != '' &&
+          github.ref == 'refs/heads/main') &&
+        fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-sca-scan"]}}', github.run_id)) ||
+        fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
     permissions:
       contents: read
       pull-requests: read
@@ -72,20 +121,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.pr_sha != '' && inputs.pr_sha || github.sha }}
           persist-credentials: false
 
       # secretlint requires Node >=22
       - name: Setup Node.js 26.x
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
+          package-manager-cache: ${{ inputs.pr_number == '' }}
           node-version: 26.x
-          # GitHub scopes the Actions cache per-branch (a pull_request run cannot write
-          # into the cache that push/main runs restore from), and every `npm ci` in this
-          # workflow runs with --ignore-scripts, so a compromised dependency cannot run
-          # install/postinstall code to tamper with the cache before it's saved. This repo
-          # has a single maintainer with push access, so cache-poisoning here is accepted
-          # as a low, non-actionable risk instead of splitting cache restore/save by trust.
-          cache: "npm" # zizmor: ignore[cache-poisoning]
+          cache: ${{ inputs.pr_number == '' && 'npm' || '' }}
 
       - name: Install dependencies
         run: npm ci --ignore-scripts
@@ -109,11 +154,27 @@ jobs:
         run: npm run check:licenses
 
   windows-service:
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    if: >-
+      github.event_name != 'pull_request_target' &&
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (inputs.pr_number == '' && inputs.pr_sha == '' && inputs.target_run_id == '') ||
+        ((github.actor == 'snapetech' || github.actor == 'github-actions[bot]') &&
+         inputs.action == 'ci' && inputs.runner_pool == 'private' && inputs.pr_number != '' && inputs.pr_sha != '' && inputs.target_run_id != '' &&
+         github.ref == 'refs/heads/main')
+      )
+    runs-on: >-
+      ${{ (github.event_name == 'workflow_dispatch' &&
+          (github.actor == 'snapetech' || github.actor == 'github-actions[bot]') &&
+          inputs.action == 'ci' && inputs.runner_pool == 'private' && inputs.pr_number != '' && inputs.pr_sha != '' && inputs.target_run_id != '' &&
+          github.ref == 'refs/heads/main') &&
+        fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-windows-service"]}}', github.run_id)) ||
+        fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.pr_sha != '' && inputs.pr_sha || github.sha }}
           persist-credentials: false
 
       - name: Setup .NET 10 SDK
@@ -183,10 +244,25 @@ jobs:
           DOTNET_INSTALL_DIR: ${{ runner.temp }}/questarrng-dotnet-${{ github.run_id }}-${{ github.run_attempt }}
         run: rm -rf -- "$DOTNET_INSTALL_DIR"
 
-  # Pull requests run app tests on GitHub-hosted runners; only trusted main runs
-  # use the isolated shared runner pool.
+  # Owner PR validation is dispatched from pull_request_target as a workflow_dispatch
+  # run on main, where its exact head SHA is checked out on private JIT.
   test:
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    if: >-
+      github.event_name != 'pull_request_target' &&
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (inputs.pr_number == '' && inputs.pr_sha == '' && inputs.target_run_id == '') ||
+        ((github.actor == 'snapetech' || github.actor == 'github-actions[bot]') &&
+         inputs.action == 'ci' && inputs.runner_pool == 'private' && inputs.pr_number != '' && inputs.pr_sha != '' && inputs.target_run_id != '' &&
+         github.ref == 'refs/heads/main')
+      )
+    runs-on: >-
+      ${{ (github.event_name == 'workflow_dispatch' &&
+          (github.actor == 'snapetech' || github.actor == 'github-actions[bot]') &&
+          inputs.action == 'ci' && inputs.runner_pool == 'private' && inputs.pr_number != '' && inputs.pr_sha != '' && inputs.target_run_id != '' &&
+          github.ref == 'refs/heads/main') &&
+        fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-test"]}}', github.run_id)) ||
+        fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -197,6 +273,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.pr_sha != '' && inputs.pr_sha || github.sha }}
           persist-credentials: false
 
       - name: Setup Node.js 26.x
@@ -204,8 +281,9 @@ jobs:
         env:
           NPM_CONFIG_CACHE: ${{ runner.temp }}/questarrng-npm-cache
         with:
+          package-manager-cache: ${{ inputs.pr_number == '' }}
           node-version: 26.x
-          cache: "npm" # zizmor: ignore[cache-poisoning]
+          cache: ${{ inputs.pr_number == '' && 'npm' || '' }}
 
       - name: Install locked JavaScript dependencies
         env:
@@ -253,14 +331,31 @@ jobs:
 
   build:
     name: Build and check on Node ${{ matrix.node-version }}
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    if: >-
+      github.event_name != 'pull_request_target' &&
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (inputs.pr_number == '' && inputs.pr_sha == '' && inputs.target_run_id == '') ||
+        ((github.actor == 'snapetech' || github.actor == 'github-actions[bot]') &&
+         inputs.action == 'ci' && inputs.runner_pool == 'private' && inputs.pr_number != '' && inputs.pr_sha != '' && inputs.target_run_id != '' &&
+         github.ref == 'refs/heads/main')
+      )
+    runs-on: >-
+      ${{ (github.event_name == 'workflow_dispatch' &&
+          (github.actor == 'snapetech' || github.actor == 'github-actions[bot]') &&
+          inputs.action == 'ci' && inputs.runner_pool == 'private' && inputs.pr_number != '' && inputs.pr_sha != '' && inputs.target_run_id != '' &&
+          github.ref == 'refs/heads/main') &&
+        ((matrix.node-version == '22.23.4' &&
+          fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-build-node-22"]}}', github.run_id))) ||
+         (matrix.node-version == '26.x' &&
+          fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-build-node-26"]}}', github.run_id)))) ||
+        fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
 
-    # PRs build on the minimum supported Node only (tests already run on 26.x);
-    # pushes to main/release also build on 26.x.
+    # Release and owner-PR runs test both supported Node versions.
     strategy:
       fail-fast: false
       matrix:
-        node-version: ${{ fromJSON(github.event_name == 'pull_request' && '["22.23.4"]' || '["22.23.4", "26.x"]') }}
+        node-version: ["22.23.4", "26.x"]
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -271,6 +366,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.pr_sha != '' && inputs.pr_sha || github.sha }}
           persist-credentials: false
 
       - name: Setup Node.js ${{ matrix.node-version }}
@@ -278,8 +374,9 @@ jobs:
         env:
           NPM_CONFIG_CACHE: ${{ runner.temp }}/questarrng-npm-cache
         with:
+          package-manager-cache: ${{ inputs.pr_number == '' }}
           node-version: ${{ matrix.node-version }}
-          cache: "npm" # zizmor: ignore[cache-poisoning]
+          cache: ${{ inputs.pr_number == '' && 'npm' || '' }}
 
       - name: Install locked JavaScript dependencies
         env:
@@ -304,10 +401,25 @@ jobs:
 
   docker-build:
     env:
-      BUILDKIT_EGRESS_PROXY: ${{ (vars.NG_HOSTED_FIRST != 'true' || vars.NG_FORCE_JIT == 'true' || github.run_attempt > 1) && (contains(fromJSON('["push","workflow_dispatch","schedule","release","repository_dispatch"]'), github.event_name) && (github.ref == 'refs/heads/main' || (github.ref_type == 'tag' && startsWith(github.ref_name, 'v')))) && 'http://10.0.2.100:3128' || '' }}
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+      BUILDKIT_EGRESS_PROXY: http://10.0.2.100:3128
+    runs-on: >-
+      ${{ (github.event_name == 'workflow_dispatch' &&
+          (github.actor == 'snapetech' || github.actor == 'github-actions[bot]') &&
+          inputs.action == 'ci' && inputs.runner_pool == 'private' && inputs.pr_number != '' && inputs.pr_sha != '' && inputs.target_run_id != '' &&
+          github.ref == 'refs/heads/main') &&
+        fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-docker-build"]}}', github.run_id)) ||
+        fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
     needs: [sca-scan, build, test]
-    if: needs.sca-scan.outputs.docker == 'true'
+    if: >-
+      github.event_name != 'pull_request_target' &&
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (inputs.pr_number == '' && inputs.pr_sha == '' && inputs.target_run_id == '') ||
+        ((github.actor == 'snapetech' || github.actor == 'github-actions[bot]') &&
+         inputs.action == 'ci' && inputs.runner_pool == 'private' && inputs.pr_number != '' && inputs.pr_sha != '' && inputs.target_run_id != '' &&
+         github.ref == 'refs/heads/main')
+      ) &&
+      needs.sca-scan.outputs.docker == 'true'
 
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -322,6 +434,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.pr_sha != '' && inputs.pr_sha || github.sha }}
           persist-credentials: false
 
       - name: Pre-pull BuildKit image
@@ -366,3 +479,174 @@ jobs:
         run: |
           echo "Docker image built successfully"
           docker images | grep questarr || echo "Image not found in docker images, but build completed"
+
+  dispatch-owner-pr:
+    name: Dispatch trusted owner PR validation
+    if: >-
+      github.event_name == 'pull_request_target' &&
+      github.event.action == 'labeled' &&
+      github.actor == 'snapetech' &&
+      github.event.pull_request.user.login == 'snapetech' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.repo.id == github.repository_id &&
+      github.event.pull_request.base.ref == 'main' &&
+      (github.event.label.name == 'action:ci' || github.event.label.name == 'pool:private') &&
+      contains(github.event.pull_request.labels.*.name, 'action:ci') &&
+      contains(github.event.pull_request.labels.*.name, 'pool:private')
+    runs-on: ${{ (github.event_name == 'pull_request_target' && github.actor == 'snapetech' && github.event.pull_request.user.login == 'snapetech' && github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.repo.id == github.repository_id && github.event.pull_request.base.ref == 'main') && fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-packer","ng-main-run-{0}","gha-{0}-owner-pr-dispatcher"]}}', github.run_id)) }}
+    permissions:
+      actions: write
+      contents: none
+    steps:
+      - name: Dispatch the requested action from main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_SHA: ${{ github.event.pull_request.head.sha }}
+          TARGET_RUN_ID: ${{ github.run_id }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          from urllib.request import Request, urlopen
+
+          expected = 'snapetech-org/QuestarrNG'
+          repository = os.environ['GITHUB_REPOSITORY']
+          number = os.environ['PR_NUMBER']
+          sha = os.environ['PR_SHA'].lower()
+          target = os.environ['TARGET_RUN_ID']
+          token = os.environ['GH_TOKEN']
+          if repository.lower() != expected.lower():
+              raise SystemExit('unexpected repository')
+          if not re.fullmatch(r'[1-9][0-9]*', number):
+              raise SystemExit('invalid PR number')
+          if not re.fullmatch(r'[0-9a-f]{40}', sha):
+              raise SystemExit('invalid PR head SHA')
+          if not re.fullmatch(r'[1-9][0-9]*', target):
+              raise SystemExit('invalid dispatch run ID')
+
+          payload = json.dumps({
+              "ref": "main",
+              'inputs': {
+                  'action': 'ci',
+                  'runner_pool': 'private',
+                  'pr_number': number,
+                  'pr_sha': sha,
+                  'target_run_id': target,
+              },
+          }).encode()
+          request = Request(
+              'https://api.github.com/repos/snapetech-org/QuestarrNG/actions/workflows/ci.yml/dispatches',
+              data=payload,
+              headers={
+                  'Accept': 'application/vnd.github+json',
+                  'Authorization': f'Bearer {token}',
+                  'Content-Type': 'application/json',
+                  'X-GitHub-Api-Version': '2022-11-28',
+              },
+              method='POST',
+          )
+          with urlopen(request, timeout=20) as response:
+              if response.status != 204:
+                  raise SystemExit(f'dispatch HTTP {response.status}')
+          PY
+
+  report-owner-pr-check:
+    name: Report trusted owner PR validation
+    needs: [sca-scan, windows-service, test, build, docker-build]
+    if: >-
+      always() &&
+      github.event_name == 'workflow_dispatch' &&
+      github.actor == 'github-actions[bot]' &&
+      inputs.pr_number != '' &&
+      inputs.pr_sha != '' &&
+      inputs.target_run_id != '' &&
+      github.ref == 'refs/heads/main'
+    runs-on: ${{ (github.event_name == 'workflow_dispatch' && github.actor == 'github-actions[bot]' && inputs.action == 'ci' && inputs.runner_pool == 'private' && inputs.pr_number != '' && inputs.pr_sha != '' && inputs.target_run_id != '' && github.ref == 'refs/heads/main') && fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-owner-pr-reporter"]}}', github.run_id)) }}
+    permissions:
+      checks: write
+      pull-requests: read
+      contents: none
+    steps:
+      - name: Attach validation result to the PR head
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          REPOSITORY_ID: ${{ github.repository_id }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          PR_SHA: ${{ inputs.pr_sha }}
+          VALIDATION_RUN_ID: ${{ github.run_id }}
+          VALIDATION_RESULTS: '{"sca-scan":"${{ needs.sca-scan.result }}","windows-service":"${{ needs.windows-service.result }}","test":"${{ needs.test.result }}","build":"${{ needs.build.result }}","docker-build":"${{ needs.docker-build.result }}"}'
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          from urllib.request import Request, urlopen
+
+          number = os.environ['PR_NUMBER']
+          sha = os.environ['PR_SHA'].lower()
+          results = json.loads(os.environ['VALIDATION_RESULTS'])
+          if not re.fullmatch(r'[1-9][0-9]*', number):
+              raise SystemExit('invalid PR number')
+          if not re.fullmatch(r'[0-9a-f]{40}', sha):
+              raise SystemExit('invalid PR head SHA')
+          if not results:
+              raise SystemExit('no validation results')
+
+          repository = os.environ['REPOSITORY']
+          repository_id = int(os.environ['REPOSITORY_ID'])
+          if repository.lower() != 'snapetech-org/questarrng':
+              raise SystemExit('unexpected repository')
+          pr_request = Request(
+              f'https://api.github.com/repos/{repository}/pulls/{number}',
+              headers={
+                  'Accept': 'application/vnd.github+json',
+                  'Authorization': f"Bearer {os.environ['GH_TOKEN']}",
+                  'X-GitHub-Api-Version': '2022-11-28',
+              },
+          )
+          with urlopen(pr_request, timeout=20) as response:
+              current_pr = json.load(response)
+          head_repo = current_pr.get('head', {}).get('repo') or {}
+          if (current_pr.get('state') != 'open' or
+                  current_pr.get('user', {}).get('login') != 'snapetech' or
+                  current_pr.get('base', {}).get('ref') != 'main' or
+                  current_pr.get('head', {}).get('sha', '').lower() != sha or
+                  (head_repo.get('full_name') or '').lower() != repository.lower() or
+                  head_repo.get('id') != repository_id):
+              raise SystemExit('PR head is no longer the dispatched head')
+
+          conclusion = 'success' if all(value == 'success' for value in results.values()) else 'failure'
+          summary = 'Main-pinned, no-secret owner PR validation:\n'
+          summary += '\n'.join(f'- {name}: {value}' for name, value in results.items())
+          run_id = os.environ['VALIDATION_RUN_ID']
+          payload = json.dumps({
+              'name': 'QuestarrNG owner PR validation',
+              'head_sha': sha,
+              'external_id': run_id,
+              'status': 'completed',
+              'conclusion': conclusion,
+              'details_url': f'https://github.com/snapetech-org/QuestarrNG/actions/runs/{run_id}',
+              'output': {
+                  'title': f'Owner PR validation {conclusion}',
+                  'summary': summary,
+              },
+          }).encode()
+          request = Request(
+              'https://api.github.com/repos/snapetech-org/QuestarrNG/check-runs',
+              data=payload,
+              headers={
+                  'Accept': 'application/vnd.github+json',
+                  'Authorization': f"Bearer {os.environ['GH_TOKEN']}",
+                  'Content-Type': 'application/json',
+                  'X-GitHub-Api-Version': '2022-11-28',
+              },
+              method='POST',
+          )
+          with urlopen(request, timeout=20) as response:
+              if response.status not in {201, 202}:
+                  raise SystemExit(f'check HTTP {response.status}')
+          PY
