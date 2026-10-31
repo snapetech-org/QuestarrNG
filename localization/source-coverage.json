@@ -2250,6 +2250,231 @@
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "source-fallback",
       "directTargetCells": 12
+    },
+    {
+      "key": "service.twitch_unreachable",
+      "source": "Could not reach Twitch — check your network connection.",
+      "kind": "app-owned IGDB/JSON catalog service",
+      "owners": ["server/igdb.ts"],
+      "coverage": [
+        "server/__tests__/igdb.test.ts",
+        "server/__tests__/json-catalog.test.ts",
+        "client/src/__tests__/IgdbCredentialsHelper.test.tsx",
+        "server/__tests__/api_routes.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.igdb_credentials_invalid",
+      "source": "Invalid Client ID or Client Secret.",
+      "kind": "app-owned IGDB/JSON catalog service",
+      "owners": ["server/igdb.ts"],
+      "coverage": [
+        "server/__tests__/igdb.test.ts",
+        "server/__tests__/json-catalog.test.ts",
+        "client/src/__tests__/IgdbCredentialsHelper.test.tsx",
+        "server/__tests__/api_routes.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.twitch_unexpected_status",
+      "source": "Twitch returned an unexpected error (status {status}).",
+      "kind": "app-owned IGDB/JSON catalog service",
+      "owners": ["server/igdb.ts"],
+      "coverage": [
+        "server/__tests__/igdb.test.ts",
+        "server/__tests__/json-catalog.test.ts",
+        "client/src/__tests__/IgdbCredentialsHelper.test.tsx",
+        "server/__tests__/api_routes.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.igdb_unreachable",
+      "source": "Could not reach IGDB — check your network connection.",
+      "kind": "app-owned IGDB/JSON catalog service",
+      "owners": ["server/igdb.ts"],
+      "coverage": [
+        "server/__tests__/igdb.test.ts",
+        "server/__tests__/json-catalog.test.ts",
+        "client/src/__tests__/IgdbCredentialsHelper.test.tsx",
+        "server/__tests__/api_routes.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.igdb_request_rejected",
+      "source": "IGDB rejected the request (status {status}).",
+      "kind": "app-owned IGDB/JSON catalog service",
+      "owners": ["server/igdb.ts"],
+      "coverage": [
+        "server/__tests__/igdb.test.ts",
+        "server/__tests__/json-catalog.test.ts",
+        "client/src/__tests__/IgdbCredentialsHelper.test.tsx",
+        "server/__tests__/api_routes.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.igdb_credentials_unconfigured",
+      "source": "IGDB credentials not configured",
+      "kind": "app-owned IGDB/JSON catalog service",
+      "owners": ["server/igdb.ts"],
+      "coverage": [
+        "server/__tests__/igdb.test.ts",
+        "server/__tests__/json-catalog.test.ts",
+        "client/src/__tests__/IgdbCredentialsHelper.test.tsx",
+        "server/__tests__/api_routes.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.igdb_authentication_failed",
+      "source": "IGDB authentication failed: {status}",
+      "kind": "app-owned IGDB/JSON catalog service",
+      "owners": ["server/igdb.ts"],
+      "coverage": [
+        "server/__tests__/igdb.test.ts",
+        "server/__tests__/json-catalog.test.ts",
+        "client/src/__tests__/IgdbCredentialsHelper.test.tsx",
+        "server/__tests__/api_routes.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.igdb_api_error",
+      "source": "IGDB API error: {status}",
+      "kind": "app-owned IGDB/JSON catalog service",
+      "owners": ["server/igdb.ts"],
+      "coverage": [
+        "server/__tests__/igdb.test.ts",
+        "server/__tests__/json-catalog.test.ts",
+        "client/src/__tests__/IgdbCredentialsHelper.test.tsx",
+        "server/__tests__/api_routes.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.igdb_game_platform_required",
+      "source": "A valid IGDB game and platform ID are required.",
+      "kind": "app-owned IGDB/JSON catalog service",
+      "owners": ["server/igdb.ts"],
+      "coverage": [
+        "server/__tests__/igdb.test.ts",
+        "server/__tests__/json-catalog.test.ts",
+        "client/src/__tests__/IgdbCredentialsHelper.test.tsx",
+        "server/__tests__/api_routes.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.igdb_credentials_test_failed",
+      "source": "Failed to test IGDB credentials",
+      "kind": "app-owned IGDB/JSON catalog service",
+      "owners": ["server/routes.ts"],
+      "coverage": [
+        "server/__tests__/igdb.test.ts",
+        "server/__tests__/json-catalog.test.ts",
+        "client/src/__tests__/IgdbCredentialsHelper.test.tsx",
+        "server/__tests__/api_routes.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.json_catalog_https_required",
+      "source": "JSON catalogs require a public HTTPS URL without embedded credentials",
+      "kind": "app-owned IGDB/JSON catalog service",
+      "owners": ["server/json-catalog.ts"],
+      "coverage": [
+        "server/__tests__/igdb.test.ts",
+        "server/__tests__/json-catalog.test.ts",
+        "client/src/__tests__/IgdbCredentialsHelper.test.tsx",
+        "server/__tests__/api_routes.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.json_catalog_http_error",
+      "source": "Catalog returned HTTP {status}",
+      "kind": "app-owned IGDB/JSON catalog service",
+      "owners": ["server/json-catalog.ts"],
+      "coverage": [
+        "server/__tests__/igdb.test.ts",
+        "server/__tests__/json-catalog.test.ts",
+        "client/src/__tests__/IgdbCredentialsHelper.test.tsx",
+        "server/__tests__/api_routes.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.json_catalog_size_limit",
+      "source": "Catalog exceeds the 10 MiB limit",
+      "kind": "app-owned IGDB/JSON catalog service",
+      "owners": ["server/json-catalog.ts"],
+      "coverage": [
+        "server/__tests__/igdb.test.ts",
+        "server/__tests__/json-catalog.test.ts",
+        "client/src/__tests__/IgdbCredentialsHelper.test.tsx",
+        "server/__tests__/api_routes.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.json_catalog_format_invalid",
+      "source": "Invalid JSON catalog: expected downloads with titles and URI lists",
+      "kind": "app-owned IGDB/JSON catalog service",
+      "owners": ["server/json-catalog.ts"],
+      "coverage": [
+        "server/__tests__/igdb.test.ts",
+        "server/__tests__/json-catalog.test.ts",
+        "client/src/__tests__/IgdbCredentialsHelper.test.tsx",
+        "server/__tests__/api_routes.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.json_catalog_request_failed",
+      "source": "Catalog request failed",
+      "kind": "app-owned IGDB/JSON catalog service",
+      "owners": ["server/json-catalog.ts"],
+      "coverage": [
+        "server/__tests__/igdb.test.ts",
+        "server/__tests__/json-catalog.test.ts",
+        "client/src/__tests__/IgdbCredentialsHelper.test.tsx",
+        "server/__tests__/api_routes.test.ts"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
     }
   ],
   "codeUnits": [

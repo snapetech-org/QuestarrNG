@@ -1194,7 +1194,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(result.success ? 200 : 400).json(result);
       } catch (error) {
         routesLogger.error({ error }, "Failed to test IGDB credentials during setup");
-        return res.status(500).json({ success: false, error: "Failed to test IGDB credentials" });
+        return res
+          .status(500)
+          .json({
+            success: false,
+            ...serviceErrorBody(
+              undefined,
+              serviceMessage("service.igdb_credentials_test_failed", {})
+            ),
+          });
       }
     }
   );
@@ -5673,7 +5681,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(result.success ? 200 : 400).json(result);
       } catch (error) {
         routesLogger.error({ error }, "Failed to test IGDB credentials");
-        return res.status(500).json({ success: false, error: "Failed to test IGDB credentials" });
+        return res
+          .status(500)
+          .json({
+            success: false,
+            ...serviceErrorBody(
+              undefined,
+              serviceMessage("service.igdb_credentials_test_failed", {})
+            ),
+          });
       }
     }
   );

@@ -46111,6 +46111,291 @@
         "vi": "Internal Server Error",
         "id": "Internal Server Error"
       }
+    },
+    "service.twitch_unreachable": {
+      "source": "Could not reach Twitch — check your network connection.",
+      "translations": {
+        "es": "Could not reach Twitch — check your network connection.",
+        "es-419": "Could not reach Twitch — check your network connection.",
+        "zh-Hans": "Could not reach Twitch — check your network connection.",
+        "hi": "Could not reach Twitch — check your network connection.",
+        "de": "Could not reach Twitch — check your network connection.",
+        "ja": "Could not reach Twitch — check your network connection.",
+        "fr": "Could not reach Twitch — check your network connection.",
+        "fr-CA": "Could not reach Twitch — check your network connection.",
+        "pt-BR": "Could not reach Twitch — check your network connection.",
+        "ar": "Could not reach Twitch — check your network connection.",
+        "ko": "Could not reach Twitch — check your network connection.",
+        "zh-Hant": "Could not reach Twitch — check your network connection.",
+        "vi": "Could not reach Twitch — check your network connection.",
+        "id": "Could not reach Twitch — check your network connection."
+      }
+    },
+    "service.igdb_credentials_invalid": {
+      "source": "Invalid Client ID or Client Secret.",
+      "translations": {
+        "es": "Invalid Client ID or Client Secret.",
+        "es-419": "Invalid Client ID or Client Secret.",
+        "zh-Hans": "Invalid Client ID or Client Secret.",
+        "hi": "Invalid Client ID or Client Secret.",
+        "de": "Invalid Client ID or Client Secret.",
+        "ja": "Invalid Client ID or Client Secret.",
+        "fr": "Invalid Client ID or Client Secret.",
+        "fr-CA": "Invalid Client ID or Client Secret.",
+        "pt-BR": "Invalid Client ID or Client Secret.",
+        "ar": "Invalid Client ID or Client Secret.",
+        "ko": "Invalid Client ID or Client Secret.",
+        "zh-Hant": "Invalid Client ID or Client Secret.",
+        "vi": "Invalid Client ID or Client Secret.",
+        "id": "Invalid Client ID or Client Secret."
+      }
+    },
+    "service.twitch_unexpected_status": {
+      "source": "Twitch returned an unexpected error (status {status}).",
+      "translations": {
+        "es": "Twitch returned an unexpected error (status {status}).",
+        "es-419": "Twitch returned an unexpected error (status {status}).",
+        "zh-Hans": "Twitch returned an unexpected error (status {status}).",
+        "hi": "Twitch returned an unexpected error (status {status}).",
+        "de": "Twitch returned an unexpected error (status {status}).",
+        "ja": "Twitch returned an unexpected error (status {status}).",
+        "fr": "Twitch returned an unexpected error (status {status}).",
+        "fr-CA": "Twitch returned an unexpected error (status {status}).",
+        "pt-BR": "Twitch returned an unexpected error (status {status}).",
+        "ar": "Twitch returned an unexpected error (status {status}).",
+        "ko": "Twitch returned an unexpected error (status {status}).",
+        "zh-Hant": "Twitch returned an unexpected error (status {status}).",
+        "vi": "Twitch returned an unexpected error (status {status}).",
+        "id": "Twitch returned an unexpected error (status {status})."
+      }
+    },
+    "service.igdb_unreachable": {
+      "source": "Could not reach IGDB — check your network connection.",
+      "translations": {
+        "es": "Could not reach IGDB — check your network connection.",
+        "es-419": "Could not reach IGDB — check your network connection.",
+        "zh-Hans": "Could not reach IGDB — check your network connection.",
+        "hi": "Could not reach IGDB — check your network connection.",
+        "de": "Could not reach IGDB — check your network connection.",
+        "ja": "Could not reach IGDB — check your network connection.",
+        "fr": "Could not reach IGDB — check your network connection.",
+        "fr-CA": "Could not reach IGDB — check your network connection.",
+        "pt-BR": "Could not reach IGDB — check your network connection.",
+        "ar": "Could not reach IGDB — check your network connection.",
+        "ko": "Could not reach IGDB — check your network connection.",
+        "zh-Hant": "Could not reach IGDB — check your network connection.",
+        "vi": "Could not reach IGDB — check your network connection.",
+        "id": "Could not reach IGDB — check your network connection."
+      }
+    },
+    "service.igdb_request_rejected": {
+      "source": "IGDB rejected the request (status {status}).",
+      "translations": {
+        "es": "IGDB rejected the request (status {status}).",
+        "es-419": "IGDB rejected the request (status {status}).",
+        "zh-Hans": "IGDB rejected the request (status {status}).",
+        "hi": "IGDB rejected the request (status {status}).",
+        "de": "IGDB rejected the request (status {status}).",
+        "ja": "IGDB rejected the request (status {status}).",
+        "fr": "IGDB rejected the request (status {status}).",
+        "fr-CA": "IGDB rejected the request (status {status}).",
+        "pt-BR": "IGDB rejected the request (status {status}).",
+        "ar": "IGDB rejected the request (status {status}).",
+        "ko": "IGDB rejected the request (status {status}).",
+        "zh-Hant": "IGDB rejected the request (status {status}).",
+        "vi": "IGDB rejected the request (status {status}).",
+        "id": "IGDB rejected the request (status {status})."
+      }
+    },
+    "service.igdb_credentials_unconfigured": {
+      "source": "IGDB credentials not configured",
+      "translations": {
+        "es": "IGDB credentials not configured",
+        "es-419": "IGDB credentials not configured",
+        "zh-Hans": "IGDB credentials not configured",
+        "hi": "IGDB credentials not configured",
+        "de": "IGDB credentials not configured",
+        "ja": "IGDB credentials not configured",
+        "fr": "IGDB credentials not configured",
+        "fr-CA": "IGDB credentials not configured",
+        "pt-BR": "IGDB credentials not configured",
+        "ar": "IGDB credentials not configured",
+        "ko": "IGDB credentials not configured",
+        "zh-Hant": "IGDB credentials not configured",
+        "vi": "IGDB credentials not configured",
+        "id": "IGDB credentials not configured"
+      }
+    },
+    "service.igdb_authentication_failed": {
+      "source": "IGDB authentication failed: {status}",
+      "translations": {
+        "es": "IGDB authentication failed: {status}",
+        "es-419": "IGDB authentication failed: {status}",
+        "zh-Hans": "IGDB authentication failed: {status}",
+        "hi": "IGDB authentication failed: {status}",
+        "de": "IGDB authentication failed: {status}",
+        "ja": "IGDB authentication failed: {status}",
+        "fr": "IGDB authentication failed: {status}",
+        "fr-CA": "IGDB authentication failed: {status}",
+        "pt-BR": "IGDB authentication failed: {status}",
+        "ar": "IGDB authentication failed: {status}",
+        "ko": "IGDB authentication failed: {status}",
+        "zh-Hant": "IGDB authentication failed: {status}",
+        "vi": "IGDB authentication failed: {status}",
+        "id": "IGDB authentication failed: {status}"
+      }
+    },
+    "service.igdb_api_error": {
+      "source": "IGDB API error: {status}",
+      "translations": {
+        "es": "IGDB API error: {status}",
+        "es-419": "IGDB API error: {status}",
+        "zh-Hans": "IGDB API error: {status}",
+        "hi": "IGDB API error: {status}",
+        "de": "IGDB API error: {status}",
+        "ja": "IGDB API error: {status}",
+        "fr": "IGDB API error: {status}",
+        "fr-CA": "IGDB API error: {status}",
+        "pt-BR": "IGDB API error: {status}",
+        "ar": "IGDB API error: {status}",
+        "ko": "IGDB API error: {status}",
+        "zh-Hant": "IGDB API error: {status}",
+        "vi": "IGDB API error: {status}",
+        "id": "IGDB API error: {status}"
+      }
+    },
+    "service.igdb_game_platform_required": {
+      "source": "A valid IGDB game and platform ID are required.",
+      "translations": {
+        "es": "A valid IGDB game and platform ID are required.",
+        "es-419": "A valid IGDB game and platform ID are required.",
+        "zh-Hans": "A valid IGDB game and platform ID are required.",
+        "hi": "A valid IGDB game and platform ID are required.",
+        "de": "A valid IGDB game and platform ID are required.",
+        "ja": "A valid IGDB game and platform ID are required.",
+        "fr": "A valid IGDB game and platform ID are required.",
+        "fr-CA": "A valid IGDB game and platform ID are required.",
+        "pt-BR": "A valid IGDB game and platform ID are required.",
+        "ar": "A valid IGDB game and platform ID are required.",
+        "ko": "A valid IGDB game and platform ID are required.",
+        "zh-Hant": "A valid IGDB game and platform ID are required.",
+        "vi": "A valid IGDB game and platform ID are required.",
+        "id": "A valid IGDB game and platform ID are required."
+      }
+    },
+    "service.igdb_credentials_test_failed": {
+      "source": "Failed to test IGDB credentials",
+      "translations": {
+        "es": "Failed to test IGDB credentials",
+        "es-419": "Failed to test IGDB credentials",
+        "zh-Hans": "Failed to test IGDB credentials",
+        "hi": "Failed to test IGDB credentials",
+        "de": "Failed to test IGDB credentials",
+        "ja": "Failed to test IGDB credentials",
+        "fr": "Failed to test IGDB credentials",
+        "fr-CA": "Failed to test IGDB credentials",
+        "pt-BR": "Failed to test IGDB credentials",
+        "ar": "Failed to test IGDB credentials",
+        "ko": "Failed to test IGDB credentials",
+        "zh-Hant": "Failed to test IGDB credentials",
+        "vi": "Failed to test IGDB credentials",
+        "id": "Failed to test IGDB credentials"
+      }
+    },
+    "service.json_catalog_https_required": {
+      "source": "JSON catalogs require a public HTTPS URL without embedded credentials",
+      "translations": {
+        "es": "JSON catalogs require a public HTTPS URL without embedded credentials",
+        "es-419": "JSON catalogs require a public HTTPS URL without embedded credentials",
+        "zh-Hans": "JSON catalogs require a public HTTPS URL without embedded credentials",
+        "hi": "JSON catalogs require a public HTTPS URL without embedded credentials",
+        "de": "JSON catalogs require a public HTTPS URL without embedded credentials",
+        "ja": "JSON catalogs require a public HTTPS URL without embedded credentials",
+        "fr": "JSON catalogs require a public HTTPS URL without embedded credentials",
+        "fr-CA": "JSON catalogs require a public HTTPS URL without embedded credentials",
+        "pt-BR": "JSON catalogs require a public HTTPS URL without embedded credentials",
+        "ar": "JSON catalogs require a public HTTPS URL without embedded credentials",
+        "ko": "JSON catalogs require a public HTTPS URL without embedded credentials",
+        "zh-Hant": "JSON catalogs require a public HTTPS URL without embedded credentials",
+        "vi": "JSON catalogs require a public HTTPS URL without embedded credentials",
+        "id": "JSON catalogs require a public HTTPS URL without embedded credentials"
+      }
+    },
+    "service.json_catalog_http_error": {
+      "source": "Catalog returned HTTP {status}",
+      "translations": {
+        "es": "Catalog returned HTTP {status}",
+        "es-419": "Catalog returned HTTP {status}",
+        "zh-Hans": "Catalog returned HTTP {status}",
+        "hi": "Catalog returned HTTP {status}",
+        "de": "Catalog returned HTTP {status}",
+        "ja": "Catalog returned HTTP {status}",
+        "fr": "Catalog returned HTTP {status}",
+        "fr-CA": "Catalog returned HTTP {status}",
+        "pt-BR": "Catalog returned HTTP {status}",
+        "ar": "Catalog returned HTTP {status}",
+        "ko": "Catalog returned HTTP {status}",
+        "zh-Hant": "Catalog returned HTTP {status}",
+        "vi": "Catalog returned HTTP {status}",
+        "id": "Catalog returned HTTP {status}"
+      }
+    },
+    "service.json_catalog_size_limit": {
+      "source": "Catalog exceeds the 10 MiB limit",
+      "translations": {
+        "es": "Catalog exceeds the 10 MiB limit",
+        "es-419": "Catalog exceeds the 10 MiB limit",
+        "zh-Hans": "Catalog exceeds the 10 MiB limit",
+        "hi": "Catalog exceeds the 10 MiB limit",
+        "de": "Catalog exceeds the 10 MiB limit",
+        "ja": "Catalog exceeds the 10 MiB limit",
+        "fr": "Catalog exceeds the 10 MiB limit",
+        "fr-CA": "Catalog exceeds the 10 MiB limit",
+        "pt-BR": "Catalog exceeds the 10 MiB limit",
+        "ar": "Catalog exceeds the 10 MiB limit",
+        "ko": "Catalog exceeds the 10 MiB limit",
+        "zh-Hant": "Catalog exceeds the 10 MiB limit",
+        "vi": "Catalog exceeds the 10 MiB limit",
+        "id": "Catalog exceeds the 10 MiB limit"
+      }
+    },
+    "service.json_catalog_format_invalid": {
+      "source": "Invalid JSON catalog: expected downloads with titles and URI lists",
+      "translations": {
+        "es": "Invalid JSON catalog: expected downloads with titles and URI lists",
+        "es-419": "Invalid JSON catalog: expected downloads with titles and URI lists",
+        "zh-Hans": "Invalid JSON catalog: expected downloads with titles and URI lists",
+        "hi": "Invalid JSON catalog: expected downloads with titles and URI lists",
+        "de": "Invalid JSON catalog: expected downloads with titles and URI lists",
+        "ja": "Invalid JSON catalog: expected downloads with titles and URI lists",
+        "fr": "Invalid JSON catalog: expected downloads with titles and URI lists",
+        "fr-CA": "Invalid JSON catalog: expected downloads with titles and URI lists",
+        "pt-BR": "Invalid JSON catalog: expected downloads with titles and URI lists",
+        "ar": "Invalid JSON catalog: expected downloads with titles and URI lists",
+        "ko": "Invalid JSON catalog: expected downloads with titles and URI lists",
+        "zh-Hant": "Invalid JSON catalog: expected downloads with titles and URI lists",
+        "vi": "Invalid JSON catalog: expected downloads with titles and URI lists",
+        "id": "Invalid JSON catalog: expected downloads with titles and URI lists"
+      }
+    },
+    "service.json_catalog_request_failed": {
+      "source": "Catalog request failed",
+      "translations": {
+        "es": "Catalog request failed",
+        "es-419": "Catalog request failed",
+        "zh-Hans": "Catalog request failed",
+        "hi": "Catalog request failed",
+        "de": "Catalog request failed",
+        "ja": "Catalog request failed",
+        "fr": "Catalog request failed",
+        "fr-CA": "Catalog request failed",
+        "pt-BR": "Catalog request failed",
+        "ar": "Catalog request failed",
+        "ko": "Catalog request failed",
+        "zh-Hant": "Catalog request failed",
+        "vi": "Catalog request failed",
+        "id": "Catalog request failed"
+      }
     }
   }
 }

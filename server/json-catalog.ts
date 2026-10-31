@@ -1,4 +1,8 @@
-import { serviceMessage } from "../shared/service-messages.js";
+import {
+  serviceMessage,
+  ServiceMessageError,
+  serviceErrorResult,
+} from "../shared/service-messages.js";
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import type { Indexer } from "../shared/schema.js";
@@ -25,7 +29,7 @@ const cache = new Map<string, { until: number; catalog: Catalog }>();
 async function readCatalog(url: string, refresh = false): Promise<Catalog> {
   const parsed = new URL(url);
   if (parsed.protocol !== "https:" || parsed.username || parsed.password) {
-    throw new Error("JSON catalogs require a public HTTPS URL without embedded credentials");
+    throw new ServiceMessageError("service.json_catalog_https_required", {});
   }
   const cached = cache.get(parsed.href);
   if (!refresh && cached && cached.until > Date.now()) return cached.catalog;
@@ -37,7 +41,7 @@ async function readCatalog(url: string, refresh = false): Promise<Catalog> {
   });
   if (!response.ok || !response.body) {
     await response.body?.cancel();
-    throw new Error(`Catalog returned HTTP ${response.status}`);
+    throw new ServiceMessageError("service.json_catalog_http_error", { status: response.status });
   }
   const reader = response.body.getReader();
   const chunks: Uint8Array[] = [];
@@ -47,7 +51,7 @@ async function readCatalog(url: string, refresh = false): Promise<Catalog> {
       const { done, value } = await reader.read();
       if (done) break;
       size += value.byteLength;
-      if (size > MAX_BYTES) throw new Error("Catalog exceeds the 10 MiB limit");
+      if (size > MAX_BYTES) throw new ServiceMessageError("service.json_catalog_size_limit", {});
       chunks.push(value);
     }
   } finally {
@@ -57,7 +61,7 @@ async function readCatalog(url: string, refresh = false): Promise<Catalog> {
   try {
     catalog = catalogSchema.parse(JSON.parse(Buffer.concat(chunks).toString("utf8")));
   } catch {
-    throw new Error("Invalid JSON catalog: expected downloads with titles and URI lists");
+    throw new ServiceMessageError("service.json_catalog_format_invalid", {});
   }
   // Bound both response size and cache cardinality; a changed URL cannot reuse old data.
   cache.delete(parsed.href);
@@ -107,10 +111,7 @@ export const jsonCatalogClient = {
         ...serviceMessage("service.json_catalog_valid", { count: catalog.downloads.length }),
       };
     } catch (error) {
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : "Catalog request failed",
-      };
+      return serviceErrorResult(error, serviceMessage("service.json_catalog_request_failed", {}));
     }
   },
   async search(indexer: Indexer, options: AggregatedSearchOptions) {

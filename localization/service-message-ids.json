@@ -179,5 +179,20 @@
   "service.download_fetch_failed",
   "service.synology_download_add_failed",
   "service.tracker_requests_failed",
-  "service.internal_server_error"
+  "service.internal_server_error",
+  "service.twitch_unreachable",
+  "service.igdb_credentials_invalid",
+  "service.twitch_unexpected_status",
+  "service.igdb_unreachable",
+  "service.igdb_request_rejected",
+  "service.igdb_credentials_unconfigured",
+  "service.igdb_authentication_failed",
+  "service.igdb_api_error",
+  "service.igdb_game_platform_required",
+  "service.igdb_credentials_test_failed",
+  "service.json_catalog_https_required",
+  "service.json_catalog_http_error",
+  "service.json_catalog_size_limit",
+  "service.json_catalog_format_invalid",
+  "service.json_catalog_request_failed"
 ]

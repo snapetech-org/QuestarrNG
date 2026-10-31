@@ -2893,6 +2893,23 @@ export const STABLE_INTERFACE_MESSAGES = {
     "Failed to add download to Synology Download Station: {error}",
   "service.tracker_requests_failed": "{count} tracker request(s) failed",
   "service.internal_server_error": "Internal Server Error",
+  "service.twitch_unreachable": "Could not reach Twitch — check your network connection.",
+  "service.igdb_credentials_invalid": "Invalid Client ID or Client Secret.",
+  "service.twitch_unexpected_status": "Twitch returned an unexpected error (status {status}).",
+  "service.igdb_unreachable": "Could not reach IGDB — check your network connection.",
+  "service.igdb_request_rejected": "IGDB rejected the request (status {status}).",
+  "service.igdb_credentials_unconfigured": "IGDB credentials not configured",
+  "service.igdb_authentication_failed": "IGDB authentication failed: {status}",
+  "service.igdb_api_error": "IGDB API error: {status}",
+  "service.igdb_game_platform_required": "A valid IGDB game and platform ID are required.",
+  "service.igdb_credentials_test_failed": "Failed to test IGDB credentials",
+  "service.json_catalog_https_required":
+    "JSON catalogs require a public HTTPS URL without embedded credentials",
+  "service.json_catalog_http_error": "Catalog returned HTTP {status}",
+  "service.json_catalog_size_limit": "Catalog exceeds the 10 MiB limit",
+  "service.json_catalog_format_invalid":
+    "Invalid JSON catalog: expected downloads with titles and URI lists",
+  "service.json_catalog_request_failed": "Catalog request failed",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;
