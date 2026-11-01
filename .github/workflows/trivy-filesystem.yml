@@ -50,4 +50,3 @@ jobs:
         env:
           TRIVY_VEX: security/vex/questarr.openvex.json
         run: ./scripts/security-scan-local.sh --trivy-only --ci
-

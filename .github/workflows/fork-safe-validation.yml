@@ -38,4 +38,3 @@ jobs:
           body_file="$RUNNER_TEMP/pr-body.md"
           printf '%s' "$PR_BODY" > "$body_file"
           node scripts/check-release-notes.mjs --base "$BASE_SHA" --head "$HEAD_SHA" --pr-body "$body_file" --summary-file "$GITHUB_STEP_SUMMARY"
-
