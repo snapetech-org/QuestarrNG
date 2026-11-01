@@ -17,13 +17,15 @@ export class ApiError extends Error {
   status: number;
   data: unknown;
   code: string | undefined;
+  rawDetail: string;
 
-  constructor(status: number, message: string, data?: unknown, code?: string) {
+  constructor(status: number, message: string, data?: unknown, code?: string, rawDetail?: string) {
     super(message);
     this.name = "ApiError";
     this.status = status;
     this.data = data;
     this.code = code;
+    this.rawDetail = rawDetail ?? message;
   }
 }
 
@@ -47,7 +49,7 @@ export async function throwIfResNotOk(res: Response) {
     const message = metadata.present
       ? localizeServiceMessage(detail, metadata.value, getInterfaceLanguage())
       : getLocalizedApiErrorMessage(code, res.status, detail, getInterfaceLanguage());
-    throw new ApiError(res.status, message, data, code);
+    throw new ApiError(res.status, message, data, code, detail);
   }
 }
 

@@ -1,5 +1,4 @@
 import {
-  formatRegionalDate,
   formatRegionalNumber,
   getRegionalDirection as getLocaleDirection,
   getRegionalLocale,
@@ -54,12 +53,16 @@ function toLocalDateKey(releaseDate: string): string {
   return /^\d{4}-\d{2}-\d{2}$/.test(releaseDate) ? releaseDate : formatDate(new Date(releaseDate));
 }
 
+function parseCalendarDate(date: string): Date {
+  return /^\d{4}-\d{2}-\d{2}$/.test(date) ? new Date(`${date}T00:00:00`) : new Date(date);
+}
+
 export function formatCalendarDate(
   date: Date,
   options: Intl.DateTimeFormatOptions,
   locale = getRegionalLocale()
 ): string {
-  return formatRegionalDate(date, { ...options, calendar: "gregory" }, locale);
+  return new Intl.DateTimeFormat(locale, { ...options, calendar: "gregory" }).format(date);
 }
 
 export function formatCalendarTitle(
@@ -346,9 +349,9 @@ export default function CalendarPage({ today: injectedToday }: CalendarPageProps
                 dir={directionFor("interface.previous_period_b5a4f439")}
               >
                 {language === "ar" ? (
-                  <ChevronRight className="h-5 w-5 rtl:rotate-180" />
+                  <ChevronRight className="h-5 w-5" />
                 ) : (
-                  <ChevronLeft className="h-5 w-5 rtl:rotate-180" />
+                  <ChevronLeft className="h-5 w-5" />
                 )}
               </Button>
               <Button
@@ -360,9 +363,9 @@ export default function CalendarPage({ today: injectedToday }: CalendarPageProps
                 dir={directionFor("interface.next_period_2feea679")}
               >
                 {language === "ar" ? (
-                  <ChevronLeft className="h-5 w-5 rtl:rotate-180" />
+                  <ChevronLeft className="h-5 w-5" />
                 ) : (
-                  <ChevronRight className="h-5 w-5 rtl:rotate-180" />
+                  <ChevronRight className="h-5 w-5" />
                 )}
               </Button>
               <div className="w-px h-5 bg-border" />
@@ -519,7 +522,7 @@ function YearView({
                       lang={getRegionalLanguage()}
                       dir={getRegionalDirection()}
                     >
-                      {formatCalendarDate(new Date(date), {
+                      {formatCalendarDate(parseCalendarDate(date), {
                         month: "short",
                         day: "numeric",
                       })}
@@ -727,7 +730,7 @@ function MonthView({
             lang={regionalLocale}
             dir={regionalDirection}
           >
-            {formatCalendarDate(new Date(selectedDayKey), {
+            {formatCalendarDate(parseCalendarDate(selectedDayKey), {
               weekday: "long",
               month: "long",
               day: "numeric",
@@ -999,7 +1002,7 @@ function GameBadge({
               dir={getRegionalDirection()}
             >
               {game.releaseDate &&
-                formatCalendarDate(new Date(game.releaseDate), {
+                formatCalendarDate(parseCalendarDate(game.releaseDate), {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
@@ -1009,7 +1012,7 @@ function GameBadge({
               <p className="text-xs text-muted-foreground">
                 <LocalizedText source="interface.was_originally_scheduled_for_3fd66704" />{" "}
                 <span lang={getRegionalLanguage()} dir={getRegionalDirection()}>
-                  {formatCalendarDate(new Date(game.originalReleaseDate), {
+                  {formatCalendarDate(parseCalendarDate(game.originalReleaseDate), {
                     month: "short",
                     day: "numeric",
                   })}
@@ -1057,7 +1060,7 @@ function GameBadge({
                 dir={getRegionalDirection()}
               >
                 {game.releaseDate &&
-                  formatCalendarDate(new Date(game.releaseDate), {
+                  formatCalendarDate(parseCalendarDate(game.releaseDate), {
                     month: "short",
                     day: "numeric",
                     year: "numeric",
@@ -1078,7 +1081,7 @@ function GameBadge({
             {hideDate ? (
               <LocalizedText source="interface.release_date_tbd_d9339594" />
             ) : game.releaseDate ? (
-              formatCalendarDate(new Date(game.releaseDate), {
+              formatCalendarDate(parseCalendarDate(game.releaseDate), {
                 month: "long",
                 day: "numeric",
                 year: "numeric",
@@ -1094,7 +1097,7 @@ function GameBadge({
                 <p className="text-xs text-muted-foreground">
                   <LocalizedText source="interface.was_originally_scheduled_for_3fd66704" />{" "}
                   <span lang={getRegionalLanguage()} dir={getRegionalDirection()}>
-                    {formatCalendarDate(new Date(game.originalReleaseDate), {
+                    {formatCalendarDate(parseCalendarDate(game.originalReleaseDate), {
                       month: "long",
                       day: "numeric",
                       year: "numeric",

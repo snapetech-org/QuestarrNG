@@ -1,5 +1,7 @@
 import { ServiceMessageError } from "@shared/service-messages";
 import { ApiError, getApiErrorMetadata } from "@/lib/queryClient";
+import { getLocalizedApiErrorMessage } from "@/lib/api-error-locale";
+import { getInterfaceLanguageDirection, useInterfaceLanguage } from "@/lib/interface-locale";
 import { InterfaceText } from "./InterfaceText";
 import { ServiceMessageText } from "./ServiceMessageText";
 
@@ -11,6 +13,7 @@ export function ApiErrorDescription({
   error: unknown;
   fallbackSource?: string;
 }) {
+  const { language } = useInterfaceLanguage();
   if (error instanceof ApiError) {
     const metadata = getApiErrorMetadata(error.data);
     if (metadata.present) {
@@ -23,6 +26,11 @@ export function ApiErrorDescription({
         />
       );
     }
+    return (
+      <bdi lang={language} dir={getInterfaceLanguageDirection(language)}>
+        {getLocalizedApiErrorMessage(error.code, error.status, error.rawDetail, language)}
+      </bdi>
+    );
   }
   if (error instanceof ServiceMessageError)
     return <ServiceMessageText message={error.message} metadata={error} />;

@@ -98,7 +98,9 @@ function availableInterfaceLanguage(value: string): InterfaceLanguage | undefine
 }
 
 function localeRegion(subtags: string[]): string | undefined {
-  return subtags.slice(1).find((subtag) => subtag === "419" || /^[a-z]{2}$/u.test(subtag));
+  const extensionStart = subtags.findIndex((subtag, index) => index > 0 && subtag.length === 1);
+  const coreSubtags = extensionStart === -1 ? subtags.slice(1) : subtags.slice(1, extensionStart);
+  return coreSubtags.find((subtag) => subtag === "419" || /^[a-z]{2}$/u.test(subtag));
 }
 
 export function resolveInterfaceLanguage(candidate: string): InterfaceLanguage | undefined {
