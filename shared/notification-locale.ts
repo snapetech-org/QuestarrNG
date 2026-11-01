@@ -538,12 +538,22 @@ export function getNotificationLabel(source: string, language: NotificationLangu
 }
 
 export function getNotificationTitle(source: string, language: NotificationLanguage): string {
-  if (source.startsWith("Security Alert: Download Flagged by ")) {
-    const provider = source.slice("Security Alert: Download Flagged by ".length);
-    const prefix = getNotificationLabel("Security Alert: Download Flagged by", language);
-    return prefix === "Security Alert: Download Flagged by" ? source : `${prefix} ${provider}`;
-  }
+  const securityAlert = getLocalizedSecurityAlertTitleParts(source, language);
+  if (securityAlert) return `${securityAlert.prefix} ${securityAlert.provider}`;
   return getNotificationLabel(source, language);
+}
+
+/** Split a localized security alert so callers can isolate its opaque provider name. */
+export function getLocalizedSecurityAlertTitleParts(
+  source: string,
+  language: NotificationLanguage
+): { prefix: string; provider: string } | undefined {
+  const sourcePrefix = "Security Alert: Download Flagged by ";
+  if (!source.startsWith(sourcePrefix)) return undefined;
+  return {
+    prefix: getNotificationLabel("Security Alert: Download Flagged by", language),
+    provider: source.slice(sourcePrefix.length),
+  };
 }
 
 export function getNotificationTitleLanguage(
@@ -569,6 +579,25 @@ export function formatNotificationAccessibleLabel(
     language
   );
   return template.replace("{title}", title);
+}
+
+/** The translated wrapper lets component consumers mark an opaque title separately. */
+export function getNotificationAccessibleLabelParts(
+  read: boolean,
+  language: NotificationLanguage
+): { prefix: string; suffix: string } {
+  const template = getNotificationLabel(
+    read ? "Read notification: {title}" : "Unread notification: {title}",
+    language
+  );
+  const marker = "{title}";
+  const markerIndex = template.indexOf(marker);
+  return markerIndex < 0
+    ? { prefix: template, suffix: "" }
+    : {
+        prefix: template.slice(0, markerIndex),
+        suffix: template.slice(markerIndex + marker.length),
+      };
 }
 
 export function formatUnreadNotificationsLabel(

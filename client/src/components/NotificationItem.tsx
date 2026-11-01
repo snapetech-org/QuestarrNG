@@ -5,7 +5,8 @@ import { cn } from "@/lib/utils";
 import { RegionalRelativeTime } from "./RegionalRelativeTime";
 import { useInterfaceLanguage } from "@/lib/interface-locale";
 import {
-  formatNotificationAccessibleLabel,
+  getLocalizedSecurityAlertTitleParts,
+  getNotificationAccessibleLabelParts,
   getNotificationTextDirection,
   getNotificationTitle,
   getNotificationTitleLanguage,
@@ -22,6 +23,8 @@ export function NotificationItem({ notification, onRead, onClick }: Notification
   const { language } = useInterfaceLanguage();
   const title = getNotificationTitle(notification.title, language);
   const titleLanguage = getNotificationTitleLanguage(notification.title, language);
+  const securityAlertTitle = getLocalizedSecurityAlertTitleParts(notification.title, language);
+  const accessibleLabel = getNotificationAccessibleLabelParts(notification.read, language);
   const localizedMessage = localizeNotificationMessage(
     notification.title,
     notification.message,
@@ -63,8 +66,21 @@ export function NotificationItem({ notification, onRead, onClick }: Notification
       )}
       onClick={handleClick}
     >
-      <span className="sr-only" lang={titleLanguage} dir="auto">
-        {formatNotificationAccessibleLabel(notification.read, title, language)}
+      <span className="sr-only" lang={language} dir={getNotificationTextDirection(language)}>
+        {accessibleLabel.prefix}
+        <bdi lang={securityAlertTitle ? language : titleLanguage} dir="auto">
+          {securityAlertTitle ? (
+            <>
+              {securityAlertTitle.prefix}{" "}
+              <bdi lang="en" dir="auto">
+                {securityAlertTitle.provider}
+              </bdi>
+            </>
+          ) : (
+            title
+          )}
+        </bdi>
+        {accessibleLabel.suffix}
       </span>
       <div className="mt-0.5" aria-hidden="true">
         {getIcon()}
@@ -76,7 +92,16 @@ export function NotificationItem({ notification, onRead, onClick }: Notification
             lang={titleLanguage}
             dir={getNotificationTextDirection(titleLanguage)}
           >
-            {title}
+            {securityAlertTitle ? (
+              <>
+                {securityAlertTitle.prefix}{" "}
+                <bdi lang="en" dir="auto">
+                  {securityAlertTitle.provider}
+                </bdi>
+              </>
+            ) : (
+              title
+            )}
           </p>
           {!notification.read && <span className="h-2 w-2 rounded-full bg-primary flex-shrink-0" />}
         </div>

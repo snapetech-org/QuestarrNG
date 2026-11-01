@@ -16,6 +16,7 @@ import { getSocket } from "@/lib/socket";
 import { useInterfaceLanguage } from "@/lib/interface-locale";
 import {
   formatUnreadNotificationsLabel,
+  getLocalizedSecurityAlertTitleParts,
   getNotificationLabel,
   getNotificationTextDirection,
   getNotificationTitle,
@@ -60,6 +61,7 @@ export function NotificationCenter() {
     const socket = getSocket();
     const handleNotification = (notification: Notification) => {
       const titleLanguage = getNotificationTitleLanguage(notification.title, language);
+      const securityAlertTitle = getLocalizedSecurityAlertTitleParts(notification.title, language);
       const localizedMessage = localizeNotificationMessage(
         notification.title,
         notification.message,
@@ -69,7 +71,16 @@ export function NotificationCenter() {
       toast({
         title: (
           <span lang={titleLanguage} dir={getNotificationTextDirection(titleLanguage)}>
-            {getNotificationTitle(notification.title, language)}
+            {securityAlertTitle ? (
+              <>
+                {securityAlertTitle.prefix}{" "}
+                <bdi lang="en" dir="auto">
+                  {securityAlertTitle.provider}
+                </bdi>
+              </>
+            ) : (
+              getNotificationTitle(notification.title, language)
+            )}
           </span>
         ),
         description: (
