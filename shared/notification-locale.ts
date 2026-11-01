@@ -1,4 +1,5 @@
 import { notificationCatalogLanguage, type NotificationLanguage } from "./notification-language.js";
+import { isolateBidirectionalValue } from "./service-messages.js";
 
 type NotificationLabelKey =
   | "Notifications"
@@ -539,7 +540,11 @@ export function getNotificationLabel(source: string, language: NotificationLangu
 
 export function getNotificationTitle(source: string, language: NotificationLanguage): string {
   const securityAlert = getLocalizedSecurityAlertTitleParts(source, language);
-  if (securityAlert) return `${securityAlert.prefix} ${securityAlert.provider}`;
+  if (securityAlert) {
+    const provider =
+      language === "en" ? securityAlert.provider : isolateBidirectionalValue(securityAlert.provider);
+    return `${securityAlert.prefix} ${provider}`;
+  }
   return getNotificationLabel(source, language);
 }
 
