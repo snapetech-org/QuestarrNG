@@ -1,14 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { cwd } from "node:process";
 import { load } from "js-yaml";
-import {
-  REQUIRED_CHECKS,
-  REQUIRED_CODE_ANALYSES,
-  securityBlockers,
-  sourceAnalysisBlockers,
-} from "../check-release-security.mjs";
+import { REQUIRED_CHECKS, securityBlockers } from "../check-release-security.mjs";
 
 const successfulChecks = () =>
   REQUIRED_CHECKS.map((name) => ({
@@ -94,6 +89,21 @@ describe("release security gate", () => {
     expect(verifyStep.run).toContain("arm64_image=${image}@${arm64_digest}");
   });
 
+  it("does not require CodeQL workflow or upload actions", () => {
+    expect(existsSync(resolve(cwd(), ".github/workflows/codeql.yml"))).toBe(false);
+    for (const workflow of [
+      "semgrep-community.yml",
+      "sast.yml",
+      "scorecard.yml",
+      "vulnerability-scan.yml",
+    ]) {
+      expect(readFileSync(resolve(cwd(), ".github/workflows", workflow), "utf8")).not.toContain(
+        "github/codeql-action"
+      );
+    }
+    expect(REQUIRED_CHECKS.some((name) => name.startsWith("Analyze ("))).toBe(false);
+  });
+
   it("permits a clean source commit only after every required scan succeeds", () => {
     expect(securityBlockers([], [], successfulChecks())).toEqual([]);
   });
@@ -153,93 +163,6 @@ describe("release security gate", () => {
       )
     ).toEqual(["Open CodeQL alert #51: release-source-alert"]);
     expect(securityBlockers([], [], [])).toHaveLength(REQUIRED_CHECKS.length);
-  });
-
-  it("requires exact-ref analyses for every release code scanner", () => {
-    const releaseRef = "refs/tags/v1.2.3";
-    const releaseSha = "a".repeat(40);
-    const analyses = REQUIRED_CODE_ANALYSES.map(({ tool, category }) => ({
-      ref: releaseRef,
-      commit_sha: releaseSha,
-      tool: { name: tool },
-      category,
-      error: "",
-      created_at: "2026-10-12T10:00:00Z",
-    }));
-    expect(sourceAnalysisBlockers(analyses, releaseRef, releaseSha)).toEqual([]);
-    expect(sourceAnalysisBlockers(analyses.slice(1), releaseRef, releaseSha)).toEqual([
-      "CodeQL /language:csharp analysis is missing for " + releaseRef + "@" + releaseSha,
-    ]);
-    expect(sourceAnalysisBlockers(analyses, releaseRef, "b".repeat(40))).toHaveLength(
-      REQUIRED_CODE_ANALYSES.length
-    );
-  });
-
-  it("recognizes GitHub's actual Semgrep OSS analysis identity and rejects failed uploads", () => {
-    const ref = "refs/tags/v1.2.3";
-    const commit_sha = "a".repeat(40);
-    const analyses = [
-      ...["csharp", "javascript-typescript", "actions", "cpp"].map((language) => ({
-        ref,
-        commit_sha,
-        tool: { name: "CodeQL" },
-        category: "/language:" + language,
-        error: "",
-        created_at: "2026-10-12T10:00:00Z",
-      })),
-      {
-        ref,
-        commit_sha,
-        tool: { name: "Semgrep OSS" },
-        category: ".github/workflows/sast.yml:semgrep",
-        error: "",
-        created_at: "2026-10-12T10:00:00Z",
-      },
-    ];
-    expect(sourceAnalysisBlockers(analyses, ref, commit_sha)).toEqual([]);
-    analyses[4].error = "SARIF processing failed";
-    expect(sourceAnalysisBlockers(analyses, ref, commit_sha)).toHaveLength(1);
-  });
-
-  it("blocks a failed newest scan even when an older scan of the same source succeeded", () => {
-    const ref = "refs/tags/v1.2.3";
-    const commit_sha = "a".repeat(40);
-    const otherAnalyses = REQUIRED_CODE_ANALYSES.slice(1).map(({ tool, category }) => ({
-      ref,
-      commit_sha,
-      tool: { name: tool },
-      category,
-      error: "",
-      created_at: "2026-10-12T10:00:00Z",
-    }));
-    const failedLatest = {
-      ref,
-      commit_sha,
-      tool: { name: "CodeQL" },
-      category: "/language:csharp",
-      error: "SARIF processing failed",
-      created_at: "2026-10-12T12:00:00Z",
-    };
-    const successfulOlder = { ...failedLatest, error: "", created_at: "2026-10-12T11:00:00Z" };
-    const expected = ["CodeQL /language:csharp analysis is missing for " + ref + "@" + commit_sha];
-
-    expect(
-      sourceAnalysisBlockers([failedLatest, successfulOlder, ...otherAnalyses], ref, commit_sha)
-    ).toEqual(expected);
-    expect(
-      sourceAnalysisBlockers([successfulOlder, failedLatest, ...otherAnalyses], ref, commit_sha)
-    ).toEqual(expected);
-    expect(
-      sourceAnalysisBlockers(
-        [
-          { ...failedLatest, created_at: "2026-10-12T11:00:00Z" },
-          { ...successfulOlder, created_at: "2026-10-12T12:00:00Z" },
-          ...otherAnalyses,
-        ],
-        ref,
-        commit_sha
-      )
-    ).toEqual([]);
   });
 
   it("blocks CodeQL, Scorecard vulnerability, and low-severity dependency alerts", () => {

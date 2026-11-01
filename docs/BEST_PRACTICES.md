@@ -80,15 +80,14 @@ on commit `858e81c64d49fcf75bfa0ee17b93f5f705a2174e`.
 The Home Assistant ownership helper is compiled and exercised with AddressSanitizer
 and UndefinedBehaviorSanitizer in a disposable fixture. The test checks argument
 rejection, nested-file traversal, physical symlink handling, error handling, and
-the ownership callback without changing any real data. The required C++ CodeQL
-job recompiles the production helper and runs this contract with the compiler
+the ownership callback without changing any real data. The CI workflow
+recompiles the production helper and runs this contract with the compiler
 required.
 
 Evidence: [`fix-data-owner.c`](../questarr/fix-data-owner.c), the
 [test-only `lchown` wrapper](../questarr/fix-data-owner-test-wrap.c),
 [sanitizer contract](../tests/contracts/home-assistant-data-owner-sanitizers.contract.mjs),
-[`ci.yml`](../.github/workflows/ci.yml), and
-[`codeql.yml`](../.github/workflows/codeql.yml).
+and [`ci.yml`](../.github/workflows/ci.yml).
 
 ## [dynamic_analysis_enable_assertions]
 
@@ -162,8 +161,8 @@ Evidence: [`server/index.ts`](../server/index.ts),
 ## Current OpenSSF Scorecard findings and disposition
 
 These repository-level findings are separate from the Badge criteria above.
-The latest main-branch scan completed on 2026-10-14. CodeQL, Dependabot, and
-secret-scanning alert lists are clear; the remaining Code Scanning alerts are
+The cited Scorecard scan completed on 2026-10-14. At that time, CodeQL,
+Dependabot, and secret-scanning alert lists were clear; the remaining Code Scanning alerts are
 Scorecard process and maturity metrics, not identified vulnerable source code.
 
 | Finding                                                                                         | Fork-specific evidence and status                                                                                                                                                                                                                                                                                                                                                                  |
@@ -202,16 +201,16 @@ See [SECRETS.md](SECRETS.md#2-authentication-secret-jwt_secret) and
 `server/__tests__/config.test.ts` / `jwt-secret-rotation.test.ts`.
 
 The live `main` branch requires the current PR checks: release notes, SCA,
-Windows service publishing, unit tests, the minimum-Node build, four CodeQL
-language jobs (including the Home Assistant C
-helper), Semgrep, and Playwright. All
+Windows service publishing, unit tests, the minimum-Node build, Semgrep, and
+Playwright. This change removes CodeQL workflows and stops requiring CodeQL
+analyses in the release gate. All
 status-check and conversation-resolution requirements apply to administrators.
 Pull requests require no separate approval. See [branch protection
 settings](https://github.com/snapetech-org/QuestarrNG/settings/branches).
 
 The security PR also gates versioned image publication, GitHub release publication,
 and release recovery on zero open security-relevant Code Scanning and Dependabot
-alerts plus successful CI, CodeQL, SAST, DAST, image-scan, and Scorecard checks
+alerts plus successful CI, SAST, DAST, image-scan, and Scorecard checks
 for the release commit. Historical Scorecard maturity and review indicators stay
 visible; the maintainer has accepted the CodeReview metric under a
 single-maintainer merge policy. All required status checks remain in force.
@@ -235,7 +234,7 @@ branch.
 - License: [COPYING](../COPYING)
 - Current release history: [CHANGELOG.md](CHANGELOG.md) and
   [GitHub releases](https://github.com/snapetech-org/QuestarrNG/releases)
-- CI, CodeQL, SAST, DAST, and Scorecard workflows: [workflow directory](../.github/workflows)
+- CI, SAST, DAST, and Scorecard workflows: [workflow directory](../.github/workflows)
 
 **Update this record** when the repository's public history, CI/security gates,
 or the cited criteria evidence changes. Recheck time-window criteria against
