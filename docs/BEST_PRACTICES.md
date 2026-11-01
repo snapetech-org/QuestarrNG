@@ -61,9 +61,9 @@ Evidence: [`ci.yml`](../.github/workflows/ci.yml),
 
 [`dast.yml`](../.github/workflows/dast.yml) builds and starts the production
 server, waits for its health endpoint, and runs the OWASP ZAP baseline scan
-against that live instance. It runs on pushes to `main` and `release/*`, weekly,
-and by manual dispatch. `fail_action: true` makes unignored scan alerts fail the
-workflow; accepted rule IDs and their rationale are recorded in
+against that live instance. It is manually dispatched from `main` on the
+private JIT pool; it does not run on pushes or a schedule. `fail_action: true`
+makes unignored scan alerts fail the workflow; accepted rule IDs and their rationale are recorded in
 [`.zap/rules.tsv`](../.zap/rules.tsv).
 
 The v1.9.1 DAST run started after publication, so it is not cited as
@@ -80,15 +80,14 @@ on commit `858e81c64d49fcf75bfa0ee17b93f5f705a2174e`.
 The Home Assistant ownership helper is compiled and exercised with AddressSanitizer
 and UndefinedBehaviorSanitizer in a disposable fixture. The test checks argument
 rejection, nested-file traversal, physical symlink handling, error handling, and
-the ownership callback without changing any real data. The required C++ CodeQL
-job recompiles the production helper and runs this contract with the compiler
+the ownership callback without changing any real data. The CI workflow
+recompiles the production helper and runs this contract with the compiler
 required.
 
 Evidence: [`fix-data-owner.c`](../questarr/fix-data-owner.c), the
 [test-only `lchown` wrapper](../questarr/fix-data-owner-test-wrap.c),
 [sanitizer contract](../tests/contracts/home-assistant-data-owner-sanitizers.contract.mjs),
-[`ci.yml`](../.github/workflows/ci.yml), and
-[`codeql.yml`](../.github/workflows/codeql.yml).
+and [`ci.yml`](../.github/workflows/ci.yml).
 
 ## [dynamic_analysis_enable_assertions]
 
@@ -162,15 +161,15 @@ Evidence: [`server/index.ts`](../server/index.ts),
 ## Current OpenSSF Scorecard findings and disposition
 
 These repository-level findings are separate from the Badge criteria above.
-The latest main-branch scan completed on 2026-10-14. CodeQL, Dependabot, and
-secret-scanning alert lists are clear; the remaining Code Scanning alerts are
+The cited Scorecard scan completed on 2026-10-14. At that time, CodeQL,
+Dependabot, and secret-scanning alert lists were clear; the remaining Code Scanning alerts are
 Scorecard process and maturity metrics, not identified vulnerable source code.
 
 | Finding                                                                                         | Fork-specific evidence and status                                                                                                                                                                                                                                                                                                                                                                  |
 | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [CI-Tests #149](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/149)         | [Scorecard run 38660675071](https://github.com/snapetech-org/QuestarrNG/actions/runs/38660675071) on main commit `abaf9a0ab4a69997a48b58c7696122f8c6e87b67` reports CI tests for 21 of 22 sampled merged pull requests (score 9/10). Branch protection requires current test and build checks for protected merges; the remaining miss is historical and does not identify a current failing test. |
+| [CI-Tests #149](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/149)         | [Scorecard run 38660675071](https://github.com/snapetech-org/QuestarrNG/actions/runs/38660675071) on main commit `abaf9a0ab4a69997a48b58c7696122f8c6e87b67` reports CI tests for 21 of 22 sampled merged pull requests (score 9/10). The missed sample is historical. GitHub's current repository settings, checked 2026-10-31, do not require CI status checks for merges. |
 | [SAST #148](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/148)             | The same Scorecard run reports SAST for 28 of the 30 sampled commits (score 9/10). The SAST workflow is active and passed on that main commit; the remaining score reflects its sampled history.                                                                                                                                                                                                   |
-| [CodeReviewID #10](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/10)       | Scorecard reports 0/13 approved changesets. The maintainer accepted the single-maintainer process and dismissed this historical process alert as `won't fix`; PRs still require all configured status checks and conversation resolution. AI review is advisory and is not represented as independent human approval.                                                                              |
+| [CodeReviewID #10](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/10)       | Scorecard reports 0/13 approved changesets. The maintainer accepted the single-maintainer process and dismissed this historical process alert as `won't fix`. AI review is advisory and is not represented as independent human approval.                                                                              |
 | [MaintainedID #11](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/11)       | GitHub records repository creation as 2026-09-25T23:50:31Z. Scorecard requires more than 90 days of repository history, so the earliest age-based reassessment is after 2026-12-24T23:50:31Z. Releases and CI demonstrate current activity, but cannot change repository age.                                                                                                                      |
 | [CIIBestPracticesID #12](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/12) | The [OpenSSF profile](https://www.bestpractices.dev/en/projects/15269/passing) is 97% complete and still `in_progress`. The project has corrected the repository URLs and 61 stale evidence links. The remaining profile answers require an authorized owner to record current evidence and the new repository history.                                                                            |
 
@@ -201,20 +200,22 @@ profile owner's external review.
 See [SECRETS.md](SECRETS.md#2-authentication-secret-jwt_secret) and
 `server/__tests__/config.test.ts` / `jwt-secret-rotation.test.ts`.
 
-The live `main` branch requires the current PR checks: release notes, SCA,
-Windows service publishing, unit tests, the minimum-Node build, four CodeQL
-language jobs (including the Home Assistant C
-helper), Semgrep, and Playwright. All
-status-check and conversation-resolution requirements apply to administrators.
-Pull requests require no separate approval. See [branch protection
+As of 2026-10-31, GitHub reports no required status checks, pull-request review
+requirement, or repository ruleset on `main`. CI and security workflows are
+manually dispatched from `main` onto private ephemeral JIT runners; they do not
+run automatically for same-repository pull requests or branch pushes. Labeled
+external-fork validation is separate and uses the isolated, secret-free
+`public-fork-jit` route. The current change removes CodeQL workflow execution
+and CodeQL analysis requirements from the release gate. See [branch protection
 settings](https://github.com/snapetech-org/QuestarrNG/settings/branches).
 
 The security PR also gates versioned image publication, GitHub release publication,
 and release recovery on zero open security-relevant Code Scanning and Dependabot
-alerts plus successful CI, CodeQL, SAST, DAST, image-scan, and Scorecard checks
-for the release commit. Historical Scorecard maturity and review indicators stay
-visible; the maintainer has accepted the CodeReview metric under a
-single-maintainer merge policy. All required status checks remain in force.
+alerts plus successful CI, SAST, DAST, image-scan, and Scorecard checks
+for the release commit. These are release-time gates, not branch-protection
+requirements for pull requests. Historical Scorecard maturity and review
+indicators stay visible; the maintainer has accepted the CodeReview metric
+under a single-maintainer merge policy.
 See [VULNERABILITY_MANAGEMENT.md](VULNERABILITY_MANAGEMENT.md#13-pre-release-gate).
 
 Release workflows use the full-SHA-pinned StepSecurity GitHub Release action, a
@@ -235,7 +236,7 @@ branch.
 - License: [COPYING](../COPYING)
 - Current release history: [CHANGELOG.md](CHANGELOG.md) and
   [GitHub releases](https://github.com/snapetech-org/QuestarrNG/releases)
-- CI, CodeQL, SAST, DAST, and Scorecard workflows: [workflow directory](../.github/workflows)
+- CI, SAST, DAST, and Scorecard workflows: [workflow directory](../.github/workflows)
 
 **Update this record** when the repository's public history, CI/security gates,
 or the cited criteria evidence changes. Recheck time-window criteria against

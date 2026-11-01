@@ -307,7 +307,10 @@ jobs:
           retention-days: 3
 
       - name: Upload Codecov reports for the trusted workflow
-        if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        if: >-
+          ${{ !cancelled() && github.event_name == 'workflow_dispatch' &&
+          github.ref == 'refs/heads/main' && inputs.action == 'ci' &&
+          inputs.runner_pool == 'private' }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: codecov-reports-attempt-${{ github.run_attempt }}

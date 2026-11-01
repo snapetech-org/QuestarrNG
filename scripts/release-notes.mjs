@@ -161,9 +161,7 @@ function latestReachableReleaseTag(head, cwd) {
       ["tag", "--merged", head, "--list", "v[0-9]*", "--sort=-version:refname"],
       { cwd, encoding: "utf8" }
     );
-    return tags
-      .split("\n")
-      .find((tag) => /^v\d+\.\d+\.\d+$/u.test(tag)) ?? null;
+    return tags.split("\n").find((tag) => /^v\d+\.\d+\.\d+$/u.test(tag)) ?? null;
   } catch {
     return null;
   }
@@ -366,7 +364,6 @@ export function injectCuratedNotes(changelog, curatedNotes, version, releaseDate
 export function hasExplicitNoReleaseNote(body) {
   return (
     /release-note\s*:\s*none/iu.test(body) ||
-    /release-note-none-codeql-action/iu.test(body) ||
     /-\s*\[x\][^\n]*(?:internal-only|no user-facing release note)/iu.test(body)
   );
 }

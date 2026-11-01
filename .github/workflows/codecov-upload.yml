@@ -14,7 +14,7 @@ permissions:
 jobs:
   upload:
     if: >-
-      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.event == 'workflow_dispatch' &&
       github.event.workflow_run.head_branch == 'main' &&
       github.event.workflow_run.head_repository.full_name == github.repository &&
       github.event.workflow_run.conclusion != 'cancelled'
@@ -26,7 +26,7 @@ jobs:
 
     steps:
       # Never check out the workflow_run source commit in this secret-bearing job.
-      # The uploader runs only for trusted pushes to main; override_commit below
+      # The uploader runs only for trusted manual CI dispatches from main; override_commit below
       # keeps the uploaded reports associated with that exact CI commit.
       - name: Check out the trusted default branch
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
