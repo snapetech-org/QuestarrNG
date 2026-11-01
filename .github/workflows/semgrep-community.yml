@@ -83,4 +83,3 @@ jobs:
         with:
           sarif_file: semgrep-upload.sarif
           category: semgrep-ce-community
-
