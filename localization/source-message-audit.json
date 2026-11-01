@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "reviewedAtUtc": "2026-10-31T23:57:57.717345+00:00",
+  "reviewedAtUtc": "2026-11-01T03:51:08+00:00",
   "scope": "Initial 260-site service inventory (20 scanned files, 15 with candidates); extended source work in indexer-caps/search/Apprise/IGDB test results is recorded in source-coverage.json. This does not claim every server/client producer is closed. Bounded follow-up closes import/archive/strategy/RomM/scan/outbound producers and main-route response/helper-to-SPA copy ownership; precise raw/API-only/secondary-validation exclusions are retained in the referenced per-route trace.",
   "originalInventorySha256": "3484cb33f6786c0cea46da03f6fd5e502c07f0dfd11f448e9eb98932e5bdf452",
   "originalSites": 260,
@@ -438,10 +438,12 @@
       "service.unsafe_url_detected"
     ]
   },
-  "validation": "Required non-test generated/catalog/whitespace source checks; existing tests preserved. No new tests/build/scan/package/CI/model calls; compatible private ephemeral JIT functional validation pending.",
-  "targetStatus": "New canonical targets remain explicit English fallback pending translation; no new model scope.",
+  "validation": "Localization catalog generation, catalog integrity, and git diff --check passed on the reviewed source head. No tests, builds, scans, packages, or CI jobs were run for this milestone. Agentic VM visual review is in progress; private ephemeral JIT functional validation was not run.",
+  "targetStatus": "The full formal direct review scope is resolved: 36,960/36,960 cells, with zero pending. This includes 2,952 newly translated source-fallback cells and 292 existing machine-draft cells semantically reviewed. Changed/generated direct targets remain machine-draft; inherited regional targets retain inherited provenance. No qualified native-speaker signoff is claimed.",
   "openBeyondInitialScope": [
-    "Final exact-head target reconciliation/application, remaining source-fallback translation and semantic review, inherited alias synchronization, private ephemeral JIT functional validation and final Agentic VM review"
+    "Qualified native-speaker signoff for machine-draft catalog values.",
+    "Private ephemeral JIT functional validation on an eligible job; none was dispatched or run for this milestone.",
+    "Browser coverage of populated integrations and live provider data remains outside the isolated visual review."
   ],
   "followupClosures": [
     {
@@ -662,16 +664,52 @@
       "path": "server/services/ImportManager.ts",
       "sha256": "c4f420aefe8698f8178a4fc079beb630929746e60063d389c8b7204f7b11819c",
       "fixedErrorConstructorLines": [
-        197, 209, 264, 1164, 1195, 1198, 1203, 1210, 1318, 1326, 1330, 1340, 1354, 1359, 1365, 1382,
+        197,
+        209,
+        264,
+        1164,
+        1195,
+        1198,
+        1203,
+        1210,
+        1318,
+        1326,
+        1330,
+        1340,
+        1354,
+        1359,
+        1365,
+        1382,
         1401
       ],
-      "userFacingMessageCandidateLines": [517, 518, 687, 688, 729, 730, 819],
+      "userFacingMessageCandidateLines": [
+        517,
+        518,
+        687,
+        688,
+        729,
+        730,
+        819
+      ],
       "status": "Candidates require bounded producer/consumer classification; log-only/provider/dynamic payloads must remain raw. Presence here does not assert every candidate is untranslated."
     },
     {
       "path": "server/services/ArchiveService.ts",
       "sha256": "7332a66aaeac3d6bfda256c9051e58deb46cffdae17f5031fdc166cdf20a8608",
-      "fixedErrorConstructorLines": [284, 291, 300, 303, 310, 314, 421, 468, 475, 480, 488, 551],
+      "fixedErrorConstructorLines": [
+        284,
+        291,
+        300,
+        303,
+        310,
+        314,
+        421,
+        468,
+        475,
+        480,
+        488,
+        551
+      ],
       "userFacingMessageCandidateLines": [],
       "status": "Candidates require bounded producer/consumer classification; log-only/provider/dynamic payloads must remain raw. Presence here does not assert every candidate is untranslated."
     },
@@ -679,7 +717,19 @@
       "path": "server/services/ImportStrategies.ts",
       "sha256": "0477ccf224994150d3ecef6e3bf80c947f99db2f65012b41d8adcfebbfbdd9cb",
       "fixedErrorConstructorLines": [
-        91, 220, 285, 299, 343, 461, 497, 527, 548, 579, 621, 628, 641
+        91,
+        220,
+        285,
+        299,
+        343,
+        461,
+        497,
+        527,
+        548,
+        579,
+        621,
+        628,
+        641
       ],
       "userFacingMessageCandidateLines": [],
       "status": "Candidates require bounded producer/consumer classification; log-only/provider/dynamic payloads must remain raw. Presence here does not assert every candidate is untranslated."
@@ -687,7 +737,14 @@
     {
       "path": "server/services/RommRouting.ts",
       "sha256": "84fe54e3d147a79b05173310535eb7d9dce3ff90d6261d81ba1249f35b2b15eb",
-      "fixedErrorConstructorLines": [20, 26, 28, 31, 34, 54],
+      "fixedErrorConstructorLines": [
+        20,
+        26,
+        28,
+        31,
+        34,
+        54
+      ],
       "userFacingMessageCandidateLines": [],
       "status": "Candidates require bounded producer/consumer classification; log-only/provider/dynamic payloads must remain raw. Presence here does not assert every candidate is untranslated."
     },
@@ -695,7 +752,13 @@
       "path": "server/security-scan.ts",
       "sha256": "a6595f83fc33b0cdca7ca5e99fb10e0ffa391ec393f564d437ef41a2acc11a54",
       "fixedErrorConstructorLines": [],
-      "userFacingMessageCandidateLines": [433, 447, 517, 555, 567],
+      "userFacingMessageCandidateLines": [
+        433,
+        447,
+        517,
+        555,
+        567
+      ],
       "status": "Candidates require bounded producer/consumer classification; log-only/provider/dynamic payloads must remain raw. Presence here does not assert every candidate is untranslated."
     },
     {
@@ -703,10 +766,62 @@
       "sha256": "002e2dfda25ba5fe10e3ab9a19fe0820d9c48a11a0ce2273778fac17469cacc7",
       "fixedErrorConstructorLines": [],
       "userFacingMessageCandidateLines": [
-        805, 843, 1197, 1198, 1247, 1357, 1523, 1524, 1573, 1574, 1635, 1636, 1869, 1870, 1935,
-        1936, 1970, 1971, 1983, 1984, 2069, 2070, 2081, 2082, 2194, 2195, 2338, 2611, 2612
+        805,
+        843,
+        1197,
+        1198,
+        1247,
+        1357,
+        1523,
+        1524,
+        1573,
+        1574,
+        1635,
+        1636,
+        1869,
+        1870,
+        1935,
+        1936,
+        1970,
+        1971,
+        1983,
+        1984,
+        2069,
+        2070,
+        2081,
+        2082,
+        2194,
+        2195,
+        2338,
+        2611,
+        2612
       ],
       "status": "Candidates require bounded producer/consumer classification; log-only/provider/dynamic payloads must remain raw. Presence here does not assert every candidate is untranslated."
     }
-  ]
+  ],
+  "translationReviewEvidence": {
+    "sourceHead": "21444d8f442f9aeacb665dfcd6d8290899b79807",
+    "sourceTree": "4798fccabeaf16e9864da5d9f3f15f03408638b6",
+    "translationManifestSha256": "ae97a4776bceeb60f85c432c49d2a68707790f507395d73b573abcb34491993f",
+    "translationReconciliationSha256": "d3c73c6985600beb7c89509bc83c7665ecdf085f1a1e040dec9829fa3f4b823e",
+    "semanticManifestSha256": "8914572b1299f1603bbd316e28d8dec2ffaa3a28ac6bf80430a52dd4620efc14",
+    "semanticReconciliationSha256": "5f1d178486d6285b6536e7561d3f2be93e701ac5cdb6a4e5ec3ea6012af8cfd2",
+    "finalTargetsSha256": "9b1b058099004fc19925ab1d5dafa4f41ae9ef1c577006561c99c68e009f7b7b",
+    "reviewIndexPath": "localization/review-cells-pr155-21444d8f.jsonl",
+    "reviewIndexSha256": "0559310c1af1f54ac2d81bdb0303704c0ae9062c979b13a2312405f47a745707",
+    "reviewIndexRows": 4284,
+    "inheritedAliasSyncPath": "localization/inherited-alias-sync-pr155-21444d8f.jsonl",
+    "inheritedAliasSyncSha256": "84214bfba8fe2ec9cf6643b10f169073b4e9a31cc069d9dbbb714e4489a15f6d",
+    "inheritedAliasValuesChanged": 481,
+    "formalDirectReviewCells": 36960,
+    "remainingPendingCells": 0,
+    "newSourceFallbackCellsTranslated": 2952,
+    "existingDraftCellsSemanticallyReviewed": 292,
+    "semanticOutcomes": {
+      "kept": 3242,
+      "corrected": 2,
+      "unresolved": 0
+    },
+    "qualifiedNativeHumanReview": false
+  }
 }

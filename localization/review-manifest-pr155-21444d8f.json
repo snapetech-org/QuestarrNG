@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "repository": "snapetech-org/QuestarrNG",
+  "pullRequest": 155,
+  "sourceHead": "21444d8f442f9aeacb665dfcd6d8290899b79807",
+  "sourceTree": "4798fccabeaf16e9864da5d9f3f15f03408638b6",
+  "translationManifestSha256": "ae97a4776bceeb60f85c432c49d2a68707790f507395d73b573abcb34491993f",
+  "translationReconciliationSha256": "d3c73c6985600beb7c89509bc83c7665ecdf085f1a1e040dec9829fa3f4b823e",
+  "semanticManifestSha256": "8914572b1299f1603bbd316e28d8dec2ffaa3a28ac6bf80430a52dd4620efc14",
+  "semanticReconciliationSha256": "5f1d178486d6285b6536e7561d3f2be93e701ac5cdb6a4e5ec3ea6012af8cfd2",
+  "finalTargetsSha256": "9b1b058099004fc19925ab1d5dafa4f41ae9ef1c577006561c99c68e009f7b7b",
+  "previousCapsuleManifestSha256": "f5af0d4f3f7392a7e1b2b1ea087df1bace7ddcbdec185ed59809f01b7fe610e1",
+  "previousReviewReconciliationSha256": "bfb0933a6c81d39077c9916bb9bc5da4d8938879d473dc04908b22be407c3c87",
+  "currentProofBatches": {
+    "80": {
+      "path": "task-scratch/semantic-review-batch-080.jsonl",
+      "sha256": "c3bc1cb8508e1cd5dbf32fb8224bcf08a7394b8326b491310b4be06234d0cb9e",
+      "rows": 996
+    },
+    "81": {
+      "path": "task-scratch/semantic-review-batch-081.jsonl",
+      "sha256": "d6ec84ae6bf242b0ddd1d0a57438f21e4e44cd08f8164ab27c09adb15c32880a",
+      "rows": 24
+    },
+    "82": {
+      "path": "task-scratch/semantic-review-batch-082.jsonl",
+      "sha256": "ae61ba90e8386ca25c9306b3e8111fb897f6e259611c838bdfd0347ce70006ba",
+      "rows": 20
+    },
+    "83": {
+      "path": "task-scratch/semantic-review-batch-083.jsonl",
+      "sha256": "e40583e9b76050fc9db99ea6e7d78ecf786b948c615a4b4beaa76a201c068dc2",
+      "rows": 3244
+    }
+  },
+  "reviewIndexPath": "localization/review-cells-pr155-21444d8f.jsonl",
+  "reviewIndexSha256": "0559310c1af1f54ac2d81bdb0303704c0ae9062c979b13a2312405f47a745707",
+  "reviewIndexRows": 4284,
+  "inheritedSyncPath": "localization/inherited-alias-sync-pr155-21444d8f.jsonl",
+  "inheritedSyncSha256": "84214bfba8fe2ec9cf6643b10f169073b4e9a31cc069d9dbbb714e4489a15f6d",
+  "inheritedSyncChangedCells": 481,
+  "canonicalIds": 2590,
+  "directLocales": [
+    "es",
+    "zh-Hans",
+    "hi",
+    "de",
+    "ja",
+    "fr",
+    "pt-BR",
+    "ar",
+    "ko",
+    "zh-Hant",
+    "vi",
+    "id"
+  ],
+  "inheritedLocales": {
+    "es-419": "es",
+    "fr-CA": "fr"
+  },
+  "canonicalDirectCells": 31080,
+  "domainCells": 5880,
+  "formalReviewedCells": 36960,
+  "previouslyReviewedCells": 33696,
+  "newlyClosedPendingCells": 3264,
+  "previouslyPendingCells": 3264,
+  "remainingPendingCells": 0,
+  "sourceFallbackCellsTranslated": 2952,
+  "existingDraftCellsSemanticallyReviewed": 292,
+  "exactSourceReuseCells": 996,
+  "neutralInvariantCells": 24,
+  "exactDraftReuseCells": 20,
+  "semanticReviewCells": 3244,
+  "semanticOutcomes": {
+    "keep": 3242,
+    "corrected": 2,
+    "unresolved": 0
+  },
+  "directCatalogStringsChanged": 2872,
+  "inheritedAliasCells": 5180,
+  "inheritedAliasValuesSynchronized": 481,
+  "provenance": "machine-draft for target-generated/edited cells; inherited for es-419/fr-CA. No qualified native-human signoff is claimed.",
+  "rawModelTraces": "Retained only under task scratch; not copied into this repository.",
+  "targetsApplied": true
+}

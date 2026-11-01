@@ -2,7 +2,7 @@
 
 ## Coverage
 
-Questarr's React interface has a browser-local language preference for English and fourteen non-English locales: Spanish, Simplified Chinese, Hindi, German, Japanese, French, Brazilian Portuguese, Arabic, Korean, Traditional Chinese, Vietnamese, and Indonesian. The stable catalog contains 2,237 namespaced message IDs and 31,318 nonempty target-locale values. The generated catalog check verifies placeholder parity and prevents incomplete locales from entering the selector.
+Questarr's React interface has a browser-local language preference for English and fourteen non-English locales: Spanish, Simplified Chinese, Hindi, German, Japanese, French, Brazilian Portuguese, Arabic, Korean, Traditional Chinese, Vietnamese, Indonesian, Latin American Spanish, and Canadian French. The stable catalog contains 2,590 namespaced message IDs, 31,080 canonical direct-locale values, and 5,180 inherited regional values (36,260 non-English catalog values total). The generated catalog check verifies placeholder parity and prevents incomplete locales from entering the selector.
 
 Fixed interface call sites now use stable IDs. Dynamic legacy surfaces retain a source-text compatibility path while they migrate; unknown or external text still falls back unchanged. Game names, release names, paths, identifiers, API values, and provider text remain untouched. Known generated notifications and app-owned API summaries continue to use their specialized catalogs.
 
@@ -14,9 +14,11 @@ RTL direction is resolved by script and applied to the document. Common inline l
 
 The current selector offers 15 choices including English. Reaching the 37-choice reference set requires 22 more complete catalogs. No partial locale is exposed as complete. Spanish (Latin America) and Canadian French are complete inherited catalogs, marked with per-message parent provenance. The locale map records every target tag, translation state, RTL status, and regional fallback.
 
-Existing translation history is not available per string, so the baseline catalog is marked `legacy-unverified`. Seven new messages (84 direct values across the twelve requested locales) are marked `machine-draft`. The `es-419` and `fr-CA` catalogs are marked `inherited` from `es` and `fr` respectively; they remain unreviewed. The terminology glossary defines game-domain terms and protected values. Native-speaker review remains outstanding.
+**Current catalog review (2026-10-31):** all 36,960 formal direct review cells are resolved: 31,080 canonical direct-locale cells plus 5,880 domain cells. This includes 2,952 newly translated cells and 292 pre-existing machine-draft cells reviewed semantically; 3,242 decisions kept their target and two corrections were accepted. New and edited direct values remain `machine-draft`, and `es-419`/`fr-CA` remain `inherited` from `es`/`fr`. The compact review evidence and per-key coverage references are in the repository. No qualified native-speaker signoff is claimed; it remains outstanding.
 
-The Playwright suite covers Arabic navigation, settings and calendar form input, localized-digit release-year filtering, download dialogs, mixed-direction game titles, accessible names, keyboard focus, narrow viewports, and 200% text scaling. It now also covers the import-history table, manual-import form, and task sheet with RTL mixed-script titles and paths. The stable-ID migration and layout audit have not been run in CI yet; repository workflows currently run on tag pushes or manual dispatch. Populated integrations and live provider data remain outside the current browser coverage.
+Existing translation history is not available per string, so the baseline catalog remains marked `legacy-unverified`. The terminology glossary defines game-domain terms and protected values.
+
+Existing Playwright coverage includes Arabic navigation, settings and calendar form input, localized-digit release-year filtering, download dialogs, mixed-direction game titles, accessible names, keyboard focus, narrow viewports, and 200% text scaling, plus the import-history table, manual-import form, and task sheet with RTL mixed-script titles and paths. For this localization milestone, catalog generation, catalog integrity, and whitespace checks passed; tests, builds, scans, packages, and CI jobs were not run. Agentic VM visual review is in progress. Populated integrations and live provider data remain outside the current browser coverage.
 
 ## Locale selection
 
@@ -70,9 +72,11 @@ The machine-readable source is localization/locale-map.json, aligned to the Plez
 
 The two regional additions already available are es-419 (inherited from es) and fr-CA (inherited from fr). Arabic is the only currently selectable RTL interface catalog. Persian and Hebrew resolve to RTL but stay out of the selector until their translations are complete. Browser tags use explicit regional rules: Latin American Spanish resolves to es-419, Canadian French to fr-CA, Portuguese regions to a complete Portuguese catalog (currently pt-BR), and Chinese script before region.
 
-## 2026-10-29 implementation follow-up
+## Historical implementation record (2026-10-29)
 
-The full 2,237-message catalog uses stable namespaced IDs in the source manifest, and 1,456 fixed translation calls plus localizable source attributes have been migrated. Two inherited regional catalogs bring target translation values to 31,318 across fourteen non-English choices. A generated source map preserves a compatibility bridge for dynamic legacy messages. Catalog generation is reproducible, source checksums fail on unreviewed source edits, and the integrity check compares selector locales with complete manifest coverage.
+The counts and review state in this section describe the catalog at that date. The current 2026-10-31 counts and review status are recorded above.
+
+At that milestone, the 2,237-message catalog used stable namespaced IDs in the source manifest, and 1,456 fixed translation calls plus localizable source attributes had been migrated. Two inherited regional catalogs brought target translation values to 31,318 across fourteen non-English choices. A generated source map preserved a compatibility bridge for dynamic legacy messages. Catalog generation is reproducible, source checksums fail on unreviewed source edits, and the integrity check compares selector locales with complete manifest coverage.
 
 Plural and select helpers now take stable message IDs. Sidebar count labels use CLDR plural categories, regional digits come from the shared regional formatter, and date, number, percent, unit, relative-time, and localized-number parsing helpers are available. Relative time uses the interface locale where a date-fns locale exists and Intl.RelativeTimeFormat for other language tags, while retaining the selected regional digits. A catalog guard ensures all 37 mapped locales remain available in the regional-format selector.
 
