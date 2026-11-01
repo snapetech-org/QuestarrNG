@@ -285,6 +285,24 @@ for (const id of ids) {
   }
   const translationStatuses = record.translations ?? {};
   const translationSources = record.translationSources ?? {};
+  // Runtime UI/service lookups index aliases directly, so every inherited locale
+  // must keep its parent metadata and materialized parent value for every ID.
+  for (const locale of localeRows.filter((row) => row.reviewStatus === "inherited")) {
+    if (
+      translationStatuses[locale.tag] !== "inherited" ||
+      translationSources[locale.tag] !== locale.translationSource
+    ) {
+      failures.push(
+        "Inherited locale " +
+          locale.tag +
+          " must retain its declared parent " +
+          locale.translationSource +
+          " for " +
+          id +
+          "."
+      );
+    }
+  }
   for (const [locale, status] of Object.entries(translationStatuses)) {
     if (!targetLanguages.includes(locale)) {
       failures.push("Provenance locale " + locale + " is not declared for " + id);
