@@ -1,4 +1,4 @@
-import { localizeServiceMessage } from "./service-messages.js";
+import { isolateBidirectionalValue, localizeServiceMessage } from "./service-messages.js";
 import { getNotificationCatalogIndex, getNotificationTitle } from "./notification-locale.js";
 import { normalizeNotificationLanguage } from "./notification-language.js";
 
@@ -579,10 +579,13 @@ export function localizeOutboundNotification(
       ? template.replace(/\{([a-z]+)\}/g, (placeholder, key: string) => {
           const value = match.params[key];
           if (value === undefined) return placeholder;
-          if (key === "count") return new Intl.NumberFormat(language).format(Number(value));
-          if (key === "error" && value === "unknown error")
-            return MESSAGES.unknownError[getNotificationCatalogIndex(language)] ?? value;
-          return language === "ar" ? `\u2068${value}\u2069` : value;
+          const interpolated =
+            key === "count"
+              ? new Intl.NumberFormat(language).format(Number(value))
+              : key === "error" && value === "unknown error"
+                ? MESSAGES.unknownError[getNotificationCatalogIndex(language)] ?? value
+                : value;
+          return isolateBidirectionalValue(interpolated);
         })
       : message;
   return { title: getNotificationTitle(title, language), message: translatedMessage };

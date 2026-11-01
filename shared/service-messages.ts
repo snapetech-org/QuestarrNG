@@ -36,6 +36,10 @@ export function tagServiceMessageError<T extends Error>(
   return error;
 }
 const PLACEHOLDER = /\{([A-Za-z][A-Za-z0-9_]*)\}/g;
+/** Isolate a substituted value from surrounding text without changing the value itself. */
+export function isolateBidirectionalValue(value: string): string {
+  return value ? `\u2068${value}\u2069` : value;
+}
 export function isServiceMessageKey(value: unknown): value is ServiceMessageKey {
   return typeof value === "string" && Object.hasOwn(SERVICE_MESSAGE_SOURCES, value);
 }
@@ -249,7 +253,7 @@ export function localizeServiceMessage(
         ? new Intl.NumberFormat(language).format(raw)
         : String(raw);
     if (nested && value !== String(raw)) nestedChanged = true;
-    return language === "ar" ? `\u2068${value}\u2069` : value;
+    return isolateBidirectionalValue(value);
   });
   return template === SERVICE_MESSAGE_SOURCES[descriptor.messageKey] && !nestedChanged
     ? message
