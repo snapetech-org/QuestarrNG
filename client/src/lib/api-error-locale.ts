@@ -1,5 +1,8 @@
 import { translateInterfaceLabel, type InterfaceLanguage } from "@/lib/interface-locale";
-import { localizeApiErrorDetailTemplate } from "@/lib/api-error-details/templates";
+import {
+  localizeApiErrorDetailTemplate,
+  getApiErrorCatalogLocale,
+} from "@/lib/api-error-details/templates";
 import { getApiErrorDetailLabel } from "@/lib/api-error-details";
 import { apiErrorCodeForStatus, type ApiErrorCode } from "@shared/api-error-codes";
 
@@ -245,7 +248,7 @@ export function getLocalizedApiErrorMessage(
       ? stableCode
       : apiErrorCodeForStatus(status);
   const key = API_ERROR_CODE_TO_CATALOG_KEY[resolvedCode];
-  const message = API_ERROR_MESSAGES[key][LOCALE_ORDER.indexOf(language)];
+  const message = API_ERROR_MESSAGES[key][LOCALE_ORDER.indexOf(getApiErrorCatalogLocale(language))];
   if (!message) return detail;
   if (!detail) return message;
   const summary = message.replace(/[.!?…。！？؟।]+$/u, "");

@@ -7,14 +7,25 @@ import ts from "typescript";
 
 const root = process.cwd();
 const failures = [];
-const [manifestSource, provenanceSource, interfaceSource, localeMapSource, regionalFormatSource] =
-  await Promise.all([
-    readFile(path.join(root, "localization/messages.json"), "utf8"),
-    readFile(path.join(root, "client/src/lib/localization-provenance.json"), "utf8"),
-    readFile(path.join(root, "client/src/lib/interface-locale.ts"), "utf8"),
-    readFile(path.join(root, "localization/locale-map.json"), "utf8"),
-    readFile(path.join(root, "client/src/lib/regional-format.ts"), "utf8"),
-  ]);
+const [
+  manifestSource,
+  provenanceSource,
+  interfaceSource,
+  localeMapSource,
+  regionalFormatSource,
+  apiTemplateSource,
+  apiAdditionalSource,
+  apiSummarySource,
+] = await Promise.all([
+  readFile(path.join(root, "localization/messages.json"), "utf8"),
+  readFile(path.join(root, "client/src/lib/localization-provenance.json"), "utf8"),
+  readFile(path.join(root, "client/src/lib/interface-locale.ts"), "utf8"),
+  readFile(path.join(root, "localization/locale-map.json"), "utf8"),
+  readFile(path.join(root, "client/src/lib/regional-format.ts"), "utf8"),
+  readFile(path.join(root, "client/src/lib/api-error-details/templates.ts"), "utf8"),
+  readFile(path.join(root, "client/src/lib/api-error-details/additional.ts"), "utf8"),
+  readFile(path.join(root, "client/src/lib/api-error-locale.ts"), "utf8"),
+]);
 const manifest = JSON.parse(manifestSource);
 const provenance = JSON.parse(provenanceSource);
 const localeMap = JSON.parse(localeMapSource);
@@ -249,6 +260,54 @@ for (const locale of localeRows) {
       );
     }
   }
+}
+const apiTemplateAst = parse(apiTemplateSource, "api-error-templates.ts");
+const apiAliasProperties = properties(
+  unwrap(constInitializer(apiTemplateAst, "API_ERROR_CATALOG_ALIASES"))
+);
+const apiAliases = Object.fromEntries(
+  apiAliasProperties.map(([tag, value]) => [
+    tag,
+    ts.isStringLiteralLike(value) ? value.text : undefined,
+  ])
+);
+const inheritedAliases = Object.fromEntries(
+  localeRows
+    .filter((row) => row.reviewStatus === "inherited")
+    .map((row) => [row.tag, row.translationSource])
+);
+if (
+  JSON.stringify(Object.entries(apiAliases).sort()) !==
+  JSON.stringify(Object.entries(inheritedAliases).sort())
+) {
+  failures.push("API catalog aliases must match every declared inherited locale parent.");
+}
+for (const [name, source] of [
+  ["api-error-templates.ts", apiTemplateSource],
+  ["api-error-additional.ts", apiAdditionalSource],
+  ["api-error-locale.ts", apiSummarySource],
+]) {
+  const ast = parse(source, name);
+  const visit = (node) => {
+    if (
+      ts.isCallExpression(node) &&
+      ts.isPropertyAccessExpression(node.expression) &&
+      node.expression.name.text === "indexOf" &&
+      ["API_ERROR_DETAIL_LOCALE_ORDER", "LOCALE_ORDER"].includes(
+        node.expression.expression.getText(ast)
+      )
+    ) {
+      const argument = node.arguments[0];
+      if (
+        !argument ||
+        !ts.isCallExpression(argument) ||
+        argument.expression.getText(ast) !== "getApiErrorCatalogLocale"
+      )
+        failures.push(name + " must normalize inherited aliases before API catalog index lookup.");
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(ast);
 }
 const fallbackReferences = [
   localeMap.regionalFallbacks?.es?.default,

@@ -1,6 +1,6 @@
 import type { InterfaceLanguage } from "@/lib/interface-locale";
 import type { AdditionalApiErrorDetailSourceMessage } from "./additional-source-messages";
-import { API_ERROR_DETAIL_LOCALE_ORDER } from "./templates";
+import { API_ERROR_DETAIL_LOCALE_ORDER, getApiErrorCatalogLocale } from "./templates";
 
 type LocaleMessages = readonly [
   string,
@@ -1908,7 +1908,7 @@ export function getAdditionalApiErrorDetailLabel(
   source: string,
   language: InterfaceLanguage
 ): string | undefined {
-  const localeIndex = API_ERROR_DETAIL_LOCALE_ORDER.indexOf(language);
+  const localeIndex = API_ERROR_DETAIL_LOCALE_ORDER.indexOf(getApiErrorCatalogLocale(language));
   if (localeIndex < 0 || !Object.hasOwn(ADDITIONAL_API_ERROR_DETAIL_LABELS, source)) {
     return undefined;
   }

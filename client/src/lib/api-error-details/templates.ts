@@ -1,5 +1,11 @@
 import type { InterfaceLanguage } from "@/lib/interface-locale";
 
+/** Materialized regional variants use these direct API catalogs. */
+export const API_ERROR_CATALOG_ALIASES = { "es-419": "es", "fr-CA": "fr" } as const;
+export function getApiErrorCatalogLocale(language: InterfaceLanguage): InterfaceLanguage {
+  return API_ERROR_CATALOG_ALIASES[language as keyof typeof API_ERROR_CATALOG_ALIASES] ?? language;
+}
+
 export const API_ERROR_DETAIL_LOCALE_ORDER: readonly InterfaceLanguage[] = [
   "es",
   "zh-Hans",
@@ -503,7 +509,7 @@ type TemplateKey = keyof typeof API_ERROR_DETAIL_TEMPLATES;
 
 function localizeIgdbErrorLabel(value: string, language: InterfaceLanguage): string | undefined {
   const labels = IGDB_ERROR_LABELS[value as keyof typeof IGDB_ERROR_LABELS];
-  const index = API_ERROR_DETAIL_LOCALE_ORDER.indexOf(language);
+  const index = API_ERROR_DETAIL_LOCALE_ORDER.indexOf(getApiErrorCatalogLocale(language));
   return labels?.[index];
 }
 
@@ -512,7 +518,7 @@ function formatTemplate(
   values: Record<string, string>,
   language: InterfaceLanguage
 ): string {
-  const index = API_ERROR_DETAIL_LOCALE_ORDER.indexOf(language);
+  const index = API_ERROR_DETAIL_LOCALE_ORDER.indexOf(getApiErrorCatalogLocale(language));
   const template = API_ERROR_DETAIL_TEMPLATES[key][index];
   if (!template) return key;
 

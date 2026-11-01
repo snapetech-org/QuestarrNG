@@ -223,8 +223,11 @@ export function localizeServiceMessage(
   if (!descriptor || sourceText(descriptor.messageKey, descriptor.messageValues) !== message)
     return message;
   const template = SERVICE_MESSAGE_TRANSLATIONS[descriptor.messageKey][language];
-  if (!template || template === SERVICE_MESSAGE_SOURCES[descriptor.messageKey]) return message;
-  return template.replace(PLACEHOLDER, (placeholder, name: string) => {
+  if (!template) return message;
+  // A source-invariant join still needs to localize explicitly tagged children.
+  // Preserve the exact English fallback if no nested message actually translates.
+  let nestedChanged = false;
+  const localized = template.replace(PLACEHOLDER, (placeholder, name: string) => {
     const raw = descriptor.messageValues[name];
     if (raw === undefined) return placeholder;
     const nested = descriptor.messageDetails?.[name];
@@ -233,6 +236,10 @@ export function localizeServiceMessage(
       : name === "count" && typeof raw === "number"
         ? new Intl.NumberFormat(language).format(raw)
         : String(raw);
+    if (nested && value !== String(raw)) nestedChanged = true;
     return language === "ar" ? `\u2068${value}\u2069` : value;
   });
+  return template === SERVICE_MESSAGE_SOURCES[descriptor.messageKey] && !nestedChanged
+    ? message
+    : localized;
 }
