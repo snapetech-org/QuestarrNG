@@ -6,10 +6,10 @@ import { ServiceMessageText } from "./ServiceMessageText";
 /** Preserve raw/typed API ownership through the toast's automatic text-localization boundary. */
 export function ApiErrorDescription({
   error,
-  fallbackSource,
+  fallbackSource = "interface.unknown_error_ce512b43",
 }: {
   error: unknown;
-  fallbackSource: string;
+  fallbackSource?: string;
 }) {
   if (error instanceof ApiError) {
     const metadata = getApiErrorMetadata(error.data);
