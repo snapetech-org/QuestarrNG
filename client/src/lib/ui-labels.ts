@@ -3412,7 +3412,7 @@ export const UI_LABELS = {
     "zh-Hans": "至少 8 个字符，并包含一个字母和一个数字。",
     hi: "कम से कम 8 अक्षर, जिनमें एक अक्षर और एक संख्या शामिल हो।",
     de: "Mindestens 8 Zeichen, darunter ein Buchstabe und eine Zahl.",
-    ja: "8文字以上で、英字と数字をそれぞれ1文字以上含めてください。",
+    ja: "8文字以上で、英字と数字を各1文字以上含めてください。",
     fr: "Au moins 8 caractères, avec une lettre et un chiffre.",
     "pt-BR": "Pelo menos 8 caracteres, incluindo uma letra e um número.",
     ar: "8 أحرف على الأقل، تتضمن حرفًا ورقمًا واحدًا.",
