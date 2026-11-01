@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { buildGitHubIssueUrl } from "@/lib/send-logs";
 import { copyToClipboard } from "@/lib/utils";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import { InterfaceText } from "@/components/InterfaceText";
 import { formatInterfaceMessage } from "@/lib/interface-locale";
 
@@ -55,7 +56,7 @@ export default function SendErrorReportDialog({
   const queryClient = useQueryClient();
   const [step, setStep] = useState<Step>("consent");
   const [result, setResult] = useState<SendSuccess | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [sendError, setSendError] = useState<unknown | null>(null);
 
   const {
     data: meta,
@@ -78,7 +79,7 @@ export default function SendErrorReportDialog({
   const reset = useCallback(() => {
     setStep("consent");
     setResult(null);
-    setErrorMessage(null);
+    setSendError(null);
   }, []);
 
   const handleOpenChange = useCallback(
@@ -98,7 +99,7 @@ export default function SendErrorReportDialog({
       setResult(data);
       setStep("success");
     } catch (err) {
-      setErrorMessage(err instanceof ApiError ? err.message : "Failed to send diagnostic report.");
+      setSendError(err);
       setStep("error");
     } finally {
       queryClient.invalidateQueries({ queryKey: ["/api/telemetry/pending", reportId] });
@@ -167,11 +168,10 @@ export default function SendErrorReportDialog({
                 <InterfaceText source={"Couldn't load report"} />
               </DialogTitle>
               <DialogDescription>
-                {metaError instanceof ApiError ? (
-                  metaError.message
-                ) : (
-                  <InterfaceText source={"Something went wrong loading this report."} />
-                )}
+                <ApiErrorDescription
+                  error={metaError}
+                  fallbackSource="interface.unknown_error_ce512b43"
+                />
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
@@ -379,7 +379,9 @@ export default function SendErrorReportDialog({
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-3 py-2">
-              <p className="text-sm text-muted-foreground">{errorMessage}</p>
+              <p className="text-sm text-muted-foreground">
+                <ApiErrorDescription error={sendError} />
+              </p>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={reset}>
