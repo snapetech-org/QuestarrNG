@@ -53,7 +53,6 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.connections_25db363e": "Connections",
   "interface.options_353e0d45": "Options",
   "interface.sharing_c3fd1573": "Sharing",
-  "interface.player_1c70fc20": "Player",
   "interface.searches_bcd69c15": "Searches",
   "interface.queues_8d4361b1": "Queues",
   "interface.torrents_ada0d0e2": "Torrents",
@@ -65,7 +64,6 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.uploads_6485049d": "Uploads",
   "interface.chat_2279d8cb": "Chat",
   "interface.discovery_graph_9eceabdd": "Discovery Graph",
-  "interface.playlist_intake_7f389779": "Playlist Intake",
   "interface.contacts_c8ae1110": "Contacts",
   "interface.collections_9ae6a966": "Collections",
   "interface.solid_56fbec94": "Solid",
@@ -1196,7 +1194,6 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.error_loading_configuration_c678e56f": "Error Loading Configuration",
   "interface.error_32edd391": "Error:",
   "interface.errors_fa17ba86": "errors",
-  "interface.espa_ol_spanish_ddbf6626": "Español — Spanish",
   "interface.estimated_hours_igdb_54ef8b53": "Estimated hours (IGDB)",
   "interface.eta_2ffd33c7": "ETA:",
   "interface.event_d02b533f": "Event",
@@ -1274,10 +1271,6 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.force_started_226501c1": "Force started",
   "interface.forced_downloads_do_not_abide_by_s_7e1fbb4f":
     "Forced downloads do not abide by seed restrictions",
-  "interface.forward_notifications_through_a_se_d6b7ff4a":
-    "Forward notifications through a self-hosted",
-  "interface.found_64ff7b9f": "found",
-  "interface.fran_ais_french_b011566e": "Français — French",
   "interface.free_space_7d17b1a1": "Free Space",
   "interface.freeleech_63727d04": "Freeleech",
   "interface.from_your_downloads_054b63a5": "From your downloads:",
@@ -1652,7 +1645,6 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.prowlarr_url_5f73642f": "Prowlarr URL",
   "interface.prowlarr_apikey_saved_71ab5ec8": "prowlarr-apikey-saved",
   "interface.prowlarr_insecure_lan_warning_320ef104": "prowlarr-insecure-lan-warning",
-  "interface.prowlarr_priority_error_7c9f497a": "prowlarr-priority-error",
   "interface.qbittorrent_21210163": "qBittorrent",
   "interface.questarr_can_now_delete_files_in_t_82f4c616":
     "Questarr can now delete files in this folder when you remove a game with its files.",
@@ -1746,7 +1738,6 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.rss_enabled_8106a582": "RSS Enabled",
   "interface.rss_feed_management_e21e8900": "RSS Feed Management",
   "interface.rtorrent_33e01695": "rTorrent",
-  "interface.s_f60c4582": "s",
   "interface.sabnzbd_af8a2393": "SABnzbd",
   "interface.save_4d2d5d68": "Save",
   "interface.save_api_key_8249adc7": "Save API Key",
@@ -1831,7 +1822,6 @@ export const STABLE_INTERFACE_MESSAGES = {
     "Sends the API key over plain HTTP (no encryption). Only enable this for a trusted local-network indexer that does not support HTTPS. Enabling this on an internet-facing indexer exposes your API key in clear text.",
   "interface.separate_containers_questarr_downl_16724ed6":
     "Separate containers (Questarr + download client)",
-  "interface.server_or_the_local_16b6d96b": "server or the local",
   "interface.set_a_webhook_url_to_enable_one_cl_75ba5398":
     "Set a webhook URL to enable one-click sharing of your library stats to a Discord channel.",
   "interface.set_each_igdb_platform_s_romarr_ro_cf0cb310":
@@ -1857,7 +1847,6 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.show_questarr_downloads_only_18bb518a": "Show Questarr downloads only",
   "interface.show_shelved_games_575a994e": "Show shelved games",
   "interface.show_webhook_url_f7a5cec0": "Show webhook URL",
-  "interface.shown_ce294716": "shown",
   "interface.shown_with_filter_ef00e2d7": "shown with filter)",
   "interface.single_rom_placement_0ca4f2bc": "Single ROM placement",
   "interface.size_largest_first_0b67b169": "Size (Largest First)",
@@ -1939,7 +1928,6 @@ export const STABLE_INTERFACE_MESSAGES = {
     "This Prowlarr URL uses plain HTTP. Unless you tick the box above, Questarr will not send the API key and the synced indexers will answer 401.",
   "interface.this_will_upload_your_current_serv_7d049388":
     "This will upload your current server logs so the Questarr maintainer can diagnose your issue. Please review what will be shared:",
-  "interface.ti_ng_vi_t_vietnamese_e845833d": "Tiếng Việt — Vietnamese",
   "interface.tier_140efbe9": "Tier:",
   "interface.time_to_beat_687ab063": "Time to Beat",
   "interface.tls_certificate_checks_stay_enable_54c0df6e":
@@ -2055,8 +2043,6 @@ export const STABLE_INTERFACE_MESSAGES = {
     "Your Steam Wishlist auto-sync preferences have been saved.",
   "interface.your_virustotal_api_key_538ed2a0": "Your VirusTotal API key",
   "interface.arabic_716f2ed7": "العربية — Arabic",
-  "interface.hindi_95b10da8": "हिन्दी — Hindi",
-  "interface.korean_fbeaa2fe": "한국어 — Korean",
   "interface.japanese_a09626a1": "日本語 — Japanese",
   "interface.chinese_simplified_4711ab60": "简体中文 — Chinese (Simplified)",
   "interface.add_value_to_wanted_list_791eb955": 'Add "{value}" to wanted list',
@@ -2129,8 +2115,6 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.some_groups_failed_to_link_count_995eaf75": "Some groups failed to link ({count}).",
   "interface.check_your_downloads_3bd15d13": "Check your downloads.",
   "interface.linked_1_group_to_a_game_8192f908": "Linked 1 group to a game",
-  "interface.linked_count_groups_to_games_1a79db95": "Linked {count} groups to games",
-  "interface.groups_ready_to_link_count_29cbe906": "Groups ready to link: {count}",
   "interface.search_results_count_b51a3250": "Search results: {count}",
   "interface.indexer_errors_count_7e2cd7f4": "Indexer errors: {count}",
   "interface.requested_editions_and_add_ons_ad3615f7": "Requested editions and add-ons",
@@ -3110,6 +3094,22 @@ export const STABLE_INTERFACE_MESSAGES = {
     "The import was interrupted before it finished (Questarr was probably restarted). Review it to run the import again.",
   "service.import_removed_before_locating":
     "The download client removed this download once it finished, so its files could not be located automatically. Review it and point the import at the downloaded files.",
+  "service.ssl_certificate_missing": "Certificate file missing",
+  "service.ssl_private_key_missing": "Private key file missing",
+  "service.ssl_certificate_format_invalid": "Invalid certificate format (PEM expected)",
+  "service.ssl_private_key_format_invalid": "Invalid private key format (PEM expected)",
+  "service.ssl_certificate_content_invalid": "Failed to parse certificate content",
+  "service.ssl_certificate_expired": "Certificate expired on {date}",
+  "service.ssl_certificate_key_invalid":
+    "Certificate and key do not match or are invalid: {detail}",
+  "service.ssl_unknown_validation_error": "Unknown validation error",
+  "service.ssl_invalid_configuration": "Invalid SSL configuration: {detail}",
+  "service.ssl_uploaded_invalid": "Uploaded certificate/key are invalid: {detail}",
+  "service.telemetry_worker_http_error": "Telemetry worker returned HTTP {status}",
+  "service.telemetry_network_error": "Network error while sending telemetry report",
+  "service.telemetry_report_unavailable": "This report is no longer available.",
+  "service.notification_telemetry_failed":
+    "Questarr detected an error but could not send the automatic diagnostic report ({detail}).",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

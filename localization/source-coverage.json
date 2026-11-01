@@ -4604,6 +4604,146 @@
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "source-fallback",
       "directTargetCells": 12
+    },
+    {
+      "key": "service.ssl_certificate_missing",
+      "source": "Certificate file missing",
+      "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
+      "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.ssl_private_key_missing",
+      "source": "Private key file missing",
+      "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
+      "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.ssl_certificate_format_invalid",
+      "source": "Invalid certificate format (PEM expected)",
+      "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
+      "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.ssl_private_key_format_invalid",
+      "source": "Invalid private key format (PEM expected)",
+      "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
+      "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.ssl_certificate_content_invalid",
+      "source": "Failed to parse certificate content",
+      "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
+      "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.ssl_certificate_expired",
+      "source": "Certificate expired on {date}",
+      "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
+      "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.ssl_certificate_key_invalid",
+      "source": "Certificate and key do not match or are invalid: {detail}",
+      "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
+      "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.ssl_unknown_validation_error",
+      "source": "Unknown validation error",
+      "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
+      "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.ssl_invalid_configuration",
+      "source": "Invalid SSL configuration: {detail}",
+      "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
+      "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.ssl_uploaded_invalid",
+      "source": "Uploaded certificate/key are invalid: {detail}",
+      "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
+      "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.telemetry_worker_http_error",
+      "source": "Telemetry worker returned HTTP {status}",
+      "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
+      "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.telemetry_network_error",
+      "source": "Network error while sending telemetry report",
+      "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
+      "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.telemetry_report_unavailable",
+      "source": "This report is no longer available.",
+      "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
+      "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.notification_telemetry_failed",
+      "source": "Questarr detected an error but could not send the automatic diagnostic report ({detail}).",
+      "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
+      "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
     }
   ],
   "codeUnits": [

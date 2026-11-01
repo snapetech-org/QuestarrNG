@@ -49,6 +49,8 @@ import {
   localizeServiceMessage,
   matchingServiceMessageDescriptor,
   serviceMessage,
+  serviceMessageValue,
+  serializeServiceMessageDescriptor,
   serviceErrorBody,
   serviceErrorValue,
   serviceErrorMetadata,
@@ -1426,12 +1428,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (certPath && keyPath) {
             // Validate the same canonical paths that were checked above and get saved below.
             const { validateCertFiles } = await import("./ssl.js"); // Dynamic import to avoid circular deps if any
-            const { valid, error } = await validateCertFiles(
+            const { valid, error, errorI18n } = await validateCertFiles(
               resolvedCertPath ?? certPath,
               resolvedKeyPath ?? keyPath
             );
             if (!valid) {
-              return res.status(400).json({ error: `Invalid SSL configuration: ${error}` });
+              return res
+                .status(400)
+                .json(
+                  serviceErrorBody(
+                    undefined,
+                    serviceMessage("service.ssl_invalid_configuration", {
+                      detail: serviceMessageValue(String(error), errorI18n),
+                    })
+                  )
+                );
             }
           } else {
             // If enabling but paths not provided in body, check if they exist in current config or are being set?
@@ -1451,9 +1462,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
 
             const { validateCertFiles } = await import("./ssl.js");
-            const { valid, error } = await validateCertFiles(effectiveCert, effectiveKey);
+            const { valid, error, errorI18n } = await validateCertFiles(
+              effectiveCert,
+              effectiveKey
+            );
             if (!valid) {
-              return res.status(400).json({ error: `Invalid SSL configuration: ${error}` });
+              return res
+                .status(400)
+                .json(
+                  serviceErrorBody(
+                    undefined,
+                    serviceMessage("service.ssl_invalid_configuration", {
+                      detail: serviceMessageValue(String(error), errorI18n),
+                    })
+                  )
+                );
             }
           }
         }
@@ -1550,13 +1573,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Validate the uploaded files specifically
         const { validateCertFiles } = await import("./ssl.js");
-        const { valid, error } = await validateCertFiles(certPath, keyPath);
+        const { valid, error, errorI18n } = await validateCertFiles(certPath, keyPath);
 
         if (!valid) {
           // Cleanup invalid files
           await fs.promises.unlink(certPath).catch(() => {});
           await fs.promises.unlink(keyPath).catch(() => {});
-          return res.status(400).json({ error: `Uploaded certificate/key are invalid: ${error}` });
+          return res
+            .status(400)
+            .json(
+              serviceErrorBody(
+                undefined,
+                serviceMessage("service.ssl_uploaded_invalid", {
+                  detail: serviceMessageValue(String(error), errorI18n),
+                })
+              )
+            );
         }
 
         // Update config to use uploaded files
@@ -5592,7 +5624,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const { reportId } = req.params as { reportId: string };
         const result = await sendPendingReport(reportId, req.user!.id);
         if (!result.ok) {
-          return res.status(422).json({ error: result.message });
+          return res
+            .status(422)
+            .json({ error: result.message, errorI18n: serializeServiceMessageDescriptor(result) });
         }
         return res.json({ code: result.code, issueNumber: result.issueNumber });
       } catch (error) {

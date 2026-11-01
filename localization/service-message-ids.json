@@ -347,5 +347,20 @@
   "service.scan_clamav_unreachable",
   "service.scan_incomplete",
   "service.import_interrupted",
-  "service.import_removed_before_locating"
+  "service.import_removed_before_locating",
+  "interface.log_upload_is_not_configured_for_t_8b70cdcc",
+  "service.ssl_certificate_missing",
+  "service.ssl_private_key_missing",
+  "service.ssl_certificate_format_invalid",
+  "service.ssl_private_key_format_invalid",
+  "service.ssl_certificate_content_invalid",
+  "service.ssl_certificate_expired",
+  "service.ssl_certificate_key_invalid",
+  "service.ssl_unknown_validation_error",
+  "service.ssl_invalid_configuration",
+  "service.ssl_uploaded_invalid",
+  "service.telemetry_worker_http_error",
+  "service.telemetry_network_error",
+  "service.telemetry_report_unavailable",
+  "service.notification_telemetry_failed"
 ]
