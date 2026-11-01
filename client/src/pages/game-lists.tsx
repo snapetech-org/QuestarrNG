@@ -28,10 +28,20 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { InterfaceText } from "@/components/InterfaceText";
+import { getStatusSourceLabel } from "@/components/StatusBadge";
 import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
 import { formatRegionalNumber, useRegionalPreference } from "@/lib/regional-format";
 
 type ListDialogMode = "create" | "rename" | null;
+
+function GameStatusText({ status }: { status: string }) {
+  const source = getStatusSourceLabel(status);
+  return source === status ? (
+    <bdi lang="und" dir="auto">{status}</bdi>
+  ) : (
+    <InterfaceText source={source} />
+  );
+}
 
 interface SaveListInput {
   mode: Exclude<ListDialogMode, null>;
@@ -373,7 +383,7 @@ export default function GameListsPage() {
                         <div className="min-w-0 flex-1">
                           <p className="truncate font-medium">{game.title}</p>
                           <p className="text-xs capitalize text-muted-foreground">
-                            <InterfaceText source={game.status} />
+                            <GameStatusText status={game.status} />
                           </p>
                         </div>
                         <Button
@@ -555,7 +565,7 @@ export default function GameListsPage() {
                         {game.title}
                       </span>
                       <span className="text-xs capitalize text-muted-foreground">
-                        <InterfaceText source={game.status} />
+                        <GameStatusText status={game.status} />
                       </span>
                     </label>
                   );

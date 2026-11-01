@@ -577,7 +577,9 @@ export function RootFolderDiscovery() {
               return (
                 <div key={p.rootFolderId} className="rounded-md border p-3 space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-mono">{p.rootFolderPath}</span>
+                    <span className="font-mono">
+                      <bdi dir="ltr" lang="und">{p.rootFolderPath}</bdi>
+                    </span>
                     <Badge variant={badgeVariant}>
                       <InterfaceText source={SCAN_STATUS_LABEL_TEXT[p.status] ?? p.status} />
                     </Badge>
@@ -594,7 +596,8 @@ export function RootFolderDiscovery() {
                     {p.currentCandidate && p.status === "running" && (
                       <>
                         {" "}
-                        <InterfaceText source={"· currently:"} /> {p.currentCandidate}
+                        <InterfaceText source={"· currently:"} />{" "}
+                        <bdi dir="auto" lang="und">{p.currentCandidate}</bdi>
                       </>
                     )}
                   </p>
@@ -692,8 +695,12 @@ function UnmatchedEntryCard({ entry, matchPending, onMatch }: UnmatchedEntryCard
 
   return (
     <div className="rounded-md border p-3 space-y-2">
-      <p className="text-sm font-medium">{entry.folderName}</p>
-      <p className="text-xs text-muted-foreground font-mono">{entry.absolutePath}</p>
+      <p className="text-sm font-medium">
+        <bdi dir="auto" lang="und">{entry.folderName}</bdi>
+      </p>
+      <p className="text-xs text-muted-foreground font-mono">
+        <bdi dir="ltr" lang="und">{entry.absolutePath}</bdi>
+      </p>
       {entry.candidates.length === 0 ? (
         <p className="text-xs text-muted-foreground">
           <InterfaceText

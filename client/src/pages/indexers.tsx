@@ -132,13 +132,20 @@ export default function IndexersPage() {
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [diagnosingProwlarr, setDiagnosingProwlarr] = useState(false);
   const [prowlarrDiagnostics, setProwlarrDiagnostics] = useState<{
-    management: { success: boolean; status?: number; version?: string; error?: string };
+    management: {
+      success: boolean;
+      status?: number;
+      version?: string;
+      error?: string;
+      errorSource?: string | null;
+    };
     indexers: {
       id: number;
       name: string;
       success: boolean;
       status?: number;
       error?: string;
+      errorSource?: string | null;
       layer: "indexer-feed";
     }[];
   } | null>(null);
@@ -1253,7 +1260,11 @@ export default function IndexersPage() {
                 </div>
                 {prowlarrDiagnostics.management.error && (
                   <p className="text-muted-foreground mt-1 text-sm">
-                    <ApiErrorDetailText source={prowlarrDiagnostics.management.error} />
+                    <ApiErrorDetailText
+                      source={prowlarrDiagnostics.management.error}
+                      ownedSource={prowlarrDiagnostics.management.errorSource}
+                      legacyApiFallback={false}
+                    />
                   </p>
                 )}
                 {prowlarrDiagnostics.indexers.length > 0 && (
@@ -1267,7 +1278,11 @@ export default function IndexersPage() {
                           <div className="truncate font-medium">{item.name}</div>
                           {item.error && (
                             <div className="text-muted-foreground break-words text-xs">
-                              <ApiErrorDetailText source={item.error} />
+                              <ApiErrorDetailText
+                                source={item.error}
+                                ownedSource={item.errorSource}
+                                legacyApiFallback={false}
+                              />
                             </div>
                           )}
                         </div>

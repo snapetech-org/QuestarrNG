@@ -90,6 +90,7 @@ interface SearchResult {
   total: number;
   offset: number;
   errors?: string[];
+  errorI18n?: Array<unknown | null>;
 }
 
 interface Downloader {
@@ -585,7 +586,11 @@ export default function SearchPage() {
                       className="text-muted-foreground"
                       data-testid={`error-message-${index}`}
                     >
-                      • <ApiErrorDetailText source={error} />
+                      • <ApiErrorDetailText
+                        source={error}
+                        metadata={firstPage?.errorI18n?.[index] ?? null}
+                        legacyApiFallback={false}
+                      />
                     </li>
                   ))}
                 </ul>
