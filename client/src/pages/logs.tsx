@@ -2,7 +2,10 @@ import { getRegionalLocale, useRegionalPreference } from "@/lib/regional-format"
 import {
   formatInterfaceMessage,
   getInterfaceCollator,
+  getInterfaceTextDirection,
+  getInterfaceTextLanguage,
   useInterfaceLanguage,
+  type InterfaceLanguage,
 } from "@/lib/interface-locale";
 import { useState, useEffect, useRef, useCallback, useMemo, memo } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -611,16 +614,23 @@ export default function LogsPage() {
   const { language, t, languageFor, directionFor } = useInterfaceLanguage();
   const moduleCollator = useMemo(() => getInterfaceCollator(language), [language]);
   const localizedText = useCallback(
-    (source: string, values: Record<string, string | number> = {}) => {
-      const text = formatInterfaceMessage(source, values, language);
-      if (language === "en") return text;
+    (
+      source: string,
+      values: Record<string, string | number> = {},
+      currentLanguage: InterfaceLanguage = language
+    ) => {
+      const text = formatInterfaceMessage(source, values, currentLanguage);
+      if (currentLanguage === "en") return text;
       return (
-        <span lang={languageFor(source)} dir={directionFor(source)}>
+        <span
+          lang={getInterfaceTextLanguage(source, currentLanguage)}
+          dir={getInterfaceTextDirection(source, currentLanguage)}
+        >
           {text}
         </span>
       );
     },
-    [directionFor, language, languageFor]
+    [language]
   );
   const { toast } = useToast();
   const isMobile = useIsMobile();
@@ -758,13 +768,14 @@ export default function LogsPage() {
       void copyToClipboard(text).then((succeeded) => {
         if (succeeded) {
           toast({
-            title: localizedText("interface.copied_8dc21305"),
-            description: localizedText(description, values),
+            title: "interface.copied_8dc21305",
+            description: (currentLanguage) => localizedText(description, values, currentLanguage),
           });
         } else {
           toast({
-            title: localizedText("interface.copy_failed_aad6c2a1"),
-            description: localizedText("interface.clipboard_access_denied_c311c408"),
+            title: "interface.copy_failed_aad6c2a1",
+            description: (currentLanguage) =>
+              localizedText("interface.clipboard_access_denied_c311c408", {}, currentLanguage),
             variant: "destructive",
           });
         }

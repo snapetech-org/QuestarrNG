@@ -687,7 +687,7 @@ function UnmatchedEntryCard({ entry, matchPending, onMatch }: UnmatchedEntryCard
     },
     onError: (error: Error) => {
       toast({
-        title: t("interface.search_failed_9104d446"),
+        title: "interface.search_failed_9104d446",
         description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });

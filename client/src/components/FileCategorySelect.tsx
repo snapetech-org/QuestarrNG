@@ -11,6 +11,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { type GameFileCategory, type ScannedGameFile } from "@shared/schema";
 import { formatInterfaceMessage } from "@/lib/interface-locale";
 import { InterfaceText } from "@/components/InterfaceText";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 
 const CATEGORY_OPTIONS: Array<{ value: GameFileCategory; label: string }> = [
   { value: "main", label: "Main game" },
@@ -49,7 +50,7 @@ export default function FileCategorySelect({ gameId, file }: FileCategorySelectP
     onError: (error: Error) => {
       toast({
         title: "Could not change the category",
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },

@@ -7,7 +7,7 @@ import { visibleIgdbPlatforms } from "@shared/platforms";
 import { useHiddenMutation } from "@/hooks/use-hidden-mutation";
 import { useToast } from "@/hooks/use-toast";
 import { mapGameToInsertGame } from "@/lib/utils";
-import { apiRequest } from "@/lib/queryClient";
+import { ApiError, apiRequest } from "@/lib/queryClient";
 import { addDiscoveryGameToLibrary, hideDiscoveryGame } from "@/lib/discover-hidden-mutation";
 import {
   Select,
@@ -27,7 +27,13 @@ import { useLocalStorageState } from "@/hooks/use-local-storage-state";
 import { ACQUIRED_GAME_STATUSES, type Game, type Config, type UserSettings } from "@shared/schema";
 import { type GameStatus } from "@/components/StatusBadge";
 import { Input } from "@/components/ui/input";
-import { useInterfaceLanguage, formatInterfaceMessage } from "@/lib/interface-locale";
+import {
+  useInterfaceLanguage,
+  formatInterfaceMessage,
+  getInterfaceTextDirection,
+  getInterfaceTextLanguage,
+  type InterfaceLanguage,
+} from "@/lib/interface-locale";
 import { InterfaceText } from "@/components/InterfaceText";
 
 const EMPTY_GAMES: Game[] = [];
@@ -90,6 +96,21 @@ const SelectTriggerWithSpinner = ({
 
 export default function DiscoverPage() {
   const { t, languageFor, directionFor } = useInterfaceLanguage();
+  const toastText = useCallback(
+    (source: string) => (language: InterfaceLanguage) => {
+      const text = formatInterfaceMessage(source, {}, language);
+      if (language === "en") return text;
+      return (
+        <span
+          lang={getInterfaceTextLanguage(source, language)}
+          dir={getInterfaceTextDirection(source, language)}
+        >
+          {text}
+        </span>
+      );
+    },
+    []
+  );
   const textNode = useCallback(
     (source: string) => (
       <span lang={languageFor(source)} dir={directionFor(source)}>
@@ -335,22 +356,22 @@ export default function DiscoverPage() {
   useEffect(() => {
     if (genresError) {
       toast({
-        description: textNode("Failed to load genres, using defaults"),
+        description: toastText("Failed to load genres, using defaults"),
 
         variant: "destructive",
       });
     }
-  }, [genresError, textNode, toast]);
+  }, [genresError, toast, toastText]);
 
   useEffect(() => {
     if (platformsError) {
       toast({
-        description: textNode("Failed to load platforms, using defaults"),
+        description: toastText("Failed to load platforms, using defaults"),
 
         variant: "destructive",
       });
     }
-  }, [platformsError, textNode, toast]);
+  }, [platformsError, toast, toastText]);
 
   // Track game mutation (for Discovery games)
 
@@ -397,21 +418,19 @@ export default function DiscoverPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/games"] });
 
-      toast({ description: textNode("Game added to watchlist!") });
+      toast({ description: toastText("Game added to watchlist!") });
     },
 
     onError: (error: Error) => {
-      const errorMessage = error.message || String(error);
-
-      if (errorMessage.includes("409") || errorMessage.includes("already in collection")) {
+      if (error instanceof ApiError && error.status === 409) {
         toast({
-          description: textNode("Game is already in your collection"),
+          description: toastText("Game is already in your collection"),
 
           variant: "default",
         });
       } else {
         toast({
-          description: textNode("Failed to track game"),
+          description: toastText("Failed to track game"),
 
           variant: "destructive",
         });
@@ -431,9 +450,9 @@ export default function DiscoverPage() {
             : undefined;
       return hideDiscoveryGame(game, localId);
     },
-    hiddenSuccessMessage: t("interface.game_hidden_from_discovery_49a98505"),
-    unhiddenSuccessMessage: t("interface.game_unhidden_b1ef3b12"),
-    errorMessage: t("interface.failed_to_hide_game_9acca03f"),
+    hiddenSuccessMessage: "interface.game_hidden_from_discovery_49a98505",
+    unhiddenSuccessMessage: "interface.game_unhidden_b1ef3b12",
+    errorMessage: "interface.failed_to_hide_game_9acca03f",
   });
 
   // Add game mutation (for status changes on Discovery games)
@@ -473,12 +492,12 @@ export default function DiscoverPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/games"] });
 
-      toast({ description: textNode("Game added to collection successfully") });
+      toast({ description: toastText("Game added to collection successfully") });
     },
 
     onError: () => {
       toast({
-        description: textNode("Failed to add game to collection"),
+        description: toastText("Failed to add game to collection"),
 
         variant: "destructive",
       });

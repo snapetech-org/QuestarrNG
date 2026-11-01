@@ -837,13 +837,15 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
             ? "stored path is outside your configured library folder"
             : "deletion failed, check server logs";
         toast({
-          description: formatInterfaceMessage(
-            "interface.game_removed_but_files_were_not_de_744e986d",
-            {
-              reasonText: translateInterfaceLabel(String(reasonText ?? "")),
-              path: String(data.fileDeletion.path ?? ""),
-            }
-          ),
+          description: (language) =>
+            formatInterfaceMessage(
+              "interface.game_removed_but_files_were_not_de_744e986d",
+              {
+                reasonText: translateInterfaceLabel(String(reasonText ?? ""), language),
+                path: String(data.fileDeletion.path ?? ""),
+              },
+              language
+            ),
           variant: "destructive",
         });
       } else {

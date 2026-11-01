@@ -682,7 +682,7 @@ export default function SettingsPage() {
     },
     onError: (err: Error) => {
       toast({
-        title: formatInterfaceMessage("service.apprise_test_failed", {}),
+        title: "service.apprise_test_failed",
         description: <ApiErrorDescription error={err} fallbackSource="Unknown error" />,
         variant: "destructive",
       });
@@ -877,7 +877,7 @@ export default function SettingsPage() {
     onError: (error: Error) => {
       toast({
         title: "Save Failed",
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },
@@ -899,7 +899,7 @@ export default function SettingsPage() {
     onError: (error: Error) => {
       toast({
         title: "Generation Failed",
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },
@@ -930,7 +930,7 @@ export default function SettingsPage() {
     onSuccess: (data) => {
       toast({
         title: "Settings Updated",
-        description: translateInterfaceLabel(data.successMessage),
+        description: (language) => translateInterfaceLabel(data.successMessage, language),
       });
       queryClient.invalidateQueries({ queryKey: ["/api/settings"] });
     },
@@ -976,7 +976,7 @@ export default function SettingsPage() {
       if (data.successMessage) {
         toast({
           title: "Settings Updated",
-          description: translateInterfaceLabel(data.successMessage),
+          description: (language) => translateInterfaceLabel(data.successMessage, language),
         });
       }
       queryClient.invalidateQueries({ queryKey: ["/api/settings"] });
@@ -1019,7 +1019,7 @@ export default function SettingsPage() {
     onError: (error: Error) => {
       toast({
         title: "Update Failed",
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },
@@ -1039,7 +1039,7 @@ export default function SettingsPage() {
     } catch (error) {
       toast({
         title: "Could not save RAWG settings",
-        description: error instanceof Error ? error.message : undefined,
+        description: error instanceof Error ? <ApiErrorDescription error={error} /> : undefined,
         variant: "destructive",
       });
     }
@@ -1079,7 +1079,7 @@ export default function SettingsPage() {
     } catch (error) {
       toast({
         title: "Could not remove RAWG settings",
-        description: error instanceof Error ? error.message : undefined,
+        description: error instanceof Error ? <ApiErrorDescription error={error} /> : undefined,
         variant: "destructive",
       });
     }
@@ -1105,7 +1105,7 @@ export default function SettingsPage() {
     onError: (error: Error) => {
       toast({
         title: "Metadata Refresh Failed",
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },
@@ -1125,19 +1125,23 @@ export default function SettingsPage() {
       setLibraryHealthResult({ drifted: data.drifted, orphaned: data.orphaned });
       toast({
         title: "Library Health Check",
-        description:
+        description: (language) =>
           data.drifted.length === 0 && data.orphaned.length === 0
-            ? "Library is in sync."
-            : formatInterfaceMessage("interface.length_drifted_length2_orphaned_0fc153d0", {
-                length: String(data.drifted.length ?? ""),
-                length2: String(data.orphaned.length ?? ""),
-              }),
+            ? translateInterfaceLabel("Library is in sync.", language)
+            : formatInterfaceMessage(
+                "interface.length_drifted_length2_orphaned_0fc153d0",
+                {
+                  length: String(data.drifted.length ?? ""),
+                  length2: String(data.orphaned.length ?? ""),
+                },
+                language
+              ),
       });
     },
     onError: (error: Error) => {
       toast({
         title: "Library Health Check Failed",
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },
@@ -1208,7 +1212,7 @@ export default function SettingsPage() {
     onError: (error: Error) => {
       toast({
         title: "Update Failed",
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },
@@ -1301,7 +1305,7 @@ export default function SettingsPage() {
     onError: (error: Error) => {
       toast({
         title: "Update Failed",
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },

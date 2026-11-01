@@ -60,34 +60,44 @@ export function NotificationCenter() {
   useEffect(() => {
     const socket = getSocket();
     const handleNotification = (notification: Notification) => {
-      const titleLanguage = getNotificationTitleLanguage(notification.title, language);
-      const securityAlertTitle = getLocalizedSecurityAlertTitleParts(notification.title, language);
-      const localizedMessage = localizeNotificationMessage(
-        notification.title,
-        notification.message,
-        language,
-        notification.messageI18n
-      );
       toast({
-        title: (
-          <span lang={titleLanguage} dir={getNotificationTextDirection(titleLanguage)}>
-            {securityAlertTitle ? (
-              <>
-                {securityAlertTitle.prefix}{" "}
-                <bdi lang="en" dir="auto">
-                  {securityAlertTitle.provider}
-                </bdi>
-              </>
-            ) : (
-              getNotificationTitle(notification.title, language)
-            )}
-          </span>
-        ),
-        description: (
-          <span lang={localizedMessage.language} dir={localizedMessage.direction}>
-            {localizedMessage.content}
-          </span>
-        ),
+        title: (currentLanguage) => {
+          const titleLanguage = getNotificationTitleLanguage(
+            notification.title,
+            currentLanguage
+          );
+          const securityAlertTitle = getLocalizedSecurityAlertTitleParts(
+            notification.title,
+            currentLanguage
+          );
+          return (
+            <span lang={titleLanguage} dir={getNotificationTextDirection(titleLanguage)}>
+              {securityAlertTitle ? (
+                <>
+                  {securityAlertTitle.prefix}{" "}
+                  <bdi lang="en" dir="auto">
+                    {securityAlertTitle.provider}
+                  </bdi>
+                </>
+              ) : (
+                getNotificationTitle(notification.title, currentLanguage)
+              )}
+            </span>
+          );
+        },
+        description: (currentLanguage) => {
+          const localizedMessage = localizeNotificationMessage(
+            notification.title,
+            notification.message,
+            currentLanguage,
+            notification.messageI18n
+          );
+          return (
+            <span lang={localizedMessage.language} dir={localizedMessage.direction}>
+              {localizedMessage.content}
+            </span>
+          );
+        },
         variant: notification.type === "error" ? "destructive" : "default",
       });
 

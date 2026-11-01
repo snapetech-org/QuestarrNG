@@ -558,6 +558,47 @@ export function matchNotification(
   return undefined;
 }
 
+/** Source templates keep English substitutions on the same bidi-safe path as translations. */
+export const ENGLISH_MESSAGE_TEMPLATES: Record<MessageKey, string> = {
+  testNotification: "Test notification from Questarr",
+  gameReleased: "{game} has been released!",
+  gameDelayed: "{game} has been delayed to {date}",
+  gameDelayedNoDate: "{game} has been delayed",
+  downloadFinished: "Download finished for {game}",
+  importRemotePath:
+    '"{game}" finished downloading but the file path could not be resolved from the download client. Check Settings → Path Mappings or trigger the import manually.',
+  importLocalPath:
+    '"{game}" finished downloading but its local path could not be accessed. Check Settings → Path Mappings or trigger the import manually.',
+  importInterrupted:
+    'The import of "{game}" was interrupted. Review it in Pending Imports to run it again.',
+  downloadRemovedBeforeImport:
+    '"{game}" finished downloading but the download client removed it before Questarr could import it. Review it in Pending Imports and select the downloaded files.',
+  downloadAborted: 'Download aborted for "{game}": {error}',
+  downloadFailed:
+    'Download for "{game}" disappeared from the download client before completing and has been marked as failed. If it actually finished, you may need to import it manually.',
+  releaseReview: "{game}: {reason}. Please review and choose.",
+  downloadStarted: "Started downloading {release} via {method}",
+  gameAvailable: "{game} is now available for download",
+  contentAvailable: "{content} is available for {game}. Review and choose.",
+  multipleResults: "{count} result(s) found for {game}. Please review and choose.",
+  updatesAvailable: "{count} update(s) found for {game}",
+  packsAvailable: "{count} pack/add-on result(s) found for {game}",
+  xrelAvailable: "{game} is listed on xREL.to: {release}",
+  steamSynced: "Successfully added {count} games from your Steam Wishlist.",
+  importExtractionFailed:
+    '"{game}" was moved into your library, but extracting the archive failed: {error}. The archive is left at {path} — extract or delete it manually to finish the import.',
+  autoDeleteFailed:
+    '"{game}" was imported successfully, but removing it from the download client failed: {error}. Please remove it manually.',
+  errorReportSent:
+    "Questarr detected an error and automatically sent a diagnostic report. Support code: {code}.",
+  errorReportFailed:
+    "Questarr detected an error but could not send the automatic diagnostic report ({error}).",
+  errorOccurred:
+    "Questarr encountered an unexpected error. Click to review and optionally send a diagnostic report to help fix it.",
+  securityFlagged: '"{game}" was flagged and quarantined. {reason}',
+  unknownError: "unknown error",
+};
+
 /** Render only source-proven app notifications; unknown bodies remain unchanged. */
 export function localizeOutboundNotification(
   title: string,
@@ -566,7 +607,6 @@ export function localizeOutboundNotification(
   metadata?: unknown
 ): { title: string; message: string } {
   const language = normalizeNotificationLanguage(locale);
-  if (language === "en") return { title, message };
   if (metadata !== null && metadata !== undefined)
     return {
       title: getNotificationTitle(title, language),
@@ -574,15 +614,19 @@ export function localizeOutboundNotification(
     };
   const match = matchNotification(title, message);
   const template = match ? MESSAGES[match.key][getNotificationCatalogIndex(language)] : undefined;
+  const sourceTemplate =
+    match && language === "en" ? ENGLISH_MESSAGE_TEMPLATES[match.key] : template;
   const translatedMessage =
-    template && match
-      ? template.replace(/\{([a-z]+)\}/g, (placeholder, key: string) => {
+    sourceTemplate && match
+      ? sourceTemplate.replace(/\{([a-z]+)\}/g, (placeholder, key: string) => {
           const value = match.params[key];
           if (value === undefined) return placeholder;
           const interpolated =
             key === "count"
-              ? new Intl.NumberFormat(language).format(Number(value))
-              : key === "error" && value === "unknown error"
+              ? language === "en"
+                ? value
+                : new Intl.NumberFormat(language).format(Number(value))
+              : key === "error" && value === "unknown error" && language !== "en"
                 ? MESSAGES.unknownError[getNotificationCatalogIndex(language)] ?? value
                 : value;
           return isolateBidirectionalValue(interpolated);

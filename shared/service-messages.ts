@@ -213,6 +213,23 @@ export function matchingServiceMessageDescriptor(
     : undefined;
 }
 
+/** True only when the requested language has translated source wording, including nested details. */
+export function hasServiceMessageTranslation(metadata: unknown, locale: unknown): boolean {
+  const descriptor = parseServiceMessageDescriptor(metadata);
+  const language = normalizeNotificationLanguage(locale);
+  if (!descriptor || language === "en") return false;
+  const translatedTemplate = SERVICE_MESSAGE_TRANSLATIONS[descriptor.messageKey][language];
+  if (
+    typeof translatedTemplate === "string" &&
+    translatedTemplate.trim() &&
+    translatedTemplate !== SERVICE_MESSAGE_SOURCES[descriptor.messageKey]
+  )
+    return true;
+  return Object.values(descriptor.messageDetails ?? {}).some((nested) =>
+    hasServiceMessageTranslation(nested, language)
+  );
+}
+
 export function serializeServiceMessageDescriptor(value: unknown): string | null {
   const descriptor = parseServiceMessageDescriptor(value);
   return descriptor ? JSON.stringify(descriptor) : null;
@@ -234,15 +251,20 @@ export function localizeServiceMessage(
   locale: unknown
 ): string {
   const language = normalizeNotificationLanguage(locale);
-  if (language === "en") return message;
   const descriptor = parseServiceMessageDescriptor(metadata);
   if (!descriptor || sourceText(descriptor.messageKey, descriptor.messageValues) !== message)
     return message;
-  const template = SERVICE_MESSAGE_TRANSLATIONS[descriptor.messageKey][language];
-  if (!template) return message;
-  // A source-invariant join still needs to localize explicitly tagged children.
-  // Preserve the exact English fallback if no nested message actually translates.
-  let nestedChanged = false;
+  const translatedTemplate =
+    language === "en" ? undefined : SERVICE_MESSAGE_TRANSLATIONS[descriptor.messageKey][language];
+  const hasTranslatedTemplate =
+    typeof translatedTemplate === "string" &&
+    translatedTemplate.trim().length > 0 &&
+    translatedTemplate !== SERVICE_MESSAGE_SOURCES[descriptor.messageKey];
+  // Keep English and source-invariant locale templates on the same interpolation
+  // path so opaque dynamic values stay isolated even when the visible wording falls back.
+  const template = hasTranslatedTemplate
+    ? translatedTemplate
+    : SERVICE_MESSAGE_SOURCES[descriptor.messageKey];
   const localized = template.replace(PLACEHOLDER, (placeholder, name: string) => {
     const raw = descriptor.messageValues[name];
     if (raw === undefined) return placeholder;
@@ -250,12 +272,11 @@ export function localizeServiceMessage(
     const value = nested
       ? localizeServiceMessage(String(raw), nested, language)
       : name === "count" && typeof raw === "number"
-        ? new Intl.NumberFormat(language).format(raw)
+        ? hasTranslatedTemplate
+          ? new Intl.NumberFormat(language).format(raw)
+          : String(raw)
         : String(raw);
-    if (nested && value !== String(raw)) nestedChanged = true;
     return isolateBidirectionalValue(value);
   });
-  return template === SERVICE_MESSAGE_SOURCES[descriptor.messageKey] && !nestedChanged
-    ? message
-    : localized;
+  return localized;
 }

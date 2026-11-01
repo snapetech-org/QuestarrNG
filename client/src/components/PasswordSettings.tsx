@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { updatePasswordSchema, type UpdatePassword } from "@shared/schema";
 import { InterfaceText } from "@/components/InterfaceText";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 
 export default function PasswordSettings() {
   const { toast } = useToast();
@@ -44,7 +45,7 @@ export default function PasswordSettings() {
     onError: (error: Error) => {
       toast({
         title: "Update Failed",
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },

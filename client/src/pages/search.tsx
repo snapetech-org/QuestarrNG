@@ -12,6 +12,7 @@ import { formatBytes, formatAge, isUsenetItem, getDownloadTypeColor } from "@/li
 import {
   formatInterfaceMessage,
   getInterfaceLanguageDirection,
+  translateInterfaceLabel,
   useInterfaceLanguage,
 } from "@/lib/interface-locale";
 import { ApiErrorDetailText } from "@/components/ApiErrorDetailText";
@@ -267,9 +268,12 @@ export default function SearchPage() {
         if (total > 0) {
           toast({
             title: "Search completed",
-            description: formatInterfaceMessage("interface.search_results_count_b51a3250", {
-              count: String(total),
-            }),
+            description: (language) =>
+              formatInterfaceMessage(
+                "interface.search_results_count_b51a3250",
+                { count: String(total) },
+                language
+              ),
           });
         } else {
           toast({ title: "No results found", description: "Try a different search query" });
@@ -278,9 +282,12 @@ export default function SearchPage() {
         if (errors && errors.length > 0) {
           toast({
             title: "Some indexers failed",
-            description: formatInterfaceMessage("interface.indexer_errors_count_7e2cd7f4", {
-              count: String(errors.length),
-            }),
+            description: (language) =>
+              formatInterfaceMessage(
+                "interface.indexer_errors_count_7e2cd7f4",
+                { count: String(errors.length) },
+                language
+              ),
             variant: "destructive",
           });
         }
@@ -371,12 +378,12 @@ export default function SearchPage() {
     if (compatibleDownloaders.length === 0) {
       toast({
         title: "No compatible downloaders",
-        description: formatInterfaceMessage(
-          "interface.please_configure_a_type_downloader_18aae4bb",
-          {
-            type: t(isUsenet ? "Usenet" : "Torrent"),
-          }
-        ),
+        description: (language) =>
+          formatInterfaceMessage(
+            "interface.please_configure_a_type_downloader_18aae4bb",
+            { type: translateInterfaceLabel(isUsenet ? "Usenet" : "Torrent", language) },
+            language
+          ),
         variant: "destructive",
       });
       return;

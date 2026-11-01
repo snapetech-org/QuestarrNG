@@ -227,9 +227,12 @@ export default function Downloads() {
         const errorKey = `${error.downloaderId}-${error.error}`;
         if (!hasShownErrorsRef.current.has(errorKey)) {
           toast({
-            title: formatInterfaceMessage("interface.downloader_error_downloadername_4342528e", {
-              downloaderName: String(error.downloaderName ?? ""),
-            }),
+            title: (language) =>
+              formatInterfaceMessage(
+                "interface.downloader_error_downloadername_4342528e",
+                { downloaderName: String(error.downloaderName ?? "") },
+                language
+              ),
             description: <ServiceMessageText message={error.error} metadata={error.errorI18n} />,
             variant: "destructive",
           });

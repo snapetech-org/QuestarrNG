@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import TagListEditor from "@/components/TagListEditor";
 import { InterfaceText } from "@/components/InterfaceText";
-import { translateInterfaceLabel } from "@/lib/interface-locale";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 
 type EditorProps = Omit<React.ComponentProps<typeof TagListEditor>, "tags" | "onChange">;
 
@@ -55,13 +55,17 @@ export default function TagListSettingsCard({
     },
     onSuccess: () => {
       toast({
-        title: translateInterfaceLabel(successTitle),
-        description: translateInterfaceLabel(successDescription),
+        title: successTitle,
+        description: successDescription,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/settings"] });
     },
     onError: (error: Error) => {
-      toast({ title: "Save Failed", description: error.message, variant: "destructive" });
+      toast({
+        title: "Save Failed",
+        description: <ApiErrorDescription error={error} />,
+        variant: "destructive",
+      });
     },
   });
 

@@ -198,15 +198,16 @@ export default function ClaimBatchModal({ open, onOpenChange }: ClaimBatchModalP
       const { count, hadErrors } = result ?? { count: 0, hadErrors: false };
       if (hadErrors) {
         toast({
-          title: formatInterfaceMessage("claims.some_downloads_failed", {
+          title: (language) => formatInterfaceMessage("claims.some_downloads_failed", {
             count: String(count),
-          }),
+          }, language),
           description: "Check your downloads.",
           variant: "destructive",
         });
       } else {
         toast({
-          title: formatInterfaceMessage("claims.downloads_linked", { count: String(count) }),
+          title: (language) =>
+            formatInterfaceMessage("claims.downloads_linked", { count: String(count) }, language),
         });
       }
       queryClient.invalidateQueries({ queryKey: ["/api/downloads"] });

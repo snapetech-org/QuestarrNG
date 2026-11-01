@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiFetch, throwIfResNotOk } from "@/lib/queryClient";
 import type { XrelReleaseListItem } from "@shared/xrel-types";
 import { InterfaceText } from "@/components/InterfaceText";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import { formatInterfaceMessage } from "@/lib/interface-locale";
 
 // The transport fields (id, dirname, nukeReason, ...) come from the
@@ -89,9 +90,12 @@ export default function XrelReleasesPage() {
     onSuccess: (data) => {
       toast({
         title: "Game added",
-        description: formatInterfaceMessage("interface.added_title_to_your_wanted_list_abe8d624", {
-          title: String(data.title ?? ""),
-        }),
+        description: (language) =>
+          formatInterfaceMessage(
+            "interface.added_title_to_your_wanted_list_abe8d624",
+            { title: String(data.title ?? "") },
+            language
+          ),
       });
       // Iterate over the list and update the item that was added to avoid full refetch if possible,
       // but simpler to just invalidates queries
@@ -102,7 +106,7 @@ export default function XrelReleasesPage() {
       toast({
         variant: "destructive",
         title: "Failed to add game",
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
       });
     },
   });

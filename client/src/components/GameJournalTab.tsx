@@ -4,7 +4,12 @@ import {
   useRegionalPreference,
 } from "@/lib/regional-format";
 import { useRef, useState } from "react";
-import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
+import {
+  formatInterfaceMessage,
+  getInterfaceTextDirection,
+  getInterfaceTextLanguage,
+  useInterfaceLanguage,
+} from "@/lib/interface-locale";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BookOpen,
@@ -74,11 +79,18 @@ export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJour
   const { language, t, languageFor, directionFor } = useInterfaceLanguage();
   const regionalPreference = useRegionalPreference();
   const queryClient = useQueryClient();
-  const localizedText = (source: string, values: Record<string, string | number> = {}) => {
-    const text = formatInterfaceMessage(source, values, language);
-    if (language === "en") return text;
+  const localizedText = (
+    source: string,
+    values: Record<string, string | number> = {},
+    currentLanguage: typeof language = language
+  ) => {
+    const text = formatInterfaceMessage(source, values, currentLanguage);
+    if (currentLanguage === "en") return text;
     return (
-      <span lang={languageFor(source)} dir={directionFor(source)}>
+      <span
+        lang={getInterfaceTextLanguage(source, currentLanguage)}
+        dir={getInterfaceTextDirection(source, currentLanguage)}
+      >
         {text}
       </span>
     );
@@ -96,7 +108,10 @@ export default function GameJournalTab({ gameId, steamAppId }: Readonly<GameJour
       onSuccessExtra?.();
     },
     onError: () =>
-      toast({ description: localizedText(errorMessage), variant: "destructive" as const }),
+      toast({
+        description: (currentLanguage) => localizedText(errorMessage, {}, currentLanguage),
+        variant: "destructive" as const,
+      }),
   });
 
   const { data: steamSettings } = useQuery<{ apiKeyConfigured: boolean }>({

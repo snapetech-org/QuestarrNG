@@ -112,9 +112,12 @@ export default function SendErrorReportDialog({
       if (succeeded) {
         toast({
           title: "Copied",
-          description: formatInterfaceMessage("interface.code_code_copied_to_clipboard_b1632d0c", {
-            code: String(result.code ?? ""),
-          }),
+          description: (language) =>
+            formatInterfaceMessage(
+              "interface.code_code_copied_to_clipboard_b1632d0c",
+              { code: String(result.code ?? "") },
+              language
+            ),
         });
       } else {
         toast({

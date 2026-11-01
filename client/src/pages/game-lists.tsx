@@ -126,7 +126,7 @@ export default function GameListsPage() {
       setEditingListId(undefined);
       setListName("");
       toast({
-        title: formatInterfaceMessage("interface.list_saved_e24d07fe", {}, language),
+        title: (language) => formatInterfaceMessage("interface.list_saved_e24d07fe", {}, language),
         description: (
           <InterfaceRichText
             source="interface.name_is_ready_d506004a"
@@ -137,12 +137,14 @@ export default function GameListsPage() {
     },
     onError: () => {
       toast({
-        title: formatInterfaceMessage("interface.couldn_t_save_list_b61bfc7c", {}, language),
-        description: formatInterfaceMessage(
-          "interface.check_the_name_and_try_again_list_d0830084",
-          {},
-          language
-        ),
+        title: (language) =>
+          formatInterfaceMessage("interface.couldn_t_save_list_b61bfc7c", {}, language),
+        description: (language) =>
+          formatInterfaceMessage(
+            "interface.check_the_name_and_try_again_list_d0830084",
+            {},
+            language
+          ),
         variant: "destructive",
       });
     },
@@ -158,7 +160,8 @@ export default function GameListsPage() {
     },
     onError: () => {
       toast({
-        title: formatInterfaceMessage("interface.couldn_t_delete_list_21203c26", {}, language),
+        title: (language) =>
+          formatInterfaceMessage("interface.couldn_t_delete_list_21203c26", {}, language),
         variant: "destructive",
       });
     },
@@ -182,7 +185,8 @@ export default function GameListsPage() {
     },
     onError: () => {
       toast({
-        title: formatInterfaceMessage("interface.couldn_t_update_this_list_bb74b78c", {}, language),
+        title: (language) =>
+          formatInterfaceMessage("interface.couldn_t_update_this_list_bb74b78c", {}, language),
         variant: "destructive",
       });
     },

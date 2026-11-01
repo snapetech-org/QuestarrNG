@@ -36,6 +36,8 @@ import {
 } from "@/components/ui/select";
 import { Search, Plus, Star, AlertCircle, Calendar, Check, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { InterfaceText } from "@/components/InterfaceText";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import { type Game, type InsertGame, type Config, type UserSettings } from "@shared/schema";
 import { visibleIgdbPlatforms } from "@shared/platforms";
 import { mapGameToInsertGame } from "@/lib/utils";
@@ -197,19 +199,12 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/games"] });
       toast({
-        description: (
-          <span
-            lang={languageFor("interface.game_added_to_collection_successfu_0b0de90f")}
-            dir={directionFor("interface.game_added_to_collection_successfu_0b0de90f")}
-          >
-            {t("interface.game_added_to_collection_successfu_0b0de90f")}
-          </span>
-        ),
+        description: <InterfaceText source="interface.game_added_to_collection_successfu_0b0de90f" />,
       });
     },
     onError: (error: Error) => {
       toast({
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },

@@ -3,8 +3,13 @@ import {
   getRegionalLocale,
   useRegionalPreference,
 } from "@/lib/regional-format";
-import { getInterfaceCollator, formatInterfaceMessage } from "@/lib/interface-locale";
+import {
+  getInterfaceCollator,
+  formatInterfaceMessage,
+  translateInterfaceLabel,
+} from "@/lib/interface-locale";
 import { ServiceMessageText } from "@/components/ServiceMessageText";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import type { ServiceMessageDescriptor } from "@shared/service-messages";
 import React, { useState, useEffect, useMemo, useCallback, useRef, useId } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -507,11 +512,12 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
       if (addedGroups.length > 0) {
         toast({
           title: "Preferred groups updated",
-          description: formatInterfaceMessage(
-            "interface.added_groups_to_your_preferred_rel_b40e0049",
-            { groups: addedGroups.join(", ") },
-            language
-          ),
+          description: (language) =>
+            formatInterfaceMessage(
+              "interface.added_groups_to_your_preferred_rel_b40e0049",
+              { groups: addedGroups.join(", ") },
+              language
+            ),
         });
       } else {
         toast({
@@ -524,7 +530,7 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
     onError: (error: Error) => {
       toast({
         title: "Could not save preferred groups",
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },
@@ -882,31 +888,72 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
       const downloaderNames = Array.from(
         new Set(successfulResults.map((r) => r.downloaderName).filter(Boolean))
       );
-      const title =
-        downloaderNames.length === 1
-          ? formatInterfaceMessage("interface.downloads_sent_count_to_downloader_b84ab382", {
-              count: formatNumber(successCount),
-              downloaderName: downloaderNames[0]!,
-            })
-          : formatInterfaceMessage("interface.downloads_sent_count_9e81f8d5", {
-              count: formatNumber(successCount),
-            });
       toast({
-        title,
-        description:
+        title: (language, currentRegionalPreference) =>
+          downloaderNames.length === 1
+            ? formatInterfaceMessage(
+                "interface.downloads_sent_count_to_downloader_b84ab382",
+                {
+                  count: formatRegionalNumber(
+                    successCount,
+                    undefined,
+                    currentRegionalPreference
+                  ),
+                  downloaderName: downloaderNames[0]!,
+                },
+                language
+              )
+            : formatInterfaceMessage(
+                "interface.downloads_sent_count_9e81f8d5",
+                {
+                  count: formatRegionalNumber(
+                    successCount,
+                    undefined,
+                    currentRegionalPreference
+                  ),
+                },
+                language
+              ),
+        description: (language, currentRegionalPreference) =>
           results.length > 1
-            ? formatInterfaceMessage("interface.added_count_of_total_downloads_d4f77de2", {
-                count: formatNumber(successCount),
-                total: formatNumber(results.length),
-              })
+            ? formatInterfaceMessage(
+                "interface.added_count_of_total_downloads_d4f77de2",
+                {
+                  count: formatRegionalNumber(
+                    successCount,
+                    undefined,
+                    currentRegionalPreference
+                  ),
+                  total: formatRegionalNumber(
+                    results.length,
+                    undefined,
+                    currentRegionalPreference
+                  ),
+                },
+                language
+              )
             : undefined,
       });
       if (failedResults.length > 0) {
         toast({
-          title: formatInterfaceMessage("interface.downloads_failed_count_06987f18", {
-            count: formatNumber(failedResults.length),
-          }),
-          description: failedResults.map(({ download }) => download.title).join(", "),
+          title: (language, currentRegionalPreference) =>
+            formatInterfaceMessage(
+              "interface.downloads_failed_count_06987f18",
+              {
+                count: formatRegionalNumber(
+                  failedResults.length,
+                  undefined,
+                  currentRegionalPreference
+                ),
+              },
+              language
+            ),
+          description: failedResults.map(({ download }, index) => (
+            <span key={`${download.title}-${index}`}>
+              <bdi lang="und" dir="auto">{download.title}</bdi>
+              {index < failedResults.length - 1 ? ", " : ""}
+            </span>
+          )),
           variant: "destructive",
         });
       }
@@ -920,7 +967,7 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
     onError: (error: Error) => {
       toast({
         title: "Failed to start download",
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },
@@ -954,16 +1001,19 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
         const awaitingConfirmation = Boolean(result.correlationTag);
         toast({
           title: awaitingConfirmation
-            ? localizedText("interface.checking_qbittorrent_b5637f31")
-            : formatInterfaceMessage("interface.download_sent_to_downloadername_1cd4290a", {
-                downloaderName: String(variables.downloaderName ?? ""),
-              }),
+            ? "interface.checking_qbittorrent_b5637f31"
+            : (language) =>
+                formatInterfaceMessage(
+                  "interface.download_sent_to_downloadername_1cd4290a",
+                  { downloaderName: String(variables.downloaderName ?? "") },
+                  language
+                ),
           ...(awaitingConfirmation
             ? {
                 description: result.message ? (
                   <ServiceMessageText message={result.message} metadata={result} />
                 ) : (
-                  localizedText("interface.the_request_was_accepted_but_qbitt_b7adf1a8")
+                  "interface.the_request_was_accepted_but_qbitt_b7adf1a8"
                 ),
               }
             : {}),
@@ -988,7 +1038,7 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
     onError: (error: Error) => {
       toast({
         title: "Failed to start download",
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },
@@ -1067,14 +1117,15 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
     }
 
     if (downloadFile(download)) {
-      const fileType = isUsenetItem(download) ? "NZB" : t("interface.torrent_eb9280a5");
+      const fileType = isUsenetItem(download) ? "NZB" : "interface.torrent_eb9280a5";
       toast({
         title: "Download started",
-        description: formatInterfaceMessage(
-          "interface.filetype_file_download_initiated_dfece638",
-          { fileType },
-          language
-        ),
+        description: (language) =>
+          formatInterfaceMessage(
+            "interface.filetype_file_download_initiated_dfece638",
+            { fileType: translateInterfaceLabel(fileType, language) },
+            language
+          ),
       });
     }
   };
@@ -1124,14 +1175,23 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
         window.URL.revokeObjectURL(url);
         toast({
           title: `Bundle downloaded`,
-          description: formatInterfaceMessage("interface.zip_file_item_count_count_cc5cd1a3", {
-            count: formatNumber(downloads.length),
-          }),
+          description: (language, currentRegionalPreference) =>
+            formatInterfaceMessage(
+              "interface.zip_file_item_count_count_cc5cd1a3",
+              {
+                count: formatRegionalNumber(
+                  downloads.length,
+                  undefined,
+                  currentRegionalPreference
+                ),
+              },
+              language
+            ),
         });
       } catch (error) {
         toast({
           title: "Failed to create bundle",
-          description: error instanceof Error ? error.message : "Unknown error",
+          description: <ApiErrorDescription error={error} fallbackSource="Unknown error" />,
           variant: "destructive",
         });
       }
@@ -1139,14 +1199,15 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
       if (downloadFile(selectedMainDownload)) {
         const fileType = isUsenetItem(selectedMainDownload)
           ? "NZB"
-          : t("interface.torrent_eb9280a5");
+          : "interface.torrent_eb9280a5";
         toast({
           title: "Download started",
-          description: formatInterfaceMessage(
-            "interface.filetype_file_download_initiated_dfece638",
-            { fileType },
-            language
-          ),
+          description: (language) =>
+            formatInterfaceMessage(
+              "interface.filetype_file_download_initiated_dfece638",
+              { fileType: translateInterfaceLabel(fileType, language) },
+              language
+            ),
         });
       } else {
         toast({

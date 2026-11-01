@@ -26,7 +26,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { FileBrowser } from "./FileBrowser";
-import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
+import {
+  formatInterfaceMessage,
+  getInterfaceTextDirection,
+  getInterfaceTextLanguage,
+  useInterfaceLanguage,
+  type InterfaceLanguage,
+} from "@/lib/interface-locale";
 
 interface ImportReviewModalProps {
   open: boolean;
@@ -48,18 +54,21 @@ export default function ImportReviewModal({
 }: Readonly<ImportReviewModalProps>) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { language, t, languageFor, directionFor } = useInterfaceLanguage();
-  const localizedText = (source: string, values: Record<string, string | number> = {}) => {
-    const text = formatInterfaceMessage(source, values, language);
-    // The document already identifies English. Keep English toast payloads as
-    // strings so consumers and tests don't receive redundant direction wrappers.
-    if (language === "en") return text;
-    return (
-      <span lang={languageFor(source)} dir={directionFor(source)}>
-        {text}
-      </span>
-    );
-  };
+  const { language, t } = useInterfaceLanguage();
+  const localizedText =
+    (source: string, values: Record<string, string | number> = {}) =>
+    (currentLanguage: InterfaceLanguage) => {
+      const text = formatInterfaceMessage(source, values, currentLanguage);
+      if (currentLanguage === "en") return text;
+      return (
+        <span
+          lang={getInterfaceTextLanguage(source, currentLanguage)}
+          dir={getInterfaceTextDirection(source, currentLanguage)}
+        >
+          {text}
+        </span>
+      );
+    };
 
   const { data: importConfig } = useQuery<ImportConfig>({
     queryKey: ["/api/imports/config"],

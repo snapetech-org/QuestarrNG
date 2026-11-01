@@ -219,7 +219,12 @@ export default function IndexersPage() {
     } catch (error) {
       toast({
         title: "Prowlarr diagnostics failed",
-        description: error instanceof Error ? error.message : "Could not diagnose Prowlarr.",
+        description:
+          error instanceof Error ? (
+            <ApiErrorDescription error={error} />
+          ) : (
+            "Could not diagnose Prowlarr."
+          ),
         variant: "destructive",
       });
     } finally {

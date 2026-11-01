@@ -1,7 +1,13 @@
 import { ServiceMessageError } from "@shared/service-messages";
 import { ApiError, getApiErrorMetadata } from "@/lib/queryClient";
 import { getLocalizedApiErrorMessage } from "@/lib/api-error-locale";
-import { getInterfaceLanguageDirection, useInterfaceLanguage } from "@/lib/interface-locale";
+import {
+  getInterfaceLanguageDirection,
+  getInterfaceTextDirection,
+  getInterfaceTextLanguage,
+  translateInterfaceLabel,
+  useInterfaceLanguage,
+} from "@/lib/interface-locale";
 import { InterfaceText } from "./InterfaceText";
 import { ServiceMessageText } from "./ServiceMessageText";
 
@@ -36,8 +42,11 @@ export function ApiErrorDescription({
     return <ServiceMessageText message={error.message} metadata={error} />;
   if (error instanceof Error && error.message)
     return (
-      <bdi lang="und" dir="auto">
-        {error.message}
+      <bdi
+        lang={getInterfaceTextLanguage(error.message, language)}
+        dir={getInterfaceTextDirection(error.message, language)}
+      >
+        {translateInterfaceLabel(error.message, language)}
       </bdi>
     );
   return <InterfaceText source={fallbackSource} />;

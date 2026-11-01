@@ -115,10 +115,10 @@ export default function ReleaseScoringSettings({
     onSuccess: () => {
       setValidationError(null);
       toast({
-        title: t("interface.release_scoring_saved_669d0e10"),
+        title: "interface.release_scoring_saved_669d0e10",
         description: enabled
-          ? t("interface.manual_and_automatic_searches_will_fbc27d33")
-          : t("interface.your_profile_is_saved_and_scoring_9c5a735d"),
+          ? "interface.manual_and_automatic_searches_will_fbc27d33"
+          : "interface.your_profile_is_saved_and_scoring_9c5a735d",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/settings"] });
     },
@@ -128,7 +128,7 @@ export default function ReleaseScoringSettings({
         isProfileError ? { kind: "profile" } : { kind: "request", error }
       );
       toast({
-        title: t("interface.could_not_save_release_scoring_30c243e4"),
+        title: "interface.could_not_save_release_scoring_30c243e4",
         description: isProfileError ? (
           <InterfaceText source="interface.check_the_scoring_profile_and_cust_5782a7b2" />
         ) : (

@@ -70,15 +70,15 @@ export default function LinkGameModal({
     },
     onSuccess: () => {
       toast({
-        title: localizedText("interface.game_linked_5437aae0"),
-        description: localizedText("interface.continue_by_reviewing_the_import_s_a709a813"),
+        title: "interface.game_linked_5437aae0",
+        description: "interface.continue_by_reviewing_the_import_s_a709a813",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/imports/pending"] });
       onOpenChange(false);
     },
     onError: (error: Error) => {
       toast({
-        title: localizedText("interface.failed_to_link_game_87d41db3"),
+        title: "interface.failed_to_link_game_87d41db3",
         description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });

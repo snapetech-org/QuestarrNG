@@ -26,8 +26,13 @@ import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { Config } from "@shared/schema";
-import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
+import {
+  formatInterfaceMessage,
+  translateInterfaceLabel,
+  useInterfaceLanguage,
+} from "@/lib/interface-locale";
 import { ServiceMessageText } from "@/components/ServiceMessageText";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import type { ServiceMessageDescriptor } from "@shared/service-messages";
 
 const AddGameModal = lazy(() => import("./AddGameModal"));
@@ -78,19 +83,29 @@ export default function Header({
     },
     onSuccess: (data) => {
       toast({
-        title: t("interface.steam_sync_c6095686"),
-        description:
+        title: "interface.steam_sync_c6095686",
+        description: (language) =>
           data.addedCount != null
-            ? formatInterfaceMessage("interface.synced_count_games_from_your_steam_7088fb6b", {
-                count: data.addedCount,
-              })
-            : data.message || t("interface.sync_completed_successfully_adfc2778"),
+            ? formatInterfaceMessage(
+                "interface.synced_count_games_from_your_steam_7088fb6b",
+                { count: data.addedCount },
+                language
+              )
+            : translateInterfaceLabel(
+                data.message || "interface.sync_completed_successfully_adfc2778",
+                language
+              ),
       });
     },
     onError: (error: Error) => {
       toast({
-        title: t("interface.sync_failed_f2f390af"),
-        description: error.message || t("interface.failed_to_connect_to_server_611d3813"),
+        title: "interface.sync_failed_f2f390af",
+        description: (
+          <ApiErrorDescription
+            error={error}
+            fallbackSource="interface.failed_to_connect_to_server_611d3813"
+          />
+        ),
         variant: "destructive",
       });
     },

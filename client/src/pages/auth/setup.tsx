@@ -25,6 +25,7 @@ import { routePaths } from "@/lib/routes";
 import { PASSWORD_MIN_LENGTH, type Downloader, type Indexer } from "@shared/schema";
 import { IgdbHelpPopover, IgdbTestConnectionButton } from "@/components/IgdbCredentialsHelper";
 import { InterfaceLanguageSelect } from "@/components/InterfaceLanguageSelect";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import { useInterfaceLanguage } from "@/lib/interface-locale";
 
 type SetupForm = {
@@ -127,7 +128,7 @@ export default function SetupPage() {
       return res.json();
     },
     onSuccess: async () => {
-      toast({ title: t("interface.setup_complete_welcome_25138a36") });
+      toast({ title: "interface.setup_complete_welcome_25138a36" });
       // Keep this confirmation local to the current setup screen. Choosing a
       // destination performs a full navigation so the new httpOnly session is
       // picked up by the normal authenticated app flow.
@@ -135,8 +136,8 @@ export default function SetupPage() {
     },
     onError: (error: Error) => {
       toast({
-        title: t("interface.setup_failed_fea065f3"),
-        description: error.message,
+        title: "interface.setup_failed_fea065f3",
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },
