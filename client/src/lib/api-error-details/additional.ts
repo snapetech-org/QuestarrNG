@@ -339,7 +339,7 @@ const ADDITIONAL_API_ERROR_DETAIL_LABELS: Record<
     "O jogo do IGDB selecionado não está entre os principais candidatos",
     "اللعبة المحددة من IGDB ليست ضمن أفضل النتائج المرشحة",
     "선택한 IGDB 게임이 상위 후보에 없습니다",
-    "找不到選取的 IGDB 遊戲於熱門候選項目中",
+    "找不到選取的 IGDB 遊戲於最佳候選項目中",
     "Trò chơi IGDB đã chọn không nằm trong các ứng viên hàng đầu",
     "Game IGDB yang dipilih tidak ada dalam kandidat teratas",
   ],
