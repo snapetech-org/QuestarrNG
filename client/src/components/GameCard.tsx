@@ -1,5 +1,5 @@
 import { coverSrc } from "@/lib/cover";
-import React, { useState, memo, useRef, useEffect, lazy, Suspense } from "react";
+import React, { useState, memo, useRef, useEffect, useId, lazy, Suspense } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, Star, Calendar, Eye, EyeOff, Loader2 } from "lucide-react";
@@ -24,7 +24,7 @@ import {
   useRegionalPreference,
 } from "@/lib/regional-format";
 import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
-import { InterfaceText } from "@/components/InterfaceText";
+import { InterfaceRichText, InterfaceText } from "@/components/InterfaceText";
 
 // ⚡ Bolt: Lazy load heavy modal components to reduce initial bundle size.
 // These are only needed when the user interacts with the card.
@@ -54,6 +54,7 @@ const GameCard = ({
   downloadSummary,
 }: GameCardProps) => {
   const { language, t, languageFor, directionFor } = useInterfaceLanguage();
+  const detailsButtonLabelId = useId();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -313,11 +314,16 @@ const GameCard = ({
               event.stopPropagation();
               handleDetailsClick();
             }}
-            aria-label={`View details for ${game.title}`}
-            data-i18n-aria-label={`View details for ${game.title}`}
+            aria-labelledby={detailsButtonLabelId}
             data-testid={`button-details-${game.id}`}
           >
-            {game.title}
+            <span className="sr-only" id={detailsButtonLabelId}>
+              <InterfaceRichText
+                source="interface.view_details_for_title_0a6aaff1"
+                values={{ title: game.title }}
+              />
+            </span>
+            <bdi lang="und" dir="auto">{game.title}</bdi>
           </button>
         </h3>
         <div className="mb-2 flex min-w-0 items-center gap-1 text-[10px] text-muted-foreground sm:gap-2 sm:text-xs">
