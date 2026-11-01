@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { InterfaceText } from "@/components/InterfaceText";
+import { InterfaceRichText, InterfaceText } from "@/components/InterfaceText";
 import { getStatusSourceLabel } from "@/components/StatusBadge";
 import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
 import { formatRegionalNumber, useRegionalPreference } from "@/lib/regional-format";
@@ -127,10 +127,11 @@ export default function GameListsPage() {
       setListName("");
       toast({
         title: formatInterfaceMessage("interface.list_saved_e24d07fe", {}, language),
-        description: formatInterfaceMessage(
-          "interface.name_is_ready_d506004a",
-          { name: list.name },
-          language
+        description: (
+          <InterfaceRichText
+            source="interface.name_is_ready_d506004a"
+            values={{ name: list.name }}
+          />
         ),
       });
     },
@@ -253,61 +254,67 @@ export default function GameListsPage() {
                 <InterfaceText source="interface.your_lists_will_show_up_here_start_54f8f253" />
               </p>
             ) : (
-              lists.map((list) => (
-                <div
-                  key={list.id}
-                  className={`flex items-center gap-1 rounded-md border p-1 ${
-                    list.id === selectedListId
-                      ? "border-primary/50 bg-primary/5"
-                      : "border-transparent"
-                  }`}
-                >
-                  <Button
-                    variant="ghost"
-                    className="min-w-0 flex-1 justify-start truncate text-start"
-                    aria-pressed={list.id === selectedListId}
-                    onClick={() => setSelectedListId(list.id)}
+              lists.map((list) => {
+                const renameLabelId = `rename-list-label-${list.id}`;
+                const deleteLabelId = `delete-list-label-${list.id}`;
+                return (
+                  <div
+                    key={list.id}
+                    className={`flex items-center gap-1 rounded-md border p-1 ${
+                      list.id === selectedListId
+                        ? "border-primary/50 bg-primary/5"
+                        : "border-transparent"
+                    }`}
                   >
-                    <Archive className="me-2 h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span className="truncate">{list.name}</span>
-                    {list.id === selectedListId && !listGamesLoading && (
-                      <span className="ms-auto ps-2 text-xs text-muted-foreground">
-                        {listGames.length}
+                    <Button
+                      variant="ghost"
+                      className="min-w-0 flex-1 justify-start truncate text-start"
+                      aria-pressed={list.id === selectedListId}
+                      onClick={() => setSelectedListId(list.id)}
+                    >
+                      <Archive className="me-2 h-4 w-4 shrink-0 text-muted-foreground" />
+                      <span className="truncate">
+                        <bdi lang="und" dir="auto">{list.name}</bdi>
                       </span>
-                    )}
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-8 w-8 shrink-0"
-                    aria-label={formatInterfaceMessage(
-                      "interface.rename_list_9ff4b40d",
-                      { list: list.name },
-                      language
-                    )}
-                    data-i18n-aria-label="interface.rename_list_9ff4b40d"
-                    data-i18n-aria-label-values={JSON.stringify({ list: list.name })}
-                    onClick={() => openRename(list)}
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
-                    aria-label={formatInterfaceMessage(
-                      "interface.delete_list_0b1eb62e",
-                      { list: list.name },
-                      language
-                    )}
-                    data-i18n-aria-label="interface.delete_list_0b1eb62e"
-                    data-i18n-aria-label-values={JSON.stringify({ list: list.name })}
-                    onClick={() => setDeleteListId(list.id)}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              ))
+                      {list.id === selectedListId && !listGamesLoading && (
+                        <span className="ms-auto ps-2 text-xs text-muted-foreground">
+                          {listGames.length}
+                        </span>
+                      )}
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 shrink-0"
+                      aria-labelledby={renameLabelId}
+                      onClick={() => openRename(list)}
+                    >
+                      <span className="sr-only" id={renameLabelId}>
+                        <InterfaceRichText
+                          source="interface.rename_list_9ff4b40d"
+                          values={{ list: list.name }}
+                        />
+                      </span>
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
+                      aria-labelledby={deleteLabelId}
+                      onClick={() => setDeleteListId(list.id)}
+                    >
+                      <span className="sr-only" id={deleteLabelId}>
+                        <InterfaceRichText
+                          source="interface.delete_list_0b1eb62e"
+                          values={{ list: list.name }}
+                        />
+                      </span>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                );
+              })
             )}
           </CardContent>
         </Card>
@@ -317,7 +324,9 @@ export default function GameListsPage() {
             <>
               <CardHeader className="flex flex-row flex-wrap items-start justify-between gap-3 space-y-0">
                 <div>
-                  <CardTitle>{selectedList.name}</CardTitle>
+                  <CardTitle>
+                    <bdi lang="und" dir="auto">{selectedList.name}</bdi>
+                  </CardTitle>
                   <CardDescription className="mt-1">
                     <InterfaceText
                       source={listGames.length === 1 ? "{count} game" : "{count} games"}
@@ -392,19 +401,19 @@ export default function GameListsPage() {
                           size="sm"
                           variant="ghost"
                           className="shrink-0 text-muted-foreground hover:text-destructive"
-                          aria-label={formatInterfaceMessage(
-                            "interface.remove_game_from_list_6de06d01",
-                            { game: game.title, list: selectedList.name },
-                            language
-                          )}
-                          data-i18n-aria-label="interface.remove_game_from_list_6de06d01"
-                          data-i18n-aria-label-values={JSON.stringify({
-                            game: game.title,
-                            list: selectedList.name,
-                          })}
+                          aria-labelledby={`remove-game-label-${selectedList.id}-${game.id}`}
                           disabled={membershipMutation.isPending}
                           onClick={() => toggleMembership(game.id, false)}
                         >
+                          <span
+                            className="sr-only"
+                            id={`remove-game-label-${selectedList.id}-${game.id}`}
+                          >
+                            <InterfaceRichText
+                              source="interface.remove_game_from_list_6de06d01"
+                              values={{ game: game.title, list: selectedList.name }}
+                            />
+                          </span>
                           <X className="me-1 h-4 w-4" aria-hidden="true" />
                           <InterfaceText source="interface.remove_21a5901d" />
                         </Button>
@@ -451,10 +460,14 @@ export default function GameListsPage() {
               <InterfaceText source="interface.give_it_a_short_name_so_you_can_fi_200b9475" />
             </DialogDescription>
           </DialogHeader>
+          <label htmlFor="game-list-name" className="sr-only">
+            <InterfaceText source="interface.list_name_cf572358" />
+          </label>
           <Input
+            id="game-list-name"
             autoFocus
-            aria-label={formatInterfaceMessage("interface.list_name_cf572358", {}, language)}
-            data-i18n-aria-label="interface.list_name_cf572358"
+            lang="und"
+            dir="auto"
             maxLength={80}
             value={listName}
             onChange={(event) => setListName(event.target.value)}
@@ -489,7 +502,7 @@ export default function GameListsPage() {
           <DialogHeader>
             <DialogTitle>
               {selectedList ? (
-                <InterfaceText
+                <InterfaceRichText
                   source="interface.add_games_to_list_d3414d8c"
                   values={{ list: selectedList.name }}
                 />
@@ -539,12 +552,13 @@ export default function GameListsPage() {
               <div className="divide-y">
                 {filteredLibraryGames.map((game) => {
                   const checked = memberIds.has(game.id);
+                  const selectionLabelId = `game-list-selection-${game.id}-label`;
                   const source = checked ? "Remove {game} from {list}" : "Add {game} to {list}";
                   const values = {
                     game: game.title,
                     list:
                       selectedList?.name ??
-                      formatInterfaceMessage("interface.your_list_10c6b14a", {}, language),
+                      { source: "interface.your_list_10c6b14a" },
                   };
                   return (
                     <label key={game.id} className="flex cursor-pointer items-center gap-3 py-2.5">
@@ -552,10 +566,11 @@ export default function GameListsPage() {
                         checked={checked}
                         disabled={!selectedListId || membershipMutation.isPending}
                         onCheckedChange={(value) => toggleMembership(game.id, value === true)}
-                        aria-label={formatInterfaceMessage(source, values, language)}
-                        data-i18n-aria-label={source}
-                        data-i18n-aria-label-values={JSON.stringify(values)}
+                        aria-labelledby={selectionLabelId}
                       />
+                      <span className="sr-only" id={selectionLabelId}>
+                        <InterfaceRichText source={source} values={values} />
+                      </span>
                       {game.coverUrl ? (
                         <img src={game.coverUrl} alt="" className="h-12 w-9 rounded object-cover" />
                       ) : (

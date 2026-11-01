@@ -1241,7 +1241,7 @@ export default function IndexersPage() {
                         {prowlarrDiagnostics.management.version && (
                           <>
                             {" "}
-                            · <bdi dir="ltr">{prowlarrDiagnostics.management.version}</bdi>
+                            · <bdi dir="ltr" lang="und">{prowlarrDiagnostics.management.version}</bdi>
                           </>
                         )}
                       </>
@@ -1251,7 +1251,10 @@ export default function IndexersPage() {
                         {prowlarrDiagnostics.management.status && (
                           <>
                             {" "}
-                            · HTTP <bdi dir="ltr">{prowlarrDiagnostics.management.status}</bdi>
+                            · HTTP{" "}
+                            <bdi dir="ltr" lang="und">
+                              {prowlarrDiagnostics.management.status}
+                            </bdi>
                           </>
                         )}
                       </>
@@ -1275,7 +1278,9 @@ export default function IndexersPage() {
                         className="flex items-start justify-between gap-3 py-2 text-sm"
                       >
                         <div className="min-w-0">
-                          <div className="truncate font-medium">{item.name}</div>
+                          <div className="truncate font-medium">
+                            <bdi dir="auto" lang="und">{item.name}</bdi>
+                          </div>
                           {item.error && (
                             <div className="text-muted-foreground break-words text-xs">
                               <ApiErrorDetailText
@@ -1293,7 +1298,7 @@ export default function IndexersPage() {
                               {item.status && (
                                 <>
                                   {" "}
-                                  · HTTP <bdi dir="ltr">{item.status}</bdi>
+                                  · HTTP <bdi dir="ltr" lang="und">{item.status}</bdi>
                                 </>
                               )}
                             </>
@@ -1303,7 +1308,7 @@ export default function IndexersPage() {
                               {item.status && (
                                 <>
                                   {" "}
-                                  · HTTP <bdi dir="ltr">{item.status}</bdi>
+                                  · HTTP <bdi dir="ltr" lang="und">{item.status}</bdi>
                                 </>
                               )}
                             </>

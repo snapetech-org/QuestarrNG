@@ -573,6 +573,9 @@ export function RootFolderDiscovery() {
               } else {
                 badgeVariant = "default";
               }
+              const scanStatusLabel = Object.hasOwn(SCAN_STATUS_LABEL_TEXT, p.status)
+                ? SCAN_STATUS_LABEL_TEXT[p.status]
+                : undefined;
 
               return (
                 <div key={p.rootFolderId} className="rounded-md border p-3 space-y-2">
@@ -581,8 +584,8 @@ export function RootFolderDiscovery() {
                       <bdi dir="ltr" lang="und">{p.rootFolderPath}</bdi>
                     </span>
                     <Badge variant={badgeVariant}>
-                      {SCAN_STATUS_LABEL_TEXT[p.status] ? (
-                        <InterfaceText source={SCAN_STATUS_LABEL_TEXT[p.status]} />
+                      {scanStatusLabel ? (
+                        <InterfaceText source={scanStatusLabel} />
                       ) : (
                         <bdi lang="und" dir="auto">{p.status}</bdi>
                       )}
