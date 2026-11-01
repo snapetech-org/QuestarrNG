@@ -22,6 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { InterfaceText } from "@/components/InterfaceText";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
 import {
   RELEASE_FORMAT_FIELD_LABELS,
@@ -37,6 +38,18 @@ const FORMAT_FIELDS: FormatField[] = [
   "indexer",
 ];
 const MATCH_MODES: FormatMatchMode[] = ["contains", "exact", "regex"];
+
+class ReleaseScoringValidationError extends Error {
+  constructor() {
+    super();
+    this.name = "ReleaseScoringValidationError";
+  }
+}
+
+type ReleaseScoringValidationState =
+  | { kind: "profile" }
+  | { kind: "request"; error: unknown };
+
 function termsText(terms: string[]): string {
   return terms.join("\n");
 }
@@ -74,7 +87,7 @@ export default function ReleaseScoringSettings({
   const [enabled, setEnabled] = useState(false);
   const [profile, setProfile] = useState<ReleaseProfile>(DEFAULT_RELEASE_PROFILE);
   const [formats, setFormats] = useState<CustomFormat[]>([]);
-  const [validationMessage, setValidationMessage] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<ReleaseScoringValidationState | null>(null);
 
   useEffect(() => {
     if (!settings || initialized.current) return;
@@ -91,7 +104,7 @@ export default function ReleaseScoringSettings({
     mutationFn: async () => {
       const releaseScoringProfile = JSON.stringify({ profile, formats });
       if (!validateSavedReleaseScoringConfig(releaseScoringProfile)) {
-        throw new Error(t("interface.check_the_scoring_profile_and_cust_5782a7b2"));
+        throw new ReleaseScoringValidationError();
       }
       const response = await apiRequest("PATCH", "/api/settings", {
         releaseScoringEnabled: enabled,
@@ -100,7 +113,7 @@ export default function ReleaseScoringSettings({
       return response.json();
     },
     onSuccess: () => {
-      setValidationMessage(null);
+      setValidationError(null);
       toast({
         title: t("interface.release_scoring_saved_669d0e10"),
         description: enabled
@@ -110,10 +123,17 @@ export default function ReleaseScoringSettings({
       queryClient.invalidateQueries({ queryKey: ["/api/settings"] });
     },
     onError: (error: Error) => {
-      setValidationMessage(t(error.message));
+      const isProfileError = error instanceof ReleaseScoringValidationError;
+      setValidationError(
+        isProfileError ? { kind: "profile" } : { kind: "request", error }
+      );
       toast({
         title: t("interface.could_not_save_release_scoring_30c243e4"),
-        description: t(error.message),
+        description: isProfileError ? (
+          <InterfaceText source="interface.check_the_scoring_profile_and_cust_5782a7b2" />
+        ) : (
+          <ApiErrorDescription error={error} />
+        ),
         variant: "destructive",
       });
     },
@@ -604,9 +624,15 @@ export default function ReleaseScoringSettings({
           )}
         </section>
 
-        {(validationMessage || !isValid) && (
+        {(validationError || !isValid) && (
           <p role="alert" className="text-sm text-destructive">
-            {validationMessage ?? t("interface.complete_each_custom_format_condit_74039cef")}
+            {validationError?.kind === "profile" ? (
+              <InterfaceText source="interface.check_the_scoring_profile_and_cust_5782a7b2" />
+            ) : validationError?.kind === "request" ? (
+              <ApiErrorDescription error={validationError.error} />
+            ) : (
+              <InterfaceText source="interface.complete_each_custom_format_condit_74039cef" />
+            )}
           </p>
         )}
         <div className="flex justify-end border-t pt-4">
