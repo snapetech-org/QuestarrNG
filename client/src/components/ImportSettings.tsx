@@ -23,6 +23,7 @@ import type { IgdbPlatform } from "@shared/platforms";
 import { PathMappingSettings } from "./PathMappingSettings";
 import { FileBrowser } from "./FileBrowser";
 import SecurityScanSettings from "./SecurityScanSettings";
+import { GameLibraryInterchange } from "./GameLibraryInterchange";
 import { InterfaceText } from "@/components/InterfaceText";
 import { formatInterfaceMessage } from "@/lib/interface-locale";
 
@@ -220,8 +221,8 @@ export default function ImportSettings() {
   return (
     <div className="space-y-6">
       <Tabs defaultValue="config" className="w-full">
-        {/* Six tabs wrap into two columns on phones and sit in one row from sm up. */}
-        <TabsList className="grid h-auto w-full grid-cols-2 gap-1 sm:inline-flex sm:h-10 sm:w-auto sm:gap-0">
+        {/* Tabs wrap on phones and remain readable at larger widths. */}
+        <TabsList className="grid h-auto w-full grid-cols-2 gap-1 sm:flex sm:h-auto sm:w-auto sm:flex-wrap sm:gap-1">
           <TabsTrigger value="config">
             <InterfaceText source={"General Config"} />
           </TabsTrigger>
@@ -236,6 +237,9 @@ export default function ImportSettings() {
           </TabsTrigger>
           <TabsTrigger value="discover">
             <InterfaceText source={"Discover"} />
+          </TabsTrigger>
+          <TabsTrigger value="interchange">
+            <InterfaceText source={"Library Interchange"} />
           </TabsTrigger>
           <TabsTrigger value="help">
             <InterfaceText source={"Help"} />
@@ -858,6 +862,10 @@ export default function ImportSettings() {
 
         <TabsContent value="security" className="space-y-4">
           <SecurityScanSettings />
+        </TabsContent>
+
+        <TabsContent value="interchange" className="space-y-4">
+          <GameLibraryInterchange />
         </TabsContent>
 
         <TabsContent value="help" className="space-y-4">
