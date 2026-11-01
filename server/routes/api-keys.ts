@@ -6,6 +6,7 @@ import { generateApiKey } from "../auth.js";
 import { routesLogger as logger } from "../logger.js";
 import { sensitiveEndpointLimiter, validate, validateRequest } from "../middleware.js";
 import { API_KEY_SCOPES } from "../../shared/schema.js";
+import { serviceErrorBody, serviceMessage } from "../../shared/service-messages.js";
 
 // Same shape as sanitizeGameId/sanitizeDownloadId in middleware.ts: api_keys.id
 // is a randomUUID(), so a non-UUID path segment can never match a row and is
@@ -60,7 +61,9 @@ apiKeysRouter.post(
     try {
       const parsed = createKeySchema.safeParse(req.body);
       if (!parsed.success) {
-        return res.status(400).json({ error: parsed.error.issues[0]?.message ?? "Invalid name" });
+        return res
+          .status(400)
+          .json({ error: parsed.error.issues[0]?.message ?? "Invalid name", errorI18n: null });
       }
 
       const userId = req.user!.id;
@@ -84,9 +87,14 @@ apiKeysRouter.post(
         );
       } catch (error) {
         if (error instanceof Error && error.message === "API key limit reached") {
-          return res.status(409).json({
-            error: `You can have at most ${MAX_KEYS_PER_USER} API keys. Revoke one first.`,
-          });
+          return res
+            .status(409)
+            .json(
+              serviceErrorBody(
+                undefined,
+                serviceMessage("service.api_key_limit_reached", { count: MAX_KEYS_PER_USER })
+              )
+            );
         }
         throw error;
       }
@@ -100,7 +108,11 @@ apiKeysRouter.post(
       return res.status(201).json({ ...created, key: rawKey });
     } catch (error) {
       logger.error({ error }, "Failed to create API key");
-      return res.status(500).json({ error: "Failed to create API key" });
+      return res
+        .status(500)
+        .json(
+          serviceErrorBody(undefined, serviceMessage("service.api_failed_to_create_api_key", {}))
+        );
     }
   }
 );
@@ -116,13 +128,19 @@ apiKeysRouter.delete(
       const userId = req.user!.id;
       const removed = await storage.removeApiKey(id, userId);
       if (!removed) {
-        return res.status(404).json({ error: "API key not found" });
+        return res
+          .status(404)
+          .json(serviceErrorBody(undefined, serviceMessage("service.api_api_key_not_found", {})));
       }
       logger.info({ userId, apiKeyId: id }, "Integration API key revoked");
       return res.status(204).send();
     } catch (error) {
       logger.error({ error }, "Failed to revoke API key");
-      return res.status(500).json({ error: "Failed to revoke API key" });
+      return res
+        .status(500)
+        .json(
+          serviceErrorBody(undefined, serviceMessage("service.api_failed_to_revoke_api_key", {}))
+        );
     }
   }
 );

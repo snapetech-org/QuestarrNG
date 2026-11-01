@@ -2978,6 +2978,35 @@ export const STABLE_INTERFACE_MESSAGES = {
   "service.import_game_unresolved": "Could not resolve game",
   "service.import_downloader_missing": "Downloader not found",
   "service.import_igdb_match_missing": "No IGDB match found",
+  "service.api_key_limit_reached": "You can have at most {count} API keys. Revoke one first.",
+  "service.api_failed_to_create_api_key": "Failed to create API key",
+  "service.api_api_key_not_found": "API key not found",
+  "service.api_failed_to_revoke_api_key": "Failed to revoke API key",
+  "service.api_failed_to_create_path_mapping": "Failed to create path mapping",
+  "service.api_mapping_not_found": "Mapping not found",
+  "service.api_failed_to_update_path_mapping": "Failed to update path mapping",
+  "service.api_failed_to_delete_path_mapping": "Failed to delete path mapping",
+  "service.api_download_not_found": "Download not found",
+  "service.api_download_was_linked_to_a_game_before_it_could_be_skipped":
+    "Download was linked to a game before it could be skipped",
+  "service.api_internal_server_error": "Internal server error",
+  "service.api_this_download_does_not_need_to_be_linked_to_a_game":
+    "This download does not need to be linked to a game",
+  "service.api_this_download_was_already_linked_to_a_game_by_another_request":
+    "This download was already linked to a game by another request",
+  "service.api_romm_imports_are_disabled": "RomM imports are disabled",
+  "service.api_igdb_search_failed": "IGDB search failed",
+  "service.api_invalid_proposed_path": "Invalid proposed path",
+  "service.api_archive_password_rejected":
+    "The provided password was rejected — it may be incorrect.",
+  "service.api_archive_password_required":
+    "This archive is password-protected — a password is required to extract it.",
+  "service.api_import_incomplete_scan_confirmation": "{reason} Confirm again to import it anyway.",
+  "service.api_import_source_path_unresolved":
+    "Source path could not be resolved — the download may no longer be tracked by the download client. Please specify the source path manually.",
+  "service.api_import_download_missing": "Download {downloadId} not found",
+  "service.api_import_game_for_download_missing": "Game not found for download {downloadId}",
+  "service.api_import_source_path_missing": "Source path not found: {path}",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

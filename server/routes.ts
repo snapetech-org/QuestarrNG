@@ -2818,7 +2818,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .json(
             notFound
               ? serviceErrorBody(error, serviceMessage("service.unmatched_entry_missing", {}))
-              : { error: "IGDB search failed" }
+              : serviceErrorBody(undefined, serviceMessage("service.api_igdb_search_failed", {}))
           );
       }
     }
@@ -2851,10 +2851,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           msg === "No matching unmatched entry for this root folder";
         res
           .status(notFound ? 404 : 500)
-          .json({
-            error: msg,
-            errorI18n: persistedServiceMessage(msg, serviceErrorMetadata(error)).errorMessageI18n,
-          });
+          .json(serviceErrorBody(error, serviceMessage("interface.unknown_error_ce512b43", {})));
       }
     }
   );

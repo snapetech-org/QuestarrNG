@@ -3,6 +3,7 @@ import {
   serviceErrorBody,
   serviceErrorValue,
   serializeServiceMessageDescriptor,
+  type ServiceMessageDescriptor,
 } from "../shared/service-messages.js";
 import crypto from "node:crypto";
 import net from "node:net";
@@ -56,6 +57,7 @@ export interface ScanResult {
   incomplete?: boolean;
   source?: ScanVerdictSource;
   reason?: string;
+  reasonI18n?: ServiceMessageDescriptor | null;
   hash?: string;
 }
 

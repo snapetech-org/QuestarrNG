@@ -1,3 +1,4 @@
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import { getRegionalLocale } from "@/lib/regional-format";
 import { useCallback, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -87,7 +88,7 @@ export function ApiKeysCard() {
     onError: (error: Error) => {
       toast({
         title: "Could not create API key",
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },
@@ -104,7 +105,7 @@ export function ApiKeysCard() {
     onError: (error: Error) => {
       toast({
         title: "Could not revoke API key",
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },

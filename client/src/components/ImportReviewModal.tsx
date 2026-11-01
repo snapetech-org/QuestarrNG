@@ -1,3 +1,4 @@
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import { useState, useEffect, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -151,11 +152,7 @@ export default function ImportReviewModal({
     onError: (error: Error) => {
       toast({
         title: localizedText("interface.failed_to_skip_import_c4cf8271"),
-        description: (
-          <span lang="und" dir="auto">
-            {error.message}
-          </span>
-        ),
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },
@@ -185,11 +182,7 @@ export default function ImportReviewModal({
     onError: (error: Error & { data?: { passwordRequired?: boolean } }) => {
       toast({
         title: localizedText(error.data?.passwordRequired ? "Incorrect Password" : "Import Failed"),
-        description: (
-          <span lang="und" dir="auto">
-            {error.message}
-          </span>
-        ),
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },

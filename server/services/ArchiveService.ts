@@ -1,3 +1,8 @@
+import {
+  serviceMessage,
+  tagServiceMessageError,
+  type ServiceMessageFragment,
+} from "../../shared/service-messages.js";
 import { execFile } from "node:child_process";
 import { accessSync, constants as fsConstants } from "node:fs";
 import path from "node:path";
@@ -52,7 +57,12 @@ function delay(ms: number): Promise<void> {
 // Marks errors that retrying can never fix (missing binary, unsupported format) so the
 // integrity-test retry loop below can fail fast on them instead of burning several seconds
 // re-running a check that will deterministically fail the same way every time.
-class NonRetryableArchiveError extends Error {}
+class NonRetryableArchiveError extends Error {
+  constructor(message: string | ServiceMessageFragment = "", options?: ErrorOptions) {
+    super(typeof message === "string" ? message : message.message, options);
+    if (typeof message !== "string") tagServiceMessageError(this, message);
+  }
+}
 
 // A password-protected archive fails the exact same way every attempt — retrying it burns
 // the same ~11s of delay as a genuinely corrupt archive for no benefit, and the generic
@@ -60,7 +70,12 @@ class NonRetryableArchiveError extends Error {}
 // is actively wrong for this case (the archive is fine, it's just encrypted). Callers
 // (ImportManager) catch this specifically to route the download to manual review with a
 // password prompt instead of the generic failure message.
-export class ArchivePasswordRequiredError extends Error {}
+export class ArchivePasswordRequiredError extends Error {
+  constructor(message: string | ServiceMessageFragment = "", options?: ErrorOptions) {
+    super(typeof message === "string" ? message : message.message, options);
+    if (typeof message !== "string") tagServiceMessageError(this, message);
+  }
+}
 
 // Both unrar and 7-Zip mention "password" in every message they produce for an encrypted
 // archive they can't read (unrar: e.g. a prompt-refusal or "wrong password" notice; 7-Zip:
@@ -378,9 +393,12 @@ export class ArchiveService {
     }
     if (err instanceof Error && isPasswordProtectedError(err.message)) {
       throw new ArchivePasswordRequiredError(
-        password
-          ? "The provided password was rejected — it may be incorrect."
-          : "This archive is password-protected — a password is required to extract it."
+        serviceMessage(
+          password
+            ? "service.api_archive_password_rejected"
+            : "service.api_archive_password_required",
+          {}
+        )
       );
     }
   }

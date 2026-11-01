@@ -1,3 +1,4 @@
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -139,7 +140,11 @@ export function PathMappingSettings() {
       closeDialog(false);
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({
+        title: "Error",
+        description: <ApiErrorDescription error={error} />,
+        variant: "destructive",
+      });
     },
   });
 
@@ -153,7 +158,11 @@ export function PathMappingSettings() {
       closeDialog(false);
     },
     onError: (error: Error) => {
-      toast({ title: "Update Failed", description: error.message, variant: "destructive" });
+      toast({
+        title: "Update Failed",
+        description: <ApiErrorDescription error={error} />,
+        variant: "destructive",
+      });
     },
   });
 
@@ -168,7 +177,12 @@ export function PathMappingSettings() {
     onError: (error: Error) => {
       toast({
         title: "Delete Failed",
-        description: error.message || "Failed to delete path mapping.",
+        description: (
+          <ApiErrorDescription
+            error={error}
+            fallbackSource="interface.failed_to_delete_path_mapping_5c3be505"
+          />
+        ),
         variant: "destructive",
       });
     },

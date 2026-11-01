@@ -3442,6 +3442,236 @@
       "codeStatus": "implemented; existing tests preserved; source/catalog checks only; private ephemeral JIT functional validation pending",
       "targetStatus": "source-fallback",
       "directTargetCells": 12
+    },
+    {
+      "key": "service.api_key_limit_reached",
+      "source": "You can have at most {count} API keys. Revoke one first.",
+      "kind": "source-owned UI-consumed route/API error",
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_failed_to_create_api_key",
+      "source": "Failed to create API key",
+      "kind": "source-owned UI-consumed route/API error",
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_api_key_not_found",
+      "source": "API key not found",
+      "kind": "source-owned UI-consumed route/API error",
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_failed_to_revoke_api_key",
+      "source": "Failed to revoke API key",
+      "kind": "source-owned UI-consumed route/API error",
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_failed_to_create_path_mapping",
+      "source": "Failed to create path mapping",
+      "kind": "source-owned UI-consumed route/API error",
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_mapping_not_found",
+      "source": "Mapping not found",
+      "kind": "source-owned UI-consumed route/API error",
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_failed_to_update_path_mapping",
+      "source": "Failed to update path mapping",
+      "kind": "source-owned UI-consumed route/API error",
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_failed_to_delete_path_mapping",
+      "source": "Failed to delete path mapping",
+      "kind": "source-owned UI-consumed route/API error",
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_download_not_found",
+      "source": "Download not found",
+      "kind": "source-owned UI-consumed route/API error",
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_download_was_linked_to_a_game_before_it_could_be_skipped",
+      "source": "Download was linked to a game before it could be skipped",
+      "kind": "source-owned UI-consumed route/API error",
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_internal_server_error",
+      "source": "Internal server error",
+      "kind": "source-owned UI-consumed route/API error",
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_this_download_does_not_need_to_be_linked_to_a_game",
+      "source": "This download does not need to be linked to a game",
+      "kind": "source-owned UI-consumed route/API error",
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_this_download_was_already_linked_to_a_game_by_another_request",
+      "source": "This download was already linked to a game by another request",
+      "kind": "source-owned UI-consumed route/API error",
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_romm_imports_are_disabled",
+      "source": "RomM imports are disabled",
+      "kind": "source-owned UI-consumed route/API error",
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_igdb_search_failed",
+      "source": "IGDB search failed",
+      "kind": "source-owned UI-consumed route/API error",
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_invalid_proposed_path",
+      "source": "Invalid proposed path",
+      "kind": "source-owned UI-consumed route/API error",
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_archive_password_rejected",
+      "source": "The provided password was rejected — it may be incorrect.",
+      "kind": "source-owned import/archive API error producer",
+      "owners": ["server/services/ArchiveService.ts", "server/services/ImportManager.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_archive_password_required",
+      "source": "This archive is password-protected — a password is required to extract it.",
+      "kind": "source-owned import/archive API error producer",
+      "owners": ["server/services/ArchiveService.ts", "server/services/ImportManager.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_import_incomplete_scan_confirmation",
+      "source": "{reason} Confirm again to import it anyway.",
+      "kind": "source-owned import/archive API error producer",
+      "owners": ["server/services/ArchiveService.ts", "server/services/ImportManager.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_import_source_path_unresolved",
+      "source": "Source path could not be resolved — the download may no longer be tracked by the download client. Please specify the source path manually.",
+      "kind": "source-owned import/archive API error producer",
+      "owners": ["server/services/ArchiveService.ts", "server/services/ImportManager.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_import_download_missing",
+      "source": "Download {downloadId} not found",
+      "kind": "source-owned import/archive API error producer",
+      "owners": ["server/services/ArchiveService.ts", "server/services/ImportManager.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_import_game_for_download_missing",
+      "source": "Game not found for download {downloadId}",
+      "kind": "source-owned import/archive API error producer",
+      "owners": ["server/services/ArchiveService.ts", "server/services/ImportManager.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_import_source_path_missing",
+      "source": "Source path not found: {path}",
+      "kind": "source-owned import/archive API error producer",
+      "owners": ["server/services/ArchiveService.ts", "server/services/ImportManager.ts"],
+      "coverage": [],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
     }
   ],
   "codeUnits": [

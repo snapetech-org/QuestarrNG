@@ -1,3 +1,4 @@
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import { useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -78,11 +79,7 @@ export default function LinkGameModal({
     onError: (error: Error) => {
       toast({
         title: localizedText("interface.failed_to_link_game_87d41db3"),
-        description: (
-          <span lang="und" dir="auto">
-            {error.message}
-          </span>
-        ),
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },

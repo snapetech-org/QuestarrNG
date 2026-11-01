@@ -24,6 +24,17 @@ export interface ServiceMessageResult extends ServiceMessageMetadata {
   message: string;
 }
 type Parameters = Record<string, string | number | ServiceMessageFragment>;
+const taggedErrorDescriptors = new WeakMap<Error, ServiceMessageDescriptor>();
+/** Explicit app constructors may tag legacy Error subclasses without changing their type. */
+export function tagServiceMessageError<T extends Error>(
+  error: T,
+  fragment: ServiceMessageFragment
+): T {
+  const descriptor = matchingServiceMessageDescriptor(error.message, fragment);
+  if (descriptor) taggedErrorDescriptors.set(error, descriptor);
+  else taggedErrorDescriptors.delete(error);
+  return error;
+}
 const PLACEHOLDER = /\{([A-Za-z][A-Za-z0-9_]*)\}/g;
 export function isServiceMessageKey(value: unknown): value is ServiceMessageKey {
   return typeof value === "string" && Object.hasOwn(SERVICE_MESSAGE_SOURCES, value);
@@ -78,8 +89,8 @@ export class ServiceMessageError extends Error implements ServiceMessageDescript
   }
 }
 export function serviceErrorValue(error: unknown): string | ServiceMessageFragment {
-  if (error instanceof ServiceMessageError) {
-    const descriptor = matchingServiceMessageDescriptor(error.message, error);
+  if (error instanceof Error) {
+    const descriptor = matchingServiceMessageDescriptor(error.message, serviceErrorMetadata(error));
     if (descriptor) return { message: error.message, ...descriptor };
   }
   return error instanceof Error
@@ -87,8 +98,9 @@ export function serviceErrorValue(error: unknown): string | ServiceMessageFragme
     : serviceMessage("interface.unknown_error_ce512b43", {});
 }
 export function serviceErrorMetadata(error: unknown): ServiceMessageMetadata {
-  if (!(error instanceof ServiceMessageError)) return {};
-  return matchingServiceMessageDescriptor(error.message, error) ?? {};
+  if (!(error instanceof Error)) return {};
+  const metadata = error instanceof ServiceMessageError ? error : taggedErrorDescriptors.get(error);
+  return matchingServiceMessageDescriptor(error.message, metadata) ?? {};
 }
 /** Retain explicit matching metadata; never infer ownership from a bare diagnostic. */
 export function serviceMessageValue(

@@ -1,3 +1,10 @@
+import {
+  ServiceMessageError,
+  serviceMessage,
+  serviceMessageValue,
+  tagServiceMessageError,
+  type ServiceMessageFragment,
+} from "../../shared/service-messages.js";
 import { type IStorage } from "../storage.js";
 import { PathMappingService } from "./PathMappingService.js";
 import { PlatformMappingService } from "./PlatformMappingService.js";
@@ -109,7 +116,12 @@ function isStrictPathAncestor(parentPath: string, childPath: string): boolean {
 export const ARCHIVE_PASSWORD_REQUIRED_PREFIX = "ARCHIVE_PASSWORD_REQUIRED:";
 
 /** Thrown when a confirmation is the first to learn the security scan was incomplete. */
-export class IncompleteScanError extends Error {}
+export class IncompleteScanError extends Error {
+  constructor(message: string | ServiceMessageFragment = "", options?: ErrorOptions) {
+    super(typeof message === "string" ? message : message.message, options);
+    if (typeof message !== "string") tagServiceMessageError(this, message);
+  }
+}
 
 interface ArchiveResolution {
   archivePath: string;
@@ -1192,15 +1204,17 @@ export class ImportManager {
     totalCount: number;
   }> {
     const download = await this.storage.getGameDownload(downloadId, callerUserId);
-    if (!download) throw new Error(`Download ${downloadId} not found`);
+    if (!download)
+      throw new ServiceMessageError("service.api_import_download_missing", { downloadId });
 
     const game = await this.storage.getGame(download.gameId);
-    if (!game) throw new Error(`Game not found for download ${downloadId}`);
+    if (!game)
+      throw new ServiceMessageError("service.api_import_game_for_download_missing", { downloadId });
 
     const config = await this.storage.getImportConfig(game.userId ?? undefined);
     const rommConfig = await this.storage.getRomMConfig(game.userId ?? callerUserId ?? "");
     if (requestedStrategy === "romm" && !rommConfig.enabled) {
-      throw new Error("RomM imports are disabled");
+      throw new ServiceMessageError("service.api_romm_imports_are_disabled", {});
     }
     const rommSlug =
       requestedStrategy === "romm"
@@ -1315,7 +1329,7 @@ export class ImportManager {
     const download = await this.storage.getGameDownload(downloadId, callerUserId);
 
     if (!download) {
-      throw new Error(`Download ${downloadId} not found`);
+      throw new ServiceMessageError("service.api_import_download_missing", { downloadId });
     }
 
     // Defense in depth: the client hides the Review action for a quarantined
@@ -1337,9 +1351,7 @@ export class ImportManager {
     );
 
     if (!resolvedOriginalPath) {
-      throw new Error(
-        "Source path could not be resolved — the download may no longer be tracked by the download client. Please specify the source path manually."
-      );
+      throw new ServiceMessageError("service.api_import_source_path_unresolved", {});
     }
 
     // Before the existence probe below: overridePlan.originalPath can come from a
@@ -1351,18 +1363,20 @@ export class ImportManager {
     );
 
     if (!(await fs.pathExists(safeOriginalPath))) {
-      throw new Error(`Source path not found: ${safeOriginalPath}`);
+      throw new ServiceMessageError("service.api_import_source_path_missing", {
+        path: safeOriginalPath,
+      });
     }
 
     const game = await this.storage.getGame(download.gameId);
     if (!game) {
-      throw new Error(`Game not found for download ${downloadId}`);
+      throw new ServiceMessageError("service.api_import_game_for_download_missing", { downloadId });
     }
 
     const config = await this.storage.getImportConfig(game.userId ?? undefined);
     const rommConfig = await this.storage.getRomMConfig(game.userId ?? callerUserId ?? "");
     if (overridePlan.strategy === "romm" && !rommConfig.enabled) {
-      throw new Error("RomM imports are disabled");
+      throw new ServiceMessageError("service.api_romm_imports_are_disabled", {});
     }
     const targetRoot =
       overridePlan.strategy === "romm" ? rommConfig.libraryRoot : config.libraryRoot;
@@ -1389,7 +1403,11 @@ export class ImportManager {
       // now and stop, so the next confirmation is an informed one.
       if (download.status !== "manual_review_required" || download.errorMessage !== reason) {
         await this.storage.updateGameDownloadStatus(downloadId, "manual_review_required", reason);
-        throw new IncompleteScanError(`${reason} Confirm again to import it anyway.`);
+        throw new IncompleteScanError(
+          serviceMessage("service.api_import_incomplete_scan_confirmation", {
+            reason: serviceMessageValue(reason, scanResult.reasonI18n),
+          })
+        );
       }
       logger.warn(
         { downloadId, reason: scanResult.reason },
