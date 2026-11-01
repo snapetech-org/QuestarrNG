@@ -381,7 +381,9 @@ export default function GameListsPage() {
                           </div>
                         )}
                         <div className="min-w-0 flex-1">
-                          <p className="truncate font-medium">{game.title}</p>
+                          <p className="truncate font-medium">
+                            <bdi lang="und" dir="auto">{game.title}</bdi>
+                          </p>
                           <p className="text-xs capitalize text-muted-foreground">
                             <GameStatusText status={game.status} />
                           </p>
@@ -562,7 +564,7 @@ export default function GameListsPage() {
                         </div>
                       )}
                       <span className="min-w-0 flex-1 truncate text-sm font-medium">
-                        {game.title}
+                        <bdi lang="und" dir="auto">{game.title}</bdi>
                       </span>
                       <span className="text-xs capitalize text-muted-foreground">
                         <GameStatusText status={game.status} />

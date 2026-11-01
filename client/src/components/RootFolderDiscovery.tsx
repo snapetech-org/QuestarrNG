@@ -581,7 +581,11 @@ export function RootFolderDiscovery() {
                       <bdi dir="ltr" lang="und">{p.rootFolderPath}</bdi>
                     </span>
                     <Badge variant={badgeVariant}>
-                      <InterfaceText source={SCAN_STATUS_LABEL_TEXT[p.status] ?? p.status} />
+                      {SCAN_STATUS_LABEL_TEXT[p.status] ? (
+                        <InterfaceText source={SCAN_STATUS_LABEL_TEXT[p.status]} />
+                      ) : (
+                        <bdi lang="und" dir="auto">{p.status}</bdi>
+                      )}
                     </Badge>
                   </div>
                   {p.totalCandidates > 0 && (
