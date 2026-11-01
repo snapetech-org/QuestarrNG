@@ -1,5 +1,6 @@
 import fs from "fs-extra";
 import path from "node:path";
+import { serviceMessageError, type ServiceMessageFragment } from "../shared/service-messages.js";
 
 const SENSITIVE_PATH_PREFIXES = ["/proc", "/sys", "/dev", "/run/secrets", "/etc", "/root"];
 
@@ -44,7 +45,7 @@ export function isSensitivePath(rawPath: string): boolean {
 export async function assertWithinRoots(
   candidatePath: string,
   roots: string[],
-  errorMessage: string
+  errorMessage: string | ServiceMessageFragment
 ): Promise<string> {
   // No path mappings means the downloader's local path is trusted wholesale; callers
   // intentionally preserve that existing configuration mode.
@@ -93,8 +94,12 @@ export async function assertWithinRoots(
       ) {
         return canonicalCandidate;
       }
-      throw new Error(errorMessage);
+      throw typeof errorMessage === "string"
+        ? new Error(errorMessage)
+        : serviceMessageError(errorMessage);
     }
   }
-  throw new Error(errorMessage);
+  throw typeof errorMessage === "string"
+    ? new Error(errorMessage)
+    : serviceMessageError(errorMessage);
 }

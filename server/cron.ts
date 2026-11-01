@@ -1562,8 +1562,8 @@ async function recoverInterruptedImport(download: GameDownload): Promise<void> {
   await storage.updateGameDownloadStatus(
     download.id,
     "manual_review_required",
-    "The import was interrupted before it finished (Questarr was probably restarted). " +
-      "Review it to run the import again."
+    serviceMessage("service.import_interrupted", {}).message,
+    serializeServiceMessageDescriptor(serviceMessage("service.import_interrupted", {}))
   );
   const game = await storage.getGame(download.gameId);
   notifyUser("downloadUpdate", download.gameId, game?.userId);
@@ -1625,8 +1625,8 @@ async function handleProbablyFinishedDisappearance(
   await storage.updateGameDownloadStatus(
     download.id,
     "manual_review_required",
-    "The download client removed this download once it finished, so its files could not " +
-      "be located automatically. Review it and point the import at the downloaded files."
+    serviceMessage("service.import_removed_before_locating", {}).message,
+    serializeServiceMessageDescriptor(serviceMessage("service.import_removed_before_locating", {}))
   );
   notifyUser("downloadUpdate", download.gameId, game?.userId);
   try {

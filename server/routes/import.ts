@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   persistedServiceMessage,
+  matchingServiceMessageDescriptor,
   serviceErrorBody,
   serviceMessage,
   ServiceMessageError,
@@ -527,6 +528,15 @@ importRouter.get("/pending", async (_req, res) => {
       pathReviews.map(async (d) => {
         const game = await storage.getGame(d.gameId);
         const passwordRequired = !!d.errorMessage?.startsWith(ARCHIVE_PASSWORD_REQUIRED_PREFIX);
+        const storedDescriptor =
+          d.errorMessage === null
+            ? undefined
+            : matchingServiceMessageDescriptor(d.errorMessage, d.errorMessageI18n);
+        const displayedMetadata = passwordRequired
+          ? storedDescriptor?.messageKey === "service.import_archive_password_marker"
+            ? storedDescriptor.messageDetails?.detail
+            : undefined
+          : d.errorMessageI18n;
         return {
           id: d.id,
           gameTitle: game?.title || d.downloadTitle,
@@ -538,7 +548,7 @@ importRouter.get("/pending", async (_req, res) => {
             passwordRequired
               ? (d.errorMessage?.slice(ARCHIVE_PASSWORD_REQUIRED_PREFIX.length) ?? null)
               : d.errorMessage,
-            d.errorMessageI18n
+            displayedMetadata
           ),
           passwordRequired,
         };
@@ -752,12 +762,10 @@ importRouter.post("/:id/confirm", validate(confirmImportBodySchema), async (req,
       return res.status(400).json({ error: error.issues, errorI18n: null });
     }
     if (error instanceof ArchivePasswordRequiredError) {
-      return res
-        .status(400)
-        .json({
-          ...serviceErrorBody(error, serviceMessage("interface.unknown_error_ce512b43", {})),
-          passwordRequired: true,
-        });
+      return res.status(400).json({
+        ...serviceErrorBody(error, serviceMessage("interface.unknown_error_ce512b43", {})),
+        passwordRequired: true,
+      });
     }
     if (error instanceof IncompleteScanError) {
       return res

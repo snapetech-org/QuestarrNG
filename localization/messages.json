@@ -33667,25 +33667,6 @@
         "fr-CA": "chinois simplifié"
       }
     },
-    "interface.chinese_traditional_1def26cf": {
-      "source": "繁體中文 — Chinese (Traditional)",
-      "translations": {
-        "es": "chino tradicional",
-        "zh-Hans": "繁体中文",
-        "hi": "पारंपरिक चीनी",
-        "de": "Traditionelles Chinesisch",
-        "ja": "繁体字中国語",
-        "fr": "chinois traditionnel",
-        "pt-BR": "chinês tradicional",
-        "ar": "الصينية التقليدية",
-        "ko": "번체 중국어",
-        "zh-Hant": "繁體中文",
-        "vi": "tiếng Trung phồn thể",
-        "id": "Bahasa Mandarin Tradisional",
-        "es-419": "chino tradicional",
-        "fr-CA": "chinois traditionnel"
-      }
-    },
     "interface.add_value_to_wanted_list_791eb955": {
       "source": "Add \"{value}\" to wanted list",
       "translations": {
@@ -48029,6 +48010,1241 @@
         "zh-Hant": "Source path not found: {path}",
         "vi": "Source path not found: {path}",
         "id": "Source path not found: {path}"
+      }
+    },
+    "service.archive_tool_failed": {
+      "source": "{tool} failed: {detail}",
+      "translations": {
+        "es": "{tool} failed: {detail}",
+        "es-419": "{tool} failed: {detail}",
+        "zh-Hans": "{tool} failed: {detail}",
+        "hi": "{tool} failed: {detail}",
+        "de": "{tool} failed: {detail}",
+        "ja": "{tool} failed: {detail}",
+        "fr": "{tool} failed: {detail}",
+        "fr-CA": "{tool} failed: {detail}",
+        "pt-BR": "{tool} failed: {detail}",
+        "ar": "{tool} failed: {detail}",
+        "ko": "{tool} failed: {detail}",
+        "zh-Hant": "{tool} failed: {detail}",
+        "vi": "{tool} failed: {detail}",
+        "id": "{tool} failed: {detail}"
+      }
+    },
+    "service.archive_seven_zip_missing": {
+      "source": "Archive extraction requires 7-Zip but no binary was found. Install the `7zip` apk package or set SEVENZIP_PATH.",
+      "translations": {
+        "es": "Archive extraction requires 7-Zip but no binary was found. Install the `7zip` apk package or set SEVENZIP_PATH.",
+        "es-419": "Archive extraction requires 7-Zip but no binary was found. Install the `7zip` apk package or set SEVENZIP_PATH.",
+        "zh-Hans": "Archive extraction requires 7-Zip but no binary was found. Install the `7zip` apk package or set SEVENZIP_PATH.",
+        "hi": "Archive extraction requires 7-Zip but no binary was found. Install the `7zip` apk package or set SEVENZIP_PATH.",
+        "de": "Archive extraction requires 7-Zip but no binary was found. Install the `7zip` apk package or set SEVENZIP_PATH.",
+        "ja": "Archive extraction requires 7-Zip but no binary was found. Install the `7zip` apk package or set SEVENZIP_PATH.",
+        "fr": "Archive extraction requires 7-Zip but no binary was found. Install the `7zip` apk package or set SEVENZIP_PATH.",
+        "fr-CA": "Archive extraction requires 7-Zip but no binary was found. Install the `7zip` apk package or set SEVENZIP_PATH.",
+        "pt-BR": "Archive extraction requires 7-Zip but no binary was found. Install the `7zip` apk package or set SEVENZIP_PATH.",
+        "ar": "Archive extraction requires 7-Zip but no binary was found. Install the `7zip` apk package or set SEVENZIP_PATH.",
+        "ko": "Archive extraction requires 7-Zip but no binary was found. Install the `7zip` apk package or set SEVENZIP_PATH.",
+        "zh-Hant": "Archive extraction requires 7-Zip but no binary was found. Install the `7zip` apk package or set SEVENZIP_PATH.",
+        "vi": "Archive extraction requires 7-Zip but no binary was found. Install the `7zip` apk package or set SEVENZIP_PATH.",
+        "id": "Archive extraction requires 7-Zip but no binary was found. Install the `7zip` apk package or set SEVENZIP_PATH."
+      }
+    },
+    "service.archive_unrar_missing": {
+      "source": "RAR archive detected but no unrar binary was found. Install it (see Dockerfile) or set UNRAR_PATH.",
+      "translations": {
+        "es": "RAR archive detected but no unrar binary was found. Install it (see Dockerfile) or set UNRAR_PATH.",
+        "es-419": "RAR archive detected but no unrar binary was found. Install it (see Dockerfile) or set UNRAR_PATH.",
+        "zh-Hans": "RAR archive detected but no unrar binary was found. Install it (see Dockerfile) or set UNRAR_PATH.",
+        "hi": "RAR archive detected but no unrar binary was found. Install it (see Dockerfile) or set UNRAR_PATH.",
+        "de": "RAR archive detected but no unrar binary was found. Install it (see Dockerfile) or set UNRAR_PATH.",
+        "ja": "RAR archive detected but no unrar binary was found. Install it (see Dockerfile) or set UNRAR_PATH.",
+        "fr": "RAR archive detected but no unrar binary was found. Install it (see Dockerfile) or set UNRAR_PATH.",
+        "fr-CA": "RAR archive detected but no unrar binary was found. Install it (see Dockerfile) or set UNRAR_PATH.",
+        "pt-BR": "RAR archive detected but no unrar binary was found. Install it (see Dockerfile) or set UNRAR_PATH.",
+        "ar": "RAR archive detected but no unrar binary was found. Install it (see Dockerfile) or set UNRAR_PATH.",
+        "ko": "RAR archive detected but no unrar binary was found. Install it (see Dockerfile) or set UNRAR_PATH.",
+        "zh-Hant": "RAR archive detected but no unrar binary was found. Install it (see Dockerfile) or set UNRAR_PATH.",
+        "vi": "RAR archive detected but no unrar binary was found. Install it (see Dockerfile) or set UNRAR_PATH.",
+        "id": "RAR archive detected but no unrar binary was found. Install it (see Dockerfile) or set UNRAR_PATH."
+      }
+    },
+    "service.archive_unsafe_entry_path": {
+      "source": "Archive contains an unsafe file path.",
+      "translations": {
+        "es": "Archive contains an unsafe file path.",
+        "es-419": "Archive contains an unsafe file path.",
+        "zh-Hans": "Archive contains an unsafe file path.",
+        "hi": "Archive contains an unsafe file path.",
+        "de": "Archive contains an unsafe file path.",
+        "ja": "Archive contains an unsafe file path.",
+        "fr": "Archive contains an unsafe file path.",
+        "fr-CA": "Archive contains an unsafe file path.",
+        "pt-BR": "Archive contains an unsafe file path.",
+        "ar": "Archive contains an unsafe file path.",
+        "ko": "Archive contains an unsafe file path.",
+        "zh-Hant": "Archive contains an unsafe file path.",
+        "vi": "Archive contains an unsafe file path.",
+        "id": "Archive contains an unsafe file path."
+      }
+    },
+    "service.archive_too_many_entries": {
+      "source": "Archive contains too many entries (limit: {limit}).",
+      "translations": {
+        "es": "Archive contains too many entries (limit: {limit}).",
+        "es-419": "Archive contains too many entries (limit: {limit}).",
+        "zh-Hans": "Archive contains too many entries (limit: {limit}).",
+        "hi": "Archive contains too many entries (limit: {limit}).",
+        "de": "Archive contains too many entries (limit: {limit}).",
+        "ja": "Archive contains too many entries (limit: {limit}).",
+        "fr": "Archive contains too many entries (limit: {limit}).",
+        "fr-CA": "Archive contains too many entries (limit: {limit}).",
+        "pt-BR": "Archive contains too many entries (limit: {limit}).",
+        "ar": "Archive contains too many entries (limit: {limit}).",
+        "ko": "Archive contains too many entries (limit: {limit}).",
+        "zh-Hant": "Archive contains too many entries (limit: {limit}).",
+        "vi": "Archive contains too many entries (limit: {limit}).",
+        "id": "Archive contains too many entries (limit: {limit})."
+      }
+    },
+    "service.archive_invalid_entry_size": {
+      "source": "Archive contains an entry with an invalid uncompressed size.",
+      "translations": {
+        "es": "Archive contains an entry with an invalid uncompressed size.",
+        "es-419": "Archive contains an entry with an invalid uncompressed size.",
+        "zh-Hans": "Archive contains an entry with an invalid uncompressed size.",
+        "hi": "Archive contains an entry with an invalid uncompressed size.",
+        "de": "Archive contains an entry with an invalid uncompressed size.",
+        "ja": "Archive contains an entry with an invalid uncompressed size.",
+        "fr": "Archive contains an entry with an invalid uncompressed size.",
+        "fr-CA": "Archive contains an entry with an invalid uncompressed size.",
+        "pt-BR": "Archive contains an entry with an invalid uncompressed size.",
+        "ar": "Archive contains an entry with an invalid uncompressed size.",
+        "ko": "Archive contains an entry with an invalid uncompressed size.",
+        "zh-Hant": "Archive contains an entry with an invalid uncompressed size.",
+        "vi": "Archive contains an entry with an invalid uncompressed size.",
+        "id": "Archive contains an entry with an invalid uncompressed size."
+      }
+    },
+    "service.archive_link_entry_refused": {
+      "source": "Archive contains a symbolic or hard link, which is not extracted.",
+      "translations": {
+        "es": "Archive contains a symbolic or hard link, which is not extracted.",
+        "es-419": "Archive contains a symbolic or hard link, which is not extracted.",
+        "zh-Hans": "Archive contains a symbolic or hard link, which is not extracted.",
+        "hi": "Archive contains a symbolic or hard link, which is not extracted.",
+        "de": "Archive contains a symbolic or hard link, which is not extracted.",
+        "ja": "Archive contains a symbolic or hard link, which is not extracted.",
+        "fr": "Archive contains a symbolic or hard link, which is not extracted.",
+        "fr-CA": "Archive contains a symbolic or hard link, which is not extracted.",
+        "pt-BR": "Archive contains a symbolic or hard link, which is not extracted.",
+        "ar": "Archive contains a symbolic or hard link, which is not extracted.",
+        "ko": "Archive contains a symbolic or hard link, which is not extracted.",
+        "zh-Hant": "Archive contains a symbolic or hard link, which is not extracted.",
+        "vi": "Archive contains a symbolic or hard link, which is not extracted.",
+        "id": "Archive contains a symbolic or hard link, which is not extracted."
+      }
+    },
+    "service.archive_entry_outside_directory": {
+      "source": "Archive contains a file path outside the extraction directory.",
+      "translations": {
+        "es": "Archive contains a file path outside the extraction directory.",
+        "es-419": "Archive contains a file path outside the extraction directory.",
+        "zh-Hans": "Archive contains a file path outside the extraction directory.",
+        "hi": "Archive contains a file path outside the extraction directory.",
+        "de": "Archive contains a file path outside the extraction directory.",
+        "ja": "Archive contains a file path outside the extraction directory.",
+        "fr": "Archive contains a file path outside the extraction directory.",
+        "fr-CA": "Archive contains a file path outside the extraction directory.",
+        "pt-BR": "Archive contains a file path outside the extraction directory.",
+        "ar": "Archive contains a file path outside the extraction directory.",
+        "ko": "Archive contains a file path outside the extraction directory.",
+        "zh-Hant": "Archive contains a file path outside the extraction directory.",
+        "vi": "Archive contains a file path outside the extraction directory.",
+        "id": "Archive contains a file path outside the extraction directory."
+      }
+    },
+    "service.archive_expanded_limit_exceeded": {
+      "source": "Archive expands beyond the configured size limit ({bytes} bytes).",
+      "translations": {
+        "es": "Archive expands beyond the configured size limit ({bytes} bytes).",
+        "es-419": "Archive expands beyond the configured size limit ({bytes} bytes).",
+        "zh-Hans": "Archive expands beyond the configured size limit ({bytes} bytes).",
+        "hi": "Archive expands beyond the configured size limit ({bytes} bytes).",
+        "de": "Archive expands beyond the configured size limit ({bytes} bytes).",
+        "ja": "Archive expands beyond the configured size limit ({bytes} bytes).",
+        "fr": "Archive expands beyond the configured size limit ({bytes} bytes).",
+        "fr-CA": "Archive expands beyond the configured size limit ({bytes} bytes).",
+        "pt-BR": "Archive expands beyond the configured size limit ({bytes} bytes).",
+        "ar": "Archive expands beyond the configured size limit ({bytes} bytes).",
+        "ko": "Archive expands beyond the configured size limit ({bytes} bytes).",
+        "zh-Hant": "Archive expands beyond the configured size limit ({bytes} bytes).",
+        "vi": "Archive expands beyond the configured size limit ({bytes} bytes).",
+        "id": "Archive expands beyond the configured size limit ({bytes} bytes)."
+      }
+    },
+    "service.archive_corrupt_or_incomplete": {
+      "source": "{detail} (the archive is corrupt or incomplete — re-download the release, extraction cannot recover this file)",
+      "translations": {
+        "es": "{detail} (the archive is corrupt or incomplete — re-download the release, extraction cannot recover this file)",
+        "es-419": "{detail} (the archive is corrupt or incomplete — re-download the release, extraction cannot recover this file)",
+        "zh-Hans": "{detail} (the archive is corrupt or incomplete — re-download the release, extraction cannot recover this file)",
+        "hi": "{detail} (the archive is corrupt or incomplete — re-download the release, extraction cannot recover this file)",
+        "de": "{detail} (the archive is corrupt or incomplete — re-download the release, extraction cannot recover this file)",
+        "ja": "{detail} (the archive is corrupt or incomplete — re-download the release, extraction cannot recover this file)",
+        "fr": "{detail} (the archive is corrupt or incomplete — re-download the release, extraction cannot recover this file)",
+        "fr-CA": "{detail} (the archive is corrupt or incomplete — re-download the release, extraction cannot recover this file)",
+        "pt-BR": "{detail} (the archive is corrupt or incomplete — re-download the release, extraction cannot recover this file)",
+        "ar": "{detail} (the archive is corrupt or incomplete — re-download the release, extraction cannot recover this file)",
+        "ko": "{detail} (the archive is corrupt or incomplete — re-download the release, extraction cannot recover this file)",
+        "zh-Hant": "{detail} (the archive is corrupt or incomplete — re-download the release, extraction cannot recover this file)",
+        "vi": "{detail} (the archive is corrupt or incomplete — re-download the release, extraction cannot recover this file)",
+        "id": "{detail} (the archive is corrupt or incomplete — re-download the release, extraction cannot recover this file)"
+      }
+    },
+    "service.archive_reserved_staging_name": {
+      "source": "Archive contains \"{name}\", a name reserved for Questarr's extraction staging directory",
+      "translations": {
+        "es": "Archive contains \"{name}\", a name reserved for Questarr's extraction staging directory",
+        "es-419": "Archive contains \"{name}\", a name reserved for Questarr's extraction staging directory",
+        "zh-Hans": "Archive contains \"{name}\", a name reserved for Questarr's extraction staging directory",
+        "hi": "Archive contains \"{name}\", a name reserved for Questarr's extraction staging directory",
+        "de": "Archive contains \"{name}\", a name reserved for Questarr's extraction staging directory",
+        "ja": "Archive contains \"{name}\", a name reserved for Questarr's extraction staging directory",
+        "fr": "Archive contains \"{name}\", a name reserved for Questarr's extraction staging directory",
+        "fr-CA": "Archive contains \"{name}\", a name reserved for Questarr's extraction staging directory",
+        "pt-BR": "Archive contains \"{name}\", a name reserved for Questarr's extraction staging directory",
+        "ar": "Archive contains \"{name}\", a name reserved for Questarr's extraction staging directory",
+        "ko": "Archive contains \"{name}\", a name reserved for Questarr's extraction staging directory",
+        "zh-Hant": "Archive contains \"{name}\", a name reserved for Questarr's extraction staging directory",
+        "vi": "Archive contains \"{name}\", a name reserved for Questarr's extraction staging directory",
+        "id": "Archive contains \"{name}\", a name reserved for Questarr's extraction staging directory"
+      }
+    },
+    "service.archive_destination_symlink": {
+      "source": "Cannot extract into {path}: it is a symbolic link — replace it with a real directory and retry",
+      "translations": {
+        "es": "Cannot extract into {path}: it is a symbolic link — replace it with a real directory and retry",
+        "es-419": "Cannot extract into {path}: it is a symbolic link — replace it with a real directory and retry",
+        "zh-Hans": "Cannot extract into {path}: it is a symbolic link — replace it with a real directory and retry",
+        "hi": "Cannot extract into {path}: it is a symbolic link — replace it with a real directory and retry",
+        "de": "Cannot extract into {path}: it is a symbolic link — replace it with a real directory and retry",
+        "ja": "Cannot extract into {path}: it is a symbolic link — replace it with a real directory and retry",
+        "fr": "Cannot extract into {path}: it is a symbolic link — replace it with a real directory and retry",
+        "fr-CA": "Cannot extract into {path}: it is a symbolic link — replace it with a real directory and retry",
+        "pt-BR": "Cannot extract into {path}: it is a symbolic link — replace it with a real directory and retry",
+        "ar": "Cannot extract into {path}: it is a symbolic link — replace it with a real directory and retry",
+        "ko": "Cannot extract into {path}: it is a symbolic link — replace it with a real directory and retry",
+        "zh-Hant": "Cannot extract into {path}: it is a symbolic link — replace it with a real directory and retry",
+        "vi": "Cannot extract into {path}: it is a symbolic link — replace it with a real directory and retry",
+        "id": "Cannot extract into {path}: it is a symbolic link — replace it with a real directory and retry"
+      }
+    },
+    "service.archive_directory_over_file": {
+      "source": "Cannot extract directory over existing file {path} — move or delete it and retry",
+      "translations": {
+        "es": "Cannot extract directory over existing file {path} — move or delete it and retry",
+        "es-419": "Cannot extract directory over existing file {path} — move or delete it and retry",
+        "zh-Hans": "Cannot extract directory over existing file {path} — move or delete it and retry",
+        "hi": "Cannot extract directory over existing file {path} — move or delete it and retry",
+        "de": "Cannot extract directory over existing file {path} — move or delete it and retry",
+        "ja": "Cannot extract directory over existing file {path} — move or delete it and retry",
+        "fr": "Cannot extract directory over existing file {path} — move or delete it and retry",
+        "fr-CA": "Cannot extract directory over existing file {path} — move or delete it and retry",
+        "pt-BR": "Cannot extract directory over existing file {path} — move or delete it and retry",
+        "ar": "Cannot extract directory over existing file {path} — move or delete it and retry",
+        "ko": "Cannot extract directory over existing file {path} — move or delete it and retry",
+        "zh-Hant": "Cannot extract directory over existing file {path} — move or delete it and retry",
+        "vi": "Cannot extract directory over existing file {path} — move or delete it and retry",
+        "id": "Cannot extract directory over existing file {path} — move or delete it and retry"
+      }
+    },
+    "service.archive_file_over_directory": {
+      "source": "Cannot extract file over existing directory {path} — move or delete it and retry",
+      "translations": {
+        "es": "Cannot extract file over existing directory {path} — move or delete it and retry",
+        "es-419": "Cannot extract file over existing directory {path} — move or delete it and retry",
+        "zh-Hans": "Cannot extract file over existing directory {path} — move or delete it and retry",
+        "hi": "Cannot extract file over existing directory {path} — move or delete it and retry",
+        "de": "Cannot extract file over existing directory {path} — move or delete it and retry",
+        "ja": "Cannot extract file over existing directory {path} — move or delete it and retry",
+        "fr": "Cannot extract file over existing directory {path} — move or delete it and retry",
+        "fr-CA": "Cannot extract file over existing directory {path} — move or delete it and retry",
+        "pt-BR": "Cannot extract file over existing directory {path} — move or delete it and retry",
+        "ar": "Cannot extract file over existing directory {path} — move or delete it and retry",
+        "ko": "Cannot extract file over existing directory {path} — move or delete it and retry",
+        "zh-Hant": "Cannot extract file over existing directory {path} — move or delete it and retry",
+        "vi": "Cannot extract file over existing directory {path} — move or delete it and retry",
+        "id": "Cannot extract file over existing directory {path} — move or delete it and retry"
+      }
+    },
+    "service.archive_rollback_originals_retained": {
+      "source": "{count} original file(s) that could not be restored are kept in {path}",
+      "translations": {
+        "es": "{count} original file(s) that could not be restored are kept in {path}",
+        "es-419": "{count} original file(s) that could not be restored are kept in {path}",
+        "zh-Hans": "{count} original file(s) that could not be restored are kept in {path}",
+        "hi": "{count} original file(s) that could not be restored are kept in {path}",
+        "de": "{count} original file(s) that could not be restored are kept in {path}",
+        "ja": "{count} original file(s) that could not be restored are kept in {path}",
+        "fr": "{count} original file(s) that could not be restored are kept in {path}",
+        "fr-CA": "{count} original file(s) that could not be restored are kept in {path}",
+        "pt-BR": "{count} original file(s) that could not be restored are kept in {path}",
+        "ar": "{count} original file(s) that could not be restored are kept in {path}",
+        "ko": "{count} original file(s) that could not be restored are kept in {path}",
+        "zh-Hant": "{count} original file(s) that could not be restored are kept in {path}",
+        "vi": "{count} original file(s) that could not be restored are kept in {path}",
+        "id": "{count} original file(s) that could not be restored are kept in {path}"
+      }
+    },
+    "service.archive_rollback_extracted_remaining": {
+      "source": "extracted file(s) that could not be removed: {paths}",
+      "translations": {
+        "es": "extracted file(s) that could not be removed: {paths}",
+        "es-419": "extracted file(s) that could not be removed: {paths}",
+        "zh-Hans": "extracted file(s) that could not be removed: {paths}",
+        "hi": "extracted file(s) that could not be removed: {paths}",
+        "de": "extracted file(s) that could not be removed: {paths}",
+        "ja": "extracted file(s) that could not be removed: {paths}",
+        "fr": "extracted file(s) that could not be removed: {paths}",
+        "fr-CA": "extracted file(s) that could not be removed: {paths}",
+        "pt-BR": "extracted file(s) that could not be removed: {paths}",
+        "ar": "extracted file(s) that could not be removed: {paths}",
+        "ko": "extracted file(s) that could not be removed: {paths}",
+        "zh-Hant": "extracted file(s) that could not be removed: {paths}",
+        "vi": "extracted file(s) that could not be removed: {paths}",
+        "id": "extracted file(s) that could not be removed: {paths}"
+      }
+    },
+    "service.archive_rollback_incomplete": {
+      "source": "{detail} (rollback incomplete: {problems})",
+      "translations": {
+        "es": "{detail} (rollback incomplete: {problems})",
+        "es-419": "{detail} (rollback incomplete: {problems})",
+        "zh-Hans": "{detail} (rollback incomplete: {problems})",
+        "hi": "{detail} (rollback incomplete: {problems})",
+        "de": "{detail} (rollback incomplete: {problems})",
+        "ja": "{detail} (rollback incomplete: {problems})",
+        "fr": "{detail} (rollback incomplete: {problems})",
+        "fr-CA": "{detail} (rollback incomplete: {problems})",
+        "pt-BR": "{detail} (rollback incomplete: {problems})",
+        "ar": "{detail} (rollback incomplete: {problems})",
+        "ko": "{detail} (rollback incomplete: {problems})",
+        "zh-Hant": "{detail} (rollback incomplete: {problems})",
+        "vi": "{detail} (rollback incomplete: {problems})",
+        "id": "{detail} (rollback incomplete: {problems})"
+      }
+    },
+    "service.transfer_non_directory_path": {
+      "source": "Refusing to transfer through a non-directory or symlinked path: {path}",
+      "translations": {
+        "es": "Refusing to transfer through a non-directory or symlinked path: {path}",
+        "es-419": "Refusing to transfer through a non-directory or symlinked path: {path}",
+        "zh-Hans": "Refusing to transfer through a non-directory or symlinked path: {path}",
+        "hi": "Refusing to transfer through a non-directory or symlinked path: {path}",
+        "de": "Refusing to transfer through a non-directory or symlinked path: {path}",
+        "ja": "Refusing to transfer through a non-directory or symlinked path: {path}",
+        "fr": "Refusing to transfer through a non-directory or symlinked path: {path}",
+        "fr-CA": "Refusing to transfer through a non-directory or symlinked path: {path}",
+        "pt-BR": "Refusing to transfer through a non-directory or symlinked path: {path}",
+        "ar": "Refusing to transfer through a non-directory or symlinked path: {path}",
+        "ko": "Refusing to transfer through a non-directory or symlinked path: {path}",
+        "zh-Hant": "Refusing to transfer through a non-directory or symlinked path: {path}",
+        "vi": "Refusing to transfer through a non-directory or symlinked path: {path}",
+        "id": "Refusing to transfer through a non-directory or symlinked path: {path}"
+      }
+    },
+    "service.transfer_hardlink_overlap": {
+      "source": "Source and destination directories must not overlap for a hardlink transfer: {source} -> {destination}",
+      "translations": {
+        "es": "Source and destination directories must not overlap for a hardlink transfer: {source} -> {destination}",
+        "es-419": "Source and destination directories must not overlap for a hardlink transfer: {source} -> {destination}",
+        "zh-Hans": "Source and destination directories must not overlap for a hardlink transfer: {source} -> {destination}",
+        "hi": "Source and destination directories must not overlap for a hardlink transfer: {source} -> {destination}",
+        "de": "Source and destination directories must not overlap for a hardlink transfer: {source} -> {destination}",
+        "ja": "Source and destination directories must not overlap for a hardlink transfer: {source} -> {destination}",
+        "fr": "Source and destination directories must not overlap for a hardlink transfer: {source} -> {destination}",
+        "fr-CA": "Source and destination directories must not overlap for a hardlink transfer: {source} -> {destination}",
+        "pt-BR": "Source and destination directories must not overlap for a hardlink transfer: {source} -> {destination}",
+        "ar": "Source and destination directories must not overlap for a hardlink transfer: {source} -> {destination}",
+        "ko": "Source and destination directories must not overlap for a hardlink transfer: {source} -> {destination}",
+        "zh-Hant": "Source and destination directories must not overlap for a hardlink transfer: {source} -> {destination}",
+        "vi": "Source and destination directories must not overlap for a hardlink transfer: {source} -> {destination}",
+        "id": "Source and destination directories must not overlap for a hardlink transfer: {source} -> {destination}"
+      }
+    },
+    "service.transfer_destination_exists": {
+      "source": "Destination already exists, refusing to overwrite: {path}",
+      "translations": {
+        "es": "Destination already exists, refusing to overwrite: {path}",
+        "es-419": "Destination already exists, refusing to overwrite: {path}",
+        "zh-Hans": "Destination already exists, refusing to overwrite: {path}",
+        "hi": "Destination already exists, refusing to overwrite: {path}",
+        "de": "Destination already exists, refusing to overwrite: {path}",
+        "ja": "Destination already exists, refusing to overwrite: {path}",
+        "fr": "Destination already exists, refusing to overwrite: {path}",
+        "fr-CA": "Destination already exists, refusing to overwrite: {path}",
+        "pt-BR": "Destination already exists, refusing to overwrite: {path}",
+        "ar": "Destination already exists, refusing to overwrite: {path}",
+        "ko": "Destination already exists, refusing to overwrite: {path}",
+        "zh-Hant": "Destination already exists, refusing to overwrite: {path}",
+        "vi": "Destination already exists, refusing to overwrite: {path}",
+        "id": "Destination already exists, refusing to overwrite: {path}"
+      }
+    },
+    "service.transfer_no_files_after_exclusions": {
+      "source": "No files to transfer after applying exclusions",
+      "translations": {
+        "es": "No files to transfer after applying exclusions",
+        "es-419": "No files to transfer after applying exclusions",
+        "zh-Hans": "No files to transfer after applying exclusions",
+        "hi": "No files to transfer after applying exclusions",
+        "de": "No files to transfer after applying exclusions",
+        "ja": "No files to transfer after applying exclusions",
+        "fr": "No files to transfer after applying exclusions",
+        "fr-CA": "No files to transfer after applying exclusions",
+        "pt-BR": "No files to transfer after applying exclusions",
+        "ar": "No files to transfer after applying exclusions",
+        "ko": "No files to transfer after applying exclusions",
+        "zh-Hant": "No files to transfer after applying exclusions",
+        "vi": "No files to transfer after applying exclusions",
+        "id": "No files to transfer after applying exclusions"
+      }
+    },
+    "service.import_sensitive_path_refused": {
+      "source": "Refusing to process a sensitive system path",
+      "translations": {
+        "es": "Refusing to process a sensitive system path",
+        "es-419": "Refusing to process a sensitive system path",
+        "zh-Hans": "Refusing to process a sensitive system path",
+        "hi": "Refusing to process a sensitive system path",
+        "de": "Refusing to process a sensitive system path",
+        "ja": "Refusing to process a sensitive system path",
+        "fr": "Refusing to process a sensitive system path",
+        "fr-CA": "Refusing to process a sensitive system path",
+        "pt-BR": "Refusing to process a sensitive system path",
+        "ar": "Refusing to process a sensitive system path",
+        "ko": "Refusing to process a sensitive system path",
+        "zh-Hant": "Refusing to process a sensitive system path",
+        "vi": "Refusing to process a sensitive system path",
+        "id": "Refusing to process a sensitive system path"
+      }
+    },
+    "service.transfer_path_outside_review": {
+      "source": "Import path escapes review root: {path}",
+      "translations": {
+        "es": "Import path escapes review root: {path}",
+        "es-419": "Import path escapes review root: {path}",
+        "zh-Hans": "Import path escapes review root: {path}",
+        "hi": "Import path escapes review root: {path}",
+        "de": "Import path escapes review root: {path}",
+        "ja": "Import path escapes review root: {path}",
+        "fr": "Import path escapes review root: {path}",
+        "fr-CA": "Import path escapes review root: {path}",
+        "pt-BR": "Import path escapes review root: {path}",
+        "ar": "Import path escapes review root: {path}",
+        "ko": "Import path escapes review root: {path}",
+        "zh-Hant": "Import path escapes review root: {path}",
+        "vi": "Import path escapes review root: {path}",
+        "id": "Import path escapes review root: {path}"
+      }
+    },
+    "service.transfer_duplicate_sorted_destination": {
+      "source": "Duplicate sortExtras destination: {path}",
+      "translations": {
+        "es": "Duplicate sortExtras destination: {path}",
+        "es-419": "Duplicate sortExtras destination: {path}",
+        "zh-Hans": "Duplicate sortExtras destination: {path}",
+        "hi": "Duplicate sortExtras destination: {path}",
+        "de": "Duplicate sortExtras destination: {path}",
+        "ja": "Duplicate sortExtras destination: {path}",
+        "fr": "Duplicate sortExtras destination: {path}",
+        "fr-CA": "Duplicate sortExtras destination: {path}",
+        "pt-BR": "Duplicate sortExtras destination: {path}",
+        "ar": "Duplicate sortExtras destination: {path}",
+        "ko": "Duplicate sortExtras destination: {path}",
+        "zh-Hant": "Duplicate sortExtras destination: {path}",
+        "vi": "Duplicate sortExtras destination: {path}",
+        "id": "Duplicate sortExtras destination: {path}"
+      }
+    },
+    "service.transfer_source_outside_roots": {
+      "source": "Refusing to process a path outside the configured downloader roots",
+      "translations": {
+        "es": "Refusing to process a path outside the configured downloader roots",
+        "es-419": "Refusing to process a path outside the configured downloader roots",
+        "zh-Hans": "Refusing to process a path outside the configured downloader roots",
+        "hi": "Refusing to process a path outside the configured downloader roots",
+        "de": "Refusing to process a path outside the configured downloader roots",
+        "ja": "Refusing to process a path outside the configured downloader roots",
+        "fr": "Refusing to process a path outside the configured downloader roots",
+        "fr-CA": "Refusing to process a path outside the configured downloader roots",
+        "pt-BR": "Refusing to process a path outside the configured downloader roots",
+        "ar": "Refusing to process a path outside the configured downloader roots",
+        "ko": "Refusing to process a path outside the configured downloader roots",
+        "zh-Hant": "Refusing to process a path outside the configured downloader roots",
+        "vi": "Refusing to process a path outside the configured downloader roots",
+        "id": "Refusing to process a path outside the configured downloader roots"
+      }
+    },
+    "service.transfer_destination_outside_library": {
+      "source": "Computed destination escapes the configured library root",
+      "translations": {
+        "es": "Computed destination escapes the configured library root",
+        "es-419": "Computed destination escapes the configured library root",
+        "zh-Hans": "Computed destination escapes the configured library root",
+        "hi": "Computed destination escapes the configured library root",
+        "de": "Computed destination escapes the configured library root",
+        "ja": "Computed destination escapes the configured library root",
+        "fr": "Computed destination escapes the configured library root",
+        "fr-CA": "Computed destination escapes the configured library root",
+        "pt-BR": "Computed destination escapes the configured library root",
+        "ar": "Computed destination escapes the configured library root",
+        "ko": "Computed destination escapes the configured library root",
+        "zh-Hant": "Computed destination escapes the configured library root",
+        "vi": "Computed destination escapes the configured library root",
+        "id": "Computed destination escapes the configured library root"
+      }
+    },
+    "service.transfer_duplicate_import_destination": {
+      "source": "Duplicate import destination: {path}",
+      "translations": {
+        "es": "Duplicate import destination: {path}",
+        "es-419": "Duplicate import destination: {path}",
+        "zh-Hans": "Duplicate import destination: {path}",
+        "hi": "Duplicate import destination: {path}",
+        "de": "Duplicate import destination: {path}",
+        "ja": "Duplicate import destination: {path}",
+        "fr": "Duplicate import destination: {path}",
+        "fr-CA": "Duplicate import destination: {path}",
+        "pt-BR": "Duplicate import destination: {path}",
+        "ar": "Duplicate import destination: {path}",
+        "ko": "Duplicate import destination: {path}",
+        "zh-Hant": "Duplicate import destination: {path}",
+        "vi": "Duplicate import destination: {path}",
+        "id": "Duplicate import destination: {path}"
+      }
+    },
+    "service.romm_platform_outside_library": {
+      "source": "Resolved RomM platform directory escapes library root",
+      "translations": {
+        "es": "Resolved RomM platform directory escapes library root",
+        "es-419": "Resolved RomM platform directory escapes library root",
+        "zh-Hans": "Resolved RomM platform directory escapes library root",
+        "hi": "Resolved RomM platform directory escapes library root",
+        "de": "Resolved RomM platform directory escapes library root",
+        "ja": "Resolved RomM platform directory escapes library root",
+        "fr": "Resolved RomM platform directory escapes library root",
+        "fr-CA": "Resolved RomM platform directory escapes library root",
+        "pt-BR": "Resolved RomM platform directory escapes library root",
+        "ar": "Resolved RomM platform directory escapes library root",
+        "ko": "Resolved RomM platform directory escapes library root",
+        "zh-Hant": "Resolved RomM platform directory escapes library root",
+        "vi": "Resolved RomM platform directory escapes library root",
+        "id": "Resolved RomM platform directory escapes library root"
+      }
+    },
+    "service.romm_slug_required": {
+      "source": "RomM fs_slug is required",
+      "translations": {
+        "es": "RomM fs_slug is required",
+        "es-419": "RomM fs_slug is required",
+        "zh-Hans": "RomM fs_slug is required",
+        "hi": "RomM fs_slug is required",
+        "de": "RomM fs_slug is required",
+        "ja": "RomM fs_slug is required",
+        "fr": "RomM fs_slug is required",
+        "fr-CA": "RomM fs_slug is required",
+        "pt-BR": "RomM fs_slug is required",
+        "ar": "RomM fs_slug is required",
+        "ko": "RomM fs_slug is required",
+        "zh-Hant": "RomM fs_slug is required",
+        "vi": "RomM fs_slug is required",
+        "id": "RomM fs_slug is required"
+      }
+    },
+    "service.romm_slug_path_separators": {
+      "source": "RomM fs_slug must not contain path separators",
+      "translations": {
+        "es": "RomM fs_slug must not contain path separators",
+        "es-419": "RomM fs_slug must not contain path separators",
+        "zh-Hans": "RomM fs_slug must not contain path separators",
+        "hi": "RomM fs_slug must not contain path separators",
+        "de": "RomM fs_slug must not contain path separators",
+        "ja": "RomM fs_slug must not contain path separators",
+        "fr": "RomM fs_slug must not contain path separators",
+        "fr-CA": "RomM fs_slug must not contain path separators",
+        "pt-BR": "RomM fs_slug must not contain path separators",
+        "ar": "RomM fs_slug must not contain path separators",
+        "ko": "RomM fs_slug must not contain path separators",
+        "zh-Hant": "RomM fs_slug must not contain path separators",
+        "vi": "RomM fs_slug must not contain path separators",
+        "id": "RomM fs_slug must not contain path separators"
+      }
+    },
+    "service.romm_slug_traversal": {
+      "source": "RomM fs_slug must not contain traversal segments",
+      "translations": {
+        "es": "RomM fs_slug must not contain traversal segments",
+        "es-419": "RomM fs_slug must not contain traversal segments",
+        "zh-Hans": "RomM fs_slug must not contain traversal segments",
+        "hi": "RomM fs_slug must not contain traversal segments",
+        "de": "RomM fs_slug must not contain traversal segments",
+        "ja": "RomM fs_slug must not contain traversal segments",
+        "fr": "RomM fs_slug must not contain traversal segments",
+        "fr-CA": "RomM fs_slug must not contain traversal segments",
+        "pt-BR": "RomM fs_slug must not contain traversal segments",
+        "ar": "RomM fs_slug must not contain traversal segments",
+        "ko": "RomM fs_slug must not contain traversal segments",
+        "zh-Hant": "RomM fs_slug must not contain traversal segments",
+        "vi": "RomM fs_slug must not contain traversal segments",
+        "id": "RomM fs_slug must not contain traversal segments"
+      }
+    },
+    "service.romm_slug_invalid_characters": {
+      "source": "RomM fs_slug contains invalid characters",
+      "translations": {
+        "es": "RomM fs_slug contains invalid characters",
+        "es-419": "RomM fs_slug contains invalid characters",
+        "zh-Hans": "RomM fs_slug contains invalid characters",
+        "hi": "RomM fs_slug contains invalid characters",
+        "de": "RomM fs_slug contains invalid characters",
+        "ja": "RomM fs_slug contains invalid characters",
+        "fr": "RomM fs_slug contains invalid characters",
+        "fr-CA": "RomM fs_slug contains invalid characters",
+        "pt-BR": "RomM fs_slug contains invalid characters",
+        "ar": "RomM fs_slug contains invalid characters",
+        "ko": "RomM fs_slug contains invalid characters",
+        "zh-Hant": "RomM fs_slug contains invalid characters",
+        "vi": "RomM fs_slug contains invalid characters",
+        "id": "RomM fs_slug contains invalid characters"
+      }
+    },
+    "service.romm_binding_missing": {
+      "source": "No RomM binding configured for slug '{slug}'",
+      "translations": {
+        "es": "No RomM binding configured for slug '{slug}'",
+        "es-419": "No RomM binding configured for slug '{slug}'",
+        "zh-Hans": "No RomM binding configured for slug '{slug}'",
+        "hi": "No RomM binding configured for slug '{slug}'",
+        "de": "No RomM binding configured for slug '{slug}'",
+        "ja": "No RomM binding configured for slug '{slug}'",
+        "fr": "No RomM binding configured for slug '{slug}'",
+        "fr-CA": "No RomM binding configured for slug '{slug}'",
+        "pt-BR": "No RomM binding configured for slug '{slug}'",
+        "ar": "No RomM binding configured for slug '{slug}'",
+        "ko": "No RomM binding configured for slug '{slug}'",
+        "zh-Hant": "No RomM binding configured for slug '{slug}'",
+        "vi": "No RomM binding configured for slug '{slug}'",
+        "id": "No RomM binding configured for slug '{slug}'"
+      }
+    },
+    "service.import_romm_destination_exists": {
+      "source": "RomM destination already exists: {path}",
+      "translations": {
+        "es": "RomM destination already exists: {path}",
+        "es-419": "RomM destination already exists: {path}",
+        "zh-Hans": "RomM destination already exists: {path}",
+        "hi": "RomM destination already exists: {path}",
+        "de": "RomM destination already exists: {path}",
+        "ja": "RomM destination already exists: {path}",
+        "fr": "RomM destination already exists: {path}",
+        "fr-CA": "RomM destination already exists: {path}",
+        "pt-BR": "RomM destination already exists: {path}",
+        "ar": "RomM destination already exists: {path}",
+        "ko": "RomM destination already exists: {path}",
+        "zh-Hant": "RomM destination already exists: {path}",
+        "vi": "RomM destination already exists: {path}",
+        "id": "RomM destination already exists: {path}"
+      }
+    },
+    "service.import_romm_destination_unavailable": {
+      "source": "Could not find a free RomM destination for {path}",
+      "translations": {
+        "es": "Could not find a free RomM destination for {path}",
+        "es-419": "Could not find a free RomM destination for {path}",
+        "zh-Hans": "Could not find a free RomM destination for {path}",
+        "hi": "Could not find a free RomM destination for {path}",
+        "de": "Could not find a free RomM destination for {path}",
+        "ja": "Could not find a free RomM destination for {path}",
+        "fr": "Could not find a free RomM destination for {path}",
+        "fr-CA": "Could not find a free RomM destination for {path}",
+        "pt-BR": "Could not find a free RomM destination for {path}",
+        "ar": "Could not find a free RomM destination for {path}",
+        "ko": "Could not find a free RomM destination for {path}",
+        "zh-Hant": "Could not find a free RomM destination for {path}",
+        "vi": "Could not find a free RomM destination for {path}",
+        "id": "Could not find a free RomM destination for {path}"
+      }
+    },
+    "service.import_parent_source_refused": {
+      "source": "Source path cannot be a parent of this download's folder. Select only this download's file or folder.",
+      "translations": {
+        "es": "Source path cannot be a parent of this download's folder. Select only this download's file or folder.",
+        "es-419": "Source path cannot be a parent of this download's folder. Select only this download's file or folder.",
+        "zh-Hans": "Source path cannot be a parent of this download's folder. Select only this download's file or folder.",
+        "hi": "Source path cannot be a parent of this download's folder. Select only this download's file or folder.",
+        "de": "Source path cannot be a parent of this download's folder. Select only this download's file or folder.",
+        "ja": "Source path cannot be a parent of this download's folder. Select only this download's file or folder.",
+        "fr": "Source path cannot be a parent of this download's folder. Select only this download's file or folder.",
+        "fr-CA": "Source path cannot be a parent of this download's folder. Select only this download's file or folder.",
+        "pt-BR": "Source path cannot be a parent of this download's folder. Select only this download's file or folder.",
+        "ar": "Source path cannot be a parent of this download's folder. Select only this download's file or folder.",
+        "ko": "Source path cannot be a parent of this download's folder. Select only this download's file or folder.",
+        "zh-Hant": "Source path cannot be a parent of this download's folder. Select only this download's file or folder.",
+        "vi": "Source path cannot be a parent of this download's folder. Select only this download's file or folder.",
+        "id": "Source path cannot be a parent of this download's folder. Select only this download's file or folder."
+      }
+    },
+    "service.import_manual_source_outside_root": {
+      "source": "Manual source path must remain inside a configured download root",
+      "translations": {
+        "es": "Manual source path must remain inside a configured download root",
+        "es-419": "Manual source path must remain inside a configured download root",
+        "zh-Hans": "Manual source path must remain inside a configured download root",
+        "hi": "Manual source path must remain inside a configured download root",
+        "de": "Manual source path must remain inside a configured download root",
+        "ja": "Manual source path must remain inside a configured download root",
+        "fr": "Manual source path must remain inside a configured download root",
+        "fr-CA": "Manual source path must remain inside a configured download root",
+        "pt-BR": "Manual source path must remain inside a configured download root",
+        "ar": "Manual source path must remain inside a configured download root",
+        "ko": "Manual source path must remain inside a configured download root",
+        "zh-Hant": "Manual source path must remain inside a configured download root",
+        "vi": "Manual source path must remain inside a configured download root",
+        "id": "Manual source path must remain inside a configured download root"
+      }
+    },
+    "service.import_tracked_path_outside_root": {
+      "source": "Tracked download path is outside the configured download roots",
+      "translations": {
+        "es": "Tracked download path is outside the configured download roots",
+        "es-419": "Tracked download path is outside the configured download roots",
+        "zh-Hans": "Tracked download path is outside the configured download roots",
+        "hi": "Tracked download path is outside the configured download roots",
+        "de": "Tracked download path is outside the configured download roots",
+        "ja": "Tracked download path is outside the configured download roots",
+        "fr": "Tracked download path is outside the configured download roots",
+        "fr-CA": "Tracked download path is outside the configured download roots",
+        "pt-BR": "Tracked download path is outside the configured download roots",
+        "ar": "Tracked download path is outside the configured download roots",
+        "ko": "Tracked download path is outside the configured download roots",
+        "zh-Hant": "Tracked download path is outside the configured download roots",
+        "vi": "Tracked download path is outside the configured download roots",
+        "id": "Tracked download path is outside the configured download roots"
+      }
+    },
+    "service.import_manual_source_outside_download": {
+      "source": "Manual source path must remain inside the tracked download directory",
+      "translations": {
+        "es": "Manual source path must remain inside the tracked download directory",
+        "es-419": "Manual source path must remain inside the tracked download directory",
+        "zh-Hans": "Manual source path must remain inside the tracked download directory",
+        "hi": "Manual source path must remain inside the tracked download directory",
+        "de": "Manual source path must remain inside the tracked download directory",
+        "ja": "Manual source path must remain inside the tracked download directory",
+        "fr": "Manual source path must remain inside the tracked download directory",
+        "fr-CA": "Manual source path must remain inside the tracked download directory",
+        "pt-BR": "Manual source path must remain inside the tracked download directory",
+        "ar": "Manual source path must remain inside the tracked download directory",
+        "ko": "Manual source path must remain inside the tracked download directory",
+        "zh-Hant": "Manual source path must remain inside the tracked download directory",
+        "vi": "Manual source path must remain inside the tracked download directory",
+        "id": "Manual source path must remain inside the tracked download directory"
+      }
+    },
+    "service.import_romm_slug_unconfigured": {
+      "source": "No RomM platform slug is configured for this game",
+      "translations": {
+        "es": "No RomM platform slug is configured for this game",
+        "es-419": "No RomM platform slug is configured for this game",
+        "zh-Hans": "No RomM platform slug is configured for this game",
+        "hi": "No RomM platform slug is configured for this game",
+        "de": "No RomM platform slug is configured for this game",
+        "ja": "No RomM platform slug is configured for this game",
+        "fr": "No RomM platform slug is configured for this game",
+        "fr-CA": "No RomM platform slug is configured for this game",
+        "pt-BR": "No RomM platform slug is configured for this game",
+        "ar": "No RomM platform slug is configured for this game",
+        "ko": "No RomM platform slug is configured for this game",
+        "zh-Hant": "No RomM platform slug is configured for this game",
+        "vi": "No RomM platform slug is configured for this game",
+        "id": "No RomM platform slug is configured for this game"
+      }
+    },
+    "service.import_scan_flagged_refused": {
+      "source": "This download was flagged by the security scan and cannot be imported.",
+      "translations": {
+        "es": "This download was flagged by the security scan and cannot be imported.",
+        "es-419": "This download was flagged by the security scan and cannot be imported.",
+        "zh-Hans": "This download was flagged by the security scan and cannot be imported.",
+        "hi": "This download was flagged by the security scan and cannot be imported.",
+        "de": "This download was flagged by the security scan and cannot be imported.",
+        "ja": "This download was flagged by the security scan and cannot be imported.",
+        "fr": "This download was flagged by the security scan and cannot be imported.",
+        "fr-CA": "This download was flagged by the security scan and cannot be imported.",
+        "pt-BR": "This download was flagged by the security scan and cannot be imported.",
+        "ar": "This download was flagged by the security scan and cannot be imported.",
+        "ko": "This download was flagged by the security scan and cannot be imported.",
+        "zh-Hant": "This download was flagged by the security scan and cannot be imported.",
+        "vi": "This download was flagged by the security scan and cannot be imported.",
+        "id": "This download was flagged by the security scan and cannot be imported."
+      }
+    },
+    "service.import_confirmation_plan_required": {
+      "source": "Confirmation requires a plan",
+      "translations": {
+        "es": "Confirmation requires a plan",
+        "es-419": "Confirmation requires a plan",
+        "zh-Hans": "Confirmation requires a plan",
+        "hi": "Confirmation requires a plan",
+        "de": "Confirmation requires a plan",
+        "ja": "Confirmation requires a plan",
+        "fr": "Confirmation requires a plan",
+        "fr-CA": "Confirmation requires a plan",
+        "pt-BR": "Confirmation requires a plan",
+        "ar": "Confirmation requires a plan",
+        "ko": "Confirmation requires a plan",
+        "zh-Hant": "Confirmation requires a plan",
+        "vi": "Confirmation requires a plan",
+        "id": "Confirmation requires a plan"
+      }
+    },
+    "service.import_proposed_path_required": {
+      "source": "Proposed path is required for import validation",
+      "translations": {
+        "es": "Proposed path is required for import validation",
+        "es-419": "Proposed path is required for import validation",
+        "zh-Hans": "Proposed path is required for import validation",
+        "hi": "Proposed path is required for import validation",
+        "de": "Proposed path is required for import validation",
+        "ja": "Proposed path is required for import validation",
+        "fr": "Proposed path is required for import validation",
+        "fr-CA": "Proposed path is required for import validation",
+        "pt-BR": "Proposed path is required for import validation",
+        "ar": "Proposed path is required for import validation",
+        "ko": "Proposed path is required for import validation",
+        "zh-Hant": "Proposed path is required for import validation",
+        "vi": "Proposed path is required for import validation",
+        "id": "Proposed path is required for import validation"
+      }
+    },
+    "service.import_proposed_path_outside_library": {
+      "source": "Proposed path is outside configured library root",
+      "translations": {
+        "es": "Proposed path is outside configured library root",
+        "es-419": "Proposed path is outside configured library root",
+        "zh-Hans": "Proposed path is outside configured library root",
+        "hi": "Proposed path is outside configured library root",
+        "de": "Proposed path is outside configured library root",
+        "ja": "Proposed path is outside configured library root",
+        "fr": "Proposed path is outside configured library root",
+        "fr-CA": "Proposed path is outside configured library root",
+        "pt-BR": "Proposed path is outside configured library root",
+        "ar": "Proposed path is outside configured library root",
+        "ko": "Proposed path is outside configured library root",
+        "zh-Hant": "Proposed path is outside configured library root",
+        "vi": "Proposed path is outside configured library root",
+        "id": "Proposed path is outside configured library root"
+      }
+    },
+    "service.scan_flagged": {
+      "source": "Flagged by security scan",
+      "translations": {
+        "es": "Flagged by security scan",
+        "es-419": "Flagged by security scan",
+        "zh-Hans": "Flagged by security scan",
+        "hi": "Flagged by security scan",
+        "de": "Flagged by security scan",
+        "ja": "Flagged by security scan",
+        "fr": "Flagged by security scan",
+        "fr-CA": "Flagged by security scan",
+        "pt-BR": "Flagged by security scan",
+        "ar": "Flagged by security scan",
+        "ko": "Flagged by security scan",
+        "zh-Hant": "Flagged by security scan",
+        "vi": "Flagged by security scan",
+        "id": "Flagged by security scan"
+      }
+    },
+    "service.import_archive_password_marker": {
+      "source": "ARCHIVE_PASSWORD_REQUIRED:{detail}",
+      "translations": {
+        "es": "ARCHIVE_PASSWORD_REQUIRED:{detail}",
+        "es-419": "ARCHIVE_PASSWORD_REQUIRED:{detail}",
+        "zh-Hans": "ARCHIVE_PASSWORD_REQUIRED:{detail}",
+        "hi": "ARCHIVE_PASSWORD_REQUIRED:{detail}",
+        "de": "ARCHIVE_PASSWORD_REQUIRED:{detail}",
+        "ja": "ARCHIVE_PASSWORD_REQUIRED:{detail}",
+        "fr": "ARCHIVE_PASSWORD_REQUIRED:{detail}",
+        "fr-CA": "ARCHIVE_PASSWORD_REQUIRED:{detail}",
+        "pt-BR": "ARCHIVE_PASSWORD_REQUIRED:{detail}",
+        "ar": "ARCHIVE_PASSWORD_REQUIRED:{detail}",
+        "ko": "ARCHIVE_PASSWORD_REQUIRED:{detail}",
+        "zh-Hant": "ARCHIVE_PASSWORD_REQUIRED:{detail}",
+        "vi": "ARCHIVE_PASSWORD_REQUIRED:{detail}",
+        "id": "ARCHIVE_PASSWORD_REQUIRED:{detail}"
+      }
+    },
+    "service.notification_import_stranded": {
+      "source": "\"{game}\" was moved into your library, but extracting the archive failed: {error}. The archive is left at {path} — extract or delete it manually to finish the import.",
+      "translations": {
+        "es": "\"{game}\" was moved into your library, but extracting the archive failed: {error}. The archive is left at {path} — extract or delete it manually to finish the import.",
+        "es-419": "\"{game}\" was moved into your library, but extracting the archive failed: {error}. The archive is left at {path} — extract or delete it manually to finish the import.",
+        "zh-Hans": "\"{game}\" was moved into your library, but extracting the archive failed: {error}. The archive is left at {path} — extract or delete it manually to finish the import.",
+        "hi": "\"{game}\" was moved into your library, but extracting the archive failed: {error}. The archive is left at {path} — extract or delete it manually to finish the import.",
+        "de": "\"{game}\" was moved into your library, but extracting the archive failed: {error}. The archive is left at {path} — extract or delete it manually to finish the import.",
+        "ja": "\"{game}\" was moved into your library, but extracting the archive failed: {error}. The archive is left at {path} — extract or delete it manually to finish the import.",
+        "fr": "\"{game}\" was moved into your library, but extracting the archive failed: {error}. The archive is left at {path} — extract or delete it manually to finish the import.",
+        "fr-CA": "\"{game}\" was moved into your library, but extracting the archive failed: {error}. The archive is left at {path} — extract or delete it manually to finish the import.",
+        "pt-BR": "\"{game}\" was moved into your library, but extracting the archive failed: {error}. The archive is left at {path} — extract or delete it manually to finish the import.",
+        "ar": "\"{game}\" was moved into your library, but extracting the archive failed: {error}. The archive is left at {path} — extract or delete it manually to finish the import.",
+        "ko": "\"{game}\" was moved into your library, but extracting the archive failed: {error}. The archive is left at {path} — extract or delete it manually to finish the import.",
+        "zh-Hant": "\"{game}\" was moved into your library, but extracting the archive failed: {error}. The archive is left at {path} — extract or delete it manually to finish the import.",
+        "vi": "\"{game}\" was moved into your library, but extracting the archive failed: {error}. The archive is left at {path} — extract or delete it manually to finish the import.",
+        "id": "\"{game}\" was moved into your library, but extracting the archive failed: {error}. The archive is left at {path} — extract or delete it manually to finish the import."
+      }
+    },
+    "service.notification_import_local_path": {
+      "source": "\"{game}\" finished downloading but its local path could not be accessed. Check Settings → Path Mappings or trigger the import manually.",
+      "translations": {
+        "es": "\"{game}\" finished downloading but its local path could not be accessed. Check Settings → Path Mappings or trigger the import manually.",
+        "es-419": "\"{game}\" finished downloading but its local path could not be accessed. Check Settings → Path Mappings or trigger the import manually.",
+        "zh-Hans": "\"{game}\" finished downloading but its local path could not be accessed. Check Settings → Path Mappings or trigger the import manually.",
+        "hi": "\"{game}\" finished downloading but its local path could not be accessed. Check Settings → Path Mappings or trigger the import manually.",
+        "de": "\"{game}\" finished downloading but its local path could not be accessed. Check Settings → Path Mappings or trigger the import manually.",
+        "ja": "\"{game}\" finished downloading but its local path could not be accessed. Check Settings → Path Mappings or trigger the import manually.",
+        "fr": "\"{game}\" finished downloading but its local path could not be accessed. Check Settings → Path Mappings or trigger the import manually.",
+        "fr-CA": "\"{game}\" finished downloading but its local path could not be accessed. Check Settings → Path Mappings or trigger the import manually.",
+        "pt-BR": "\"{game}\" finished downloading but its local path could not be accessed. Check Settings → Path Mappings or trigger the import manually.",
+        "ar": "\"{game}\" finished downloading but its local path could not be accessed. Check Settings → Path Mappings or trigger the import manually.",
+        "ko": "\"{game}\" finished downloading but its local path could not be accessed. Check Settings → Path Mappings or trigger the import manually.",
+        "zh-Hant": "\"{game}\" finished downloading but its local path could not be accessed. Check Settings → Path Mappings or trigger the import manually.",
+        "vi": "\"{game}\" finished downloading but its local path could not be accessed. Check Settings → Path Mappings or trigger the import manually.",
+        "id": "\"{game}\" finished downloading but its local path could not be accessed. Check Settings → Path Mappings or trigger the import manually."
+      }
+    },
+    "service.notification_auto_delete_failed": {
+      "source": "\"{game}\" was imported successfully, but removing it from the download client failed: {error}. Please remove it manually.",
+      "translations": {
+        "es": "\"{game}\" was imported successfully, but removing it from the download client failed: {error}. Please remove it manually.",
+        "es-419": "\"{game}\" was imported successfully, but removing it from the download client failed: {error}. Please remove it manually.",
+        "zh-Hans": "\"{game}\" was imported successfully, but removing it from the download client failed: {error}. Please remove it manually.",
+        "hi": "\"{game}\" was imported successfully, but removing it from the download client failed: {error}. Please remove it manually.",
+        "de": "\"{game}\" was imported successfully, but removing it from the download client failed: {error}. Please remove it manually.",
+        "ja": "\"{game}\" was imported successfully, but removing it from the download client failed: {error}. Please remove it manually.",
+        "fr": "\"{game}\" was imported successfully, but removing it from the download client failed: {error}. Please remove it manually.",
+        "fr-CA": "\"{game}\" was imported successfully, but removing it from the download client failed: {error}. Please remove it manually.",
+        "pt-BR": "\"{game}\" was imported successfully, but removing it from the download client failed: {error}. Please remove it manually.",
+        "ar": "\"{game}\" was imported successfully, but removing it from the download client failed: {error}. Please remove it manually.",
+        "ko": "\"{game}\" was imported successfully, but removing it from the download client failed: {error}. Please remove it manually.",
+        "zh-Hant": "\"{game}\" was imported successfully, but removing it from the download client failed: {error}. Please remove it manually.",
+        "vi": "\"{game}\" was imported successfully, but removing it from the download client failed: {error}. Please remove it manually.",
+        "id": "\"{game}\" was imported successfully, but removing it from the download client failed: {error}. Please remove it manually."
+      }
+    },
+    "service.notification_security_flagged": {
+      "source": "\"{game}\" was flagged and quarantined. {reason}",
+      "translations": {
+        "es": "\"{game}\" was flagged and quarantined. {reason}",
+        "es-419": "\"{game}\" was flagged and quarantined. {reason}",
+        "zh-Hans": "\"{game}\" was flagged and quarantined. {reason}",
+        "hi": "\"{game}\" was flagged and quarantined. {reason}",
+        "de": "\"{game}\" was flagged and quarantined. {reason}",
+        "ja": "\"{game}\" was flagged and quarantined. {reason}",
+        "fr": "\"{game}\" was flagged and quarantined. {reason}",
+        "fr-CA": "\"{game}\" was flagged and quarantined. {reason}",
+        "pt-BR": "\"{game}\" was flagged and quarantined. {reason}",
+        "ar": "\"{game}\" was flagged and quarantined. {reason}",
+        "ko": "\"{game}\" was flagged and quarantined. {reason}",
+        "zh-Hant": "\"{game}\" was flagged and quarantined. {reason}",
+        "vi": "\"{game}\" was flagged and quarantined. {reason}",
+        "id": "\"{game}\" was flagged and quarantined. {reason}"
+      }
+    },
+    "service.notification_security_flagged_without_reason": {
+      "source": "\"{game}\" was flagged and quarantined.",
+      "translations": {
+        "es": "\"{game}\" was flagged and quarantined.",
+        "es-419": "\"{game}\" was flagged and quarantined.",
+        "zh-Hans": "\"{game}\" was flagged and quarantined.",
+        "hi": "\"{game}\" was flagged and quarantined.",
+        "de": "\"{game}\" was flagged and quarantined.",
+        "ja": "\"{game}\" was flagged and quarantined.",
+        "fr": "\"{game}\" was flagged and quarantined.",
+        "fr-CA": "\"{game}\" was flagged and quarantined.",
+        "pt-BR": "\"{game}\" was flagged and quarantined.",
+        "ar": "\"{game}\" was flagged and quarantined.",
+        "ko": "\"{game}\" was flagged and quarantined.",
+        "zh-Hant": "\"{game}\" was flagged and quarantined.",
+        "vi": "\"{game}\" was flagged and quarantined.",
+        "id": "\"{game}\" was flagged and quarantined."
+      }
+    },
+    "service.import_unknown_error": {
+      "source": "unknown error",
+      "translations": {
+        "es": "unknown error",
+        "es-419": "unknown error",
+        "zh-Hans": "unknown error",
+        "hi": "unknown error",
+        "de": "unknown error",
+        "ja": "unknown error",
+        "fr": "unknown error",
+        "fr-CA": "unknown error",
+        "pt-BR": "unknown error",
+        "ar": "unknown error",
+        "ko": "unknown error",
+        "zh-Hant": "unknown error",
+        "vi": "unknown error",
+        "id": "unknown error"
+      }
+    },
+    "service.scan_virustotal_flagged": {
+      "source": "VirusTotal detected {positives} engine(s) flagging this file (threshold: {threshold})",
+      "translations": {
+        "es": "VirusTotal detected {positives} engine(s) flagging this file (threshold: {threshold})",
+        "es-419": "VirusTotal detected {positives} engine(s) flagging this file (threshold: {threshold})",
+        "zh-Hans": "VirusTotal detected {positives} engine(s) flagging this file (threshold: {threshold})",
+        "hi": "VirusTotal detected {positives} engine(s) flagging this file (threshold: {threshold})",
+        "de": "VirusTotal detected {positives} engine(s) flagging this file (threshold: {threshold})",
+        "ja": "VirusTotal detected {positives} engine(s) flagging this file (threshold: {threshold})",
+        "fr": "VirusTotal detected {positives} engine(s) flagging this file (threshold: {threshold})",
+        "fr-CA": "VirusTotal detected {positives} engine(s) flagging this file (threshold: {threshold})",
+        "pt-BR": "VirusTotal detected {positives} engine(s) flagging this file (threshold: {threshold})",
+        "ar": "VirusTotal detected {positives} engine(s) flagging this file (threshold: {threshold})",
+        "ko": "VirusTotal detected {positives} engine(s) flagging this file (threshold: {threshold})",
+        "zh-Hant": "VirusTotal detected {positives} engine(s) flagging this file (threshold: {threshold})",
+        "vi": "VirusTotal detected {positives} engine(s) flagging this file (threshold: {threshold})",
+        "id": "VirusTotal detected {positives} engine(s) flagging this file (threshold: {threshold})"
+      }
+    },
+    "service.scan_virustotal_unknown_blocked": {
+      "source": "Hash not found on VirusTotal and 'Block unknown hashes' is enabled",
+      "translations": {
+        "es": "Hash not found on VirusTotal and 'Block unknown hashes' is enabled",
+        "es-419": "Hash not found on VirusTotal and 'Block unknown hashes' is enabled",
+        "zh-Hans": "Hash not found on VirusTotal and 'Block unknown hashes' is enabled",
+        "hi": "Hash not found on VirusTotal and 'Block unknown hashes' is enabled",
+        "de": "Hash not found on VirusTotal and 'Block unknown hashes' is enabled",
+        "ja": "Hash not found on VirusTotal and 'Block unknown hashes' is enabled",
+        "fr": "Hash not found on VirusTotal and 'Block unknown hashes' is enabled",
+        "fr-CA": "Hash not found on VirusTotal and 'Block unknown hashes' is enabled",
+        "pt-BR": "Hash not found on VirusTotal and 'Block unknown hashes' is enabled",
+        "ar": "Hash not found on VirusTotal and 'Block unknown hashes' is enabled",
+        "ko": "Hash not found on VirusTotal and 'Block unknown hashes' is enabled",
+        "zh-Hant": "Hash not found on VirusTotal and 'Block unknown hashes' is enabled",
+        "vi": "Hash not found on VirusTotal and 'Block unknown hashes' is enabled",
+        "id": "Hash not found on VirusTotal and 'Block unknown hashes' is enabled"
+      }
+    },
+    "service.scan_clamav_enumeration_incomplete": {
+      "source": "ClamAV scan could not enumerate every file in this download. Review it before importing.",
+      "translations": {
+        "es": "ClamAV scan could not enumerate every file in this download. Review it before importing.",
+        "es-419": "ClamAV scan could not enumerate every file in this download. Review it before importing.",
+        "zh-Hans": "ClamAV scan could not enumerate every file in this download. Review it before importing.",
+        "hi": "ClamAV scan could not enumerate every file in this download. Review it before importing.",
+        "de": "ClamAV scan could not enumerate every file in this download. Review it before importing.",
+        "ja": "ClamAV scan could not enumerate every file in this download. Review it before importing.",
+        "fr": "ClamAV scan could not enumerate every file in this download. Review it before importing.",
+        "fr-CA": "ClamAV scan could not enumerate every file in this download. Review it before importing.",
+        "pt-BR": "ClamAV scan could not enumerate every file in this download. Review it before importing.",
+        "ar": "ClamAV scan could not enumerate every file in this download. Review it before importing.",
+        "ko": "ClamAV scan could not enumerate every file in this download. Review it before importing.",
+        "zh-Hant": "ClamAV scan could not enumerate every file in this download. Review it before importing.",
+        "vi": "ClamAV scan could not enumerate every file in this download. Review it before importing.",
+        "id": "ClamAV scan could not enumerate every file in this download. Review it before importing."
+      }
+    },
+    "service.scan_clamav_file_limit": {
+      "source": "ClamAV did not scan this download: it has more than {limit} files. Review it before importing.",
+      "translations": {
+        "es": "ClamAV did not scan this download: it has more than {limit} files. Review it before importing.",
+        "es-419": "ClamAV did not scan this download: it has more than {limit} files. Review it before importing.",
+        "zh-Hans": "ClamAV did not scan this download: it has more than {limit} files. Review it before importing.",
+        "hi": "ClamAV did not scan this download: it has more than {limit} files. Review it before importing.",
+        "de": "ClamAV did not scan this download: it has more than {limit} files. Review it before importing.",
+        "ja": "ClamAV did not scan this download: it has more than {limit} files. Review it before importing.",
+        "fr": "ClamAV did not scan this download: it has more than {limit} files. Review it before importing.",
+        "fr-CA": "ClamAV did not scan this download: it has more than {limit} files. Review it before importing.",
+        "pt-BR": "ClamAV did not scan this download: it has more than {limit} files. Review it before importing.",
+        "ar": "ClamAV did not scan this download: it has more than {limit} files. Review it before importing.",
+        "ko": "ClamAV did not scan this download: it has more than {limit} files. Review it before importing.",
+        "zh-Hant": "ClamAV did not scan this download: it has more than {limit} files. Review it before importing.",
+        "vi": "ClamAV did not scan this download: it has more than {limit} files. Review it before importing.",
+        "id": "ClamAV did not scan this download: it has more than {limit} files. Review it before importing."
+      }
+    },
+    "service.scan_clamav_timeout": {
+      "source": "ClamAV ran out of time before scanning every file. Review it before importing.",
+      "translations": {
+        "es": "ClamAV ran out of time before scanning every file. Review it before importing.",
+        "es-419": "ClamAV ran out of time before scanning every file. Review it before importing.",
+        "zh-Hans": "ClamAV ran out of time before scanning every file. Review it before importing.",
+        "hi": "ClamAV ran out of time before scanning every file. Review it before importing.",
+        "de": "ClamAV ran out of time before scanning every file. Review it before importing.",
+        "ja": "ClamAV ran out of time before scanning every file. Review it before importing.",
+        "fr": "ClamAV ran out of time before scanning every file. Review it before importing.",
+        "fr-CA": "ClamAV ran out of time before scanning every file. Review it before importing.",
+        "pt-BR": "ClamAV ran out of time before scanning every file. Review it before importing.",
+        "ar": "ClamAV ran out of time before scanning every file. Review it before importing.",
+        "ko": "ClamAV ran out of time before scanning every file. Review it before importing.",
+        "zh-Hant": "ClamAV ran out of time before scanning every file. Review it before importing.",
+        "vi": "ClamAV ran out of time before scanning every file. Review it before importing.",
+        "id": "ClamAV ran out of time before scanning every file. Review it before importing."
+      }
+    },
+    "service.scan_clamav_infected": {
+      "source": "ClamAV detected {signature} in {file}",
+      "translations": {
+        "es": "ClamAV detected {signature} in {file}",
+        "es-419": "ClamAV detected {signature} in {file}",
+        "zh-Hans": "ClamAV detected {signature} in {file}",
+        "hi": "ClamAV detected {signature} in {file}",
+        "de": "ClamAV detected {signature} in {file}",
+        "ja": "ClamAV detected {signature} in {file}",
+        "fr": "ClamAV detected {signature} in {file}",
+        "fr-CA": "ClamAV detected {signature} in {file}",
+        "pt-BR": "ClamAV detected {signature} in {file}",
+        "ar": "ClamAV detected {signature} in {file}",
+        "ko": "ClamAV detected {signature} in {file}",
+        "zh-Hant": "ClamAV detected {signature} in {file}",
+        "vi": "ClamAV detected {signature} in {file}",
+        "id": "ClamAV detected {signature} in {file}"
+      }
+    },
+    "service.scan_clamav_stopped": {
+      "source": "ClamAV stopped responding before scanning every file. Review it before importing.",
+      "translations": {
+        "es": "ClamAV stopped responding before scanning every file. Review it before importing.",
+        "es-419": "ClamAV stopped responding before scanning every file. Review it before importing.",
+        "zh-Hans": "ClamAV stopped responding before scanning every file. Review it before importing.",
+        "hi": "ClamAV stopped responding before scanning every file. Review it before importing.",
+        "de": "ClamAV stopped responding before scanning every file. Review it before importing.",
+        "ja": "ClamAV stopped responding before scanning every file. Review it before importing.",
+        "fr": "ClamAV stopped responding before scanning every file. Review it before importing.",
+        "fr-CA": "ClamAV stopped responding before scanning every file. Review it before importing.",
+        "pt-BR": "ClamAV stopped responding before scanning every file. Review it before importing.",
+        "ar": "ClamAV stopped responding before scanning every file. Review it before importing.",
+        "ko": "ClamAV stopped responding before scanning every file. Review it before importing.",
+        "zh-Hant": "ClamAV stopped responding before scanning every file. Review it before importing.",
+        "vi": "ClamAV stopped responding before scanning every file. Review it before importing.",
+        "id": "ClamAV stopped responding before scanning every file. Review it before importing."
+      }
+    },
+    "service.scan_clamav_refused_size": {
+      "source": "ClamAV could not scan {count} file(s), including {file} over clamd's size limit. Raise StreamMaxLength, MaxFileSize and MaxScanSize in clamd.conf to scan large files. Review it before importing.",
+      "translations": {
+        "es": "ClamAV could not scan {count} file(s), including {file} over clamd's size limit. Raise StreamMaxLength, MaxFileSize and MaxScanSize in clamd.conf to scan large files. Review it before importing.",
+        "es-419": "ClamAV could not scan {count} file(s), including {file} over clamd's size limit. Raise StreamMaxLength, MaxFileSize and MaxScanSize in clamd.conf to scan large files. Review it before importing.",
+        "zh-Hans": "ClamAV could not scan {count} file(s), including {file} over clamd's size limit. Raise StreamMaxLength, MaxFileSize and MaxScanSize in clamd.conf to scan large files. Review it before importing.",
+        "hi": "ClamAV could not scan {count} file(s), including {file} over clamd's size limit. Raise StreamMaxLength, MaxFileSize and MaxScanSize in clamd.conf to scan large files. Review it before importing.",
+        "de": "ClamAV could not scan {count} file(s), including {file} over clamd's size limit. Raise StreamMaxLength, MaxFileSize and MaxScanSize in clamd.conf to scan large files. Review it before importing.",
+        "ja": "ClamAV could not scan {count} file(s), including {file} over clamd's size limit. Raise StreamMaxLength, MaxFileSize and MaxScanSize in clamd.conf to scan large files. Review it before importing.",
+        "fr": "ClamAV could not scan {count} file(s), including {file} over clamd's size limit. Raise StreamMaxLength, MaxFileSize and MaxScanSize in clamd.conf to scan large files. Review it before importing.",
+        "fr-CA": "ClamAV could not scan {count} file(s), including {file} over clamd's size limit. Raise StreamMaxLength, MaxFileSize and MaxScanSize in clamd.conf to scan large files. Review it before importing.",
+        "pt-BR": "ClamAV could not scan {count} file(s), including {file} over clamd's size limit. Raise StreamMaxLength, MaxFileSize and MaxScanSize in clamd.conf to scan large files. Review it before importing.",
+        "ar": "ClamAV could not scan {count} file(s), including {file} over clamd's size limit. Raise StreamMaxLength, MaxFileSize and MaxScanSize in clamd.conf to scan large files. Review it before importing.",
+        "ko": "ClamAV could not scan {count} file(s), including {file} over clamd's size limit. Raise StreamMaxLength, MaxFileSize and MaxScanSize in clamd.conf to scan large files. Review it before importing.",
+        "zh-Hant": "ClamAV could not scan {count} file(s), including {file} over clamd's size limit. Raise StreamMaxLength, MaxFileSize and MaxScanSize in clamd.conf to scan large files. Review it before importing.",
+        "vi": "ClamAV could not scan {count} file(s), including {file} over clamd's size limit. Raise StreamMaxLength, MaxFileSize and MaxScanSize in clamd.conf to scan large files. Review it before importing.",
+        "id": "ClamAV could not scan {count} file(s), including {file} over clamd's size limit. Raise StreamMaxLength, MaxFileSize and MaxScanSize in clamd.conf to scan large files. Review it before importing."
+      }
+    },
+    "service.scan_clamav_refused": {
+      "source": "ClamAV could not scan {count} file(s), including {file}. Review it before importing.",
+      "translations": {
+        "es": "ClamAV could not scan {count} file(s), including {file}. Review it before importing.",
+        "es-419": "ClamAV could not scan {count} file(s), including {file}. Review it before importing.",
+        "zh-Hans": "ClamAV could not scan {count} file(s), including {file}. Review it before importing.",
+        "hi": "ClamAV could not scan {count} file(s), including {file}. Review it before importing.",
+        "de": "ClamAV could not scan {count} file(s), including {file}. Review it before importing.",
+        "ja": "ClamAV could not scan {count} file(s), including {file}. Review it before importing.",
+        "fr": "ClamAV could not scan {count} file(s), including {file}. Review it before importing.",
+        "fr-CA": "ClamAV could not scan {count} file(s), including {file}. Review it before importing.",
+        "pt-BR": "ClamAV could not scan {count} file(s), including {file}. Review it before importing.",
+        "ar": "ClamAV could not scan {count} file(s), including {file}. Review it before importing.",
+        "ko": "ClamAV could not scan {count} file(s), including {file}. Review it before importing.",
+        "zh-Hant": "ClamAV could not scan {count} file(s), including {file}. Review it before importing.",
+        "vi": "ClamAV could not scan {count} file(s), including {file}. Review it before importing.",
+        "id": "ClamAV could not scan {count} file(s), including {file}. Review it before importing."
+      }
+    },
+    "service.scan_clamav_unreachable": {
+      "source": "ClamAV could not be reached to scan this download. Review it before importing.",
+      "translations": {
+        "es": "ClamAV could not be reached to scan this download. Review it before importing.",
+        "es-419": "ClamAV could not be reached to scan this download. Review it before importing.",
+        "zh-Hans": "ClamAV could not be reached to scan this download. Review it before importing.",
+        "hi": "ClamAV could not be reached to scan this download. Review it before importing.",
+        "de": "ClamAV could not be reached to scan this download. Review it before importing.",
+        "ja": "ClamAV could not be reached to scan this download. Review it before importing.",
+        "fr": "ClamAV could not be reached to scan this download. Review it before importing.",
+        "fr-CA": "ClamAV could not be reached to scan this download. Review it before importing.",
+        "pt-BR": "ClamAV could not be reached to scan this download. Review it before importing.",
+        "ar": "ClamAV could not be reached to scan this download. Review it before importing.",
+        "ko": "ClamAV could not be reached to scan this download. Review it before importing.",
+        "zh-Hant": "ClamAV could not be reached to scan this download. Review it before importing.",
+        "vi": "ClamAV could not be reached to scan this download. Review it before importing.",
+        "id": "ClamAV could not be reached to scan this download. Review it before importing."
+      }
+    },
+    "service.scan_incomplete": {
+      "source": "Security scan could not examine every file",
+      "translations": {
+        "es": "Security scan could not examine every file",
+        "es-419": "Security scan could not examine every file",
+        "zh-Hans": "Security scan could not examine every file",
+        "hi": "Security scan could not examine every file",
+        "de": "Security scan could not examine every file",
+        "ja": "Security scan could not examine every file",
+        "fr": "Security scan could not examine every file",
+        "fr-CA": "Security scan could not examine every file",
+        "pt-BR": "Security scan could not examine every file",
+        "ar": "Security scan could not examine every file",
+        "ko": "Security scan could not examine every file",
+        "zh-Hant": "Security scan could not examine every file",
+        "vi": "Security scan could not examine every file",
+        "id": "Security scan could not examine every file"
+      }
+    },
+    "service.import_interrupted": {
+      "source": "The import was interrupted before it finished (Questarr was probably restarted). Review it to run the import again.",
+      "translations": {
+        "es": "The import was interrupted before it finished (Questarr was probably restarted). Review it to run the import again.",
+        "es-419": "The import was interrupted before it finished (Questarr was probably restarted). Review it to run the import again.",
+        "zh-Hans": "The import was interrupted before it finished (Questarr was probably restarted). Review it to run the import again.",
+        "hi": "The import was interrupted before it finished (Questarr was probably restarted). Review it to run the import again.",
+        "de": "The import was interrupted before it finished (Questarr was probably restarted). Review it to run the import again.",
+        "ja": "The import was interrupted before it finished (Questarr was probably restarted). Review it to run the import again.",
+        "fr": "The import was interrupted before it finished (Questarr was probably restarted). Review it to run the import again.",
+        "fr-CA": "The import was interrupted before it finished (Questarr was probably restarted). Review it to run the import again.",
+        "pt-BR": "The import was interrupted before it finished (Questarr was probably restarted). Review it to run the import again.",
+        "ar": "The import was interrupted before it finished (Questarr was probably restarted). Review it to run the import again.",
+        "ko": "The import was interrupted before it finished (Questarr was probably restarted). Review it to run the import again.",
+        "zh-Hant": "The import was interrupted before it finished (Questarr was probably restarted). Review it to run the import again.",
+        "vi": "The import was interrupted before it finished (Questarr was probably restarted). Review it to run the import again.",
+        "id": "The import was interrupted before it finished (Questarr was probably restarted). Review it to run the import again."
+      }
+    },
+    "service.import_removed_before_locating": {
+      "source": "The download client removed this download once it finished, so its files could not be located automatically. Review it and point the import at the downloaded files.",
+      "translations": {
+        "es": "The download client removed this download once it finished, so its files could not be located automatically. Review it and point the import at the downloaded files.",
+        "es-419": "The download client removed this download once it finished, so its files could not be located automatically. Review it and point the import at the downloaded files.",
+        "zh-Hans": "The download client removed this download once it finished, so its files could not be located automatically. Review it and point the import at the downloaded files.",
+        "hi": "The download client removed this download once it finished, so its files could not be located automatically. Review it and point the import at the downloaded files.",
+        "de": "The download client removed this download once it finished, so its files could not be located automatically. Review it and point the import at the downloaded files.",
+        "ja": "The download client removed this download once it finished, so its files could not be located automatically. Review it and point the import at the downloaded files.",
+        "fr": "The download client removed this download once it finished, so its files could not be located automatically. Review it and point the import at the downloaded files.",
+        "fr-CA": "The download client removed this download once it finished, so its files could not be located automatically. Review it and point the import at the downloaded files.",
+        "pt-BR": "The download client removed this download once it finished, so its files could not be located automatically. Review it and point the import at the downloaded files.",
+        "ar": "The download client removed this download once it finished, so its files could not be located automatically. Review it and point the import at the downloaded files.",
+        "ko": "The download client removed this download once it finished, so its files could not be located automatically. Review it and point the import at the downloaded files.",
+        "zh-Hant": "The download client removed this download once it finished, so its files could not be located automatically. Review it and point the import at the downloaded files.",
+        "vi": "The download client removed this download once it finished, so its files could not be located automatically. Review it and point the import at the downloaded files.",
+        "id": "The download client removed this download once it finished, so its files could not be located automatically. Review it and point the import at the downloaded files."
       }
     }
   }

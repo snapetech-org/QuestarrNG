@@ -438,13 +438,11 @@
       "service.unsafe_url_detected"
     ]
   },
-  "validation": "Source/catalog checks only; private ephemeral JIT functional validation pending. New regression cases are authored, not executed locally.",
+  "validation": "Required non-test generated/catalog/whitespace source checks; existing tests preserved. No new tests/build/scan/package/CI/model calls; compatible private ephemeral JIT functional validation pending.",
   "targetStatus": "New canonical targets remain explicit English fallback pending translation; no new model scope.",
   "openBeyondInitialScope": [
-    "ImportManager/ArchiveService/ImportStrategies/RommRouting fixed error constructors and persisted error ownership",
-    "SecurityScanResult.reason fixed wording and typed metadata transport into persisted download and outbound notices",
-    "ImportManager outbound notification headings/bodies and source-bound nested error values",
-    "Expanded source audit completion, exact-head target reconciliation, Chinese script/region alias resolution review, private JIT and final Agentic VM review"
+    "Remaining server/routes.ts fixed response→SPA consumer classification; opaque dynamic/provider/schema diagnostics stay raw and API-only messages require explicit exclusions",
+    "Exact-head target reconciliation, remaining translations/semantic review, inherited variants, private JIT validation and final Agentic VM review"
   ],
   "followupClosures": [
     {
@@ -515,6 +513,91 @@
       "ownership": "Legacy Error subclass constructors retain string/default/ErrorOptions behavior and class/retry identity. Explicit app fragments are tagged in a private WeakMap; arbitrary/provider strings and spoofed fields remain unowned. Serialization rechecks exact source equality. Passwords are never captured in metadata.",
       "validation": "Required non-test catalog/source/whitespace checks only. Existing tests unchanged; private ephemeral JIT functional validation pending.",
       "remaining": "Other ImportManager/Archive/strategy/RomM/path-security constructors, ScanResult.reason metadata and persisted/outbound ownership, remaining UI-consumed main-route responses, final current-head source/target re-freeze and translation/review remain open."
+    },
+    {
+      "head": "current producer source milestone",
+      "scope": "65 archive/transfer/RomM/import/scan/recovery/persisted/outbound source templates; two internal-only result/log fields precisely excluded; obsolete combined Traditional Chinese selector retired after source reference proof",
+      "keys": [
+        "service.archive_tool_failed",
+        "service.archive_seven_zip_missing",
+        "service.archive_unrar_missing",
+        "service.archive_unsafe_entry_path",
+        "service.archive_too_many_entries",
+        "service.archive_invalid_entry_size",
+        "service.archive_link_entry_refused",
+        "service.archive_entry_outside_directory",
+        "service.archive_expanded_limit_exceeded",
+        "service.archive_corrupt_or_incomplete",
+        "service.archive_reserved_staging_name",
+        "service.archive_destination_symlink",
+        "service.archive_directory_over_file",
+        "service.archive_file_over_directory",
+        "service.archive_rollback_originals_retained",
+        "service.archive_rollback_extracted_remaining",
+        "service.archive_rollback_incomplete",
+        "service.transfer_non_directory_path",
+        "service.transfer_hardlink_overlap",
+        "service.transfer_destination_exists",
+        "service.transfer_no_files_after_exclusions",
+        "service.import_sensitive_path_refused",
+        "service.transfer_path_outside_review",
+        "service.transfer_duplicate_sorted_destination",
+        "service.transfer_source_outside_roots",
+        "service.transfer_destination_outside_library",
+        "service.transfer_duplicate_import_destination",
+        "service.romm_platform_outside_library",
+        "service.romm_slug_required",
+        "service.romm_slug_path_separators",
+        "service.romm_slug_traversal",
+        "service.romm_slug_invalid_characters",
+        "service.romm_binding_missing",
+        "service.import_romm_destination_exists",
+        "service.import_romm_destination_unavailable",
+        "service.import_parent_source_refused",
+        "service.import_manual_source_outside_root",
+        "service.import_tracked_path_outside_root",
+        "service.import_manual_source_outside_download",
+        "service.import_romm_slug_unconfigured",
+        "service.import_scan_flagged_refused",
+        "service.import_confirmation_plan_required",
+        "service.import_proposed_path_required",
+        "service.import_proposed_path_outside_library",
+        "service.scan_flagged",
+        "service.import_archive_password_marker",
+        "service.notification_import_stranded",
+        "service.notification_import_local_path",
+        "service.notification_auto_delete_failed",
+        "service.notification_security_flagged",
+        "service.notification_security_flagged_without_reason",
+        "service.import_unknown_error",
+        "service.scan_virustotal_flagged",
+        "service.scan_virustotal_unknown_blocked",
+        "service.scan_clamav_enumeration_incomplete",
+        "service.scan_clamav_file_limit",
+        "service.scan_clamav_timeout",
+        "service.scan_clamav_infected",
+        "service.scan_clamav_stopped",
+        "service.scan_clamav_refused_size",
+        "service.scan_clamav_refused",
+        "service.scan_clamav_unreachable",
+        "service.scan_incomplete",
+        "service.import_interrupted",
+        "service.import_removed_before_locating"
+      ],
+      "transport": "Archive marker classes retain string/default/ErrorOptions behavior and explicit WeakMap tags. Manual-review/error rows retain exact source metadata; pending password projection unwraps only an exact stored marker descriptor and matching child; null/invalid/raw provider data stays raw. Scan reasons carry nullable metadata without changing security verdicts. All four ImportManager notification bodies are explicitly tagged, including nested known error/reason values; existing delivery/gating unchanged. Cron restart/removed-on-completion fixed persisted status messages also tagged.",
+      "exclusions": [
+        {
+          "producer": "ImportStrategies.reviewReason",
+          "consumer": "ImportManager.flagNeedsReview logger only; no persisted/UI value",
+          "reason": "Only Destination already exists internal review reason; UI uses independent authored guidance."
+        },
+        {
+          "producer": "ImportStrategies.conflictsResolved",
+          "consumer": "ImportManager receives return but does not persist/render entries",
+          "reason": "Internal result diagnostics only."
+        }
+      ],
+      "evidence": "producer-closure-child-evidence-0a836c54 manifest ea83f3e80ed9a4b658b9e373ece5df8f0e7ab481764215a2b158dae9faf85ad3; independent source review of parent persistence wiring found no additional defect. No tests executed; private JIT validation outstanding."
     }
   ],
   "expandedRemainingEvidence": [

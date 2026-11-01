@@ -1,5 +1,6 @@
 import {
   serviceMessage,
+  type ServiceMessageFragment,
   serviceErrorBody,
   serviceErrorValue,
   serializeServiceMessageDescriptor,
@@ -59,6 +60,11 @@ export interface ScanResult {
   reason?: string;
   reasonI18n?: ServiceMessageDescriptor | null;
   hash?: string;
+}
+
+/** Keep the English reason and its explicitly owned descriptor together. */
+function scanReason(fragment: ServiceMessageFragment) {
+  return { reason: fragment.message, reasonI18n: fragment };
 }
 
 interface SystemConfigReader {
@@ -432,7 +438,12 @@ export class SecurityScanService {
         blocked: true,
         source: "virustotal",
         hash,
-        reason: `VirusTotal detected ${verdict.positives} engine(s) flagging this file (threshold: ${vtSettings.threshold})`,
+        ...scanReason(
+          serviceMessage("service.scan_virustotal_flagged", {
+            positives: verdict.positives,
+            threshold: vtSettings.threshold,
+          })
+        ),
       };
     }
 
@@ -446,7 +457,7 @@ export class SecurityScanService {
           blocked: true,
           source: "virustotal",
           hash,
-          reason: "Hash not found on VirusTotal and 'Block unknown hashes' is enabled",
+          ...scanReason(serviceMessage("service.scan_virustotal_unknown_blocked", {})),
         };
       }
     }
@@ -488,9 +499,11 @@ export class SecurityScanService {
           blocked: false,
           incomplete: true,
           source: "clamav",
-          reason: incomplete
-            ? "ClamAV scan could not enumerate every file in this download. Review it before importing."
-            : `ClamAV did not scan this download: it has more than ${MAX_CLAMAV_SCAN_FILES} files. Review it before importing.`,
+          ...scanReason(
+            incomplete
+              ? serviceMessage("service.scan_clamav_enumeration_incomplete", {})
+              : serviceMessage("service.scan_clamav_file_limit", { limit: MAX_CLAMAV_SCAN_FILES })
+          ),
         };
       }
 
@@ -507,8 +520,7 @@ export class SecurityScanService {
             blocked: false,
             incomplete: true,
             source: "clamav",
-            reason:
-              "ClamAV ran out of time before scanning every file. Review it before importing.",
+            ...scanReason(serviceMessage("service.scan_clamav_timeout", {})),
           };
         }
         const verdict = await scanFileWithClamAv(file, connectAddress, clamAvSettings.port);
@@ -516,7 +528,12 @@ export class SecurityScanService {
           return {
             blocked: true,
             source: "clamav",
-            reason: `ClamAV detected ${verdict.signature} in ${path.basename(file)}`,
+            ...scanReason(
+              serviceMessage("service.scan_clamav_infected", {
+                signature: verdict.signature,
+                file: path.basename(file),
+              })
+            ),
           };
         }
         if (verdict.status === "error") {
@@ -533,8 +550,7 @@ export class SecurityScanService {
               blocked: false,
               incomplete: true,
               source: "clamav",
-              reason:
-                "ClamAV stopped responding before scanning every file. Review it before importing.",
+              ...scanReason(serviceMessage("service.scan_clamav_stopped", {})),
             };
           }
           // A file-level refusal (e.g. over clamd's stream size limit) only skips
@@ -547,14 +563,17 @@ export class SecurityScanService {
       if (refusedFiles.length > 0) {
         // The raw error (which can name server paths) stays in the log above; the
         // reason shown to the user only says which kind of failure it was.
-        const cause = /size limit exceeded/i.test(refusal)
-          ? " over clamd's size limit. Raise StreamMaxLength, MaxFileSize and MaxScanSize in clamd.conf to scan large files."
-          : ".";
+        const reason = serviceMessage(
+          /size limit exceeded/i.test(refusal)
+            ? "service.scan_clamav_refused_size"
+            : "service.scan_clamav_refused",
+          { count: refusedFiles.length, file: path.basename(refusedFiles[0] ?? "") }
+        );
         return {
           blocked: false,
           incomplete: true,
           source: "clamav",
-          reason: `ClamAV could not scan ${refusedFiles.length} file(s), including ${path.basename(refusedFiles[0] ?? "")}${cause} Review it before importing.`,
+          ...scanReason(reason),
         };
       }
     } catch (error) {
@@ -566,7 +585,7 @@ export class SecurityScanService {
         blocked: false,
         incomplete: true,
         source: "clamav",
-        reason: "ClamAV could not be reached to scan this download. Review it before importing.",
+        ...scanReason(serviceMessage("service.scan_clamav_unreachable", {})),
       };
     }
 

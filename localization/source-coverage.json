@@ -3672,6 +3672,938 @@
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "source-fallback",
       "directTargetCells": 12
+    },
+    {
+      "key": "service.archive_tool_failed",
+      "source": "{tool} failed: {detail}",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.archive_seven_zip_missing",
+      "source": "Archive extraction requires 7-Zip but no binary was found. Install the `7zip` apk package or set SEVENZIP_PATH.",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.archive_unrar_missing",
+      "source": "RAR archive detected but no unrar binary was found. Install it (see Dockerfile) or set UNRAR_PATH.",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.archive_unsafe_entry_path",
+      "source": "Archive contains an unsafe file path.",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.archive_too_many_entries",
+      "source": "Archive contains too many entries (limit: {limit}).",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.archive_invalid_entry_size",
+      "source": "Archive contains an entry with an invalid uncompressed size.",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.archive_link_entry_refused",
+      "source": "Archive contains a symbolic or hard link, which is not extracted.",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.archive_entry_outside_directory",
+      "source": "Archive contains a file path outside the extraction directory.",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.archive_expanded_limit_exceeded",
+      "source": "Archive expands beyond the configured size limit ({bytes} bytes).",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.archive_corrupt_or_incomplete",
+      "source": "{detail} (the archive is corrupt or incomplete — re-download the release, extraction cannot recover this file)",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.archive_reserved_staging_name",
+      "source": "Archive contains \"{name}\", a name reserved for Questarr's extraction staging directory",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.archive_destination_symlink",
+      "source": "Cannot extract into {path}: it is a symbolic link — replace it with a real directory and retry",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.archive_directory_over_file",
+      "source": "Cannot extract directory over existing file {path} — move or delete it and retry",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.archive_file_over_directory",
+      "source": "Cannot extract file over existing directory {path} — move or delete it and retry",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.archive_rollback_originals_retained",
+      "source": "{count} original file(s) that could not be restored are kept in {path}",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.archive_rollback_extracted_remaining",
+      "source": "extracted file(s) that could not be removed: {paths}",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.archive_rollback_incomplete",
+      "source": "{detail} (rollback incomplete: {problems})",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.transfer_non_directory_path",
+      "source": "Refusing to transfer through a non-directory or symlinked path: {path}",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.transfer_hardlink_overlap",
+      "source": "Source and destination directories must not overlap for a hardlink transfer: {source} -> {destination}",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.transfer_destination_exists",
+      "source": "Destination already exists, refusing to overwrite: {path}",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.transfer_no_files_after_exclusions",
+      "source": "No files to transfer after applying exclusions",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_sensitive_path_refused",
+      "source": "Refusing to process a sensitive system path",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.transfer_path_outside_review",
+      "source": "Import path escapes review root: {path}",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.transfer_duplicate_sorted_destination",
+      "source": "Duplicate sortExtras destination: {path}",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.transfer_source_outside_roots",
+      "source": "Refusing to process a path outside the configured downloader roots",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.transfer_destination_outside_library",
+      "source": "Computed destination escapes the configured library root",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.transfer_duplicate_import_destination",
+      "source": "Duplicate import destination: {path}",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.romm_platform_outside_library",
+      "source": "Resolved RomM platform directory escapes library root",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.romm_slug_required",
+      "source": "RomM fs_slug is required",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.romm_slug_path_separators",
+      "source": "RomM fs_slug must not contain path separators",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.romm_slug_traversal",
+      "source": "RomM fs_slug must not contain traversal segments",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.romm_slug_invalid_characters",
+      "source": "RomM fs_slug contains invalid characters",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.romm_binding_missing",
+      "source": "No RomM binding configured for slug '{slug}'",
+      "kind": "source-bound producer error templates",
+      "owners": [
+        "server/services/ArchiveService.ts",
+        "server/services/ImportStrategies.ts",
+        "server/services/RommRouting.ts"
+      ],
+      "coverage": "Explicit constructors/wrappers carried through import API and persisted manual-review errors; provider/OS/tool diagnostics remain raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_romm_destination_exists",
+      "source": "RomM destination already exists: {path}",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_romm_destination_unavailable",
+      "source": "Could not find a free RomM destination for {path}",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_parent_source_refused",
+      "source": "Source path cannot be a parent of this download's folder. Select only this download's file or folder.",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_manual_source_outside_root",
+      "source": "Manual source path must remain inside a configured download root",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_tracked_path_outside_root",
+      "source": "Tracked download path is outside the configured download roots",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_manual_source_outside_download",
+      "source": "Manual source path must remain inside the tracked download directory",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_romm_slug_unconfigured",
+      "source": "No RomM platform slug is configured for this game",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_scan_flagged_refused",
+      "source": "This download was flagged by the security scan and cannot be imported.",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_confirmation_plan_required",
+      "source": "Confirmation requires a plan",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_proposed_path_required",
+      "source": "Proposed path is required for import validation",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_proposed_path_outside_library",
+      "source": "Proposed path is outside configured library root",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.scan_flagged",
+      "source": "Flagged by security scan",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_archive_password_marker",
+      "source": "ARCHIVE_PASSWORD_REQUIRED:{detail}",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.notification_import_stranded",
+      "source": "\"{game}\" was moved into your library, but extracting the archive failed: {error}. The archive is left at {path} — extract or delete it manually to finish the import.",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.notification_import_local_path",
+      "source": "\"{game}\" finished downloading but its local path could not be accessed. Check Settings → Path Mappings or trigger the import manually.",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.notification_auto_delete_failed",
+      "source": "\"{game}\" was imported successfully, but removing it from the download client failed: {error}. Please remove it manually.",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.notification_security_flagged",
+      "source": "\"{game}\" was flagged and quarantined. {reason}",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.notification_security_flagged_without_reason",
+      "source": "\"{game}\" was flagged and quarantined.",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_unknown_error",
+      "source": "unknown error",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.scan_virustotal_flagged",
+      "source": "VirusTotal detected {positives} engine(s) flagging this file (threshold: {threshold})",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.scan_virustotal_unknown_blocked",
+      "source": "Hash not found on VirusTotal and 'Block unknown hashes' is enabled",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.scan_clamav_enumeration_incomplete",
+      "source": "ClamAV scan could not enumerate every file in this download. Review it before importing.",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.scan_clamav_file_limit",
+      "source": "ClamAV did not scan this download: it has more than {limit} files. Review it before importing.",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.scan_clamav_timeout",
+      "source": "ClamAV ran out of time before scanning every file. Review it before importing.",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.scan_clamav_infected",
+      "source": "ClamAV detected {signature} in {file}",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.scan_clamav_stopped",
+      "source": "ClamAV stopped responding before scanning every file. Review it before importing.",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.scan_clamav_refused_size",
+      "source": "ClamAV could not scan {count} file(s), including {file} over clamd's size limit. Raise StreamMaxLength, MaxFileSize and MaxScanSize in clamd.conf to scan large files. Review it before importing.",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.scan_clamav_refused",
+      "source": "ClamAV could not scan {count} file(s), including {file}. Review it before importing.",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.scan_clamav_unreachable",
+      "source": "ClamAV could not be reached to scan this download. Review it before importing.",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.scan_incomplete",
+      "source": "Security scan could not examine every file",
+      "kind": "source-bound import/scan persisted and outbound message templates",
+      "owners": [
+        "server/services/ImportManager.ts",
+        "server/security-scan.ts",
+        "server/path-security.ts",
+        "server/routes/import.ts"
+      ],
+      "coverage": "Explicit owned producer descriptors retained through persisted error and notification paths; raw OS/provider/tool/signature/path values stay raw.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_interrupted",
+      "source": "The import was interrupted before it finished (Questarr was probably restarted). Review it to run the import again.",
+      "kind": "persisted import recovery status",
+      "owners": ["server/cron.ts"],
+      "coverage": "Recovery status is persisted in game_downloads and returned by pending API to PendingImportsCard; preserve exact English restart/removed-on-completion behavior.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_removed_before_locating",
+      "source": "The download client removed this download once it finished, so its files could not be located automatically. Review it and point the import at the downloaded files.",
+      "kind": "persisted import recovery status",
+      "owners": ["server/cron.ts"],
+      "coverage": "Recovery status is persisted in game_downloads and returned by pending API to PendingImportsCard; preserve exact English restart/removed-on-completion behavior.",
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
     }
   ],
   "codeUnits": [

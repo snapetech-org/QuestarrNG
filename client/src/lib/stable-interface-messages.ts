@@ -2059,7 +2059,6 @@ export const STABLE_INTERFACE_MESSAGES = {
   "interface.korean_fbeaa2fe": "한국어 — Korean",
   "interface.japanese_a09626a1": "日本語 — Japanese",
   "interface.chinese_simplified_4711ab60": "简体中文 — Chinese (Simplified)",
-  "interface.chinese_traditional_1def26cf": "繁體中文 — Chinese (Traditional)",
   "interface.add_value_to_wanted_list_791eb955": 'Add "{value}" to wanted list',
   "interface.added_title_to_your_wanted_list_abe8d624": 'Added "{title}" to your wanted list',
   "interface.added_count_of_count2_downloads_44d1a855": "Added {count} of {count2} downloads",
@@ -3007,6 +3006,110 @@ export const STABLE_INTERFACE_MESSAGES = {
   "service.api_import_download_missing": "Download {downloadId} not found",
   "service.api_import_game_for_download_missing": "Game not found for download {downloadId}",
   "service.api_import_source_path_missing": "Source path not found: {path}",
+  "service.archive_tool_failed": "{tool} failed: {detail}",
+  "service.archive_seven_zip_missing":
+    "Archive extraction requires 7-Zip but no binary was found. Install the `7zip` apk package or set SEVENZIP_PATH.",
+  "service.archive_unrar_missing":
+    "RAR archive detected but no unrar binary was found. Install it (see Dockerfile) or set UNRAR_PATH.",
+  "service.archive_unsafe_entry_path": "Archive contains an unsafe file path.",
+  "service.archive_too_many_entries": "Archive contains too many entries (limit: {limit}).",
+  "service.archive_invalid_entry_size":
+    "Archive contains an entry with an invalid uncompressed size.",
+  "service.archive_link_entry_refused":
+    "Archive contains a symbolic or hard link, which is not extracted.",
+  "service.archive_entry_outside_directory":
+    "Archive contains a file path outside the extraction directory.",
+  "service.archive_expanded_limit_exceeded":
+    "Archive expands beyond the configured size limit ({bytes} bytes).",
+  "service.archive_corrupt_or_incomplete":
+    "{detail} (the archive is corrupt or incomplete — re-download the release, extraction cannot recover this file)",
+  "service.archive_reserved_staging_name":
+    'Archive contains "{name}", a name reserved for Questarr\'s extraction staging directory',
+  "service.archive_destination_symlink":
+    "Cannot extract into {path}: it is a symbolic link — replace it with a real directory and retry",
+  "service.archive_directory_over_file":
+    "Cannot extract directory over existing file {path} — move or delete it and retry",
+  "service.archive_file_over_directory":
+    "Cannot extract file over existing directory {path} — move or delete it and retry",
+  "service.archive_rollback_originals_retained":
+    "{count} original file(s) that could not be restored are kept in {path}",
+  "service.archive_rollback_extracted_remaining":
+    "extracted file(s) that could not be removed: {paths}",
+  "service.archive_rollback_incomplete": "{detail} (rollback incomplete: {problems})",
+  "service.transfer_non_directory_path":
+    "Refusing to transfer through a non-directory or symlinked path: {path}",
+  "service.transfer_hardlink_overlap":
+    "Source and destination directories must not overlap for a hardlink transfer: {source} -> {destination}",
+  "service.transfer_destination_exists":
+    "Destination already exists, refusing to overwrite: {path}",
+  "service.transfer_no_files_after_exclusions": "No files to transfer after applying exclusions",
+  "service.import_sensitive_path_refused": "Refusing to process a sensitive system path",
+  "service.transfer_path_outside_review": "Import path escapes review root: {path}",
+  "service.transfer_duplicate_sorted_destination": "Duplicate sortExtras destination: {path}",
+  "service.transfer_source_outside_roots":
+    "Refusing to process a path outside the configured downloader roots",
+  "service.transfer_destination_outside_library":
+    "Computed destination escapes the configured library root",
+  "service.transfer_duplicate_import_destination": "Duplicate import destination: {path}",
+  "service.romm_platform_outside_library": "Resolved RomM platform directory escapes library root",
+  "service.romm_slug_required": "RomM fs_slug is required",
+  "service.romm_slug_path_separators": "RomM fs_slug must not contain path separators",
+  "service.romm_slug_traversal": "RomM fs_slug must not contain traversal segments",
+  "service.romm_slug_invalid_characters": "RomM fs_slug contains invalid characters",
+  "service.romm_binding_missing": "No RomM binding configured for slug '{slug}'",
+  "service.import_romm_destination_exists": "RomM destination already exists: {path}",
+  "service.import_romm_destination_unavailable":
+    "Could not find a free RomM destination for {path}",
+  "service.import_parent_source_refused":
+    "Source path cannot be a parent of this download's folder. Select only this download's file or folder.",
+  "service.import_manual_source_outside_root":
+    "Manual source path must remain inside a configured download root",
+  "service.import_tracked_path_outside_root":
+    "Tracked download path is outside the configured download roots",
+  "service.import_manual_source_outside_download":
+    "Manual source path must remain inside the tracked download directory",
+  "service.import_romm_slug_unconfigured": "No RomM platform slug is configured for this game",
+  "service.import_scan_flagged_refused":
+    "This download was flagged by the security scan and cannot be imported.",
+  "service.import_confirmation_plan_required": "Confirmation requires a plan",
+  "service.import_proposed_path_required": "Proposed path is required for import validation",
+  "service.import_proposed_path_outside_library":
+    "Proposed path is outside configured library root",
+  "service.scan_flagged": "Flagged by security scan",
+  "service.import_archive_password_marker": "ARCHIVE_PASSWORD_REQUIRED:{detail}",
+  "service.notification_import_stranded":
+    '"{game}" was moved into your library, but extracting the archive failed: {error}. The archive is left at {path} — extract or delete it manually to finish the import.',
+  "service.notification_import_local_path":
+    '"{game}" finished downloading but its local path could not be accessed. Check Settings → Path Mappings or trigger the import manually.',
+  "service.notification_auto_delete_failed":
+    '"{game}" was imported successfully, but removing it from the download client failed: {error}. Please remove it manually.',
+  "service.notification_security_flagged": '"{game}" was flagged and quarantined. {reason}',
+  "service.notification_security_flagged_without_reason": '"{game}" was flagged and quarantined.',
+  "service.import_unknown_error": "unknown error",
+  "service.scan_virustotal_flagged":
+    "VirusTotal detected {positives} engine(s) flagging this file (threshold: {threshold})",
+  "service.scan_virustotal_unknown_blocked":
+    "Hash not found on VirusTotal and 'Block unknown hashes' is enabled",
+  "service.scan_clamav_enumeration_incomplete":
+    "ClamAV scan could not enumerate every file in this download. Review it before importing.",
+  "service.scan_clamav_file_limit":
+    "ClamAV did not scan this download: it has more than {limit} files. Review it before importing.",
+  "service.scan_clamav_timeout":
+    "ClamAV ran out of time before scanning every file. Review it before importing.",
+  "service.scan_clamav_infected": "ClamAV detected {signature} in {file}",
+  "service.scan_clamav_stopped":
+    "ClamAV stopped responding before scanning every file. Review it before importing.",
+  "service.scan_clamav_refused_size":
+    "ClamAV could not scan {count} file(s), including {file} over clamd's size limit. Raise StreamMaxLength, MaxFileSize and MaxScanSize in clamd.conf to scan large files. Review it before importing.",
+  "service.scan_clamav_refused":
+    "ClamAV could not scan {count} file(s), including {file}. Review it before importing.",
+  "service.scan_clamav_unreachable":
+    "ClamAV could not be reached to scan this download. Review it before importing.",
+  "service.scan_incomplete": "Security scan could not examine every file",
+  "service.import_interrupted":
+    "The import was interrupted before it finished (Questarr was probably restarted). Review it to run the import again.",
+  "service.import_removed_before_locating":
+    "The download client removed this download once it finished, so its files could not be located automatically. Review it and point the import at the downloaded files.",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;
