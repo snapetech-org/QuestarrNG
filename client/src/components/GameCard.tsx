@@ -54,6 +54,7 @@ const GameCard = ({
   downloadSummary,
 }: GameCardProps) => {
   const { language, t, languageFor, directionFor } = useInterfaceLanguage();
+  const gameCardLabelId = useId();
   const detailsButtonLabelId = useId();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -163,12 +164,14 @@ const GameCard = ({
       className={`group hover-elevate transition-all duration-200 mx-auto min-w-0 w-full max-w-full cursor-pointer flex flex-col h-full overflow-hidden sm:max-w-[225px] ${game.hidden ? "opacity-60 grayscale" : ""}`}
       data-testid={`card-game-${game.id}`}
       role="group"
-      aria-label={formatInterfaceMessage("interface.game_card_for_title_da08dee8", {
-        title: game.title,
-      })}
-      lang={languageFor("interface.game_card_for_title_da08dee8")}
-      dir={directionFor("interface.game_card_for_title_da08dee8")}
+      aria-labelledby={gameCardLabelId}
     >
+      <span className="sr-only" id={gameCardLabelId}>
+        <InterfaceRichText
+          source="interface.game_card_for_title_da08dee8"
+          values={{ title: game.title }}
+        />
+      </span>
       <div className="relative">
         {/* ⚡ Bolt: Lazy loading images prevents fetching all game covers upfront,
             improving initial page load speed, especially on pages with many carousels. */}
