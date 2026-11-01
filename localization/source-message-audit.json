@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "reviewedAtUtc": "2026-11-01T03:51:08+00:00",
+  "reviewedAtUtc": "2026-11-01T03:59:21+00:00",
   "scope": "Initial 260-site service inventory (20 scanned files, 15 with candidates); extended source work in indexer-caps/search/Apprise/IGDB test results is recorded in source-coverage.json. This does not claim every server/client producer is closed. Bounded follow-up closes import/archive/strategy/RomM/scan/outbound producers and main-route response/helper-to-SPA copy ownership; precise raw/API-only/secondary-validation exclusions are retained in the referenced per-route trace.",
   "originalInventorySha256": "3484cb33f6786c0cea46da03f6fd5e502c07f0dfd11f448e9eb98932e5bdf452",
   "originalSites": 260,
@@ -438,12 +438,12 @@
       "service.unsafe_url_detected"
     ]
   },
-  "validation": "Localization catalog generation, catalog integrity, and git diff --check passed on the reviewed source head. No tests, builds, scans, packages, or CI jobs were run for this milestone. Agentic VM visual review is in progress; private ephemeral JIT functional validation was not run.",
+  "validation": "Localization catalog generation, catalog integrity, JSON audit parsing, and git diff --check passed on the reviewed source. Headed Agent VM review covered /setup and /login?oidcFailed=true in all 15 selectable locales, with Arabic at 1440x1000 and 375x812; the Arabic version-order defect was fixed and visually verified. No tests, builds, scans, packages, or CI jobs were run. Private ephemeral JIT functional validation was not run.",
   "targetStatus": "The full formal direct review scope is resolved: 36,960/36,960 cells, with zero pending. This includes 2,952 newly translated source-fallback cells and 292 existing machine-draft cells semantically reviewed. Changed/generated direct targets remain machine-draft; inherited regional targets retain inherited provenance. No qualified native-speaker signoff is claimed.",
   "openBeyondInitialScope": [
     "Qualified native-speaker signoff for machine-draft catalog values.",
     "Private ephemeral JIT functional validation on an eligible job; none was dispatched or run for this milestone.",
-    "Browser coverage of populated integrations and live provider data remains outside the isolated visual review."
+    "Authenticated settings, service-toast states, outbound delivery, populated integrations, and live provider data remain outside public login/setup visual review."
   ],
   "followupClosures": [
     {
@@ -823,5 +823,42 @@
       "unresolved": 0
     },
     "qualifiedNativeHumanReview": false
+  },
+  "visualReviewEvidence": {
+    "reviewManifestPath": "localization/review-manifest-pr155-21444d8f.json",
+    "reviewManifestSha256": "b165b9b0dac5a5cdbacf90b70f7db6c1dd152dffd0564319a49386642d063c83",
+    "captureManifestTaskScratchPath": "task-scratch/questarrng/qa-runtime/final-public-review/review-manifest.json",
+    "captureManifestSha256": "c93cf94ea889b599842750bd4810e16a4fb488f81af53cf21a9cbbefb79741cc",
+    "captureCount": 34,
+    "routes": [
+      "/setup",
+      "/login?oidcFailed=true",
+      "/__qa/mobile-login (scratch-only iframe with /login)"
+    ],
+    "selectableLocales": [
+      "en",
+      "es",
+      "es-419",
+      "zh-Hans",
+      "hi",
+      "de",
+      "ja",
+      "fr",
+      "fr-CA",
+      "pt-BR",
+      "ar",
+      "ko",
+      "zh-Hant",
+      "vi",
+      "id"
+    ],
+    "arabicViewports": [
+      "1440x1000",
+      "375x812"
+    ],
+    "finding": "Arabic product/version text reordered under RTL; fixed with LTR isolation and verified as QuestarrNG v2.1.2 at both viewport sizes.",
+    "blockingFindings": 0,
+    "qualifiedNativeHumanSignoff": false,
+    "accountActionPerformed": false
   }
 }

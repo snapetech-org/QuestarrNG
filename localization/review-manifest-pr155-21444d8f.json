@@ -81,5 +81,49 @@
   "inheritedAliasValuesSynchronized": 481,
   "provenance": "machine-draft for target-generated/edited cells; inherited for es-419/fr-CA. No qualified native-human signoff is claimed.",
   "rawModelTraces": "Retained only under task scratch; not copied into this repository.",
-  "targetsApplied": true
+  "targetsApplied": true,
+  "visualReview": {
+    "review": "headed Agent VM Chrome, fresh session with saved login disabled",
+    "sourceBaseCommit": "cb3e463f549fb5581666e24dae29dd7aee114316",
+    "sourceCatalogSha256": "7ff391ca0d8d9f0afefccdc05343993b49cf5a83873fae01d645926182d5fca4",
+    "sourceFiles": {
+      "client/src/components/GitHubVersionLink.tsx": "84076247b6de0bacd9d80dd27a0ac3a359cbe3a83e0ce03eee6cf69aef21d137",
+      "client/src/components/InterfaceText.tsx": "51d7322dbadd9bd77e15feee98baa1f5ae625e7155a8b1ca8c8326157d190839"
+    },
+    "routes": [
+      "/setup",
+      "/login",
+      "/login?oidcFailed=true",
+      "/__qa/mobile-login (scratch-only iframe with /login)"
+    ],
+    "selectableLocales": [
+      "en",
+      "es",
+      "es-419",
+      "zh-Hans",
+      "hi",
+      "de",
+      "ja",
+      "fr",
+      "fr-CA",
+      "pt-BR",
+      "ar",
+      "ko",
+      "zh-Hant",
+      "vi",
+      "id"
+    ],
+    "desktopViewport": "1440x1000",
+    "arabicMobileViewport": "375x812",
+    "result": "34 screenshot/snapshot pairs; one Arabic RTL version-order defect was fixed and verified at desktop and mobile widths; no other blocking findings.",
+    "resolvedFinding": {
+      "id": "rtl-version-order",
+      "display": "QuestarrNG v2.1.2 in left-to-right order",
+      "fix": "Isolate the product/version labels with bdi dir=ltr and permit an explicit InterfaceText direction override."
+    },
+    "evidenceManifestPath": "task-scratch/questarrng/qa-runtime/final-public-review/review-manifest.json",
+    "evidenceManifestSha256": "c93cf94ea889b599842750bd4810e16a4fb488f81af53cf21a9cbbefb79741cc",
+    "qualifiedNativeHumanSignoff": false,
+    "scopeLimit": "Public unauthenticated login/setup only; no account action. Authenticated settings, service toasts, outbound deliveries, populated integrations, and native-speaker signoff were not claimed."
+  }
 }

@@ -4,9 +4,11 @@ import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-lo
 export function InterfaceText({
   source,
   values,
+  dir,
 }: {
   source: string;
   values?: Record<string, string | number> | undefined;
+  dir?: "ltr" | "rtl" | "auto";
 }) {
   const { language, t, languageFor, directionFor } = useInterfaceLanguage();
   const text = values ? formatInterfaceMessage(source, values) : t(source);
@@ -15,7 +17,7 @@ export function InterfaceText({
   // existing component markup without adding useful language information.
   if (language === "en") return text;
   return (
-    <span lang={languageFor(source)} dir={directionFor(source)}>
+    <span lang={languageFor(source)} dir={dir ?? directionFor(source)}>
       {text}
     </span>
   );
