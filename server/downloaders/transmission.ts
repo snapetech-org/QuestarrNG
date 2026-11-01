@@ -1,3 +1,9 @@
+import {
+  ServiceMessageError,
+  serviceErrorValue,
+  serviceErrorResult,
+  serviceMessage,
+} from "../../shared/service-messages.js";
 import type {
   Downloader,
   DownloadStatus,
@@ -118,10 +124,12 @@ export class TransmissionClient implements DownloaderClient {
       );
       return {
         success: true,
-        message:
-          typeof version === "string"
-            ? `Connected successfully to Transmission ${version}`
-            : "Connected successfully to Transmission",
+        ...(typeof version === "string"
+          ? serviceMessage("service.connected_successfully_version", {
+              client: "Transmission",
+              version: String(version),
+            })
+          : serviceMessage("service.connected_successfully", { client: "Transmission" })),
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
@@ -135,9 +143,15 @@ export class TransmissionClient implements DownloaderClient {
       );
 
       if (errorMessage.includes("Authentication failed")) {
-        return { success: false, message: errorMessage };
+        return serviceErrorResult(error, serviceMessage("interface.unknown_error_ce512b43", {}));
       }
-      return { success: false, message: `Failed to connect to Transmission: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.connection_failed", {
+          client: "Transmission",
+          error: serviceErrorValue(error),
+        }),
+      };
     }
   }
 
@@ -173,7 +187,7 @@ export class TransmissionClient implements DownloaderClient {
     if (request.downloadPath && !isSafeDownloadPathOverride(request.downloadPath)) {
       return {
         success: false,
-        message: "Invalid download path: use a relative path without parent-directory segments",
+        ...serviceMessage("service.invalid_relative_download_path", {}),
       };
     }
 
@@ -191,7 +205,10 @@ export class TransmissionClient implements DownloaderClient {
       } else {
         // Check URL safety before attempting download or fallback
         if (!(await isSafeUrl(request.url))) {
-          return { success: false, message: `Unsafe URL blocked: ${request.url}` };
+          return {
+            success: false,
+            ...serviceMessage("service.unsafe_url_blocked", { url: request.url }),
+          };
         }
 
         // Download the torrent file locally; uses manual redirect-following to detect
@@ -304,7 +321,7 @@ export class TransmissionClient implements DownloaderClient {
         return {
           success: true,
           id: id || torrent.id?.toString(),
-          message: "Download added successfully",
+          ...serviceMessage("service.download_added", {}),
         };
       } else if (response.arguments["torrent-duplicate"]) {
         const torrent = response.arguments["torrent-duplicate"];
@@ -313,7 +330,7 @@ export class TransmissionClient implements DownloaderClient {
         return {
           success: true,
           id: torrent.hashString || torrent.id?.toString(),
-          message: "Download already exists (Transmission)",
+          ...serviceMessage("service.download_already_exists", { client: "Transmission" }),
         };
       } else {
         const transmissionError =
@@ -322,14 +339,16 @@ export class TransmissionClient implements DownloaderClient {
             : null;
         return {
           success: false,
-          message: transmissionError
-            ? `Failed to add download: ${transmissionError}`
-            : "Failed to add download",
+          ...(transmissionError
+            ? serviceMessage("service.download_add_failed", { error: transmissionError })
+            : serviceMessage("service.download_add_failed_without_details", {})),
         };
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to add download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_add_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
@@ -449,20 +468,24 @@ export class TransmissionClient implements DownloaderClient {
   async pauseDownload(id: string): Promise<{ success: boolean; message: string }> {
     try {
       await this.makeRequest("torrent-stop", { ids: this.toTransmissionIds(id) });
-      return { success: true, message: "Download paused successfully" };
+      return { success: true, ...serviceMessage("service.download_paused", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to pause download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_pause_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
   async resumeDownload(id: string): Promise<{ success: boolean; message: string }> {
     try {
       await this.makeRequest("torrent-start", { ids: this.toTransmissionIds(id) });
-      return { success: true, message: "Download resumed successfully" };
+      return { success: true, ...serviceMessage("service.download_resumed", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to resume download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_resume_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
@@ -475,10 +498,12 @@ export class TransmissionClient implements DownloaderClient {
         ids: this.toTransmissionIds(id),
         "delete-local-data": deleteFiles,
       });
-      return { success: true, message: "Download removed successfully" };
+      return { success: true, ...serviceMessage("service.download_removed", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to remove download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_remove_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
@@ -762,7 +787,9 @@ export class TransmissionClient implements DownloaderClient {
         await logDownloaderDebugResponse("Transmission", method, url, retryResponse);
 
         if (!retryResponse.ok) {
-          const errorText = await retryResponse.text().catch(() => "No error details available");
+          const errorText = await retryResponse
+            .text()
+            .catch(() => serviceMessage("service.no_error_details_available", {}));
           if (retryResponse.status === 401) {
             downloadersLogger.error(
               {
@@ -774,9 +801,9 @@ export class TransmissionClient implements DownloaderClient {
               },
               "Transmission authentication failed - check username and password"
             );
-            throw new Error(
-              `Authentication failed: Invalid username or password for Transmission - ${errorText}`
-            );
+            throw new ServiceMessageError("service.transmission_authentication_failed", {
+              error: errorText,
+            });
           }
           downloadersLogger.error(
             {
@@ -788,9 +815,11 @@ export class TransmissionClient implements DownloaderClient {
             },
             "Transmission request failed after session ID retry"
           );
-          throw new Error(
-            `HTTP ${retryResponse.status}: ${retryResponse.statusText} - ${errorText}`
-          );
+          throw new ServiceMessageError("service.http_error_status", {
+            status: retryResponse.status,
+            statusText: retryResponse.statusText,
+            error: errorText,
+          });
         }
 
         return retryResponse.json();
@@ -798,7 +827,9 @@ export class TransmissionClient implements DownloaderClient {
     }
 
     if (!response.ok) {
-      const errorText = await response.text().catch(() => "No error details available");
+      const errorText = await response
+        .text()
+        .catch(() => serviceMessage("service.no_error_details_available", {}));
       if (response.status === 401) {
         const authHeader = response.headers.get("www-authenticate");
         downloadersLogger.error(
@@ -812,9 +843,9 @@ export class TransmissionClient implements DownloaderClient {
           },
           "Transmission authentication failed - check username and password"
         );
-        throw new Error(
-          `Authentication failed: Invalid username or password for Transmission - ${errorText}`
-        );
+        throw new ServiceMessageError("service.transmission_authentication_failed", {
+          error: errorText,
+        });
       }
       downloadersLogger.error(
         {
@@ -826,7 +857,11 @@ export class TransmissionClient implements DownloaderClient {
         },
         "Transmission request failed"
       );
-      throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+      throw new ServiceMessageError("service.http_error_status", {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText,
+      });
     }
 
     return response.json();

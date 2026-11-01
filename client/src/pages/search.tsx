@@ -12,9 +12,11 @@ import { formatBytes, formatAge, isUsenetItem, getDownloadTypeColor } from "@/li
 import {
   formatInterfaceMessage,
   getInterfaceLanguageDirection,
+  translateInterfaceLabel,
   useInterfaceLanguage,
 } from "@/lib/interface-locale";
 import { ApiErrorDetailText } from "@/components/ApiErrorDetailText";
+import { ServiceMessageText } from "@/components/ServiceMessageText";
 import { isTorrentDownloaderType, isUsenetDownloaderType } from "@shared/downloader-types";
 import { cleanReleaseName } from "@shared/title-utils";
 import {
@@ -89,6 +91,7 @@ interface SearchResult {
   total: number;
   offset: number;
   errors?: string[];
+  errorI18n?: Array<unknown | null>;
 }
 
 interface Downloader {
@@ -265,9 +268,12 @@ export default function SearchPage() {
         if (total > 0) {
           toast({
             title: "Search completed",
-            description: formatInterfaceMessage("Search results: {count}", {
-              count: String(total),
-            }),
+            description: (language) =>
+              formatInterfaceMessage(
+                "interface.search_results_count_b51a3250",
+                { count: String(total) },
+                language
+              ),
           });
         } else {
           toast({ title: "No results found", description: "Try a different search query" });
@@ -276,9 +282,12 @@ export default function SearchPage() {
         if (errors && errors.length > 0) {
           toast({
             title: "Some indexers failed",
-            description: formatInterfaceMessage("Indexer errors: {count}", {
-              count: String(errors.length),
-            }),
+            description: (language) =>
+              formatInterfaceMessage(
+                "interface.indexer_errors_count_7e2cd7f4",
+                { count: String(errors.length) },
+                language
+              ),
             variant: "destructive",
           });
         }
@@ -317,9 +326,11 @@ export default function SearchPage() {
           title: awaitingConfirmation ? "Checking qBittorrent" : "Download started successfully",
           ...(awaitingConfirmation
             ? {
-                description:
-                  result.message ||
-                  "The request was accepted, but qBittorrent has not confirmed the download yet. Check qBittorrent before retrying to avoid a duplicate.",
+                description: result.message ? (
+                  <ServiceMessageText message={result.message} metadata={result} />
+                ) : (
+                  "The request was accepted, but qBittorrent has not confirmed the download yet. Check qBittorrent before retrying to avoid a duplicate."
+                ),
               }
             : {}),
         });
@@ -328,7 +339,14 @@ export default function SearchPage() {
         void queryClient.invalidateQueries({ queryKey: ["/api/downloads"] });
         void queryClient.invalidateQueries({ queryKey: ["/api/downloads/summary"] });
       } else {
-        toast({ title: result.message || "Failed to start download", variant: "destructive" });
+        toast({
+          title: result.message ? (
+            <ServiceMessageText message={result.message} metadata={result} />
+          ) : (
+            "Failed to start download"
+          ),
+          variant: "destructive",
+        });
       }
     },
     onError: () => {
@@ -360,9 +378,12 @@ export default function SearchPage() {
     if (compatibleDownloaders.length === 0) {
       toast({
         title: "No compatible downloaders",
-        description: formatInterfaceMessage("Please configure a {type} downloader in settings.", {
-          type: t(isUsenet ? "Usenet" : "Torrent"),
-        }),
+        description: (language) =>
+          formatInterfaceMessage(
+            "interface.please_configure_a_type_downloader_18aae4bb",
+            { type: translateInterfaceLabel(isUsenet ? "Usenet" : "Torrent", language) },
+            language
+          ),
         variant: "destructive",
       });
       return;
@@ -426,12 +447,12 @@ export default function SearchPage() {
         <Button type="submit" disabled={isSearching} data-testid="button-search">
           {isSearching ? (
             <>
-              <Search className="h-4 w-4 mr-2 animate-spin" />
+              <Search className="h-4 w-4 me-2 animate-spin" />
               <InterfaceText source={"Searching..."} />
             </>
           ) : (
             <>
-              <Search className="h-4 w-4 mr-2" />
+              <Search className="h-4 w-4 me-2" />
               <InterfaceText source={"Search"} />
             </>
           )}
@@ -452,18 +473,18 @@ export default function SearchPage() {
       {showFilters && (
         <div className="mb-3 space-y-1">
           <label htmlFor="verified-file-types" className="text-sm font-medium">
-            <InterfaceText source="Verified file types" />
+            <InterfaceText source="interface.verified_file_types_d9050498" />
           </label>
           <Input
             id="verified-file-types"
             value={fileTypes}
             onChange={(event) => setFileTypes(event.target.value)}
             placeholder="Any type, or e.g. nsp,xci"
-            data-i18n-placeholder="Any type, or e.g. nsp,xci"
+            data-i18n-placeholder="interface.any_type_or_e_g_nsp_xci_c59f3b99"
             maxLength={120}
           />
           <p className="text-xs text-muted-foreground">
-            <InterfaceText source="Only releases whose torrent file list contains these extensions pass. Magnets, Usenet, archives, and unavailable file lists are excluded. Checks inspect up to 20 releases per page." />
+            <InterfaceText source="interface.only_releases_whose_torrent_file_l_20745ac3" />
           </p>
         </div>
       )}
@@ -538,9 +559,11 @@ export default function SearchPage() {
         <div>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-base font-semibold" data-testid="text-search-results-count">
-              {formatInterfaceMessage("Search results: {count}", { count: totalResults })}
+              {formatInterfaceMessage("interface.search_results_count_b51a3250", {
+                count: totalResults,
+              })}
               {!!(dateFrom || dateTo) && filteredAndSortedItems.length !== allItems.length && (
-                <span className="text-muted-foreground font-normal text-sm ml-2">
+                <span className="text-muted-foreground font-normal text-sm ms-2">
                   ({filteredAndSortedItems.length} <InterfaceText source={"shown with filter)"} />
                 </span>
               )}
@@ -570,7 +593,11 @@ export default function SearchPage() {
                       className="text-muted-foreground"
                       data-testid={`error-message-${index}`}
                     >
-                      • <ApiErrorDetailText source={error} />
+                      • <ApiErrorDetailText
+                        source={error}
+                        metadata={firstPage?.errorI18n?.[index] ?? null}
+                        legacyApiFallback={false}
+                      />
                     </li>
                   ))}
                 </ul>
@@ -600,9 +627,12 @@ export default function SearchPage() {
                     className="h-5 w-5 text-destructive/70 hover:text-destructive"
                     onClick={() => removeGameMutation.mutate(game.id)}
                     disabled={removeGameMutation.isPending}
-                    aria-label={formatInterfaceMessage("Remove {title} from library", {
-                      title: String(game.title ?? ""),
-                    })}
+                    aria-label={formatInterfaceMessage(
+                      "interface.remove_title_from_library_1a8c679c",
+                      {
+                        title: String(game.title ?? ""),
+                      }
+                    )}
                     data-testid={`button-remove-game-${game.id}`}
                   >
                     <Trash2 className="h-3 w-3" />
@@ -617,7 +647,7 @@ export default function SearchPage() {
               <div>
                 <InterfaceText source={"Release Name"} />
               </div>
-              <div className="w-[40px] text-right">
+              <div className="w-[40px] text-end">
                 <InterfaceText source={"Action"} />
               </div>
             </div>
@@ -645,12 +675,12 @@ export default function SearchPage() {
                           >
                             {isUsenet ? (
                               <>
-                                <Newspaper className="h-3 w-3 mr-1" />
+                                <Newspaper className="h-3 w-3 me-1" />
                                 <InterfaceText source={"USENET"} />
                               </>
                             ) : (
                               <>
-                                <Download className="h-3 w-3 mr-1" />
+                                <Download className="h-3 w-3 me-1" />
                                 <InterfaceText source={"TORRENT"} />
                               </>
                             )}
@@ -670,7 +700,7 @@ export default function SearchPage() {
                                 </TooltipTrigger>
                                 <TooltipContent>
                                   <InterfaceText
-                                    source="AI flagged this file size as unusual for this type of release ({percent} plausible)"
+                                    source="interface.ai_flagged_this_file_size_as_unusu_d3f30955"
                                     values={{
                                       percent: formatRegionalPercent(
                                         download.aiLegitimacyScore * 100,
@@ -733,7 +763,7 @@ export default function SearchPage() {
                           )}
                         </div>
                       </div>
-                      <div className="w-[40px] text-right flex-shrink-0">
+                      <div className="w-[40px] text-end flex-shrink-0">
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <div
@@ -747,9 +777,12 @@ export default function SearchPage() {
                                 disabled={downloaders.length === 0}
                                 className="h-8 w-8"
                                 data-testid={`button-download-${index}`}
-                                aria-label={formatInterfaceMessage("Start download for {title}", {
-                                  title: String(download.title ?? ""),
-                                })}
+                                aria-label={formatInterfaceMessage(
+                                  "interface.start_download_for_title_8ab69bd2",
+                                  {
+                                    title: String(download.title ?? ""),
+                                  }
+                                )}
                               >
                                 <Download className="h-4 w-4" />
                               </Button>
@@ -758,9 +791,9 @@ export default function SearchPage() {
                           <TooltipContent>
                             <p>
                               {downloaders.length === 0 ? (
-                                <InterfaceText source="Configure a downloader first" />
+                                <InterfaceText source="interface.configure_a_downloader_first_14107b71" />
                               ) : (
-                                <InterfaceText source="Start download" />
+                                <InterfaceText source="interface.start_download_3d514841" />
                               )}
                             </p>
                           </TooltipContent>
@@ -777,9 +810,9 @@ export default function SearchPage() {
                 </p>
                 <p className="text-sm mt-1">
                   {dateFrom || dateTo ? (
-                    <InterfaceText source="No releases match the selected date range. Try adjusting the filter." />
+                    <InterfaceText source="interface.no_releases_match_the_selected_dat_f178dd25" />
                   ) : (
-                    <InterfaceText source="Try adjusting your search terms or check if your indexers are properly configured." />
+                    <InterfaceText source="interface.try_adjusting_your_search_terms_or_3be77ff9" />
                   )}
                 </p>
                 {!!(dateFrom || dateTo) && hasNextPage && (
@@ -793,9 +826,9 @@ export default function SearchPage() {
                     data-testid="button-load-more-results"
                   >
                     {isFetchingNextPage ? (
-                      <InterfaceText source="Loading more results…" />
+                      <InterfaceText source="interface.loading_more_results_42aaa318" />
                     ) : (
-                      <InterfaceText source="Load more results" />
+                      <InterfaceText source="interface.load_more_results_2600c090" />
                     )}
                   </Button>
                 )}
@@ -980,9 +1013,9 @@ export default function SearchPage() {
                   data-testid="button-start-download"
                 >
                   {downloadMutation.isPending ? (
-                    <InterfaceText source="Starting..." />
+                    <InterfaceText source="interface.starting_6cac833d" />
                   ) : (
-                    <InterfaceText source="Start Download" />
+                    <InterfaceText source="interface.start_download_6361b161" />
                   )}
                 </Button>
               </div>

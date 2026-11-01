@@ -1,9 +1,18 @@
+import {
+  ServiceMessageError,
+  serviceMessage,
+  serviceMessageError,
+  serviceErrorValue,
+  serviceErrorResult,
+  parseServiceMessageDescriptor,
+  type ServiceMessageDescriptor,
+} from "../shared/service-messages.js";
 import { XMLParser } from "fast-xml-parser";
 import { type Indexer } from "@shared/schema";
 import {
   DEFAULT_GAME_CATEGORIES,
   discoverCapsCategories,
-  formatIndexerHttpError,
+  indexerHttpErrorMessage,
   indexerAllowsApiKey,
   redactIndexerUrl,
   resolveSearchCategories,
@@ -116,7 +125,7 @@ class NewznabClient {
     try {
       // Validate URL before making request
       if (!(await isSafeUrl(indexer.url))) {
-        throw new Error(`Unsafe URL detected: ${indexer.url}`);
+        throw new ServiceMessageError("service.unsafe_url_detected", { url: indexer.url });
       }
 
       const url = this.buildApiUrl(indexer.url);
@@ -177,7 +186,9 @@ class NewznabClient {
       });
 
       if (!response.ok) {
-        throw new Error(formatIndexerHttpError(indexer, response.status, response.statusText));
+        throw serviceMessageError(
+          indexerHttpErrorMessage(indexer, response.status, response.statusText)
+        );
       }
 
       const xmlText = await response.text();
@@ -314,9 +325,14 @@ class NewznabClient {
         stack: error instanceof Error ? error.stack : undefined,
       };
       routesLogger.error(errorDetails, "newznab search error");
-      throw new Error(`Newznab search failed for ${indexer.name}: ${errorMessage}`, {
-        cause: error,
-      });
+      throw new ServiceMessageError(
+        "service.newznab_search_failed",
+        {
+          indexer: indexer.name,
+          error: error instanceof Error ? serviceErrorValue(error) : String(error),
+        },
+        { cause: error }
+      );
     }
   }
 
@@ -326,21 +342,37 @@ class NewznabClient {
   async searchMultipleIndexers(
     indexers: Indexer[],
     params: NewznabSearchParams
-  ): Promise<{ results: NewznabSearchResults; errors: Array<{ indexer: string; error: string }> }> {
+  ): Promise<{
+    results: NewznabSearchResults;
+    errors: Array<{ indexer: string; error: string; errorI18n?: ServiceMessageDescriptor | null }>;
+  }> {
     const promises = indexers.map((indexer) =>
       this.search(indexer, params)
-        .then((results) => ({ indexer: indexer.name, results, error: null }))
-        .catch((error) => ({ indexer: indexer.name, results: [], error: error.message }))
+        .then((results) => ({ indexer: indexer.name, results, error: null, errorI18n: null }))
+        .catch((error: unknown) => {
+          const value = error instanceof Error ? serviceErrorValue(error) : String(error);
+          return {
+            indexer: indexer.name,
+            results: [],
+            error: typeof value === "string" ? value : value.message,
+            errorI18n:
+              typeof value === "string" ? null : (parseServiceMessageDescriptor(value) ?? null),
+          };
+        })
     );
 
     const settled = await Promise.all(promises);
 
     const allResults: NewznabResult[] = [];
-    const errors: Array<{ indexer: string; error: string }> = [];
+    const errors: Array<{
+      indexer: string;
+      error: string;
+      errorI18n?: ServiceMessageDescriptor | null;
+    }> = [];
 
     for (const result of settled) {
       if (result.error) {
-        errors.push({ indexer: result.indexer, error: result.error });
+        errors.push({ indexer: result.indexer, error: result.error, errorI18n: result.errorI18n });
       } else {
         allResults.push(...result.results);
       }
@@ -386,7 +418,7 @@ class NewznabClient {
       buildApiUrl: this.buildApiUrl.bind(this),
       assertAllowed: async () => {
         if (!(await isSafeUrl(indexer.url))) {
-          throw new Error(`Unsafe URL detected: ${indexer.url}`);
+          throw new ServiceMessageError("service.unsafe_url_detected", { url: indexer.url });
         }
       },
       parseCaps: (xmlText) => this.parseCapsCategories(xmlText),
@@ -403,7 +435,7 @@ class NewznabClient {
   async testConnection(indexer: Indexer): Promise<{ success: boolean; message: string }> {
     try {
       if (!(await isSafeUrl(indexer.url))) {
-        return { success: false, message: "Unsafe URL detected" };
+        return { success: false, ...serviceMessage("service.unsafe_url_detected_without_url", {}) };
       }
 
       const url = this.buildApiUrl(indexer.url);
@@ -421,11 +453,9 @@ class NewznabClient {
       if (!response.ok) {
         return {
           success: false,
-          message: `Connection failed: ${formatIndexerHttpError(
-            indexer,
-            response.status,
-            response.statusText
-          )}`,
+          ...serviceMessage("service.newznab_connection_failed", {
+            error: indexerHttpErrorMessage(indexer, response.status, response.statusText),
+          }),
         };
       }
 
@@ -435,7 +465,9 @@ class NewznabClient {
       if (data.error) {
         return {
           success: false,
-          message: data.error["@_description"] || data.error.description || "Unknown error",
+          ...(data.error["@_description"] || data.error.description
+            ? { message: data.error["@_description"] || data.error.description }
+            : serviceMessage("interface.unknown_error_ce512b43", {})),
         };
       }
 
@@ -443,19 +475,16 @@ class NewznabClient {
       if (data.caps) {
         return {
           success: true,
-          message: "Connection successful",
+          ...serviceMessage("interface.connection_successful_515fb6d9", {}),
         };
       }
 
       return {
         success: false,
-        message: "Invalid Newznab response",
+        ...serviceMessage("service.newznab_response_invalid", {}),
       };
     } catch (error) {
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : "Unknown error",
-      };
+      return serviceErrorResult(error, serviceMessage("interface.unknown_error_ce512b43", {}));
     }
   }
 
@@ -497,7 +526,7 @@ class NewznabClient {
    */
   private async fetchServerInfo(indexer: Indexer): Promise<NewznabServerInfo> {
     if (!(await isSafeUrl(indexer.url))) {
-      throw new Error(`Unsafe URL detected: ${indexer.url}`);
+      throw new ServiceMessageError("service.unsafe_url_detected", { url: indexer.url });
     }
 
     const url = this.buildApiUrl(indexer.url);
@@ -508,7 +537,7 @@ class NewznabClient {
     url.searchParams.set("t", "caps");
 
     if (!(await isSafeUrl(url.toString()))) {
-      throw new Error(`Unsafe URL detected: ${url.toString()}`);
+      throw new ServiceMessageError("service.unsafe_url_detected", { url: url.toString() });
     }
 
     const response = await safeFetch(url.toString(), {
@@ -517,7 +546,9 @@ class NewznabClient {
     });
 
     if (!response.ok) {
-      throw new Error(formatIndexerHttpError(indexer, response.status, response.statusText));
+      throw serviceMessageError(
+        indexerHttpErrorMessage(indexer, response.status, response.statusText)
+      );
     }
 
     const xmlText = await response.text();

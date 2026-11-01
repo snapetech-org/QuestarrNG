@@ -1,3 +1,6 @@
+import { serviceMessage, serviceErrorBody } from "../shared/service-messages.js";
+import { readNotificationLanguage } from "../shared/notification-language.js";
+import { localizeOutboundNotification } from "../shared/notification-messages.js";
 import { execFile } from "child_process";
 import { accessSync, constants as fsConstants } from "fs";
 import { mkdtemp, rm, writeFile } from "fs/promises";
@@ -181,6 +184,18 @@ function formatCliError(error: unknown, stdout = "", stderr = ""): string {
   return message.length > 200 ? `${message.slice(0, 197)}...` : message;
 }
 
+function cliErrorBody(error: unknown, stdout = "", stderr = "") {
+  const execError = error as ExecFileError | undefined;
+  const key =
+    execError?.code === "ENOENT"
+      ? "service.apprise_cli_not_found"
+      : execError?.killed || execError?.signal
+        ? "service.apprise_cli_timeout"
+        : undefined;
+  const descriptor = key ? serviceErrorBody(undefined, serviceMessage(key, {})).errorI18n : null;
+  return { error: formatCliError(error, stdout, stderr), errorI18n: descriptor };
+}
+
 function runAppriseCli(args: string[]): Promise<ExecFileResult> {
   const binary = resolveAppriseBinary();
   if (!binary) {
@@ -355,48 +370,91 @@ class AppriseClient {
     }
   }
 
+  private async localize(
+    title: string,
+    message: string,
+    userId?: string | null,
+    metadata?: unknown
+  ): Promise<{ title: string; message: string }> {
+    if (!userId) return { title, message };
+    try {
+      // Lazy import keeps transport-only consumers independent of database startup.
+      const { storage } = await import("./storage.js");
+      const settings = await storage.getUserSettings(userId);
+      return localizeOutboundNotification(
+        title,
+        message,
+        readNotificationLanguage(settings?.notificationPreferences),
+        metadata
+      );
+    } catch (error) {
+      appriseLogger.warn({ error }, "Could not load notification language, using English");
+      return { title, message };
+    }
+  }
+
   async send(notification: Notification): Promise<void> {
     if (!this.isConfigured()) return;
 
+    const translated = {
+      ...notification,
+      ...(await this.localize(
+        notification.title,
+        notification.message,
+        notification.userId,
+        notification.messageI18n
+      )),
+    };
     if (this.settings.mode === "cli") {
-      await this.sendViaCli(notification);
+      await this.sendViaCli(translated);
       return;
     }
 
-    await this.sendViaApi(notification);
+    await this.sendViaApi(translated);
   }
 
-  async test(): Promise<{ success: boolean; error?: string }> {
+  async test(
+    userId?: string
+  ): Promise<{ success: boolean; error?: string; errorI18n?: string | null }> {
     if (!this.isConfigured()) {
-      return { success: false, error: "Apprise is not configured" };
+      return {
+        success: false,
+        ...serviceErrorBody(undefined, serviceMessage("service.apprise_unconfigured", {})),
+      };
     }
 
+    const text = await this.localize("Questarr", "Test notification from Questarr", userId);
     if (this.settings.mode === "cli") {
       const urls = parseAppriseUrls(this.settings.urls);
       if (urls.length === 0) {
-        return { success: false, error: "No notification URLs provided" };
+        return {
+          success: false,
+          ...serviceErrorBody(
+            undefined,
+            serviceMessage("service.apprise_notification_urls_missing", {})
+          ),
+        };
       }
 
       try {
-        await runAppriseCliWithUrls(urls, [
-          "-t",
-          "Questarr",
-          "-b",
-          "Test notification from Questarr",
-          "-n",
-          "info",
-        ]);
+        await runAppriseCliWithUrls(urls, ["-t", text.title, "-b", text.message, "-n", "info"]);
         return { success: true };
       } catch (result) {
         const { error, stdout, stderr } =
           result instanceof AppriseCliError ? result : new AppriseCliError(result);
-        return { success: false, error: formatCliError(error, stdout, stderr) };
+        return { success: false, ...cliErrorBody(error, stdout, stderr) };
       }
     }
 
-    const request = this.buildApiRequest("Questarr", "Test notification from Questarr", "info");
+    const request = this.buildApiRequest(text.title, text.message, "info");
     if (!request) {
-      return { success: false, error: "No config key or notification URLs provided" };
+      return {
+        success: false,
+        ...serviceErrorBody(
+          undefined,
+          serviceMessage("service.apprise_config_or_urls_missing", {})
+        ),
+      };
     }
 
     try {
@@ -412,11 +470,21 @@ class AppriseClient {
       const text = await res.text().catch(() => "");
       return {
         success: false,
-        error: `Server responded with ${res.status}: ${text}`.slice(0, 200),
+        ...serviceErrorBody(
+          undefined,
+          serviceMessage("service.apprise_server_responded", {
+            status: res.status,
+            error: text.slice(0, Math.max(0, 200 - `Server responded with ${res.status}: `.length)),
+          })
+        ),
       };
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      return { success: false, error: message };
+      return {
+        success: false,
+        ...(error instanceof Error
+          ? serviceErrorBody(error, serviceMessage("service.apprise_reach_failed", {}))
+          : { error: String(error), errorI18n: null }),
+      };
     }
   }
 }

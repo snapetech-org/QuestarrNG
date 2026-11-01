@@ -1,3 +1,4 @@
+import { serviceMessage, type ServiceMessageFragment } from "../shared/service-messages.js";
 // Shared helpers for Newznab/Torznab caps (category) discovery. Both
 // protocols expose an equivalent `t=caps` endpoint with the same query-param
 // contract and the same reasonable retry/fallback behavior, so this logic
@@ -113,6 +114,23 @@ export function formatIndexerHttpError(
     return `${message} (check the indexer API key; re-sync from Prowlarr if its key changed).`;
   }
   return message;
+}
+
+/** Metadata follows the explicit transport-policy branch, never a provider-text match. */
+export function indexerHttpErrorMessage(
+  indexer: Pick<Indexer, "url" | "apiKey" | "allowInsecureLan">,
+  status: number,
+  statusText: string
+): ServiceMessageFragment {
+  const key = withheldApiKeyHint(indexer, status)
+    ? "service.indexer_http_key_withheld"
+    : status === 401 && indexer.apiKey
+      ? "service.indexer_http_key_check"
+      : "service.indexer_http_error";
+  return {
+    ...serviceMessage(key, { status, statusText }),
+    message: formatIndexerHttpError(indexer, status, statusText),
+  };
 }
 
 /** Remove credentials from URLs before they enter application logs. */

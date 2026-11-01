@@ -120,7 +120,7 @@ export default function PlatformsSettings() {
         />
         <div className="flex justify-end">
           <Button onClick={handleSave} disabled={!settings || updateSettingsMutation.isPending}>
-            {updateSettingsMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {updateSettingsMutation.isPending && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
             <InterfaceText source={"Save Changes"} />
           </Button>
         </div>

@@ -1,3 +1,4 @@
+import { getDownloadStatusSource } from "@/lib/download-status-locale";
 import {
   formatRegionalNumber,
   getRegionalLocale,
@@ -111,6 +112,7 @@ import {
   useInterfaceLanguage,
 } from "@/lib/interface-locale";
 import { InterfaceText } from "@/components/InterfaceText";
+import { ApiErrorDetailText } from "@/components/ApiErrorDetailText";
 
 const GameDownloadDialog = lazy(() => import("./GameDownloadDialog"));
 
@@ -186,7 +188,7 @@ function scoreColor(score: number): string {
 const EXPANSION_CATEGORY_LABELS: Record<string, string> = {
   main: "Main",
   dlc: "DLC",
-  update: "Update",
+  update: "Updates",
   extra: "Extra",
   packs: "Packs",
 };
@@ -223,7 +225,7 @@ function GameTabTrigger({
             {t(label)}
           </span>
           {count !== undefined && count > 0 && (
-            <Badge variant="secondary" className="ml-0.5 px-1.5 py-0 text-xs">
+            <Badge variant="secondary" className="ms-0.5 px-1.5 py-0 text-xs">
               {count}
             </Badge>
           )}
@@ -341,18 +343,9 @@ function DownloadStatusIcon({ status }: { status: string }) {
   }
 }
 
-const TRACKED_DOWNLOAD_STATUS_LABELS: Record<string, string> = {
-  completed: "Completed",
-  downloading: "Downloading",
-  failed: "Aborted",
-  paused: "Paused",
-};
-
 function TrackedDownloadStatus({ status }: { status: string }) {
-  const source = Object.hasOwn(TRACKED_DOWNLOAD_STATUS_LABELS, status)
-    ? TRACKED_DOWNLOAD_STATUS_LABELS[status]
-    : undefined;
-  return source ? (
+  const source = getDownloadStatusSource(status);
+  return source !== status ? (
     <InterfaceText source={source} />
   ) : (
     <span lang="und" dir="auto">
@@ -468,7 +461,7 @@ function StarHitTarget({
   onChange: (v: number | null) => void;
 }) {
   const { language, languageFor, directionFor } = useInterfaceLanguage();
-  const source = "Rate {rating} out of 5";
+  const source = "interface.rate_rating_out_of_5_88808050";
   return (
     <button
       type="button"
@@ -499,10 +492,10 @@ function StarRatingInput({
     <fieldset className="flex items-center gap-2 border-0 p-0 sm:gap-1">
       <legend
         className="sr-only"
-        lang={languageFor("Your rating")}
-        dir={directionFor("Your rating")}
+        lang={languageFor("interface.your_rating_5d43168f")}
+        dir={directionFor("interface.your_rating_5d43168f")}
       >
-        {t("Your rating")}
+        {t("interface.your_rating_5d43168f")}
       </legend>
       {[1, 2, 3, 4, 5].map((star) => {
         const fullValue = star * 2; // e.g. star=3 → fullValue=6
@@ -548,15 +541,18 @@ function StarRatingInput({
         );
       })}
       {/* Always rendered so aria-live is a stable region for screen readers */}
-      <span className="text-sm text-muted-foreground ml-1" aria-live="polite">
+      <span className="text-sm text-muted-foreground ms-1" aria-live="polite">
         {value !== null ? (
           <>
             {value % 2 === 0 ? value / 2 : `${Math.floor(value / 2)}.5`}/5
             <span className="sr-only"> ({value}/10)</span>
           </>
         ) : (
-          <span lang={languageFor("Not rated")} dir={directionFor("Not rated")}>
-            {t("Not rated")}
+          <span
+            lang={languageFor("interface.not_rated_9de37148")}
+            dir={directionFor("interface.not_rated_9de37148")}
+          >
+            {t("interface.not_rated_9de37148")}
           </span>
         )}
       </span>
@@ -841,13 +837,15 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
             ? "stored path is outside your configured library folder"
             : "deletion failed, check server logs";
         toast({
-          description: formatInterfaceMessage(
-            "Game removed, but files were not deleted ({reasonText}): {path}",
-            {
-              reasonText: translateInterfaceLabel(String(reasonText ?? "")),
-              path: String(data.fileDeletion.path ?? ""),
-            }
-          ),
+          description: (language) =>
+            formatInterfaceMessage(
+              "interface.game_removed_but_files_were_not_de_744e986d",
+              {
+                reasonText: translateInterfaceLabel(String(reasonText ?? ""), language),
+                path: String(data.fileDeletion.path ?? ""),
+              },
+              language
+            ),
           variant: "destructive",
         });
       } else {
@@ -1047,7 +1045,7 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
   const detailsBody = (
     <>
       {/* ── Header ── */}
-      <DialogHeader className="flex-shrink-0 pb-0 pr-8 text-left">
+      <DialogHeader className="flex-shrink-0 pb-0 pe-8 text-start">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
             <DialogTitle
@@ -1060,11 +1058,11 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
             </DialogTitle>
             <DialogDescription
               className="sr-only"
-              lang={languageFor("Detailed information about {game}")}
-              dir={directionFor("Detailed information about {game}")}
+              lang={languageFor("interface.detailed_information_about_game_636bd400")}
+              dir={directionFor("interface.detailed_information_about_game_636bd400")}
             >
               {formatInterfaceMessage(
-                "Detailed information about {game}",
+                "interface.detailed_information_about_game_636bd400",
                 { game: game.title },
                 language
               )}
@@ -1092,20 +1090,20 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                         <FlaskConical className="w-3 h-3" />
                         <span
                           className="hidden sm:inline"
-                          lang={languageFor("Early Access")}
-                          dir={directionFor("Early Access")}
+                          lang={languageFor("interface.early_access_3a5fe28e")}
+                          dir={directionFor("interface.early_access_3a5fe28e")}
                         >
-                          {t("Early Access")}
+                          {t("interface.early_access_3a5fe28e")}
                         </span>
                       </Badge>
                     </span>
                   </TooltipTrigger>
                   <TooltipContent
                     className="sm:hidden"
-                    lang={languageFor("Early Access")}
-                    dir={directionFor("Early Access")}
+                    lang={languageFor("interface.early_access_3a5fe28e")}
+                    dir={directionFor("interface.early_access_3a5fe28e")}
                   >
-                    {t("Early Access")}
+                    {t("interface.early_access_3a5fe28e")}
                   </TooltipContent>
                 </Tooltip>
               )}
@@ -1139,19 +1137,19 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                       <Search className="w-3 h-3" />
                       <span
                         className="hidden sm:inline"
-                        lang={languageFor("Results available")}
-                        dir={directionFor("Results available")}
+                        lang={languageFor("interface.results_available_d5606b5e")}
+                        dir={directionFor("interface.results_available_d5606b5e")}
                       >
-                        {t("Results available")}
+                        {t("interface.results_available_d5606b5e")}
                       </span>
                     </Badge>
                   </TooltipTrigger>
                   <TooltipContent
                     className="sm:hidden"
-                    lang={languageFor("Downloads found on indexers")}
-                    dir={directionFor("Downloads found on indexers")}
+                    lang={languageFor("interface.downloads_found_on_indexers_9af1e8cd")}
+                    dir={directionFor("interface.downloads_found_on_indexers_9af1e8cd")}
                   >
-                    {t("Downloads found on indexers")}
+                    {t("interface.downloads_found_on_indexers_9af1e8cd")}
                   </TooltipContent>
                 </Tooltip>
               )}
@@ -1175,7 +1173,9 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
             <div className="flex-shrink-0">
               <img
                 src={game.coverUrl}
-                alt={formatInterfaceMessage("{title} cover", { title: String(game.title ?? "") })}
+                alt={formatInterfaceMessage("interface.title_cover_c9fae4f4", {
+                  title: String(game.title ?? ""),
+                })}
                 lang="und"
                 dir="auto"
                 className="w-20 sm:w-32 object-cover rounded-lg shadow-md"
@@ -1196,28 +1196,28 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                 variant="outline"
                 size="sm"
                 className="h-10 w-10 sm:h-9 sm:w-auto sm:px-3 sm:gap-2"
-                aria-label={t("Download")}
-                lang={languageFor("Download")}
-                dir={directionFor("Download")}
+                aria-label={t("interface.download_6964bb19")}
+                lang={languageFor("interface.download_6964bb19")}
+                dir={directionFor("interface.download_6964bb19")}
                 onClick={() => setDownloadOpen(true)}
                 data-testid="button-download-game"
               >
                 <Download className="w-4 h-4" />
                 <span
                   className="hidden sm:inline"
-                  lang={languageFor("Download")}
-                  dir={directionFor("Download")}
+                  lang={languageFor("interface.download_6964bb19")}
+                  dir={directionFor("interface.download_6964bb19")}
                 >
-                  {t("Download")}
+                  {t("interface.download_6964bb19")}
                 </span>
               </Button>
             </TooltipTrigger>
             <TooltipContent
               className="sm:hidden"
-              lang={languageFor("Download")}
-              dir={directionFor("Download")}
+              lang={languageFor("interface.download_6964bb19")}
+              dir={directionFor("interface.download_6964bb19")}
             >
-              {t("Download")}
+              {t("interface.download_6964bb19")}
             </TooltipContent>
           </Tooltip>
           <Tooltip>
@@ -1236,9 +1236,9 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                   {hiddenMutation.isPending ? (
                     <InterfaceText source={"Updating..."} />
                   ) : game.hidden ? (
-                    <InterfaceText source="Unhide" />
+                    <InterfaceText source="interface.unhide_864b2c8a" />
                   ) : (
-                    <InterfaceText source="Hide" />
+                    <InterfaceText source="interface.hide_e10c7bcd" />
                   )}
                 </span>
               </Button>
@@ -1269,17 +1269,17 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                     {removeGameMutation.isPending ? (
                       <InterfaceText source={"Removing..."} />
                     ) : (
-                      <InterfaceText source="Remove" />
+                      <InterfaceText source="interface.remove_21a5901d" />
                     )}
                   </span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent
                 className="sm:hidden"
-                lang={languageFor("Remove")}
-                dir={directionFor("Remove")}
+                lang={languageFor("interface.remove_21a5901d")}
+                dir={directionFor("interface.remove_21a5901d")}
               >
-                {t("Remove")}
+                {t("interface.remove_21a5901d")}
               </TooltipContent>
             </Tooltip>
           )}
@@ -1342,7 +1342,7 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
             <GameTabTrigger
               value="mods"
               label="Mods"
-              icon={<NexusModsIcon className="h-3.5 w-3.5 text-amber-500 sm:mr-1" />}
+              icon={<NexusModsIcon className="h-3.5 w-3.5 text-amber-500 sm:me-1" />}
             />
           )}
         </TabsList>
@@ -1350,14 +1350,17 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
         {/* ── Overview tab ── */}
         <TabsContent value="overview" className="flex-1 min-h-0">
           <ScrollArea className="h-full">
-            <div className="space-y-5 pr-4 pb-2">
+            <div className="space-y-5 pe-4 pb-2">
               {/* Summary */}
               {game.summary && (
                 <div>
                   <h3 className="font-semibold mb-2 flex items-center gap-2">
                     <Gamepad2 className="w-4 h-4" />
-                    <span lang={languageFor("About")} dir={directionFor("About")}>
-                      {t("About")}
+                    <span
+                      lang={languageFor("interface.about_58e096de")}
+                      dir={directionFor("interface.about_58e096de")}
+                    >
+                      {t("interface.about_58e096de")}
                     </span>
                   </h3>
                   <p
@@ -1391,9 +1394,9 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
               {hltbEntry && hltbTimes.length > 0 && (
                 <section
                   data-testid="section-hltb"
-                  aria-label={t("HowLongToBeat estimates")}
-                  lang={languageFor("HowLongToBeat estimates")}
-                  dir={directionFor("HowLongToBeat estimates")}
+                  aria-label={t("interface.howlongtobeat_estimates_668e1415")}
+                  lang={languageFor("interface.howlongtobeat_estimates_668e1415")}
+                  dir={directionFor("interface.howlongtobeat_estimates_668e1415")}
                 >
                   <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                     <h3 className="flex items-center gap-2 font-semibold">
@@ -1407,11 +1410,11 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                       className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
                     >
                       <span
-                        lang={languageFor("View {title} on HLTB")}
-                        dir={directionFor("View {title} on HLTB")}
+                        lang={languageFor("interface.view_title_on_hltb_bbe044e1")}
+                        dir={directionFor("interface.view_title_on_hltb_bbe044e1")}
                       >
                         {formatInterfaceMessage(
-                          "View {title} on HLTB",
+                          "interface.view_title_on_hltb_bbe044e1",
                           { title: hltbEntry.name },
                           language
                         )}
@@ -1428,12 +1431,12 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                         <div
                           className="text-lg font-semibold"
                           aria-label={formatInterfaceMessage(
-                            "{label}: {hours} hours",
+                            "interface.label_hours_hours_e3cb1d93",
                             { label: t(label), hours },
                             language
                           )}
-                          lang={languageFor("{label}: {hours} hours")}
-                          dir={directionFor("{label}: {hours} hours")}
+                          lang={languageFor("interface.label_hours_hours_e3cb1d93")}
+                          dir={directionFor("interface.label_hours_hours_e3cb1d93")}
                         >
                           {hours}
                           <InterfaceText source={"h"} />
@@ -1442,7 +1445,7 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                     ))}
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    <InterfaceText source="Estimated play times from HowLongToBeat." />
+                    <InterfaceText source="interface.estimated_play_times_from_howlongt_5c844686" />
                   </p>
                 </section>
               )}
@@ -1452,8 +1455,11 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                 <div>
                   <h3 className="font-semibold mb-2 flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4" />
-                    <span lang={languageFor("Crack Status")} dir={directionFor("Crack Status")}>
-                      {t("Crack Status")}
+                    <span
+                      lang={languageFor("interface.crack_status_9d161165")}
+                      dir={directionFor("interface.crack_status_9d161165")}
+                    >
+                      {t("interface.crack_status_9d161165")}
                     </span>
                   </h3>
                   <CrackStatusContent
@@ -1471,10 +1477,10 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                   <div>
                     <h4
                       className="font-medium text-sm text-muted-foreground mb-1"
-                      lang={languageFor("IGDB score")}
-                      dir={directionFor("IGDB score")}
+                      lang={languageFor("interface.igdb_score_39719cbd")}
+                      dir={directionFor("interface.igdb_score_39719cbd")}
                     >
-                      {t("IGDB score")}
+                      {t("interface.igdb_score_39719cbd")}
                     </h4>
                     <div className="flex items-center gap-1">
                       <Star className="w-4 h-4 text-accent fill-current" />
@@ -1486,10 +1492,10 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                   <div>
                     <h4
                       className="font-medium text-sm text-muted-foreground mb-1"
-                      lang={languageFor("Release Date")}
-                      dir={directionFor("Release Date")}
+                      lang={languageFor("interface.release_date_1d144bfe")}
+                      dir={directionFor("interface.release_date_1d144bfe")}
                     >
-                      {t("Release Date")}
+                      {t("interface.release_date_1d144bfe")}
                     </h4>
                     <p
                       className="text-sm"
@@ -1507,10 +1513,10 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                   <div>
                     <h4
                       className="font-medium text-sm text-muted-foreground mb-1"
-                      lang={languageFor("Added to Collection")}
-                      dir={directionFor("Added to Collection")}
+                      lang={languageFor("interface.added_to_collection_964f8286")}
+                      dir={directionFor("interface.added_to_collection_964f8286")}
                     >
-                      {t("Added to Collection")}
+                      {t("interface.added_to_collection_964f8286")}
                     </h4>
                     <p className="text-sm">
                       {new Date(game.addedAt).toLocaleDateString(getRegionalLocale())}
@@ -1557,8 +1563,11 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                   <div>
                     <h3 className="font-semibold mb-2 flex items-center gap-2">
                       <Tag className="w-4 h-4" />
-                      <span lang={languageFor("Genres")} dir={directionFor("Genres")}>
-                        {t("Genres")}
+                      <span
+                        lang={languageFor("interface.genres_65d70ee9")}
+                        dir={directionFor("interface.genres_65d70ee9")}
+                      >
+                        {t("interface.genres_65d70ee9")}
                       </span>
                     </h3>
                     <TagList
@@ -1573,8 +1582,11 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                   <div>
                     <h3 className="font-semibold mb-2 flex items-center gap-2">
                       <Monitor className="w-4 h-4" />
-                      <span lang={languageFor("Platforms")} dir={directionFor("Platforms")}>
-                        {t("Platforms")}
+                      <span
+                        lang={languageFor("interface.platforms_c06da773")}
+                        dir={directionFor("interface.platforms_c06da773")}
+                      >
+                        {t("interface.platforms_c06da773")}
                       </span>
                     </h3>
                     <TagList
@@ -1593,10 +1605,10 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                     >
                       <Gamepad2 className="w-4 h-4" />
                       <span
-                        lang={languageFor("Automatic download target")}
-                        dir={directionFor("Automatic download target")}
+                        lang={languageFor("interface.automatic_download_target_23bf8f65")}
+                        dir={directionFor("interface.automatic_download_target_23bf8f65")}
                       >
-                        {t("Automatic download target")}
+                        {t("interface.automatic_download_target_23bf8f65")}
                       </span>
                     </label>
                     <Select
@@ -1606,20 +1618,20 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                     >
                       <SelectTrigger
                         id="target-platform"
-                        aria-label={t("Automatic download target")}
-                        lang={languageFor("Automatic download target")}
-                        dir={directionFor("Automatic download target")}
+                        aria-label={t("interface.automatic_download_target_23bf8f65")}
+                        lang={languageFor("interface.automatic_download_target_23bf8f65")}
+                        dir={directionFor("interface.automatic_download_target_23bf8f65")}
                         className="w-full max-w-sm"
                       >
-                        <SelectValue placeholder={t("Use account default")} />
+                        <SelectValue placeholder={t("interface.use_account_default_a80d36fa")} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem
                           value="default"
-                          lang={languageFor("Use account default")}
-                          dir={directionFor("Use account default")}
+                          lang={languageFor("interface.use_account_default_a80d36fa")}
+                          dir={directionFor("interface.use_account_default_a80d36fa")}
                         >
-                          {t("Use account default")}
+                          {t("interface.use_account_default_a80d36fa")}
                         </SelectItem>
                         {supportedTargetPlatformOptions.map((platform) => (
                           <SelectItem key={platform.id} value={String(platform.id)}>
@@ -1632,14 +1644,10 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                     </Select>
                     <p
                       className="mt-1 text-xs text-muted-foreground"
-                      lang={languageFor(
-                        "Overrides the account platform for automatic release matching."
-                      )}
-                      dir={directionFor(
-                        "Overrides the account platform for automatic release matching."
-                      )}
+                      lang={languageFor("interface.overrides_the_account_platform_for_4d0354db")}
+                      dir={directionFor("interface.overrides_the_account_platform_for_4d0354db")}
                     >
-                      {t("Overrides the account platform for automatic release matching.")}
+                      {t("interface.overrides_the_account_platform_for_4d0354db")}
                     </p>
                   </div>
                 )}
@@ -1668,10 +1676,10 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
           className="flex-1 min-h-0 data-[state=inactive]:hidden"
         >
           <ScrollArea className="h-full">
-            <div className="space-y-3 pr-4 pb-2">
+            <div className="space-y-3 pe-4 pb-2">
               {downloadsLoading ? (
                 <div className="flex items-center justify-center py-8 text-muted-foreground">
-                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  <Loader2 className="w-5 h-5 animate-spin me-2" />
                   <InterfaceText source={"Loading downloads…"} />
                 </div>
               ) : gameDownloads.length === 0 ? (
@@ -1679,10 +1687,10 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                   <HardDrive className="w-8 h-8 opacity-40" />
                   <p
                     className="text-sm"
-                    lang={languageFor("No downloads recorded for this game.")}
-                    dir={directionFor("No downloads recorded for this game.")}
+                    lang={languageFor("interface.no_downloads_recorded_for_this_gam_4827435a")}
+                    dir={directionFor("interface.no_downloads_recorded_for_this_gam_4827435a")}
                   >
-                    {t("No downloads recorded for this game.")}
+                    {t("interface.no_downloads_recorded_for_this_gam_4827435a")}
                   </p>
                 </div>
               ) : (
@@ -1712,14 +1720,18 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                               </span>
                               {dl.errorMessage && (
                                 <span className="text-xs text-red-400 break-words max-w-full">
-                                  {dl.errorMessage}
+                                  <ApiErrorDetailText
+                                    source={dl.errorMessage}
+                                    metadata={dl.errorMessageI18n}
+                                    legacyApiFallback={false}
+                                  />
                                 </span>
                               )}
                             </div>
                           </div>
                         </div>
                         <div className="flex items-start gap-3 flex-shrink-0">
-                          <div className="text-right">
+                          <div className="text-end">
                             {dl.fileSize ? (
                               <p className="text-sm font-medium">{formatBytes(dl.fileSize)}</p>
                             ) : null}
@@ -1740,7 +1752,7 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                             size="icon"
                             className="h-7 w-7 text-muted-foreground hover:text-destructive"
                             aria-label={formatInterfaceMessage(
-                              "Remove download record {downloadTitle}",
+                              "interface.remove_download_record_downloadtit_c198790c",
                               { downloadTitle: String(dl.downloadTitle ?? "") }
                             )}
                             disabled={
@@ -1768,16 +1780,19 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
           className="flex-1 min-h-0 data-[state=inactive]:hidden"
         >
           <ScrollArea className="h-full">
-            <div className="pr-4 pb-2">
+            <div className="pe-4 pb-2">
               {game.screenshots && game.screenshots.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {game.screenshots.map((screenshot, index) => (
                     <button
                       key={index}
                       type="button"
-                      aria-label={formatInterfaceMessage("Open screenshot {value}", {
-                        value: String(index + 1),
-                      })}
+                      aria-label={formatInterfaceMessage(
+                        "interface.open_screenshot_value_2d23d24a",
+                        {
+                          value: String(index + 1),
+                        }
+                      )}
                       className="shadcn-card overflow-hidden cursor-pointer hover-elevate rounded-xl border bg-card border-card-border text-card-foreground shadow-sm"
                       onClick={() => setSelectedScreenshotIndex(index)}
                       data-testid={`screenshot-${index}`}
@@ -1786,7 +1801,7 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                     >
                       <img
                         src={screenshot}
-                        alt={formatInterfaceMessage("{title} screenshot {value}", {
+                        alt={formatInterfaceMessage("interface.title_screenshot_value_37287400", {
                           title: String(game.title ?? ""),
                           value: String(index + 1),
                         })}
@@ -1805,10 +1820,10 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                   <Monitor className="w-8 h-8 opacity-40" />
                   <p
                     className="text-sm"
-                    lang={languageFor("No screenshots available.")}
-                    dir={directionFor("No screenshots available.")}
+                    lang={languageFor("interface.no_screenshots_available_5d0c48e6")}
+                    dir={directionFor("interface.no_screenshots_available_5d0c48e6")}
                   >
-                    {t("No screenshots available.")}
+                    {t("interface.no_screenshots_available_5d0c48e6")}
                   </p>
                 </div>
               )}
@@ -1824,7 +1839,7 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
             className="flex-1 min-h-0 data-[state=inactive]:hidden"
           >
             <ScrollArea className="h-full">
-              <div className="pr-4 pb-2">
+              <div className="pe-4 pb-2">
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                   {game.expansions.map((expansion) => {
                     const content = (
@@ -1897,7 +1912,7 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
           className="flex-1 min-h-0 data-[state=inactive]:hidden"
         >
           <ScrollArea className="h-full">
-            <div className="pr-4 pb-2">
+            <div className="pe-4 pb-2">
               {filesTruncated && (
                 <div
                   role="status"
@@ -1905,13 +1920,13 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                 >
                   <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
                   <span>
-                    <InterfaceText source="Showing a partial file list because the scan reached a safety limit." />
+                    <InterfaceText source="interface.showing_a_partial_file_list_becaus_eee2b030" />
                   </span>
                 </div>
               )}
               {filesLoading ? (
                 <div className="flex items-center justify-center py-8 text-muted-foreground">
-                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  <Loader2 className="w-5 h-5 animate-spin me-2" />
                   <InterfaceText source={"Loading files…"} />
                 </div>
               ) : filesError ? (
@@ -1923,10 +1938,10 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                   <HardDrive className="w-8 h-8 opacity-40" />
                   <p
                     className="text-sm"
-                    lang={languageFor("No files found on disk.")}
-                    dir={directionFor("No files found on disk.")}
+                    lang={languageFor("interface.no_files_found_on_disk_4cdf687f")}
+                    dir={directionFor("interface.no_files_found_on_disk_4cdf687f")}
                   >
-                    {t("No files found on disk.")}
+                    {t("interface.no_files_found_on_disk_4cdf687f")}
                   </p>
                 </div>
               ) : (
@@ -1996,7 +2011,7 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
           className="flex-1 min-h-0 data-[state=inactive]:hidden"
         >
           <ScrollArea className="h-full">
-            <div className="space-y-6 pr-4 pb-2">
+            <div className="space-y-6 pe-4 pb-2">
               {/* Ratings */}
               <div>
                 <h3 className="font-semibold mb-3 flex items-center gap-2">
@@ -2050,10 +2065,10 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                 <div data-testid="section-user-rating">
                   <h4
                     className="font-medium text-sm text-muted-foreground mb-2"
-                    lang={languageFor("Your rating")}
-                    dir={directionFor("Your rating")}
+                    lang={languageFor("interface.your_rating_5d43168f")}
+                    dir={directionFor("interface.your_rating_5d43168f")}
                   >
-                    {t("Your rating")}
+                    {t("interface.your_rating_5d43168f")}
                   </h4>
                   <StarRatingInput value={currentUserRating} onChange={handleUserRatingChange} />
                 </div>
@@ -2212,7 +2227,7 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
         {nexusDomain && (
           <TabsContent value="mods" className="flex-1 min-h-0">
             <ScrollArea className="h-full">
-              <div className="space-y-4 pr-4 pb-2">
+              <div className="space-y-4 pe-4 pb-2">
                 <h3 className="font-semibold flex items-center gap-2">
                   <NexusModsIcon className="w-4 h-4 text-amber-500" />
                   <InterfaceText source={"Trending Mods on Nexus Mods"} />
@@ -2226,10 +2241,10 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                 ) : trendingMods.length === 0 ? (
                   <p
                     className="text-sm text-muted-foreground"
-                    lang={languageFor("No trending mods found.")}
-                    dir={directionFor("No trending mods found.")}
+                    lang={languageFor("interface.no_trending_mods_found_7b89c1be")}
+                    dir={directionFor("interface.no_trending_mods_found_7b89c1be")}
                   >
-                    {t("No trending mods found.")}
+                    {t("interface.no_trending_mods_found_7b89c1be")}
                   </p>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -2256,7 +2271,7 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                                 <NexusModsIcon className="w-6 h-6 text-muted-foreground" />
                               </div>
                             )}
-                            <div className="flex-1 min-w-0 py-2 pr-2">
+                            <div className="flex-1 min-w-0 py-2 pe-2">
                               <p className="text-sm font-medium truncate group-hover:text-amber-400 transition-colors">
                                 {mod.name}
                               </p>
@@ -2339,21 +2354,25 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                   type="button"
                   variant="secondary"
                   size="icon"
-                  className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-10 h-11 w-11 rounded-full shadow-lg"
+                  className="absolute start-1 sm:start-2 top-1/2 -translate-y-1/2 z-10 h-11 w-11 rounded-full shadow-lg"
                   onClick={showPreviousScreenshot}
-                  aria-label={t("Previous screenshot")}
-                  lang={languageFor("Previous screenshot")}
-                  dir={directionFor("Previous screenshot")}
+                  aria-label={t("interface.previous_screenshot_d2fbbbec")}
+                  lang={languageFor("interface.previous_screenshot_d2fbbbec")}
+                  dir={directionFor("interface.previous_screenshot_d2fbbbec")}
                   data-testid="screenshot-lightbox-prev"
                 >
-                  <ChevronLeft className="w-5 h-5" />
+                  <ChevronLeft className="w-5 h-5 rtl:rotate-180" />
                 </Button>
               )}
               <img
                 src={screenshots[selectedScreenshotIndex]}
-                alt={formatInterfaceMessage("Screenshot of {game}", { game: game.title }, language)}
-                lang={languageFor("Screenshot of {game}")}
-                dir={directionFor("Screenshot of {game}")}
+                alt={formatInterfaceMessage(
+                  "interface.screenshot_of_game_126a19fc",
+                  { game: game.title },
+                  language
+                )}
+                lang={languageFor("interface.screenshot_of_game_126a19fc")}
+                dir={directionFor("interface.screenshot_of_game_126a19fc")}
                 className={cn(
                   "max-w-full object-contain rounded-lg select-none",
                   isMobile ? "max-h-full" : "max-h-[70vh]"
@@ -2366,14 +2385,14 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                   type="button"
                   variant="secondary"
                   size="icon"
-                  className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-10 h-11 w-11 rounded-full shadow-lg"
+                  className="absolute end-1 sm:end-2 top-1/2 -translate-y-1/2 z-10 h-11 w-11 rounded-full shadow-lg"
                   onClick={showNextScreenshot}
-                  aria-label={t("Next screenshot")}
-                  lang={languageFor("Next screenshot")}
-                  dir={directionFor("Next screenshot")}
+                  aria-label={t("interface.next_screenshot_5ce8402c")}
+                  lang={languageFor("interface.next_screenshot_5ce8402c")}
+                  dir={directionFor("interface.next_screenshot_5ce8402c")}
                   data-testid="screenshot-lightbox-next"
                 >
-                  <ChevronRight className="w-5 h-5" />
+                  <ChevronRight className="w-5 h-5 rtl:rotate-180" />
                 </Button>
               )}
             </div>
@@ -2402,17 +2421,17 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                 <SheetHeader>
                   <SheetTitle>
                     {formatInterfaceMessage(
-                      "Screenshot {current} of {total}",
+                      "interface.screenshot_current_of_total_2a1e8d7d",
                       { current: selectedScreenshotIndex + 1, total: screenshots.length },
                       language
                     )}
                   </SheetTitle>
                   <SheetDescription
                     className="sr-only"
-                    lang={languageFor("Full size game screenshot")}
-                    dir={directionFor("Full size game screenshot")}
+                    lang={languageFor("interface.full_size_game_screenshot_83eeba4b")}
+                    dir={directionFor("interface.full_size_game_screenshot_83eeba4b")}
                   >
-                    {t("Full size game screenshot")}
+                    {t("interface.full_size_game_screenshot_83eeba4b")}
                   </SheetDescription>
                 </SheetHeader>
                 {lightboxImage}
@@ -2428,17 +2447,17 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                 <DialogHeader>
                   <DialogTitle>
                     {formatInterfaceMessage(
-                      "Screenshot {current} of {total}",
+                      "interface.screenshot_current_of_total_2a1e8d7d",
                       { current: selectedScreenshotIndex + 1, total: screenshots.length },
                       language
                     )}
                   </DialogTitle>
                   <DialogDescription
                     className="sr-only"
-                    lang={languageFor("Full size game screenshot")}
-                    dir={directionFor("Full size game screenshot")}
+                    lang={languageFor("interface.full_size_game_screenshot_83eeba4b")}
+                    dir={directionFor("interface.full_size_game_screenshot_83eeba4b")}
                   >
-                    {t("Full size game screenshot")}
+                    {t("interface.full_size_game_screenshot_83eeba4b")}
                   </DialogDescription>
                 </DialogHeader>
                 {lightboxImage}
@@ -2457,19 +2476,18 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
       <AlertDialog open={showRemoveConfirm} onOpenChange={setShowRemoveConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle lang={languageFor("Remove game?")} dir={directionFor("Remove game?")}>
-              {t("Remove game?")}
+            <AlertDialogTitle
+              lang={languageFor("interface.remove_game_095ea616")}
+              dir={directionFor("interface.remove_game_095ea616")}
+            >
+              {t("interface.remove_game_095ea616")}
             </AlertDialogTitle>
             <AlertDialogDescription
-              lang={languageFor(
-                "This will remove {game} from your library. This action cannot be undone."
-              )}
-              dir={directionFor(
-                "This will remove {game} from your library. This action cannot be undone."
-              )}
+              lang={languageFor("interface.this_will_remove_game_from_your_li_b280beb8")}
+              dir={directionFor("interface.this_will_remove_game_from_your_li_b280beb8")}
             >
               {formatInterfaceMessage(
-                "This will remove {game} from your library. This action cannot be undone.",
+                "interface.this_will_remove_game_from_your_li_b280beb8",
                 { game: game?.title ?? "" },
                 language
               )}
@@ -2487,18 +2505,18 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                   <div>
                     <div
                       className="text-sm font-medium leading-none"
-                      lang={languageFor("Remove from download client")}
-                      dir={directionFor("Remove from download client")}
+                      lang={languageFor("interface.remove_from_download_client_2292f2b8")}
+                      dir={directionFor("interface.remove_from_download_client_2292f2b8")}
                     >
-                      {t("Remove from download client")}
+                      {t("interface.remove_from_download_client_2292f2b8")}
                     </div>
                     <div
                       className="text-xs text-muted-foreground mt-1"
-                      lang={languageFor("Removes the {format} metadata from your downloader")}
-                      dir={directionFor("Removes the {format} metadata from your downloader")}
+                      lang={languageFor("interface.removes_the_format_metadata_from_y_da6be94b")}
+                      dir={directionFor("interface.removes_the_format_metadata_from_y_da6be94b")}
                     >
                       {formatInterfaceMessage(
-                        "Removes the {format} metadata from your downloader",
+                        "interface.removes_the_format_metadata_from_y_da6be94b",
                         {
                           format:
                             gameDownloads.some((dl) => dl.downloadType === "usenet") &&
@@ -2522,25 +2540,28 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
                 <div>
                   <div
                     className="text-sm font-medium leading-none"
-                    lang={languageFor("Delete downloaded files from disk")}
-                    dir={directionFor("Delete downloaded files from disk")}
+                    lang={languageFor("interface.delete_downloaded_files_from_disk_d71879bd")}
+                    dir={directionFor("interface.delete_downloaded_files_from_disk_d71879bd")}
                   >
-                    {t("Delete downloaded files from disk")}
+                    {t("interface.delete_downloaded_files_from_disk_d71879bd")}
                   </div>
                   <div
                     className="text-xs text-muted-foreground mt-1"
-                    lang={languageFor("Permanently removes the game files")}
-                    dir={directionFor("Permanently removes the game files")}
+                    lang={languageFor("interface.permanently_removes_the_game_files_ffd66df5")}
+                    dir={directionFor("interface.permanently_removes_the_game_files_ffd66df5")}
                   >
-                    {t("Permanently removes the game files")}
+                    {t("interface.permanently_removes_the_game_files_ffd66df5")}
                   </div>
                 </div>
               </label>
             </div>
           )}
           <AlertDialogFooter>
-            <AlertDialogCancel lang={languageFor("Cancel")} dir={directionFor("Cancel")}>
-              {t("Cancel")}
+            <AlertDialogCancel
+              lang={languageFor("interface.cancel_35afca3b")}
+              dir={directionFor("interface.cancel_35afca3b")}
+            >
+              {t("interface.cancel_35afca3b")}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
@@ -2555,8 +2576,11 @@ export default function GameDetailsModal({ game, open, onOpenChange }: GameDetai
               }}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              <span lang={languageFor("Remove")} dir={directionFor("Remove")}>
-                {t("Remove")}
+              <span
+                lang={languageFor("interface.remove_21a5901d")}
+                dir={directionFor("interface.remove_21a5901d")}
+              >
+                {t("interface.remove_21a5901d")}
               </span>
             </AlertDialogAction>
           </AlertDialogFooter>

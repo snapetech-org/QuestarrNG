@@ -1,3 +1,8 @@
+import {
+  serviceMessage,
+  ServiceMessageError,
+  serviceErrorBody,
+} from "../shared/service-messages.js";
 import { z } from "zod";
 import { config } from "./config.js";
 import { igdbLogger } from "./logger.js";
@@ -572,7 +577,7 @@ class IGDBClient {
   async testCredentials(
     clientId: string,
     clientSecret: string
-  ): Promise<{ success: true } | { success: false; error: string }> {
+  ): Promise<{ success: true } | ({ success: false } & ReturnType<typeof serviceErrorBody>)> {
     let tokenResponse: Response;
     try {
       // Credentials go in the request body, not the URL: query strings are commonly retained
@@ -591,16 +596,25 @@ class IGDBClient {
       });
     } catch (error) {
       igdbLogger.warn({ error }, "IGDB credential test: network error reaching Twitch");
-      return { success: false, error: "Could not reach Twitch — check your network connection." };
+      return {
+        success: false,
+        ...serviceErrorBody(undefined, serviceMessage("service.twitch_unreachable", {})),
+      };
     }
 
     if (!tokenResponse.ok) {
       if (tokenResponse.status === 400 || tokenResponse.status === 403) {
-        return { success: false, error: "Invalid Client ID or Client Secret." };
+        return {
+          success: false,
+          ...serviceErrorBody(undefined, serviceMessage("service.igdb_credentials_invalid", {})),
+        };
       }
       return {
         success: false,
-        error: `Twitch returned an unexpected error (status ${tokenResponse.status}).`,
+        ...serviceErrorBody(
+          undefined,
+          serviceMessage("service.twitch_unexpected_status", { status: tokenResponse.status })
+        ),
       };
     }
 
@@ -620,13 +634,19 @@ class IGDBClient {
       });
     } catch (error) {
       igdbLogger.warn({ error }, "IGDB credential test: network error reaching IGDB");
-      return { success: false, error: "Could not reach IGDB — check your network connection." };
+      return {
+        success: false,
+        ...serviceErrorBody(undefined, serviceMessage("service.igdb_unreachable", {})),
+      };
     }
 
     if (!igdbResponse.ok) {
       return {
         success: false,
-        error: `IGDB rejected the request (status ${igdbResponse.status}).`,
+        ...serviceErrorBody(
+          undefined,
+          serviceMessage("service.igdb_request_rejected", { status: igdbResponse.status })
+        ),
       };
     }
 
@@ -690,7 +710,7 @@ class IGDBClient {
     const { clientId, clientSecret } = await this.getCredentials();
 
     if (!clientId || !clientSecret) {
-      throw new Error("IGDB credentials not configured");
+      throw new ServiceMessageError("service.igdb_credentials_unconfigured", {});
     }
 
     // Credentials go in the request body, not the URL: query strings are commonly retained in
@@ -707,7 +727,9 @@ class IGDBClient {
     });
 
     if (!response.ok) {
-      throw new Error(`IGDB authentication failed: ${response.status}`);
+      throw new ServiceMessageError("service.igdb_authentication_failed", {
+        status: response.status,
+      });
     }
 
     const data: IGDBAuthResponse = await response.json();
@@ -760,7 +782,7 @@ class IGDBClient {
       }
 
       if (!response.ok) {
-        throw new Error(`IGDB API error: ${response.status}`);
+        throw new ServiceMessageError("service.igdb_api_error", { status: response.status });
       }
 
       const data = await response.json();
@@ -1126,7 +1148,7 @@ class IGDBClient {
       platformId <= 0 ||
       platformId > 1_000_000
     ) {
-      throw new Error("A valid IGDB game and platform ID are required.");
+      throw new ServiceMessageError("service.igdb_game_platform_required", {});
     }
 
     const gameFields = `${IGDB_GAME_FIELDS}${includeVideos ? ", videos.name, videos.video_id" : ""}`;

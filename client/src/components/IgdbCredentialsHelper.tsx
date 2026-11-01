@@ -1,4 +1,6 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
+import { ServiceMessageText } from "@/components/ServiceMessageText";
+import { useState, useCallback, useEffect, useRef, type ReactNode } from "react";
 import { Copy, Check, HelpCircle, Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -62,7 +64,7 @@ export function IgdbHelpPopover() {
             </li>
             <li>
               <InterfaceText source={"Set Redirect URI to:"} />
-              <div className="mt-1 flex items-center gap-1.5 rounded border bg-muted/50 p-1 pl-2">
+              <div className="mt-1 flex items-center gap-1.5 rounded border bg-muted/50 p-1 ps-2">
                 <code className="flex-1 text-foreground">{IGDB_REDIRECT_URI}</code>
                 <Button
                   type="button"
@@ -110,7 +112,7 @@ export function IgdbHelpPopover() {
   );
 }
 
-type TestResult = { success: true } | { success: false; error: string };
+type TestResult = { success: true } | { success: false; error: string; errorI18n?: unknown };
 
 interface IgdbTestConnectionButtonProps {
   clientId: string;
@@ -130,7 +132,7 @@ export function IgdbTestConnectionButton({
   testEndpoint,
 }: IgdbTestConnectionButtonProps) {
   const [state, setState] = useState<"idle" | "testing" | "success" | "error">("idle");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<ReactNode | null>(null);
 
   // Guards against two races: an in-flight request resolving after the user has already edited
   // a field (its result would otherwise overwrite the newer, untested input), and the result
@@ -157,15 +159,20 @@ export function IgdbTestConnectionButton({
         setState("success");
       } else {
         setState("error");
-        setErrorMessage(result.error);
+        setErrorMessage(<ServiceMessageText message={result.error} metadata={result.errorI18n} />);
       }
     } catch (error) {
       if (requestId !== requestIdRef.current) return;
       setState("error");
       setErrorMessage(
-        error instanceof ApiError
-          ? error.message
-          : "Could not reach the server to test the connection."
+        error instanceof ApiError ? (
+          <ApiErrorDescription
+            error={error}
+            fallbackSource="service.connection_test_server_unreachable"
+          />
+        ) : (
+          <InterfaceText source="service.connection_test_server_unreachable" />
+        )
       );
     }
   }, [clientId, clientSecret, testEndpoint]);
@@ -200,7 +207,7 @@ export function IgdbTestConnectionButton({
       {state === "error" && (
         <p className="flex items-center gap-1.5 text-xs text-destructive">
           <XCircle className="h-3.5 w-3.5 shrink-0" />
-          <InterfaceText source={errorMessage ?? "Connection failed."} />
+          {errorMessage ?? <InterfaceText source="interface.connection_failed_e3bd2c48" />}
         </p>
       )}
     </div>

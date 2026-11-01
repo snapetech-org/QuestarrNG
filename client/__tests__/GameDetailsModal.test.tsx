@@ -7,6 +7,8 @@ import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import GameDetailsModal from "../src/components/GameDetailsModal";
 import { Toaster } from "@/components/ui/toaster";
+import { setInterfaceLanguage } from "@/lib/interface-locale";
+import { serviceMessage, serializeServiceMessageDescriptor } from "@shared/service-messages";
 
 // Mocking external dependencies
 vi.mock("socket.io-client", () => ({
@@ -221,7 +223,12 @@ const renderComponent = (game = mockGame) => {
 describe("GameDetailsModal", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    setInterfaceLanguage("en");
     (global.fetch as ReturnType<typeof vi.fn>).mockImplementation(makeFetchMock());
+  });
+
+  afterEach(() => {
+    setInterfaceLanguage("en");
   });
 
   it("renders game details correctly", () => {
@@ -994,6 +1001,66 @@ describe("GameDetailsModal", () => {
         expect(screen.getByText("Aborted")).toBeInTheDocument();
         expect(
           screen.getByText("Aborted, cannot be completed - https://sabnzbd.org/not-complete")
+        ).toBeInTheDocument();
+      });
+    });
+
+    it("localizes tagged persisted errors and keeps legacy and provider text raw", async () => {
+      setInterfaceLanguage("es");
+      const taggedError = serviceMessage("service.realdebrid_staging_failed", {});
+      const downloads = [
+        {
+          id: "dl-fixed-error",
+          downloadTitle: "Test Game-SKIDROW",
+          status: "failed",
+          downloadType: "torrent",
+          downloaderName: "qBittorrent",
+          fileSize: null,
+          downloadHash: "fixed-error",
+          errorMessage: "Could not resolve game",
+        },
+        {
+          id: "dl-runtime-error",
+          downloadTitle: "Other Game-SKIDROW",
+          status: "failed",
+          downloadType: "torrent",
+          downloaderName: "qBittorrent",
+          fileSize: null,
+          downloadHash: "runtime-error",
+          errorMessage: "Connection refused by qBittorrent at 10.0.0.7",
+        },
+        {
+          id: "dl-tagged-error",
+          downloadTitle: "Tagged Game-SKIDROW",
+          status: "failed",
+          downloadType: "torrent",
+          downloaderName: "qBittorrent",
+          fileSize: null,
+          downloadHash: "tagged-error",
+          errorMessage: taggedError.message,
+          errorMessageI18n: serializeServiceMessageDescriptor(taggedError),
+        },
+      ];
+      const qc = createQueryClient();
+      qc.setQueryData(["/api/games/1/downloads"], downloads);
+      (global.fetch as ReturnType<typeof vi.fn>).mockImplementation(
+        makeFetchMock({ "/api/games/1/downloads": downloads })
+      );
+
+      render(
+        <QueryClientProvider client={qc}>
+          <GameDetailsModal game={mockGame} open={true} onOpenChange={() => {}} />
+          <Toaster />
+        </QueryClientProvider>
+      );
+
+      await waitFor(() => {
+        expect(screen.getByText("Could not resolve game")).toHaveAttribute("lang", "und");
+        expect(
+          screen.getByText("Falló la preparación de los archivos de Real-Debrid.")
+        ).toHaveAttribute("lang", "es");
+        expect(
+          screen.getByText("Connection refused by qBittorrent at 10.0.0.7")
         ).toBeInTheDocument();
       });
     });

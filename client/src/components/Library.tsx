@@ -519,7 +519,7 @@ export default function Library() {
                       <InterfaceText source={"Filters"} />
                     </span>
                     {activeFilters.length > 0 && (
-                      <span className="ml-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold w-4 h-4 flex items-center justify-center">
+                      <span className="ms-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold w-4 h-4 flex items-center justify-center">
                         {activeFilters.length}
                       </span>
                     )}
@@ -607,7 +607,7 @@ export default function Library() {
                   className="h-3 w-3 p-0 hover:bg-transparent"
                   onClick={f.onRemove}
                   aria-label={formatInterfaceMessage(
-                    "Remove filter: {label}",
+                    "interface.remove_filter_label_27013441",
                     {
                       label: formatInterfaceMessage(f.source, f.values ?? {}, interfaceLanguage),
                     },

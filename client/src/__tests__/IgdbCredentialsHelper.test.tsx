@@ -1,27 +1,17 @@
 // @vitest-environment jsdom
+import { serviceMessage } from "@shared/service-messages";
+import { setInterfaceLanguage } from "@/lib/interface-locale";
 import React from "react";
 import "@testing-library/jest-dom";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { act, render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import { IgdbHelpPopover, IgdbTestConnectionButton } from "../components/IgdbCredentialsHelper";
 import * as queryClientLib from "@/lib/queryClient";
 
-vi.mock("@/lib/queryClient", async () => {
-  class ApiError extends Error {
-    status: number;
-    data: unknown;
-    constructor(status: number, message: string, data?: unknown) {
-      super(message);
-      this.name = "ApiError";
-      this.status = status;
-      this.data = data;
-    }
-  }
-  return {
-    apiRequest: vi.fn(),
-    ApiError,
-  };
-});
+vi.mock("@/lib/queryClient", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/queryClient")>()),
+  apiRequest: vi.fn(),
+}));
 
 describe("IgdbHelpPopover", () => {
   it("opens the popover and copies the redirect URI to the clipboard", async () => {
@@ -54,6 +44,43 @@ describe("IgdbHelpPopover", () => {
 });
 
 describe("IgdbTestConnectionButton", () => {
+  it.each(["valid", "null", "mismatch"] as const)(
+    "preserves inline API metadata ownership: %s",
+    async (kind) => {
+      const fragment = serviceMessage("service.connection_failed", {
+        client: "IGDB",
+        error: "Provider العربية: /user/{error}",
+      });
+      const metadata =
+        kind === "valid"
+          ? fragment
+          : kind === "null"
+            ? null
+            : { ...fragment, messageValues: { client: "Different", error: "provider" } };
+      const apiError = new queryClientLib.ApiError(400, fragment.message, {
+        error: fragment.message,
+        errorI18n: metadata,
+      });
+      vi.mocked(queryClientLib.apiRequest).mockRejectedValueOnce(apiError);
+      act(() => setInterfaceLanguage("ar"));
+      try {
+        render(
+          <IgdbTestConnectionButton clientId="id" clientSecret="secret" testEndpoint="/api/test" />
+        );
+        fireEvent.click(screen.getByRole("button"));
+        await waitFor(() =>
+          expect(document.querySelector("p.text-destructive bdi")).not.toBeNull()
+        );
+        const detail = document.querySelector("p.text-destructive bdi");
+        expect(detail).toHaveAttribute("lang", kind === "valid" ? "ar" : "und");
+        expect(detail).toHaveTextContent("Provider العربية: /user/{error}");
+        if (kind !== "valid") expect(detail).toHaveTextContent(fragment.message);
+      } finally {
+        act(() => setInterfaceLanguage("en"));
+      }
+    }
+  );
+
   const mockApiRequest = queryClientLib.apiRequest as unknown as ReturnType<typeof vi.fn>;
 
   beforeEach(() => {

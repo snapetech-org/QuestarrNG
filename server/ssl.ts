@@ -1,3 +1,8 @@
+import {
+  serviceMessage,
+  serializeServiceMessageDescriptor,
+  type ServiceMessageFragment,
+} from "../shared/service-messages.js";
 import forge from "node-forge";
 import fs from "fs";
 import path from "path";
@@ -78,10 +83,19 @@ export async function generateSelfSignedCert() {
   };
 }
 
+/** Preserve the original English result while carrying only explicitly owned copy. */
+function invalidCertificate(fragment: ServiceMessageFragment) {
+  return {
+    valid: false,
+    error: fragment.message,
+    errorI18n: serializeServiceMessageDescriptor(fragment),
+  };
+}
+
 export async function validateCertFiles(
   certPath: string,
   keyPath: string
-): Promise<{ valid: boolean; error?: string; expiry?: Date }> {
+): Promise<{ valid: boolean; error?: string; errorI18n?: string | null; expiry?: Date }> {
   try {
     const allowedRoots = [process.cwd(), SSL_DIR];
     const safeCertPath = await assertWithinRoots(
@@ -96,10 +110,10 @@ export async function validateCertFiles(
     );
 
     if (!fs.existsSync(safeCertPath)) {
-      return { valid: false, error: "Certificate file missing" };
+      return invalidCertificate(serviceMessage("service.ssl_certificate_missing", {}));
     }
     if (!fs.existsSync(safeKeyPath)) {
-      return { valid: false, error: "Private key file missing" };
+      return invalidCertificate(serviceMessage("service.ssl_private_key_missing", {}));
     }
 
     // Read files
@@ -108,10 +122,10 @@ export async function validateCertFiles(
 
     // 1. Basic Content Check
     if (!certPem.includes("BEGIN CERTIFICATE")) {
-      return { valid: false, error: "Invalid certificate format (PEM expected)" };
+      return invalidCertificate(serviceMessage("service.ssl_certificate_format_invalid", {}));
     }
     if (!keyPem.includes("PRIVATE KEY")) {
-      return { valid: false, error: "Invalid private key format (PEM expected)" };
+      return invalidCertificate(serviceMessage("service.ssl_private_key_format_invalid", {}));
     }
 
     // 2. Parse with node-forge to check details
@@ -119,15 +133,18 @@ export async function validateCertFiles(
     try {
       cert = forge.pki.certificateFromPem(certPem);
     } catch {
-      return { valid: false, error: "Failed to parse certificate content" };
+      return invalidCertificate(serviceMessage("service.ssl_certificate_content_invalid", {}));
     }
 
     // Check expiry
     const now = new Date();
     if (cert.validity.notAfter < now) {
       return {
-        valid: false,
-        error: `Certificate expired on ${cert.validity.notAfter.toISOString()}`,
+        ...invalidCertificate(
+          serviceMessage("service.ssl_certificate_expired", {
+            date: cert.validity.notAfter.toISOString(),
+          })
+        ),
         expiry: cert.validity.notAfter,
       };
     }
@@ -142,13 +159,15 @@ export async function validateCertFiles(
       });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      return { valid: false, error: `Certificate and key do not match or are invalid: ${message}` };
+      return invalidCertificate(
+        serviceMessage("service.ssl_certificate_key_invalid", { detail: message })
+      );
     }
 
     return { valid: true, expiry: cert.validity.notAfter };
   } catch (error) {
     console.error("Certificate validation failed:", error);
-    return { valid: false, error: "Unknown validation error" };
+    return invalidCertificate(serviceMessage("service.ssl_unknown_validation_error", {}));
   }
 }
 

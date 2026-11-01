@@ -1,3 +1,9 @@
+import {
+  serviceMessage,
+  serviceMessageValue,
+  serializeServiceMessageDescriptor,
+  type ServiceMessageMetadata,
+} from "../shared/service-messages.js";
 /**
  * Automatic error-telemetry pipeline.
  *
@@ -82,7 +88,8 @@ export function getPendingReport(reportId: string, userId: string): PendingError
 }
 
 type WorkerSendResult =
-  { ok: true; code: string; issueNumber: number } | { ok: false; message: string };
+  | { ok: true; code: string; issueNumber: number }
+  | ({ ok: false; message: string } & ServiceMessageMetadata);
 
 async function sendToSupportWorker(
   logs: string,
@@ -90,7 +97,10 @@ async function sendToSupportWorker(
   banner: string
 ): Promise<WorkerSendResult> {
   if (SUPPORT_WORKER_URL.includes("REPLACE_ME")) {
-    return { ok: false, message: "Log upload is not configured for this build." };
+    return {
+      ok: false,
+      ...serviceMessage("interface.log_upload_is_not_configured_for_t_8b70cdcc", {}),
+    };
   }
 
   try {
@@ -108,16 +118,18 @@ async function sendToSupportWorker(
     });
 
     if (!response.ok) {
-      return { ok: false, message: `Telemetry worker returned HTTP ${response.status}` };
+      return {
+        ok: false,
+        ...serviceMessage("service.telemetry_worker_http_error", { status: response.status }),
+      };
     }
 
     const data = (await response.json()) as { code: string; issueNumber: number };
     return { ok: true, code: data.code, issueNumber: data.issueNumber };
   } catch (err) {
-    return {
-      ok: false,
-      message: err instanceof Error ? err.message : "Network error while sending telemetry report",
-    };
+    return err instanceof Error
+      ? { ok: false, message: err.message }
+      : { ok: false, ...serviceMessage("service.telemetry_network_error", {}) };
   }
 }
 
@@ -133,7 +145,7 @@ export async function sendPendingReport(
 ): Promise<WorkerSendResult> {
   const report = getPendingReport(reportId, userId);
   if (!report) {
-    return { ok: false, message: "This report is no longer available." };
+    return { ok: false, ...serviceMessage("service.telemetry_report_unavailable", {}) };
   }
   pendingReports.delete(reportId);
 
@@ -203,19 +215,24 @@ function buildNotificationFor(
 
   if (telemetryEnabled) {
     if (!autoSendResult || !prefs.errorDetected.inApp) return null;
-    return autoSendResult.ok
-      ? {
-          userId: user.id,
-          type: "info",
-          title: "Automated error report sent",
-          message: `Questarr detected an error and automatically sent a diagnostic report. Support code: ${autoSendResult.code}.`,
-        }
-      : {
-          userId: user.id,
-          type: "warning",
-          title: "Automated error report failed",
-          message: `Questarr detected an error but could not send the automatic diagnostic report (${autoSendResult.message}).`,
-        };
+    if (autoSendResult.ok) {
+      return {
+        userId: user.id,
+        type: "info",
+        title: "Automated error report sent",
+        message: `Questarr detected an error and automatically sent a diagnostic report. Support code: ${autoSendResult.code}.`,
+      };
+    }
+    const body = serviceMessage("service.notification_telemetry_failed", {
+      detail: serviceMessageValue(autoSendResult.message, autoSendResult),
+    });
+    return {
+      userId: user.id,
+      type: "warning",
+      title: "Automated error report failed",
+      message: body.message,
+      messageI18n: serializeServiceMessageDescriptor(body),
+    };
   }
 
   if (!prefs.errorDetected.inApp || !pending) return null;

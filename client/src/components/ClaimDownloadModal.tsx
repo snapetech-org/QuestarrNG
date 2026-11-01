@@ -1,3 +1,5 @@
+import { ServiceMessageError } from "@shared/service-messages";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -135,7 +137,7 @@ export default function ClaimDownloadModal({
 
   const claimMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedGame) throw new Error("No game selected");
+      if (!selectedGame) throw new ServiceMessageError("service.claim_game_required", {});
 
       const body: Record<string, unknown> = {
         downloaderId: download.downloaderId,
@@ -175,7 +177,15 @@ export default function ClaimDownloadModal({
       onOpenChange(false);
     },
     onError: (err: Error) => {
-      toast({ title: err.message || "Failed to link download", variant: "destructive" });
+      toast({
+        title: (
+          <ApiErrorDescription
+            error={err}
+            fallbackSource="interface.failed_to_link_download_54d64f85"
+          />
+        ),
+        variant: "destructive",
+      });
     },
   });
 
@@ -202,7 +212,7 @@ export default function ClaimDownloadModal({
                 <InterfaceText source={"Main"} />
               </SelectItem>
               <SelectItem value="update">
-                <InterfaceText source={"Update"} />
+                <InterfaceText source={"Updates"} />
               </SelectItem>
               <SelectItem value="dlc">
                 <InterfaceText source={"DLC"} />
@@ -237,20 +247,20 @@ export default function ClaimDownloadModal({
 
           <TabsContent value="library" className="flex-1 flex flex-col gap-2 min-h-0">
             <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute start-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search your library…"
-                className="pl-8"
+                className="ps-8"
                 value={librarySearch}
                 onChange={(e) => setLibrarySearch(e.target.value)}
                 data-i18n-placeholder={"Search your library…"}
               />
             </div>
-            <div className="overflow-y-auto flex-1 space-y-1 pr-1">
+            <div className="overflow-y-auto flex-1 space-y-1 pe-1">
               {libraryMatches.length === 0 ? (
                 <p className="text-sm text-muted-foreground py-4 text-center">
                   {librarySearch ? (
-                    <InterfaceText source="No games match your search" />
+                    <InterfaceText source="interface.no_games_match_your_search_1272b6c5" />
                   ) : (
                     <InterfaceText source={"No library matches found — try IGDB Search"} />
                   )}
@@ -284,10 +294,10 @@ export default function ClaimDownloadModal({
 
           <TabsContent value="igdb" className="flex-1 flex flex-col gap-2 min-h-0">
             <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute start-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search IGDB…"
-                className="pl-8"
+                className="ps-8"
                 value={igdbQuery}
                 onChange={(e) => setIgdbQuery(e.target.value)}
                 data-i18n-placeholder={"Search IGDB…"}
@@ -308,7 +318,7 @@ export default function ClaimDownloadModal({
               </div>
               <Switch checked={showUndatedGames} onCheckedChange={setShowUndatedGames} />
             </div>
-            <div className="overflow-y-auto flex-1 space-y-1 pr-1">
+            <div className="overflow-y-auto flex-1 space-y-1 pe-1">
               {isSearchingIgdb ? (
                 <p className="text-sm text-muted-foreground py-4 text-center">
                   <InterfaceText source={"Searching…"} />
@@ -353,7 +363,7 @@ export default function ClaimDownloadModal({
           <div className="flex items-center gap-2 py-2 px-3 rounded-md bg-muted text-sm">
             <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
             <span className="truncate font-medium">{selectedGame.title}</span>
-            <Badge variant="secondary" className="ml-auto shrink-0 text-xs">
+            <Badge variant="secondary" className="ms-auto shrink-0 text-xs">
               {selectedGame.source === "library" ? (
                 <InterfaceText source={"Library"} />
               ) : (
@@ -371,7 +381,7 @@ export default function ClaimDownloadModal({
             onClick={() => claimMutation.mutate()}
             disabled={!selectedGame || claimMutation.isPending}
           >
-            <Link2 className="h-4 w-4 mr-2" />
+            <Link2 className="h-4 w-4 me-2" />
             {claimMutation.isPending ? (
               <InterfaceText source={"Linking…"} />
             ) : (
@@ -402,7 +412,7 @@ function GameRow({
     <button
       type="button"
       onClick={onSelect}
-      className={`w-full flex items-center gap-3 p-2 rounded-md text-left hover:bg-accent transition-colors ${
+      className={`w-full flex items-center gap-3 p-2 rounded-md text-start hover:bg-accent transition-colors ${
         selected ? "bg-accent ring-1 ring-primary" : ""
       }`}
     >

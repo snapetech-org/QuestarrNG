@@ -6,6 +6,7 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import RssSettings from "@/components/RssSettings";
 import type { RssFeed } from "@shared/schema";
+import { setInterfaceLanguage } from "@/lib/interface-locale";
 
 const mockState = vi.hoisted(() => ({
   apiRequest: vi.fn(),
@@ -14,14 +15,6 @@ const mockState = vi.hoisted(() => ({
 
 vi.mock("@/lib/queryClient", () => ({ apiRequest: mockState.apiRequest }));
 vi.mock("@/hooks/use-toast", () => ({ useToast: () => ({ toast: mockState.toast }) }));
-vi.mock("@/components/InterfaceText", () => ({
-  InterfaceText: ({ source }: { source: string }) => source,
-}));
-vi.mock("@/lib/interface-locale", () => ({
-  formatInterfaceMessage: (source: string, values: Record<string, string>) =>
-    source.replace(/\{(\w+)\}/g, (_match, key: string) => values[key] ?? ""),
-}));
-
 function makeFeed(overrides: Partial<RssFeed> = {}): RssFeed {
   return {
     id: "feed-1",
@@ -55,6 +48,7 @@ function renderSettings(feeds: RssFeed[]) {
 describe("RssSettings", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    setInterfaceLanguage("en");
     mockState.apiRequest.mockImplementation(async (method: string) => ({
       json: async () => (method === "GET" ? [] : { ok: true }),
     }));

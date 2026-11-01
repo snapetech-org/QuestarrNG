@@ -10,6 +10,7 @@ import Downloads from "../src/pages/downloads";
 import { createTestQueryClient, getRequestUrl } from "./test-utils";
 import { formatRegionalPercent, setRegionalPreference } from "@/lib/regional-format";
 import { setInterfaceLanguage } from "@/lib/interface-locale";
+import { serviceMessage } from "@shared/service-messages";
 
 const toastSpy = vi.fn();
 
@@ -106,6 +107,82 @@ describe("Downloads page", () => {
         </TooltipProvider>
       </QueryClientProvider>
     );
+
+  it.each([
+    ["pause", "downloading", "service.download_pause_failed"],
+    ["resume", "paused", "service.download_resume_failed"],
+    ["remove", "downloading", "service.download_remove_failed"],
+  ] as const)(
+    "keeps %s result metadata through the displayed Arabic toast",
+    async (action, status, key) => {
+      act(() => setInterfaceLanguage("ar"));
+      const result = {
+        success: false,
+        ...serviceMessage(key, { error: "Settings / Provider: 429" }),
+      };
+      globalThis.fetch = vi.fn(async (url: RequestInfo | URL) => {
+        if (getRequestUrl(url) === "/api/downloads")
+          return createJsonResponse({
+            downloads: [
+              {
+                id: "dl-action",
+                name: "User-owned game",
+                status,
+                progress: 40,
+                downloaderId: "downloader-1",
+                downloaderName: "qBittorrent",
+                trackedByQuestarr: true,
+                downloadType: "torrent",
+              },
+            ],
+            errors: [],
+          });
+        return createJsonResponse(result);
+      }) as typeof fetch;
+      renderPage();
+      fireEvent.click(await screen.findByTestId(`button-${action}-dl-action`));
+      await waitFor(() => expect(toastSpy).toHaveBeenCalled());
+      const title = toastSpy.mock.calls.at(-1)![0].title;
+      expect(React.isValidElement(title)).toBe(true);
+      render(<>{title}</>);
+      const node = screen.getByText(/Settings \/ Provider: 429/);
+      expect(node).toHaveAttribute("lang", "ar");
+      expect(node).toHaveAttribute("dir", "rtl");
+      expect(node.textContent).toContain("\u2068Settings / Provider: 429\u2069");
+      expect(node.textContent).not.toContain("Failed to");
+    }
+  );
+
+  it("keeps an untagged provider message equal to an interface label out of toast translation", async () => {
+    act(() => setInterfaceLanguage("ar"));
+    globalThis.fetch = vi.fn(async (url: RequestInfo | URL) => {
+      if (getRequestUrl(url) === "/api/downloads")
+        return createJsonResponse({
+          downloads: [
+            {
+              id: "dl-provider",
+              name: "User-owned game",
+              status: "downloading",
+              progress: 40,
+              downloaderId: "downloader-1",
+              downloaderName: "qBittorrent",
+              trackedByQuestarr: true,
+              downloadType: "torrent",
+            },
+          ],
+          errors: [],
+        });
+      return createJsonResponse({ success: false, message: "Settings" });
+    }) as typeof fetch;
+    renderPage();
+    fireEvent.click(await screen.findByTestId("button-pause-dl-provider"));
+    await waitFor(() => expect(toastSpy).toHaveBeenCalled());
+    const title = toastSpy.mock.calls.at(-1)![0].title;
+    expect(React.isValidElement(title)).toBe(true);
+    render(<>{title}</>);
+    expect(screen.getByText("Settings")).toHaveAttribute("lang", "und");
+    expect(screen.getByText("Settings")).toHaveAttribute("dir", "auto");
+  });
 
   it("keeps the scan unlinked action available and opens the batch modal", async () => {
     renderPage();

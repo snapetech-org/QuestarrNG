@@ -1,3 +1,10 @@
+import {
+  serviceMessage,
+  serviceErrorValue,
+  serviceMessageValue,
+  parseServiceMessageDescriptor,
+  type ServiceMessageDescriptor,
+} from "../shared/service-messages.js";
 import { jsonCatalogClient } from "./json-catalog.js";
 import { storage } from "./storage.js";
 import { torznabClient } from "./torznab.js";
@@ -61,6 +68,7 @@ export interface AggregatedSearchResults {
   total: number;
   offset: number;
   errors: string[];
+  errorI18n?: Array<ServiceMessageDescriptor | null>;
 }
 
 export async function searchAllIndexers(
@@ -69,7 +77,14 @@ export async function searchAllIndexers(
   const enabledIndexers = await storage.getEnabledIndexers();
 
   if (enabledIndexers.length === 0) {
-    return { items: [], total: 0, offset: options.offset || 0, errors: ["No indexers configured"] };
+    const fragment = serviceMessage("service.no_indexers_configured", {});
+    return {
+      items: [],
+      total: 0,
+      offset: options.offset || 0,
+      errors: [fragment.message],
+      errorI18n: [parseServiceMessageDescriptor(fragment) ?? null],
+    };
   }
 
   const torznabIndexers = enabledIndexers.filter(
@@ -100,12 +115,16 @@ export async function searchAllIndexers(
         .searchMultipleIndexers(torznabIndexers, searchParams)
         .then((res) => ({ type: "torznab" as const, ...res }))
         .catch((err: unknown) => {
-          const message = err instanceof Error ? err.message : String(err);
+          const value = err instanceof Error ? serviceErrorValue(err) : String(err);
+          const message = typeof value === "string" ? value : value.message;
           searchLogger.error({ error: message }, "torznab client failed");
           return {
             type: "torznab" as const,
             results: { items: [], total: 0, offset: 0 },
             errors: [message],
+            errorI18n: [
+              typeof value === "string" ? null : (parseServiceMessageDescriptor(value) ?? null),
+            ],
           };
         })
     );
@@ -120,12 +139,20 @@ export async function searchAllIndexers(
       .searchMultipleIndexers(indexers, params)
       .then((res) => ({ type: "newznab" as const, ...res }))
       .catch((err: unknown) => {
-        const message = err instanceof Error ? err.message : String(err);
+        const value = err instanceof Error ? serviceErrorValue(err) : String(err);
+        const message = typeof value === "string" ? value : value.message;
         searchLogger.error({ error: message }, `${label} client failed`);
         return {
           type: "newznab" as const,
           results: { items: [], total: 0, offset: 0 },
-          errors: [{ indexer: label, error: message }],
+          errors: [
+            {
+              indexer: label,
+              error: message,
+              errorI18n:
+                typeof value === "string" ? null : (parseServiceMessageDescriptor(value) ?? null),
+            },
+          ],
         };
       });
 
@@ -141,25 +168,40 @@ export async function searchAllIndexers(
     promises.push(
       jsonCatalogClient
         .search(indexer, searchParams)
-        .then((results) => ({ type: "catalog" as const, results, errors: [] as string[] }))
-        .catch(() => ({
+        .then((results) => ({
           type: "catalog" as const,
-          results: { items: [] as SearchItem[], total: 0, offset: 0 },
-          errors: [`${indexer.name}: JSON catalog search failed; use Test Connection for details`],
+          results,
+          errors: [] as string[],
+          errorI18n: [] as Array<ServiceMessageDescriptor | null>,
         }))
+        .catch(() => {
+          const fragment = serviceMessage("service.json_catalog_search_failed", {
+            indexer: indexer.name,
+          });
+          return {
+            type: "catalog" as const,
+            results: { items: [] as SearchItem[], total: 0, offset: 0 },
+            errors: [fragment.message],
+            errorI18n: [parseServiceMessageDescriptor(fragment) ?? null],
+          };
+        })
     );
   }
   const results = await Promise.all(promises);
 
   const combinedItems: SearchItem[] = [];
   const combinedErrors: string[] = [];
+  const combinedErrorI18n: Array<ServiceMessageDescriptor | null> = [];
   let totalCount = 0;
 
   for (const result of results) {
     if (result.type === "catalog") {
       combinedItems.push(...result.results.items);
       totalCount += result.results.total;
-      combinedErrors.push(...result.errors);
+      result.errors.forEach((message, index) => {
+        combinedErrors.push(message);
+        combinedErrorI18n.push(result.errorI18n?.[index] ?? null);
+      });
     } else if (result.type === "torznab") {
       const items = result.results.items.map((item) => {
         // Construct comments URL if not provided by the indexer.
@@ -203,7 +245,11 @@ export async function searchAllIndexers(
       });
       combinedItems.push(...items);
       totalCount += result.results.total || 0;
-      if (result.errors) combinedErrors.push(...result.errors);
+      if (result.errors)
+        result.errors.forEach((message, index) => {
+          combinedErrors.push(message);
+          combinedErrorI18n.push(result.errorI18n?.[index] ?? null);
+        });
     } else if (result.type === "newznab") {
       const items = result.results.items.map(
         (item) =>
@@ -227,7 +273,14 @@ export async function searchAllIndexers(
       combinedItems.push(...items);
       totalCount += result.results.total || 0;
       if (result.errors) {
-        combinedErrors.push(...result.errors.map((e) => `${e.indexer}: ${e.error}`));
+        result.errors.forEach((e) => {
+          const fragment = serviceMessage("service.downloader_named_error", {
+            client: e.indexer,
+            error: serviceMessageValue(e.error, e.errorI18n),
+          });
+          combinedErrors.push(fragment.message);
+          combinedErrorI18n.push(parseServiceMessageDescriptor(fragment) ?? null);
+        });
       }
     }
   }
@@ -255,6 +308,7 @@ export async function searchAllIndexers(
     total: totalCount,
     offset: options.offset || 0,
     errors: combinedErrors,
+    ...(combinedErrorI18n.length ? { errorI18n: combinedErrorI18n } : {}),
   };
 }
 

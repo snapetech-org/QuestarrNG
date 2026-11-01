@@ -58,7 +58,6 @@ export function FileBrowser({
             ? `/api/system/browse?path=${encodeURIComponent(p)}&root=${encodeURIComponent(root)}`
             : `/api/system/browse?path=${encodeURIComponent(p)}`;
         const res = await apiRequest("GET", url);
-        if (!res.ok) throw new Error(`Server error: ${res.status}`);
         const data = await res.json();
         setData(data);
       } catch {
@@ -67,7 +66,6 @@ export function FileBrowser({
           try {
             const fallbackUrl = `/api/system/browse?path=${encodeURIComponent(p)}`;
             const res = await apiRequest("GET", fallbackUrl);
-            if (!res.ok) throw new Error(`Server error: ${res.status}`);
             const data = await res.json();
             setData(data);
             return;
@@ -80,7 +78,7 @@ export function FileBrowser({
           setCurrentPath("/");
           return;
         }
-        setError("Failed to load directory");
+        setError("interface.failed_to_load_directory_484520e8");
       } finally {
         setLoading(false);
       }
@@ -136,7 +134,7 @@ export function FileBrowser({
             <button
               key={item.path}
               type="button"
-              className="flex items-center gap-2 p-2 rounded-sm cursor-pointer hover:bg-accent w-full text-left"
+              className="flex items-center gap-2 p-2 rounded-sm cursor-pointer hover:bg-accent w-full text-start"
               onClick={() => handleNavigate(item.path)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
@@ -146,8 +144,10 @@ export function FileBrowser({
               }}
             >
               <Folder className="h-4 w-4 text-blue-500" />
-              <span className="text-sm flex-1 truncate">{item.name}</span>
-              <ChevronRight className="h-3 w-3 text-muted-foreground" />
+              <span className="text-sm flex-1 truncate">
+                <bdi dir="auto" lang="und">{item.name}</bdi>
+              </span>
+              <ChevronRight className="h-3 w-3 text-muted-foreground rtl:rotate-180" />
             </button>
           ) : (
             <div
@@ -155,7 +155,9 @@ export function FileBrowser({
               className="flex items-center gap-2 p-2 rounded-sm opacity-50 cursor-default"
             >
               <File className="h-4 w-4 text-gray-500" />
-              <span className="text-sm flex-1 truncate">{item.name}</span>
+              <span className="text-sm flex-1 truncate">
+                <bdi dir="auto" lang="und">{item.name}</bdi>
+              </span>
             </div>
           )
         )}
@@ -177,8 +179,13 @@ export function FileBrowser({
 
         <div className="flex items-center gap-2 p-2 bg-muted rounded-md mb-2">
           <HardDrive className="h-4 w-4 text-muted-foreground" />
-          <div className="text-sm font-mono truncate flex-1" title={currentPath}>
-            {currentPath}
+          <div
+            className="text-sm font-mono truncate flex-1"
+            title={currentPath}
+            dir="ltr"
+            lang="und"
+          >
+            <bdi dir="ltr" lang="und">{currentPath}</bdi>
           </div>
           <Button
             variant="ghost"

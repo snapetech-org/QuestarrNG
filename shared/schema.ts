@@ -1,3 +1,5 @@
+import type { ServiceMessageDescriptor } from "./service-messages.js";
+import type { NotificationLanguage } from "./notification-language.js";
 import { sql } from "drizzle-orm";
 import { sqliteTable, text, integer, real, uniqueIndex, index } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
@@ -383,6 +385,7 @@ export const gameDownloads = sqliteTable(
     downloadTitle: text("download_title").notNull(),
     status: text("status").notNull().default("downloading"),
     errorMessage: text("error_message"),
+    errorMessageI18n: text("error_message_i18n"),
     // Correlates only downloads created while a SeerrNG request owns the game.
     // Cancellation must never infer request ownership from gameId alone.
     seerrExternalRequestId: text("seerr_external_request_id"),
@@ -560,6 +563,7 @@ export const notifications = sqliteTable("notifications", {
   type: text("type").notNull(),
   title: text("title").notNull(),
   message: text("message").notNull(),
+  messageI18n: text("message_i18n"),
   link: text("link"),
   read: integer("read", { mode: "boolean" }).notNull().default(false),
   createdAt: integer("created_at", { mode: "timestamp_ms" }).default(
@@ -1059,6 +1063,8 @@ export type NotificationPreferences = Record<
   NotificationEvent,
   { inApp: boolean; apprise: boolean }
 > & {
+  /** Language for external notifications; absent legacy values mean English. */
+  language?: NotificationLanguage;
   gameUpdates: {
     inApp: boolean;
     apprise: boolean;
@@ -1069,6 +1075,7 @@ export type NotificationPreferences = Record<
 };
 
 export const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
+  language: "en",
   gameReleased: { inApp: true, apprise: true },
   gameDelayed: { inApp: true, apprise: true },
   downloadCompleted: { inApp: true, apprise: true },
@@ -1142,6 +1149,7 @@ export interface DownloadTracker {
   lastAnnounce?: string | undefined;
   nextAnnounce?: string | undefined;
   error?: string | undefined;
+  errorI18n?: ServiceMessageDescriptor | undefined;
 }
 
 export type DownloadStatusType =
@@ -1179,6 +1187,7 @@ export interface DownloadStatus {
   age?: number | undefined; // Age in days
   // Common fields
   error?: string | undefined;
+  errorI18n?: ServiceMessageDescriptor | undefined;
   category?: string | undefined;
   // Questarr tracking fields
   trackedByQuestarr?: boolean; // True if the download was initiated through Questarr
@@ -1244,6 +1253,7 @@ export const rssFeeds = sqliteTable("rss_feeds", {
   lastCheck: integer("last_check", { mode: "timestamp_ms" }),
   status: text("status").default("ok"), // 'ok' or 'error'
   errorMessage: text("error_message"),
+  errorMessageI18n: text("error_message_i18n"),
   createdAt: integer("created_at", { mode: "timestamp_ms" }).default(
     sql`(strftime('%s', 'now') * 1000)`
   ),
@@ -1277,6 +1287,7 @@ export const insertRssFeedSchema = createInsertSchema(rssFeeds).omit({
   lastCheck: true,
   status: true,
   errorMessage: true,
+  errorMessageI18n: true,
 });
 
 export const insertRssFeedItemSchema = createInsertSchema(rssFeedItems).omit({
@@ -1322,6 +1333,7 @@ export const importTasks = sqliteTable("import_tasks", {
   skippedItems: integer("skipped_items").notNull().default(0),
   failedItems: integer("failed_items").notNull().default(0),
   errorMessage: text("error_message"),
+  errorMessageI18n: text("error_message_i18n"),
 });
 
 export const importTaskItems = sqliteTable(
@@ -1336,6 +1348,7 @@ export const importTaskItems = sqliteTable(
     gameId: text("game_id"),
     gameTitle: text("game_title"),
     errorMessage: text("error_message"),
+    errorMessageI18n: text("error_message_i18n"),
     createdAt: integer("created_at", { mode: "timestamp_ms" }).default(
       sql`(strftime('%s', 'now') * 1000)`
     ),

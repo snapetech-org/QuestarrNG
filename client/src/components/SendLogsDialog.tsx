@@ -82,9 +82,12 @@ export default function SendLogsDialog({
       if (succeeded) {
         toast({
           title: "Copied",
-          description: formatInterfaceMessage("Code {code} copied to clipboard", {
-            code: String(result.code ?? ""),
-          }),
+          description: (language) =>
+            formatInterfaceMessage(
+              "interface.code_code_copied_to_clipboard_b1632d0c",
+              { code: String(result.code ?? "") },
+              language
+            ),
         });
       } else {
         toast({
@@ -195,7 +198,7 @@ export default function SendLogsDialog({
                 }}
                 disabled={logLines.length === 0}
               >
-                <Send className="mr-2 h-4 w-4" />
+                <Send className="me-2 h-4 w-4" />
                 <InterfaceText source={"Send logs"} />
               </Button>
             </DialogFooter>
@@ -242,7 +245,7 @@ export default function SendLogsDialog({
               <div className="flex items-center gap-3 rounded-xl border border-border bg-zinc-900 px-4 py-3">
                 <span
                   className="flex-1 text-center font-mono text-3xl font-bold tracking-[0.3em] text-primary"
-                  aria-label={formatInterfaceMessage("Support code: {code}", {
+                  aria-label={formatInterfaceMessage("interface.support_code_code_a1b3e83c", {
                     code: String(result.code ?? ""),
                   })}
                   data-i18n-aria-label={"Support code: {code}"}
@@ -274,14 +277,14 @@ export default function SendLogsDialog({
               <Button
                 variant="outline"
                 onClick={() => handleOpenChange(false)}
-                className="sm:mr-auto"
+                className="sm:me-auto"
               >
                 <InterfaceText source={"Close"} />
               </Button>
               {issueUrl && (
                 <Button asChild>
                   <a href={issueUrl} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="mr-2 h-4 w-4" />
+                    <ExternalLink className="me-2 h-4 w-4" />
                     <InterfaceText source={"Create GitHub issue"} />
                   </a>
                 </Button>

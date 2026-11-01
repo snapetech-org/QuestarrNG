@@ -4,6 +4,7 @@ import { act, fireEvent, render, screen, waitFor, within } from "@testing-librar
 import "@testing-library/jest-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { serviceMessage } from "@shared/service-messages";
 import SettingsPage from "../src/pages/settings";
 import { setInterfaceLanguage } from "../src/lib/interface-locale";
 import { setRegionalPreference } from "../src/lib/regional-format";
@@ -42,7 +43,8 @@ vi.mock("@/hooks/use-toast", () => ({
   useToast: () => ({ toast: mockToast }),
 }));
 
-vi.mock("@/lib/queryClient", () => ({
+vi.mock("@/lib/queryClient", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/queryClient")>()),
   apiRequest: vi.fn().mockResolvedValue({
     headers: { get: () => null },
     json: async () => ({}),
@@ -411,6 +413,49 @@ describe("SettingsPage", () => {
       });
     });
   });
+
+  it.each([true, false])(
+    "keeps mocked Apprise test error ownership in the toast body: %s",
+    async (typed) => {
+      const { apiRequest, ApiError } = await import("@/lib/queryClient");
+      const fragment = serviceMessage("service.apprise_cli_not_found", {});
+      vi.mocked(apiRequest).mockRejectedValueOnce(
+        new ApiError(502, fragment.message, {
+          error: fragment.message,
+          errorI18n: typed ? fragment : null,
+        })
+      );
+      vi.mocked(globalThis.fetch).mockImplementation(async (input) => {
+        const url =
+          typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+        if (url.includes("/api/settings/apprise"))
+          return Response.json({
+            configured: true,
+            mode: "api",
+            apiUrl: "http://apprise:8000",
+            key: "***",
+          });
+        return defaultFetch(input);
+      });
+      render(
+        <QueryClientProvider client={createTestQueryClient()}>
+          <SettingsPage />
+        </QueryClientProvider>
+      );
+      await screen.findByText("Settings");
+      fireEvent.mouseDown(screen.getByRole("tab", { name: "Notifications" }));
+      const button = await screen.findByRole("button", { name: "Send Test Notification" });
+      await waitFor(() => expect(button).not.toBeDisabled());
+      fireEvent.click(button);
+      await waitFor(() => expect(mockToast).toHaveBeenCalled());
+      const toast = mockToast.mock.calls.at(-1)?.[0];
+      expect(toast).toMatchObject({ title: "Apprise test failed", variant: "destructive" });
+      const detail = render(<>{toast.description}</>);
+      expect(detail.container).toHaveTextContent(fragment.message);
+      expect(detail.container.querySelector("bdi")).toHaveAttribute("lang", typed ? "en" : "und");
+      detail.unmount();
+    }
+  );
 
   it("switches to the Notifications tab and toggles Apprise mode fields", async () => {
     render(

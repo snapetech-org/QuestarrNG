@@ -1,12 +1,11 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Star, HardDrive, CheckCircle2, Loader2, Archive, Gamepad2 } from "lucide-react";
-import { UI_LABELS } from "@/lib/ui-labels";
 import {
   getInterfaceLanguage,
   getInterfaceTextDirection,
   getInterfaceTextLanguage,
-  type InterfaceLanguage,
+  translateInterfaceLabel,
 } from "@/lib/interface-locale";
 
 interface StatusBadgeProps {
@@ -76,8 +75,7 @@ export function getStatusSourceLabel(status: string): string {
 export function getStatusLabel(status: string): string {
   const source = getStatusSourceLabel(status);
   const language = getInterfaceLanguage();
-  const labels = UI_LABELS as Record<string, Partial<Record<InterfaceLanguage, string>>>;
-  return labels[source]?.[language] ?? source;
+  return translateInterfaceLabel(source, language);
 }
 
 /** Icon + tint for a status, used where the status is shown outside its badge (e.g. StatusPicker). */

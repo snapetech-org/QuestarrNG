@@ -21,9 +21,9 @@ export default function GridColumnsControl({ columns, onColumnsChange }: GridCol
           variant="outline"
           size="icon"
           className="h-8 w-8"
-          aria-label={t("Configure grid columns")}
-          lang={languageFor("Configure grid columns")}
-          dir={directionFor("Configure grid columns")}
+          aria-label={t("interface.configure_grid_columns_0e899c02")}
+          lang={languageFor("interface.configure_grid_columns_0e899c02")}
+          dir={directionFor("interface.configure_grid_columns_0e899c02")}
         >
           <Settings2 className="h-4 w-4" />
         </Button>
@@ -33,11 +33,11 @@ export default function GridColumnsControl({ columns, onColumnsChange }: GridCol
           <div className="flex items-center justify-between">
             <Label
               className="flex items-center gap-2 text-sm font-medium"
-              lang={languageFor("Grid Columns")}
-              dir={directionFor("Grid Columns")}
+              lang={languageFor("interface.grid_columns_cbdbac6e")}
+              dir={directionFor("interface.grid_columns_cbdbac6e")}
             >
               <LayoutGrid className="h-4 w-4" />
-              {t("Grid Columns")}
+              {t("interface.grid_columns_cbdbac6e")}
             </Label>
             <span className="w-4 text-center text-sm font-bold">{columns}</span>
           </div>
@@ -47,16 +47,16 @@ export default function GridColumnsControl({ columns, onColumnsChange }: GridCol
             min={GRID_COLUMNS_MIN}
             max={GRID_COLUMNS_MAX}
             step={1}
-            aria-label={t("Grid columns")}
-            lang={languageFor("Grid columns")}
-            dir={directionFor("Grid columns")}
+            aria-label={t("interface.grid_columns_18fbc6ce")}
+            lang={languageFor("interface.grid_columns_18fbc6ce")}
+            dir={directionFor("interface.grid_columns_18fbc6ce")}
           />
           <p
             className="text-xs text-muted-foreground"
-            lang={languageFor("Number of columns in the game grid ({min}-{max}).")}
-            dir={directionFor("Number of columns in the game grid ({min}-{max}).")}
+            lang={languageFor("interface.number_of_columns_in_the_game_grid_ad42677c")}
+            dir={directionFor("interface.number_of_columns_in_the_game_grid_ad42677c")}
           >
-            {formatInterfaceMessage("Number of columns in the game grid ({min}-{max}).", {
+            {formatInterfaceMessage("interface.number_of_columns_in_the_game_grid_ad42677c", {
               min: GRID_COLUMNS_MIN,
               max: GRID_COLUMNS_MAX,
             })}

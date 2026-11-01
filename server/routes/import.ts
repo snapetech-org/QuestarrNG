@@ -1,4 +1,11 @@
 import { Router } from "express";
+import {
+  persistedServiceMessage,
+  matchingServiceMessageDescriptor,
+  serviceErrorBody,
+  serviceMessage,
+  ServiceMessageError,
+} from "../../shared/service-messages.js";
 import { storage } from "../storage.js";
 import { importManager, pathMappingService, platformMappingService } from "../services/index.js";
 import {
@@ -103,7 +110,7 @@ function isPathInside(root: string, candidate: string): boolean {
 
 function resolveProposedPathWithinRoot(libraryRoot: string, rawPath: string): string {
   if (rawPath.startsWith("\\\\") || /^[a-zA-Z]:[\\/]/.test(rawPath)) {
-    throw new Error("Invalid proposed path");
+    throw new ServiceMessageError("service.api_invalid_proposed_path", {});
   }
 
   const resolvedRoot = path.resolve(libraryRoot);
@@ -112,7 +119,7 @@ function resolveProposedPathWithinRoot(libraryRoot: string, rawPath: string): st
     : path.resolve(resolvedRoot, path.normalize(rawPath).replace(/^[/\\]+/, ""));
 
   if (!isPathInside(resolvedRoot, resolvedTarget)) {
-    throw new Error("Invalid proposed path");
+    throw new ServiceMessageError("service.api_invalid_proposed_path", {});
   }
 
   return resolvedTarget;
@@ -228,7 +235,7 @@ importRouter.post(
       return res.json(created);
     } catch (error) {
       if (error instanceof z.ZodError)
-        return res.status(400).json({ error: zodErrorMessage(error) });
+        return res.status(400).json({ error: zodErrorMessage(error), errorI18n: null });
       return res.status(500).json({ error: "Failed to create platform mapping" });
     }
   }
@@ -252,7 +259,7 @@ importRouter.patch(
       }
     } catch (error) {
       if (error instanceof z.ZodError)
-        return res.status(400).json({ error: zodErrorMessage(error) });
+        return res.status(400).json({ error: zodErrorMessage(error), errorI18n: null });
       return res.status(500).json({ error: "Failed to update platform mapping" });
     }
   }
@@ -297,8 +304,13 @@ importRouter.post("/mappings/paths", validate(insertPathMappingSchema), async (r
     const created = await storage.addPathMapping(mapping);
     return res.json(created);
   } catch (error) {
-    if (error instanceof z.ZodError) return res.status(400).json({ error: zodErrorMessage(error) });
-    return res.status(500).json({ error: "Failed to create path mapping" });
+    if (error instanceof z.ZodError)
+      return res.status(400).json({ error: zodErrorMessage(error), errorI18n: null });
+    return res
+      .status(500)
+      .json(
+        serviceErrorBody(undefined, serviceMessage("service.api_failed_to_create_path_mapping", {}))
+      );
   }
 });
 
@@ -310,12 +322,19 @@ importRouter.patch("/mappings/paths/:id", validate(updatePathMappingSchema), asy
     if (updated) {
       return res.json(updated);
     } else {
-      return res.status(404).json({ error: "Mapping not found" });
+      return res
+        .status(404)
+        .json(serviceErrorBody(undefined, serviceMessage("service.api_mapping_not_found", {})));
     }
   } catch (error) {
-    if (error instanceof z.ZodError) return res.status(400).json({ error: zodErrorMessage(error) });
+    if (error instanceof z.ZodError)
+      return res.status(400).json({ error: zodErrorMessage(error), errorI18n: null });
     logger.error({ error }, "Error updating path mapping");
-    return res.status(500).json({ error: "Failed to update path mapping" });
+    return res
+      .status(500)
+      .json(
+        serviceErrorBody(undefined, serviceMessage("service.api_failed_to_update_path_mapping", {}))
+      );
   }
 });
 
@@ -323,10 +342,17 @@ importRouter.delete("/mappings/paths/:id", async (req, res) => {
   try {
     const success = await storage.removePathMapping(req.params.id);
     if (success) res.json({ success: true });
-    else res.status(404).json({ error: "Mapping not found" });
+    else
+      res
+        .status(404)
+        .json(serviceErrorBody(undefined, serviceMessage("service.api_mapping_not_found", {})));
   } catch (error) {
     logger.error({ error }, "Error deleting path mapping");
-    res.status(500).json({ error: "Failed to delete path mapping" });
+    res
+      .status(500)
+      .json(
+        serviceErrorBody(undefined, serviceMessage("service.api_failed_to_delete_path_mapping", {}))
+      );
   }
 });
 
@@ -382,7 +408,8 @@ importRouter.patch("/config", validate(importConfigPatchSchema), async (req, res
     }
     return res.json(newConfig);
   } catch (error) {
-    if (error instanceof z.ZodError) return res.status(400).json({ error: zodErrorMessage(error) });
+    if (error instanceof z.ZodError)
+      return res.status(400).json({ error: zodErrorMessage(error), errorI18n: null });
     return res.status(500).json({ error: "Failed to update import config" });
   }
 });
@@ -408,7 +435,8 @@ importRouter.patch("/romm", validate(rommConfigPatchSchema), async (req, res) =>
     }
     return res.json(await storage.updateRomMConfig(userId, next));
   } catch (error) {
-    if (error instanceof z.ZodError) return res.status(400).json({ error: zodErrorMessage(error) });
+    if (error instanceof z.ZodError)
+      return res.status(400).json({ error: zodErrorMessage(error), errorI18n: null });
     logger.error({ error }, "Error updating RomM config");
     return res.status(500).json({ error: "Failed to update RomM config" });
   }
@@ -500,6 +528,15 @@ importRouter.get("/pending", async (_req, res) => {
       pathReviews.map(async (d) => {
         const game = await storage.getGame(d.gameId);
         const passwordRequired = !!d.errorMessage?.startsWith(ARCHIVE_PASSWORD_REQUIRED_PREFIX);
+        const storedDescriptor =
+          d.errorMessage === null
+            ? undefined
+            : matchingServiceMessageDescriptor(d.errorMessage, d.errorMessageI18n);
+        const displayedMetadata = passwordRequired
+          ? storedDescriptor?.messageKey === "service.import_archive_password_marker"
+            ? storedDescriptor.messageDetails?.detail
+            : undefined
+          : d.errorMessageI18n;
         return {
           id: d.id,
           gameTitle: game?.title || d.downloadTitle,
@@ -507,9 +544,12 @@ importRouter.get("/pending", async (_req, res) => {
           status: d.status,
           downloaderId: d.downloaderId,
           createdAt: d.addedAt,
-          errorMessage: passwordRequired
-            ? d.errorMessage?.slice(ARCHIVE_PASSWORD_REQUIRED_PREFIX.length)
-            : d.errorMessage,
+          ...persistedServiceMessage(
+            passwordRequired
+              ? (d.errorMessage?.slice(ARCHIVE_PASSWORD_REQUIRED_PREFIX.length) ?? null)
+              : d.errorMessage,
+            displayedMetadata
+          ),
           passwordRequired,
         };
       })
@@ -522,7 +562,7 @@ importRouter.get("/pending", async (_req, res) => {
       status: d.status,
       downloaderId: d.downloaderId,
       createdAt: d.addedAt,
-      errorMessage: d.errorMessage,
+      ...persistedServiceMessage(d.errorMessage, d.errorMessageI18n),
     }));
 
     const quarantinedResults = await Promise.all(
@@ -535,7 +575,7 @@ importRouter.get("/pending", async (_req, res) => {
           status: d.status,
           downloaderId: d.downloaderId,
           createdAt: d.addedAt,
-          errorMessage: d.errorMessage,
+          ...persistedServiceMessage(d.errorMessage, d.errorMessageI18n),
         };
       })
     );
@@ -553,7 +593,9 @@ importRouter.delete("/:id", async (req, res) => {
     const userId = res.locals.userId as string;
     const download = await storage.getGameDownload(id, userId);
     if (!download) {
-      return res.status(404).json({ error: "Download not found" });
+      return res
+        .status(404)
+        .json(serviceErrorBody(undefined, serviceMessage("service.api_download_not_found", {})));
     }
 
     if (download.status === GAME_LINK_REQUIRED_STATUS) {
@@ -563,7 +605,15 @@ importRouter.delete("/:id", async (req, res) => {
       if (!skipped) {
         return res
           .status(409)
-          .json({ error: "Download was linked to a game before it could be skipped" });
+          .json(
+            serviceErrorBody(
+              undefined,
+              serviceMessage(
+                "service.api_download_was_linked_to_a_game_before_it_could_be_skipped",
+                {}
+              )
+            )
+          );
       }
       return res.json({ success: true });
     }
@@ -572,7 +622,9 @@ importRouter.delete("/:id", async (req, res) => {
     return res.json({ success: true });
   } catch (error) {
     logger.error({ error }, "Error skipping import");
-    return res.status(500).json({ error: "Internal server error" });
+    return res
+      .status(500)
+      .json(serviceErrorBody(undefined, serviceMessage("service.api_internal_server_error", {})));
   }
 });
 
@@ -587,18 +639,31 @@ importRouter.post("/:id/link", validate(linkGameDownloadBodySchema), async (req,
 
     const download = await storage.getGameDownload(id, userId);
     if (!download) {
-      return res.status(404).json({ error: "Download not found" });
+      return res
+        .status(404)
+        .json(serviceErrorBody(undefined, serviceMessage("service.api_download_not_found", {})));
     }
     if (download.status !== GAME_LINK_REQUIRED_STATUS) {
-      return res.status(400).json({ error: "This download does not need to be linked to a game" });
+      return res
+        .status(400)
+        .json(
+          serviceErrorBody(
+            undefined,
+            serviceMessage("service.api_this_download_does_not_need_to_be_linked_to_a_game", {})
+          )
+        );
     }
 
     const game = await storage.getGame(gameId);
     if (!game) {
-      return res.status(404).json({ error: "Game not found" });
+      return res
+        .status(404)
+        .json(serviceErrorBody(undefined, serviceMessage("service.import_game_missing", {})));
     }
     if (game.userId !== userId) {
-      return res.status(404).json({ error: "Game not found" });
+      return res
+        .status(404)
+        .json(serviceErrorBody(undefined, serviceMessage("service.import_game_missing", {})));
     }
 
     const updated = await storage.relinkGameDownload(id, gameId, userId);
@@ -608,7 +673,15 @@ importRouter.post("/:id/link", validate(linkGameDownloadBodySchema), async (req,
       // moved on) this download between the check and the write.
       return res
         .status(409)
-        .json({ error: "This download was already linked to a game by another request" });
+        .json(
+          serviceErrorBody(
+            undefined,
+            serviceMessage(
+              "service.api_this_download_was_already_linked_to_a_game_by_another_request",
+              {}
+            )
+          )
+        );
     }
     return res.json({
       success: true,
@@ -616,10 +689,12 @@ importRouter.post("/:id/link", validate(linkGameDownloadBodySchema), async (req,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: zodErrorMessage(error) });
+      return res.status(400).json({ error: zodErrorMessage(error), errorI18n: null });
     }
     logger.error({ error }, "Error linking download to game");
-    return res.status(500).json({ error: "Internal server error" });
+    return res
+      .status(500)
+      .json(serviceErrorBody(undefined, serviceMessage("service.api_internal_server_error", {})));
   }
 });
 
@@ -639,7 +714,9 @@ importRouter.get("/:id/plan", async (req, res) => {
     return res.json(plan);
   } catch (error) {
     if (error instanceof Error && error.message.includes("not found"))
-      return res.status(404).json({ error: error.message });
+      return res
+        .status(404)
+        .json(serviceErrorBody(error, serviceMessage("interface.unknown_error_ce512b43", {})));
     logger.error({ error }, "Error planning import");
     return res.status(500).json({ error: "Internal server error" });
   }
@@ -654,7 +731,11 @@ importRouter.post("/:id/confirm", validate(confirmImportBodySchema), async (req,
     const config = await storage.getImportConfig(userId);
     const rommConfig = await storage.getRomMConfig(userId);
     if (body.strategy === "romm" && !rommConfig.enabled) {
-      return res.status(400).json({ error: "RomM imports are disabled" });
+      return res
+        .status(400)
+        .json(
+          serviceErrorBody(undefined, serviceMessage("service.api_romm_imports_are_disabled", {}))
+        );
     }
     const targetRoot = body.strategy === "romm" ? rommConfig.libraryRoot : config.libraryRoot;
     const safeProposedPath = resolveProposedPathWithinRoot(targetRoot, body.proposedPath);
@@ -678,13 +759,18 @@ importRouter.post("/:id/confirm", validate(confirmImportBodySchema), async (req,
     return res.json({ success: true });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: error.issues });
+      return res.status(400).json({ error: error.issues, errorI18n: null });
     }
     if (error instanceof ArchivePasswordRequiredError) {
-      return res.status(400).json({ error: error.message, passwordRequired: true });
+      return res.status(400).json({
+        ...serviceErrorBody(error, serviceMessage("interface.unknown_error_ce512b43", {})),
+        passwordRequired: true,
+      });
     }
     if (error instanceof IncompleteScanError) {
-      return res.status(409).json({ error: error.message });
+      return res
+        .status(409)
+        .json(serviceErrorBody(error, serviceMessage("interface.unknown_error_ce512b43", {})));
     }
     if (error instanceof Error) {
       if (
@@ -692,13 +778,19 @@ importRouter.post("/:id/confirm", validate(confirmImportBodySchema), async (req,
         error.message === "Confirmation requires a plan" ||
         error.message.startsWith("Source path could not be resolved")
       ) {
-        return res.status(400).json({ error: error.message });
+        return res
+          .status(400)
+          .json(serviceErrorBody(error, serviceMessage("interface.unknown_error_ce512b43", {})));
       }
       if (error.message.includes("not found")) {
-        return res.status(404).json({ error: error.message });
+        return res
+          .status(404)
+          .json(serviceErrorBody(error, serviceMessage("interface.unknown_error_ce512b43", {})));
       }
     }
     logger.error({ error }, "Error confirming import");
-    return res.status(500).json({ error: "Internal server error" });
+    return res
+      .status(500)
+      .json(serviceErrorBody(undefined, serviceMessage("service.api_internal_server_error", {})));
   }
 });

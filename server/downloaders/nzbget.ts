@@ -1,3 +1,9 @@
+import {
+  serviceMessage,
+  ServiceMessageError,
+  serviceErrorResult,
+  serviceErrorValue,
+} from "../../shared/service-messages.js";
 import type { Downloader, DownloadStatus, DownloadDetails } from "../../shared/schema.js";
 import { resolveArchivePassword } from "../../shared/archive-password.js";
 import { downloadersLogger } from "../logger.js";
@@ -245,8 +251,13 @@ export class NZBGetClient implements DownloaderClient {
     await logDownloaderDebugResponse("NZBGet", method, url, response);
 
     if (!response.ok) {
-      const errorText = await response.text().catch(() => "No error details");
-      throw new Error(`HTTP ${response.status}: ${errorText}`);
+      const errorText = await response
+        .text()
+        .catch(() => serviceMessage("service.no_error_details", {}));
+      throw new ServiceMessageError("service.http_error", {
+        status: response.status,
+        error: errorText,
+      });
     }
 
     const responseText = await response.text();
@@ -267,9 +278,10 @@ export class NZBGetClient implements DownloaderClient {
         string,
         unknown
       >;
-      throw new Error(
-        `NZBGet Fault: ${fault["faultString"] as string} (${fault["faultCode"] as number})`
-      );
+      throw new ServiceMessageError("service.nzbget_fault", {
+        error: String(fault["faultString"]),
+        code: String(fault["faultCode"]),
+      });
     }
 
     if (parsed.methodResponse?.params?.param) {
@@ -287,14 +299,24 @@ export class NZBGetClient implements DownloaderClient {
   async testConnection(): Promise<{ success: boolean; message: string }> {
     try {
       const version = await this.makeXMLRPCRequest("version");
-      return { success: true, message: `Connected to NZBGet v${version}` };
+      return {
+        success: true,
+        ...serviceMessage("service.connected_version", {
+          client: "NZBGet",
+          version: String(version),
+        }),
+      };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = serviceErrorValue(error);
       const baseUrl = this.getBaseUrl();
       downloadersLogger.error({ error, url: baseUrl }, "NZBGet connection test failed");
       return {
         success: false,
-        message: `Failed to connect to NZBGet at ${baseUrl}: ${errorMessage}`,
+        ...serviceMessage("service.connection_failed_at", {
+          client: "NZBGet",
+          url: baseUrl,
+          error: errorMessage,
+        }),
       };
     }
   }
@@ -316,14 +338,20 @@ export class NZBGetClient implements DownloaderClient {
   ): Promise<{ success: boolean; id?: string; message: string }> {
     try {
       if (!(await isSafeUrl(request.url))) {
-        return { success: false, message: `Unsafe URL blocked: ${request.url}` };
+        return {
+          success: false,
+          ...serviceMessage("service.unsafe_url_blocked", { url: request.url }),
+        };
       }
 
       // Keep &file= intact — Prowlarr uses it for link validation.
       const nzbUrl = fixNzbUrlEncoding(request.url);
       const nzbResponse = await safeFetch(nzbUrl);
       if (!nzbResponse.ok) {
-        return { success: false, message: `Failed to fetch NZB: ${nzbResponse.statusText}` };
+        return {
+          success: false,
+          ...serviceMessage("service.nzb_fetch_failed", { error: nzbResponse.statusText }),
+        };
       }
 
       const nzbContent = await nzbResponse.text();
@@ -335,14 +363,18 @@ export class NZBGetClient implements DownloaderClient {
       // built-in Unpack post-processor reads a per-NZB override via the well-known
       // "*Unpack:Password" PPParameter — configured per-downloader since it's usually
       // a fixed indexer/group convention.
-      const { password, error: passwordError } = resolveArchivePassword(
+      const {
+        password,
+        error: passwordError,
+        errorI18n: passwordMetadata,
+      } = resolveArchivePassword(
         request.password,
         this.downloader.settings,
         this.getBaseUrl(),
         "NZBGet"
       );
       if (passwordError) {
-        return { success: false, message: passwordError };
+        return { success: false, message: passwordError, ...passwordMetadata };
       }
 
       const nzbId = (await this.makeXMLRPCRequest(
@@ -366,16 +398,13 @@ export class NZBGetClient implements DownloaderClient {
         return {
           success: true,
           id: nzbId.toString(),
-          message: "NZB added successfully",
+          ...serviceMessage("service.nzb_added", {}),
         };
       }
 
-      return { success: false, message: "Failed to add NZB (ID is 0 or negative)" };
+      return { success: false, ...serviceMessage("service.nzb_add_invalid_id", {}) };
     } catch (error) {
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : "Unknown error",
-      };
+      return serviceErrorResult(error, serviceMessage("interface.unknown_error_ce512b43", {}));
     }
   }
 
@@ -565,24 +594,18 @@ export class NZBGetClient implements DownloaderClient {
   async pauseDownload(id: string): Promise<{ success: boolean; message: string }> {
     try {
       await this.makeXMLRPCRequest("editqueue", ["GroupPause", 0, "", [Number.parseInt(id)]]);
-      return { success: true, message: "NZB paused" };
+      return { success: true, ...serviceMessage("service.nzb_paused", {}) };
     } catch (error) {
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : "Unknown error",
-      };
+      return serviceErrorResult(error, serviceMessage("interface.unknown_error_ce512b43", {}));
     }
   }
 
   async resumeDownload(id: string): Promise<{ success: boolean; message: string }> {
     try {
       await this.makeXMLRPCRequest("editqueue", ["GroupResume", 0, "", [Number.parseInt(id)]]);
-      return { success: true, message: "NZB resumed" };
+      return { success: true, ...serviceMessage("service.nzb_resumed", {}) };
     } catch (error) {
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : "Unknown error",
-      };
+      return serviceErrorResult(error, serviceMessage("interface.unknown_error_ce512b43", {}));
     }
   }
 
@@ -592,12 +615,9 @@ export class NZBGetClient implements DownloaderClient {
   ): Promise<{ success: boolean; message: string }> {
     try {
       await this.makeXMLRPCRequest("editqueue", ["GroupDelete", 0, "", [Number.parseInt(id)]]);
-      return { success: true, message: "NZB removed" };
+      return { success: true, ...serviceMessage("service.nzb_removed", {}) };
     } catch (error) {
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : "Unknown error",
-      };
+      return serviceErrorResult(error, serviceMessage("interface.unknown_error_ce512b43", {}));
     }
   }
 

@@ -25,14 +25,16 @@ export function GitHubVersionLink({ className }: Readonly<GitHubVersionLinkProps
     >
       <FaGithub size={14} />
       <span>
-        <InterfaceText source={"QuestarrNG v"} />
-        {pkg.version}
+        <bdi dir="ltr">
+          <InterfaceText source={"QuestarrNG v"} dir="ltr" />
+          {pkg.version}
+        </bdi>
       </span>
       {hasNewerVersion && (
-        <span className="text-emerald-500/70">
-          <InterfaceText source={"v"} />
+        <bdi dir="ltr" className="text-emerald-500/70">
+          <InterfaceText source={"v"} dir="ltr" />
           {latestVersion} <FaArrowUp className="inline" size={10} />
-        </span>
+        </bdi>
       )}
     </a>
   );

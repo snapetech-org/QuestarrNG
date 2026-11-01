@@ -179,10 +179,10 @@ export default function PlayingPage() {
         <div>
           <h1
             className="text-2xl font-bold tracking-tight"
-            lang={languageFor("Playing")}
-            dir={directionFor("Playing")}
+            lang={languageFor("navigation.playing")}
+            dir={directionFor("navigation.playing")}
           >
-            {t("Playing")}
+            {t("navigation.playing")}
           </h1>
           {games.length > 0 && (
             <p
@@ -227,10 +227,10 @@ export default function PlayingPage() {
               {showSearchResultsOnly && showDownloadsOnly && (
                 <p
                   className="text-xs text-muted-foreground"
-                  lang={languageFor("Multiple filters active")}
-                  dir={directionFor("Multiple filters active")}
+                  lang={languageFor("interface.multiple_filters_active_6d809578")}
+                  dir={directionFor("interface.multiple_filters_active_6d809578")}
                 >
-                  {t("Multiple filters active")}
+                  {t("interface.multiple_filters_active_6d809578")}
                 </p>
               )}
             </>

@@ -7,7 +7,7 @@ import { visibleIgdbPlatforms } from "@shared/platforms";
 import { useHiddenMutation } from "@/hooks/use-hidden-mutation";
 import { useToast } from "@/hooks/use-toast";
 import { mapGameToInsertGame } from "@/lib/utils";
-import { apiRequest } from "@/lib/queryClient";
+import { ApiError, apiRequest } from "@/lib/queryClient";
 import { addDiscoveryGameToLibrary, hideDiscoveryGame } from "@/lib/discover-hidden-mutation";
 import {
   Select,
@@ -27,7 +27,13 @@ import { useLocalStorageState } from "@/hooks/use-local-storage-state";
 import { ACQUIRED_GAME_STATUSES, type Game, type Config, type UserSettings } from "@shared/schema";
 import { type GameStatus } from "@/components/StatusBadge";
 import { Input } from "@/components/ui/input";
-import { useInterfaceLanguage, formatInterfaceMessage } from "@/lib/interface-locale";
+import {
+  useInterfaceLanguage,
+  formatInterfaceMessage,
+  getInterfaceTextDirection,
+  getInterfaceTextLanguage,
+  type InterfaceLanguage,
+} from "@/lib/interface-locale";
 import { InterfaceText } from "@/components/InterfaceText";
 
 const EMPTY_GAMES: Game[] = [];
@@ -90,6 +96,21 @@ const SelectTriggerWithSpinner = ({
 
 export default function DiscoverPage() {
   const { t, languageFor, directionFor } = useInterfaceLanguage();
+  const toastText = useCallback(
+    (source: string) => (language: InterfaceLanguage) => {
+      const text = formatInterfaceMessage(source, {}, language);
+      if (language === "en") return text;
+      return (
+        <span
+          lang={getInterfaceTextLanguage(source, language)}
+          dir={getInterfaceTextDirection(source, language)}
+        >
+          {text}
+        </span>
+      );
+    },
+    []
+  );
   const textNode = useCallback(
     (source: string) => (
       <span lang={languageFor(source)} dir={directionFor(source)}>
@@ -335,22 +356,22 @@ export default function DiscoverPage() {
   useEffect(() => {
     if (genresError) {
       toast({
-        description: textNode("Failed to load genres, using defaults"),
+        description: toastText("Failed to load genres, using defaults"),
 
         variant: "destructive",
       });
     }
-  }, [genresError, textNode, toast]);
+  }, [genresError, toast, toastText]);
 
   useEffect(() => {
     if (platformsError) {
       toast({
-        description: textNode("Failed to load platforms, using defaults"),
+        description: toastText("Failed to load platforms, using defaults"),
 
         variant: "destructive",
       });
     }
-  }, [platformsError, textNode, toast]);
+  }, [platformsError, toast, toastText]);
 
   // Track game mutation (for Discovery games)
 
@@ -397,21 +418,19 @@ export default function DiscoverPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/games"] });
 
-      toast({ description: textNode("Game added to watchlist!") });
+      toast({ description: toastText("Game added to watchlist!") });
     },
 
     onError: (error: Error) => {
-      const errorMessage = error.message || String(error);
-
-      if (errorMessage.includes("409") || errorMessage.includes("already in collection")) {
+      if (error instanceof ApiError && error.status === 409) {
         toast({
-          description: textNode("Game is already in your collection"),
+          description: toastText("Game is already in your collection"),
 
           variant: "default",
         });
       } else {
         toast({
-          description: textNode("Failed to track game"),
+          description: toastText("Failed to track game"),
 
           variant: "destructive",
         });
@@ -431,9 +450,9 @@ export default function DiscoverPage() {
             : undefined;
       return hideDiscoveryGame(game, localId);
     },
-    hiddenSuccessMessage: t("Game hidden from discovery"),
-    unhiddenSuccessMessage: t("Game unhidden"),
-    errorMessage: t("Failed to hide game"),
+    hiddenSuccessMessage: "interface.game_hidden_from_discovery_49a98505",
+    unhiddenSuccessMessage: "interface.game_unhidden_b1ef3b12",
+    errorMessage: "interface.failed_to_hide_game_9acca03f",
   });
 
   // Add game mutation (for status changes on Discovery games)
@@ -473,12 +492,12 @@ export default function DiscoverPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/games"] });
 
-      toast({ description: textNode("Game added to collection successfully") });
+      toast({ description: toastText("Game added to collection successfully") });
     },
 
     onError: () => {
       toast({
-        description: textNode("Failed to add game to collection"),
+        description: toastText("Failed to add game to collection"),
 
         variant: "destructive",
       });
@@ -689,21 +708,17 @@ export default function DiscoverPage() {
             <div>
               <h1
                 className="text-2xl font-bold tracking-tight"
-                lang={languageFor("Discover")}
-                dir={directionFor("Discover")}
+                lang={languageFor("navigation.discover")}
+                dir={directionFor("navigation.discover")}
               >
-                {t("Discover")}
+                {t("navigation.discover")}
               </h1>
               <p
                 className="text-muted-foreground text-sm mt-0.5"
-                lang={languageFor(
-                  "Explore popular games, new releases, and find your next adventure"
-                )}
-                dir={directionFor(
-                  "Explore popular games, new releases, and find your next adventure"
-                )}
+                lang={languageFor("interface.explore_popular_games_new_releases_320e855e")}
+                dir={directionFor("interface.explore_popular_games_new_releases_320e855e")}
               >
-                {t("Explore popular games, new releases, and find your next adventure")}
+                {t("interface.explore_popular_games_new_releases_320e855e")}
               </p>
             </div>
 
@@ -731,9 +746,9 @@ export default function DiscoverPage() {
                 size="sm"
                 className="gap-2"
                 onClick={() => setShowSettings(true)}
-                aria-label={t("Discovery settings")}
-                lang={languageFor("Discovery settings")}
-                dir={directionFor("Discovery settings")}
+                aria-label={t("interface.discovery_settings_c74f6d62")}
+                lang={languageFor("interface.discovery_settings_c74f6d62")}
+                dir={directionFor("interface.discovery_settings_c74f6d62")}
               >
                 <Settings2 className="h-4 w-4" />
                 {textNode("Discovery Settings")}
@@ -794,10 +809,10 @@ export default function DiscoverPage() {
               <div className="flex items-center gap-4">
                 <h2
                   className="text-xl font-semibold"
-                  lang={languageFor("By Genre")}
-                  dir={directionFor("By Genre")}
+                  lang={languageFor("interface.by_genre_16e7407b")}
+                  dir={directionFor("interface.by_genre_16e7407b")}
                 >
-                  {t("By Genre")}
+                  {t("interface.by_genre_16e7407b")}
                 </h2>
                 <Select value={selectedGenre} onValueChange={setSelectedGenre}>
                   <SelectTriggerWithSpinner
@@ -805,7 +820,7 @@ export default function DiscoverPage() {
                     data-testid="select-genre"
                     loading={isFetchingGenres}
                   >
-                    <SelectValue placeholder={t("Select genre")} />
+                    <SelectValue placeholder={t("interface.select_genre_afa02ce2")} />
                   </SelectTriggerWithSpinner>
                   <SelectContent>
                     {displayGenres.map((genre: Genre) => (
@@ -818,7 +833,7 @@ export default function DiscoverPage() {
               </div>
               {/* Keep the label in sync with its debounced query while the filter settles. */}
               <GameCarouselSection
-                title={formatInterfaceMessage("{selectedGenre} Games", {
+                title={formatInterfaceMessage("interface.selectedgenre_games_26eebef6", {
                   selectedGenre: String(debouncedGenre ?? ""),
                 })}
                 queryKey={genreCarouselQueryKey}
@@ -841,10 +856,10 @@ export default function DiscoverPage() {
                 <div className="flex items-center gap-4">
                   <h2
                     className="text-xl font-semibold"
-                    lang={languageFor("By Platform")}
-                    dir={directionFor("By Platform")}
+                    lang={languageFor("interface.by_platform_5b8c467f")}
+                    dir={directionFor("interface.by_platform_5b8c467f")}
                   >
-                    {t("By Platform")}
+                    {t("interface.by_platform_5b8c467f")}
                   </h2>
                   <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
                     <SelectTriggerWithSpinner
@@ -852,7 +867,7 @@ export default function DiscoverPage() {
                       data-testid="select-platform"
                       loading={isFetchingPlatforms}
                     >
-                      <SelectValue placeholder={t("Select platform")} />
+                      <SelectValue placeholder={t("interface.select_platform_3f01db88")} />
                     </SelectTriggerWithSpinner>
                     <SelectContent>
                       {displayPlatforms.map((platform: Platform) => (
@@ -865,7 +880,7 @@ export default function DiscoverPage() {
                 </div>
                 {/* Match the label to the same debounced platform used by its query. */}
                 <GameCarouselSection
-                  title={formatInterfaceMessage("{selectedPlatform} Games", {
+                  title={formatInterfaceMessage("interface.selectedplatform_games_797e8bc0", {
                     selectedPlatform: String(selectedPlatform ?? ""),
                   })}
                   queryKey={platformCarouselQueryKey}
@@ -884,15 +899,15 @@ export default function DiscoverPage() {
             <TabsContent value="rawg" className="space-y-8">
               <div className="space-y-2">
                 <label htmlFor="rawg-discover-search" className="text-sm font-medium">
-                  <InterfaceText source="Search RAWG games" />
+                  <InterfaceText source="interface.search_rawg_games_4d5f00ff" />
                 </label>
                 <div className="relative max-w-xl">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Search className="absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="rawg-discover-search"
-                    className="pl-9"
+                    className="ps-9"
                     placeholder="Search by game title"
-                    data-i18n-placeholder="Search by game title"
+                    data-i18n-placeholder="interface.search_by_game_title_c6c5b926"
                     value={rawgSearch}
                     onChange={(event) => setRawgSearch(event.target.value)}
                   />
@@ -951,17 +966,17 @@ export default function DiscoverPage() {
               <div>
                 <h3
                   className="font-semibold"
-                  lang={languageFor("RSS Feed Discovery")}
-                  dir={directionFor("RSS Feed Discovery")}
+                  lang={languageFor("interface.rss_feed_discovery_879db693")}
+                  dir={directionFor("interface.rss_feed_discovery_879db693")}
                 >
-                  {t("RSS Feed Discovery")}
+                  {t("interface.rss_feed_discovery_879db693")}
                 </h3>
                 <p
                   className="text-sm text-muted-foreground"
-                  lang={languageFor("Track releases from your favorite sites.")}
-                  dir={directionFor("Track releases from your favorite sites.")}
+                  lang={languageFor("interface.track_releases_from_your_favorite_74df79c3")}
+                  dir={directionFor("interface.track_releases_from_your_favorite_74df79c3")}
                 >
-                  {t("Track releases from your favorite sites.")}
+                  {t("interface.track_releases_from_your_favorite_74df79c3")}
                 </p>
               </div>
               <RssSettings />

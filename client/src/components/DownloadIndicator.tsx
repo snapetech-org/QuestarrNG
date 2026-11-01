@@ -43,7 +43,7 @@ const DownloadIndicator = memo(({ summary, variant = "overlay" }: DownloadIndica
             "w-2.5 h-2.5 rounded-full shrink-0",
             colorClass,
             summary.topStatus === "downloading" && "animate-pulse",
-            variant === "overlay" ? "absolute bottom-2 left-2" : "inline-flex"
+            variant === "overlay" ? "absolute bottom-2 start-2" : "inline-flex"
           )}
           aria-label={tooltipText}
           lang={languageFor(source)}

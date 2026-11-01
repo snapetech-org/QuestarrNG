@@ -31,6 +31,17 @@ import { DownloaderManager } from "../downloaders.js";
 import { xrelClient } from "../xrel.js";
 import { readLastLogLines } from "../log-file.js";
 import type { Downloader, Indexer, Game } from "../../shared/schema.js";
+import {
+  ServiceMessageError,
+  parseServiceMessageDescriptor,
+} from "../../shared/service-messages.js";
+
+const realDebridAuthMocks = vi.hoisted(() => ({ start: vi.fn(), poll: vi.fn() }));
+vi.mock("../downloaders/realdebrid-auth.js", () => ({
+  startRealDebridDeviceAuth: realDebridAuthMocks.start,
+  pollRealDebridDeviceAuth: realDebridAuthMocks.poll,
+  getRealDebridAccessToken: vi.fn(),
+}));
 
 vi.mock("../log-file.js", () => ({
   getLogFilePath: vi.fn(() => "/tmp/server.log"),
@@ -109,6 +120,50 @@ describe("API Routes - Additional Coverage", () => {
     await registerRoutes(app);
   });
 
+  describe("Real-Debrid auth response ownership", () => {
+    it.each([true, false])(
+      "preserves poll wire text and explicit metadata ownership: %s",
+      async (typed) => {
+        vi.mocked(storage.getDownloader).mockResolvedValueOnce({
+          ...testDownloader,
+          type: "realdebrid",
+        });
+        const appError = new ServiceMessageError(
+          "service.realdebrid_authorization_code_expired",
+          {}
+        );
+        realDebridAuthMocks.poll.mockRejectedValueOnce(
+          typed ? appError : new Error(appError.message)
+        );
+        const result = await request(app).post("/api/downloaders/dl-1/realdebrid/auth/poll").send({
+          handle: "00000000-0000-4000-8000-000000000001",
+        });
+        expect(result.status).toBe(400);
+        expect(result.body.error).toBe(appError.message);
+        if (typed)
+          expect(parseServiceMessageDescriptor(result.body.errorI18n)?.messageKey).toBe(
+            appError.messageKey
+          );
+        else expect(result.body.errorI18n).toBeNull();
+      }
+    );
+
+    it("keeps the start route's fixed fallback rather than exposing the logged provider error", async () => {
+      vi.mocked(storage.getDownloader).mockResolvedValueOnce({
+        ...testDownloader,
+        type: "realdebrid",
+      });
+      realDebridAuthMocks.start.mockRejectedValueOnce(new Error("Private provider detail"));
+      const result = await request(app).post("/api/downloaders/dl-1/realdebrid/auth/start");
+      expect(result.status).toBe(502);
+      expect(result.body.error).toBe("Real-Debrid account linking could not be started.");
+      expect(parseServiceMessageDescriptor(result.body.errorI18n)?.messageKey).toBe(
+        "service.realdebrid_link_start_failed"
+      );
+      expect(JSON.stringify(result.body)).not.toContain("Private provider detail");
+    });
+  });
+
   describe("GET /api/downloaders/:id", () => {
     it("returns a masked downloader", async () => {
       vi.mocked(storage.getDownloader).mockResolvedValue(testDownloader);
@@ -146,6 +201,40 @@ describe("API Routes - Additional Coverage", () => {
   });
 
   describe("Downloader downloads endpoints", () => {
+    it.each([
+      { production: false, typed: false },
+      { production: false, typed: true },
+      { production: true, typed: false },
+      { production: true, typed: true },
+    ])(
+      "retains aggregate downloader error ownership/redaction: $production/$typed",
+      async ({ production, typed }) => {
+        const previous = mockConfig.server.isProduction;
+        mockConfig.server.isProduction = production;
+        const error = new ServiceMessageError("service.download_path_escapes_directory", {});
+        vi.mocked(storage.getEnabledDownloaders).mockResolvedValueOnce([testDownloader]);
+        vi.mocked(storage.getTrackedDownloadKeys).mockResolvedValueOnce(new Set());
+        vi.mocked(storage.getTrackedDownloadGameStatuses).mockResolvedValueOnce(new Map());
+        vi.mocked(DownloaderManager.getAllDownloads).mockRejectedValueOnce(
+          typed ? error : new Error(error.message)
+        );
+        try {
+          const res = await request(app).get("/api/downloads");
+          expect(res.status).toBe(200);
+          const detail = res.body.errors[0];
+          expect(detail.downloaderId).toBe(testDownloader.id);
+          expect(detail.error).toBe(production ? "Internal Server Error" : error.message);
+          if (production || typed)
+            expect(parseServiceMessageDescriptor(detail.errorI18n)?.messageKey).toBe(
+              production ? "service.internal_server_error" : error.messageKey
+            );
+          else expect(detail.errorI18n).toBeNull();
+        } finally {
+          mockConfig.server.isProduction = previous;
+        }
+      }
+    );
+
     beforeEach(() => {
       vi.mocked(storage.getDownloader).mockResolvedValue(testDownloader);
     });

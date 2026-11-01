@@ -11,11 +11,12 @@ import { apiRequest } from "@/lib/queryClient";
 import { type GameFileCategory, type ScannedGameFile } from "@shared/schema";
 import { formatInterfaceMessage } from "@/lib/interface-locale";
 import { InterfaceText } from "@/components/InterfaceText";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 
 const CATEGORY_OPTIONS: Array<{ value: GameFileCategory; label: string }> = [
   { value: "main", label: "Main game" },
   { value: "dlc", label: "DLC" },
-  { value: "update", label: "Update" },
+  { value: "update", label: "Updates" },
   { value: "extra", label: "Extra" },
 ];
 
@@ -49,7 +50,7 @@ export default function FileCategorySelect({ gameId, file }: FileCategorySelectP
     onError: (error: Error) => {
       toast({
         title: "Could not change the category",
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },
@@ -63,7 +64,7 @@ export default function FileCategorySelect({ gameId, file }: FileCategorySelectP
     >
       <SelectTrigger
         className="h-9 w-[7.5rem] shrink-0 text-xs"
-        aria-label={formatInterfaceMessage("Category for {name}", {
+        aria-label={formatInterfaceMessage("interface.category_for_name_ffbdc0b7", {
           name: String(file.name ?? ""),
         })}
         data-testid={`select-file-category-${file.name}`}

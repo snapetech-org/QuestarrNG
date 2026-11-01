@@ -9,6 +9,7 @@ import GameDownloadDialog from "../src/components/GameDownloadDialog";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { createTestQueryClient, getRequestUrl } from "./test-utils";
+import { serviceMessage } from "@shared/service-messages";
 import { setInterfaceLanguage } from "@/lib/interface-locale";
 
 // Route apiRequest through globalThis.fetch so test mocks capture mutation calls
@@ -752,6 +753,34 @@ describe("GameDownloadDialog", () => {
       expect(mockToast).toHaveBeenCalledWith(expect.objectContaining({ variant: "destructive" }));
     });
   });
+
+  it.each(["valid", "null", "mismatch"] as const)(
+    "preserves search error ownership in the rendered list: %s",
+    async (kind) => {
+      const fragment = serviceMessage("service.indexer_disabled", {
+        indexer: "Name العربية: {error}",
+      });
+      const metadata =
+        kind === "valid"
+          ? fragment
+          : kind === "null"
+            ? null
+            : { ...fragment, messageValues: { indexer: "different" } };
+      globalThis.fetch = createFetchMock({
+        search: {
+          items: [],
+          total: 0,
+          offset: 0,
+          errors: [fragment.message],
+          errorI18n: [metadata],
+        },
+      });
+      renderComponent();
+      const text = await screen.findByText(fragment.message);
+      expect(text.tagName).toBe("BDI");
+      expect(text).toHaveAttribute("lang", kind === "valid" ? "en" : "und");
+    }
+  );
 
   it("displays indexer errors returned by the search API", async () => {
     globalThis.fetch = createFetchMock({
@@ -1675,7 +1704,15 @@ describe("GameDownloadDialog", () => {
         expect.objectContaining({ method: "POST" })
       );
       expect(mockToast).toHaveBeenCalledWith(
-        expect.objectContaining({ title: "Checking qBittorrent", description: message })
+        expect.objectContaining({
+          title: "Checking qBittorrent",
+          description: expect.objectContaining({
+            props: {
+              message,
+              metadata: { success: true, correlationTag: "questarr-add-pending", message },
+            },
+          }),
+        })
       );
     });
   });

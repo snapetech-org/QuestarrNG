@@ -15,10 +15,10 @@ export default function NotFound() {
 
           <p
             className="mt-4 text-sm text-muted-foreground"
-            lang={languageFor("The page you requested could not be found.")}
-            dir={directionFor("The page you requested could not be found.")}
+            lang={languageFor("interface.the_page_you_requested_could_not_b_09c782ad")}
+            dir={directionFor("interface.the_page_you_requested_could_not_b_09c782ad")}
           >
-            {t("The page you requested could not be found.")}
+            {t("interface.the_page_you_requested_could_not_b_09c782ad")}
           </p>
         </CardContent>
       </Card>

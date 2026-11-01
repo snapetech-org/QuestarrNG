@@ -1,3 +1,9 @@
+import {
+  serviceMessage,
+  serviceErrorBody,
+  parseServiceMessageDescriptor,
+  serializeServiceMessageDescriptor,
+} from "../../shared/service-messages.js";
 import { beforeAll, afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { execFile } from "child_process";
 import fs from "fs";
@@ -6,6 +12,7 @@ import { tmpdir } from "os";
 import path from "path";
 import { appriseClient } from "../apprise.js";
 import { safeFetch } from "../ssrf.js";
+import { storage } from "../storage.js";
 import type { Notification } from "../../shared/schema.js";
 
 vi.mock("../logger.js", () => ({
@@ -18,6 +25,8 @@ vi.mock("../logger.js", () => ({
     }),
   },
 }));
+
+vi.mock("../storage.js", () => ({ storage: { getUserSettings: vi.fn() } }));
 
 vi.mock("../ssrf.js", () => ({
   safeFetch: vi.fn(),
@@ -32,6 +41,42 @@ vi.mock("child_process", () => {
 });
 
 describe("Apprise client", () => {
+  it.each([
+    { props: { code: "ENOENT" }, key: "service.apprise_cli_not_found" },
+    { props: { killed: true }, key: "service.apprise_cli_timeout" },
+    { props: {}, key: undefined },
+  ])("tags only known CLI execution states: $key", async ({ props, key }) => {
+    vi.mocked(execFile).mockImplementation((...args) => {
+      const callback = args[3] as (error: Error, stdout: string, stderr: string) => void;
+      callback(
+        Object.assign(new Error("opaque provider error"), props),
+        "",
+        "Apprise CLI not found"
+      );
+      return {} as never;
+    });
+    appriseClient.configure({ mode: "cli", urls: "discord://example.invalid/mock-only" });
+    const result = await appriseClient.test();
+    expect(result.success).toBe(false);
+    const descriptor = parseServiceMessageDescriptor(result.errorI18n);
+    expect(descriptor?.messageKey).toBe(key);
+    if (!key) expect(result.error).toBe("Apprise CLI not found");
+  });
+
+  it("preserves the exact bounded HTTP diagnostic and captured provider body", async () => {
+    appriseClient.configure({ mode: "api", apiUrl: "http://apprise:8000", key: "key" });
+    const provider = "العربية {error} Apprise CLI not found ".repeat(20);
+    vi.mocked(safeFetch).mockResolvedValueOnce(new Response(provider, { status: 503 }));
+    const result = await appriseClient.test();
+    expect(result.error).toBe(`Server responded with 503: ${provider}`.slice(0, 200));
+    const descriptor = parseServiceMessageDescriptor(result.errorI18n);
+    expect(descriptor?.messageKey).toBe("service.apprise_server_responded");
+    expect(descriptor?.messageDetails).toBeUndefined();
+    expect(descriptor?.messageValues.error).toBe(
+      provider.slice(0, 200 - "Server responded with 503: ".length)
+    );
+  });
+
   const notification = {
     type: "info",
     title: "Questarr",
@@ -57,6 +102,81 @@ describe("Apprise client", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     appriseClient.configure({ mode: "api", apiUrl: null, key: null, urls: null });
+  });
+
+  it("localizes API delivery using persisted user preference without changing saved copy", async () => {
+    vi.mocked(storage.getUserSettings).mockResolvedValue({
+      notificationPreferences: '{"language":"de"}',
+    } as never);
+    vi.mocked(safeFetch).mockResolvedValue({ ok: true } as never);
+    appriseClient.configure({ mode: "api", apiUrl: "http://apprise:8000", key: "key" });
+    const saved = {
+      ...notification,
+      userId: "user-1",
+      title: "Download Completed",
+      message: "Download finished for A Game",
+    };
+    await appriseClient.send(saved);
+    const payload = JSON.parse(String(vi.mocked(safeFetch).mock.calls[0]?.[1]?.body));
+    expect(payload.title).not.toBe(saved.title);
+    expect(payload.body).toContain("A Game");
+    expect(payload.body).not.toBe(saved.message);
+    expect(saved.message).toBe("Download finished for A Game");
+    expect(storage.getUserSettings).toHaveBeenCalledWith("user-1");
+  });
+
+  it("localizes stored nested app errors before mocked delivery while preserving user values", async () => {
+    vi.mocked(storage.getUserSettings).mockResolvedValue({
+      notificationPreferences: '{"language":"es"}',
+    } as never);
+    vi.mocked(safeFetch).mockResolvedValue({ ok: true } as never);
+    appriseClient.configure({ mode: "api", apiUrl: "http://apprise:8000", key: "key" });
+    const game = 'Game ": provider /a/path العربية';
+    const fragment = serviceMessage("service.notification_download_aborted", {
+      game,
+      error: serviceMessage("service.client_reported_error", {
+        client: "Synology Download Station",
+      }),
+    });
+    const saved = {
+      ...notification,
+      userId: "user-1",
+      title: "Download Aborted",
+      message: fragment.message,
+      messageI18n: serializeServiceMessageDescriptor(fragment),
+    };
+    await appriseClient.send(saved);
+    const body = JSON.parse(String(vi.mocked(safeFetch).mock.calls[0]?.[1]?.body)).body;
+    expect(body).toContain(game);
+    expect(body).toContain("informó");
+    expect(body).not.toContain("reported an error");
+    expect(saved.message).toBe(fragment.message);
+  });
+
+  it("falls back to English when preference lookup fails", async () => {
+    vi.mocked(storage.getUserSettings).mockRejectedValue(new Error("settings unavailable"));
+    vi.mocked(safeFetch).mockResolvedValue({ ok: true } as never);
+    appriseClient.configure({ mode: "api", apiUrl: "http://apprise:8000", key: "key" });
+    await appriseClient.send({ ...notification, userId: "user-1" });
+    expect(JSON.parse(String(vi.mocked(safeFetch).mock.calls[0]?.[1]?.body)).body).toBe(
+      notification.message
+    );
+  });
+
+  it("localizes CLI test delivery from the same user preference", async () => {
+    vi.mocked(storage.getUserSettings).mockResolvedValue({
+      notificationPreferences: '{"language":"ja"}',
+    } as never);
+    vi.mocked(execFile).mockImplementation((...args: unknown[]) => {
+      const callback = args[3] as (error: Error | null, stdout: string, stderr: string) => void;
+      callback(null, "ok", "");
+      return {} as never;
+    });
+    appriseClient.configure({ mode: "cli", urls: "json://example.test" });
+    await expect(appriseClient.test("user-1")).resolves.toEqual({ success: true });
+    const args = vi.mocked(execFile).mock.calls[0]?.[1] as string[];
+    expect(args[args.indexOf("-b") + 1]).toBe("Questarr からのテスト通知");
+    expect(args[args.indexOf("-t") + 1]).toBe("Questarr");
   });
 
   it("sends notifications via Apprise API mode", async () => {
@@ -230,7 +350,7 @@ describe("Apprise client", () => {
     await expect(appriseClient.send(notification)).resolves.toBeUndefined();
     await expect(appriseClient.test()).resolves.toEqual({
       success: false,
-      error: "Apprise CLI not found",
+      ...serviceErrorBody(undefined, serviceMessage("service.apprise_cli_not_found", {})),
     });
   });
 
@@ -248,7 +368,7 @@ describe("Apprise client", () => {
 
     await expect(freshClient.test()).resolves.toEqual({
       success: false,
-      error: "Apprise CLI not found",
+      ...serviceErrorBody(undefined, serviceMessage("service.apprise_cli_not_found", {})),
     });
     expect(execFile).not.toHaveBeenCalled();
 

@@ -118,7 +118,7 @@ export function MultiSelect({
           <div className="flex gap-1 flex-wrap">
             {selectedOptions.length > 0 ? (
               formatInterfaceMessage(
-                "{count} selected",
+                "interface.count_selected_90873ee5",
                 { count: selectedOptions.length },
                 language
               )
@@ -128,7 +128,7 @@ export function MultiSelect({
               </span>
             )}
           </div>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className="ms-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       {selectedOptions.length > 0 && (
@@ -227,7 +227,7 @@ export function MultiSelect({
                     onSelect={() => handleToggle(option.value)}
                   >
                     <Check
-                      className={cn("mr-2 h-4 w-4", isSelected ? "opacity-100" : "opacity-0")}
+                      className={cn("me-2 h-4 w-4", isSelected ? "opacity-100" : "opacity-0")}
                     />
                     <span lang="und" dir="auto">
                       {option.label}

@@ -25,6 +25,7 @@ import { routePaths } from "@/lib/routes";
 import { PASSWORD_MIN_LENGTH, type Downloader, type Indexer } from "@shared/schema";
 import { IgdbHelpPopover, IgdbTestConnectionButton } from "@/components/IgdbCredentialsHelper";
 import { InterfaceLanguageSelect } from "@/components/InterfaceLanguageSelect";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import { useInterfaceLanguage } from "@/lib/interface-locale";
 
 type SetupForm = {
@@ -127,7 +128,7 @@ export default function SetupPage() {
       return res.json();
     },
     onSuccess: async () => {
-      toast({ title: t("Setup complete! Welcome.") });
+      toast({ title: "interface.setup_complete_welcome_25138a36" });
       // Keep this confirmation local to the current setup screen. Choosing a
       // destination performs a full navigation so the new httpOnly session is
       // picked up by the normal authenticated app flow.
@@ -135,8 +136,8 @@ export default function SetupPage() {
     },
     onError: (error: Error) => {
       toast({
-        title: t("Setup failed"),
-        description: error.message,
+        title: "interface.setup_failed_fea065f3",
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },
@@ -155,51 +156,49 @@ export default function SetupPage() {
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <Card className="w-full max-w-2xl">
           <CardHeader>
-            <CardTitle>{t("Your QuestarrNG setup is ready")}</CardTitle>
+            <CardTitle>{t("interface.your_questarrng_setup_is_ready_08fc7690")}</CardTitle>
             <CardDescription>
-              {t(
-                "Choose what you want to do first. You can configure the other game-management features later in Settings."
-              )}
+              {t("interface.choose_what_you_want_to_do_first_y_297e271a")}
             </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-3 sm:grid-cols-3">
             <Button
-              className="h-auto min-h-24 flex-col items-start whitespace-normal p-4 text-left"
+              className="h-auto min-h-24 flex-col items-start whitespace-normal p-4 text-start"
               onClick={() => continueTo(routePaths.discover)}
             >
-              <span className="font-semibold">{t("Browse game catalog")}</span>
+              <span className="font-semibold">{t("interface.browse_game_catalog_96a51dd8")}</span>
               <span className="mt-1 text-xs font-normal opacity-80">
-                {t("Explore and track games without setting up downloads.")}
+                {t("interface.explore_and_track_games_without_se_8cd0c32b")}
               </span>
             </Button>
             <Button
-              className="h-auto min-h-24 flex-col items-start whitespace-normal p-4 text-left"
+              className="h-auto min-h-24 flex-col items-start whitespace-normal p-4 text-start"
               onClick={() => continueTo(acquisitionPath)}
               disabled={isLoadingAcquisitionStatus}
             >
-              <span className="font-semibold">{t("Acquire releases")}</span>
+              <span className="font-semibold">{t("interface.acquire_releases_2d1d08fb")}</span>
               <span className="mt-1 text-xs font-normal opacity-80">
                 {isLoadingAcquisitionStatus
-                  ? t("Checking your existing acquisition setup…")
+                  ? t("interface.checking_your_existing_acquisition_bd64ebbf")
                   : indexersStatusFailed || downloadersStatusFailed
-                    ? t(
-                        "Open the existing indexer and downloader settings to check acquisition readiness."
-                      )
+                    ? t("interface.open_the_existing_indexer_and_down_8fd65ea9")
                     : !hasEnabledIndexer
-                      ? t("Add an indexer to search for game releases.")
+                      ? t("interface.add_an_indexer_to_search_for_game_ebd6bc3e")
                       : !hasEnabledDownloader
-                        ? t("Add a downloader to send a release grab.")
-                        : t("Search for releases for games in your library.")}
+                        ? t("interface.add_a_downloader_to_send_a_release_45192b09")
+                        : t("interface.search_for_releases_for_games_in_y_48726b11")}
               </span>
             </Button>
             <Button
               variant="outline"
-              className="h-auto min-h-24 flex-col items-start whitespace-normal p-4 text-left"
+              className="h-auto min-h-24 flex-col items-start whitespace-normal p-4 text-start"
               onClick={() => continueTo(routePaths.libraryImport)}
             >
-              <span className="font-semibold">{t("Organize existing downloads")}</span>
+              <span className="font-semibold">
+                {t("interface.organize_existing_downloads_e09b05e4")}
+              </span>
               <span className="mt-1 text-xs font-normal opacity-80">
-                {t("Configure library imports for files you already have.")}
+                {t("interface.configure_library_imports_for_file_6d77e54d")}
               </span>
             </Button>
           </CardContent>
@@ -213,37 +212,31 @@ export default function SetupPage() {
       <Alert className="max-w-md border-amber-500/50 bg-amber-500/10 text-amber-600 dark:text-amber-400">
         <Info className="h-4 w-4" />
         <AlertTitle
-          lang={languageFor("Upgrading from v1.0?")}
-          dir={directionFor("Upgrading from v1.0?")}
+          lang={languageFor("interface.upgrading_from_v1_0_08dfd0e0")}
+          dir={directionFor("interface.upgrading_from_v1_0_08dfd0e0")}
         >
-          {t("Upgrading from v1.0?")}
+          {t("interface.upgrading_from_v1_0_08dfd0e0")}
         </AlertTitle>
         <AlertDescription>
           <div className="mt-2 text-sm space-y-2">
             <p
-              lang={languageFor("If you are upgrading from an older version (PostgreSQL),")}
-              dir={directionFor("If you are upgrading from an older version (PostgreSQL),")}
+              lang={languageFor("interface.if_you_are_upgrading_from_an_older_b29c9106")}
+              dir={directionFor("interface.if_you_are_upgrading_from_an_older_b29c9106")}
             >
-              {t("If you are upgrading from an older version (PostgreSQL),")}{" "}
+              {t("interface.if_you_are_upgrading_from_an_older_b29c9106")}{" "}
               <strong
-                lang={languageFor("do not create a new account")}
-                dir={directionFor("do not create a new account")}
+                lang={languageFor("interface.do_not_create_a_new_account_393f0571")}
+                dir={directionFor("interface.do_not_create_a_new_account_393f0571")}
               >
-                {t("do not create a new account")}
+                {t("interface.do_not_create_a_new_account_393f0571")}
               </strong>
               .
             </p>
             <p
-              lang={languageFor(
-                "You must migrate your data to the new database format first, otherwise your library will be empty."
-              )}
-              dir={directionFor(
-                "You must migrate your data to the new database format first, otherwise your library will be empty."
-              )}
+              lang={languageFor("interface.you_must_migrate_your_data_to_the_6216e94f")}
+              dir={directionFor("interface.you_must_migrate_your_data_to_the_6216e94f")}
             >
-              {t(
-                "You must migrate your data to the new database format first, otherwise your library will be empty."
-              )}
+              {t("interface.you_must_migrate_your_data_to_the_6216e94f")}
             </p>
             <a
               href="https://github.com/snapetech-org/QuestarrNG/blob/main/docs/MIGRATION.md"
@@ -252,10 +245,10 @@ export default function SetupPage() {
               className="inline-flex items-center gap-1 font-semibold underline underline-offset-4 hover:text-amber-800 dark:hover:text-amber-300 transition-colors"
             >
               <span
-                lang={languageFor("Read Migration Guide")}
-                dir={directionFor("Read Migration Guide")}
+                lang={languageFor("interface.read_migration_guide_d53088c9")}
+                dir={directionFor("interface.read_migration_guide_d53088c9")}
               >
-                {t("Read Migration Guide")}
+                {t("interface.read_migration_guide_d53088c9")}
               </span>{" "}
               <ExternalLink className="h-3 w-3" />
             </a>
@@ -270,24 +263,24 @@ export default function SetupPage() {
           </div>
           <CardTitle
             className="text-2xl font-bold"
-            lang={languageFor("Initial Setup")}
-            dir={directionFor("Initial Setup")}
+            lang={languageFor("interface.initial_setup_a04f9a7a")}
+            dir={directionFor("interface.initial_setup_a04f9a7a")}
           >
-            {t("Initial Setup")}
+            {t("interface.initial_setup_a04f9a7a")}
           </CardTitle>
           <CardDescription
-            lang={languageFor("Create your admin account to get started")}
-            dir={directionFor("Create your admin account to get started")}
+            lang={languageFor("interface.create_your_admin_account_to_get_s_bb28e574")}
+            dir={directionFor("interface.create_your_admin_account_to_get_s_bb28e574")}
           >
-            {t("Create your admin account to get started")}
+            {t("interface.create_your_admin_account_to_get_s_bb28e574")}
           </CardDescription>
-          <div className="mt-4 space-y-2 text-left">
+          <div className="mt-4 space-y-2 text-start">
             <label htmlFor="setup-interface-language" className="text-sm font-medium">
               <span
-                lang={languageFor("Interface language")}
-                dir={directionFor("Interface language")}
+                lang={languageFor("interface.interface_language_66eac25a")}
+                dir={directionFor("interface.interface_language_66eac25a")}
               >
-                {t("Interface language")}
+                {t("interface.interface_language_66eac25a")}
               </span>
             </label>
             <InterfaceLanguageSelect
@@ -306,24 +299,27 @@ export default function SetupPage() {
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel lang={languageFor("Username")} dir={directionFor("Username")}>
-                      {t("Username")}
+                    <FormLabel
+                      lang={languageFor("interface.username_1c08d4d9")}
+                      dir={directionFor("interface.username_1c08d4d9")}
+                    >
+                      {t("interface.username_1c08d4d9")}
                     </FormLabel>
                     <div className="relative">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <User className="absolute start-3 top-3 h-4 w-4 text-muted-foreground" />
                       <FormControl>
                         <Input
-                          className="pl-9"
-                          placeholder={t("Choose a username")}
-                          lang={languageFor("Choose a username")}
+                          className="ps-9"
+                          placeholder={t("interface.choose_a_username_bb3303d5")}
+                          lang={languageFor("interface.choose_a_username_bb3303d5")}
                           dir="auto"
                           {...field}
                         />
                       </FormControl>
                     </div>
                     <FormMessage
-                      lang={languageFor("Username must be at least 3 characters")}
-                      dir={directionFor("Username must be at least 3 characters")}
+                      lang={languageFor("interface.username_must_be_at_least_3_charac_d1c3c390")}
+                      dir={directionFor("interface.username_must_be_at_least_3_charac_d1c3c390")}
                     />
                   </FormItem>
                 )}
@@ -333,35 +329,34 @@ export default function SetupPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel lang={languageFor("Password")} dir={directionFor("Password")}>
-                      {t("Password")}
+                    <FormLabel
+                      lang={languageFor("interface.password_2cc30838")}
+                      dir={directionFor("interface.password_2cc30838")}
+                    >
+                      {t("interface.password_2cc30838")}
                     </FormLabel>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Lock className="absolute start-3 top-3 h-4 w-4 text-muted-foreground" />
                       <FormControl>
                         <Input
                           type="password"
-                          className="pl-9"
-                          placeholder={t("Choose a password")}
-                          lang={languageFor("Choose a password")}
-                          dir={directionFor("Choose a password")}
+                          className="ps-9"
+                          placeholder={t("interface.choose_a_password_d74f1a34")}
+                          lang={languageFor("interface.choose_a_password_d74f1a34")}
+                          dir={directionFor("interface.choose_a_password_d74f1a34")}
                           {...field}
                         />
                       </FormControl>
                     </div>
                     <FormDescription
-                      lang={languageFor(
-                        "At least 8 characters, including one letter and one number."
-                      )}
-                      dir={directionFor(
-                        "At least 8 characters, including one letter and one number."
-                      )}
+                      lang={languageFor("interface.at_least_8_characters_including_on_2a6832ca")}
+                      dir={directionFor("interface.at_least_8_characters_including_on_2a6832ca")}
                     >
-                      {t("At least 8 characters, including one letter and one number.")}
+                      {t("interface.at_least_8_characters_including_on_2a6832ca")}
                     </FormDescription>
                     <FormMessage
-                      lang={languageFor("Password must be at least 8 characters")}
-                      dir={directionFor("Password must be at least 8 characters")}
+                      lang={languageFor("interface.password_must_be_at_least_8_charac_3c38435e")}
+                      dir={directionFor("interface.password_must_be_at_least_8_charac_3c38435e")}
                     />
                   </FormItem>
                 )}
@@ -372,27 +367,27 @@ export default function SetupPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel
-                      lang={languageFor("Confirm Password")}
-                      dir={directionFor("Confirm Password")}
+                      lang={languageFor("interface.confirm_password_fbf2f740")}
+                      dir={directionFor("interface.confirm_password_fbf2f740")}
                     >
-                      {t("Confirm Password")}
+                      {t("interface.confirm_password_fbf2f740")}
                     </FormLabel>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Lock className="absolute start-3 top-3 h-4 w-4 text-muted-foreground" />
                       <FormControl>
                         <Input
                           type="password"
-                          className="pl-9"
-                          placeholder={t("Confirm your password")}
-                          lang={languageFor("Confirm your password")}
-                          dir={directionFor("Confirm your password")}
+                          className="ps-9"
+                          placeholder={t("interface.confirm_your_password_0e47abbb")}
+                          lang={languageFor("interface.confirm_your_password_0e47abbb")}
+                          dir={directionFor("interface.confirm_your_password_0e47abbb")}
                           {...field}
                         />
                       </FormControl>
                     </div>
                     <FormMessage
-                      lang={languageFor("Passwords do not match")}
-                      dir={directionFor("Passwords do not match")}
+                      lang={languageFor("interface.passwords_do_not_match_a8bf4976")}
+                      dir={directionFor("interface.passwords_do_not_match_a8bf4976")}
                     />
                   </FormItem>
                 )}
@@ -404,24 +399,20 @@ export default function SetupPage() {
                     <div className="flex items-center gap-2 mb-2">
                       <h3
                         className="font-medium flex items-center gap-2"
-                        lang={languageFor("IGDB Configuration")}
-                        dir={directionFor("IGDB Configuration")}
+                        lang={languageFor("interface.igdb_configuration_2007c8b1")}
+                        dir={directionFor("interface.igdb_configuration_2007c8b1")}
                       >
                         <Gamepad2 className="h-4 w-4" />
-                        {t("IGDB Configuration")}
+                        {t("interface.igdb_configuration_2007c8b1")}
                       </h3>
                       <IgdbHelpPopover />
                     </div>
                     <p
                       className="text-sm text-muted-foreground mb-4"
-                      lang={languageFor(
-                        "IGDB credentials are required to discover and import games."
-                      )}
-                      dir={directionFor(
-                        "IGDB credentials are required to discover and import games."
-                      )}
+                      lang={languageFor("interface.igdb_credentials_are_required_to_d_db32487d")}
+                      dir={directionFor("interface.igdb_credentials_are_required_to_d_db32487d")}
                     >
-                      {t("IGDB credentials are required to discover and import games.")}
+                      {t("interface.igdb_credentials_are_required_to_d_db32487d")}
                     </p>
                   </div>
 
@@ -430,20 +421,23 @@ export default function SetupPage() {
                     name="igdbClientId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel lang={languageFor("Client ID")} dir={directionFor("Client ID")}>
-                          {t("Client ID")}
+                        <FormLabel
+                          lang={languageFor("interface.client_id_96a12137")}
+                          dir={directionFor("interface.client_id_96a12137")}
+                        >
+                          {t("interface.client_id_96a12137")}
                         </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder={t("IGDB Client ID")}
-                            lang={languageFor("IGDB Client ID")}
+                            placeholder={t("interface.igdb_client_id_397a9eef")}
+                            lang={languageFor("interface.igdb_client_id_397a9eef")}
                             dir="ltr"
                             {...field}
                           />
                         </FormControl>
                         <FormMessage
-                          lang={languageFor("IGDB Client ID is required")}
-                          dir={directionFor("IGDB Client ID is required")}
+                          lang={languageFor("interface.igdb_client_id_is_required_d2fb5b82")}
+                          dir={directionFor("interface.igdb_client_id_is_required_d2fb5b82")}
                         />
                       </FormItem>
                     )}
@@ -455,23 +449,23 @@ export default function SetupPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel
-                          lang={languageFor("Client Secret")}
-                          dir={directionFor("Client Secret")}
+                          lang={languageFor("interface.client_secret_603b406a")}
+                          dir={directionFor("interface.client_secret_603b406a")}
                         >
-                          {t("Client Secret")}
+                          {t("interface.client_secret_603b406a")}
                         </FormLabel>
                         <FormControl>
                           <Input
                             type="password"
-                            placeholder={t("IGDB Client Secret")}
-                            lang={languageFor("IGDB Client Secret")}
+                            placeholder={t("interface.igdb_client_secret_472349b2")}
+                            lang={languageFor("interface.igdb_client_secret_472349b2")}
                             dir="ltr"
                             {...field}
                           />
                         </FormControl>
                         <FormMessage
-                          lang={languageFor("IGDB Client Secret is required")}
-                          dir={directionFor("IGDB Client Secret is required")}
+                          lang={languageFor("interface.igdb_client_secret_is_required_632c4bc7")}
+                          dir={directionFor("interface.igdb_client_secret_is_required_632c4bc7")}
                         />
                       </FormItem>
                     )}

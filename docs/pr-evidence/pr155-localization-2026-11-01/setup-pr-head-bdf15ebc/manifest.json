@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "repository": "snapetech-org/QuestarrNG",
+  "pull_request": 155,
+  "evidence_base_head": "cc67225eaaa7f6ca8fd6b116141fa0421a12a096",
+  "historical_catalog_head": "6f592afae749d2ad9fa82a9807f7e992ead81e10",
+  "historical_catalog_tree": "b0005d82aa1a6470adc6472d6946b3cef5cef7b1",
+  "review_head": "bdf15ebc8f19ea0d88a0fc6f007c46f7f9a7a845",
+  "review_tree": "0c8f45596655ebe1546a3d82f584663c7da30910",
+  "direct_catalog": {
+    "message_ids": 2590,
+    "locales": [
+      "es",
+      "zh-Hans",
+      "hi",
+      "de",
+      "ja",
+      "fr",
+      "pt-BR",
+      "ar",
+      "ko",
+      "zh-Hant",
+      "vi",
+      "id"
+    ],
+    "populated_cells": 31080,
+    "missing_or_blank_cells": 0,
+    "catalog_sha256": "5311f8b219e2227b988ac7df775eb266414b88392508eafa0e847301c24d5ba2",
+    "generated_labels_sha256": "165ba9c6e3106440c2a46108aa89e1dc77a45f9aa3397f7db083579e847f72d3"
+  },
+  "prior_review_reconciliation": {
+    "artifact_root": "/mnt/disks/scratch/task-worktrees/localization-20261030/questarrng",
+    "matching_rows": 3080554,
+    "artifact_files": 1905,
+    "exact_terminal_cells": 31077,
+    "uncovered_cells": 3,
+    "eligible_uncovered_source_keys": 3,
+    "disjoint_25_key_300_cell_batch_available": false,
+    "uncovered_cells_reviewed_and_accepted": 3,
+    "report_sha256": "cc3fc466277841a9993eb8cf0075f8bd7171c65bba1cabe8c0ce62c45ae02a2b",
+    "scan_rule": "same message ID, locale, source text, exact current raw target, and terminal accepted/corrected/keep outcome"
+  },
+  "code_file_sha256": {
+    "client/src/pages/auth/setup.tsx": "1bbdf77cec33cb602fb4f4441eca5586f00a734b0c518591f767355a2bc65ef5",
+    "shared/schema.ts": "2ede42f4ae569098b5b1440cc548553a54b1f0b3d1d24cde89d2fb0863d3a525",
+    "client/src/components/navigation-items.ts": "810227c91c59641a9b661a528c65cf3c33969b5ab0a9eeb6bee64d2a0c1d0d9a",
+    "client/src/components/AppSidebar.tsx": "27921fd1872dc9ea9ef5a684ed8029999f86e596464c90ecb2cb4b2db27fc752",
+    "docs/translation-glossary.md": "bcaf89e1048437073772f9f07a8c888a64d24f7d29c0f83e154f2764e39d3a53"
+  },
+  "visual_review": {
+    "environment": "persistent Agentic VM, owned Chrome tab, isolated preview",
+    "route": "http://192.168.50.148:53101/setup",
+    "viewport": "1920x1024",
+    "database": "task-scoped disposable SQLite database",
+    "provider_credentials": "none",
+    "account_created": false,
+    "top_screenshot": "setup-ja-1920x1024-top.png",
+    "bottom_screenshot": "setup-ja-1920x1024-bottom.png",
+    "scroll_check": "confirmation field, IGDB fields, and account-create button visible without clipping"
+  },
+  "dispositions": [
+    "ko:navigation.discover accepted at historical head",
+    "ja:navigation.browse accepted at historical head",
+    "id:interface.game_management_b1319076 accepted at historical head",
+    "ja:interface.at_least_8_characters_including_on_2a6832ca corrected after headed visual review",
+    "id:interface.igdb_credentials_are_required_to_d_db32487d accepted unchanged; game spelling retained"
+  ],
+  "historical_duplicate_reconciliation": {
+    "artifact_record_copies": 54,
+    "distinct_artifact_paths": 54,
+    "distinct_review_rows": 1,
+    "authoritative_row_sha256": "7bc52f663c79972ebfc3877341afcaca143fd04ac0ed381b41f0ed2cf932867d"
+  },
+  "native_speaker_approval": false,
+  "tests_builds_or_ci_run": false,
+  "release_or_tag_created": false
+}

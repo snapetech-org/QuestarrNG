@@ -1,3 +1,4 @@
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -139,7 +140,11 @@ export function PathMappingSettings() {
       closeDialog(false);
     },
     onError: (error: Error) => {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({
+        title: "Error",
+        description: <ApiErrorDescription error={error} />,
+        variant: "destructive",
+      });
     },
   });
 
@@ -153,7 +158,11 @@ export function PathMappingSettings() {
       closeDialog(false);
     },
     onError: (error: Error) => {
-      toast({ title: "Update Failed", description: error.message, variant: "destructive" });
+      toast({
+        title: "Update Failed",
+        description: <ApiErrorDescription error={error} />,
+        variant: "destructive",
+      });
     },
   });
 
@@ -168,7 +177,12 @@ export function PathMappingSettings() {
     onError: (error: Error) => {
       toast({
         title: "Delete Failed",
-        description: error.message || "Failed to delete path mapping.",
+        description: (
+          <ApiErrorDescription
+            error={error}
+            fallbackSource="interface.failed_to_delete_path_mapping_5c3be505"
+          />
+        ),
         variant: "destructive",
       });
     },
@@ -313,7 +327,7 @@ export function PathMappingSettings() {
                   </div>
                 </div>
                 <Button className="w-full" onClick={handleSubmit} disabled={isSaving}>
-                  {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isSaving && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                   {editingMappingId ? (
                     <InterfaceText source={"Save Changes"} />
                   ) : (
@@ -420,9 +434,12 @@ export function PathMappingSettings() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      aria-label={formatInterfaceMessage("Edit mapping for {path}", {
-                        path: String(mapping.remotePath ?? ""),
-                      })}
+                      aria-label={formatInterfaceMessage(
+                        "interface.edit_mapping_for_path_ddb1e915",
+                        {
+                          path: String(mapping.remotePath ?? ""),
+                        }
+                      )}
                       onClick={() => openEditDialog(mapping)}
                     >
                       <Pencil className="h-4 w-4" />
@@ -430,9 +447,12 @@ export function PathMappingSettings() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      aria-label={formatInterfaceMessage("Delete mapping for {path}", {
-                        path: String(mapping.remotePath ?? ""),
-                      })}
+                      aria-label={formatInterfaceMessage(
+                        "interface.delete_mapping_for_path_00d2c9f4",
+                        {
+                          path: String(mapping.remotePath ?? ""),
+                        }
+                      )}
                       className="text-destructive hover:text-destructive"
                       onClick={() => deleteMutation.mutate(mapping.id)}
                     >

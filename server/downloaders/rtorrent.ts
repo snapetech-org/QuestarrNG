@@ -1,3 +1,10 @@
+import {
+  ServiceMessageError,
+  serviceErrorValue,
+  serviceErrorResult,
+  serviceMessage,
+  parseServiceMessageDescriptor,
+} from "../../shared/service-messages.js";
 import type {
   Downloader,
   DownloadStatus,
@@ -55,7 +62,13 @@ export class RTorrentClient implements DownloaderClient {
         },
         "rTorrent connection test successful"
       );
-      return { success: true, message: `Connected to rTorrent v${version}` };
+      return {
+        success: true,
+        ...serviceMessage("service.connected_version", {
+          client: "rTorrent",
+          version: String(version),
+        }),
+      };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
       downloadersLogger.error(
@@ -69,9 +82,15 @@ export class RTorrentClient implements DownloaderClient {
       );
 
       if (errorMessage.includes("Authentication failed")) {
-        return { success: false, message: errorMessage };
+        return serviceErrorResult(error, serviceMessage("interface.unknown_error_ce512b43", {}));
       }
-      return { success: false, message: `Failed to connect to rTorrent: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.connection_failed", {
+          client: "rTorrent",
+          error: serviceErrorValue(error),
+        }),
+      };
     }
   }
 
@@ -93,17 +112,20 @@ export class RTorrentClient implements DownloaderClient {
     if (request.downloadPath && !isSafeDownloadPathOverride(request.downloadPath)) {
       return {
         success: false,
-        message: "Invalid download path: use a relative path without parent-directory segments",
+        ...serviceMessage("service.invalid_relative_download_path", {}),
       };
     }
 
     try {
       if (!request.url) {
-        return { success: false, message: "Download URL is required" };
+        return { success: false, ...serviceMessage("service.download_url_required", {}) };
       }
 
       if (!(await isSafeUrl(request.url))) {
-        return { success: false, message: `Unsafe URL blocked: ${request.url}` };
+        return {
+          success: false,
+          ...serviceMessage("service.unsafe_url_blocked", { url: request.url }),
+        };
       }
 
       const isMagnet = request.url.startsWith("magnet:");
@@ -131,12 +153,14 @@ export class RTorrentClient implements DownloaderClient {
           return {
             success: true,
             id: infoHash,
-            message: `Download added successfully${this.downloader.addStopped ? " (stopped)" : ""}`,
+            ...(this.downloader.addStopped
+              ? serviceMessage("service.download_added_stopped", {})
+              : serviceMessage("service.download_added", {})),
           };
         }
         return {
           success: false,
-          message: `Failed to add download (rTorrent returned code: ${result})`,
+          ...serviceMessage("service.rtorrent_add_return_code", { code: String(result) }),
         };
       };
 
@@ -174,7 +198,10 @@ export class RTorrentClient implements DownloaderClient {
           { status, url: request.url },
           "Failed to download file from indexer"
         );
-        return { success: false, message: `Failed to download file from indexer: ${statusText}` };
+        return {
+          success: false,
+          ...serviceMessage("service.indexer_download_failed", { error: statusText }),
+        };
       }
 
       const arrayBuffer = await fetchResult.response.arrayBuffer();
@@ -207,18 +234,22 @@ export class RTorrentClient implements DownloaderClient {
         return {
           success: true,
           id: infoHash,
-          message: `Download added successfully${this.downloader.addStopped ? " (stopped)" : ""}`,
+          ...(this.downloader.addStopped
+            ? serviceMessage("service.download_added_stopped", {})
+            : serviceMessage("service.download_added", {})),
         };
       }
 
       return {
         success: false,
-        message: `Failed to add download (rTorrent returned code: ${result})`,
+        ...serviceMessage("service.rtorrent_add_return_code", { code: String(result) }),
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       downloadersLogger.error({ error, url: request.url }, "Failed to add download");
-      return { success: false, message: `Failed to add download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_add_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
@@ -424,7 +455,16 @@ export class RTorrentClient implements DownloaderClient {
           nextAnnounce: toIsoTimestamp(activityTimeNext),
           error:
             trackerHealthAvailable && Number(failedCounter) > 0
-              ? `${Number(failedCounter)} tracker request(s) failed`
+              ? serviceMessage("service.tracker_requests_failed", { count: Number(failedCounter) })
+                  .message
+              : undefined,
+          errorI18n:
+            trackerHealthAvailable && Number(failedCounter) > 0
+              ? parseServiceMessageDescriptor(
+                  serviceMessage("service.tracker_requests_failed", {
+                    count: Number(failedCounter),
+                  })
+                )
               : undefined,
         };
       });
@@ -491,20 +531,24 @@ export class RTorrentClient implements DownloaderClient {
   async pauseDownload(id: string): Promise<{ success: boolean; message: string }> {
     try {
       await this.makeXMLRPCRequest("d.stop", [id]);
-      return { success: true, message: "Download paused successfully" };
+      return { success: true, ...serviceMessage("service.download_paused", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to pause download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_pause_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
   async resumeDownload(id: string): Promise<{ success: boolean; message: string }> {
     try {
       await this.makeXMLRPCRequest("d.start", [id]);
-      return { success: true, message: "Download resumed successfully" };
+      return { success: true, ...serviceMessage("service.download_resumed", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to resume download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_resume_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
@@ -522,10 +566,12 @@ export class RTorrentClient implements DownloaderClient {
         // Just remove from client without deleting files
         await this.makeXMLRPCRequest("d.erase", [id]);
       }
-      return { success: true, message: "Download removed successfully" };
+      return { success: true, ...serviceMessage("service.download_removed", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to remove download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_remove_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
@@ -670,9 +716,7 @@ export class RTorrentClient implements DownloaderClient {
     const opaque = challenge.opaque;
     // RFC 2617 defaults to MD5 when `algorithm` is missing; never downgrade.
     if (algorithm.toUpperCase() !== "SHA-256") {
-      throw new Error(
-        `Unsupported rTorrent Digest algorithm: ${algorithm}. Configure rTorrent to advertise SHA-256.`
-      );
+      throw new ServiceMessageError("service.rtorrent_digest_algorithm_unsupported", { algorithm });
     }
     const hashAlgo = "sha256";
 
@@ -809,7 +853,9 @@ export class RTorrentClient implements DownloaderClient {
     await logDownloaderDebugResponse("rTorrent", method, url, response);
 
     if (!response.ok) {
-      const errorText = await response.text().catch(() => "No error details available");
+      const errorText = await response
+        .text()
+        .catch(() => serviceMessage("service.no_error_details_available", {}));
       if (response.status === 401) {
         const authHeader = response.headers.get("www-authenticate");
 
@@ -860,14 +906,21 @@ export class RTorrentClient implements DownloaderClient {
                 "rTorrent Digest Authentication failed"
               );
               const isHttp = url.startsWith("http://");
-              throw new Error(
-                `Digest Authentication failed (wrong credentials${isHttp ? ", or server may have switched to HTTPS" : ""})`
+              throw new ServiceMessageError(
+                isHttp
+                  ? "service.rtorrent_digest_http_auth_failed"
+                  : "service.rtorrent_digest_auth_failed",
+                {}
               );
             }
           } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "Unknown error";
             downloadersLogger.error({ error: errorMessage }, "Error processing Digest Auth");
-            throw new Error(`Digest Auth Error: ${errorMessage}`, { cause: error });
+            throw new ServiceMessageError(
+              "service.rtorrent_digest_auth_error",
+              { error: serviceErrorValue(error) },
+              { cause: error }
+            );
           }
         }
 
@@ -882,9 +935,9 @@ export class RTorrentClient implements DownloaderClient {
           },
           "rTorrent authentication failed - verify username, password, and web server authentication configuration"
         );
-        throw new Error(
-          `Authentication failed: Invalid credentials or web server authentication not configured for rTorrent - ${errorText}`
-        );
+        throw new ServiceMessageError("service.rtorrent_authentication_failed", {
+          error: errorText,
+        });
       }
       downloadersLogger.error(
         {
@@ -896,7 +949,11 @@ export class RTorrentClient implements DownloaderClient {
         },
         "rTorrent XML-RPC request failed"
       );
-      throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+      throw new ServiceMessageError("service.http_error_status", {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText,
+      });
     }
 
     const responseText = await response.text();
@@ -912,7 +969,10 @@ export class RTorrentClient implements DownloaderClient {
         unknown
       >;
       const faultString = fault["faultString"] as string;
-      throw new Error(faultString ? `XML-RPC Fault: ${faultString}` : "XML-RPC Fault occurred");
+      throw new ServiceMessageError(
+        faultString ? "service.xml_rpc_fault" : "service.xml_rpc_fault_without_details",
+        { error: faultString }
+      );
     }
 
     if (parsed.methodResponse?.params?.param) {

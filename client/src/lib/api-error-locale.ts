@@ -1,5 +1,8 @@
 import { translateInterfaceLabel, type InterfaceLanguage } from "@/lib/interface-locale";
-import { localizeApiErrorDetailTemplate } from "@/lib/api-error-details/templates";
+import {
+  localizeApiErrorDetailTemplate,
+  getApiErrorCatalogLocale,
+} from "@/lib/api-error-details/templates";
 import { getApiErrorDetailLabel } from "@/lib/api-error-details";
 import { apiErrorCodeForStatus, type ApiErrorCode } from "@shared/api-error-codes";
 
@@ -188,10 +191,10 @@ const LOCALE_ORDER: readonly InterfaceLanguage[] = [
 ];
 
 function localizeApiErrorDetail(detail: string, language: InterfaceLanguage): string | undefined {
-  const localizedDetail = translateInterfaceLabel(detail, language);
-  if (localizedDetail !== detail) return localizedDetail;
   const localizedApiErrorDetail = getApiErrorDetailLabel(detail, language);
   if (localizedApiErrorDetail !== undefined) return localizedApiErrorDetail;
+  const localizedDetail = translateInterfaceLabel(detail, language);
+  if (localizedDetail !== detail) return localizedDetail;
   const importWrapper = detail.match(/^(Security alert|Password required|Import failed): (.+)$/);
   if (importWrapper?.[1] && importWrapper[2]) {
     const nestedDetail = localizeApiErrorDetail(importWrapper[2], language) ?? importWrapper[2];
@@ -245,7 +248,7 @@ export function getLocalizedApiErrorMessage(
       ? stableCode
       : apiErrorCodeForStatus(status);
   const key = API_ERROR_CODE_TO_CATALOG_KEY[resolvedCode];
-  const message = API_ERROR_MESSAGES[key][LOCALE_ORDER.indexOf(language)];
+  const message = API_ERROR_MESSAGES[key][LOCALE_ORDER.indexOf(getApiErrorCatalogLocale(language))];
   if (!message) return detail;
   if (!detail) return message;
   const summary = message.replace(/[.!?…。！？؟।]+$/u, "");

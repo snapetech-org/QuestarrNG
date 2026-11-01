@@ -97,6 +97,24 @@ describe("getLocalizedApiErrorMessage", () => {
         "es"
       )
     ).toBe("Puedes tener como máximo 3 claves de API. Revoca una primero.");
+    expect(
+      getLocalizedApiErrorMessage(
+        "api.rate_limited",
+        429,
+        "Too many IGDB requests are queued; try again shortly",
+        "es"
+      )
+    ).toBe("Hay demasiadas solicitudes a IGDB en cola. Inténtalo de nuevo en breve.");
+    expect(
+      getLocalizedApiErrorMessage(
+        "api.bad_request",
+        400,
+        "The provided domain is not in the allowed list: xrel-api.nfos.to, api.xrel.to",
+        "ar"
+      )
+    ).toBe(
+      "النطاق المُدخل غير موجود في قائمة النطاقات المسموح بها: \u2068xrel-api.nfos.to, api.xrel.to\u2069"
+    );
   });
 
   it("only formats known app-owned templates and preserves arbitrary backend text", () => {
@@ -159,5 +177,14 @@ describe("getLocalizedApiErrorMessage", () => {
       )
     ).toBe("إعدادات SSL غير صالحة: \u2068ملف الشهادة غير موجود\u2069");
     expect(getLocalizedApiErrorDetail("Transmission returned HTTP 503", "es")).toBeUndefined();
+  });
+
+  it("localizes fixed ClamAV connectivity-test errors", () => {
+    expect(getLocalizedApiErrorDetail("ClamAV test failed", "es")).toBe(
+      "La prueba de ClamAV falló"
+    );
+    expect(getLocalizedApiErrorDetail("No PONG reply from ClamAV", "zh-Hans")).toBe(
+      "ClamAV 未返回 PONG 响应"
+    );
   });
 });
