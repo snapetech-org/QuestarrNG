@@ -425,6 +425,7 @@ export const rssFeeds = pgTable("rss_feeds", {
   lastCheck: timestampMs("last_check"),
   status: text("status").default("ok"), // 'ok' or 'error'
   errorMessage: text("error_message"),
+  errorMessageI18n: text("error_message_i18n"),
   createdAt: timestampMs("created_at").default(sql`(EXTRACT(EPOCH FROM now()) * 1000)::bigint`),
   updatedAt: timestampMs("updated_at").default(sql`(EXTRACT(EPOCH FROM now()) * 1000)::bigint`),
 });
@@ -459,6 +460,7 @@ export const importTasks = pgTable("import_tasks", {
   skippedItems: integer("skipped_items").notNull().default(0),
   failedItems: integer("failed_items").notNull().default(0),
   errorMessage: text("error_message"),
+  errorMessageI18n: text("error_message_i18n"),
 });
 
 export const importTaskItems = pgTable(
@@ -473,6 +475,7 @@ export const importTaskItems = pgTable(
     gameId: text("game_id"),
     gameTitle: text("game_title"),
     errorMessage: text("error_message"),
+    errorMessageI18n: text("error_message_i18n"),
     createdAt: timestampMs("created_at").default(sql`(EXTRACT(EPOCH FROM now()) * 1000)::bigint`),
   },
   (t) => [index("import_task_items_task_id_idx").on(t.taskId)]

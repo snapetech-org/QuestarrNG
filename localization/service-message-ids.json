@@ -246,5 +246,18 @@
   "service.client_test_input_required",
   "service.both_certificate_files_required",
   "service.api_route_missing_restart",
-  "service.claim_game_required"
+  "service.claim_game_required",
+  "service.root_folder_missing",
+  "service.unmatched_entry_missing",
+  "service.discovery_path_type_invalid",
+  "service.discovery_candidate_missing",
+  "service.pending_security_error",
+  "service.pending_password_error",
+  "service.pending_import_error",
+  "service.rss_fetch_failed",
+  "service.import_already_linked",
+  "service.import_game_missing",
+  "service.import_game_unresolved",
+  "service.import_downloader_missing",
+  "service.import_igdb_match_missing"
 ]

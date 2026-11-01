@@ -1253,6 +1253,7 @@ export const rssFeeds = sqliteTable("rss_feeds", {
   lastCheck: integer("last_check", { mode: "timestamp_ms" }),
   status: text("status").default("ok"), // 'ok' or 'error'
   errorMessage: text("error_message"),
+  errorMessageI18n: text("error_message_i18n"),
   createdAt: integer("created_at", { mode: "timestamp_ms" }).default(
     sql`(strftime('%s', 'now') * 1000)`
   ),
@@ -1286,6 +1287,7 @@ export const insertRssFeedSchema = createInsertSchema(rssFeeds).omit({
   lastCheck: true,
   status: true,
   errorMessage: true,
+  errorMessageI18n: true,
 });
 
 export const insertRssFeedItemSchema = createInsertSchema(rssFeedItems).omit({
@@ -1331,6 +1333,7 @@ export const importTasks = sqliteTable("import_tasks", {
   skippedItems: integer("skipped_items").notNull().default(0),
   failedItems: integer("failed_items").notNull().default(0),
   errorMessage: text("error_message"),
+  errorMessageI18n: text("error_message_i18n"),
 });
 
 export const importTaskItems = sqliteTable(
@@ -1345,6 +1348,7 @@ export const importTaskItems = sqliteTable(
     gameId: text("game_id"),
     gameTitle: text("game_title"),
     errorMessage: text("error_message"),
+    errorMessageI18n: text("error_message_i18n"),
     createdAt: integer("created_at", { mode: "timestamp_ms" }).default(
       sql`(strftime('%s', 'now') * 1000)`
     ),

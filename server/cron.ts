@@ -3,6 +3,8 @@ import {
   parseServiceMessageDescriptor,
   serializeServiceMessageDescriptor,
   serviceMessage,
+  serviceErrorMetadata,
+  persistedServiceMessage,
 } from "../shared/service-messages.js";
 import { storage } from "./storage.js";
 import { normalizeDownloadHash } from "./download-hash.js";
@@ -2579,7 +2581,10 @@ export async function syncUserSteamWishlist(
         taskId: taskId!,
         itemName: `Steam App ${id}`,
         result: "failed" as const,
-        errorMessage: "No IGDB match found",
+        ...persistedServiceMessage(
+          "No IGDB match found",
+          serviceMessage("service.import_igdb_match_missing", {})
+        ),
       })),
     ];
     if (importItems.length > 0) {
@@ -2622,7 +2627,7 @@ export async function syncUserSteamWishlist(
         .updateImportTask(taskId, {
           status: "failed",
           completedAt: new Date(),
-          errorMessage: errMessage,
+          ...persistedServiceMessage(errMessage, serviceErrorMetadata(error)),
         })
         .catch(() => undefined);
       notifyUser("importTaskUpdate", { taskId, status: "failed" }, userId);

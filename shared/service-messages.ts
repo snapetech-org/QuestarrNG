@@ -201,6 +201,16 @@ export function serializeServiceMessageDescriptor(value: unknown): string | null
   const descriptor = parseServiceMessageDescriptor(value);
   return descriptor ? JSON.stringify(descriptor) : null;
 }
+/** Persist only explicit source-matching ownership; replacement/clearing never retains stale tags. */
+export function persistedServiceMessage(message: string | null, metadata: unknown) {
+  return {
+    errorMessage: message,
+    errorMessageI18n:
+      message === null
+        ? null
+        : serializeServiceMessageDescriptor(matchingServiceMessageDescriptor(message, metadata)),
+  };
+}
 /** Translate only an exact source/key/value match, including explicitly tagged nested details. */
 export function localizeServiceMessage(
   message: string,

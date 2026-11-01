@@ -92,6 +92,7 @@ import {
   apiKeys,
   rootFolders,
 } from "./db/tables.js";
+import { persistedServiceMessage } from "../shared/service-messages.js";
 import { randomUUID } from "crypto";
 import { db } from "./db.js";
 import { normalizeDownloadHash } from "./download-hash.js";
@@ -201,6 +202,7 @@ type ImportTaskUpdate = Pick<
   | "skippedItems"
   | "failedItems"
   | "errorMessage"
+  | "errorMessageI18n"
 >;
 
 /**
@@ -1726,6 +1728,7 @@ export class MemStorage implements IStorage {
       lastCheck: null,
       status: "ok",
       errorMessage: null,
+      errorMessageI18n: null,
       type: feed.type || "custom",
       enabled: feed.enabled ?? true,
       mapping: feed.mapping || null,
@@ -1737,7 +1740,14 @@ export class MemStorage implements IStorage {
   async updateRssFeed(id: string, updates: Partial<RssFeed>): Promise<RssFeed | undefined> {
     const feed = this.rssFeeds.get(id);
     if (!feed) return undefined;
-    const updatedFeed = { ...feed, ...updates, updatedAt: new Date() };
+    const updatedFeed = {
+      ...feed,
+      ...updates,
+      ...(updates.errorMessage !== undefined
+        ? persistedServiceMessage(updates.errorMessage, updates.errorMessageI18n)
+        : {}),
+      updatedAt: new Date(),
+    };
     this.rssFeeds.set(id, updatedFeed);
     return updatedFeed;
   }
@@ -3762,7 +3772,13 @@ export class DatabaseStorage implements IStorage {
   async updateRssFeed(id: string, updates: Partial<RssFeed>): Promise<RssFeed | undefined> {
     const [updated] = await db
       .update(rssFeeds)
-      .set({ ...updates, updatedAt: new Date() })
+      .set({
+        ...updates,
+        ...(updates.errorMessage !== undefined
+          ? persistedServiceMessage(updates.errorMessage, updates.errorMessageI18n)
+          : {}),
+        updatedAt: new Date(),
+      })
       .where(eq(rssFeeds.id, id))
       .returning();
     return updated;
@@ -4084,7 +4100,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateImportTask(id: string, updates: Partial<ImportTaskUpdate>): Promise<void> {
-    await db.update(importTasks).set(updates).where(eq(importTasks.id, id));
+    await db
+      .update(importTasks)
+      .set({
+        ...updates,
+        ...(updates.errorMessage !== undefined
+          ? persistedServiceMessage(updates.errorMessage, updates.errorMessageI18n)
+          : {}),
+      })
+      .where(eq(importTasks.id, id));
   }
 
   async addImportTaskItem(item: InsertImportTaskItem): Promise<ImportTaskItem> {
@@ -4098,7 +4122,7 @@ export class DatabaseStorage implements IStorage {
         result: item.result as ImportTaskItemResult,
         gameId: item.gameId ?? null,
         gameTitle: item.gameTitle ?? null,
-        errorMessage: item.errorMessage ?? null,
+        ...persistedServiceMessage(item.errorMessage ?? null, item.errorMessageI18n),
       })
       .returning();
     return firstOrThrow(rows);
@@ -4113,7 +4137,7 @@ export class DatabaseStorage implements IStorage {
       result: item.result as ImportTaskItemResult,
       gameId: item.gameId ?? null,
       gameTitle: item.gameTitle ?? null,
-      errorMessage: item.errorMessage ?? null,
+      ...persistedServiceMessage(item.errorMessage ?? null, item.errorMessageI18n),
     }));
     return db.insert(importTaskItems).values(values).returning();
   }

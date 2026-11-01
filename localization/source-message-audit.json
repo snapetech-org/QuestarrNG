@@ -441,10 +441,92 @@
   "validation": "Source/catalog checks only; private ephemeral JIT functional validation pending. New regression cases are authored, not executed locally.",
   "targetStatus": "New canonical targets remain explicit English fallback pending translation; no new model scope.",
   "openBeyondInitialScope": [
-    "RAWG fixed service/test errors and transport",
-    "ClamAV ping fixed outcomes and transport",
-    "Free-space error DTO ownership",
-    "Reachable client-side fixed guard/fallback errors",
-    "Full expanded producer/persistence audit and final Agentic VM review"
+    "ImportManager/ArchiveService/ImportStrategies/RommRouting fixed error constructors and persisted error ownership",
+    "SecurityScanResult.reason fixed wording and typed metadata transport into persisted download and outbound notices",
+    "ImportManager outbound notification headings/bodies and source-bound nested error values",
+    "Expanded source audit completion, exact-head target reconciliation, Chinese script/region alias resolution review, private JIT and final Agentic VM review"
+  ],
+  "followupClosures": [
+    {
+      "head": "046ecb97c67882f0beb7fc849529dc865a28b074",
+      "scope": "RAWG constructors/test transport, ClamAV ping, VirusTotal HTTP error DTO, free-space DTO/UI ownership"
+    },
+    {
+      "head": "eb94e26042a279cf7ad6de898f517be4501c943e",
+      "scope": "Reachable local guard/fallback errors for downloader/indexer tests, certificate upload, API-route guidance and claim/share toasts"
+    },
+    {
+      "head": "current milestone",
+      "scope": "RSS/import-task/item nullable ownership with both database schemas/migrations, discovery progress and constructors, pending-import source prefixes and API metadata transport",
+      "newSourceKeys": [
+        "service.root_folder_missing",
+        "service.unmatched_entry_missing",
+        "service.discovery_path_type_invalid",
+        "service.discovery_candidate_missing",
+        "service.pending_security_error",
+        "service.pending_password_error",
+        "service.pending_import_error",
+        "service.rss_fetch_failed",
+        "service.import_already_linked",
+        "service.import_game_missing",
+        "service.import_game_unresolved",
+        "service.import_downloader_missing",
+        "service.import_igdb_match_missing"
+      ],
+      "newFallbackCells": 156,
+      "validation": "Source/catalog checks only. No test files added, modified or run in this milestone; existing tests preserved."
+    }
+  ],
+  "expandedRemainingEvidence": [
+    {
+      "path": "server/services/ImportManager.ts",
+      "sha256": "c4f420aefe8698f8178a4fc079beb630929746e60063d389c8b7204f7b11819c",
+      "fixedErrorConstructorLines": [
+        197, 209, 264, 1164, 1195, 1198, 1203, 1210, 1318, 1326, 1330, 1340, 1354, 1359, 1365, 1382,
+        1401
+      ],
+      "userFacingMessageCandidateLines": [517, 518, 687, 688, 729, 730, 819],
+      "status": "Candidates require bounded producer/consumer classification; log-only/provider/dynamic payloads must remain raw. Presence here does not assert every candidate is untranslated."
+    },
+    {
+      "path": "server/services/ArchiveService.ts",
+      "sha256": "7332a66aaeac3d6bfda256c9051e58deb46cffdae17f5031fdc166cdf20a8608",
+      "fixedErrorConstructorLines": [284, 291, 300, 303, 310, 314, 421, 468, 475, 480, 488, 551],
+      "userFacingMessageCandidateLines": [],
+      "status": "Candidates require bounded producer/consumer classification; log-only/provider/dynamic payloads must remain raw. Presence here does not assert every candidate is untranslated."
+    },
+    {
+      "path": "server/services/ImportStrategies.ts",
+      "sha256": "0477ccf224994150d3ecef6e3bf80c947f99db2f65012b41d8adcfebbfbdd9cb",
+      "fixedErrorConstructorLines": [
+        91, 220, 285, 299, 343, 461, 497, 527, 548, 579, 621, 628, 641
+      ],
+      "userFacingMessageCandidateLines": [],
+      "status": "Candidates require bounded producer/consumer classification; log-only/provider/dynamic payloads must remain raw. Presence here does not assert every candidate is untranslated."
+    },
+    {
+      "path": "server/services/RommRouting.ts",
+      "sha256": "84fe54e3d147a79b05173310535eb7d9dce3ff90d6261d81ba1249f35b2b15eb",
+      "fixedErrorConstructorLines": [20, 26, 28, 31, 34, 54],
+      "userFacingMessageCandidateLines": [],
+      "status": "Candidates require bounded producer/consumer classification; log-only/provider/dynamic payloads must remain raw. Presence here does not assert every candidate is untranslated."
+    },
+    {
+      "path": "server/security-scan.ts",
+      "sha256": "a6595f83fc33b0cdca7ca5e99fb10e0ffa391ec393f564d437ef41a2acc11a54",
+      "fixedErrorConstructorLines": [],
+      "userFacingMessageCandidateLines": [433, 447, 517, 555, 567],
+      "status": "Candidates require bounded producer/consumer classification; log-only/provider/dynamic payloads must remain raw. Presence here does not assert every candidate is untranslated."
+    },
+    {
+      "path": "server/cron.ts",
+      "sha256": "002e2dfda25ba5fe10e3ab9a19fe0820d9c48a11a0ce2273778fac17469cacc7",
+      "fixedErrorConstructorLines": [],
+      "userFacingMessageCandidateLines": [
+        805, 843, 1197, 1198, 1247, 1357, 1523, 1524, 1573, 1574, 1635, 1636, 1869, 1870, 1935,
+        1936, 1970, 1971, 1983, 1984, 2069, 2070, 2081, 2082, 2194, 2195, 2338, 2611, 2612
+      ],
+      "status": "Candidates require bounded producer/consumer classification; log-only/provider/dynamic payloads must remain raw. Presence here does not assert every candidate is untranslated."
+    }
   ]
 }

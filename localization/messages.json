@@ -47346,6 +47346,253 @@
         "vi": "No game selected",
         "id": "No game selected"
       }
+    },
+    "service.root_folder_missing": {
+      "source": "Root folder not found",
+      "translations": {
+        "es": "Root folder not found",
+        "es-419": "Root folder not found",
+        "zh-Hans": "Root folder not found",
+        "hi": "Root folder not found",
+        "de": "Root folder not found",
+        "ja": "Root folder not found",
+        "fr": "Root folder not found",
+        "fr-CA": "Root folder not found",
+        "pt-BR": "Root folder not found",
+        "ar": "Root folder not found",
+        "ko": "Root folder not found",
+        "zh-Hant": "Root folder not found",
+        "vi": "Root folder not found",
+        "id": "Root folder not found"
+      }
+    },
+    "service.unmatched_entry_missing": {
+      "source": "No matching unmatched entry for this root folder",
+      "translations": {
+        "es": "No matching unmatched entry for this root folder",
+        "es-419": "No matching unmatched entry for this root folder",
+        "zh-Hans": "No matching unmatched entry for this root folder",
+        "hi": "No matching unmatched entry for this root folder",
+        "de": "No matching unmatched entry for this root folder",
+        "ja": "No matching unmatched entry for this root folder",
+        "fr": "No matching unmatched entry for this root folder",
+        "fr-CA": "No matching unmatched entry for this root folder",
+        "pt-BR": "No matching unmatched entry for this root folder",
+        "ar": "No matching unmatched entry for this root folder",
+        "ko": "No matching unmatched entry for this root folder",
+        "zh-Hant": "No matching unmatched entry for this root folder",
+        "vi": "No matching unmatched entry for this root folder",
+        "id": "No matching unmatched entry for this root folder"
+      }
+    },
+    "service.discovery_path_type_invalid": {
+      "source": "Path is neither a directory nor a file",
+      "translations": {
+        "es": "Path is neither a directory nor a file",
+        "es-419": "Path is neither a directory nor a file",
+        "zh-Hans": "Path is neither a directory nor a file",
+        "hi": "Path is neither a directory nor a file",
+        "de": "Path is neither a directory nor a file",
+        "ja": "Path is neither a directory nor a file",
+        "fr": "Path is neither a directory nor a file",
+        "fr-CA": "Path is neither a directory nor a file",
+        "pt-BR": "Path is neither a directory nor a file",
+        "ar": "Path is neither a directory nor a file",
+        "ko": "Path is neither a directory nor a file",
+        "zh-Hant": "Path is neither a directory nor a file",
+        "vi": "Path is neither a directory nor a file",
+        "id": "Path is neither a directory nor a file"
+      }
+    },
+    "service.discovery_candidate_missing": {
+      "source": "Selected IGDB game not found in top candidates",
+      "translations": {
+        "es": "Selected IGDB game not found in top candidates",
+        "es-419": "Selected IGDB game not found in top candidates",
+        "zh-Hans": "Selected IGDB game not found in top candidates",
+        "hi": "Selected IGDB game not found in top candidates",
+        "de": "Selected IGDB game not found in top candidates",
+        "ja": "Selected IGDB game not found in top candidates",
+        "fr": "Selected IGDB game not found in top candidates",
+        "fr-CA": "Selected IGDB game not found in top candidates",
+        "pt-BR": "Selected IGDB game not found in top candidates",
+        "ar": "Selected IGDB game not found in top candidates",
+        "ko": "Selected IGDB game not found in top candidates",
+        "zh-Hant": "Selected IGDB game not found in top candidates",
+        "vi": "Selected IGDB game not found in top candidates",
+        "id": "Selected IGDB game not found in top candidates"
+      }
+    },
+    "service.pending_security_error": {
+      "source": "Security alert: {error}",
+      "translations": {
+        "es": "Security alert: {error}",
+        "es-419": "Security alert: {error}",
+        "zh-Hans": "Security alert: {error}",
+        "hi": "Security alert: {error}",
+        "de": "Security alert: {error}",
+        "ja": "Security alert: {error}",
+        "fr": "Security alert: {error}",
+        "fr-CA": "Security alert: {error}",
+        "pt-BR": "Security alert: {error}",
+        "ar": "Security alert: {error}",
+        "ko": "Security alert: {error}",
+        "zh-Hant": "Security alert: {error}",
+        "vi": "Security alert: {error}",
+        "id": "Security alert: {error}"
+      }
+    },
+    "service.pending_password_error": {
+      "source": "Password required: {error}",
+      "translations": {
+        "es": "Password required: {error}",
+        "es-419": "Password required: {error}",
+        "zh-Hans": "Password required: {error}",
+        "hi": "Password required: {error}",
+        "de": "Password required: {error}",
+        "ja": "Password required: {error}",
+        "fr": "Password required: {error}",
+        "fr-CA": "Password required: {error}",
+        "pt-BR": "Password required: {error}",
+        "ar": "Password required: {error}",
+        "ko": "Password required: {error}",
+        "zh-Hant": "Password required: {error}",
+        "vi": "Password required: {error}",
+        "id": "Password required: {error}"
+      }
+    },
+    "service.pending_import_error": {
+      "source": "Import failed: {error}",
+      "translations": {
+        "es": "Import failed: {error}",
+        "es-419": "Import failed: {error}",
+        "zh-Hans": "Import failed: {error}",
+        "hi": "Import failed: {error}",
+        "de": "Import failed: {error}",
+        "ja": "Import failed: {error}",
+        "fr": "Import failed: {error}",
+        "fr-CA": "Import failed: {error}",
+        "pt-BR": "Import failed: {error}",
+        "ar": "Import failed: {error}",
+        "ko": "Import failed: {error}",
+        "zh-Hant": "Import failed: {error}",
+        "vi": "Import failed: {error}",
+        "id": "Import failed: {error}"
+      }
+    },
+    "service.rss_fetch_failed": {
+      "source": "Failed to fetch feed: {status}",
+      "translations": {
+        "es": "Failed to fetch feed: {status}",
+        "es-419": "Failed to fetch feed: {status}",
+        "zh-Hans": "Failed to fetch feed: {status}",
+        "hi": "Failed to fetch feed: {status}",
+        "de": "Failed to fetch feed: {status}",
+        "ja": "Failed to fetch feed: {status}",
+        "fr": "Failed to fetch feed: {status}",
+        "fr-CA": "Failed to fetch feed: {status}",
+        "pt-BR": "Failed to fetch feed: {status}",
+        "ar": "Failed to fetch feed: {status}",
+        "ko": "Failed to fetch feed: {status}",
+        "zh-Hant": "Failed to fetch feed: {status}",
+        "vi": "Failed to fetch feed: {status}",
+        "id": "Failed to fetch feed: {status}"
+      }
+    },
+    "service.import_already_linked": {
+      "source": "Already linked",
+      "translations": {
+        "es": "Already linked",
+        "es-419": "Already linked",
+        "zh-Hans": "Already linked",
+        "hi": "Already linked",
+        "de": "Already linked",
+        "ja": "Already linked",
+        "fr": "Already linked",
+        "fr-CA": "Already linked",
+        "pt-BR": "Already linked",
+        "ar": "Already linked",
+        "ko": "Already linked",
+        "zh-Hant": "Already linked",
+        "vi": "Already linked",
+        "id": "Already linked"
+      }
+    },
+    "service.import_game_missing": {
+      "source": "Game not found",
+      "translations": {
+        "es": "Game not found",
+        "es-419": "Game not found",
+        "zh-Hans": "Game not found",
+        "hi": "Game not found",
+        "de": "Game not found",
+        "ja": "Game not found",
+        "fr": "Game not found",
+        "fr-CA": "Game not found",
+        "pt-BR": "Game not found",
+        "ar": "Game not found",
+        "ko": "Game not found",
+        "zh-Hant": "Game not found",
+        "vi": "Game not found",
+        "id": "Game not found"
+      }
+    },
+    "service.import_game_unresolved": {
+      "source": "Could not resolve game",
+      "translations": {
+        "es": "Could not resolve game",
+        "es-419": "Could not resolve game",
+        "zh-Hans": "Could not resolve game",
+        "hi": "Could not resolve game",
+        "de": "Could not resolve game",
+        "ja": "Could not resolve game",
+        "fr": "Could not resolve game",
+        "fr-CA": "Could not resolve game",
+        "pt-BR": "Could not resolve game",
+        "ar": "Could not resolve game",
+        "ko": "Could not resolve game",
+        "zh-Hant": "Could not resolve game",
+        "vi": "Could not resolve game",
+        "id": "Could not resolve game"
+      }
+    },
+    "service.import_downloader_missing": {
+      "source": "Downloader not found",
+      "translations": {
+        "es": "Downloader not found",
+        "es-419": "Downloader not found",
+        "zh-Hans": "Downloader not found",
+        "hi": "Downloader not found",
+        "de": "Downloader not found",
+        "ja": "Downloader not found",
+        "fr": "Downloader not found",
+        "fr-CA": "Downloader not found",
+        "pt-BR": "Downloader not found",
+        "ar": "Downloader not found",
+        "ko": "Downloader not found",
+        "zh-Hant": "Downloader not found",
+        "vi": "Downloader not found",
+        "id": "Downloader not found"
+      }
+    },
+    "service.import_igdb_match_missing": {
+      "source": "No IGDB match found",
+      "translations": {
+        "es": "No IGDB match found",
+        "es-419": "No IGDB match found",
+        "zh-Hans": "No IGDB match found",
+        "hi": "No IGDB match found",
+        "de": "No IGDB match found",
+        "ja": "No IGDB match found",
+        "fr": "No IGDB match found",
+        "fr-CA": "No IGDB match found",
+        "pt-BR": "No IGDB match found",
+        "ar": "No IGDB match found",
+        "ko": "No IGDB match found",
+        "zh-Hant": "No IGDB match found",
+        "vi": "No IGDB match found",
+        "id": "No IGDB match found"
+      }
     }
   }
 }

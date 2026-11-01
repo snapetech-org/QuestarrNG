@@ -12,7 +12,12 @@ import { RegionalRelativeTime } from "./RegionalRelativeTime";
 import { InterfaceText } from "@/components/InterfaceText";
 import { ApiErrorDetailText } from "@/components/ApiErrorDetailText";
 import { useInterfaceLanguage } from "@/lib/interface-locale";
-import { getLocalizedApiErrorDetail } from "@/lib/api-error-locale";
+import {
+  serviceMessage,
+  serviceMessageValue,
+  localizeServiceMessage,
+  type ServiceMessageFragment,
+} from "@shared/service-messages";
 
 interface PendingImport {
   id: string;
@@ -21,24 +26,38 @@ interface PendingImport {
   status: string;
   createdAt: string;
   errorMessage?: string | null;
+  errorMessageI18n?: string | null;
   passwordRequired?: boolean;
 }
 
-function describeImportError(item: PendingImport): string | undefined {
-  if (!item.errorMessage) return undefined;
-  const source =
+function describeImportError(item: PendingImport): string | ServiceMessageFragment {
+  const error = serviceMessageValue(item.errorMessage ?? "", item.errorMessageI18n);
+  if (item.status === GAME_LINK_REQUIRED_STATUS) return error;
+  return serviceMessage(
     item.status === QUARANTINED_STATUS
-      ? "Security alert: " + item.errorMessage
-      : item.status === GAME_LINK_REQUIRED_STATUS
-        ? item.errorMessage
-        : item.passwordRequired
-          ? "Password required: " + item.errorMessage
-          : "Import failed: " + item.errorMessage;
-  return source;
+      ? "service.pending_security_error"
+      : item.passwordRequired
+        ? "service.pending_password_error"
+        : "service.pending_import_error",
+    { error }
+  );
+}
+function PendingImportError({ item }: { item: PendingImport }) {
+  const { language } = useInterfaceLanguage();
+  const value = describeImportError(item);
+  const message = typeof value === "string" ? value : value.message;
+  const metadata = typeof value === "string" ? null : value;
+  return (
+    <p
+      className="text-xs text-destructive truncate max-w-[300px]"
+      title={localizeServiceMessage(message, metadata, language)}
+    >
+      <ApiErrorDetailText source={message} metadata={metadata} legacyApiFallback={false} />
+    </p>
+  );
 }
 
 export default function PendingImportsCard() {
-  const { language } = useInterfaceLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -153,17 +172,7 @@ export default function PendingImportsCard() {
                           );
                         })()}
                     </p>
-                    {item.errorMessage && (
-                      <p
-                        className="text-xs text-destructive truncate max-w-[300px]"
-                        title={
-                          getLocalizedApiErrorDetail(describeImportError(item) ?? "", language) ??
-                          describeImportError(item)
-                        }
-                      >
-                        <ApiErrorDetailText source={describeImportError(item) ?? ""} />
-                      </p>
-                    )}
+                    {item.errorMessage && <PendingImportError item={item} />}
                   </div>
                   <div className="flex gap-2">
                     <Button

@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { persistedServiceMessage } from "../../shared/service-messages.js";
 import { storage } from "../storage.js";
 import { importManager, pathMappingService, platformMappingService } from "../services/index.js";
 import {
@@ -507,9 +508,12 @@ importRouter.get("/pending", async (_req, res) => {
           status: d.status,
           downloaderId: d.downloaderId,
           createdAt: d.addedAt,
-          errorMessage: passwordRequired
-            ? d.errorMessage?.slice(ARCHIVE_PASSWORD_REQUIRED_PREFIX.length)
-            : d.errorMessage,
+          ...persistedServiceMessage(
+            passwordRequired
+              ? (d.errorMessage?.slice(ARCHIVE_PASSWORD_REQUIRED_PREFIX.length) ?? null)
+              : d.errorMessage,
+            d.errorMessageI18n
+          ),
           passwordRequired,
         };
       })
@@ -522,7 +526,7 @@ importRouter.get("/pending", async (_req, res) => {
       status: d.status,
       downloaderId: d.downloaderId,
       createdAt: d.addedAt,
-      errorMessage: d.errorMessage,
+      ...persistedServiceMessage(d.errorMessage, d.errorMessageI18n),
     }));
 
     const quarantinedResults = await Promise.all(
@@ -535,7 +539,7 @@ importRouter.get("/pending", async (_req, res) => {
           status: d.status,
           downloaderId: d.downloaderId,
           createdAt: d.addedAt,
-          errorMessage: d.errorMessage,
+          ...persistedServiceMessage(d.errorMessage, d.errorMessageI18n),
         };
       })
     );

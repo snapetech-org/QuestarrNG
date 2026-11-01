@@ -379,7 +379,11 @@ export default function ImportHistoryPage() {
 
               {selectedTask.errorMessage && (
                 <div className="rounded-md bg-red-900/20 border border-red-700/30 px-3 py-2 text-sm text-red-400">
-                  <ApiErrorDetailText source={selectedTask.errorMessage} />
+                  <ApiErrorDetailText
+                    source={selectedTask.errorMessage}
+                    metadata={selectedTask.errorMessageI18n}
+                    legacyApiFallback={false}
+                  />
                 </div>
               )}
 
@@ -404,7 +408,11 @@ export default function ImportHistoryPage() {
                         </p>
                         {item.errorMessage && (
                           <p className="text-xs text-red-400 mt-0.5">
-                            <ApiErrorDetailText source={item.errorMessage} />
+                            <ApiErrorDetailText
+                              source={item.errorMessage}
+                              metadata={item.errorMessageI18n}
+                              legacyApiFallback={false}
+                            />
                           </p>
                         )}
                       </div>

@@ -2965,6 +2965,19 @@ export const STABLE_INTERFACE_MESSAGES = {
   "service.api_route_missing_restart":
     "API route not found. Please restart the server to apply changes.",
   "service.claim_game_required": "No game selected",
+  "service.root_folder_missing": "Root folder not found",
+  "service.unmatched_entry_missing": "No matching unmatched entry for this root folder",
+  "service.discovery_path_type_invalid": "Path is neither a directory nor a file",
+  "service.discovery_candidate_missing": "Selected IGDB game not found in top candidates",
+  "service.pending_security_error": "Security alert: {error}",
+  "service.pending_password_error": "Password required: {error}",
+  "service.pending_import_error": "Import failed: {error}",
+  "service.rss_fetch_failed": "Failed to fetch feed: {status}",
+  "service.import_already_linked": "Already linked",
+  "service.import_game_missing": "Game not found",
+  "service.import_game_unresolved": "Could not resolve game",
+  "service.import_downloader_missing": "Downloader not found",
+  "service.import_igdb_match_missing": "No IGDB match found",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

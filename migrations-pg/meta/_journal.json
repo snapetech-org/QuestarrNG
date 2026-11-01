@@ -113,6 +113,13 @@
       "when": 1793474782091,
       "tag": "0016_localized_error_metadata",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1793493408493,
+      "tag": "0017_persisted_ui_error_metadata",
+      "breakpoints": true
     }
   ]
 }

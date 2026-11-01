@@ -41,6 +41,7 @@ import { getSocket } from "@/lib/socket";
 import type { RootFolder } from "@shared/schema";
 import { FileBrowser } from "./FileBrowser";
 import { InterfaceText } from "@/components/InterfaceText";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import { ApiErrorDetailText } from "@/components/ApiErrorDetailText";
 import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
 
@@ -57,6 +58,7 @@ interface ScanProgress {
   errors: number;
   currentCandidate?: string;
   errorMessage?: string;
+  errorMessageI18n?: string | null;
 }
 
 interface UnmatchedEntry {
@@ -199,7 +201,11 @@ export function RootFolderDiscovery() {
       invalidateAll();
     },
     onError: (error: Error) => {
-      toast({ title: "Could Not Add Folder", description: error.message, variant: "destructive" });
+      toast({
+        title: "Could Not Add Folder",
+        description: <ApiErrorDescription error={error} />,
+        variant: "destructive",
+      });
     },
   });
 
@@ -228,7 +234,7 @@ export function RootFolderDiscovery() {
     onError: (error: Error) => {
       toast({
         title: "Could Not Update Delete Permission",
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },
@@ -250,7 +256,11 @@ export function RootFolderDiscovery() {
       queryClient.invalidateQueries({ queryKey: ["/api/root-folders"] });
     },
     onError: (error: Error) => {
-      toast({ title: "Delete Failed", description: error.message, variant: "destructive" });
+      toast({
+        title: "Delete Failed",
+        description: <ApiErrorDescription error={error} />,
+        variant: "destructive",
+      });
     },
   });
 
@@ -263,7 +273,11 @@ export function RootFolderDiscovery() {
       invalidateAll();
     },
     onError: (error: Error) => {
-      toast({ title: "Scan Failed to Start", description: error.message, variant: "destructive" });
+      toast({
+        title: "Scan Failed to Start",
+        description: <ApiErrorDescription error={error} />,
+        variant: "destructive",
+      });
     },
   });
 
@@ -277,7 +291,11 @@ export function RootFolderDiscovery() {
       queryClient.invalidateQueries({ queryKey: ["/api/games"] });
     },
     onError: (error: Error) => {
-      toast({ title: "Match Failed", description: error.message, variant: "destructive" });
+      toast({
+        title: "Match Failed",
+        description: <ApiErrorDescription error={error} />,
+        variant: "destructive",
+      });
     },
   });
 
@@ -582,7 +600,11 @@ export function RootFolderDiscovery() {
                   </p>
                   {p.errorMessage && (
                     <p className="text-xs text-destructive">
-                      <ApiErrorDetailText source={p.errorMessage} />
+                      <ApiErrorDetailText
+                        source={p.errorMessage}
+                        metadata={p.errorMessageI18n}
+                        legacyApiFallback={false}
+                      />
                     </p>
                   )}
                 </div>
@@ -656,7 +678,7 @@ function UnmatchedEntryCard({ entry, matchPending, onMatch }: UnmatchedEntryCard
     onError: (error: Error) => {
       toast({
         title: t("interface.search_failed_9104d446"),
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },

@@ -51,6 +51,8 @@ import {
   serviceMessage,
   serviceErrorBody,
   serviceErrorValue,
+  serviceErrorMetadata,
+  persistedServiceMessage,
   parseServiceMessageDescriptor,
   type ServiceMessageDescriptor,
 } from "../shared/service-messages.js";
@@ -2811,7 +2813,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const msg = error instanceof Error ? error.message : "Unknown error";
         routesLogger.error({ error }, "error searching IGDB for unmatched folder");
         const notFound = msg === "No matching unmatched entry for this root folder";
-        res.status(notFound ? 404 : 500).json({ error: notFound ? msg : "IGDB search failed" });
+        res
+          .status(notFound ? 404 : 500)
+          .json(
+            notFound
+              ? serviceErrorBody(error, serviceMessage("service.unmatched_entry_missing", {}))
+              : { error: "IGDB search failed" }
+          );
       }
     }
   );
@@ -2834,14 +2842,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (error) {
         const msg = error instanceof Error ? error.message : "Unknown error";
         routesLogger.error({ error }, "error resolving unmatched folder");
-        // matchUnmatchedFolder throws these two plain-Error messages for the
+        // matchUnmatchedFolder throws these two source-owned messages for the
         // "client asked to match something that no longer exists" cases —
         // report them as 404s rather than 500s; everything else (IGDB
         // lookup failure, filesystem error) stays a 500.
         const notFound =
           msg === "Root folder not found" ||
           msg === "No matching unmatched entry for this root folder";
-        res.status(notFound ? 404 : 500).json({ error: msg });
+        res
+          .status(notFound ? 404 : 500)
+          .json({
+            error: msg,
+            errorI18n: persistedServiceMessage(msg, serviceErrorMetadata(error)).errorMessageI18n,
+          });
       }
     }
   );
@@ -3547,14 +3560,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         const apiKey = await fetchRawgKey();
         if (!apiKey)
-          return res
-            .status(503)
-            .json({
-              ...serviceErrorBody(
-                undefined,
-                serviceMessage("service.rawg_configuration_required", {})
-              ),
-            });
+          return res.status(503).json({
+            ...serviceErrorBody(
+              undefined,
+              serviceMessage("service.rawg_configuration_required", {})
+            ),
+          });
         const parsed =
           typeof req.query.limit === "string" ? Number.parseInt(req.query.limit, 10) : 20;
         const limit = Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 40) : 20;
@@ -3579,14 +3590,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       const apiKey = await fetchRawgKey();
       if (!apiKey)
-        return res
-          .status(503)
-          .json({
-            ...serviceErrorBody(
-              undefined,
-              serviceMessage("service.rawg_configuration_required", {})
-            ),
-          });
+        return res.status(503).json({
+          ...serviceErrorBody(undefined, serviceMessage("service.rawg_configuration_required", {})),
+        });
       const parsed =
         typeof req.query.limit === "string" ? Number.parseInt(req.query.limit, 10) : 20;
       const limit = Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 40) : 20;
@@ -5013,7 +5019,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             taskId: task.id,
             itemName: item.downloadTitle,
             result: "skipped",
-            errorMessage: "Already linked",
+            ...persistedServiceMessage(
+              "Already linked",
+              serviceMessage("service.import_already_linked", {})
+            ),
           });
           continue;
         }
@@ -5042,7 +5051,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 taskId: task.id,
                 itemName: item.downloadTitle,
                 result: "failed",
-                errorMessage: "Game not found",
+                ...persistedServiceMessage(
+                  "Game not found",
+                  serviceMessage("service.import_game_missing", {})
+                ),
               });
               failedCount++;
               continue;
@@ -5105,7 +5117,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               taskId: task.id,
               itemName: item.downloadTitle,
               result: "failed",
-              errorMessage: "Could not resolve game",
+              ...persistedServiceMessage(
+                "Could not resolve game",
+                serviceMessage("service.import_game_unresolved", {})
+              ),
             });
             failedCount++;
             continue;
@@ -5117,7 +5132,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               taskId: task.id,
               itemName: item.downloadTitle,
               result: "failed",
-              errorMessage: "Downloader not found",
+              ...persistedServiceMessage(
+                "Downloader not found",
+                serviceMessage("service.import_downloader_missing", {})
+              ),
             });
             failedCount++;
             continue;
@@ -5151,7 +5169,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             taskId: task.id,
             itemName: item.downloadTitle,
             result: "failed",
-            errorMessage: errMsg,
+            ...persistedServiceMessage(errMsg, serviceErrorMetadata(err)),
           });
           failedCount++;
         }
@@ -5746,11 +5764,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const value = apiKey.trim();
         if (!value || isUnchangedSentinel(value)) {
           if (!stored)
-            return res
-              .status(400)
-              .json({
-                ...serviceErrorBody(undefined, serviceMessage("service.rawg_key_required", {})),
-              });
+            return res.status(400).json({
+              ...serviceErrorBody(undefined, serviceMessage("service.rawg_key_required", {})),
+            });
           return res.json({ success: true, configured: true });
         }
         await storage.setSystemConfig("rawg.apiKey", await encryptCredential(value));
@@ -5792,23 +5808,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
             ? submitted.trim()
             : await decryptCredential(stored ?? "");
         if (!apiKey) {
-          return res
-            .status(400)
-            .json({
-              success: false,
-              ...serviceErrorBody(undefined, serviceMessage("service.rawg_key_required", {})),
-            });
+          return res.status(400).json({
+            success: false,
+            ...serviceErrorBody(undefined, serviceMessage("service.rawg_key_required", {})),
+          });
         }
         const result = await rawgClient.testCredentials(apiKey);
         return res.status(result.success ? 200 : 400).json(result);
       } catch (error) {
         routesLogger.error({ error }, "Failed to test RAWG settings");
-        return res
-          .status(500)
-          .json({
-            success: false,
-            ...serviceErrorBody(undefined, serviceMessage("service.rawg_test_failed", {})),
-          });
+        return res.status(500).json({
+          success: false,
+          ...serviceErrorBody(undefined, serviceMessage("service.rawg_test_failed", {})),
+        });
       }
     }
   );

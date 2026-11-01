@@ -3232,6 +3232,216 @@
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "source-fallback",
       "directTargetCells": 12
+    },
+    {
+      "key": "service.root_folder_missing",
+      "source": "Root folder not found",
+      "kind": "source-owned discovery and persisted import/feed diagnostic",
+      "owners": [
+        "server/library-scanner.ts",
+        "server/routes.ts",
+        "client/src/components/RootFolderDiscovery.tsx"
+      ],
+      "coverage": [
+        "server/__tests__/library-scanner.test.ts",
+        "server/__tests__/localized-error-persistence.test.ts"
+      ],
+      "codeStatus": "implemented; existing tests preserved; source/catalog checks only; private ephemeral JIT functional validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.unmatched_entry_missing",
+      "source": "No matching unmatched entry for this root folder",
+      "kind": "source-owned discovery and persisted import/feed diagnostic",
+      "owners": [
+        "server/library-scanner.ts",
+        "server/routes.ts",
+        "client/src/components/RootFolderDiscovery.tsx"
+      ],
+      "coverage": [
+        "server/__tests__/library-scanner.test.ts",
+        "server/__tests__/localized-error-persistence.test.ts"
+      ],
+      "codeStatus": "implemented; existing tests preserved; source/catalog checks only; private ephemeral JIT functional validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.discovery_path_type_invalid",
+      "source": "Path is neither a directory nor a file",
+      "kind": "source-owned discovery and persisted import/feed diagnostic",
+      "owners": [
+        "server/library-scanner.ts",
+        "server/routes.ts",
+        "client/src/components/RootFolderDiscovery.tsx"
+      ],
+      "coverage": [
+        "server/__tests__/library-scanner.test.ts",
+        "server/__tests__/localized-error-persistence.test.ts"
+      ],
+      "codeStatus": "implemented; existing tests preserved; source/catalog checks only; private ephemeral JIT functional validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.discovery_candidate_missing",
+      "source": "Selected IGDB game not found in top candidates",
+      "kind": "source-owned discovery and persisted import/feed diagnostic",
+      "owners": [
+        "server/library-scanner.ts",
+        "server/routes.ts",
+        "client/src/components/RootFolderDiscovery.tsx"
+      ],
+      "coverage": [
+        "server/__tests__/library-scanner.test.ts",
+        "server/__tests__/localized-error-persistence.test.ts"
+      ],
+      "codeStatus": "implemented; existing tests preserved; source/catalog checks only; private ephemeral JIT functional validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.pending_security_error",
+      "source": "Security alert: {error}",
+      "kind": "source-owned discovery and persisted import/feed diagnostic",
+      "owners": ["client/src/components/PendingImportsCard.tsx", "server/routes/import.ts"],
+      "coverage": [
+        "server/__tests__/library-scanner.test.ts",
+        "server/__tests__/localized-error-persistence.test.ts"
+      ],
+      "codeStatus": "implemented; existing tests preserved; source/catalog checks only; private ephemeral JIT functional validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.pending_password_error",
+      "source": "Password required: {error}",
+      "kind": "source-owned discovery and persisted import/feed diagnostic",
+      "owners": ["client/src/components/PendingImportsCard.tsx", "server/routes/import.ts"],
+      "coverage": [
+        "server/__tests__/library-scanner.test.ts",
+        "server/__tests__/localized-error-persistence.test.ts"
+      ],
+      "codeStatus": "implemented; existing tests preserved; source/catalog checks only; private ephemeral JIT functional validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.pending_import_error",
+      "source": "Import failed: {error}",
+      "kind": "source-owned discovery and persisted import/feed diagnostic",
+      "owners": ["client/src/components/PendingImportsCard.tsx", "server/routes/import.ts"],
+      "coverage": [
+        "server/__tests__/library-scanner.test.ts",
+        "server/__tests__/localized-error-persistence.test.ts"
+      ],
+      "codeStatus": "implemented; existing tests preserved; source/catalog checks only; private ephemeral JIT functional validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.rss_fetch_failed",
+      "source": "Failed to fetch feed: {status}",
+      "kind": "source-owned discovery and persisted import/feed diagnostic",
+      "owners": ["server/rss.ts", "server/storage.ts", "client/src/components/RssSettings.tsx"],
+      "coverage": [
+        "server/__tests__/library-scanner.test.ts",
+        "server/__tests__/localized-error-persistence.test.ts"
+      ],
+      "codeStatus": "implemented; existing tests preserved; source/catalog checks only; private ephemeral JIT functional validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_already_linked",
+      "source": "Already linked",
+      "kind": "source-owned discovery and persisted import/feed diagnostic",
+      "owners": [
+        "server/routes.ts",
+        "server/cron.ts",
+        "server/storage.ts",
+        "client/src/pages/import-history.tsx"
+      ],
+      "coverage": [
+        "server/__tests__/library-scanner.test.ts",
+        "server/__tests__/localized-error-persistence.test.ts"
+      ],
+      "codeStatus": "implemented; existing tests preserved; source/catalog checks only; private ephemeral JIT functional validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_game_missing",
+      "source": "Game not found",
+      "kind": "source-owned discovery and persisted import/feed diagnostic",
+      "owners": [
+        "server/routes.ts",
+        "server/cron.ts",
+        "server/storage.ts",
+        "client/src/pages/import-history.tsx"
+      ],
+      "coverage": [
+        "server/__tests__/library-scanner.test.ts",
+        "server/__tests__/localized-error-persistence.test.ts"
+      ],
+      "codeStatus": "implemented; existing tests preserved; source/catalog checks only; private ephemeral JIT functional validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_game_unresolved",
+      "source": "Could not resolve game",
+      "kind": "source-owned discovery and persisted import/feed diagnostic",
+      "owners": [
+        "server/routes.ts",
+        "server/cron.ts",
+        "server/storage.ts",
+        "client/src/pages/import-history.tsx"
+      ],
+      "coverage": [
+        "server/__tests__/library-scanner.test.ts",
+        "server/__tests__/localized-error-persistence.test.ts"
+      ],
+      "codeStatus": "implemented; existing tests preserved; source/catalog checks only; private ephemeral JIT functional validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_downloader_missing",
+      "source": "Downloader not found",
+      "kind": "source-owned discovery and persisted import/feed diagnostic",
+      "owners": [
+        "server/routes.ts",
+        "server/cron.ts",
+        "server/storage.ts",
+        "client/src/pages/import-history.tsx"
+      ],
+      "coverage": [
+        "server/__tests__/library-scanner.test.ts",
+        "server/__tests__/localized-error-persistence.test.ts"
+      ],
+      "codeStatus": "implemented; existing tests preserved; source/catalog checks only; private ephemeral JIT functional validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.import_igdb_match_missing",
+      "source": "No IGDB match found",
+      "kind": "source-owned discovery and persisted import/feed diagnostic",
+      "owners": [
+        "server/routes.ts",
+        "server/cron.ts",
+        "server/storage.ts",
+        "client/src/pages/import-history.tsx"
+      ],
+      "coverage": [
+        "server/__tests__/library-scanner.test.ts",
+        "server/__tests__/localized-error-persistence.test.ts"
+      ],
+      "codeStatus": "implemented; existing tests preserved; source/catalog checks only; private ephemeral JIT functional validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
     }
   ],
   "codeUnits": [

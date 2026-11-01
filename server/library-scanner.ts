@@ -27,6 +27,12 @@ import { notifyUser } from "./socket.js";
 import type { InsertGame, InsertGameFile, GameFileCategory } from "../shared/schema.js";
 import { isUserCuratedGameStatus } from "../shared/schema.js";
 
+import {
+  ServiceMessageError,
+  persistedServiceMessage,
+  serviceErrorMetadata,
+} from "../shared/service-messages.js";
+
 // ---------- Types ----------
 
 export interface ScanProgress {
@@ -43,6 +49,7 @@ export interface ScanProgress {
   errors: number;
   currentCandidate?: string | undefined;
   errorMessage?: string;
+  errorMessageI18n?: string | null;
 }
 
 export interface UnmatchedEntry {
@@ -364,12 +371,12 @@ export async function searchUnmatchedFolder(
   query: string
 ): Promise<UnmatchedEntry["candidates"]> {
   const entry = getUnmatchedEntry(rootFolderId, folderName);
-  if (!entry) throw new Error("No matching unmatched entry for this root folder");
+  if (!entry) throw new ServiceMessageError("service.unmatched_entry_missing", {});
   const results = await igdbClient.searchGames(query, 5);
   // A rescan may have rebuilt the review list while IGDB answered; candidates
   // stored on the old entry would never be offered for matching.
   if (getUnmatchedEntry(rootFolderId, folderName) !== entry) {
-    throw new Error("No matching unmatched entry for this root folder");
+    throw new ServiceMessageError("service.unmatched_entry_missing", {});
   }
   const accepted = offeredIds(entry);
   entry.candidates = toUnmatchedCandidates(results);
@@ -384,18 +391,18 @@ export async function matchUnmatchedFolder(
   userId: string
 ): Promise<{ gameId: string; filesAdded: number }> {
   const rootFolder = await storage.getRootFolder(rootFolderId);
-  if (!rootFolder) throw new Error("Root folder not found");
+  if (!rootFolder) throw new ServiceMessageError("service.root_folder_missing", {});
 
   // Never join client-supplied `folderName` onto a filesystem path — resolve
   // it against the server-trusted list of folders/files this root folder's
   // own scan already discovered and queued for review.
   const entry = getUnmatchedEntry(rootFolderId, folderName);
-  if (!entry) throw new Error("No matching unmatched entry for this root folder");
+  if (!entry) throw new ServiceMessageError("service.unmatched_entry_missing", {});
   const absolutePath = entry.absolutePath;
 
   const stat = await fs.promises.stat(absolutePath);
   if (!stat.isFile() && !stat.isDirectory()) {
-    throw new Error("Path is neither a directory nor a file");
+    throw new ServiceMessageError("service.discovery_path_type_invalid", {});
   }
   const isFile = stat.isFile();
   const standaloneSize = isFile ? stat.size : 0;
@@ -405,10 +412,10 @@ export async function matchUnmatchedFolder(
   // scan searches with the cleaned release name) returned a different list for
   // names like "Absolum v1.01 [CUSA53342] [EUR]", so every pick was rejected.
   if (!offeredIds(entry).has(igdbId)) {
-    throw new Error("Selected IGDB game not found in top candidates");
+    throw new ServiceMessageError("service.discovery_candidate_missing", {});
   }
   const igdb = await igdbClient.getGameById(igdbId);
-  if (!igdb) throw new Error("Selected IGDB game not found in top candidates");
+  if (!igdb) throw new ServiceMessageError("service.discovery_candidate_missing", {});
 
   let game = await storage.getGameByIgdbId(igdbId);
   if (!game) {
@@ -446,7 +453,7 @@ export async function scanRootFolderById(rootFolderId: string, userId: string): 
 
   try {
     const rootFolder = await storage.getRootFolder(rootFolderId);
-    if (!rootFolder) throw new Error("Root folder not found");
+    if (!rootFolder) throw new ServiceMessageError("service.root_folder_missing", {});
     if (!rootFolder.enabled) {
       igdbLogger.info({ rootFolderId }, "Skipping scan: root folder is disabled");
       return;
@@ -637,7 +644,12 @@ async function runScan(
   } catch (err) {
     progress.status = "failed";
     progress.finishedAt = new Date().toISOString();
-    progress.errorMessage = err instanceof Error ? err.message : String(err);
+    const message = err instanceof Error ? err.message : String(err);
+    progress.errorMessage = message;
+    progress.errorMessageI18n = persistedServiceMessage(
+      message,
+      serviceErrorMetadata(err)
+    ).errorMessageI18n;
     emitProgress(progress, userId);
     routesLogger.error({ err, rootFolderId }, "library scan failed");
   }
