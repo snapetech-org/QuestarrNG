@@ -27,7 +27,8 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import type { Config } from "@shared/schema";
 import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
-import { ApiErrorDetailText } from "@/components/ApiErrorDetailText";
+import { ServiceMessageText } from "@/components/ServiceMessageText";
+import type { ServiceMessageDescriptor } from "@shared/service-messages";
 
 const AddGameModal = lazy(() => import("./AddGameModal"));
 
@@ -42,6 +43,7 @@ interface StorageInfo {
   downloaderName: string;
   freeSpace: number;
   error?: string;
+  errorI18n?: ServiceMessageDescriptor | null;
 }
 
 export default function Header({
@@ -211,7 +213,7 @@ export default function Header({
                         </p>
                         {info.error && (
                           <p className="mt-1 text-xs text-destructive" lang="en" dir="auto">
-                            <ApiErrorDetailText source={info.error} />
+                            <ServiceMessageText message={info.error} metadata={info.errorI18n} />
                           </p>
                         )}
                       </div>

@@ -1,3 +1,4 @@
+import { ServiceMessageText } from "@/components/ServiceMessageText";
 import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import { normalizeNotificationLanguage } from "@shared/notification-language";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
@@ -1041,11 +1042,20 @@ export default function SettingsPage() {
         apiKey: rawgApiKey || (rawgSettings?.configured ? "********" : ""),
       });
       const result = await response.json();
-      toast({ title: result.message ?? "RAWG API key is valid" });
+      toast({
+        title: result.message ? (
+          <ServiceMessageText message={result.message} metadata={result} />
+        ) : (
+          <InterfaceText source="interface.rawg_api_key_is_valid_5d4211bd" />
+        ),
+      });
     } catch (error) {
       toast({
         title: "RAWG connection failed",
-        description: error instanceof Error ? error.message : undefined,
+        description:
+          error instanceof Error ? (
+            <ApiErrorDescription error={error} fallbackSource="Unknown error" />
+          ) : undefined,
         variant: "destructive",
       });
     }

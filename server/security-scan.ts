@@ -1,3 +1,9 @@
+import {
+  serviceMessage,
+  serviceErrorBody,
+  serviceErrorValue,
+  serializeServiceMessageDescriptor,
+} from "../shared/service-messages.js";
 import crypto from "node:crypto";
 import net from "node:net";
 import path from "node:path";
@@ -214,7 +220,7 @@ export type VirusTotalVerdict =
   | { status: "clean"; positives: number }
   | { status: "flagged"; positives: number }
   | { status: "unknown" }
-  | { status: "error"; error: string };
+  | { status: "error"; error: string; errorI18n?: string | null };
 
 /** GET /files/{hash} against the VirusTotal v3 API, with a hard 10s timeout. */
 export async function checkVirusTotalHash(
@@ -234,7 +240,13 @@ export async function checkVirusTotalHash(
     }
 
     if (!res.ok) {
-      return { status: "error", error: `VirusTotal responded with ${res.status}` };
+      return {
+        status: "error",
+        ...serviceErrorBody(
+          undefined,
+          serviceMessage("service.virustotal_http_error", { status: res.status })
+        ),
+      };
     }
 
     const body = (await res.json()) as {
@@ -243,8 +255,12 @@ export async function checkVirusTotalHash(
     const positives = body.data?.attributes?.last_analysis_stats?.malicious ?? 0;
     return positives > 0 ? { status: "flagged", positives } : { status: "clean", positives };
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return { status: "error", error: message };
+    const value = error instanceof Error ? serviceErrorValue(error) : String(error);
+    return {
+      status: "error",
+      error: typeof value === "string" ? value : value.message,
+      errorI18n: typeof value === "string" ? null : serializeServiceMessageDescriptor(value),
+    };
   }
 }
 

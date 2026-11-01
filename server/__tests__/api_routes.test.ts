@@ -1,3 +1,4 @@
+import { parseServiceMessageDescriptor } from "../../shared/service-messages.js";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import express from "express";
 import request from "supertest";
@@ -4943,6 +4944,21 @@ describe("API Routes - Extended Coverage", () => {
       expect(response.body.success).toBe(true);
     });
 
+    it("retains a provider ping reply that matches app timeout wording without metadata", async () => {
+      securityScanState["security.clamav.host"] = "clamav";
+      netTestState.nextReply = "Connection to ClamAV timed out";
+      vi.spyOn(ssrfModule, "resolveSafeAddress").mockResolvedValue({
+        address: "10.0.0.5",
+        family: 4,
+      });
+      const response = await request(app)
+        .post("/api/settings/security-scan/test")
+        .send({ provider: "clamav" });
+      expect(response.status).toBe(502);
+      expect(response.body.error).toBe(netTestState.nextReply);
+      expect(response.body.errorI18n).toBeNull();
+    });
+
     it("reports a failed ClamAV ping", async () => {
       securityScanState["security.clamav.host"] = "clamav";
       netTestState.nextReply = "";
@@ -4956,6 +4972,9 @@ describe("API Routes - Extended Coverage", () => {
         .send({ provider: "clamav" });
 
       expect(response.status).toBe(502);
+      expect(parseServiceMessageDescriptor(response.body.errorI18n)?.messageKey).toBe(
+        "service.clamav_ping_reply_missing"
+      );
     });
 
     it.each([

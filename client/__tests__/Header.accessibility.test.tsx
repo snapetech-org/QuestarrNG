@@ -5,6 +5,7 @@ import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { serviceMessage } from "@shared/service-messages";
 import Header from "../src/components/Header";
 import { createTestQueryClient, getRequestUrl } from "./test-utils";
 
@@ -40,6 +41,43 @@ vi.mock("../src/components/AddGameModal", () => ({
 }));
 
 describe("Header accessibility", () => {
+  it("keeps typed storage failures distinct from matching raw provider text", async () => {
+    const fragment = serviceMessage("service.internal_server_error", {});
+    globalThis.fetch = vi.fn(async (input: RequestInfo | URL) => {
+      const url = getRequestUrl(input);
+      const data = url.includes("/api/downloaders/storage")
+        ? [
+            {
+              downloaderId: "app",
+              downloaderName: "App",
+              freeSpace: 0,
+              error: fragment.message,
+              errorI18n: fragment,
+            },
+            {
+              downloaderId: "provider",
+              downloaderName: "Provider",
+              freeSpace: 0,
+              error: fragment.message,
+              errorI18n: null,
+            },
+          ]
+        : url.includes("/api/config")
+          ? { igdb: { configured: true } }
+          : [];
+      return { ok: true, json: async () => data } as Response;
+    }) as typeof fetch;
+    render(
+      <QueryClientProvider client={createTestQueryClient()}>
+        <Header />
+      </QueryClientProvider>
+    );
+    const messages = await screen.findAllByText(fragment.message);
+    expect(messages).toHaveLength(2);
+    expect(messages[0]).toHaveAttribute("lang", "en");
+    expect(messages[1]).toHaveAttribute("lang", "und");
+  });
+
   beforeEach(() => {
     globalThis.fetch = vi.fn(async (input: RequestInfo | URL) => {
       const url = getRequestUrl(input);

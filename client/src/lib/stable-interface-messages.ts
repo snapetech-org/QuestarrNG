@@ -2940,6 +2940,26 @@ export const STABLE_INTERFACE_MESSAGES = {
     "{indexer}: JSON catalog search failed; use Test Connection for details",
   "service.connection_test_server_unreachable":
     "Could not reach the server to test the connection.",
+  "service.rawg_busy": "RAWG is busy; try again shortly",
+  "service.rawg_connect_failed": "Could not connect to RAWG",
+  "service.rawg_key_rejected": "RAWG rejected the API key. Check the key in Settings.",
+  "service.rawg_rate_limit": "RAWG rate limit reached. Try again shortly.",
+  "service.rawg_http_error": "RAWG returned HTTP {status}",
+  "service.rawg_size_limit": "RAWG response exceeded the size limit",
+  "service.rawg_list_invalid": "RAWG returned an invalid game list",
+  "service.rawg_request_failed": "RAWG request failed",
+  "service.rawg_search_failed": "RAWG search failed",
+  "service.rawg_test_failed": "Failed to test RAWG API key",
+  "service.rawg_key_required": "RAWG API key is required",
+  "service.rawg_configuration_required": "Configure RAWG in Settings first",
+  "service.clamav_ping_timeout": "Connection to ClamAV timed out",
+  "service.clamav_ping_reply_missing": "No PONG reply from ClamAV",
+  "service.clamav_test_failed": "ClamAV test failed",
+  "service.clamav_host_unconfigured": "No ClamAV host configured",
+  "service.virustotal_http_error": "VirusTotal responded with {status}",
+  "service.virustotal_key_unconfigured": "No VirusTotal API key configured",
+  "service.security_provider_unknown": "Unknown provider",
+  "service.security_provider_test_failed": "Security scan provider test failed",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

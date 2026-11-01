@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Loader2, ShieldCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { InterfaceText } from "@/components/InterfaceText";
-import { ApiErrorDetailText } from "@/components/ApiErrorDetailText";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 
 const REDACTED_PLACEHOLDER = "********";
 
@@ -86,7 +86,7 @@ export default function SecurityScanSettings() {
       toast({
         title: <InterfaceText source="interface.test_failed_938cf28a" />,
         description: error.message ? (
-          <ApiErrorDetailText source={error.message} />
+          <ApiErrorDescription error={error} fallbackSource="Unknown error" />
         ) : (
           <InterfaceText source="interface.could_not_reach_the_provider_e93d694a" />
         ),

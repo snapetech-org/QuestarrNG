@@ -2852,6 +2852,326 @@
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "source-fallback",
       "directTargetCells": 12
+    },
+    {
+      "key": "service.rawg_busy",
+      "source": "RAWG is busy; try again shortly",
+      "kind": "app-owned RAWG/security/provider test",
+      "owners": ["server/rawg.ts", "server/routes.ts"],
+      "coverage": [
+        "server/__tests__/rawg.test.ts",
+        "server/__tests__/security-scan.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SecurityScanSettings.test.tsx",
+        "client/__tests__/Header.accessibility.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.rawg_connect_failed",
+      "source": "Could not connect to RAWG",
+      "kind": "app-owned RAWG/security/provider test",
+      "owners": ["server/rawg.ts", "server/routes.ts"],
+      "coverage": [
+        "server/__tests__/rawg.test.ts",
+        "server/__tests__/security-scan.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SecurityScanSettings.test.tsx",
+        "client/__tests__/Header.accessibility.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.rawg_key_rejected",
+      "source": "RAWG rejected the API key. Check the key in Settings.",
+      "kind": "app-owned RAWG/security/provider test",
+      "owners": ["server/rawg.ts", "server/routes.ts"],
+      "coverage": [
+        "server/__tests__/rawg.test.ts",
+        "server/__tests__/security-scan.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SecurityScanSettings.test.tsx",
+        "client/__tests__/Header.accessibility.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.rawg_rate_limit",
+      "source": "RAWG rate limit reached. Try again shortly.",
+      "kind": "app-owned RAWG/security/provider test",
+      "owners": ["server/rawg.ts", "server/routes.ts"],
+      "coverage": [
+        "server/__tests__/rawg.test.ts",
+        "server/__tests__/security-scan.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SecurityScanSettings.test.tsx",
+        "client/__tests__/Header.accessibility.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.rawg_http_error",
+      "source": "RAWG returned HTTP {status}",
+      "kind": "app-owned RAWG/security/provider test",
+      "owners": ["server/rawg.ts", "server/routes.ts"],
+      "coverage": [
+        "server/__tests__/rawg.test.ts",
+        "server/__tests__/security-scan.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SecurityScanSettings.test.tsx",
+        "client/__tests__/Header.accessibility.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.rawg_size_limit",
+      "source": "RAWG response exceeded the size limit",
+      "kind": "app-owned RAWG/security/provider test",
+      "owners": ["server/rawg.ts", "server/routes.ts"],
+      "coverage": [
+        "server/__tests__/rawg.test.ts",
+        "server/__tests__/security-scan.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SecurityScanSettings.test.tsx",
+        "client/__tests__/Header.accessibility.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.rawg_list_invalid",
+      "source": "RAWG returned an invalid game list",
+      "kind": "app-owned RAWG/security/provider test",
+      "owners": ["server/rawg.ts", "server/routes.ts"],
+      "coverage": [
+        "server/__tests__/rawg.test.ts",
+        "server/__tests__/security-scan.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SecurityScanSettings.test.tsx",
+        "client/__tests__/Header.accessibility.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.rawg_request_failed",
+      "source": "RAWG request failed",
+      "kind": "app-owned RAWG/security/provider test",
+      "owners": ["server/rawg.ts", "server/routes.ts"],
+      "coverage": [
+        "server/__tests__/rawg.test.ts",
+        "server/__tests__/security-scan.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SecurityScanSettings.test.tsx",
+        "client/__tests__/Header.accessibility.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.rawg_search_failed",
+      "source": "RAWG search failed",
+      "kind": "app-owned RAWG/security/provider test",
+      "owners": ["server/routes.ts"],
+      "coverage": [
+        "server/__tests__/rawg.test.ts",
+        "server/__tests__/security-scan.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SecurityScanSettings.test.tsx",
+        "client/__tests__/Header.accessibility.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.rawg_test_failed",
+      "source": "Failed to test RAWG API key",
+      "kind": "app-owned RAWG/security/provider test",
+      "owners": ["server/routes.ts"],
+      "coverage": [
+        "server/__tests__/rawg.test.ts",
+        "server/__tests__/security-scan.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SecurityScanSettings.test.tsx",
+        "client/__tests__/Header.accessibility.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.rawg_key_required",
+      "source": "RAWG API key is required",
+      "kind": "app-owned RAWG/security/provider test",
+      "owners": ["server/routes.ts"],
+      "coverage": [
+        "server/__tests__/rawg.test.ts",
+        "server/__tests__/security-scan.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SecurityScanSettings.test.tsx",
+        "client/__tests__/Header.accessibility.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.rawg_configuration_required",
+      "source": "Configure RAWG in Settings first",
+      "kind": "app-owned RAWG/security/provider test",
+      "owners": ["server/routes.ts"],
+      "coverage": [
+        "server/__tests__/rawg.test.ts",
+        "server/__tests__/security-scan.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SecurityScanSettings.test.tsx",
+        "client/__tests__/Header.accessibility.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.clamav_ping_timeout",
+      "source": "Connection to ClamAV timed out",
+      "kind": "app-owned RAWG/security/provider test",
+      "owners": ["server/routes.ts"],
+      "coverage": [
+        "server/__tests__/rawg.test.ts",
+        "server/__tests__/security-scan.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SecurityScanSettings.test.tsx",
+        "client/__tests__/Header.accessibility.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.clamav_ping_reply_missing",
+      "source": "No PONG reply from ClamAV",
+      "kind": "app-owned RAWG/security/provider test",
+      "owners": ["server/routes.ts"],
+      "coverage": [
+        "server/__tests__/rawg.test.ts",
+        "server/__tests__/security-scan.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SecurityScanSettings.test.tsx",
+        "client/__tests__/Header.accessibility.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.clamav_test_failed",
+      "source": "ClamAV test failed",
+      "kind": "app-owned RAWG/security/provider test",
+      "owners": ["server/routes.ts"],
+      "coverage": [
+        "server/__tests__/rawg.test.ts",
+        "server/__tests__/security-scan.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SecurityScanSettings.test.tsx",
+        "client/__tests__/Header.accessibility.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.clamav_host_unconfigured",
+      "source": "No ClamAV host configured",
+      "kind": "app-owned RAWG/security/provider test",
+      "owners": ["server/routes.ts"],
+      "coverage": [
+        "server/__tests__/rawg.test.ts",
+        "server/__tests__/security-scan.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SecurityScanSettings.test.tsx",
+        "client/__tests__/Header.accessibility.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.virustotal_http_error",
+      "source": "VirusTotal responded with {status}",
+      "kind": "app-owned RAWG/security/provider test",
+      "owners": ["server/security-scan.ts", "server/routes.ts"],
+      "coverage": [
+        "server/__tests__/rawg.test.ts",
+        "server/__tests__/security-scan.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SecurityScanSettings.test.tsx",
+        "client/__tests__/Header.accessibility.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.virustotal_key_unconfigured",
+      "source": "No VirusTotal API key configured",
+      "kind": "app-owned RAWG/security/provider test",
+      "owners": ["server/routes.ts"],
+      "coverage": [
+        "server/__tests__/rawg.test.ts",
+        "server/__tests__/security-scan.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SecurityScanSettings.test.tsx",
+        "client/__tests__/Header.accessibility.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.security_provider_unknown",
+      "source": "Unknown provider",
+      "kind": "app-owned RAWG/security/provider test",
+      "owners": ["server/routes.ts"],
+      "coverage": [
+        "server/__tests__/rawg.test.ts",
+        "server/__tests__/security-scan.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SecurityScanSettings.test.tsx",
+        "client/__tests__/Header.accessibility.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.security_provider_test_failed",
+      "source": "Security scan provider test failed",
+      "kind": "app-owned RAWG/security/provider test",
+      "owners": ["server/routes.ts"],
+      "coverage": [
+        "server/__tests__/rawg.test.ts",
+        "server/__tests__/security-scan.test.ts",
+        "server/__tests__/api_routes.test.ts",
+        "client/__tests__/SecurityScanSettings.test.tsx",
+        "client/__tests__/Header.accessibility.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
     }
   ],
   "codeUnits": [
@@ -2879,6 +3199,13 @@
       "keys": ["interface.connection_successful_515fb6d9"],
       "coverage": ["server/__tests__/newznab.test.ts"],
       "codeStatus": "implemented; reuses existing translated source ID; private JIT validation pending"
+    },
+    {
+      "name": "Storage error ownership through cached API DTO and Header tooltip",
+      "owners": ["server/routes.ts", "client/src/components/Header.tsx"],
+      "keys": ["service.internal_server_error"],
+      "coverage": ["client/__tests__/Header.accessibility.test.tsx"],
+      "codeStatus": "implemented; private JIT validation pending"
     }
   ],
   "retirementCandidates": [

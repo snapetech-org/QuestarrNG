@@ -6,6 +6,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createTestQueryClient, getRequestUrl } from "./test-utils";
+import { serviceMessage } from "@shared/service-messages";
 import SecurityScanSettings from "../src/components/SecurityScanSettings";
 import { setInterfaceLanguage } from "../src/lib/interface-locale";
 
@@ -48,6 +49,28 @@ function renderComponent() {
 }
 
 describe("SecurityScanSettings", () => {
+  it.each([true, false])("keeps provider test error ownership in its toast: %s", async (typed) => {
+    const { apiRequest, ApiError } = await import("@/lib/queryClient");
+    const fragment = serviceMessage("service.clamav_ping_timeout", {});
+    vi.mocked(apiRequest).mockRejectedValueOnce(
+      new ApiError(502, fragment.message, {
+        error: fragment.message,
+        errorI18n: typed ? fragment : null,
+      })
+    );
+    mockFetch({ ...defaultSettings, clamav: { enabled: false, host: "clamav", port: 3310 } });
+    renderComponent();
+    const buttons = await screen.findAllByRole("button", { name: "Test" });
+    await waitFor(() => expect(buttons.at(-1)).not.toBeDisabled());
+    fireEvent.click(buttons.at(-1)!);
+    await waitFor(() => expect(mockToast).toHaveBeenCalled());
+    const toast = mockToast.mock.calls.at(-1)?.[0];
+    const detail = render(<>{toast.description}</>);
+    expect(detail.container).toHaveTextContent(fragment.message);
+    expect(detail.container.querySelector("bdi")).toHaveAttribute("lang", typed ? "en" : "und");
+    detail.unmount();
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     act(() => setInterfaceLanguage("en"));
