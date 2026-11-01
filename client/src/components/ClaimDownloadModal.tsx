@@ -1,3 +1,5 @@
+import { ServiceMessageError } from "@shared/service-messages";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -135,7 +137,7 @@ export default function ClaimDownloadModal({
 
   const claimMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedGame) throw new Error("No game selected");
+      if (!selectedGame) throw new ServiceMessageError("service.claim_game_required", {});
 
       const body: Record<string, unknown> = {
         downloaderId: download.downloaderId,
@@ -175,7 +177,15 @@ export default function ClaimDownloadModal({
       onOpenChange(false);
     },
     onError: (err: Error) => {
-      toast({ title: err.message || "Failed to link download", variant: "destructive" });
+      toast({
+        title: (
+          <ApiErrorDescription
+            error={err}
+            fallbackSource="interface.failed_to_link_download_54d64f85"
+          />
+        ),
+        variant: "destructive",
+      });
     },
   });
 

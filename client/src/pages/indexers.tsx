@@ -1,3 +1,5 @@
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
+import { ServiceMessageError } from "@shared/service-messages";
 import { ServiceMessageText } from "@/components/ServiceMessageText";
 import type { ServiceMessageResult } from "@shared/service-messages";
 import { isSameProwlarrUrl } from "@shared/prowlarr-url";
@@ -263,7 +265,9 @@ export default function IndexersPage() {
     onError: (error) => {
       toast({
         title: "Sync failed",
-        description: error instanceof Error ? error.message : "Unknown error",
+        description: (
+          <ApiErrorDescription error={error} fallbackSource="interface.unknown_error_ce512b43" />
+        ),
         variant: "destructive",
       });
     },
@@ -387,7 +391,10 @@ export default function IndexersPage() {
         await throwIfResNotOk(response);
         return response.json() as Promise<ServiceMessageResult>;
       } else {
-        throw new Error("Either id or formData must be provided");
+        throw new ServiceMessageError("service.client_test_input_required", {
+          id: "id",
+          formData: "formData",
+        });
       }
     },
     onMutate: (data) => {
@@ -410,7 +417,9 @@ export default function IndexersPage() {
     onError: (error) => {
       toast({
         title: "Test failed",
-        description: error instanceof Error ? error.message : "Unknown error",
+        description: (
+          <ApiErrorDescription error={error} fallbackSource="interface.unknown_error_ce512b43" />
+        ),
         variant: "destructive",
       });
     },

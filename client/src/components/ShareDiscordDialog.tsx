@@ -1,3 +1,4 @@
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import {
   formatRegionalPercent,
   getRegionalLocale,
@@ -94,7 +95,12 @@ export default function ShareDiscordDialog({
     } catch (err) {
       toast({
         title: "Download failed",
-        description: err instanceof Error ? err.message : "An unexpected error occurred",
+        description: (
+          <ApiErrorDescription
+            error={err}
+            fallbackSource="interface.an_unexpected_error_occurred_6944f87a"
+          />
+        ),
         variant: "destructive",
       });
     } finally {
@@ -107,20 +113,21 @@ export default function ShareDiscordDialog({
     try {
       const dataUrl = await captureImage();
       if (!dataUrl) return;
-      const res = await apiRequest("POST", "/api/stats/discord-share", {
+      await apiRequest("POST", "/api/stats/discord-share", {
         image: dataUrl,
         ...serviceMessage("interface.my_questarr_library_stats_6f07559d", {}),
       });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error((data as { error?: string }).error || "Failed to share");
-      }
       toast({ title: "Shared!", description: "Stats posted to Discord successfully." });
       onOpenChange(false);
     } catch (err) {
       toast({
         title: "Share failed",
-        description: err instanceof Error ? err.message : "An unexpected error occurred",
+        description: (
+          <ApiErrorDescription
+            error={err}
+            fallbackSource="interface.an_unexpected_error_occurred_6944f87a"
+          />
+        ),
         variant: "destructive",
       });
     } finally {

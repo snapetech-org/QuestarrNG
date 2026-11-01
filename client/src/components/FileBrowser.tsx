@@ -58,7 +58,6 @@ export function FileBrowser({
             ? `/api/system/browse?path=${encodeURIComponent(p)}&root=${encodeURIComponent(root)}`
             : `/api/system/browse?path=${encodeURIComponent(p)}`;
         const res = await apiRequest("GET", url);
-        if (!res.ok) throw new Error(`Server error: ${res.status}`);
         const data = await res.json();
         setData(data);
       } catch {
@@ -67,7 +66,6 @@ export function FileBrowser({
           try {
             const fallbackUrl = `/api/system/browse?path=${encodeURIComponent(p)}`;
             const res = await apiRequest("GET", fallbackUrl);
-            if (!res.ok) throw new Error(`Server error: ${res.status}`);
             const data = await res.json();
             setData(data);
             return;
@@ -80,7 +78,7 @@ export function FileBrowser({
           setCurrentPath("/");
           return;
         }
-        setError("Failed to load directory");
+        setError("interface.failed_to_load_directory_484520e8");
       } finally {
         setLoading(false);
       }

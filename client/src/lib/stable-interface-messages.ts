@@ -2960,6 +2960,11 @@ export const STABLE_INTERFACE_MESSAGES = {
   "service.virustotal_key_unconfigured": "No VirusTotal API key configured",
   "service.security_provider_unknown": "Unknown provider",
   "service.security_provider_test_failed": "Security scan provider test failed",
+  "service.client_test_input_required": "Either {id} or {formData} must be provided",
+  "service.both_certificate_files_required": "Please select both files",
+  "service.api_route_missing_restart":
+    "API route not found. Please restart the server to apply changes.",
+  "service.claim_game_required": "No game selected",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

@@ -9,6 +9,7 @@ import {
   localizeServiceMessage,
   serializeServiceMessageDescriptor,
   serviceMessage,
+  ServiceMessageError,
 } from "@shared/service-messages";
 
 afterEach(() => {
@@ -27,6 +28,28 @@ async function reject(body: object) {
 }
 
 describe("source-bound API error metadata", () => {
+  it.each([true, false])(
+    "preserves ownership for local fixed errors versus provider lookalikes: %s",
+    (typed) => {
+      const app = new ServiceMessageError("service.both_certificate_files_required", {});
+      setInterfaceLanguage("ar");
+      render(
+        <ApiErrorDescription
+          error={typed ? app : new Error(app.message)}
+          fallbackSource="interface.unknown_error_ce512b43"
+        />
+      );
+      expect(screen.getByText(app.message)).toHaveAttribute("lang", typed ? "en" : "und");
+    }
+  );
+  it("retains mutated local errors verbatim without translating an unrelated key", () => {
+    const error = new ServiceMessageError("service.claim_game_required", {});
+    error.message = "Could not resolve game";
+    setInterfaceLanguage("es");
+    render(<ApiErrorDescription error={error} fallbackSource="interface.unknown_error_ce512b43" />);
+    expect(screen.getByText(error.message)).toHaveAttribute("lang", "und");
+  });
+
   it("localizes exact descriptors and preserves status, code and original payload", async () => {
     setInterfaceLanguage("ar");
     const fragment = serviceMessage("service.connected_named", { name: "Provider /srv/Test" });

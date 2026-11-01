@@ -1,3 +1,4 @@
+import { ServiceMessageError } from "@shared/service-messages";
 import { ServiceMessageText } from "@/components/ServiceMessageText";
 import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import { normalizeNotificationLanguage } from "@shared/notification-language";
@@ -814,7 +815,8 @@ export default function SettingsPage() {
 
   const uploadCertMutation = useMutation({
     mutationFn: async () => {
-      if (!selectedCert || !selectedKey) throw new Error("Please select both files");
+      if (!selectedCert || !selectedKey)
+        throw new ServiceMessageError("service.both_certificate_files_required", {});
 
       const formData = new FormData();
       formData.append("cert", selectedCert);
@@ -844,7 +846,9 @@ export default function SettingsPage() {
     onError: (error: Error) => {
       toast({
         title: "Upload Failed",
-        description: error.message,
+        description: (
+          <ApiErrorDescription error={error} fallbackSource="interface.unknown_error_ce512b43" />
+        ),
         variant: "destructive",
       });
     },
@@ -918,7 +922,7 @@ export default function SettingsPage() {
       // Check if response is HTML (which means the route wasn't found and Vite served index.html)
       const contentType = res.headers.get("content-type");
       if (contentType && contentType.includes("text/html")) {
-        throw new Error("API route not found. Please restart the server to apply changes.");
+        throw new ServiceMessageError("service.api_route_missing_restart", {});
       }
 
       return { data: await res.json(), successMessage };
@@ -933,14 +937,16 @@ export default function SettingsPage() {
     onError: (error: Error) => {
       console.error("Settings update error:", error);
 
-      let message = error.message;
-      if (message.includes("Unexpected token") || message.includes("JSON")) {
-        message = translateInterfaceLabel("interface.server_response_invalid_please_res_4762a781");
-      }
+      const description =
+        error instanceof SyntaxError ? (
+          <InterfaceText source="interface.server_response_invalid_please_res_4762a781" />
+        ) : (
+          <ApiErrorDescription error={error} fallbackSource="interface.unknown_error_ce512b43" />
+        );
 
       toast({
         title: "Update Failed",
-        description: message,
+        description,
         variant: "destructive",
       });
     },
@@ -959,7 +965,7 @@ export default function SettingsPage() {
       // Check if response is HTML (which means the route wasn't found and Vite served index.html)
       const contentType = res.headers.get("content-type");
       if (contentType && contentType.includes("text/html")) {
-        throw new Error("API route not found. Please restart the server to apply changes.");
+        throw new ServiceMessageError("service.api_route_missing_restart", {});
       }
 
       return { data: await res.json(), successMessage };
@@ -978,14 +984,16 @@ export default function SettingsPage() {
     onError: (error: Error) => {
       console.error("Settings update error:", error);
 
-      let message = error.message;
-      if (message.includes("Unexpected token") || message.includes("JSON")) {
-        message = translateInterfaceLabel("interface.server_response_invalid_please_res_4762a781");
-      }
+      const description =
+        error instanceof SyntaxError ? (
+          <InterfaceText source="interface.server_response_invalid_please_res_4762a781" />
+        ) : (
+          <ApiErrorDescription error={error} fallbackSource="interface.unknown_error_ce512b43" />
+        );
 
       toast({
         title: "Update Failed",
-        description: message,
+        description,
         variant: "destructive",
       });
     },

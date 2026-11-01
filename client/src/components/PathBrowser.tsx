@@ -80,7 +80,6 @@ export function PathBrowser({
         "GET",
         `/api/system/filesystem?path=${encodeURIComponent(currentPath)}`
       );
-      if (!res.ok) throw new Error("Failed to load directory");
       return res.json();
     },
     enabled: isOpen,

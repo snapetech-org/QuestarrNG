@@ -242,5 +242,9 @@
   "service.virustotal_http_error",
   "service.virustotal_key_unconfigured",
   "service.security_provider_unknown",
-  "service.security_provider_test_failed"
+  "service.security_provider_test_failed",
+  "service.client_test_input_required",
+  "service.both_certificate_files_required",
+  "service.api_route_missing_restart",
+  "service.claim_game_required"
 ]

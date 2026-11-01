@@ -1,3 +1,4 @@
+import { ServiceMessageError } from "@shared/service-messages";
 import { ApiError, getApiErrorMetadata } from "@/lib/queryClient";
 import { InterfaceText } from "./InterfaceText";
 import { ServiceMessageText } from "./ServiceMessageText";
@@ -23,7 +24,9 @@ export function ApiErrorDescription({
       );
     }
   }
-  if (error instanceof Error)
+  if (error instanceof ServiceMessageError)
+    return <ServiceMessageText message={error.message} metadata={error} />;
+  if (error instanceof Error && error.message)
     return (
       <bdi lang="und" dir="auto">
         {error.message}

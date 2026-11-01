@@ -1,3 +1,4 @@
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import { useState, useEffect, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -183,10 +184,6 @@ export default function ClaimBatchModal({ open, onOpenChange }: ClaimBatchModalP
       });
 
       const response = await apiRequest("POST", "/api/downloads/claim-batch", { items });
-      if (!response.ok) {
-        const body = (await response.json().catch(() => ({}))) as { error?: string };
-        throw new Error(body.error ?? `Batch claim failed with status ${response.status}`);
-      }
       const result = (await response.json()) as {
         addedCount: number;
         failedCount: number;
@@ -218,7 +215,15 @@ export default function ClaimBatchModal({ open, onOpenChange }: ClaimBatchModalP
       onOpenChange(false);
     },
     onError: (err: Error) => {
-      toast({ title: err.message || "Failed to claim downloads", variant: "destructive" });
+      toast({
+        title: (
+          <ApiErrorDescription
+            error={err}
+            fallbackSource="interface.failed_to_claim_downloads_083f157c"
+          />
+        ),
+        variant: "destructive",
+      });
     },
     onSettled: () => setProgress(null),
   });

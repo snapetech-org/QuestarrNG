@@ -3172,6 +3172,66 @@
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "source-fallback",
       "directTargetCells": 12
+    },
+    {
+      "key": "service.client_test_input_required",
+      "source": "Either {id} or {formData} must be provided",
+      "kind": "app-owned reachable client error",
+      "owners": ["client/src/pages/downloaders.tsx", "client/src/pages/indexers.tsx"],
+      "coverage": [
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "client/__tests__/SettingsPage.test.tsx",
+        "client/__tests__/DownloadersPage.test.tsx",
+        "client/__tests__/ClaimModals.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.both_certificate_files_required",
+      "source": "Please select both files",
+      "kind": "app-owned reachable client error",
+      "owners": ["client/src/pages/settings.tsx"],
+      "coverage": [
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "client/__tests__/SettingsPage.test.tsx",
+        "client/__tests__/DownloadersPage.test.tsx",
+        "client/__tests__/ClaimModals.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.api_route_missing_restart",
+      "source": "API route not found. Please restart the server to apply changes.",
+      "kind": "app-owned reachable client error",
+      "owners": ["client/src/pages/settings.tsx"],
+      "coverage": [
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "client/__tests__/SettingsPage.test.tsx",
+        "client/__tests__/DownloadersPage.test.tsx",
+        "client/__tests__/ClaimModals.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
+    },
+    {
+      "key": "service.claim_game_required",
+      "source": "No game selected",
+      "kind": "app-owned reachable client error",
+      "owners": ["client/src/components/ClaimDownloadModal.tsx"],
+      "coverage": [
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "client/__tests__/SettingsPage.test.tsx",
+        "client/__tests__/DownloadersPage.test.tsx",
+        "client/__tests__/ClaimModals.test.tsx"
+      ],
+      "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
+      "targetStatus": "source-fallback",
+      "directTargetCells": 12
     }
   ],
   "codeUnits": [
@@ -3206,6 +3266,20 @@
       "keys": ["service.internal_server_error"],
       "coverage": ["client/__tests__/Header.accessibility.test.tsx"],
       "codeStatus": "implemented; private JIT validation pending"
+    },
+    {
+      "name": "Local typed errors and API DTO ownership at toast boundaries",
+      "owners": [
+        "client/src/components/ApiErrorDescription.tsx",
+        "client/src/components/ShareDiscordDialog.tsx",
+        "client/src/components/ClaimBatchModal.tsx"
+      ],
+      "coverage": [
+        "client/src/lib/__tests__/api-error-metadata.test.tsx",
+        "client/__tests__/ClaimModals.test.tsx"
+      ],
+      "codeStatus": "implemented; private JIT validation pending",
+      "notes": "Removed unreachable non-ok checks after apiRequest. Parse-error copy is selected by SyntaxError type, not provider text containing JSON."
     }
   ],
   "retirementCandidates": [

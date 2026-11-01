@@ -1,3 +1,4 @@
+import { ServiceMessageError } from "@shared/service-messages";
 import { ServiceMessageText } from "@/components/ServiceMessageText";
 import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import type { ServiceMessageResult } from "@shared/service-messages";
@@ -348,7 +349,10 @@ export default function DownloadersPage() {
         await throwIfResNotOk(response);
         return response.json() as Promise<ServiceMessageResult>;
       } else {
-        throw new Error("Either id or formData must be provided");
+        throw new ServiceMessageError("service.client_test_input_required", {
+          id: "id",
+          formData: "formData",
+        });
       }
     },
     onMutate: (data) => {
@@ -371,7 +375,9 @@ export default function DownloadersPage() {
     onError: (error) => {
       toast({
         title: "Test failed",
-        description: error instanceof Error ? error.message : "Unknown error",
+        description: (
+          <ApiErrorDescription error={error} fallbackSource="interface.unknown_error_ce512b43" />
+        ),
         variant: "destructive",
       });
     },
