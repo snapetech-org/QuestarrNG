@@ -27,3 +27,7 @@ The three corrected cells are marked `machine-draft` pending qualified native-sp
 `npm run check:localization` passed at reviewed code head `096a63c0`: 2,590 stable IDs and 14 complete target locales. `git diff --check` passed. No tests, builds, or CI jobs were run. Mobile-size RTL was not reviewed. This machine-assisted review is not native-speaker signoff.
 
 `SHA256SUMS` records each screenshot hash.
+
+## Follow-up: Arabic initial setup
+
+At PR head `051053c3cce393674d30a87f9fb2587f1f6f8d94` (application code head `096a63c07d11e5a1fb71700cbf4c37ebfa829fde`), an isolated headed Agentic VM Chrome session with no saved login opened `/auth/setup`, which redirected to `/setup`. A disposable empty SQLite database was used; no account was created and no credentials were entered. The 1440×1000 Arabic view showed right-aligned translated copy and a vertically scrollable form without horizontal clipping. Screenshot: `questarr-arabic-setup-desktop-1440x1000.png` (SHA-256: `e6471beb62c0b19527a34115e50d38880097a7e2855731f8f105462d0f409930`). This is desktop-only evidence; mobile RTL remains outstanding.
