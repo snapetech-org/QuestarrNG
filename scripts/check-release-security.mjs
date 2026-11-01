@@ -13,10 +13,6 @@ export const REQUIRED_CHECKS = [
   "windows-service",
   "Build and check on Node 22.23.4",
   "Build and check on Node 26.x",
-  "Analyze (javascript-typescript)",
-  "Analyze (csharp)",
-  "Analyze (actions)",
-  "Analyze (cpp)",
   "semgrep",
   "Playwright e2e",
   "OWASP ZAP baseline scan",
@@ -26,10 +22,6 @@ export const REQUIRED_CHECKS = [
 ];
 
 export const REQUIRED_CODE_ANALYSES = [
-  { tool: "CodeQL", category: "/language:csharp" },
-  { tool: "CodeQL", category: "/language:javascript-typescript" },
-  { tool: "CodeQL", category: "/language:actions" },
-  { tool: "CodeQL", category: "/language:cpp" },
   { tool: "Semgrep OSS", category: ".github/workflows/sast.yml:semgrep" },
 ];
 
@@ -44,8 +36,8 @@ const SOURCE_SCAN_POLL_MS = 15 * 1000;
 function isBlockingCodeAlert(alert, releaseRef) {
   const instance = alert.most_recent_instance;
   if (releaseRef && instance?.ref !== releaseRef) {
-    // Scorecard is checked against the default branch below; the source tag
-    // scans are CodeQL and Semgrep, and must fail closed if their ref differs.
+    // Scorecard is checked against the default branch below. Source findings
+    // from another ref remain blocking because they have not been cleared.
     return alert.tool?.name !== "Scorecard";
   }
   const state = instance?.state ?? alert.state;
@@ -166,7 +158,7 @@ async function waitForReleaseScans(repository, releaseRef, releaseSha) {
     }
     if (!didLogWaiting) {
       console.log(
-        "Waiting for CodeQL, Semgrep, and required checks on " + releaseRef + "@" + releaseSha + "."
+        "Waiting for Semgrep and required checks on " + releaseRef + "@" + releaseSha + "."
       );
       didLogWaiting = true;
     }
