@@ -10,10 +10,10 @@ describe("staged English source fallback", () => {
     "keeps pending count templates in English with correct language metadata for %s",
     (locale) => {
       expect(formatInterfaceMessage("claims.downloads_linked", { count: 2 }, locale)).toBe(
-        "Downloads linked to games: 2"
+        "Downloads linked to games: \u20682\u2069"
       );
       expect(formatInterfaceMessage("claims.some_downloads_failed", { count: 0 }, locale)).toBe(
-        "Some downloads failed to link (0 linked)"
+        "Some downloads failed to link (\u20680\u2069 linked)"
       );
       for (const key of ["claims.downloads_linked", "claims.some_downloads_failed"]) {
         expect(getInterfaceTextLanguage(key, locale)).toBe("en");
@@ -21,4 +21,13 @@ describe("staged English source fallback", () => {
       }
     }
   );
+
+  it("isolates an RTL title inside a left-to-right Spanish message", () => {
+    const id = "interface.added_title_to_your_wanted_list_abe8d624";
+    const title = "فيلم 2025 (نسخة)";
+    expect(getInterfaceTextDirection(id, "es")).toBe("ltr");
+    expect(formatInterfaceMessage(id, { title }, "es")).toContain(
+      `\u2068${title}\u2069`
+    );
+  });
 });

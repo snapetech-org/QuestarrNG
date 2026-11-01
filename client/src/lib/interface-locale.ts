@@ -232,11 +232,11 @@ export function formatInterfaceMessage(
   const id = resolveInterfaceMessageId(reference);
   const source = id ? STABLE_INTERFACE_MESSAGES[id] : reference;
   const template = id && language !== "en" ? (UI_LABELS_BY_ID[id]?.[language] ?? source) : source;
-  const isolateValues = getInterfaceTextDirection(reference, language) === "rtl";
   return template.replace(/\{([A-Za-z][A-Za-z0-9_]*)\}/g, (placeholder, name: string) => {
     const value = values[name];
     if (value === undefined) return placeholder;
-    return isolateValues ? `\u2068${String(value)}\u2069` : String(value);
+    const text = String(value);
+    return text ? `\u2068${text}\u2069` : text;
   });
 }
 
