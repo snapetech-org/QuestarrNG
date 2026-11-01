@@ -68,6 +68,17 @@ const GameCard = ({
   const regionalLocale =
     getRegionalLocale(regionalPreference) ?? Intl.DateTimeFormat().resolvedOptions().locale;
   const regionalDirection = getRegionalDirection(regionalLocale);
+  const formatGameCardAttribute = (
+    source: string,
+    values: Record<string, string | number>
+  ) => {
+    const attributeValues = directionFor(source) === "rtl"
+      ? values
+      : Object.fromEntries(
+          Object.entries(values).map(([name, value]) => [name, `\u2068${String(value)}\u2069`])
+        );
+    return formatInterfaceMessage(source, attributeValues, language);
+  };
 
   // Keep track of the resolved game object (either original or newly added)
   const [resolvedGame, setResolvedGame] = useState<Game>(game);
@@ -177,7 +188,7 @@ const GameCard = ({
             improving initial page load speed, especially on pages with many carousels. */}
         <img
           src={coverSrc(game.coverUrl)}
-          alt={formatInterfaceMessage("interface.cover_art_for_title_44c4687e", {
+          alt={formatGameCardAttribute("interface.cover_art_for_title_44c4687e", {
             title: game.title,
           })}
           lang={languageFor("interface.cover_art_for_title_44c4687e")}
@@ -237,7 +248,7 @@ const GameCard = ({
                     e.stopPropagation();
                     handleToggleHidden();
                   }}
-                  aria-label={formatInterfaceMessage(
+                  aria-label={formatGameCardAttribute(
                     game.hidden ? "Unhide {title}" : "Hide {title}",
                     { title: game.title }
                   )}
@@ -276,7 +287,7 @@ const GameCard = ({
                       void handleDownloadClick();
                     }}
                     disabled={addGameMutation.isPending}
-                    aria-label={formatInterfaceMessage("interface.download_title_5de658d1", {
+                    aria-label={formatGameCardAttribute("interface.download_title_5de658d1", {
                       title: game.title,
                     })}
                     lang={languageFor("interface.download_title_5de658d1")}
@@ -337,7 +348,7 @@ const GameCard = ({
                 role="img"
                 aria-label={
                   hasUserVisibleRating
-                    ? formatInterfaceMessage("interface.igdb_rating_rating_out_of_10_fbf37993", {
+                    ? formatGameCardAttribute("interface.igdb_rating_rating_out_of_10_fbf37993", {
                         rating: Number(game.rating),
                       })
                     : t("interface.not_rated_9de37148")
@@ -371,7 +382,7 @@ const GameCard = ({
                 <div
                   className="flex items-center gap-1 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   role="img"
-                  aria-label={formatInterfaceMessage(
+                  aria-label={formatGameCardAttribute(
                     "interface.my_rating_rating_out_of_10_f3d2beef",
                     {
                       rating: game.userRating,
@@ -400,7 +411,7 @@ const GameCard = ({
               <div
                 className="flex items-center gap-1 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 role="img"
-                aria-label={formatInterfaceMessage("interface.release_date_date_e2610e34", {
+                aria-label={formatGameCardAttribute("interface.release_date_date_e2610e34", {
                   date: releaseYear,
                 })}
                 lang={languageFor("interface.release_date_date_e2610e34")}
@@ -445,7 +456,7 @@ const GameCard = ({
               e.stopPropagation();
             }}
             role="toolbar"
-            aria-label={formatInterfaceMessage("interface.actions_for_title_f9d3c417", {
+            aria-label={formatGameCardAttribute("interface.actions_for_title_f9d3c417", {
               title: game.title,
             })}
             lang={languageFor("interface.actions_for_title_f9d3c417")}
@@ -458,7 +469,7 @@ const GameCard = ({
               className={mobileActionButtonClass}
               onClick={() => void handleDownloadClick()}
               disabled={addGameMutation.isPending}
-              aria-label={formatInterfaceMessage("interface.download_title_5de658d1", {
+              aria-label={formatGameCardAttribute("interface.download_title_5de658d1", {
                 title: game.title,
               })}
               lang={languageFor("interface.download_title_5de658d1")}
@@ -485,7 +496,7 @@ const GameCard = ({
               }}
               disabled={addGameMutation.isPending}
               data-testid={`button-track-${game.id}`}
-              aria-label={formatInterfaceMessage("interface.track_title_c799ab04", {
+              aria-label={formatGameCardAttribute("interface.track_title_c799ab04", {
                 title: game.title,
               })}
               lang={languageFor("interface.track_title_c799ab04")}
