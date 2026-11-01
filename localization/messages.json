@@ -675,7 +675,7 @@
         "fr": "Découvrir",
         "pt-BR": "Descobrir",
         "ar": "اكتشف",
-        "ko": "둘러보기",
+        "ko": "발견",
         "zh-Hant": "探索",
         "vi": "Khám phá",
         "id": "Temukan",
@@ -690,7 +690,7 @@
         "zh-Hans": "浏览",
         "hi": "ब्राउज़ करें",
         "de": "Durchsuchen",
-        "ja": "参照",
+        "ja": "閲覧",
         "fr": "Parcourir",
         "pt-BR": "Explorar",
         "ar": "تصفح",
@@ -6302,7 +6302,7 @@
         "ko": "게임 관리",
         "zh-Hant": "遊戲管理",
         "vi": "Quản lý trò chơi",
-        "id": "Pengelolaan game",
+        "id": "Pengelolaan gim",
         "es-419": "Gestión de juegos",
         "fr-CA": "Gestion des jeux"
       }

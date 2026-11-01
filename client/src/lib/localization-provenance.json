@@ -397,7 +397,8 @@
       "sourceChecksum": "fnv1a32:fa18c0ee",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "ko": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -408,7 +409,8 @@
       "sourceChecksum": "fnv1a32:0eac1f07",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "ja": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
@@ -3657,7 +3659,8 @@
       "sourceChecksum": "fnv1a32:b1319076",
       "translations": {
         "es-419": "inherited",
-        "fr-CA": "inherited"
+        "fr-CA": "inherited",
+        "id": "machine-draft"
       },
       "translationSources": {
         "es-419": "es",
