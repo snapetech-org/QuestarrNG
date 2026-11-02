@@ -1,7 +1,7 @@
 # QuestarrNG PR #155 headed browser review — 2026-11-02
 
-- Reviewed PR head: `64c16f9cfe8f24e462895d817e805faf70edd96b`
-- PR tree: `c10ce0e075b9ee68eb4c4aaa35f1e3870462763d`
+- Reviewed application-code head: `64c16f9cfe8f24e462895d817e805faf70edd96b` / tree `c10ce0e075b9ee68eb4c4aaa35f1e3870462763d`
+- Current PR head after the evidence-only follow-up: `47e57bdff5918e6444417d140511b3f2713cf7fd` / tree `f70952821dcc37e4df3236caf609e1bc3af7d11e`
 - Browser: isolated headed Chrome session on the Agentic VM, 1440 × 1000 viewport.
 - App: exact-head detached worktree and task-scoped SQLite database; the preview ran without user credentials or external account state.
 
@@ -20,3 +20,4 @@ This run covers Spanish desktop rendering and one Arabic right-to-left settings 
 
 - `questarr-pr155-discover-es.png` — Spanish discovery view.
 - `questarr-pr155-settings-ar-rtl.png` — Arabic settings and right-to-left layout.
+- [Exact-head catalog reconciliation audit](catalog-reconciliation-audit-2026-11-02.md) — verifies catalog coverage and lists the four separately re-attested direct cells, with remaining review gates.
