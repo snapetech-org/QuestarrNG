@@ -1,0 +1,613 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import request from "supertest";
+
+const {
+  mockStorage,
+  mockImportManager,
+  mockPathMappingService,
+  mockPlatformMappingService,
+  fsMock,
+} = vi.hoisted(() => ({
+  mockStorage: {
+    getImportConfig: vi.fn(),
+    getRomMConfig: vi.fn(),
+    getEnabledDownloaders: vi.fn(),
+    getPendingImportReviews: vi.fn(),
+    getUnlinkedImportReviews: vi.fn(),
+    getQuarantinedDownloads: vi.fn(),
+    relinkGameDownload: vi.fn(),
+    getGameDownload: vi.fn(),
+    getGame: vi.fn(),
+    getPlatformMappings: vi.fn(),
+    getPathMappings: vi.fn(),
+    updatePathMapping: vi.fn(),
+    removePathMapping: vi.fn(),
+    getUserSettings: vi.fn(),
+    updateUserSettings: vi.fn(),
+  },
+  mockImportManager: {
+    confirmImport: vi.fn(),
+  },
+  mockPlatformMappingService: {
+    initializeDefaults: vi.fn(),
+  },
+  mockPathMappingService: {
+    translatePath: vi.fn(),
+  },
+  fsMock: {
+    stat: vi.fn(),
+    writeFile: vi.fn(),
+    link: vi.fn(),
+    remove: vi.fn(),
+  },
+}));
+
+vi.mock("../storage.js", () => ({
+  storage: mockStorage,
+}));
+
+vi.mock("../services/index.js", () => ({
+  importManager: mockImportManager,
+  pathMappingService: mockPathMappingService,
+  platformMappingService: mockPlatformMappingService,
+}));
+
+vi.mock("fs-extra", () => ({
+  default: fsMock,
+}));
+
+import { importRouter } from "../routes/import.js";
+import {
+  makeImportConfig,
+  makeRomMConfig,
+  createImportTestApp,
+} from "./helpers/import-test-helpers.js";
+
+describe("importRouter additional coverage", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockPathMappingService.translatePath.mockImplementation(
+      async (remotePath: string) => remotePath
+    );
+    mockStorage.getEnabledDownloaders.mockResolvedValue([]);
+    mockStorage.getImportConfig.mockResolvedValue(makeImportConfig({ overwriteExisting: true }));
+    mockStorage.getRomMConfig.mockResolvedValue(makeRomMConfig());
+    mockStorage.getPathMappings.mockResolvedValue([]);
+    mockStorage.getUnlinkedImportReviews.mockResolvedValue([]);
+    mockStorage.getQuarantinedDownloads.mockResolvedValue([]);
+  });
+
+  const createApp = (withUser = true) => createImportTestApp(importRouter, withUser);
+
+  it("returns unauthorized for GET /config without user", async () => {
+    const app = createApp(false);
+    const response = await request(app).get("/api/imports/config");
+
+    expect(response.status).toBe(401);
+  });
+
+  it("returns pending manual-review imports with game title fallback", async () => {
+    mockStorage.getPendingImportReviews.mockResolvedValue([
+      {
+        id: "d1",
+        gameId: "g1",
+        downloadTitle: "Download 1",
+        status: "manual_review_required",
+        downloaderId: "down-1",
+        addedAt: "2026-01-01",
+      },
+    ]);
+    mockStorage.getGame.mockResolvedValueOnce({ title: "Known Game" });
+
+    const app = createApp();
+    const response = await request(app).get("/api/imports/pending");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual([
+      expect.objectContaining({
+        id: "d1",
+        gameTitle: "Known Game",
+        status: "manual_review_required",
+      }),
+    ]);
+  });
+
+  it("merges game-link-required downloads ahead of path reviews, without a game lookup", async () => {
+    mockStorage.getPendingImportReviews.mockResolvedValue([
+      {
+        id: "d-path",
+        gameId: "g1",
+        downloadTitle: "Path Review-GROUP",
+        status: "manual_review_required",
+        downloaderId: "down-1",
+        addedAt: "2026-01-01",
+      },
+    ]);
+    mockStorage.getGame.mockResolvedValueOnce({ title: "Known Game" });
+    mockStorage.getUnlinkedImportReviews.mockResolvedValue([
+      {
+        id: "d-unlinked",
+        gameId: "gone",
+        downloadTitle: "Orphaned-GROUP",
+        status: "game_link_required",
+        downloaderId: "down-1",
+        addedAt: "2026-01-02",
+        errorMessage: "This download's linked game could not be found",
+      },
+    ]);
+
+    const app = createApp();
+    const response = await request(app).get("/api/imports/pending");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual([
+      expect.objectContaining({
+        id: "d-unlinked",
+        gameTitle: "Orphaned-GROUP",
+        status: "game_link_required",
+      }),
+      expect.objectContaining({
+        id: "d-path",
+        gameTitle: "Known Game",
+        status: "manual_review_required",
+      }),
+    ]);
+    // The unlinked entry's title never goes through storage.getGame — there's no
+    // game row to look up.
+    expect(mockStorage.getGame).toHaveBeenCalledTimes(1);
+  });
+
+  describe("POST /:id/link", () => {
+    it("links a game_link_required download to the given game", async () => {
+      mockStorage.getGameDownload.mockResolvedValue({
+        id: "d1",
+        gameId: "gone",
+        ownerUserId: "user-1",
+        status: "game_link_required",
+      });
+      mockStorage.getGame.mockResolvedValue({ id: "g2", title: "Correct Game", userId: "user-1" });
+      mockStorage.relinkGameDownload.mockResolvedValue({
+        id: "d1",
+        gameId: "g2",
+        status: "manual_review_required",
+      });
+
+      const app = createApp();
+      const response = await request(app).post("/api/imports/d1/link").send({ gameId: "g2" });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({
+        success: true,
+        download: { id: "d1", gameId: "g2", status: "manual_review_required" },
+      });
+      expect(mockStorage.getGameDownload).toHaveBeenCalledWith("d1", "user-1");
+      expect(mockStorage.relinkGameDownload).toHaveBeenCalledWith("d1", "g2", "user-1");
+    });
+
+    it("returns 404 when the download does not exist", async () => {
+      mockStorage.getGameDownload.mockResolvedValue(undefined);
+
+      const app = createApp();
+      const response = await request(app).post("/api/imports/missing/link").send({ gameId: "g2" });
+
+      expect(response.status).toBe(404);
+      expect(mockStorage.relinkGameDownload).not.toHaveBeenCalled();
+    });
+
+    it("returns 400 when the download isn't awaiting a game link", async () => {
+      mockStorage.getGameDownload.mockResolvedValue({
+        id: "d1",
+        gameId: "g1",
+        status: "manual_review_required",
+      });
+
+      const app = createApp();
+      const response = await request(app).post("/api/imports/d1/link").send({ gameId: "g2" });
+
+      expect(response.status).toBe(400);
+      expect(mockStorage.relinkGameDownload).not.toHaveBeenCalled();
+    });
+
+    it("returns 404 when the target game does not exist", async () => {
+      mockStorage.getGameDownload.mockResolvedValue({
+        id: "d1",
+        gameId: "gone",
+        status: "game_link_required",
+      });
+      mockStorage.getGame.mockResolvedValue(undefined);
+
+      const app = createApp();
+      const response = await request(app)
+        .post("/api/imports/d1/link")
+        .send({ gameId: "nonexistent" });
+
+      expect(response.status).toBe(404);
+      expect(mockStorage.relinkGameDownload).not.toHaveBeenCalled();
+    });
+
+    it("returns 400 for a missing gameId", async () => {
+      const app = createApp();
+      const response = await request(app).post("/api/imports/d1/link").send({});
+
+      expect(response.status).toBe(400);
+      expect(mockStorage.getGameDownload).not.toHaveBeenCalled();
+    });
+
+    it("returns 409 when another request already relinked the download first", async () => {
+      // Passed the status check (still game_link_required at that instant), but
+      // storage's conditional update matched nothing by the time it ran — a
+      // concurrent request won the race.
+      mockStorage.getGameDownload.mockResolvedValue({
+        id: "d1",
+        gameId: "gone",
+        ownerUserId: "user-1",
+        status: "game_link_required",
+      });
+      mockStorage.getGame.mockResolvedValue({ id: "g2", title: "Correct Game", userId: "user-1" });
+      mockStorage.relinkGameDownload.mockResolvedValue(undefined);
+
+      const app = createApp();
+      const response = await request(app).post("/api/imports/d1/link").send({ gameId: "g2" });
+
+      expect(response.status).toBe(409);
+    });
+
+    it("returns 500 when the storage layer throws unexpectedly", async () => {
+      mockStorage.getGameDownload.mockRejectedValue(new Error("db failure"));
+
+      const app = createApp();
+      const response = await request(app).post("/api/imports/d1/link").send({ gameId: "g2" });
+
+      expect(response.status).toBe(500);
+    });
+  });
+
+  it("initializes platform mappings via /mappings/platforms/init", async () => {
+    mockStorage.getPlatformMappings.mockResolvedValue([
+      { id: "m1", igdbPlatformId: 19, sourcePlatformName: "snes" },
+    ]);
+    const app = createApp();
+
+    const response = await request(app).post("/api/imports/mappings/platforms/init").send({});
+
+    expect(response.status).toBe(200);
+    expect(mockPlatformMappingService.initializeDefaults).toHaveBeenCalled();
+    expect(response.body.count).toBe(1);
+  });
+
+  it("returns 400 for invalid /config patch payload", async () => {
+    const app = createApp();
+
+    const response = await request(app).patch("/api/imports/config").send({
+      invalidField: true,
+    });
+
+    expect(response.status).toBe(400);
+  });
+
+  it("updates a path mapping via PATCH /mappings/paths/:id", async () => {
+    mockStorage.updatePathMapping.mockResolvedValue({
+      id: "map-1",
+      remotePath: "/downloads",
+      localPath: "/mnt/downloads",
+      remoteHost: "qb.example",
+    });
+    const app = createApp();
+
+    const response = await request(app).patch("/api/imports/mappings/paths/map-1").send({
+      remotePath: "/downloads",
+      localPath: "/mnt/downloads",
+      remoteHost: "qb.example",
+    });
+
+    expect(response.status).toBe(200);
+    expect(mockStorage.updatePathMapping).toHaveBeenCalledWith("map-1", {
+      remotePath: "/downloads",
+      localPath: "/mnt/downloads",
+      remoteHost: "qb.example",
+    });
+  });
+
+  it("returns 400 for invalid PATCH /mappings/paths/:id payload", async () => {
+    const app = createApp();
+
+    const response = await request(app).patch("/api/imports/mappings/paths/map-1").send({
+      remotePath: "/downloads",
+      // localPath is required and missing
+    });
+
+    expect(response.status).toBe(400);
+  });
+
+  it("returns 404 when patching a missing path mapping", async () => {
+    mockStorage.updatePathMapping.mockResolvedValue(undefined);
+    const app = createApp();
+
+    const response = await request(app).patch("/api/imports/mappings/paths/missing").send({
+      remotePath: "/downloads",
+      localPath: "/mnt/downloads",
+      remoteHost: null,
+    });
+
+    expect(response.status).toBe(404);
+  });
+
+  it("returns neutral hardlink check when no downloader paths are configured", async () => {
+    const app = createApp();
+
+    const response = await request(app).get("/api/imports/hardlink/check");
+
+    expect(response.status).toBe(200);
+    expect(response.body.generic.supportedForAll).toBeNull();
+  });
+
+  it("updates import config using authenticated userId", async () => {
+    mockStorage.getUserSettings.mockResolvedValue({
+      id: "settings-1",
+      userId: "user-1",
+    });
+    mockStorage.updateUserSettings.mockResolvedValue({ id: "settings-1", userId: "user-1" });
+
+    const app = createApp();
+    const response = await request(app).patch("/api/imports/config").send({
+      renamePattern: "{Title} - {Platform}",
+    });
+
+    expect(response.status).toBe(200);
+    expect(mockStorage.updateUserSettings).toHaveBeenCalledWith(
+      "user-1",
+      expect.objectContaining({ renamePattern: "{Title} - {Platform}" })
+    );
+  });
+
+  // --- GET /api/imports/config happy path ---
+
+  it("GET /config returns the import config for the user", async () => {
+    const config = makeImportConfig({
+      overwriteExisting: false,
+      renamePattern: "{Title} ({Year})",
+    });
+    mockStorage.getImportConfig.mockResolvedValue(config);
+
+    const app = createApp();
+    const response = await request(app).get("/api/imports/config");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(expect.objectContaining({ renamePattern: "{Title} ({Year})" }));
+    expect(mockStorage.getImportConfig).toHaveBeenCalledWith("user-1");
+  });
+
+  // --- POST /:id/confirm — path traversal and Windows absolute path ---
+
+  it("POST /:id/confirm returns 400 for path traversal in proposedPath", async () => {
+    mockStorage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/data" }));
+
+    const app = createApp();
+    const response = await request(app).post("/api/imports/dl-1/confirm").send({
+      strategy: "pc",
+      proposedPath: "../../etc/passwd",
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toMatch(/invalid proposed path/i);
+  });
+
+  it("POST /:id/confirm returns 400 for Windows absolute path in proposedPath", async () => {
+    mockStorage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/data" }));
+
+    const app = createApp();
+    const response = await request(app).post("/api/imports/dl-2/confirm").send({
+      strategy: "pc",
+      proposedPath: "C:/games",
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toMatch(/invalid proposed path/i);
+  });
+
+  it("POST /:id/confirm returns 400 when required fields are missing", async () => {
+    const app = createApp();
+    const response = await request(app).post("/api/imports/dl-1/confirm").send({});
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe("Validation failed");
+    expect(Array.isArray(response.body.details)).toBe(true);
+  });
+
+  // --- GET /api/imports/pending — empty array ---
+
+  it("GET /pending returns count 0 and empty items when storage returns empty array", async () => {
+    mockStorage.getPendingImportReviews.mockResolvedValue([]);
+
+    const app = createApp();
+    const response = await request(app).get("/api/imports/pending");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual([]);
+  });
+
+  // --- GET /api/imports/pending — password-protected archive marker ---
+
+  it("GET /pending flags passwordRequired and strips the internal marker from the message", async () => {
+    mockStorage.getPendingImportReviews.mockResolvedValue([
+      {
+        id: "d-pw",
+        gameId: "g1",
+        downloadTitle: "Encrypted.rar",
+        status: "manual_review_required",
+        downloaderId: "down-1",
+        addedAt: "2026-01-01",
+        errorMessage:
+          "ARCHIVE_PASSWORD_REQUIRED:This archive is password-protected — a password is required to extract it.",
+      },
+    ]);
+    mockStorage.getGame.mockResolvedValueOnce({ title: "Encrypted Game" });
+
+    const app = createApp();
+    const response = await request(app).get("/api/imports/pending");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual([
+      expect.objectContaining({
+        id: "d-pw",
+        passwordRequired: true,
+        errorMessage: "This archive is password-protected — a password is required to extract it.",
+      }),
+    ]);
+  });
+
+  it("GET /pending does not flag passwordRequired for an unrelated failure message", async () => {
+    mockStorage.getPendingImportReviews.mockResolvedValue([
+      {
+        id: "d-other",
+        gameId: "g1",
+        downloadTitle: "Broken.zip",
+        status: "manual_review_required",
+        downloaderId: "down-1",
+        addedAt: "2026-01-01",
+        errorMessage: "archive is corrupt or incomplete",
+      },
+    ]);
+    mockStorage.getGame.mockResolvedValueOnce({ title: "Broken Game" });
+
+    const app = createApp();
+    const response = await request(app).get("/api/imports/pending");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual([
+      expect.objectContaining({
+        id: "d-other",
+        passwordRequired: false,
+        errorMessage: "archive is corrupt or incomplete",
+      }),
+    ]);
+  });
+
+  // --- POST /:id/confirm — password field ---
+
+  it("POST /:id/confirm forwards the password to confirmImport when unpack is requested", async () => {
+    mockStorage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/data" }));
+    mockImportManager.confirmImport.mockResolvedValue(undefined);
+
+    const app = createApp();
+    const response = await request(app).post("/api/imports/dl-1/confirm").send({
+      strategy: "pc",
+      proposedPath: "/data/PC/Game",
+      unpack: true,
+      password: "hunter2",
+    });
+
+    expect(response.status).toBe(200);
+    expect(mockImportManager.confirmImport).toHaveBeenCalledWith(
+      "dl-1",
+      expect.objectContaining({ unpack: true, password: "hunter2" }),
+      "user-1"
+    );
+  });
+
+  it("POST /:id/confirm returns 400 with passwordRequired when confirmImport rejects with a password error", async () => {
+    const { ArchivePasswordRequiredError } = await import("../services/ArchiveService.js");
+    mockStorage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/data" }));
+    mockImportManager.confirmImport.mockRejectedValue(
+      new ArchivePasswordRequiredError("The provided password was rejected — it may be incorrect.")
+    );
+
+    const app = createApp();
+    const response = await request(app).post("/api/imports/dl-1/confirm").send({
+      strategy: "pc",
+      proposedPath: "/data/PC/Game",
+      unpack: true,
+      password: "wrongpass",
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({
+      error: "The provided password was rejected — it may be incorrect.",
+      passwordRequired: true,
+    });
+  });
+
+  it("POST /:id/confirm returns 400 for a password containing a null byte", async () => {
+    mockStorage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/data" }));
+
+    const app = createApp();
+    const response = await request(app).post("/api/imports/dl-1/confirm").send({
+      strategy: "pc",
+      proposedPath: "/data/PC/Game",
+      unpack: true,
+      password: "hunter\x002",
+    });
+
+    expect(response.status).toBe(400);
+    expect(mockImportManager.confirmImport).not.toHaveBeenCalled();
+  });
+
+  // --- GET /api/imports/hardlink/check ---
+
+  it("GET /hardlink/check returns 200 with sameDevice:true when paths are on the same device", async () => {
+    mockStorage.getEnabledDownloaders.mockResolvedValue([
+      { id: "dl-1", downloadPath: "/downloads", url: "http://localhost:8080" },
+    ]);
+    const mappings = [
+      {
+        id: "mapping-1",
+        remotePath: "/downloads",
+        localPath: "/mapped/downloads",
+        remoteHost: "localhost",
+      },
+    ];
+    mockStorage.getPathMappings.mockResolvedValue(mappings);
+    mockPathMappingService.translatePath.mockResolvedValue("/mapped/downloads");
+
+    const sharedStat = { dev: 42, isDirectory: () => true };
+    fsMock.stat.mockResolvedValue(sharedStat);
+    fsMock.writeFile.mockResolvedValue(undefined);
+    fsMock.link.mockResolvedValue(undefined);
+    fsMock.remove.mockResolvedValue(undefined);
+
+    const app = createApp();
+    const response = await request(app).get("/api/imports/hardlink/check");
+
+    expect(response.status).toBe(200);
+    expect(response.body.generic.supportedForAll).toBe(true);
+    expect(response.body.generic.checkedSources).toHaveLength(1);
+    expect(response.body.generic.checkedSources[0].sameDevice).toBe(true);
+    expect(mockPathMappingService.translatePath).toHaveBeenCalledWith(
+      "/downloads",
+      "localhost",
+      mappings
+    );
+  });
+
+  it("GET /hardlink/check returns sameDevice:false when paths are on different devices", async () => {
+    mockStorage.getEnabledDownloaders.mockResolvedValue([
+      { id: "dl-1", downloadPath: "/downloads", url: "http://localhost:8080" },
+    ]);
+    mockStorage.getPathMappings.mockResolvedValue([]);
+
+    fsMock.stat.mockImplementation((p: string) => {
+      if (p.endsWith("downloads") || p.includes("downloads")) {
+        return Promise.resolve({ dev: 1, isDirectory: () => true });
+      }
+      return Promise.resolve({ dev: 2, isDirectory: () => true });
+    });
+
+    const app = createApp();
+    const response = await request(app).get("/api/imports/hardlink/check");
+
+    expect(response.status).toBe(200);
+    expect(response.body.generic.supportedForAll).toBe(false);
+    expect(response.body.generic.checkedSources[0].sameDevice).toBe(false);
+    expect(response.body.generic.checkedSources[0].reason).toMatch(/different filesystems/i);
+  });
+
+  it("GET /hardlink/check returns 500 when getEnabledDownloaders rejects", async () => {
+    mockStorage.getEnabledDownloaders.mockRejectedValue(new Error("db failure"));
+
+    const app = createApp();
+    const response = await request(app).get("/api/imports/hardlink/check");
+
+    expect(response.status).toBe(500);
+    expect(response.body.error).toMatch(/hardlink/i);
+  });
+});

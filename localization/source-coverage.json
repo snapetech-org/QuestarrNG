@@ -5075,7 +5075,9 @@
         "server/routes/import.ts",
         "server/routes.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/integration_api.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5094,7 +5096,9 @@
         "server/routes/import.ts",
         "server/routes.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/integration_api.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5113,7 +5117,9 @@
         "server/routes/import.ts",
         "server/routes.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/integration_api.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5132,7 +5138,9 @@
         "server/routes/import.ts",
         "server/routes.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/integration_api.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5151,7 +5159,9 @@
         "server/routes/import.ts",
         "server/routes.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/import_routes_coverage.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5170,7 +5180,10 @@
         "server/routes/import.ts",
         "server/routes.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/import_routes_coverage.test.ts",
+        "server/__tests__/import_routes_additional.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5208,7 +5221,9 @@
         "server/routes/import.ts",
         "server/routes.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/import_routes_coverage.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5227,7 +5242,10 @@
         "server/routes/import.ts",
         "server/routes.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/import_routes_coverage.test.ts",
+        "server/__tests__/import_routes_additional.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5246,7 +5264,9 @@
         "server/routes/import.ts",
         "server/routes.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/import_routes_coverage.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5265,7 +5285,10 @@
         "server/routes/import.ts",
         "server/routes.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/import_routes_coverage.test.ts",
+        "server/__tests__/import_routes_additional.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5284,7 +5307,9 @@
         "server/routes/import.ts",
         "server/routes.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/import_routes_additional.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5303,7 +5328,9 @@
         "server/routes/import.ts",
         "server/routes.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/import_routes_additional.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5341,7 +5368,9 @@
         "server/routes/import.ts",
         "server/routes.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/api_routes.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5360,7 +5389,10 @@
         "server/routes/import.ts",
         "server/routes.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/import_routes_security.test.ts",
+        "server/__tests__/import_routes_additional.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5378,7 +5410,9 @@
         "server/services/ArchiveService.ts",
         "server/services/ImportManager.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/archive_service.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5396,7 +5430,9 @@
         "server/services/ArchiveService.ts",
         "server/services/ImportManager.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/archive_service.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5414,7 +5450,9 @@
         "server/services/ArchiveService.ts",
         "server/services/ImportManager.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/import_manager.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5432,7 +5470,9 @@
         "server/services/ArchiveService.ts",
         "server/services/ImportManager.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/import_manager_additional.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5450,7 +5490,9 @@
         "server/services/ArchiveService.ts",
         "server/services/ImportManager.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/import_manager_additional.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5468,7 +5510,10 @@
         "server/services/ArchiveService.ts",
         "server/services/ImportManager.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/import_manager_additional.test.ts",
+        "server/__tests__/import_manager.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5486,7 +5531,9 @@
         "server/services/ArchiveService.ts",
         "server/services/ImportManager.ts"
       ],
-      "coverage": [],
+      "coverage": [
+        "server/__tests__/import_manager.test.ts"
+      ],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
