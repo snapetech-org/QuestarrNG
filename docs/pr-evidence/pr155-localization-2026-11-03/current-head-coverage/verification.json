@@ -1,0 +1,20 @@
+{
+  "activeUnresolvedRecords": 0,
+  "attestedInputHead": "0ea966692f4dec72e8830ebc1f085549968c587e",
+  "attestedInputTree": "edc78b5261b481ab8afd044df8371bb21f5d4d14",
+  "auditChecksumListSha256": "cd98ea36c0c37f51bd391409c14b5b93faf5241debc4db7d5104b59d886be0be",
+  "auditSha256": "e0033a66c3f61ab750041ff97d2944c3e649134c7adb48d754bea14fe66c1ca6",
+  "catalogPathsChanged": [],
+  "compareLocalizationPaths": [
+    "localization/source-coverage.json"
+  ],
+  "currentSourceCoverageSha256": "8067518d6eb7148470897d6dfa346f2893e6de7465e049b91b6d8b13fb300bfb",
+  "directCells": 31080,
+  "locales": 12,
+  "postInputCommitPaths": [],
+  "resolvedReviewRecords": 36960,
+  "result": "PASS",
+  "sourceIds": 2590,
+  "workingHead": "0ea966692f4dec72e8830ebc1f085549968c587e",
+  "workingTree": "edc78b5261b481ab8afd044df8371bb21f5d4d14"
+}
