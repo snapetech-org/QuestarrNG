@@ -6,6 +6,7 @@ import type {
   DownloadDetails,
 } from "../../shared/schema.js";
 import { downloadersLogger } from "../logger.js";
+import { parseJsonObject } from "../../shared/json-object-utils.js";
 import { randomUUID } from "node:crypto";
 import parseTorrent from "parse-torrent";
 import { isSafeUrl, safeFetch } from "../ssrf.js";
@@ -87,6 +88,14 @@ export class QBittorrentClient implements DownloaderClient {
 
   constructor(downloader: Downloader) {
     this.downloader = downloader;
+  }
+
+  private usesApiKeyAuth(): boolean {
+    return parseJsonObject(this.downloader.settings).authMode === "api_key";
+  }
+
+  private getApiKey(): string {
+    return this.downloader.password?.trim() ?? "";
   }
 
   async testConnection(): Promise<{ success: boolean; message: string }> {
@@ -1398,6 +1407,15 @@ export class QBittorrentClient implements DownloaderClient {
    * request itself fails.
    */
   private async authenticate(force = false, requestSignal?: AbortSignal): Promise<void> {
+    if (this.usesApiKeyAuth()) {
+      if (!this.getApiKey()) {
+        throw new Error("qBittorrent API key is required when API-key authentication is enabled");
+      }
+      assertCredentialsAllowed(this.downloader, this.getBaseUrl() + "/api/v2/app/version", "qBittorrent");
+      this.cookie = null;
+      return;
+    }
+
     if (this.cookie && !force) {
       return; // Already authenticated
     }
@@ -1563,7 +1581,12 @@ export class QBittorrentClient implements DownloaderClient {
       ...additionalHeaders,
     };
 
-    if (this.cookie) {
+    if (this.usesApiKeyAuth()) {
+      const apiKey = this.getApiKey();
+      if (!apiKey) throw new Error("qBittorrent API key is required");
+      assertCredentialsAllowed(this.downloader, url, "qBittorrent");
+      headers["Authorization"] = `Bearer ${apiKey}`;
+    } else if (this.cookie) {
       headers["Cookie"] = this.cookie;
     }
 
@@ -1572,7 +1595,10 @@ export class QBittorrentClient implements DownloaderClient {
         method,
         path,
         hasCookie: !!this.cookie,
-        hasAuth: !!(this.downloader.username && this.downloader.password),
+        hasAuth: this.usesApiKeyAuth()
+          ? !!this.getApiKey()
+          : !!(this.downloader.username && this.downloader.password),
+        authMode: this.usesApiKeyAuth() ? "api_key" : "session",
       },
       "Making qBittorrent request"
     );
@@ -1585,10 +1611,16 @@ export class QBittorrentClient implements DownloaderClient {
       ...(requestBody !== undefined ? { body: requestBody } : {}),
       signal: requestSignal ?? AbortSignal.timeout(30000),
       requireHttps: isHttpsUrl(url),
+      // qBittorrent API keys are scoped to this origin; do not forward them
+      // across an HTTP redirect to another host or scheme.
+      redirect: this.usesApiKeyAuth() ? "manual" : "follow",
     });
     await logDownloaderDebugResponse("qBittorrent", method, url, response);
 
-    if (response.status === 403 || response.status === 401) {
+    if (
+      (response.status === 403 || response.status === 401) &&
+      !this.usesApiKeyAuth()
+    ) {
       // Session expired or unauthorized, re-authenticate
       downloadersLogger.debug({ status: response.status, path }, "Got 403/401, re-authenticating");
       this.cookie = null;

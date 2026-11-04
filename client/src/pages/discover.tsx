@@ -20,6 +20,14 @@ import { Button } from "@/components/ui/button";
 import DiscoverSettingsModal from "@/components/DiscoverSettingsModal";
 import { Link } from "wouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import RssFeedList from "@/components/RssFeedList";
 import RssSettings from "@/components/RssSettings";
 import { Rss } from "lucide-react";
@@ -31,6 +39,48 @@ import { useInterfaceLanguage, formatInterfaceMessage } from "@/lib/interface-lo
 import { InterfaceText } from "@/components/InterfaceText";
 
 const EMPTY_GAMES: Game[] = [];
+const MAX_BULK_DISCOVERY_GAMES = 100;
+
+interface BulkDiscoveryResult {
+  addedCount: number;
+  duplicateCount: number;
+  errorCount: number;
+}
+
+function safeCatalogImageUrl(value: string | null | undefined): string | null {
+  if (!value || value.length > 2048) return null;
+  try {
+    return new URL(value).protocol === "https:" ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+function toBulkDiscoveryCatalogGame(game: Game) {
+  return {
+    igdbId: game.igdbId ?? undefined,
+    rawgId: game.rawgId ?? undefined,
+    rawgSlug: game.rawgSlug ?? undefined,
+    title: game.title,
+    summary: game.summary?.slice(0, 20000) ?? null,
+    coverUrl: safeCatalogImageUrl(game.coverUrl),
+    releaseDate: game.releaseDate ?? null,
+    rating: game.rating ?? null,
+    aggregatedRating: game.aggregatedRating ?? null,
+    platforms: game.platforms ?? undefined,
+    genres: game.genres ?? undefined,
+    themes: game.themes ?? undefined,
+    publishers: game.publishers ?? undefined,
+    developers: game.developers ?? undefined,
+    screenshots: (game.screenshots ?? []).flatMap((url) => {
+      const safeUrl = safeCatalogImageUrl(url);
+      return safeUrl ? [safeUrl] : [];
+    }).slice(0, 100),
+    earlyAccess: game.earlyAccess ?? false,
+    isAdultContent: game.isAdultContent ?? false,
+    isAgeRestricted: game.isAgeRestricted ?? false,
+  };
+}
 
 interface Genre {
   id: number;
@@ -105,6 +155,8 @@ export default function DiscoverPage() {
   const [rawgSearch, setRawgSearch] = useState("");
   const [hideOwned, setHideOwned] = useLocalStorageState("discoverHideOwned", false);
   const [hideWanted, setHideWanted] = useLocalStorageState("discoverHideWanted", false);
+  const [bulkSelection, setBulkSelection] = useState<Map<string, Game>>(() => new Map());
+  const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false);
 
   // ⚡ Bolt: Using the useDebounce hook to limit the frequency of API calls
   const debouncedGenre = useDebounce(selectedGenre, 300);
@@ -201,6 +253,35 @@ export default function DiscoverPage() {
       hiddenGames: hiddenList,
     };
   }, [localGames]);
+
+  const selectedGameIds = useMemo(() => new Set(bulkSelection.keys()), [bulkSelection]);
+  const canBulkSelect = useCallback(
+    (game: Game) =>
+      !(
+        (game.igdbId != null && igdbToLocalIdMap.has(game.igdbId)) ||
+        (game.rawgId != null && rawgToLocalIdMap.has(game.rawgId))
+      ),
+    [igdbToLocalIdMap, rawgToLocalIdMap]
+  );
+  const handleToggleBulkSelection = useCallback(
+    (game: Game) => {
+      if (bulkSelection.has(game.id)) {
+        const nextSelection = new Map(bulkSelection);
+        nextSelection.delete(game.id);
+        setBulkSelection(nextSelection);
+        return;
+      }
+      if (!canBulkSelect(game)) return;
+      if (bulkSelection.size >= MAX_BULK_DISCOVERY_GAMES) {
+        toast({
+          description: textNode("Select up to 100 games at a time"),
+        });
+        return;
+      }
+      setBulkSelection(new Map(bulkSelection).set(game.id, game));
+    },
+    [bulkSelection, canBulkSelect, textNode, toast]
+  );
 
   // Carousels cache their already-filtered lists, so their keys carry what the
   // filter depends on: tracking, hiding or changing a game's status refetches them.
@@ -416,6 +497,37 @@ export default function DiscoverPage() {
           variant: "destructive",
         });
       }
+    },
+  });
+
+  const bulkAddMutation = useMutation<BulkDiscoveryResult, Error, Game[]>({
+    mutationFn: async (games) => {
+      const response = await apiRequest("POST", "/api/games/bulk-discovery", {
+        games: games.map(toBulkDiscoveryCatalogGame),
+      });
+      return response.json();
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/games"] });
+      setBulkConfirmOpen(false);
+      if (result.errorCount === 0) setBulkSelection(new Map());
+      toast({
+        description: formatInterfaceMessage(
+          "Bulk add finished: {added} added, {duplicates} already in your library, {errors} failed.",
+          {
+            added: result.addedCount,
+            duplicates: result.duplicateCount,
+            errors: result.errorCount,
+          }
+        ),
+        variant: result.errorCount > 0 ? "destructive" : "default",
+      });
+    },
+    onError: (error) => {
+      toast({
+        description: error.message || t("Failed to add selected games"),
+        variant: "destructive",
+      });
     },
   });
 
@@ -724,6 +836,79 @@ export default function DiscoverPage() {
             </div>
           </div>
 
+          {bulkSelection.size > 0 && (
+            <div className="flex flex-col gap-3 rounded-lg border bg-card p-3 sm:flex-row sm:items-center sm:justify-between">
+              <p
+                className="text-sm font-medium"
+                lang={languageFor("{count} games selected")}
+                dir={directionFor("{count} games selected")}
+              >
+                {formatInterfaceMessage("{count} games selected", { count: bulkSelection.size })}
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setBulkConfirmOpen(true)}
+                  disabled={bulkAddMutation.isPending}
+                >
+                  <InterfaceText source="Add selected to Wanted" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => setBulkSelection(new Map())}
+                  disabled={bulkAddMutation.isPending}
+                >
+                  <InterfaceText source="Clear selection" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          <Dialog open={bulkConfirmOpen} onOpenChange={setBulkConfirmOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
+                  <InterfaceText source="Add selected games to Wanted?" />
+                </DialogTitle>
+                <DialogDescription>
+                  <InterfaceText source="This adds the selected games to Wanted and will not start downloads." />
+                </DialogDescription>
+              </DialogHeader>
+              <ul className="max-h-48 space-y-1 overflow-y-auto rounded-md border p-3 text-sm">
+                {[...bulkSelection.values()].slice(0, 10).map((game) => (
+                  <li key={game.id} className="truncate">{game.title}</li>
+                ))}
+                {bulkSelection.size > 10 && (
+                  <li className="text-muted-foreground">
+                    {formatInterfaceMessage("and {count} more", { count: bulkSelection.size - 10 })}
+                  </li>
+                )}
+              </ul>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setBulkConfirmOpen(false)}
+                  disabled={bulkAddMutation.isPending}
+                >
+                  <InterfaceText source="Cancel" />
+                </Button>
+                <Button
+                  onClick={() => bulkAddMutation.mutate([...bulkSelection.values()])}
+                  disabled={bulkAddMutation.isPending || bulkSelection.size === 0}
+                >
+                  {bulkAddMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <InterfaceText source="Adding..." />
+                    </>
+                  ) : (
+                    <InterfaceText source="Add selected" />
+                  )}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
           <TabsContent value="igdb" className="space-y-8">
             <div className="flex justify-end">
               <Button
@@ -761,6 +946,9 @@ export default function DiscoverPage() {
               onTrackGame={handleTrackGame}
               onToggleHidden={handleToggleHidden}
               isDiscovery={true}
+              selectedGameIds={selectedGameIds}
+              onToggleBulkSelection={handleToggleBulkSelection}
+              canBulkSelect={canBulkSelect}
             />
 
             {/* Recent Releases Section */}
@@ -774,6 +962,9 @@ export default function DiscoverPage() {
               onTrackGame={handleTrackGame}
               onToggleHidden={handleToggleHidden}
               isDiscovery={true}
+              selectedGameIds={selectedGameIds}
+              onToggleBulkSelection={handleToggleBulkSelection}
+              canBulkSelect={canBulkSelect}
             />
 
             {/* Upcoming Releases Section */}
@@ -787,6 +978,9 @@ export default function DiscoverPage() {
               onTrackGame={handleTrackGame}
               onToggleHidden={handleToggleHidden}
               isDiscovery={true}
+              selectedGameIds={selectedGameIds}
+              onToggleBulkSelection={handleToggleBulkSelection}
+              canBulkSelect={canBulkSelect}
             />
 
             {/* By Genre Section */}
@@ -828,6 +1022,9 @@ export default function DiscoverPage() {
                 onTrackGame={handleTrackGame}
                 onToggleHidden={handleToggleHidden}
                 isDiscovery={true}
+              selectedGameIds={selectedGameIds}
+              onToggleBulkSelection={handleToggleBulkSelection}
+              canBulkSelect={canBulkSelect}
               />
             </div>
 
@@ -875,6 +1072,9 @@ export default function DiscoverPage() {
                   onTrackGame={handleTrackGame}
                   onToggleHidden={handleToggleHidden}
                   isDiscovery={true}
+              selectedGameIds={selectedGameIds}
+              onToggleBulkSelection={handleToggleBulkSelection}
+              canBulkSelect={canBulkSelect}
                 />
               </div>
             )}
@@ -908,6 +1108,9 @@ export default function DiscoverPage() {
                   onTrackGame={handleTrackGame}
                   onToggleHidden={handleToggleHidden}
                   isDiscovery={true}
+              selectedGameIds={selectedGameIds}
+              onToggleBulkSelection={handleToggleBulkSelection}
+              canBulkSelect={canBulkSelect}
                 />
               ) : (
                 <>
@@ -920,6 +1123,9 @@ export default function DiscoverPage() {
                     onTrackGame={handleTrackGame}
                     onToggleHidden={handleToggleHidden}
                     isDiscovery={true}
+              selectedGameIds={selectedGameIds}
+              onToggleBulkSelection={handleToggleBulkSelection}
+              canBulkSelect={canBulkSelect}
                   />
                   <GameCarouselSection
                     title="Recent Releases"
@@ -930,6 +1136,9 @@ export default function DiscoverPage() {
                     onTrackGame={handleTrackGame}
                     onToggleHidden={handleToggleHidden}
                     isDiscovery={true}
+              selectedGameIds={selectedGameIds}
+              onToggleBulkSelection={handleToggleBulkSelection}
+              canBulkSelect={canBulkSelect}
                   />
                   <GameCarouselSection
                     title="Upcoming Games"
@@ -940,6 +1149,9 @@ export default function DiscoverPage() {
                     onTrackGame={handleTrackGame}
                     onToggleHidden={handleToggleHidden}
                     isDiscovery={true}
+              selectedGameIds={selectedGameIds}
+              onToggleBulkSelection={handleToggleBulkSelection}
+              canBulkSelect={canBulkSelect}
                   />
                 </>
               )}

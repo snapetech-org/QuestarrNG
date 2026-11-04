@@ -6,6 +6,7 @@ import { param } from "express-validator";
 import { createServer, type Server } from "http";
 import { storage, type IStorage } from "./storage.js";
 import { stripUndefined } from "./object-utils.js";
+import { normalizeTitle } from "../shared/title-utils.js";
 import { normalizeDownloadHash, normalizeTrackedKey } from "./download-hash.js";
 import { checkDownloadStatus, withGameOperationLock } from "./cron.js";
 import { igdbClient } from "./igdb.js";
@@ -15,6 +16,7 @@ import { pingDatabase } from "./db.js";
 import {
   insertGameSchema,
   insertGameDownloadSchema,
+  GAME_STATUSES,
   updateGameStatusSchema,
   updateGameHiddenSchema,
   updateGameUserRatingSchema,
@@ -296,8 +298,8 @@ import {
   scanRootFolderById,
   rescanRootFolderById,
   scanAllEnabledRootFolders,
-  getAllScanProgress,
-  getAllUnmatched,
+  getUserScanProgress,
+  getUserUnmatched,
   matchUnmatchedFolder,
   searchUnmatchedFolder,
 } from "./library-scanner.js";
@@ -308,6 +310,29 @@ import { apiKeysRouter } from "./routes/api-keys.js";
 const CC_IGDB_METADATA = "public, max-age=86400, stale-while-revalidate=3600";
 // Adult-content filtering makes game-list responses vary per user, so they must not be shared-cacheable
 const CC_IGDB_GAME_LIST_PRIVATE = "private, max-age=3600, stale-while-revalidate=600";
+
+function preferExistingMetadata<T>(
+  existing: T,
+  incoming: T | null | undefined,
+  overwrite: boolean
+): T;
+function preferExistingMetadata<T>(
+  existing: T | null | undefined,
+  incoming: T | null | undefined,
+  overwrite: boolean
+): T | null | undefined;
+function preferExistingMetadata<T>(
+  existing: T | null | undefined,
+  incoming: T | null | undefined,
+  overwrite: boolean
+): T | null | undefined {
+  const empty =
+    existing == null ||
+    (typeof existing === "string" && existing.trim().length === 0) ||
+    (Array.isArray(existing) && existing.length === 0);
+  if (incoming == null) return existing;
+  return overwrite || empty ? incoming : existing;
+}
 
 interface StorageCacheItem {
   downloaderId: string;
@@ -2341,13 +2366,294 @@ export async function registerRoutes(app: Express): Promise<Server> {
     igdbUrl: z.string().optional(),
   });
 
+  // Versioned, metadata-only collection interchange. Local filesystem paths,
+  // credentials, download records, and server-specific settings are deliberately
+  // excluded so an export can move between QuestarrNG installs safely.
+  const catalogHttpsUrlSchema = z
+    .string()
+    .url()
+    .max(2048)
+    .refine((value) => {
+      try {
+        return new URL(value).protocol === "https:";
+      } catch {
+        return false;
+      }
+    }, "Image URLs must use HTTPS");
+  const catalogImageUrlSchema = catalogHttpsUrlSchema.nullable().optional();
+
+  const libraryCatalogGameSchema = z
+    .object({
+      igdbId: z.number().int().positive().nullable().optional(),
+      rawgId: z.number().int().positive().nullable().optional(),
+      rawgSlug: z.string().trim().max(500).nullable().optional(),
+      steamAppId: z.number().int().positive().nullable().optional(),
+      title: z.string().trim().min(1).max(500),
+      summary: z.string().max(20000).nullable().optional(),
+      coverUrl: catalogImageUrlSchema,
+      releaseDate: z.string().max(40).nullable().optional(),
+      rating: z.number().min(0).max(100).nullable().optional(),
+      aggregatedRating: z.number().min(0).max(100).nullable().optional(),
+      platforms: z.array(z.string().trim().min(1).max(120)).max(100).optional(),
+      genres: z.array(z.string().trim().min(1).max(120)).max(100).optional(),
+      themes: z.array(z.string().trim().min(1).max(120)).max(100).optional(),
+      publishers: z.array(z.string().trim().min(1).max(200)).max(100).optional(),
+      developers: z.array(z.string().trim().min(1).max(200)).max(100).optional(),
+      screenshots: z.array(catalogHttpsUrlSchema).max(100).optional(),
+      status: z.enum(GAME_STATUSES).optional(),
+      userRating: z.number().min(0).max(10).nullable().optional(),
+      hidden: z.boolean().optional(),
+      earlyAccess: z.boolean().optional(),
+      isAdultContent: z.boolean().optional(),
+      isAgeRestricted: z.boolean().optional(),
+    })
+    .strict();
+
+  const libraryCatalogSchema = z
+    .object({
+      format: z.literal("questarrng-library"),
+      version: z.literal(1),
+      exportedAt: z.string().datetime().optional(),
+      games: z.array(libraryCatalogGameSchema).max(1000),
+    })
+    .strict();
+
+  const catalogIdentityKeys = (game: z.infer<typeof libraryCatalogGameSchema>): string[] => {
+    const keys: string[] = [];
+    if (game.igdbId != null) keys.push(`igdb:${game.igdbId}`);
+    if (game.rawgId != null) keys.push(`rawg:${game.rawgId}`);
+    if (game.steamAppId != null) keys.push(`steam:${game.steamAppId}`);
+    const title = normalizeTitle(game.title);
+    if (title) keys.push(`title:${title}:${game.releaseDate ?? ""}`);
+    return keys;
+  };
+
+  const catalogIdentitySet = (games: Game[]): Set<string> => {
+    const keys = new Set<string>();
+    for (const game of games) {
+      if (game.igdbId != null) keys.add(`igdb:${game.igdbId}`);
+      if (game.rawgId != null) keys.add(`rawg:${game.rawgId}`);
+      if (game.steamAppId != null) keys.add(`steam:${game.steamAppId}`);
+      const title = normalizeTitle(game.title);
+      if (title) keys.add(`title:${title}:${game.releaseDate ?? ""}`);
+    }
+    return keys;
+  };
+
+  const bulkDiscoveryRequestSchema = z
+    .object({
+      games: z.array(libraryCatalogGameSchema).min(1).max(100),
+    })
+    .strict();
+
+  app.post(
+    "/api/games/bulk-discovery",
+    authenticateToken,
+    sensitiveEndpointLimiter,
+    async (req: Request, res: Response) => {
+      const parsed = bulkDiscoveryRequestSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({
+          error: "Invalid discovery batch",
+          details: parsed.error.issues,
+        });
+      }
+
+      try {
+        const userId = req.user!.id;
+        const existingGames = await storage.getUserGames(userId, true);
+        const seen = catalogIdentitySet(existingGames);
+        let addedCount = 0;
+        let duplicateCount = 0;
+        let errorCount = 0;
+
+        for (const discoveryGame of parsed.data.games) {
+          const keys = catalogIdentityKeys(discoveryGame);
+          if (keys.some((key) => seen.has(key))) {
+            duplicateCount += 1;
+            continue;
+          }
+
+          try {
+            const insert = insertGameSchema.parse({
+              ...discoveryGame,
+              userId,
+              source: "api",
+              status: "wanted",
+              hidden: false,
+              userRating: null,
+            });
+            await storage.addGame(normalizeInitialReleaseStatus(insert));
+            keys.forEach((key) => seen.add(key));
+            addedCount += 1;
+          } catch (error) {
+            errorCount += 1;
+            routesLogger.warn(
+              { error, title: discoveryGame.title },
+              "skipping invalid discovery game"
+            );
+          }
+        }
+
+        return res.json({
+          success: errorCount === 0,
+          addedCount,
+          duplicateCount,
+          errorCount,
+        });
+      } catch (error) {
+        routesLogger.error({ error }, "error adding discovery batch");
+        return res.status(500).json({ error: "Failed to add selected games" });
+      }
+    }
+  );
+
+  app.get("/api/games/export", authenticateToken, sensitiveEndpointLimiter, async (req, res) => {
+    try {
+      const games = await storage.getUserGames(req.user!.id, true);
+      const catalog = {
+        format: "questarrng-library" as const,
+        version: 1 as const,
+        exportedAt: new Date().toISOString(),
+        games: games.map((game) => ({
+          igdbId: game.igdbId,
+          rawgId: game.rawgId,
+          rawgSlug: game.rawgSlug,
+          steamAppId: game.steamAppId,
+          title: game.title,
+          summary: game.summary,
+          coverUrl:
+            game.coverUrl && catalogHttpsUrlSchema.safeParse(game.coverUrl).success
+              ? game.coverUrl
+              : null,
+          releaseDate: game.releaseDate,
+          rating: game.rating,
+          aggregatedRating: game.aggregatedRating,
+          platforms: game.platforms,
+          genres: game.genres,
+          themes: game.themes,
+          publishers: game.publishers,
+          developers: game.developers,
+          screenshots: (game.screenshots ?? []).filter(
+            (url) => catalogHttpsUrlSchema.safeParse(url).success
+          ),
+          status: game.status,
+          userRating: game.userRating,
+          hidden: game.hidden,
+          earlyAccess: game.earlyAccess,
+          isAdultContent: game.isAdultContent,
+          isAgeRestricted: game.isAgeRestricted,
+        })),
+      };
+      res.setHeader("Cache-Control", "no-store");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="questarrng-library-${new Date().toISOString().slice(0, 10)}.json"`
+      );
+      return res.json(catalog);
+    } catch (error) {
+      routesLogger.error({ error }, "error exporting game library");
+      return res.status(500).json({ error: "Failed to export game library" });
+    }
+  });
+
+  app.post(
+    "/api/games/import/preview",
+    authenticateToken,
+    sensitiveEndpointLimiter,
+    async (req, res) => {
+      const parsed = libraryCatalogSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({
+          error: "Invalid QuestarrNG library catalog",
+          details: parsed.error.issues,
+        });
+      }
+      try {
+        const existingGames = await storage.getUserGames(req.user!.id, true);
+        const seen = catalogIdentitySet(existingGames);
+        const addTitles: string[] = [];
+        const duplicateTitles: string[] = [];
+        for (const game of parsed.data.games) {
+          const keys = catalogIdentityKeys(game);
+          if (keys.some((key) => seen.has(key))) {
+            duplicateTitles.push(game.title);
+          } else {
+            addTitles.push(game.title);
+            keys.forEach((key) => seen.add(key));
+          }
+        }
+        return res.json({
+          totalCount: parsed.data.games.length,
+          addCount: addTitles.length,
+          duplicateCount: duplicateTitles.length,
+          addTitles,
+          duplicateTitles,
+        });
+      } catch (error) {
+        routesLogger.error({ error }, "error previewing game library import");
+        return res.status(500).json({ error: "Failed to preview game library import" });
+      }
+    }
+  );
+
+  app.post(
+    "/api/games/import",
+    authenticateToken,
+    sensitiveEndpointLimiter,
+    async (req, res) => {
+      const parsed = libraryCatalogSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({
+          error: "Invalid QuestarrNG library catalog",
+          details: parsed.error.issues,
+        });
+      }
+      try {
+        const existingGames = await storage.getUserGames(req.user!.id, true);
+        const seen = catalogIdentitySet(existingGames);
+        let addedCount = 0;
+        let skippedCount = 0;
+        let errorCount = 0;
+        for (const game of parsed.data.games) {
+          const keys = catalogIdentityKeys(game);
+          if (keys.some((key) => seen.has(key))) {
+            skippedCount += 1;
+            continue;
+          }
+          try {
+            const insert = insertGameSchema.parse({
+              ...game,
+              userId: req.user!.id,
+              source: "manual",
+            });
+            await storage.addGame(insert);
+            keys.forEach((key) => seen.add(key));
+            addedCount += 1;
+          } catch (error) {
+            errorCount += 1;
+            routesLogger.warn({ error, title: game.title }, "skipping invalid imported game");
+          }
+        }
+        return res.json({ success: errorCount === 0, addedCount, skippedCount, errorCount });
+      } catch (error) {
+        routesLogger.error({ error }, "error importing game library");
+        return res.status(500).json({ error: "Failed to import game library" });
+      }
+    }
+  );
+
   // Refresh metadata for all games
   app.post("/api/games/refresh-metadata", igdbRateLimiter, async (req, res) => {
     try {
       const userId = req.user!.id;
+      const overwriteMetadata = req.query.overwrite === "true";
       const userGames = await storage.getUserGames(userId, true);
 
-      routesLogger.info({ userId, gameCount: userGames.length }, "starting metadata refresh");
+      routesLogger.info(
+        { userId, gameCount: userGames.length, overwriteMetadata },
+        "starting metadata refresh"
+      );
 
       let updatedCount = 0;
       let errorCount = 0;
@@ -2386,25 +2692,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
               updates.push({
                 id: game.id,
                 data: {
-                  publishers: updatedData.publishers as string[],
-                  developers: updatedData.developers as string[],
-                  summary: updatedData.summary as string,
-                  rating: updatedData.rating as number | null,
-                  genres: updatedData.genres as string[],
-                  themes: updatedData.themes as string[],
-                  isAdultContent: updatedData.isAdultContent as boolean,
-                  isAgeRestricted: updatedData.isAgeRestricted as boolean,
-                  platforms: updatedData.platforms as string[],
-                  coverUrl: updatedData.coverUrl as string,
-                  screenshots: updatedData.screenshots as string[],
-                  releaseDate: updatedData.releaseDate as string,
-                  earlyAccess: updatedData.earlyAccess as boolean,
-                  igdbWebsites: z
-                    .array(z.object({ url: z.string(), category: z.number() }))
-                    .catch([])
-                    .parse(updatedData.igdbWebsites),
-                  expansions: gameExpansionSchema.array().catch([]).parse(updatedData.expansions),
-                  aggregatedRating: (updatedData.aggregatedRating as number | undefined) ?? null,
+                  publishers: preferExistingMetadata(
+                    game.publishers,
+                    updatedData.publishers as Game["publishers"],
+                    overwriteMetadata
+                  ),
+                  developers: preferExistingMetadata(
+                    game.developers,
+                    updatedData.developers as Game["developers"],
+                    overwriteMetadata
+                  ),
+                  summary: preferExistingMetadata(
+                    game.summary,
+                    updatedData.summary as Game["summary"],
+                    overwriteMetadata
+                  ),
+                  rating: preferExistingMetadata(
+                    game.rating,
+                    updatedData.rating as Game["rating"],
+                    overwriteMetadata
+                  ),
+                  genres: preferExistingMetadata(
+                    game.genres,
+                    updatedData.genres as Game["genres"],
+                    overwriteMetadata
+                  ),
+                  themes: preferExistingMetadata(
+                    game.themes,
+                    updatedData.themes as Game["themes"],
+                    overwriteMetadata
+                  ),
+                  isAdultContent: preferExistingMetadata(
+                    game.isAdultContent,
+                    updatedData.isAdultContent as Game["isAdultContent"],
+                    overwriteMetadata
+                  ),
+                  isAgeRestricted: preferExistingMetadata(
+                    game.isAgeRestricted,
+                    updatedData.isAgeRestricted as Game["isAgeRestricted"],
+                    overwriteMetadata
+                  ),
+                  platforms: preferExistingMetadata(
+                    game.platforms,
+                    updatedData.platforms as Game["platforms"],
+                    overwriteMetadata
+                  ),
+                  coverUrl: preferExistingMetadata(
+                    game.coverUrl,
+                    updatedData.coverUrl as Game["coverUrl"],
+                    overwriteMetadata
+                  ),
+                  screenshots: preferExistingMetadata(
+                    game.screenshots,
+                    updatedData.screenshots as Game["screenshots"],
+                    overwriteMetadata
+                  ),
+                  releaseDate: preferExistingMetadata(
+                    game.releaseDate,
+                    updatedData.releaseDate as Game["releaseDate"],
+                    overwriteMetadata
+                  ),
+                  earlyAccess: preferExistingMetadata(
+                    game.earlyAccess,
+                    updatedData.earlyAccess as Game["earlyAccess"],
+                    overwriteMetadata
+                  ),
+                  igdbWebsites: preferExistingMetadata(
+                    game.igdbWebsites,
+                    z.array(z.object({ url: z.string(), category: z.number() })).catch([]).parse(updatedData.igdbWebsites),
+                    overwriteMetadata
+                  ) as Game["igdbWebsites"],
+                  expansions: preferExistingMetadata(
+                    game.expansions,
+                    gameExpansionSchema.array().catch([]).parse(updatedData.expansions),
+                    overwriteMetadata
+                  ) as Game["expansions"],
+                  aggregatedRating: preferExistingMetadata(
+                    game.aggregatedRating,
+                    (updatedData.aggregatedRating as number | undefined) ?? null,
+                    overwriteMetadata
+                  ),
                 },
               });
             } catch (error) {
@@ -2438,7 +2805,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({
         success: true,
-        message: `Successfully refreshed metadata for ${updatedCount} games.${errorCount > 0 ? ` Failed for ${errorCount} games.` : ""}`,
+        message: `Successfully refreshed metadata for ${updatedCount} games. ${overwriteMetadata ? "Existing fields were replaced from IGDB." : "Existing fields were preserved; missing fields were filled."}${errorCount > 0 ? ` Failed for ${errorCount} games.` : ""}`,
         updatedCount,
         errorCount,
       });
@@ -2746,7 +3113,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/library/scan/status", authenticateToken, async (_req: Request, res: Response) => {
     try {
-      res.json(getAllScanProgress());
+      res.json(await getUserScanProgress(_req.user!.id));
     } catch (error) {
       routesLogger.error({ error }, "error reading scan status");
       res.status(500).json({ error: "Failed to read scan status" });
@@ -2758,7 +3125,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     authenticateToken,
     async (_req: Request, res: Response) => {
       try {
-        res.json(getAllUnmatched());
+        res.json(await getUserUnmatched(_req.user!.id));
       } catch (error) {
         routesLogger.error({ error }, "error reading unmatched list");
         res.status(500).json({ error: "Failed to read unmatched list" });
@@ -2779,7 +3146,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           folderName: string;
           query: string;
         };
-        res.json(await searchUnmatchedFolder(rootFolderId, folderName, query));
+        res.json(await searchUnmatchedFolder(rootFolderId, folderName, query, req.user!.id));
       } catch (error) {
         const msg = error instanceof Error ? error.message : "Unknown error";
         routesLogger.error({ error }, "error searching IGDB for unmatched folder");

@@ -22,6 +22,31 @@ import {
 } from "./utils.js";
 import { XMLParser } from "fast-xml-parser";
 
+function safeRTorrentDiagnosticUrl(rawUrl: string): string {
+  try {
+    const candidate = /^https?:\/\//i.test(rawUrl) ? rawUrl : `http://${rawUrl}`;
+    const url = new URL(candidate);
+    url.username = "";
+    url.password = "";
+    url.search = "";
+    url.hash = "";
+    return url.toString();
+  } catch {
+    return "[invalid downloader URL]";
+  }
+}
+
+function safeRTorrentDiagnosticError(message: string, downloader: Downloader): string {
+  let safe = message;
+  for (const secret of [downloader.password, downloader.username]) {
+    if (secret && secret.length >= 3) safe = safe.split(secret).join("[redacted]");
+  }
+  safe = safe
+    .replace(/https?:\/\/[^\s"'<>]+/gi, (value) => safeRTorrentDiagnosticUrl(value))
+    .replace(/([?&](?:api[_-]?key|token|password|username)=)[^&\s]*/gi, "$1[redacted]");
+  return safe.slice(0, 500);
+}
+
 /**
  * rTorrent/ruTorrent client implementation using XML-RPC protocol.
  *
@@ -50,7 +75,7 @@ export class RTorrentClient implements DownloaderClient {
       const version = await this.makeXMLRPCRequest("system.client_version", []);
       downloadersLogger.info(
         {
-          url: this.downloader.url,
+          url: safeRTorrentDiagnosticUrl(this.downloader.url),
           version,
         },
         "rTorrent connection test successful"
@@ -58,20 +83,20 @@ export class RTorrentClient implements DownloaderClient {
       return { success: true, message: `Connected to rTorrent v${version}` };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      const safeError = safeRTorrentDiagnosticError(errorMessage, this.downloader);
       downloadersLogger.error(
         {
-          error: errorMessage,
-          url: this.downloader.url,
-          username: this.downloader.username,
+          error: safeError,
+          url: safeRTorrentDiagnosticUrl(this.downloader.url),
           urlPath: this.downloader.urlPath || "RPC2",
         },
         "rTorrent connection test failed"
       );
 
       if (errorMessage.includes("Authentication failed")) {
-        return { success: false, message: errorMessage };
+        return { success: false, message: "Authentication failed" };
       }
-      return { success: false, message: `Failed to connect to rTorrent: ${errorMessage}` };
+      return { success: false, message: `Failed to connect to rTorrent: ${safeError}` };
     }
   }
 

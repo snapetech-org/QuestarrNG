@@ -27,6 +27,9 @@ interface GameCarouselSectionProps {
   onViewDetails?: (gameId: string) => void;
   onTrackGame?: (game: Game) => void;
   onToggleHidden?: (gameId: string, hidden: boolean) => void;
+  selectedGameIds?: Set<string>;
+  onToggleBulkSelection?: (game: Game) => void;
+  canBulkSelect?: (game: Game) => boolean;
   isDiscovery?: boolean;
 }
 
@@ -40,6 +43,9 @@ const GameCarouselSection = ({
   onViewDetails,
   onTrackGame,
   onToggleHidden,
+  selectedGameIds,
+  onToggleBulkSelection,
+  canBulkSelect,
   isDiscovery = true,
 }: GameCarouselSectionProps) => {
   const { t, languageFor, directionFor } = useInterfaceLanguage();
@@ -286,6 +292,9 @@ const GameCarouselSection = ({
                   onTrackGame={onTrackGame}
                   onToggleHidden={onToggleHidden}
                   isDiscovery={isDiscovery}
+                  isBulkSelected={selectedGameIds?.has(game.id)}
+                  bulkSelectionDisabled={canBulkSelect ? !canBulkSelect(game) : false}
+                  onToggleBulkSelection={onToggleBulkSelection}
                 />
               </CarouselItem>
             ))}

@@ -1058,9 +1058,13 @@ export default function SettingsPage() {
     }
   };
 
+  const [overwriteExistingMetadata, setOverwriteExistingMetadata] = useState(false);
   const refreshMetadataMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiRequest("POST", "/api/games/refresh-metadata");
+      const url = overwriteExistingMetadata
+        ? "/api/games/refresh-metadata?overwrite=true"
+        : "/api/games/refresh-metadata";
+      const res = await apiRequest("POST", url);
       return res.json();
     },
     onSuccess: (data) => {
@@ -3133,10 +3137,20 @@ export default function SettingsPage() {
                       <p className="text-xs text-muted-foreground">
                         <InterfaceText
                           source={
-                            "Update all games in your library with the latest information from IGDB."
+                            "Fill missing game details from IGDB. Existing metadata is preserved unless you enable overwrite."
                           }
                         />
                       </p>
+                      <div className="mt-2 flex items-center gap-2">
+                        <Switch
+                          id="overwrite-existing-game-metadata"
+                          checked={overwriteExistingMetadata}
+                          onCheckedChange={setOverwriteExistingMetadata}
+                        />
+                        <Label htmlFor="overwrite-existing-game-metadata" className="text-xs">
+                          <InterfaceText source={"Replace existing metadata"} />
+                        </Label>
+                      </div>
                     </div>
                     <Button
                       variant="outline"
