@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import GameCard from "./GameCard";
 import { type Game } from "@shared/schema";
 import { type GameStatus } from "./StatusBadge";
-import { useInterfaceLanguage } from "@/lib/interface-locale";
+import { getInterfaceLanguageDirection, useInterfaceLanguage } from "@/lib/interface-locale";
 import { InterfaceText } from "@/components/InterfaceText";
 
 interface GameCarouselSectionProps {
@@ -42,7 +42,8 @@ const GameCarouselSection = ({
   onToggleHidden,
   isDiscovery = true,
 }: GameCarouselSectionProps) => {
-  const { t, languageFor, directionFor } = useInterfaceLanguage();
+  const { language, t, languageFor, directionFor } = useInterfaceLanguage();
+  const carouselDirection = getInterfaceLanguageDirection(language);
   const displayTitle = t(title);
   const [api, setApi] = useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = useState(false);
@@ -271,6 +272,7 @@ const GameCarouselSection = ({
           opts={{
             align: "start",
             loop: false,
+            direction: carouselDirection,
           }}
           setApi={setApi}
           className={cn("w-full max-w-full transition-opacity", {
