@@ -70,17 +70,19 @@ const Carousel = React.forwardRef<
     api?.scrollNext();
   }, [api]);
 
+  const isRtl = orientation === "horizontal" && opts?.direction === "rtl";
+
   const handleKeyDown = React.useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
-      if (event.key === "ArrowLeft") {
+      if (event.key === (isRtl ? "ArrowRight" : "ArrowLeft")) {
         event.preventDefault();
         scrollPrev();
-      } else if (event.key === "ArrowRight") {
+      } else if (event.key === (isRtl ? "ArrowLeft" : "ArrowRight")) {
         event.preventDefault();
         scrollNext();
       }
     },
-    [scrollPrev, scrollNext]
+    [isRtl, scrollPrev, scrollNext]
   );
 
   React.useEffect(() => {
