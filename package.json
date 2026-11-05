@@ -210,9 +210,8 @@
     "@esbuild-kit/core-utils": {
       "esbuild": "^0.25.0"
     },
-    "qs": "^6.16.0",
-    "brace-expansion": "^5.0.12",
-    "minimatch": "^10.2.6",
+    "qs": "^6.16.1",
+    "minimatch": "^11.0.1",
     "fast-uri": "^3.1.9",
     "fast-copy": "^4.1.0",
     "source-map-js": "^1.2.2",
@@ -220,12 +219,11 @@
       "eslint": "^10.9.1"
     },
     "ip-address": "^10.7.4",
-    "body-parser": "^2.4.0",
-    "re2js": "^2.8.7"
+    "body-parser": "^2.4.0"
   },
   "allowScripts": {
     "esbuild@0.25.12": true,
-    "esbuild@0.28.1": true,
-    "bufferutil@4.1.0": true
+    "bufferutil@4.1.0": true,
+    "esbuild@0.28.2": true
   }
 }

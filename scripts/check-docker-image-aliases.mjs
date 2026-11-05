@@ -5,7 +5,7 @@ import process from "node:process";
 const aliases = ["main", "master", "latest", "stable"];
 const workflows = [
   [".github/workflows/fork-image.yml", 4],
-  [".github/workflows/sync-stable-image-aliases.yml", 2],
+  [".github/workflows/sync-stable-image-aliases.yml", 3],
 ];
 
 const readHead = process.argv.includes("--head");
@@ -19,9 +19,7 @@ function checkWorkflow(path, expectedCount) {
   const source = readPolicyFile(path);
   const publishLoops = [
     ...source.matchAll(/for tag in ([^\r\n;]+); do\r?\n([\s\S]*?)\r?\n[ \t]*done/gu),
-  ].filter(([, , body]) =>
-    /docker buildx imagetools create|^[ \t]*copy --authfile/mu.test(body)
-  );
+  ].filter(([, , body]) => /docker buildx imagetools create|^[ \t]*copy --authfile/mu.test(body));
 
   if (publishLoops.length !== expectedCount) {
     throw new Error(
