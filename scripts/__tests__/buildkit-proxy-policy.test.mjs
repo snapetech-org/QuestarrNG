@@ -32,9 +32,6 @@ describe("trusted-main BuildKit proxy policy", () => {
 
       expect(proxyGate).not.toContain("pull_request");
       expect(proxyGate).toContain("refs/heads/main");
-      expect(proxyGate).toContain("vars.NG_HOSTED_FIRST");
-      expect(proxyGate).toContain("vars.NG_FORCE_JIT");
-      expect(proxyGate).toContain("github.run_attempt > 1");
       expect(proxyGate).toContain("|| ''");
       for (const event of events) {
         expect(
@@ -69,13 +66,7 @@ describe("trusted-main BuildKit proxy policy", () => {
       expect(build.with["build-args"]).toContain("https_proxy=${{ env.BUILDKIT_EGRESS_PROXY }}");
       expect(build.with["build-args"]).toContain("NO_PROXY=localhost,127.0.0.1");
       expect(build.with["build-args"]).toContain("no_proxy=localhost,127.0.0.1");
-      const resolveProxy = ({
-        event = "push",
-        ref = "refs/heads/main",
-        attempt = 1,
-        hostedFirst = false,
-        forceJit = false,
-      } = {}) =>
+      const resolveProxy = ({ event = "push", ref = "refs/heads/main", attempt = 1 } = {}) =>
         runInNewContext(proxyGate.slice(3, -2), {
           github: {
             event_name: event,
@@ -83,10 +74,6 @@ describe("trusted-main BuildKit proxy policy", () => {
             ref_type: ref.startsWith("refs/tags/") ? "tag" : "branch",
             ref_name: ref.replace(/^refs\/(?:heads|tags)\//u, ""),
             run_attempt: attempt,
-          },
-          vars: {
-            NG_HOSTED_FIRST: hostedFirst ? "true" : "false",
-            NG_FORCE_JIT: forceJit ? "true" : "false",
           },
           contains: (values, value) => values.includes(value),
           fromJSON: JSON.parse,
@@ -96,8 +83,7 @@ describe("trusted-main BuildKit proxy policy", () => {
         expect(resolveProxy({ event })).toBe("http://10.0.2.100:3128");
       }
       expect(resolveProxy({ event: "pull_request" })).toBe("");
-      expect(resolveProxy({ hostedFirst: true })).toBe("");
-      expect(resolveProxy({ hostedFirst: true, attempt: 2 })).toBe("http://10.0.2.100:3128");
+      expect(resolveProxy({ event: "push", attempt: 2 })).toBe("http://10.0.2.100:3128");
       expect(resolveProxy({ ref: "refs/tags/v1.2.3" })).toBe(
         allowTags ? "http://10.0.2.100:3128" : ""
       );

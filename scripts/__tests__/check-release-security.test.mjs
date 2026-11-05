@@ -192,7 +192,7 @@ describe("release security gate", () => {
       },
     ];
     expect(sourceAnalysisBlockers(analyses, ref, commit_sha)).toEqual([]);
-    analyses[4].error = "SARIF processing failed";
+    analyses[0].error = "SARIF processing failed";
     expect(sourceAnalysisBlockers(analyses, ref, commit_sha)).toHaveLength(1);
   });
 
