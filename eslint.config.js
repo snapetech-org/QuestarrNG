@@ -9,7 +9,6 @@ export default tseslint.config(
     ignores: [
       "**/dist/**",
       "**/node_modules/**",
-      "vendor/node-forge/**",
       // Keep the proposed upstream cache fix byte-identical so its pinned source can be reviewed.
       "vendor/http-cache-semantics/index.js",
       "**/.git/**",

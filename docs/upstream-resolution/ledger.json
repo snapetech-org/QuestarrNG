@@ -14158,14 +14158,13 @@
       "review": {
         "status": "superseded",
         "findings": [
-          "The requested node-forge 1.4.0 fix is superseded by QuestarrNG vendoring node-forge 1.4.1-questarr.2, which is newer than the requested fixed version."
+          "The requested node-forge 1.4.0 fix is superseded by the official node-forge 1.4.1 dependency, qualified with the retained security regression tests."
         ],
         "acceptance": [
           "The bundled node-forge implementation is newer than the requested 1.4.0 version."
         ],
         "evidence": [
           "package.json",
-          "vendor/node-forge/package.json",
           "package-lock.json"
         ],
         "dependencies": []

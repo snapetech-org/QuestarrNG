@@ -1310,9 +1310,10 @@ the repository's pre-commit configuration.
 
 PR #497 is superseded by the merged preferred-groups work in #491, including
 the new search-to-settings action. PR #495 was closed as merged with #496; the
-fork's lockfile has `socket.io-parser` 4.2.7, and its vendored `node-forge` is
-1.4.1-questarr.2. Dependency PRs #498–502 are superseded by the newer locked
-versions and Codecov action already in the fork.
+fork's lockfile has `socket.io-parser` 4.2.7 and the official `node-forge` 1.4.1
+release. The obsolete local crypto fork was removed after its security regression
+tests passed against that release. Dependency PRs #498–502 are superseded by
+the newer locked versions and Codecov action already in the fork.
 
 Issue #503's seven reports are covered: downloader names are validated before
 testing or saving, while a client-managed default download path remains

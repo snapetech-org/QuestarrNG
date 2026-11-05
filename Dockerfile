@@ -15,7 +15,6 @@ RUN apk update && apk upgrade --no-cache && \
     apk add --no-cache g++ make python3
 
 COPY package*.json ./
-COPY vendor/node-forge ./vendor/node-forge
 RUN npm ci --ignore-scripts
 
 # Build RAR extraction support from RARLAB's pinned UnRAR 7.23 source. Building it for the
@@ -80,7 +79,6 @@ COPY --from=unrar-builder /usr/share/licenses/questarr/UNRAR-LICENSE.txt /usr/sh
 # Reuse node_modules from base and prune dev dependencies (avoids a second npm ci)
 COPY --from=base /app/node_modules ./node_modules
 COPY package*.json ./
-COPY vendor/node-forge ./vendor/node-forge
 
 # Once pruned, the base image's global npm CLI (with its own bundled node_modules, e.g.
 # tar, ip-address, brace-expansion) isn't needed at runtime: CMD below execs node

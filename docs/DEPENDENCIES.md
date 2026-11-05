@@ -57,3 +57,8 @@ _Reviewed 2026-10-06 against `main` at v1.9.2: the older React 19 and resolver b
 The matcher override requires minimatch 11.0.1 or newer. The obsolete
 brace-expansion override is removed because all consumers now require a patched
 release; the re2js override is removed because it has no remaining consumer.
+
+The official node-forge 1.4.1 release replaces the obsolete local crypto fork.
+The retained RSA DigestInfo, valid-signature, PEM and TLS regression tests pass
+against the registry package; the Docker build no longer copies a vendored
+crypto module into either stage.
