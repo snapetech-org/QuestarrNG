@@ -439,10 +439,14 @@ describe("qbittorrent remaining regression coverage", () => {
     await expect(guardedClient.testConnection()).resolves.toEqual({
       success: true,
       message: "Connected successfully to qBittorrent 4.6.0",
+      messageKey: "service.connected_successfully_version",
+      messageValues: { client: "qBittorrent", version: "4.6.0" },
     });
     await expect(guardedClient.testConnection()).resolves.toEqual({
       success: false,
       message: "Failed to connect to qBittorrent: offline",
+      messageKey: "service.connection_failed",
+      messageValues: { client: "qBittorrent", error: "offline" },
     });
 
     await expect(guardedClient.addDownload({ url: "", title: "Missing URL" })).resolves.toEqual({
@@ -642,6 +646,9 @@ describe("qbittorrent remaining regression coverage", () => {
       success: true,
       id: "recent-hash",
       message: "Download already exists (qBittorrent)",
+
+      messageKey: "service.download_already_exists",
+      messageValues: { client: "qBittorrent" },
     });
 
     expect(makeRequestSpy.mock.calls[0]?.[2]).toContain("savepath=");
@@ -718,6 +725,9 @@ describe("qbittorrent remaining regression coverage", () => {
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully",
+
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     setTimeoutSpy.mockRestore();
@@ -763,6 +773,9 @@ describe("qbittorrent remaining regression coverage", () => {
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully",
+
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     makeRequestSpy.mockReset();
@@ -869,6 +882,9 @@ describe("qbittorrent remaining regression coverage", () => {
       success: true,
       id: "recent-upload",
       message: "Download added successfully",
+
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     makeRequestSpy.mockReset();
@@ -904,6 +920,9 @@ describe("qbittorrent remaining regression coverage", () => {
       correlationTag: expect.stringMatching(/^questarr-(add|fallback)-/),
       message:
         "qBittorrent accepted the request, but the download is not confirmed yet. Check qBittorrent before retrying to avoid creating a duplicate.",
+
+      messageKey: "service.download_unconfirmed",
+      messageValues: {},
     });
     expect(result.id).toBeUndefined();
 
@@ -946,6 +965,9 @@ describe("qbittorrent remaining regression coverage", () => {
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully",
+
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     const uploadBody = makeRequestSpy.mock.calls[1]?.[2];
@@ -984,6 +1006,9 @@ describe("qbittorrent remaining regression coverage", () => {
     ).resolves.toEqual({
       success: false,
       message: "Failed to add download: Still weird",
+
+      messageKey: "service.download_add_failed",
+      messageValues: { error: "Still weird" },
     });
 
     makeRequestSpy.mockReset();
@@ -1007,6 +1032,9 @@ describe("qbittorrent remaining regression coverage", () => {
     ).resolves.toEqual({
       success: false,
       message: "Failed to add download: upload exploded",
+
+      messageKey: "service.download_add_failed",
+      messageValues: { error: "upload exploded" },
     });
 
     setTimeoutSpy.mockRestore();

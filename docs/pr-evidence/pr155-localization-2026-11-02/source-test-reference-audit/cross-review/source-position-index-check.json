@@ -1,0 +1,196 @@
+{
+  "producerLiteralOccurrenceCount": 32,
+  "sourceCoverageEntryIndexKeyChecks": [
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_key_limit_reached",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 229,
+      "sourcePosition": 230
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_failed_to_create_api_key",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 230,
+      "sourcePosition": 231
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_api_key_not_found",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 231,
+      "sourcePosition": 232
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_failed_to_revoke_api_key",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 232,
+      "sourcePosition": 233
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_failed_to_create_path_mapping",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 233,
+      "sourcePosition": 234
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_mapping_not_found",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 234,
+      "sourcePosition": 235
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_failed_to_update_path_mapping",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 235,
+      "sourcePosition": 236
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_failed_to_delete_path_mapping",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 236,
+      "sourcePosition": 237
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_download_not_found",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 237,
+      "sourcePosition": 238
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_download_was_linked_to_a_game_before_it_could_be_skipped",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 238,
+      "sourcePosition": 239
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_internal_server_error",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 239,
+      "sourcePosition": 240
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_this_download_does_not_need_to_be_linked_to_a_game",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 240,
+      "sourcePosition": 241
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_this_download_was_already_linked_to_a_game_by_another_request",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 241,
+      "sourcePosition": 242
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_romm_imports_are_disabled",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 242,
+      "sourcePosition": 243
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_igdb_search_failed",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 243,
+      "sourcePosition": 244
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_invalid_proposed_path",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 244,
+      "sourcePosition": 245
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_archive_password_rejected",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 245,
+      "sourcePosition": 246
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_archive_password_required",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 246,
+      "sourcePosition": 247
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_import_incomplete_scan_confirmation",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 247,
+      "sourcePosition": 248
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_import_source_path_unresolved",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 248,
+      "sourcePosition": 249
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_import_download_missing",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 249,
+      "sourcePosition": 250
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_import_game_for_download_missing",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 250,
+      "sourcePosition": 251
+    },
+    {
+      "emptyCoverageMatches": true,
+      "entryKeyMatches": true,
+      "key": "service.api_import_source_path_missing",
+      "ownerListsMatch": true,
+      "sourceCoverageEntryIndex": 251,
+      "sourcePosition": 252
+    }
+  ],
+  "uniqueProducerPaths": [
+    "server/routes.ts",
+    "server/routes/api-keys.ts",
+    "server/routes/import.ts",
+    "server/services/ArchiveService.ts",
+    "server/services/ImportManager.ts"
+  ]
+}

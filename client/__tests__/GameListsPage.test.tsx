@@ -9,9 +9,8 @@ import {
   getInterfaceTextLanguage,
   INTERFACE_LANGUAGE_OPTIONS,
   setInterfaceLanguage,
-  type InterfaceLanguage,
+  translateInterfaceLabel,
 } from "@/lib/interface-locale";
-import { UI_LABELS } from "@/lib/ui-labels";
 
 vi.mock("@/hooks/use-toast", () => ({
   useToast: () => ({ toast: vi.fn() }),
@@ -104,16 +103,15 @@ describe("custom game list localization", () => {
   });
 
   it("provides every fixed game list string in all supported locales", () => {
-    const labels = UI_LABELS as Record<string, Partial<Record<InterfaceLanguage, string>>>;
-
     for (const source of GAME_LIST_SOURCES) {
       for (const { value: language } of INTERFACE_LANGUAGE_OPTIONS) {
         if (language === "en") continue;
         expect(getInterfaceTextLanguage(source, language)).toBe(language);
+        const translated = translateInterfaceLabel(source, language);
         const expected = [...source.matchAll(/\{([A-Za-z][A-Za-z0-9_]*)\}/g)]
           .map((match) => match[1])
           .sort();
-        const translated = labels[source]?.[language] ?? "";
+        expect(translated).not.toBe(source);
         expect(
           [...translated.matchAll(/\{([A-Za-z][A-Za-z0-9_]*)\}/g)].map((match) => match[1]).sort()
         ).toEqual(expected);

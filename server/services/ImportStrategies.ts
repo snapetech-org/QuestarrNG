@@ -1,3 +1,4 @@
+import { ServiceMessageError, serviceMessage } from "../../shared/service-messages.js";
 import { Game, ImportConfig } from "../../shared/schema.js";
 import { categorizeDownload, type DownloadCategory } from "../../shared/download-categorizer.js";
 import fs from "fs-extra";
@@ -88,7 +89,7 @@ async function ensureParentDir(filePath: string, root: string): Promise<void> {
       continue;
     }
     if (!stats.isDirectory()) {
-      throw new Error(`Refusing to transfer through a non-directory or symlinked path: ${current}`);
+      throw new ServiceMessageError("service.transfer_non_directory_path", { path: current });
     }
   }
 }
@@ -217,9 +218,7 @@ async function transferDirectoryHardlink(
     isPathContainedIn(resolvedDestination, resolvedSource) ||
     isPathContainedIn(resolvedSource, resolvedDestination)
   ) {
-    throw new Error(
-      `Source and destination directories must not overlap for a hardlink transfer: ${source} -> ${destination}`
-    );
+    throw new ServiceMessageError("service.transfer_hardlink_overlap", { source, destination });
   }
 
   return withHardlinkFallback(
@@ -282,7 +281,7 @@ async function transferDirectoryPerFile(
   // silently replace an extracted file with an unrelated loose one of the same name.
   for (const { destFile } of plannedTransfers) {
     if (await fs.pathExists(destFile)) {
-      throw new Error(`Destination already exists, refusing to overwrite: ${destFile}`);
+      throw new ServiceMessageError("service.transfer_destination_exists", { path: destFile });
     }
   }
 
@@ -296,7 +295,7 @@ async function transferDirectoryPerFile(
   }
 
   if (!transferredAny) {
-    throw new Error("No files to transfer after applying exclusions");
+    throw new ServiceMessageError("service.transfer_no_files_after_exclusions", {});
   }
 
   if (mode === "move") {
@@ -340,7 +339,7 @@ async function transferFile(
 
 export async function gatherFiles(rootPath: string, options: WalkOptions = {}): Promise<string[]> {
   if (isSensitivePath(rootPath)) {
-    throw new Error("Refusing to process a sensitive system path");
+    throw new ServiceMessageError("service.import_sensitive_path_refused", {});
   }
 
   const stats = await fs.stat(rootPath);
@@ -458,7 +457,7 @@ function resolveContainedPath(root: string, candidate: string): string {
     resolvedCandidate !== resolvedRoot &&
     !resolvedCandidate.startsWith(resolvedRoot + path.sep)
   ) {
-    throw new Error(`Import path escapes review root: ${candidate}`);
+    throw new ServiceMessageError("service.transfer_path_outside_review", { path: candidate });
   }
   return resolvedCandidate;
 }
@@ -494,7 +493,9 @@ export async function reorganizeBySortExtras(destDir: string): Promise<void> {
   const desiredPaths = new Set<string>();
   for (const { desiredPath } of moves) {
     if (desiredPaths.has(desiredPath)) {
-      throw new Error(`Duplicate sortExtras destination: ${desiredPath}`);
+      throw new ServiceMessageError("service.transfer_duplicate_sorted_destination", {
+        path: desiredPath,
+      });
     }
     desiredPaths.add(desiredPath);
   }
@@ -524,13 +525,13 @@ export class PCImportStrategy implements ImportStrategy {
     options?: PlanImportOptions
   ): Promise<ImportReview> {
     if (isSensitivePath(sourcePath)) {
-      throw new Error("Refusing to process a sensitive system path");
+      throw new ServiceMessageError("service.import_sensitive_path_refused", {});
     }
 
     const safeSourcePath = await assertWithinRoots(
       sourcePath,
       this.sourceRoots,
-      "Refusing to process a path outside the configured downloader roots"
+      serviceMessage("service.transfer_source_outside_roots", {})
     );
 
     const stats = await fs.stat(safeSourcePath);
@@ -545,7 +546,7 @@ export class PCImportStrategy implements ImportStrategy {
     // the title never contains a traversal sequence.
     const relativeToRoot = path.relative(targetRoot, destination);
     if (relativeToRoot.startsWith("..") || path.isAbsolute(relativeToRoot)) {
-      throw new Error("Computed destination escapes the configured library root");
+      throw new ServiceMessageError("service.transfer_destination_outside_library", {});
     }
 
     const fileCategories =
@@ -576,7 +577,7 @@ export class PCImportStrategy implements ImportStrategy {
     // transferFile's own checks), so a single guard at this shared entry point is what
     // actually covers every branch, including that one.
     if (isSensitivePath(review.originalPath) || isSensitivePath(review.proposedPath)) {
-      throw new Error("Refusing to process a sensitive system path");
+      throw new ServiceMessageError("service.import_sensitive_path_refused", {});
     }
 
     // Same containment check as planImport, applied here too since executeImport is a
@@ -585,7 +586,7 @@ export class PCImportStrategy implements ImportStrategy {
     review.originalPath = await assertWithinRoots(
       review.originalPath,
       this.sourceRoots,
-      "Refusing to process a path outside the configured downloader roots"
+      serviceMessage("service.transfer_source_outside_roots", {})
     );
 
     if (review.fileCategories && review.fileCategories.length > 0) {
@@ -618,14 +619,16 @@ export class PCImportStrategy implements ImportStrategy {
       // filesPlaced would still finalize the import and, in move mode, remove
       // originalPath below despite having transferred nothing.
       if (plannedTransfers.length === 0) {
-        throw new Error("No files to transfer after applying exclusions");
+        throw new ServiceMessageError("service.transfer_no_files_after_exclusions", {});
       }
 
       const destinations = new Set<string>();
       for (const { destinationFile } of plannedTransfers) {
         const resolvedDestination = path.resolve(destinationFile);
         if (destinations.has(resolvedDestination)) {
-          throw new Error(`Duplicate import destination: ${resolvedDestination}`);
+          throw new ServiceMessageError("service.transfer_duplicate_import_destination", {
+            path: resolvedDestination,
+          });
         }
         destinations.add(resolvedDestination);
       }
@@ -638,7 +641,9 @@ export class PCImportStrategy implements ImportStrategy {
       // failure mode transferDirectoryPerFile guards against above.
       for (const { destinationFile } of plannedTransfers) {
         if (await fs.pathExists(destinationFile)) {
-          throw new Error(`Destination already exists, refusing to overwrite: ${destinationFile}`);
+          throw new ServiceMessageError("service.transfer_destination_exists", {
+            path: destinationFile,
+          });
         }
       }
 

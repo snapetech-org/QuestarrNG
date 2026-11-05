@@ -75,7 +75,7 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
   "Failed to start library scan": "Không thể bắt đầu quét thư viện",
   "Failed to read scan status": "Không thể đọc trạng thái quét",
   "Failed to read unmatched list": "Không thể đọc danh sách mục chưa khớp",
-  "Failed to fetch game downloads": "Không thể tải nội dung tải xuống của trò chơi",
+  "Failed to fetch game downloads": "Không thể tải danh sách tải xuống của trò chơi",
   Forbidden: "Bị từ chối",
   "releaseTitle required (max 500 chars)": "releaseTitle là bắt buộc (tối đa 500 ký tự)",
   "Failed to add to blacklist": "Không thể thêm vào danh sách chặn",

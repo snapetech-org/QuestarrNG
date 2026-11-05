@@ -1,0 +1,116 @@
+{
+  "allInputHashesMatchedFrozenManifest": true,
+  "allInputSnapshotsByteMatchedLivePinnedTree": true,
+  "blockers": [
+    "Missing producer-branch test evidence at positions 236 and 243."
+  ],
+  "confidence": "high for test branch/path decisions and 21/2 classification within cited frozen evidence; moderate for intended semantics of broad owner arrays.",
+  "confirmedCoverageGaps": [
+    {
+      "blocker": "Add a rejected updatePathMapping test and assert the 500 source error.",
+      "citedTests": "PATCH success and updatePathMapping undefined (different missing-mapping 404 key).",
+      "key": "service.api_failed_to_update_path_mapping",
+      "missingBehavior": "PATCH updatePathMapping rejection emits the failure key from the 500 catch.",
+      "sourcePosition": 236
+    },
+    {
+      "blocker": "Add disabled-config cases for each intended public path.",
+      "citedTests": "Only enabled configuration and successful enabled RomM import.",
+      "key": "service.api_romm_imports_are_disabled",
+      "missingBehavior": "Disabled RomM guard at route and ImportManager producer sites.",
+      "sourcePosition": 243
+    }
+  ],
+  "currentCoverageFieldsEmptyForAll23": true,
+  "directEvidenceCaveats": [
+    {
+      "detail": "Encoded and backslash cases allow either keyed rejection or safe-path acceptance, so are conditional alone. The absolute traversal subcase at import_routes_security.test.ts:130–141 and Windows-drive path at import_routes_additional.test.ts:395–405 deterministically reject.",
+      "key": "service.api_invalid_proposed_path",
+      "sourcePosition": 245
+    },
+    {
+      "detail": "Additional cited route/marker tests manually seed errors or strings and establish downstream propagation only. Each key has a separate direct producer test.",
+      "sourcePositions": [
+        246,
+        247,
+        248,
+        249
+      ]
+    }
+  ],
+  "independentDispositionCounts": {
+    "metadata-only": 21,
+    "missing-test-blocker": 2
+  },
+  "inputChecks": {
+    "entryReviewSha256": "005237ebe79f5dbc035a01afa100665c37435ac9daa0982b25f6b4d5064928c1",
+    "inputManifestSha256": "59290873441940f62e5032b30b8f86a48d9cc9436f459d2e327dc7e645f11ce5",
+    "inputPacketChecksumsVerified": true,
+    "sourceCoverageSha256": "5a735cd49d4fa91b22cf7fe98e3d96f001d166f11f7e714c3c2e7b72b10a1b03",
+    "sourceEvidenceSha256": "5e90cb4eb4ce1ec53dc48e235ca787e45a15cb12750718e0f8262c4470957875"
+  },
+  "inputManifestFileCount": 28,
+  "isDraftAtStart": false,
+  "limitations": [
+    "Read-only review of pinned source/test content; no tests or runtime execution.",
+    "Exact producer locations from packet were checked against frozen file snapshots; no new repository-wide producer scan was run.",
+    "PR remains OPEN and isDraft=false; exact requested head/tree are unchanged."
+  ],
+  "packet": "QuestarrNG PR #155 source coverage positions 230–252 independent cross-review",
+  "prStateAtStart": "OPEN",
+  "producerOwnerAssessment": {
+    "confidence": "moderate for intended owner-field meaning; high for exact producer path/literals listed",
+    "finding": "declared owner arrays are not faithful exact producer-path metadata: they include unrelated route files or the other service producer path; position 243 omits ImportManager although it contains two keyed producer sites.",
+    "pathsWithConsumerOnlyProposedEvidence": [
+      {
+        "key": "service.api_archive_password_rejected",
+        "proposedPathsThatDoNotReachProducer": [
+          "server/__tests__/import_routes_additional.test.ts"
+        ],
+        "recommendation": "Keep only as secondary consumer/route contract evidence or omit from producer-coverage field.",
+        "sourcePosition": 246
+      },
+      {
+        "key": "service.api_archive_password_required",
+        "proposedPathsThatDoNotReachProducer": [
+          "server/__tests__/import_manager.test.ts",
+          "server/__tests__/import_routes_additional.test.ts"
+        ],
+        "recommendation": "Keep only as secondary consumer/route contract evidence or omit from producer-coverage field.",
+        "sourcePosition": 247
+      },
+      {
+        "key": "service.api_import_incomplete_scan_confirmation",
+        "proposedPathsThatDoNotReachProducer": [
+          "server/__tests__/import_routes_coverage.test.ts"
+        ],
+        "recommendation": "Keep only as secondary consumer/route contract evidence or omit from producer-coverage field.",
+        "sourcePosition": 248
+      },
+      {
+        "key": "service.api_import_source_path_unresolved",
+        "proposedPathsThatDoNotReachProducer": [
+          "server/__tests__/import_routes_coverage.test.ts"
+        ],
+        "recommendation": "Keep only as secondary consumer/route contract evidence or omit from producer-coverage field.",
+        "sourcePosition": 249
+      }
+    ],
+    "recommendation": "If owners denotes broad feature ownership, document it; otherwise make owners exact producer paths. In either case keep exact producer paths separate."
+  },
+  "pullRequest": 155,
+  "referenceVerdictCounts": {
+    "conditional-path-not-sufficient-alone": 1,
+    "consumer-contract-only": 5,
+    "direct-producer-branch": 27,
+    "does-not-reach-producer-branch": 4,
+    "mixed-direct-and-conditional-subcases": 1
+  },
+  "repository": "snapetech-org/QuestarrNG",
+  "sourceCoverageEntryIndexAndKeyMatches": 23,
+  "sourcePositionsReviewed": 23,
+  "sourceReferencesIndividuallyReviewed": 38,
+  "verifiedAtUtc": "2026-11-02T14:56:34.852194+00:00",
+  "verifiedHead": "1ab1c680fda2da8c4933fa78b529ef29e29ffc90",
+  "verifiedTree": "bf909d8b3057a480f455a9ba916e6c55c52f8833"
+}

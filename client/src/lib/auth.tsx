@@ -4,6 +4,7 @@ import { useLocation } from "wouter";
 import { apiFetch, apiRequest, setBearerToken, throwIfResNotOk } from "./queryClient";
 import { disconnectSocket } from "./socket";
 import { useToast } from "@/hooks/use-toast";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 
 type User = {
   id: string;
@@ -180,7 +181,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     onError: (error: Error) => {
       toast({
         title: "Login failed",
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },
@@ -203,7 +204,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         title: "Logout failed",
         description:
           error instanceof Error
-            ? error.message
+            ? <ApiErrorDescription error={error} />
             : "Unable to reach the server. Please check your connection and try again.",
         variant: "destructive",
       });

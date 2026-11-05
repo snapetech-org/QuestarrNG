@@ -72,8 +72,10 @@ export default function StatusPicker({
       data-testid={testId}
       aria-label={
         gameTitle
-          ? formatInterfaceMessage("Change status for {title}", { title: gameTitle })
-          : t("Change status")
+          ? formatInterfaceMessage("interface.change_status_for_title_4314f9e2", {
+              title: gameTitle,
+            })
+          : t("interface.change_status_30895671")
       }
       lang={languageFor(gameTitle ? "Change status for {title}" : "Change status")}
       dir={directionFor(gameTitle ? "Change status for {title}" : "Change status")}
@@ -92,8 +94,11 @@ export default function StatusPicker({
         )}
         <span className="truncate">
           {!compact && (
-            <span lang={languageFor("Status:")} dir={directionFor("Status:")}>
-              {t("Status:")}{" "}
+            <span
+              lang={languageFor("interface.status_ca77496f")}
+              dir={directionFor("interface.status_ca77496f")}
+            >
+              {t("interface.status_ca77496f")}{" "}
             </span>
           )}
           <span
@@ -121,10 +126,10 @@ export default function StatusPicker({
       <PopoverContent className="w-48 p-1.5" align="start" onClick={(e) => e.stopPropagation()}>
         <p
           className="px-2 py-1 text-[11px] font-medium text-muted-foreground"
-          lang={languageFor("Change status")}
-          dir={directionFor("Change status")}
+          lang={languageFor("interface.change_status_30895671")}
+          dir={directionFor("interface.change_status_30895671")}
         >
-          {t("Change status")}
+          {t("interface.change_status_30895671")}
         </p>
         <div className="flex flex-col gap-0.5">
           {USER_SETTABLE_STATUSES.map(({ id, label }) => {
@@ -144,7 +149,7 @@ export default function StatusPicker({
                 lang={languageFor(label)}
                 dir={directionFor(label)}
                 className={cn(
-                  "flex items-center justify-between gap-2 rounded-sm px-2 py-1.5 text-left text-sm transition-colors",
+                  "flex items-center justify-between gap-2 rounded-sm px-2 py-1.5 text-start text-sm transition-colors",
                   "hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   isActive && "bg-accent/70 font-medium"
                 )}

@@ -1,8 +1,18 @@
+import {
+  ServiceMessageError,
+  serviceMessage,
+  serviceMessageError,
+  serviceErrorValue,
+  serviceErrorResult,
+  serviceMessageValue,
+  parseServiceMessageDescriptor,
+  type ServiceMessageDescriptor,
+} from "../shared/service-messages.js";
 import { type Indexer } from "@shared/schema";
 import {
   DEFAULT_GAME_CATEGORIES,
   discoverCapsCategories,
-  formatIndexerHttpError,
+  indexerHttpErrorMessage,
   indexerAllowsApiKey,
   redactIndexerUrl,
   resolveSearchCategories,
@@ -109,7 +119,7 @@ export class TorznabClient {
    */
   async searchGames(indexer: Indexer, params: TorznabSearchParams): Promise<TorznabResponse> {
     if (!indexer.enabled) {
-      throw new Error(`Indexer ${indexer.name} is disabled`);
+      throw new ServiceMessageError("service.indexer_disabled", { indexer: indexer.name });
     }
 
     const searchUrl = this.buildSearchUrl(indexer, params);
@@ -138,10 +148,18 @@ export class TorznabClient {
       });
 
       if (!response.ok) {
-        const errorText = await response.text().catch(() => "No error details available");
-        const statusMessage = formatIndexerHttpError(indexer, response.status, response.statusText);
-        throw new Error(
-          response.status === 401 ? statusMessage : `${statusMessage} - ${errorText}`
+        const errorText = await response
+          .text()
+          .catch(() => serviceMessage("service.no_error_details_available", {}));
+        const statusMessage = indexerHttpErrorMessage(
+          indexer,
+          response.status,
+          response.statusText
+        );
+        throw serviceMessageError(
+          response.status === 401
+            ? statusMessage
+            : serviceMessage("service.indexer_http_body", { statusMessage, error: errorText })
         );
       }
 
@@ -187,10 +205,11 @@ export class TorznabClient {
       return result;
     } catch (error) {
       torznabLogger.error({ indexerName: indexer.name, error }, `error searching indexer`);
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      throw new Error(`Failed to search indexer ${indexer.name}: ${errorMessage}`, {
-        cause: error,
-      });
+      throw new ServiceMessageError(
+        "service.indexer_search_failed",
+        { indexer: indexer.name, error: serviceErrorValue(error) },
+        { cause: error }
+      );
     }
   }
 
@@ -200,37 +219,57 @@ export class TorznabClient {
   async searchMultipleIndexers(
     indexers: Indexer[],
     params: TorznabSearchParams
-  ): Promise<{ results: TorznabResponse; errors: string[] }> {
+  ): Promise<{
+    results: TorznabResponse;
+    errors: string[];
+    errorI18n?: Array<ServiceMessageDescriptor | null>;
+  }> {
     const enabledIndexers = indexers.filter((indexer) => indexer.enabled);
 
     if (enabledIndexers.length === 0) {
-      throw new Error("No enabled indexers available");
+      throw new ServiceMessageError("service.no_enabled_indexers", {});
     }
 
     const promises = enabledIndexers.map(async (indexer) => {
       try {
         const result = await this.searchGames(indexer, params);
-        return { indexer: indexer.name, result, error: null };
+        return { indexer: indexer.name, result, error: null, errorI18n: null };
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "Unknown error";
-        return { indexer: indexer.name, result: null, error: errorMessage };
+        const value = serviceErrorValue(error);
+        return {
+          indexer: indexer.name,
+          result: null,
+          error: typeof value === "string" ? value : value.message,
+          errorI18n:
+            typeof value === "string" ? null : (parseServiceMessageDescriptor(value) ?? null),
+        };
       }
     });
 
     const results = await Promise.allSettled(promises);
     const aggregatedItems: TorznabItem[] = [];
     const errors: string[] = [];
+    const errorI18n: Array<ServiceMessageDescriptor | null> = [];
 
     results.forEach((result) => {
       if (result.status === "fulfilled") {
-        const { indexer, result: searchResult, error } = result.value;
+        const { indexer, result: searchResult, error, errorI18n: metadata } = result.value;
         if (error) {
-          errors.push(`${indexer}: ${error}`);
+          const fragment = serviceMessage("service.downloader_named_error", {
+            client: indexer,
+            error: serviceMessageValue(error, metadata),
+          });
+          errors.push(fragment.message);
+          errorI18n.push(parseServiceMessageDescriptor(fragment) ?? null);
         } else if (searchResult) {
           aggregatedItems.push(...searchResult.items);
         }
       } else {
-        errors.push(`Unknown error: ${result.reason}`);
+        const fragment = serviceMessage("service.unknown_error_reason", {
+          reason: String(result.reason),
+        });
+        errors.push(fragment.message);
+        errorI18n.push(parseServiceMessageDescriptor(fragment) ?? null);
       }
     });
 
@@ -251,6 +290,7 @@ export class TorznabClient {
         offset: params.offset || 0,
       },
       errors,
+      ...(errorI18n.length ? { errorI18n } : {}),
     };
   }
 
@@ -332,7 +372,7 @@ export class TorznabClient {
     }
 
     if (!(await isSafeUrl(url.toString()))) {
-      throw new Error(`Unsafe URL detected: ${url.toString()}`);
+      throw new ServiceMessageError("service.unsafe_url_detected", { url: url.toString() });
     }
 
     const response = await safeFetch(url.toString(), {
@@ -342,7 +382,9 @@ export class TorznabClient {
     });
 
     if (!response.ok) {
-      throw new Error(formatIndexerHttpError(indexer, response.status, response.statusText));
+      throw serviceMessageError(
+        indexerHttpErrorMessage(indexer, response.status, response.statusText)
+      );
     }
 
     const xmlData = await response.text();
@@ -371,7 +413,7 @@ export class TorznabClient {
             `Error code ${parsed.error["@_code"] ?? "unknown"}`;
           throw new Error(description);
         }
-        throw new Error("Invalid Torznab response format");
+        throw new ServiceMessageError("service.torznab_response_invalid", {});
       }
 
       const channel = parsed.rss.channel;
@@ -397,8 +439,11 @@ export class TorznabClient {
       };
     } catch (error) {
       torznabLogger.error({ error }, "error parsing Torznab response");
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      throw new Error(`Failed to parse response: ${errorMessage}`, { cause: error });
+      throw new ServiceMessageError(
+        "service.indexer_response_parse_failed",
+        { error: serviceErrorValue(error) },
+        { cause: error }
+      );
     }
   }
 
@@ -565,10 +610,12 @@ export class TorznabClient {
       };
 
       await this.searchGames(indexer, testParams);
-      return { success: true, message: `Successfully connected to ${indexer.name}` };
+      return {
+        success: true,
+        ...serviceMessage("service.connected_named", { name: indexer.name }),
+      };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: errorMessage };
+      return serviceErrorResult(error, serviceMessage("interface.unknown_error_ce512b43", {}));
     }
   }
 
@@ -650,7 +697,7 @@ export class TorznabClient {
       buildApiUrl: this.buildApiUrl.bind(this),
       assertAllowed: () => {
         if (!indexer.enabled) {
-          throw new Error(`Indexer ${indexer.name} is disabled`);
+          throw new ServiceMessageError("service.indexer_disabled", { indexer: indexer.name });
         }
       },
       fetchHeaders: { "User-Agent": "Questarr/1.0" },

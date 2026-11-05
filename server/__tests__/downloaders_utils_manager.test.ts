@@ -1,9 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  ServiceMessageError,
+  serviceMessage,
+  serializeServiceMessageDescriptor,
+  parseServiceMessageDescriptor,
+} from "../../shared/service-messages.js";
 import type { Downloader, DownloadStatus } from "../../shared/schema.js";
 import { DelugeClient } from "../downloaders/deluge.js";
 import { DownloaderManager } from "../downloaders.js";
 import {
   DOWNLOAD_CLIENT_USER_AGENT,
+  assertCredentialsAllowed,
   buildRemoteImportPath,
   extractHashFromUrl,
   fetchWithMagnetDetection,
@@ -85,6 +92,33 @@ const stubClient = (overrides: Partial<DownloaderClient> = {}): DownloaderClient
 });
 
 describe("downloaders utils", () => {
+  it.each(["credentials", "password", "API key", "custom provider token"])(
+    "tags the %s transport refusal without storing credentials",
+    (kind) => {
+      try {
+        assertCredentialsAllowed(
+          { allowInsecureLan: false },
+          "http://example.invalid",
+          "Client العربية",
+          kind
+        );
+        throw new Error("expected refusal");
+      } catch (error) {
+        expect(error).toBeInstanceOf(ServiceMessageError);
+        const app = error as ServiceMessageError;
+        expect(app.message).toBe(
+          `Client العربية: refusing to send ${kind} over unencrypted HTTP. QuestarrNG received Allow insecure LAN as disabled for this request. Enable SSL or turn on 'Allow insecure LAN' in the downloader settings or current test form.`
+        );
+        expect(parseServiceMessageDescriptor(app)).toBeDefined();
+        expect(app.messageValues).toEqual(
+          kind === "custom provider token"
+            ? { client: "Client العربية", credentialKind: kind }
+            : { client: "Client العربية" }
+        );
+      }
+    }
+  );
+
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(isSafeUrl).mockResolvedValue(true);
@@ -439,6 +473,60 @@ describe("DownloaderManager", () => {
     );
   });
 
+  it.each([true, false])("preserves manager action error ownership: %s", async (typed) => {
+    const error = new ServiceMessageError("service.download_path_escapes_directory", {});
+    const client = stubClient({
+      pauseDownload: vi.fn().mockRejectedValue(typed ? error : new Error(error.message)),
+    });
+    const spy = vi.spyOn(DownloaderManager, "createClient").mockReturnValue(client);
+    try {
+      const result = await DownloaderManager.pauseDownload(baseDownloader(), "id");
+      expect(result).toMatchObject({ success: false, message: error.message });
+      expect(serializeServiceMessageDescriptor(result) !== null).toBe(typed);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it.each([2, 24])(
+    "keeps exact provider/name text and bounded descriptors for %s fallback errors",
+    async (count) => {
+      const typed = serviceMessage("service.download_path_escapes_directory", {});
+      const provider = "Download path escapes its download directory";
+      const downloaders = Array.from({ length: count }, (_, i) =>
+        baseDownloader({ id: String(i), name: `Client ${i}: العربية {error}` })
+      );
+      let i = 0;
+      const spy = vi
+        .spyOn(DownloaderManager, "addDownload")
+        .mockImplementation(async () =>
+          i++ === 0 ? { success: false, ...typed } : { success: false, message: provider }
+        );
+      try {
+        const result = await DownloaderManager.addDownloadWithFallback(downloaders, {
+          url: "magnet:?xt=urn:btih:abc",
+          title: "Game",
+        });
+        expect(result.message).toBe(
+          "All downloaders failed. Errors: " +
+            downloaders.map((d) => `${d.name}: ${provider}`).join("; ")
+        );
+        const parsed = parseServiceMessageDescriptor(result);
+        expect(parsed?.messageKey).toBe("service.all_downloaders_failed");
+        if (count === 2) {
+          expect(
+            parsed?.messageDetails?.errors?.messageDetails?.left?.messageDetails?.error?.messageKey
+          ).toBe(typed.messageKey);
+          expect(
+            parsed?.messageDetails?.errors?.messageDetails?.right?.messageDetails
+          ).toBeUndefined();
+        }
+      } finally {
+        spy.mockRestore();
+      }
+    }
+  );
+
   it("rejects unsupported downloader types", () => {
     expect(() =>
       DownloaderManager.createClient(baseDownloader({ type: "not-real" as Downloader["type"] }))
@@ -547,7 +635,7 @@ describe("DownloaderManager", () => {
       })
     ).resolves.toEqual({
       success: false,
-      message: "No downloaders available",
+      ...serviceMessage("service.no_downloaders_available", {}),
       attemptedDownloaders: [],
     });
   });

@@ -1,3 +1,14 @@
+import {
+  ServiceMessageError,
+  serviceMessage,
+  serviceErrorMetadata,
+  serviceMessageError,
+  persistedServiceMessage,
+  serializeServiceMessageDescriptor,
+  serviceMessageValue,
+  tagServiceMessageError,
+  type ServiceMessageFragment,
+} from "../../shared/service-messages.js";
 import { type IStorage } from "../storage.js";
 import { PathMappingService } from "./PathMappingService.js";
 import { PlatformMappingService } from "./PlatformMappingService.js";
@@ -109,7 +120,12 @@ function isStrictPathAncestor(parentPath: string, childPath: string): boolean {
 export const ARCHIVE_PASSWORD_REQUIRED_PREFIX = "ARCHIVE_PASSWORD_REQUIRED:";
 
 /** Thrown when a confirmation is the first to learn the security scan was incomplete. */
-export class IncompleteScanError extends Error {}
+export class IncompleteScanError extends Error {
+  constructor(message: string | ServiceMessageFragment = "", options?: ErrorOptions) {
+    super(typeof message === "string" ? message : message.message, options);
+    if (typeof message !== "string") tagServiceMessageError(this, message);
+  }
+}
 
 interface ArchiveResolution {
   archivePath: string;
@@ -194,7 +210,9 @@ export class ImportManager {
     if (!(await fs.pathExists(destination))) return destination;
     if (conflictPolicy === "skip") return null;
     if (conflictPolicy === "fail")
-      throw new Error(`RomM destination already exists: ${destination}`);
+      throw new ServiceMessageError("service.import_romm_destination_exists", {
+        path: destination,
+      });
     if (conflictPolicy === "overwrite") {
       if (applyOverwrite) await fs.remove(destination);
       return destination;
@@ -206,7 +224,9 @@ export class ImportManager {
       const candidate = `${stem} (${suffix})${extension}`;
       if (!(await fs.pathExists(candidate))) return candidate;
     }
-    throw new Error(`Could not find a free RomM destination for ${destination}`);
+    throw new ServiceMessageError("service.import_romm_destination_unavailable", {
+      path: destination,
+    });
   }
 
   private isPlatformEnabled(platformId: number | undefined, allowed: number[]): boolean {
@@ -241,11 +261,16 @@ export class ImportManager {
   // Renders a caught error for storage in game_downloads.error_message, tagging an
   // ArchivePasswordRequiredError with ARCHIVE_PASSWORD_REQUIRED_PREFIX so the pending-imports
   // API can turn it into a `passwordRequired` flag instead of a generic failure message.
-  private formatErrorMessage(err: unknown): string {
+  private formatErrorMessage(err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    return err instanceof ArchivePasswordRequiredError
-      ? `${ARCHIVE_PASSWORD_REQUIRED_PREFIX}${message}`
-      : message;
+    const detail = serviceMessageValue(message, serviceErrorMetadata(err));
+    const fragment =
+      err instanceof ArchivePasswordRequiredError
+        ? serviceMessage("service.import_archive_password_marker", { detail })
+        : detail;
+    return typeof fragment === "string"
+      ? persistedServiceMessage(fragment, null)
+      : persistedServiceMessage(fragment.message, fragment);
   }
 
   /**
@@ -261,13 +286,13 @@ export class ImportManager {
     options?: { includeDiscImages?: boolean }
   ): Promise<ArchiveResolution | null> {
     if (isSensitivePath(sourcePath)) {
-      throw new Error("Refusing to process a sensitive system path");
+      throw new ServiceMessageError("service.import_sensitive_path_refused", {});
     }
 
     const safeSourcePath = await assertWithinRoots(
       sourcePath,
       await this.pathService.getConfiguredRoots(),
-      "Refusing to process a path outside the configured downloader roots"
+      serviceMessage("service.transfer_source_outside_roots", {})
     );
 
     const stats = await fs.stat(safeSourcePath);
@@ -510,12 +535,19 @@ export class ImportManager {
     archiveInDest: string,
     err: unknown
   ): Promise<void> {
+    const detail = err instanceof Error ? err.message : String(err);
+    const body = serviceMessage("service.notification_import_stranded", {
+      game: game.title,
+      error: serviceMessageValue(detail, serviceErrorMetadata(err)),
+      path: archiveInDest,
+    });
     await this.storage
       .addNotification({
         userId: game.userId ?? "",
         type: "error",
         title: "Import extraction failed",
-        message: `"${game.title}" was moved into your library, but extracting the archive failed: ${err instanceof Error ? err.message : String(err)}. The archive is left at ${archiveInDest} — extract or delete it manually to finish the import.`,
+        message: body.message,
+        messageI18n: serializeServiceMessageDescriptor(body),
       })
       .catch((notifErr) =>
         logger.error(
@@ -539,7 +571,7 @@ export class ImportManager {
       const resolved = await assertWithinRoots(
         sourcePath,
         await this.pathService.getConfiguredRoots(),
-        "Refusing to process a path outside the configured downloader roots"
+        serviceMessage("service.transfer_source_outside_roots", {})
       );
       const stats = await fs.stat(resolved);
       let allNames: string[];
@@ -681,11 +713,15 @@ export class ImportManager {
     await this.storage.updateGameDownloadStatus(downloadId, "manual_review_required");
     if (meta.gameTitle && meta.userId) {
       try {
+        const body = serviceMessage("service.notification_import_local_path", {
+          game: meta.gameTitle,
+        });
         const notification = await this.storage.addNotification({
           userId: meta.userId,
           type: "warning",
           title: "Import needs attention",
-          message: `"${meta.gameTitle}" finished downloading but its local path could not be accessed. Check Settings → Path Mappings or trigger the import manually.`,
+          message: body.message,
+          messageI18n: serializeServiceMessageDescriptor(body),
           link: "/library",
         });
         notifyUser("notification", notification, notification.userId);
@@ -722,12 +758,20 @@ export class ImportManager {
         { downloadId, downloadHash: download.downloadHash, reason: result.message },
         "[ImportManager] Auto-delete after import failed"
       );
+      const body = serviceMessage("service.notification_auto_delete_failed", {
+        game: game.title,
+        error:
+          result.message === undefined || result.message === null
+            ? serviceMessage("service.import_unknown_error", {})
+            : serviceMessageValue(result.message, result),
+      });
       await this.storage
         .addNotification({
           userId: game.userId ?? "",
           type: "warning",
           title: "Auto-delete failed",
-          message: `"${game.title}" was imported successfully, but removing it from the download client failed: ${result.message ?? "unknown error"}. Please remove it manually.`,
+          message: body.message,
+          messageI18n: serializeServiceMessageDescriptor(body),
         })
         .catch((notifErr) =>
           logger.error(
@@ -799,7 +843,12 @@ export class ImportManager {
     await this.storage.updateGameDownloadStatus(
       downloadId,
       QUARANTINED_STATUS,
-      scanResult.reason ?? "Flagged by security scan"
+      scanResult.reason ?? serviceMessage("service.scan_flagged", {}).message,
+      serializeServiceMessageDescriptor(
+        scanResult.reason === undefined
+          ? serviceMessage("service.scan_flagged", {})
+          : scanResult.reasonI18n
+      )
     );
 
     try {
@@ -812,11 +861,21 @@ export class ImportManager {
       // check on top of that.
       if (prefs.securityAlert.inApp) {
         const providerLabel = scanResult.source === "virustotal" ? "VirusTotal" : "ClamAV";
+        const notificationReason = (scanResult.reason ?? "").trimEnd();
+        const body = notificationReason
+          ? serviceMessage("service.notification_security_flagged", {
+              game: game.title,
+              reason: serviceMessageValue(notificationReason, scanResult.reasonI18n),
+            })
+          : serviceMessage("service.notification_security_flagged_without_reason", {
+              game: game.title,
+            });
         const notification = await this.storage.addNotification({
           userId: game.userId ?? undefined,
           type: "error",
           title: `Security Alert: Download Flagged by ${providerLabel}`,
-          message: `"${game.title}" was flagged and quarantined. ${scanResult.reason ?? ""}`.trim(),
+          message: body.message,
+          messageI18n: serializeServiceMessageDescriptor(body),
           link: "/downloads",
         });
         notifyUser("notification", notification, notification.userId);
@@ -951,7 +1010,7 @@ export class ImportManager {
       localPath = await assertWithinRoots(
         localPath,
         await this.pathService.getConfiguredRoots(),
-        "Refusing to process a path outside the configured downloader roots"
+        serviceMessage("service.transfer_source_outside_roots", {})
       );
 
       logger.debug({ localPath }, "[ImportManager] Checking path accessibility");
@@ -985,7 +1044,12 @@ export class ImportManager {
         await this.storage.updateGameDownloadStatus(
           downloadId,
           "manual_review_required",
-          scanResult.reason ?? "Security scan could not examine every file"
+          scanResult.reason ?? serviceMessage("service.scan_incomplete", {}).message,
+          serializeServiceMessageDescriptor(
+            scanResult.reason === undefined
+              ? serviceMessage("service.scan_incomplete", {})
+              : scanResult.reasonI18n
+          )
         );
         return;
       }
@@ -1090,10 +1154,12 @@ export class ImportManager {
         // Route to manual review instead of a terminal "error" status so the
         // download stays actionable — it surfaces under Pending Manual Imports
         // where the user can adjust settings and re-attempt the import.
+        const failure = this.formatErrorMessage(err);
         await this.storage.updateGameDownloadStatus(
           downloadId,
           "manual_review_required",
-          this.formatErrorMessage(err)
+          failure.errorMessage,
+          failure.errorMessageI18n
         );
       } catch (statusErr) {
         logger.error({ statusErr, downloadId }, "[ImportManager] Failed to set error status");
@@ -1146,7 +1212,7 @@ export class ImportManager {
           safeOverridePath = await assertWithinRoots(
             overridePath,
             configuredRoots,
-            "Manual source path must remain inside a configured download root"
+            serviceMessage("service.import_manual_source_outside_root", {})
           );
         } catch {
           // The caller applies the same configured-root check before using this path.
@@ -1155,15 +1221,13 @@ export class ImportManager {
           safeExpectedPath = await assertWithinRoots(
             expectedPath,
             configuredRoots,
-            "Tracked download path is outside the configured download roots"
+            serviceMessage("service.import_tracked_path_outside_root", {})
           );
         } catch {
           // A remote path without a matching mapping is still compared lexically.
         }
         if (isStrictPathAncestor(safeOverridePath, safeExpectedPath)) {
-          throw new Error(
-            "Source path cannot be a parent of this download's folder. Select only this download's file or folder."
-          );
+          throw new ServiceMessageError("service.import_parent_source_refused", {});
         }
       }
 
@@ -1172,7 +1236,7 @@ export class ImportManager {
       return assertWithinRoots(
         overridePath,
         [expectedPath],
-        "Manual source path must remain inside the tracked download directory"
+        serviceMessage("service.import_manual_source_outside_download", {})
       );
     }
 
@@ -1192,22 +1256,24 @@ export class ImportManager {
     totalCount: number;
   }> {
     const download = await this.storage.getGameDownload(downloadId, callerUserId);
-    if (!download) throw new Error(`Download ${downloadId} not found`);
+    if (!download)
+      throw new ServiceMessageError("service.api_import_download_missing", { downloadId });
 
     const game = await this.storage.getGame(download.gameId);
-    if (!game) throw new Error(`Game not found for download ${downloadId}`);
+    if (!game)
+      throw new ServiceMessageError("service.api_import_game_for_download_missing", { downloadId });
 
     const config = await this.storage.getImportConfig(game.userId ?? undefined);
     const rommConfig = await this.storage.getRomMConfig(game.userId ?? callerUserId ?? "");
     if (requestedStrategy === "romm" && !rommConfig.enabled) {
-      throw new Error("RomM imports are disabled");
+      throw new ServiceMessageError("service.api_romm_imports_are_disabled", {});
     }
     const rommSlug =
       requestedStrategy === "romm"
         ? await this.getRommPlatformSlug(game, download.downloadTitle || "")
         : undefined;
     if (requestedStrategy === "romm" && !rommSlug) {
-      throw new Error("No RomM platform slug is configured for this game");
+      throw new ServiceMessageError("service.import_romm_slug_unconfigured", {});
     }
     const libraryRoot =
       requestedStrategy === "romm" ? rommConfig.libraryRoot : config.libraryRoot || "/data";
@@ -1232,7 +1298,7 @@ export class ImportManager {
         safeOriginalPath = await assertWithinRoots(
           resolvedOriginalPath,
           await this.pathService.getConfiguredRoots(),
-          "Refusing to process a path outside the configured downloader roots"
+          serviceMessage("service.transfer_source_outside_roots", {})
         );
       } catch {
         // Preserve the review flow for invalid/unavailable source paths without
@@ -1315,7 +1381,7 @@ export class ImportManager {
     const download = await this.storage.getGameDownload(downloadId, callerUserId);
 
     if (!download) {
-      throw new Error(`Download ${downloadId} not found`);
+      throw new ServiceMessageError("service.api_import_download_missing", { downloadId });
     }
 
     // Defense in depth: the client hides the Review action for a quarantined
@@ -1323,11 +1389,11 @@ export class ImportManager {
     // endpoint must independently refuse to transfer a file the scan already
     // flagged, regardless of what the caller submits as a plan.
     if (download.status === QUARANTINED_STATUS) {
-      throw new Error("This download was flagged by the security scan and cannot be imported.");
+      throw new ServiceMessageError("service.import_scan_flagged_refused", {});
     }
 
     if (!overridePlan) {
-      throw new Error("Confirmation requires a plan");
+      throw new ServiceMessageError("service.import_confirmation_plan_required", {});
     }
 
     const resolvedOriginalPath = await this.resolveConfirmOriginalPath(
@@ -1337,9 +1403,7 @@ export class ImportManager {
     );
 
     if (!resolvedOriginalPath) {
-      throw new Error(
-        "Source path could not be resolved — the download may no longer be tracked by the download client. Please specify the source path manually."
-      );
+      throw new ServiceMessageError("service.api_import_source_path_unresolved", {});
     }
 
     // Before the existence probe below: overridePlan.originalPath can come from a
@@ -1347,22 +1411,24 @@ export class ImportManager {
     const safeOriginalPath = await assertWithinRoots(
       resolvedOriginalPath,
       await this.pathService.getConfiguredRoots(),
-      "Refusing to process a path outside the configured downloader roots"
+      serviceMessage("service.transfer_source_outside_roots", {})
     );
 
     if (!(await fs.pathExists(safeOriginalPath))) {
-      throw new Error(`Source path not found: ${safeOriginalPath}`);
+      throw new ServiceMessageError("service.api_import_source_path_missing", {
+        path: safeOriginalPath,
+      });
     }
 
     const game = await this.storage.getGame(download.gameId);
     if (!game) {
-      throw new Error(`Game not found for download ${downloadId}`);
+      throw new ServiceMessageError("service.api_import_game_for_download_missing", { downloadId });
     }
 
     const config = await this.storage.getImportConfig(game.userId ?? undefined);
     const rommConfig = await this.storage.getRomMConfig(game.userId ?? callerUserId ?? "");
     if (overridePlan.strategy === "romm" && !rommConfig.enabled) {
-      throw new Error("RomM imports are disabled");
+      throw new ServiceMessageError("service.api_romm_imports_are_disabled", {});
     }
     const targetRoot =
       overridePlan.strategy === "romm" ? rommConfig.libraryRoot : config.libraryRoot;
@@ -1379,17 +1445,37 @@ export class ImportManager {
         scanResult,
         targetRoot || "/data"
       );
-      throw new Error(scanResult.reason ?? "Flagged by security scan");
+      const reason = scanResult.reason ?? serviceMessage("service.scan_flagged", {}).message;
+      const fragment = serviceMessageValue(
+        reason,
+        scanResult.reason === undefined
+          ? serviceMessage("service.scan_flagged", {})
+          : scanResult.reasonI18n
+      );
+      throw typeof fragment === "string" ? new Error(fragment) : serviceMessageError(fragment);
     }
     if (scanResult.incomplete) {
-      const reason = scanResult.reason ?? "Security scan could not examine every file";
+      const reason = scanResult.reason ?? serviceMessage("service.scan_incomplete", {}).message;
+      const reasonI18n =
+        scanResult.reason === undefined
+          ? serviceMessage("service.scan_incomplete", {})
+          : scanResult.reasonI18n;
       // Importing an incompletely scanned download needs the user to have seen why.
       // processImport records the reason on the pending import; when this
       // confirmation is the first scan (e.g. right after linking a game), record it
       // now and stop, so the next confirmation is an informed one.
       if (download.status !== "manual_review_required" || download.errorMessage !== reason) {
-        await this.storage.updateGameDownloadStatus(downloadId, "manual_review_required", reason);
-        throw new IncompleteScanError(`${reason} Confirm again to import it anyway.`);
+        await this.storage.updateGameDownloadStatus(
+          downloadId,
+          "manual_review_required",
+          reason,
+          serializeServiceMessageDescriptor(reasonI18n)
+        );
+        throw new IncompleteScanError(
+          serviceMessage("service.api_import_incomplete_scan_confirmation", {
+            reason: serviceMessageValue(reason, reasonI18n),
+          })
+        );
       }
       logger.warn(
         { downloadId, reason: scanResult.reason },
@@ -1398,7 +1484,7 @@ export class ImportManager {
     }
 
     if (!overridePlan.proposedPath) {
-      throw new Error("Proposed path is required for import validation");
+      throw new ServiceMessageError("service.import_proposed_path_required", {});
     }
 
     const archiveResolution = overridePlan.unpack
@@ -1424,7 +1510,7 @@ export class ImportManager {
     proposedPath = await assertWithinRoots(
       proposedPath,
       [targetRoot],
-      "Proposed path is outside configured library root"
+      serviceMessage("service.import_proposed_path_outside_library", {})
     );
 
     if (overridePlan.strategy === "romm") {
@@ -1482,10 +1568,12 @@ export class ImportManager {
       try {
         // Keep the download in manual review rather than a terminal "error"
         // status, so a failed retry attempt can itself be re-attempted.
+        const failure = this.formatErrorMessage(err);
         await this.storage.updateGameDownloadStatus(
           downloadId,
           "manual_review_required",
-          this.formatErrorMessage(err)
+          failure.errorMessage,
+          failure.errorMessageI18n
         );
       } catch (statusErr) {
         logger.error({ statusErr, downloadId }, "[ImportManager] Failed to set error status");

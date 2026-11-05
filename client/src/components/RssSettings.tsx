@@ -25,9 +25,11 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { InterfaceText } from "@/components/InterfaceText";
-import { formatInterfaceMessage } from "@/lib/interface-locale";
+import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
+import { localizeServiceMessage } from "@shared/service-messages";
 
 export default function RssSettings() {
+  const { language, t } = useInterfaceLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [newFeedUrl, setNewFeedUrl] = useState("");
   const [newFeedName, setNewFeedName] = useState("");
@@ -130,7 +132,7 @@ export default function RssSettings() {
                 className="w-full"
                 disabled={!newFeedName || !newFeedUrl}
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4 me-2" />
                 <InterfaceText source={"Add"} />
               </Button>
             </div>
@@ -151,7 +153,7 @@ export default function RssSettings() {
                 <TableHead>
                   <InterfaceText source={"Enabled"} />
                 </TableHead>
-                <TableHead className="text-right">
+                <TableHead className="text-end">
                   <InterfaceText source={"Actions"} />
                 </TableHead>
               </TableRow>
@@ -164,7 +166,15 @@ export default function RssSettings() {
                       <CheckCircle className="h-4 w-4 text-green-500" />
                     ) : (
                       <span
-                        title={feed.errorMessage || "Error"}
+                        title={
+                          feed.errorMessage
+                            ? localizeServiceMessage(
+                                feed.errorMessage,
+                                feed.errorMessageI18n,
+                                language
+                              )
+                            : t("interface.error_f38d9cf1")
+                        }
                         data-i18n-title={feed.errorMessage ? undefined : "Error"}
                       >
                         <AlertCircle className="h-4 w-4 text-red-500" />
@@ -190,13 +200,13 @@ export default function RssSettings() {
                       }
                     />
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-end">
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => deleteFeedMutation.mutate(feed.id)}
                       className="text-destructive"
-                      aria-label={formatInterfaceMessage("Delete feed {name}", {
+                      aria-label={formatInterfaceMessage("interface.delete_feed_name_4e8a42a7", {
                         name: String(feed.name ?? ""),
                       })}
                       disabled={deleteFeedMutation.isPending}

@@ -1,3 +1,8 @@
+import {
+  ServiceMessageError,
+  persistedServiceMessage,
+  serviceErrorMetadata,
+} from "../shared/service-messages.js";
 import Parser from "rss-parser";
 import { storage } from "./storage.js";
 import { igdbClient } from "./igdb.js";
@@ -80,7 +85,10 @@ export class RssService {
         rssLogger.error({ feedId: feed.id, error }, `Failed to refresh feed ${feed.name}`);
         await storage.updateRssFeed(feed.id, {
           status: "error",
-          errorMessage: error instanceof Error ? error.message : String(error),
+          ...persistedServiceMessage(
+            error instanceof Error ? error.message : String(error),
+            serviceErrorMetadata(error)
+          ),
           lastCheck: new Date(),
         });
       }
@@ -93,7 +101,7 @@ export class RssService {
     // Use safeFetch instead of directly parsing the URL to prevent DNS rebinding
     const response = await safeFetch(feed.url);
     if (!response.ok) {
-      throw new Error(`Failed to fetch feed: ${response.statusText}`);
+      throw new ServiceMessageError("service.rss_fetch_failed", { status: response.statusText });
     }
     const xmlData = await response.text();
     const feedContent = await this.parser.parseString(xmlData);
@@ -136,6 +144,7 @@ export class RssService {
       lastCheck: new Date(),
       status: "ok",
       errorMessage: null,
+      errorMessageI18n: null,
     });
 
     // 4. Trigger background matching

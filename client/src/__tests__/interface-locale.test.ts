@@ -41,7 +41,7 @@ describe("browser interface language detection", () => {
   });
 
   it("uses the browser's primary language when its preference list is empty", () => {
-    expect(getBrowserInterfaceLanguage({ language: "fr-CA", languages: [] })).toBe("fr");
+    expect(getBrowserInterfaceLanguage({ language: "fr-CA", languages: [] })).toBe("fr-CA");
   });
 
   it("skips unsupported preferences and keeps the browser's order", () => {

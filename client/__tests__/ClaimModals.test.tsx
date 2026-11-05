@@ -52,7 +52,12 @@ describe("claim dialog regressions", () => {
     vi.unstubAllGlobals();
   });
 
-  it("claims an IGDB batch selection as a new game and reports the server's linked count", async () => {
+  it.each([
+    { downloads: 1, added: 1, failed: 0 },
+    { downloads: 2, added: 2, failed: 0 },
+    { downloads: 2, added: 1, failed: 1 },
+    { downloads: 2, added: 0, failed: 2 },
+  ])("reports download-item counts for one group: %j", async ({ downloads, added, failed }) => {
     let submittedBody: Record<string, unknown> | undefined;
     const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
@@ -61,19 +66,17 @@ describe("claim dialog regressions", () => {
           groups: [
             {
               baseTitle: "Candidate Game",
-              downloads: [
-                {
-                  downloaderId: "downloader-1",
-                  downloaderName: "Deluge",
-                  downloadId: "hash-1",
-                  downloadHash: "hash-1",
-                  downloadTitle: "Candidate Game",
-                  status: "completed",
-                  downloadType: "torrent",
-                  category: "main",
-                  categoryConfidence: 1,
-                },
-              ],
+              downloads: Array.from({ length: downloads }, (_, index) => ({
+                downloaderId: "downloader-1",
+                downloaderName: "Deluge",
+                downloadId: `hash-${index + 1}`,
+                downloadHash: `hash-${index + 1}`,
+                downloadTitle: "Candidate Game",
+                status: "completed",
+                downloadType: "torrent",
+                category: "main",
+                categoryConfidence: 1,
+              })),
               libraryMatch: null,
             },
           ],
@@ -82,7 +85,7 @@ describe("claim dialog regressions", () => {
       if (url.includes("/api/igdb/search")) return response([igdbCandidate]);
       if (url === "/api/downloads/claim-batch" && init?.method === "POST") {
         submittedBody = JSON.parse(String(init.body)) as Record<string, unknown>;
-        return response({ addedCount: 1, failedCount: 0, skippedCount: 0 });
+        return response({ addedCount: added, failedCount: failed, skippedCount: 0 });
       }
       return response([]);
     });
@@ -104,10 +107,20 @@ describe("claim dialog regressions", () => {
 
     await waitFor(() => expect(submittedBody).toBeDefined());
     const items = submittedBody?.items as Record<string, unknown>[];
-    expect(items).toHaveLength(1);
-    expect(items[0]).not.toHaveProperty("gameId");
-    expect(items[0]?.newGame).toMatchObject({ igdbId: 123, title: "Candidate Game" });
-    expect(toastMock).toHaveBeenCalledWith({ title: "Linked 1 group to a game" });
+    expect(items).toHaveLength(downloads);
+    for (const item of items) {
+      expect(item).not.toHaveProperty("gameId");
+      expect(item.newGame).toMatchObject({ igdbId: 123, title: "Candidate Game" });
+    }
+    expect(toastMock).toHaveBeenCalledWith(
+      failed
+        ? {
+            title: `Some downloads failed to link (${added} linked)`,
+            description: "Check your downloads.",
+            variant: "destructive",
+          }
+        : { title: `Downloads linked to games: ${added}` }
+    );
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 

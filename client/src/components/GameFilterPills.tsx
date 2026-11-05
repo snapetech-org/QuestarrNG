@@ -31,26 +31,26 @@ export default function GameFilterPills({
             size="sm"
             className="h-7 gap-1.5 text-xs"
             onClick={() => setShowSearchResultsOnly(!showSearchResultsOnly)}
-            aria-label={t("Show games with search results only")}
-            lang={languageFor("Show games with search results only")}
-            dir={directionFor("Show games with search results only")}
+            aria-label={t("interface.show_games_with_search_results_onl_5166ca5d")}
+            lang={languageFor("interface.show_games_with_search_results_onl_5166ca5d")}
+            dir={directionFor("interface.show_games_with_search_results_onl_5166ca5d")}
           >
             <Search className="h-3 w-3" />
             <span
               className="hidden sm:inline"
-              lang={languageFor("Has Results")}
-              dir={directionFor("Has Results")}
+              lang={languageFor("interface.has_results_949261d1")}
+              dir={directionFor("interface.has_results_949261d1")}
             >
-              {t("Has Results")}
+              {t("interface.has_results_949261d1")}
             </span>
           </Button>
         </TooltipTrigger>
         <TooltipContent
           className="sm:hidden"
-          lang={languageFor("Has Results")}
-          dir={directionFor("Has Results")}
+          lang={languageFor("interface.has_results_949261d1")}
+          dir={directionFor("interface.has_results_949261d1")}
         >
-          {t("Has Results")}
+          {t("interface.has_results_949261d1")}
         </TooltipContent>
       </Tooltip>
       <Tooltip>
@@ -71,19 +71,19 @@ export default function GameFilterPills({
             <Download className="h-3 w-3" />
             <span
               className="hidden sm:inline"
-              lang={languageFor("Has Downloads")}
-              dir={directionFor("Has Downloads")}
+              lang={languageFor("interface.has_downloads_7d16c302")}
+              dir={directionFor("interface.has_downloads_7d16c302")}
             >
-              {t("Has Downloads")}
+              {t("interface.has_downloads_7d16c302")}
             </span>
           </Button>
         </TooltipTrigger>
         <TooltipContent
           className="sm:hidden"
-          lang={languageFor("Has Downloads")}
-          dir={directionFor("Has Downloads")}
+          lang={languageFor("interface.has_downloads_7d16c302")}
+          dir={directionFor("interface.has_downloads_7d16c302")}
         >
-          {t("Has Downloads")}
+          {t("interface.has_downloads_7d16c302")}
         </TooltipContent>
       </Tooltip>
       {setShowUpdateAvailableOnly && (
@@ -107,19 +107,19 @@ export default function GameFilterPills({
               <RefreshCw className="h-3 w-3" />
               <span
                 className="hidden sm:inline"
-                lang={languageFor("Update Available")}
-                dir={directionFor("Update Available")}
+                lang={languageFor("interface.update_available_c803387f")}
+                dir={directionFor("interface.update_available_c803387f")}
               >
-                {t("Update Available")}
+                {t("interface.update_available_c803387f")}
               </span>
             </Button>
           </TooltipTrigger>
           <TooltipContent
             className="sm:hidden"
-            lang={languageFor("Update Available")}
-            dir={directionFor("Update Available")}
+            lang={languageFor("interface.update_available_c803387f")}
+            dir={directionFor("interface.update_available_c803387f")}
           >
-            {t("Update Available")}
+            {t("interface.update_available_c803387f")}
           </TooltipContent>
         </Tooltip>
       )}

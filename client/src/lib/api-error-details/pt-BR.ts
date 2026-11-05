@@ -255,7 +255,8 @@ export const API_ERROR_DETAIL_LABELS: Record<ApiErrorDetailSourceMessage, string
     "Nenhum caminho de biblioteca configurado está disponível para navegação",
   "Invalid path: absolute host paths are not allowed":
     "Caminho inválido: caminhos absolutos do host não são permitidos",
-  "Invalid path: traversal detected": "Caminho inválido: foi detectada uma tentativa de travessia",
+  "Invalid path: traversal detected":
+    "Caminho inválido: foi detectada uma tentativa de travessia de diretórios",
   "Steam ID is required": "O Steam ID é obrigatório",
   "Invalid Steam ID format (must be 17 digits starting with 7656)":
     "Formato de Steam ID inválido (deve ter 17 dígitos e começar com 7656)",

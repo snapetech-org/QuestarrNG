@@ -1,0 +1,322 @@
+{
+  "changedTrackedPaths": [
+    "localization/source-coverage.json"
+  ],
+  "coverageRowsRemainingEmptyInCurrentAuditSlice": [
+    "service.api_failed_to_update_path_mapping",
+    "service.api_romm_imports_are_disabled"
+  ],
+  "directTestReferenceRowsAdded": 26,
+  "entries": [
+    {
+      "coverage": [
+        "server/__tests__/integration_api.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_key_limit_reached",
+      "producerPaths": [
+        "server/routes/api-keys.ts"
+      ],
+      "sourceCoverageEntryIndex": 229,
+      "sourcePosition": 230
+    },
+    {
+      "coverage": [
+        "server/__tests__/integration_api.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_failed_to_create_api_key",
+      "producerPaths": [
+        "server/routes/api-keys.ts"
+      ],
+      "sourceCoverageEntryIndex": 230,
+      "sourcePosition": 231
+    },
+    {
+      "coverage": [
+        "server/__tests__/integration_api.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_api_key_not_found",
+      "producerPaths": [
+        "server/routes/api-keys.ts"
+      ],
+      "sourceCoverageEntryIndex": 231,
+      "sourcePosition": 232
+    },
+    {
+      "coverage": [
+        "server/__tests__/integration_api.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_failed_to_revoke_api_key",
+      "producerPaths": [
+        "server/routes/api-keys.ts"
+      ],
+      "sourceCoverageEntryIndex": 232,
+      "sourcePosition": 233
+    },
+    {
+      "coverage": [
+        "server/__tests__/import_routes_coverage.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_failed_to_create_path_mapping",
+      "producerPaths": [
+        "server/routes/import.ts"
+      ],
+      "sourceCoverageEntryIndex": 233,
+      "sourcePosition": 234
+    },
+    {
+      "coverage": [
+        "server/__tests__/import_routes_coverage.test.ts",
+        "server/__tests__/import_routes_additional.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_mapping_not_found",
+      "producerPaths": [
+        "server/routes/import.ts"
+      ],
+      "sourceCoverageEntryIndex": 234,
+      "sourcePosition": 235
+    },
+    {
+      "coverage": [],
+      "disposition": "missing-test-blocker",
+      "key": "service.api_failed_to_update_path_mapping",
+      "producerPaths": [
+        "server/routes/import.ts"
+      ],
+      "sourceCoverageEntryIndex": 235,
+      "sourcePosition": 236
+    },
+    {
+      "coverage": [
+        "server/__tests__/import_routes_coverage.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_failed_to_delete_path_mapping",
+      "producerPaths": [
+        "server/routes/import.ts"
+      ],
+      "sourceCoverageEntryIndex": 236,
+      "sourcePosition": 237
+    },
+    {
+      "coverage": [
+        "server/__tests__/import_routes_coverage.test.ts",
+        "server/__tests__/import_routes_additional.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_download_not_found",
+      "producerPaths": [
+        "server/routes/import.ts"
+      ],
+      "sourceCoverageEntryIndex": 237,
+      "sourcePosition": 238
+    },
+    {
+      "coverage": [
+        "server/__tests__/import_routes_coverage.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_download_was_linked_to_a_game_before_it_could_be_skipped",
+      "producerPaths": [
+        "server/routes/import.ts"
+      ],
+      "sourceCoverageEntryIndex": 238,
+      "sourcePosition": 239
+    },
+    {
+      "coverage": [
+        "server/__tests__/import_routes_coverage.test.ts",
+        "server/__tests__/import_routes_additional.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_internal_server_error",
+      "producerPaths": [
+        "server/routes/import.ts"
+      ],
+      "sourceCoverageEntryIndex": 239,
+      "sourcePosition": 240
+    },
+    {
+      "coverage": [
+        "server/__tests__/import_routes_additional.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_this_download_does_not_need_to_be_linked_to_a_game",
+      "producerPaths": [
+        "server/routes/import.ts"
+      ],
+      "sourceCoverageEntryIndex": 240,
+      "sourcePosition": 241
+    },
+    {
+      "coverage": [
+        "server/__tests__/import_routes_additional.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_this_download_was_already_linked_to_a_game_by_another_request",
+      "producerPaths": [
+        "server/routes/import.ts"
+      ],
+      "sourceCoverageEntryIndex": 241,
+      "sourcePosition": 242
+    },
+    {
+      "coverage": [],
+      "disposition": "missing-test-blocker",
+      "key": "service.api_romm_imports_are_disabled",
+      "producerPaths": [
+        "server/routes/import.ts",
+        "server/services/ImportManager.ts"
+      ],
+      "sourceCoverageEntryIndex": 242,
+      "sourcePosition": 243
+    },
+    {
+      "coverage": [
+        "server/__tests__/api_routes.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_igdb_search_failed",
+      "producerPaths": [
+        "server/routes.ts"
+      ],
+      "sourceCoverageEntryIndex": 243,
+      "sourcePosition": 244
+    },
+    {
+      "coverage": [
+        "server/__tests__/import_routes_security.test.ts",
+        "server/__tests__/import_routes_additional.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_invalid_proposed_path",
+      "producerPaths": [
+        "server/routes/import.ts"
+      ],
+      "sourceCoverageEntryIndex": 244,
+      "sourcePosition": 245
+    },
+    {
+      "coverage": [
+        "server/__tests__/archive_service.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_archive_password_rejected",
+      "producerPaths": [
+        "server/services/ArchiveService.ts"
+      ],
+      "sourceCoverageEntryIndex": 245,
+      "sourcePosition": 246
+    },
+    {
+      "coverage": [
+        "server/__tests__/archive_service.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_archive_password_required",
+      "producerPaths": [
+        "server/services/ArchiveService.ts"
+      ],
+      "sourceCoverageEntryIndex": 246,
+      "sourcePosition": 247
+    },
+    {
+      "coverage": [
+        "server/__tests__/import_manager.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_import_incomplete_scan_confirmation",
+      "producerPaths": [
+        "server/services/ImportManager.ts"
+      ],
+      "sourceCoverageEntryIndex": 247,
+      "sourcePosition": 248
+    },
+    {
+      "coverage": [
+        "server/__tests__/import_manager_additional.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_import_source_path_unresolved",
+      "producerPaths": [
+        "server/services/ImportManager.ts"
+      ],
+      "sourceCoverageEntryIndex": 248,
+      "sourcePosition": 249
+    },
+    {
+      "coverage": [
+        "server/__tests__/import_manager_additional.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_import_download_missing",
+      "producerPaths": [
+        "server/services/ImportManager.ts"
+      ],
+      "sourceCoverageEntryIndex": 249,
+      "sourcePosition": 250
+    },
+    {
+      "coverage": [
+        "server/__tests__/import_manager_additional.test.ts",
+        "server/__tests__/import_manager.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_import_game_for_download_missing",
+      "producerPaths": [
+        "server/services/ImportManager.ts"
+      ],
+      "sourceCoverageEntryIndex": 250,
+      "sourcePosition": 251
+    },
+    {
+      "coverage": [
+        "server/__tests__/import_manager.test.ts"
+      ],
+      "disposition": "metadata-only",
+      "key": "service.api_import_source_path_missing",
+      "producerPaths": [
+        "server/services/ImportManager.ts"
+      ],
+      "sourceCoverageEntryIndex": 251,
+      "sourcePosition": 252
+    }
+  ],
+  "livePullRequest": {
+    "headRefName": "codex/localization-foundations-20261028",
+    "headRefOid": "1ab1c680fda2da8c4933fa78b529ef29e29ffc90",
+    "isDraft": false,
+    "state": "OPEN"
+  },
+  "metadataOnlyRows": 21,
+  "missingTestBlockers": [
+    {
+      "blocker": "No cited test reaches the source catch/guard that emits this key; coverage blocker confirmed.",
+      "key": "service.api_failed_to_update_path_mapping",
+      "sourcePosition": 236
+    },
+    {
+      "blocker": "No cited test reaches the source catch/guard that emits this key; coverage blocker confirmed.",
+      "key": "service.api_romm_imports_are_disabled",
+      "sourcePosition": 243
+    }
+  ],
+  "nativeSpeakerApproval": false,
+  "ownerMetadataChanged": false,
+  "ownerMetadataNote": "Exact producer paths are retained in the audit evidence; the meaning of broad owners arrays is undocumented and cross-review confidence on changing their semantics is moderate, so owners were preserved.",
+  "pullRequest": 155,
+  "repository": "snapetech-org/QuestarrNG",
+  "reviewedPositionCount": 23,
+  "schemaVersion": 1,
+  "sourceCoverageAfterSha256": "8067518d6eb7148470897d6dfa346f2893e6de7465e049b91b6d8b13fb300bfb",
+  "sourceCoverageBeforeSha256": "5a735cd49d4fa91b22cf7fe98e3d96f001d166f11f7e714c3c2e7b72b10a1b03",
+  "sourceCoverageEntryCount": 331,
+  "sourceHead": "1ab1c680fda2da8c4933fa78b529ef29e29ffc90",
+  "sourceTree": "bf909d8b3057a480f455a9ba916e6c55c52f8833",
+  "testsBuildsScansCiBrowserWorkflowsReleasesRun": false
+}

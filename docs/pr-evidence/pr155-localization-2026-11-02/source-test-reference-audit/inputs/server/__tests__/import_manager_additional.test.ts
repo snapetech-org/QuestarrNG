@@ -1,0 +1,948 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const { fsMock, downloadersMock } = vi.hoisted(() => ({
+  fsMock: {
+    ensureDir: vi.fn().mockResolvedValue(undefined),
+    move: vi.fn().mockResolvedValue(undefined),
+    copy: vi.fn().mockResolvedValue(undefined),
+    remove: vi.fn().mockResolvedValue(undefined),
+    pathExists: vi.fn().mockResolvedValue(true),
+    stat: vi.fn().mockResolvedValue({ isDirectory: () => false }),
+    readdir: vi.fn().mockResolvedValue([]),
+  },
+  downloadersMock: {
+    removeDownload: vi.fn().mockResolvedValue({ success: true, message: "ok" }),
+    getDownloadDetails: vi.fn().mockResolvedValue(null),
+  },
+}));
+
+vi.mock("fs-extra", () => ({ default: fsMock }));
+vi.mock("../downloaders.js", () => ({ DownloaderManager: downloadersMock }));
+
+const isSensitivePathMock = vi.hoisted(() =>
+  vi.fn<(path: string) => boolean>().mockReturnValue(false)
+);
+const assertWithinRootsMock = vi.hoisted(() =>
+  vi.fn<(candidatePath: string, roots: string[], errorMessage: string) => Promise<string>>()
+);
+vi.mock("../path-security.js", () => ({
+  isSensitivePath: isSensitivePathMock,
+  assertWithinRoots: assertWithinRootsMock,
+}));
+
+import { ImportManager } from "../services/ImportManager.js";
+import { PCImportStrategy } from "../services/ImportStrategies.js";
+import { makeImportConfig, makeRomMConfig } from "./helpers/import-test-helpers.js";
+
+beforeEach(() => {
+  isSensitivePathMock.mockReturnValue(false);
+  assertWithinRootsMock.mockReset();
+  assertWithinRootsMock.mockImplementation(async (candidatePath) => candidatePath);
+});
+
+function makeStorage() {
+  return {
+    getGameDownload: vi.fn(),
+    getGame: vi.fn(),
+    getImportConfig: vi.fn(),
+    getRomMConfig: vi.fn().mockResolvedValue(makeRomMConfig()),
+    getDownloader: vi.fn(),
+    updateGameDownloadStatus: vi.fn(),
+    updateGameStatus: vi.fn(),
+    updateGame: vi.fn(),
+    addNotification: vi.fn().mockResolvedValue(undefined),
+  };
+}
+
+function makeManager(
+  storage: ReturnType<typeof makeStorage>,
+  overrides: {
+    pathService?: {
+      translatePath: ReturnType<typeof vi.fn>;
+      getConfiguredRoots?: ReturnType<typeof vi.fn>;
+    };
+    archiveService?: {
+      isArchive: ReturnType<typeof vi.fn>;
+      extract: ReturnType<typeof vi.fn>;
+    };
+  } = {}
+) {
+  const pathService = {
+    getConfiguredRoots: vi.fn().mockResolvedValue([]),
+    ...(overrides.pathService ?? { translatePath: vi.fn().mockResolvedValue("/local/file.iso") }),
+  };
+  const platformService = { getSourcePlatform: vi.fn() };
+  const archiveService = overrides.archiveService ?? {
+    isArchive: vi.fn().mockReturnValue(false),
+    extract: vi.fn().mockResolvedValue([]),
+  };
+  return new ImportManager(
+    storage as never, // NOSONAR
+    pathService as never, // NOSONAR
+    platformService as never, // NOSONAR
+    archiveService as never // NOSONAR
+  );
+}
+
+// ─── planConfirmImport ────────────────────────────────────────────────────────
+
+describe("ImportManager - planConfirmImport", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    downloadersMock.getDownloadDetails.mockResolvedValue(null);
+  });
+
+  it("throws when download not found", async () => {
+    const storage = makeStorage();
+    storage.getGameDownload.mockResolvedValue(undefined);
+
+    const manager = makeManager(storage);
+    await expect(manager.planConfirmImport("dl-missing")).rejects.toThrow(
+      "Download dl-missing not found"
+    );
+  });
+
+  it("throws when game not found", async () => {
+    const storage = makeStorage();
+    storage.getGameDownload.mockResolvedValue({ id: "dl-1", gameId: "g-x", downloaderId: "d1" });
+    storage.getGame.mockResolvedValue(undefined);
+
+    const manager = makeManager(storage);
+    await expect(manager.planConfirmImport("dl-1")).rejects.toThrow(
+      "Game not found for download dl-1"
+    );
+  });
+
+  it("returns resolved path and planned proposedPath when overrideSourcePath is provided", async () => {
+    const storage = makeStorage();
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadHash: "abc",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [],
+    });
+    storage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/games" }));
+    storage.getDownloader.mockResolvedValue({ id: "d1", name: "qBit", url: "http://nas.local" });
+    downloadersMock.getDownloadDetails.mockResolvedValue({
+      downloadDir: "/local/path",
+      name: "game.iso",
+    });
+
+    const planSpy = vi.spyOn(PCImportStrategy.prototype, "planImport").mockResolvedValue({
+      needsReview: false,
+      strategy: "pc",
+      originalPath: "/local/path/game.iso",
+      proposedPath: "/games/PC/My Game",
+    });
+
+    const pathService = {
+      translatePath: vi.fn().mockResolvedValue("/local/path/game.iso"),
+      getConfiguredRoots: vi.fn().mockResolvedValue(["/local/path"]),
+    };
+    const manager = makeManager(storage, { pathService });
+
+    const result = await manager.planConfirmImport("dl-1", "/local/path/game.iso");
+
+    expect(result.originalPath).toBe("/local/path/game.iso");
+    expect(result.proposedPath).toBe("/games/PC/My Game");
+
+    planSpy.mockRestore();
+  });
+
+  it("rejects an override outside the tracked download directory when no mappings exist", async () => {
+    const storage = makeStorage();
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadHash: "abc",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [],
+    });
+    storage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/games" }));
+    storage.getDownloader.mockResolvedValue({ id: "d1", name: "qBit", url: "http://nas.local" });
+    downloadersMock.getDownloadDetails.mockResolvedValue({
+      downloadDir: "/downloads",
+      name: "My Game Release",
+    });
+
+    const manager = makeManager(storage, {
+      pathService: { translatePath: vi.fn().mockResolvedValue("/downloads/My Game Release") },
+    });
+    assertWithinRootsMock.mockImplementation(async (candidatePath, roots, errorMessage) => {
+      const root = roots[0]!;
+      if (candidatePath !== root && !candidatePath.startsWith(`${root}/`)) {
+        throw new Error(errorMessage);
+      }
+      return candidatePath;
+    });
+
+    const result = await manager.planConfirmImport("dl-1", "/etc/passwd");
+    expect(result.originalPath).toBeNull();
+    expect(result.files).toEqual([]);
+  });
+
+  it("returns null originalPath when downloader not found (no overrideSourcePath)", async () => {
+    const storage = makeStorage();
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadHash: "abc",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "Fallback Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [],
+    });
+    storage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/games" }));
+    storage.getDownloader.mockResolvedValue(undefined);
+
+    const manager = makeManager(storage);
+    const result = await manager.planConfirmImport("dl-1");
+
+    expect(result.originalPath).toBeNull();
+    expect(result.proposedPath).toContain("Fallback Game");
+  });
+
+  it("resolves originalPath via getDownloadDetails when no override", async () => {
+    const storage = makeStorage();
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadHash: "abc123",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "NAS Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [],
+    });
+    storage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/games" }));
+    storage.getDownloader.mockResolvedValue({
+      id: "d1",
+      name: "qBit",
+      url: "http://nas.local:8080",
+    });
+    downloadersMock.getDownloadDetails.mockResolvedValue({
+      downloadDir: "/remote/downloads",
+      name: "game.iso",
+    });
+
+    const pathService = { translatePath: vi.fn().mockResolvedValue("/local/downloads/game.iso") };
+    const planSpy = vi.spyOn(PCImportStrategy.prototype, "planImport").mockResolvedValue({
+      needsReview: false,
+      strategy: "pc",
+      originalPath: "/local/downloads/game.iso",
+      proposedPath: "/games/PC/NAS Game",
+    });
+
+    const manager = makeManager(storage, { pathService });
+    const result = await manager.planConfirmImport("dl-1");
+
+    expect(result.originalPath).toBe("/local/downloads/game.iso");
+    expect(pathService.translatePath).toHaveBeenCalledWith(
+      "/remote/downloads/game.iso",
+      "nas.local"
+    );
+
+    planSpy.mockRestore();
+  });
+
+  it("uses the single file's own name, not the torrent name, when there's no subfolder", async () => {
+    const storage = makeStorage();
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadHash: "abc123",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "NAS Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [],
+    });
+    storage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/games" }));
+    storage.getDownloader.mockResolvedValue({
+      id: "d1",
+      name: "qBit",
+      url: "http://nas.local:8080",
+    });
+    // qBittorrent dropped the single file directly into the category dir —
+    // no subfolder named after the torrent's display name exists.
+    downloadersMock.getDownloadDetails.mockResolvedValue({
+      downloadDir: "/remote/downloads",
+      name: "NAS.Game-GROUP",
+      files: [{ name: "NAS.Game-GROUP.iso" }],
+    });
+
+    const pathService = {
+      translatePath: vi.fn().mockResolvedValue("/local/downloads/NAS.Game-GROUP.iso"),
+    };
+    const planSpy = vi.spyOn(PCImportStrategy.prototype, "planImport").mockResolvedValue({
+      needsReview: false,
+      strategy: "pc",
+      originalPath: "/local/downloads/NAS.Game-GROUP.iso",
+      proposedPath: "/games/PC/NAS Game.iso",
+    });
+
+    const manager = makeManager(storage, { pathService });
+    const result = await manager.planConfirmImport("dl-1");
+
+    expect(result.originalPath).toBe("/local/downloads/NAS.Game-GROUP.iso");
+    expect(pathService.translatePath).toHaveBeenCalledWith(
+      "/remote/downloads/NAS.Game-GROUP.iso",
+      "nas.local"
+    );
+
+    planSpy.mockRestore();
+  });
+
+  it("returns null originalPath when getDownloadDetails returns no downloadDir", async () => {
+    const storage = makeStorage();
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadHash: "abc123",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [],
+    });
+    storage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/games" }));
+    storage.getDownloader.mockResolvedValue({ id: "d1", name: "qBit", url: "http://localhost" });
+    downloadersMock.getDownloadDetails.mockResolvedValue({ downloadDir: null, name: "game.iso" });
+
+    const manager = makeManager(storage);
+    const result = await manager.planConfirmImport("dl-1");
+
+    expect(result.originalPath).toBeNull();
+  });
+
+  it("avoids appending the release name twice when downloadDir already ends with it", async () => {
+    const storage = makeStorage();
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadHash: "abc123",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [],
+    });
+    storage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/games" }));
+    storage.getDownloader.mockResolvedValue({
+      id: "d1",
+      name: "SABnzbd",
+      url: "http://sab.local:8080",
+    });
+    downloadersMock.getDownloadDetails.mockResolvedValue({
+      downloadDir: "/remote/complete/Aethus.v1.036-ElAmigos",
+      name: "Aethus.v1.036-ElAmigos",
+    });
+
+    const pathService = {
+      translatePath: vi.fn().mockResolvedValue("/local/complete/Aethus.v1.036-ElAmigos"),
+    };
+    const planSpy = vi.spyOn(PCImportStrategy.prototype, "planImport").mockResolvedValue({
+      needsReview: false,
+      strategy: "pc",
+      originalPath: "/local/complete/Aethus.v1.036-ElAmigos",
+      proposedPath: "/games/PC/My Game",
+    });
+
+    const manager = makeManager(storage, { pathService });
+    const result = await manager.planConfirmImport("dl-1");
+
+    expect(result.originalPath).toBe("/local/complete/Aethus.v1.036-ElAmigos");
+    expect(pathService.translatePath).toHaveBeenCalledWith(
+      "/remote/complete/Aethus.v1.036-ElAmigos",
+      "sab.local"
+    );
+
+    planSpy.mockRestore();
+  });
+
+  it("returns fallback proposedPath when planImport throws (source not accessible)", async () => {
+    const storage = makeStorage();
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadHash: "abc",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [],
+    });
+    storage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/games" }));
+
+    const planSpy = vi
+      .spyOn(PCImportStrategy.prototype, "planImport")
+      .mockRejectedValue(new Error("ENOENT: no such file"));
+
+    const pathService = {
+      translatePath: vi.fn().mockResolvedValue("/local/path/game.iso"),
+      getConfiguredRoots: vi.fn().mockResolvedValue(["/local/path"]),
+    };
+    const manager = makeManager(storage, { pathService });
+
+    const result = await manager.planConfirmImport("dl-1", "/local/path/game.iso");
+
+    expect(result.originalPath).toBe("/local/path/game.iso");
+    expect(result.proposedPath).toMatch(/My Game/);
+
+    planSpy.mockRestore();
+  });
+
+  it("handles source resolution failure gracefully → null originalPath", async () => {
+    const storage = makeStorage();
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadHash: "abc",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "Graceful Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [],
+    });
+    storage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/games" }));
+    storage.getDownloader.mockRejectedValue(new Error("DB error"));
+
+    const manager = makeManager(storage);
+    const result = await manager.planConfirmImport("dl-1");
+
+    expect(result.originalPath).toBeNull();
+    expect(result.proposedPath).toContain("Graceful Game");
+  });
+});
+
+// ─── readSourceFiles behavior (via planConfirmImport) ─────────────────────────
+
+describe("ImportManager - readSourceFiles (via planConfirmImport)", () => {
+  function makeBaseStorage() {
+    const s = makeStorage();
+    s.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadHash: "abc",
+    });
+    s.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [],
+    });
+    s.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/games" }));
+    return s;
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    isSensitivePathMock.mockReturnValue(false);
+    fsMock.stat.mockResolvedValue({ isDirectory: () => true });
+    fsMock.readdir.mockResolvedValue([]);
+  });
+
+  it("caps the file list at 100 entries and reports the full totalCount", async () => {
+    const allFiles = Array.from(
+      { length: 150 },
+      (_, i) => `file-${String(i).padStart(3, "0")}.bin`
+    );
+    fsMock.readdir.mockResolvedValue(allFiles);
+
+    const planSpy = vi
+      .spyOn(PCImportStrategy.prototype, "planImport")
+      .mockRejectedValue(new Error("ENOENT"));
+
+    const manager = makeManager(makeBaseStorage(), {
+      pathService: {
+        translatePath: vi.fn().mockResolvedValue("/data/downloads/big-game"),
+        getConfiguredRoots: vi.fn().mockResolvedValue(["/data/downloads"]),
+      },
+    });
+    const result = await manager.planConfirmImport("dl-1", "/data/downloads/big-game");
+
+    expect(result.files).toHaveLength(100);
+    expect(result.totalCount).toBe(150);
+    expect(result.hasArchive).toBe(false);
+
+    planSpy.mockRestore();
+  });
+
+  it("reports hasArchive=true even when the archive falls beyond the 100-file cap", async () => {
+    // Use zero-padded names so lexicographic sort keeps all 100 "file-*" entries
+    // before "zzz-archive.zip", which then lands beyond the cap at index 100.
+    const regularFiles = Array.from(
+      { length: 100 },
+      (_, i) => `file-${String(i).padStart(3, "0")}.bin`
+    );
+    const allFiles = [...regularFiles, "zzz-archive.zip", "zzz-extra.bin"];
+    fsMock.readdir.mockResolvedValue(allFiles);
+
+    const archiveService = {
+      isArchive: vi.fn().mockImplementation((name: string) => name.endsWith(".zip")),
+      extract: vi.fn(),
+    };
+    const planSpy = vi
+      .spyOn(PCImportStrategy.prototype, "planImport")
+      .mockRejectedValue(new Error("ENOENT"));
+
+    const manager = makeManager(makeBaseStorage(), {
+      archiveService,
+      pathService: {
+        translatePath: vi.fn().mockResolvedValue("/data/downloads/game"),
+        getConfiguredRoots: vi.fn().mockResolvedValue(["/data/downloads"]),
+      },
+    });
+    const result = await manager.planConfirmImport("dl-1", "/data/downloads/game");
+
+    expect(result.files).toHaveLength(100);
+    expect(result.files.every((f) => !f.isArchive)).toBe(true);
+    expect(result.hasArchive).toBe(true);
+    expect(result.totalCount).toBe(102);
+
+    planSpy.mockRestore();
+  });
+
+  it("returns empty file listing for sensitive source paths without touching the filesystem", async () => {
+    isSensitivePathMock.mockReturnValue(true);
+
+    const planSpy = vi.spyOn(PCImportStrategy.prototype, "planImport").mockResolvedValue({
+      needsReview: false,
+      strategy: "pc",
+      originalPath: "/etc",
+      proposedPath: "/games/PC/My Game",
+    });
+
+    const manager = makeManager(makeBaseStorage());
+    const result = await manager.planConfirmImport("dl-1", "/etc");
+
+    expect(result.files).toEqual([]);
+    expect(result.hasArchive).toBe(false);
+    expect(result.totalCount).toBe(0);
+    expect(fsMock.stat).not.toHaveBeenCalled();
+    expect(fsMock.readdir).not.toHaveBeenCalled();
+
+    planSpy.mockRestore();
+  });
+
+  it("returns empty file listing for a source outside configured roots without touching the filesystem", async () => {
+    // Regression test: readSourceFiles used to stat/readdir the source directly, so an
+    // out-of-root path had its directory contents disclosed through this preview
+    // listing even though the later import itself would go on to reject it.
+    assertWithinRootsMock.mockRejectedValue(
+      new Error("Refusing to process a path outside the configured downloader roots")
+    );
+
+    const manager = makeManager(makeBaseStorage());
+    const result = await manager.planConfirmImport("dl-1", "/etc/outside-root");
+
+    expect(result.files).toEqual([]);
+    expect(result.hasArchive).toBe(false);
+    expect(result.totalCount).toBe(0);
+    expect(fsMock.stat).not.toHaveBeenCalled();
+    expect(fsMock.readdir).not.toHaveBeenCalled();
+
+    assertWithinRootsMock.mockReset();
+  });
+});
+
+// ─── performAutoDelete edge cases ────────────────────────────────────────────
+
+describe("ImportManager - performAutoDelete skips", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    fsMock.pathExists.mockResolvedValue(true);
+    downloadersMock.removeDownload.mockResolvedValue({ success: true, message: "ok" });
+  });
+
+  it("skips auto-delete when downloader is not found during cleanup", async () => {
+    const storage = makeStorage();
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadHash: "abc",
+      downloadTitle: "My Game",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue(
+      makeImportConfig({ transferMode: "copy", autoDeleteAfterImport: true })
+    );
+    // First getDownloader (resolveLocalPath) returns the downloader;
+    // second (performAutoDelete) returns undefined
+    storage.getDownloader
+      .mockResolvedValueOnce({ id: "d1", name: "qBit", url: "http://localhost" })
+      .mockResolvedValueOnce(undefined);
+
+    const manager = makeManager(storage);
+    await manager.processImport("dl-1", "/remote/path");
+
+    expect(downloadersMock.removeDownload).not.toHaveBeenCalled();
+  });
+
+  it("skips auto-delete when download has no hash", async () => {
+    const storage = makeStorage();
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadHash: null,
+      downloadTitle: "My Game",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue(
+      makeImportConfig({ transferMode: "copy", autoDeleteAfterImport: true })
+    );
+    storage.getDownloader.mockResolvedValue({ id: "d1", name: "qBit", url: "http://localhost" });
+
+    const manager = makeManager(storage);
+    await manager.processImport("dl-1", "/remote/path");
+
+    expect(downloadersMock.removeDownload).not.toHaveBeenCalled();
+  });
+});
+
+// ─── platform filter ──────────────────────────────────────────────────────────
+
+describe("ImportManager - shouldSkipPCPlatform", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    fsMock.pathExists.mockResolvedValue(true);
+  });
+
+  it("marks completed when game platform is excluded by importPlatformIds filter", async () => {
+    const storage = makeStorage();
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: "",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "PS3 Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [9], // PS3
+    });
+    storage.getImportConfig.mockResolvedValue(
+      makeImportConfig({ importPlatformIds: [6] }) // PC only
+    );
+    storage.getDownloader.mockResolvedValue({ id: "d1", name: "qBit", url: "http://localhost" });
+
+    const manager = makeManager(storage);
+    await manager.processImport("dl-1", "/remote/path");
+
+    expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith("dl-1", "completed");
+    expect(fsMock.ensureDir).not.toHaveBeenCalled();
+  });
+
+  it("does not skip when game platform matches importPlatformIds", async () => {
+    const storage = makeStorage();
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: "",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "PC Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6], // PC
+    });
+    storage.getImportConfig.mockResolvedValue(
+      makeImportConfig({ importPlatformIds: [6], libraryRoot: "/games" })
+    );
+    storage.getDownloader.mockResolvedValue({ id: "d1", name: "qBit", url: "http://localhost" });
+
+    const manager = makeManager(storage);
+    await manager.processImport("dl-1", "/remote/path");
+
+    expect(fsMock.ensureDir).toHaveBeenCalledWith("/games");
+  });
+});
+
+// ─── archive cleanup in processImport ────────────────────────────────────────
+
+describe("ImportManager - processImport archive cleanup", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    fsMock.pathExists.mockResolvedValue(true);
+    fsMock.remove.mockResolvedValue(undefined);
+    // vi.clearAllMocks() doesn't reset a mockResolvedValue set by an earlier test/block
+    // (only vi.resetAllMocks() does) — an earlier block's directory-stat override would
+    // otherwise leak into these single-file-source tests. Pin the default explicitly.
+    fsMock.stat.mockResolvedValue({ isDirectory: () => false });
+  });
+
+  it("removes extracted directory after successful import when autoUnpack is enabled", async () => {
+    const storage = makeStorage();
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: "Game.zip",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "Archive Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue(
+      makeImportConfig({ autoUnpack: true, transferMode: "copy", libraryRoot: "/games" })
+    );
+    storage.getDownloader.mockResolvedValue({ id: "d1", name: "qBit", url: "http://localhost" });
+
+    const pathService = { translatePath: vi.fn().mockResolvedValue("/local/Game.zip") };
+    const archiveService = {
+      isArchive: vi.fn().mockReturnValue(true),
+      extract: vi.fn().mockResolvedValue(["/local/Game.zip_extracted/game.exe"]),
+    };
+
+    const planSpy = vi.spyOn(PCImportStrategy.prototype, "planImport").mockResolvedValue({
+      needsReview: false,
+      strategy: "pc",
+      originalPath: "/local/Game.zip_extracted",
+      proposedPath: "/games/PC/Archive Game",
+    });
+    const execSpy = vi.spyOn(PCImportStrategy.prototype, "executeImport").mockResolvedValue({
+      destDir: "/games/PC/Archive Game",
+      filesPlaced: ["/games/PC/Archive Game/game.exe"],
+      modeUsed: "copy",
+      conflictsResolved: [],
+    });
+
+    const manager = makeManager(storage, { pathService, archiveService });
+    await manager.processImport("dl-1", "/remote/path");
+
+    // copy mode relocates the raw archive into the library first (Game.zip's basename,
+    // under the planned destination), extracts it in place there, then removes that
+    // now-redundant copy — not a downloader-side "_extracted" directory.
+    expect(fsMock.remove).toHaveBeenCalledWith("/games/PC/Archive Game/Game.zip");
+
+    planSpy.mockRestore();
+    execSpy.mockRestore();
+  });
+
+  it("does not call remove when autoUnpack is false (no extraction)", async () => {
+    const storage = makeStorage();
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: "Game.iso",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "ISO Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue(
+      makeImportConfig({ autoUnpack: false, transferMode: "copy", libraryRoot: "/games" })
+    );
+    storage.getDownloader.mockResolvedValue({ id: "d1", name: "qBit", url: "http://localhost" });
+
+    const pathService = { translatePath: vi.fn().mockResolvedValue("/local/Game.iso") };
+
+    const planSpy = vi.spyOn(PCImportStrategy.prototype, "planImport").mockResolvedValue({
+      needsReview: false,
+      strategy: "pc",
+      originalPath: "/local/Game.iso",
+      proposedPath: "/games/PC/ISO Game",
+    });
+    const execSpy = vi.spyOn(PCImportStrategy.prototype, "executeImport").mockResolvedValue({
+      destDir: "/games/PC/ISO Game",
+      filesPlaced: ["/games/PC/ISO Game/game.iso"],
+      modeUsed: "copy",
+      conflictsResolved: [],
+    });
+
+    const manager = makeManager(storage, { pathService });
+    await manager.processImport("dl-1", "/remote/path");
+
+    expect(fsMock.remove).not.toHaveBeenCalled();
+
+    planSpy.mockRestore();
+    execSpy.mockRestore();
+  });
+});
+
+// ─── confirmImport missing path / unresolvable source ────────────────────────
+
+describe("ImportManager - confirmImport path resolution failures", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    fsMock.pathExists.mockResolvedValue(true);
+    fsMock.remove.mockResolvedValue(undefined);
+    downloadersMock.getDownloadDetails.mockResolvedValue(null);
+    // See the same note in the "processImport archive cleanup" describe block above —
+    // vi.clearAllMocks() doesn't reset a mockResolvedValue left by an earlier block.
+    fsMock.stat.mockResolvedValue({ isDirectory: () => false });
+  });
+
+  it("throws when source path cannot be resolved (no downloader, empty originalPath)", async () => {
+    const storage = makeStorage();
+    storage.getGameDownload.mockResolvedValue({ id: "dl-1", gameId: "g1", downloaderId: "d1" });
+    storage.getDownloader.mockResolvedValue(undefined);
+
+    const manager = makeManager(storage);
+
+    await expect(
+      manager.confirmImport("dl-1", {
+        strategy: "pc",
+        originalPath: "", // falsy → falls through to downloader lookup
+        proposedPath: "/data/PC/game",
+        needsReview: false,
+      })
+    ).rejects.toThrow("Source path could not be resolved");
+  });
+
+  it("throws when proposedPath is missing", async () => {
+    const storage = makeStorage();
+    storage.getGameDownload.mockResolvedValue({ id: "dl-1", gameId: "g1", downloaderId: "d1" });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/data" }));
+
+    const manager = makeManager(storage, {
+      pathService: {
+        translatePath: vi.fn().mockResolvedValue("/local/source"),
+        getConfiguredRoots: vi.fn().mockResolvedValue(["/local"]),
+      },
+    });
+
+    await expect(
+      manager.confirmImport("dl-1", {
+        strategy: "pc",
+        originalPath: "/local/source", // truthy → returned directly
+        proposedPath: "" as unknown as string, // falsy
+        needsReview: false,
+      })
+    ).rejects.toThrow("Proposed path is required for import validation");
+  });
+
+  it("leaves the raw archive stranded in the library and notifies when extraction fails after a move", async () => {
+    // move/copy relocate the raw archive into the library first, then extract it in
+    // place there. If that extraction fails, the archive is deliberately left where it
+    // landed rather than cleaned up — there's no retry-import path to recover it, so
+    // deleting it here would just destroy the user's only remaining copy. An
+    // in-app notification is raised instead so the failure isn't silent.
+    const storage = makeStorage();
+    storage.getGameDownload.mockResolvedValue({ id: "dl-1", gameId: "g1", downloaderId: "d1" });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/safe/root" }));
+
+    const archiveService = {
+      isArchive: vi.fn().mockReturnValue(true),
+      extract: vi.fn().mockRejectedValue(new Error("disk full")),
+    };
+
+    const manager = makeManager(storage, {
+      archiveService,
+      pathService: {
+        translatePath: vi.fn().mockResolvedValue("/downloads/game.zip"),
+        getConfiguredRoots: vi.fn().mockResolvedValue(["/downloads"]),
+      },
+    });
+
+    await expect(
+      manager.confirmImport("dl-1", {
+        strategy: "pc",
+        originalPath: "/downloads/game.zip",
+        proposedPath: "/safe/root/PC/My Game",
+        needsReview: false,
+        transferMode: "move",
+        unpack: true,
+      })
+    ).rejects.toThrow("disk full");
+
+    // The archive is copied into the library (never moved directly) so a mid-family
+    // failure can't split a multi-volume set across source and destination; the
+    // source is only removed after the copy succeeds, which it does here — the
+    // failure below is extract()'s, not the relocation's.
+    expect(fsMock.copy).toHaveBeenCalledWith(
+      "/downloads/game.zip",
+      "/safe/root/PC/My Game/game.zip",
+      { overwrite: true }
+    );
+    expect(fsMock.remove).toHaveBeenCalledWith("/downloads/game.zip");
+    expect(fsMock.remove).not.toHaveBeenCalledWith("/safe/root/PC/My Game/game.zip");
+    expect(storage.addNotification).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "error",
+        title: "Import extraction failed",
+      })
+    );
+    expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
+      "dl-1",
+      "manual_review_required",
+      "disk full"
+    );
+  });
+});

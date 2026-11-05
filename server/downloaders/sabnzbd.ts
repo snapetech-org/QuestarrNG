@@ -1,3 +1,9 @@
+import {
+  serviceMessage,
+  ServiceMessageError,
+  serviceErrorResult,
+  serviceErrorValue,
+} from "../../shared/service-messages.js";
 import type { Downloader, DownloadStatus, DownloadDetails } from "../../shared/schema.js";
 import { resolveArchivePassword } from "../../shared/archive-password.js";
 import { downloadersLogger } from "../logger.js";
@@ -174,17 +180,27 @@ export class SABnzbdClient implements DownloaderClient {
     try {
       const data = await this.getVersionInfo();
       if (data.version) {
-        return { success: true, message: `Connected to SABnzbd v${data.version}` };
+        return {
+          success: true,
+          ...serviceMessage("service.connected_version", {
+            client: "SABnzbd",
+            version: String(data.version),
+          }),
+        };
       }
 
-      return { success: false, message: "Invalid SABnzbd response - missing version field" };
+      return { success: false, ...serviceMessage("service.sabnzbd_version_missing", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = serviceErrorValue(error);
       const baseUrl = this.getBaseUrl();
       downloadersLogger.error({ error, url: baseUrl }, "SABnzbd connection test failed");
       return {
         success: false,
-        message: `Failed to connect to SABnzbd at ${baseUrl}: ${errorMessage}`,
+        ...serviceMessage("service.connection_failed_at", {
+          client: "SABnzbd",
+          url: baseUrl,
+          error: errorMessage,
+        }),
       };
     }
   }
@@ -215,8 +231,14 @@ export class SABnzbdClient implements DownloaderClient {
     const response = await this.fetchWithFallback(url, { signal: AbortSignal.timeout(10000) });
 
     if (!response.ok) {
-      const errorText = await response.text().catch(() => "No error details");
-      throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+      const errorText = await response
+        .text()
+        .catch(() => serviceMessage("service.no_error_details", {}));
+      throw new ServiceMessageError("service.http_error_status", {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText,
+      });
     }
 
     return (await response.json()) as Record<string, unknown>;
@@ -230,10 +252,10 @@ export class SABnzbdClient implements DownloaderClient {
     if (data.status === true) {
       const [nzoId] = data.nzo_ids ?? [];
       if (nzoId) {
-        return { success: true, id: nzoId, message: "NZB added successfully" };
+        return { success: true, id: nzoId, ...serviceMessage("service.nzb_added", {}) };
       }
       // Status true but no ID usually means duplicate in SABnzbd (or merged)
-      return { success: true, message: "NZB added successfully (likely duplicate or merged)" };
+      return { success: true, ...serviceMessage("service.nzb_added_duplicate_or_merged", {}) };
     }
 
     // Check for specific duplicate error
@@ -242,12 +264,15 @@ export class SABnzbdClient implements DownloaderClient {
       typeof data.error === "string" &&
       data.error.toLowerCase().includes("duplicate")
     ) {
-      return { success: true, message: `NZB already exists: ${data.error}` };
+      return {
+        success: true,
+        ...serviceMessage("service.nzb_already_exists", { error: data.error }),
+      };
     }
 
     return {
       success: false,
-      message: data.error || "Failed to add NZB - SABnzbd returned success:false",
+      ...(data.error ? { message: data.error } : serviceMessage("service.nzb_add_rejected", {})),
     };
   }
 
@@ -255,7 +280,10 @@ export class SABnzbdClient implements DownloaderClient {
     request: DownloadRequest
   ): Promise<{ success: boolean; id?: string; message: string }> {
     if (!(await isSafeUrl(request.url))) {
-      return { success: false, message: `Unsafe URL blocked: ${request.url}` };
+      return {
+        success: false,
+        ...serviceMessage("service.unsafe_url_blocked", { url: request.url }),
+      };
     }
 
     try {
@@ -264,21 +292,28 @@ export class SABnzbdClient implements DownloaderClient {
       const nzbUrl = fixNzbUrlEncoding(request.url);
       const nzbResponse = await safeFetch(nzbUrl);
       if (!nzbResponse.ok) {
-        return { success: false, message: `Failed to fetch NZB: ${nzbResponse.statusText}` };
+        return {
+          success: false,
+          ...serviceMessage("service.nzb_fetch_failed", { error: nzbResponse.statusText }),
+        };
       }
       const nzbContent = await nzbResponse.arrayBuffer();
 
       // Many usenet releases (e.g. G4U) ship as password-protected archives. SABnzbd
       // can unpack them automatically if we hand it the extraction password up front —
       // configured per-downloader since it's usually a fixed indexer/group convention.
-      const { password, error: passwordError } = resolveArchivePassword(
+      const {
+        password,
+        error: passwordError,
+        errorI18n: passwordMetadata,
+      } = resolveArchivePassword(
         request.password,
         this.downloader.settings,
         this.getBaseUrl(),
         "SABnzbd"
       );
       if (passwordError) {
-        return { success: false, message: passwordError };
+        return { success: false, message: passwordError, ...passwordMetadata };
       }
 
       const url = this.getApiUrl("addfile", {
@@ -312,17 +347,22 @@ export class SABnzbdClient implements DownloaderClient {
       );
 
       if (!response.ok) {
-        const errorText = await response.text().catch(() => "No error details");
-        return { success: false, message: `HTTP ${response.status}: ${errorText}` };
+        const errorText = await response
+          .text()
+          .catch(() => serviceMessage("service.no_error_details", {}));
+        return {
+          success: false,
+          ...serviceMessage("service.http_error", { status: response.status, error: errorText }),
+        };
       }
 
       const data = await response.json();
       return this.parseAddFileResponse(data);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = serviceErrorValue(error);
       return {
         success: false,
-        message: `Failed to add NZB to SABnzbd: ${errorMessage}`,
+        ...serviceMessage("service.nzb_sabnzbd_add_failed", { error: errorMessage }),
       };
     }
   }
@@ -622,15 +662,12 @@ export class SABnzbdClient implements DownloaderClient {
       const data = await response.json();
 
       if (data.status === true) {
-        return { success: true, message: "NZB paused" };
+        return { success: true, ...serviceMessage("service.nzb_paused", {}) };
       }
 
-      return { success: false, message: "Failed to pause NZB" };
+      return { success: false, ...serviceMessage("service.nzb_pause_failed", {}) };
     } catch (error) {
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : "Unknown error",
-      };
+      return serviceErrorResult(error, serviceMessage("interface.unknown_error_ce512b43", {}));
     }
   }
 
@@ -641,15 +678,12 @@ export class SABnzbdClient implements DownloaderClient {
       const data = await response.json();
 
       if (data.status === true) {
-        return { success: true, message: "NZB resumed" };
+        return { success: true, ...serviceMessage("service.nzb_resumed", {}) };
       }
 
-      return { success: false, message: "Failed to resume NZB" };
+      return { success: false, ...serviceMessage("service.nzb_resume_failed", {}) };
     } catch (error) {
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : "Unknown error",
-      };
+      return serviceErrorResult(error, serviceMessage("interface.unknown_error_ce512b43", {}));
     }
   }
 
@@ -663,15 +697,12 @@ export class SABnzbdClient implements DownloaderClient {
       const data = await response.json();
 
       if (data.status === true) {
-        return { success: true, message: "NZB removed" };
+        return { success: true, ...serviceMessage("service.nzb_removed", {}) };
       }
 
-      return { success: false, message: "Failed to remove NZB" };
+      return { success: false, ...serviceMessage("service.nzb_remove_failed", {}) };
     } catch (error) {
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : "Unknown error",
-      };
+      return serviceErrorResult(error, serviceMessage("interface.unknown_error_ce512b43", {}));
     }
   }
 

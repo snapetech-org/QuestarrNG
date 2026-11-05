@@ -1,8 +1,9 @@
 /** @vitest-environment jsdom */
 import React from "react";
-import { render, screen } from "@testing-library/react";
-import { vi, describe, it, expect } from "vitest";
+import { act, render, screen } from "@testing-library/react";
+import { afterEach, vi, describe, it, expect } from "vitest";
 import SearchResultsBadge from "../src/components/SearchResultsBadge";
+import { setInterfaceLanguage } from "@/lib/interface-locale";
 
 // Mock Tooltip
 vi.mock("@/components/ui/tooltip", () => ({
@@ -12,6 +13,14 @@ vi.mock("@/components/ui/tooltip", () => ({
 }));
 
 describe("SearchResultsBadge", () => {
+  afterEach(() => act(() => setInterfaceLanguage("en")));
+
+  it("describes German available content with a noun rather than the update action", () => {
+    act(() => setInterfaceLanguage("de"));
+    render(<SearchResultsBadge visible={false} updatesAvailable />);
+    expect(screen.getByRole("status")).toHaveTextContent("Updates");
+    expect(screen.getByRole("status")).not.toHaveTextContent("Aktualisieren");
+  });
   it.each(["overlay", "inline"] as const)(
     "identifies available updates in the %s layout",
     (variant) => {

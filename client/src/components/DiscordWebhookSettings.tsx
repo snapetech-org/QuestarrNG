@@ -123,7 +123,7 @@ export default function DiscordWebhookSettings() {
                 }
                 value={webhookUrl}
                 onChange={handleChange}
-                className="pr-10"
+                className="pe-10"
               />
               <Button
                 type="button"
@@ -131,7 +131,7 @@ export default function DiscordWebhookSettings() {
                 size="icon"
                 aria-label={showWebhook ? "Hide webhook URL" : "Show webhook URL"}
                 data-i18n-aria-label={showWebhook ? "Hide webhook URL" : "Show webhook URL"}
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                className="absolute end-1 top-1/2 -translate-y-1/2 h-7 w-7"
                 onClick={handleToggleShow}
               >
                 {showWebhook ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -148,9 +148,9 @@ export default function DiscordWebhookSettings() {
           <div className="flex justify-end">
             <Button size="sm" onClick={handleSave} disabled={saveDisabled}>
               {updateDiscordMutation.isPending ? (
-                <InterfaceText source="Saving..." />
+                <InterfaceText source="interface.saving_1ee0c88f" />
               ) : (
-                <InterfaceText source="Save" />
+                <InterfaceText source="interface.save_4d2d5d68" />
               )}
             </Button>
           </div>

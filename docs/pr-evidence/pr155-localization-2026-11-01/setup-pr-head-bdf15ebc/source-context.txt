@@ -1,0 +1,85 @@
+[client/src/components/navigation-items.ts:54-64] Discover/Browse navigation group (file SHA-256 810227c91c59641a9b661a528c65cf3c33969b5ab0a9eeb6bee64d2a0c1d0d9a)
+54:   {
+55:     title: "Discover",
+56:     messageId: "navigation.discover",
+57:     url: "/discover",
+58:     icon: Compass,
+59:     // The group header only toggles the group, so the Discover page itself needs its own
+60:     // entry here (like "All Games" under Library), or the desktop sidebar can't reach it.
+61:     children: [
+62:       { title: "Browse", messageId: "navigation.browse", url: "/discover", icon: Compass },
+63:       {
+64:         title: "xREL.to Releases",
+
+[client/src/components/navigation-items.ts:108-112] Mobile Discover entry (file SHA-256 810227c91c59641a9b661a528c65cf3c33969b5ab0a9eeb6bee64d2a0c1d0d9a)
+108: export const mobileBottomNavigation: AppNavItem[] = [
+109:   { title: "Library", messageId: "navigation.library", url: "/", icon: Home },
+110:   { title: "Discover", messageId: "navigation.discover", url: "/discover", icon: Compass },
+111:   { title: "Downloads", messageId: "navigation.downloads", url: "/downloads", icon: Download },
+112:   { title: "Playing", messageId: "navigation.playing", url: "/playing", icon: Gamepad2 },
+
+[client/src/components/AppSidebar.tsx:190-201] Game Management sidebar header (file SHA-256 27921fd1872dc9ea9ef5a684ed8029999f86e596464c90ecb2cb4b2db27fc752)
+190:           <div>
+191:             <span className="truncate font-semibold">
+192:               <InterfaceText source={"QuestarrNG"} />
+193:             </span>
+194:             <p
+195:               className="text-xs text-muted-foreground"
+196:               lang={languageFor("interface.game_management_b1319076")}
+197:               dir={directionFor("interface.game_management_b1319076")}
+198:             >
+199:               {t("interface.game_management_b1319076")}
+200:             </p>
+201:           </div>
+
+[client/src/pages/auth/setup.tsx:348-356] (file SHA-256 1bbdf77cec33cb602fb4f4441eca5586f00a734b0c518591f767355a2bc65ef5)
+348:                         />
+349:                       </FormControl>
+350:                     </div>
+351:                     <FormDescription
+352:                       lang={languageFor("interface.at_least_8_characters_including_on_2a6832ca")}
+353:                       dir={directionFor("interface.at_least_8_characters_including_on_2a6832ca")}
+354:                     >
+355:                       {t("interface.at_least_8_characters_including_on_2a6832ca")}
+356:                     </FormDescription>
+
+[client/src/pages/auth/setup.tsx:408-416] (file SHA-256 1bbdf77cec33cb602fb4f4441eca5586f00a734b0c518591f767355a2bc65ef5)
+408:                       <IgdbHelpPopover />
+409:                     </div>
+410:                     <p
+411:                       className="text-sm text-muted-foreground mb-4"
+412:                       lang={languageFor("interface.igdb_credentials_are_required_to_d_db32487d")}
+413:                       dir={directionFor("interface.igdb_credentials_are_required_to_d_db32487d")}
+414:                     >
+415:                       {t("interface.igdb_credentials_are_required_to_d_db32487d")}
+416:                     </p>
+
+[shared/schema.ts:980-992] (file SHA-256 2ede42f4ae569098b5b1440cc548553a54b1f0b3d1d24cde89d2fb0863d3a525)
+980: // Shared password policy: minimum length plus a mix of letters and digits,
+981: // used for both account setup and password changes (client and server).
+982: export const PASSWORD_MIN_LENGTH = 8;
+983:
+984: export const passwordPolicySchema = z
+985:   .string()
+986:   .trim()
+987:   .min(PASSWORD_MIN_LENGTH, `Password must be at least ${PASSWORD_MIN_LENGTH} characters`)
+988:   .regex(/[A-Za-z]/, "Password must contain at least one letter")
+989:   .regex(/[0-9]/, "Password must contain at least one number");
+990:
+991: export const updatePasswordSchema = z
+992:   .object({
+
+[docs/translation-glossary.md:1-13] (file SHA-256 bcaf89e1048437073772f9f07a8c888a64d24f7d29c0f83e154f2764e39d3a53)
+1: # QuestarrNG translation glossary
+2:
+3: Use these meanings consistently across interface copy, help text, notifications, and API summaries.
+4:
+5: | Source term | Meaning and translation guidance |
+6: |---|---|
+7: | Game | A catalog item in the user's game library. Do not translate a game's actual title. |
+8: | Release | A downloadable release record returned by an indexer or provider. Preserve the release's original title and group tag. |
+9: | Update / patch | A later game version or corrective package. Keep it distinct from a full game release. |
+10: | DLC / expansion | Add-on content associated with a base game. Preserve vendor product names. |
+11: | Pack / add-on | A grouped download or bundle when the product context does not specifically mean DLC. |
+12: | Wanted | A user-selected game they intend to acquire; it is a library status, not a generic desire. |
+13: | Library import | The operation that matches downloaded files to a game and moves or records them in the library. |

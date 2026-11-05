@@ -1,3 +1,4 @@
+import { serviceMessage, serviceErrorBody } from "../../shared/service-messages.js";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Mock the config module before importing igdb
@@ -1315,7 +1316,10 @@ describe("IGDBClient - testCredentials", () => {
     const { igdbClient } = await import("../igdb.js");
     const result = await igdbClient.testCredentials("bad-id", "bad-secret");
 
-    expect(result).toEqual({ success: false, error: "Invalid Client ID or Client Secret." });
+    expect(result).toEqual({
+      success: false,
+      ...serviceErrorBody(undefined, serviceMessage("service.igdb_credentials_invalid", {})),
+    });
   });
 
   it("reports success when both the Twitch and IGDB calls succeed", async () => {
@@ -1339,7 +1343,7 @@ describe("IGDBClient - testCredentials", () => {
 
     expect(result).toEqual({
       success: false,
-      error: "Could not reach Twitch — check your network connection.",
+      ...serviceErrorBody(undefined, serviceMessage("service.twitch_unreachable", {})),
     });
   });
 
@@ -1351,7 +1355,10 @@ describe("IGDBClient - testCredentials", () => {
 
     expect(result).toEqual({
       success: false,
-      error: "Twitch returned an unexpected error (status 500).",
+      ...serviceErrorBody(
+        undefined,
+        serviceMessage("service.twitch_unexpected_status", { status: 500 })
+      ),
     });
   });
 
@@ -1367,7 +1374,7 @@ describe("IGDBClient - testCredentials", () => {
 
     expect(result).toEqual({
       success: false,
-      error: "Could not reach IGDB — check your network connection.",
+      ...serviceErrorBody(undefined, serviceMessage("service.igdb_unreachable", {})),
     });
   });
 
@@ -1383,7 +1390,10 @@ describe("IGDBClient - testCredentials", () => {
 
     expect(result).toEqual({
       success: false,
-      error: "IGDB rejected the request (status 429).",
+      ...serviceErrorBody(
+        undefined,
+        serviceMessage("service.igdb_request_rejected", { status: 429 })
+      ),
     });
   });
 });

@@ -45,6 +45,20 @@ import {
 } from "../shared/schema.js";
 import { isUsenetDownloaderType } from "../shared/downloader-types.js";
 import { parseJsonObject } from "../shared/json-object-utils.js";
+import {
+  localizeServiceMessage,
+  matchingServiceMessageDescriptor,
+  serviceMessage,
+  serviceMessageValue,
+  serializeServiceMessageDescriptor,
+  serviceErrorBody,
+  serviceErrorValue,
+  serviceErrorMetadata,
+  persistedServiceMessage,
+  parseServiceMessageDescriptor,
+  type ServiceMessageDescriptor,
+} from "../shared/service-messages.js";
+import { readNotificationLanguage } from "../shared/notification-language.js";
 import { torznabClient } from "./torznab.js";
 import { newznabClient } from "./newznab.js";
 import { rssService } from "./rss.js";
@@ -314,6 +328,7 @@ interface StorageCacheItem {
   downloaderName: string;
   freeSpace: number;
   error?: string;
+  errorI18n?: ServiceMessageDescriptor | null;
 }
 
 interface StorageCache {
@@ -415,11 +430,11 @@ async function applyClamAvSettingsUpdate(
 async function testClamAvConnectivity(
   address: string,
   port: number
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: boolean; error?: string; errorI18n?: string | null }> {
   return new Promise((resolve) => {
     const socket = new net.Socket();
     let settled = false;
-    const finish = (outcome: { success: boolean; error?: string }) => {
+    const finish = (outcome: { success: boolean; error?: string; errorI18n?: string | null }) => {
       if (settled) return;
       settled = true;
       clearTimeout(deadline);
@@ -430,10 +445,14 @@ async function testClamAvConnectivity(
     // scanFileWithClamAv, so a connection that stays open without ever
     // closing can't hang this check forever.
     const deadline = setTimeout(
-      () => finish({ success: false, error: "Connection to ClamAV timed out" }),
+      () =>
+        finish({
+          success: false,
+          ...serviceErrorBody(undefined, serviceMessage("service.clamav_ping_timeout", {})),
+        }),
       10_000
     );
-    socket.once("error", (err) => finish({ success: false, error: err.message }));
+    socket.once("error", (err) => finish({ success: false, error: err.message, errorI18n: null }));
     let data = "";
     socket.connect(port, address, () => {
       socket.write("zPING\0");
@@ -450,7 +469,12 @@ async function testClamAvConnectivity(
     });
     socket.on("close", () => {
       const reply = data.replaceAll("\0", "").trim();
-      finish({ success: false, error: reply || "No PONG reply from ClamAV" });
+      finish({
+        success: false,
+        ...(reply
+          ? { error: reply, errorI18n: null }
+          : serviceErrorBody(undefined, serviceMessage("service.clamav_ping_reply_missing", {}))),
+      });
     });
   });
 }
@@ -688,7 +712,7 @@ async function handleAggregatedIndexerSearch(req: Request, res: Response) {
       return res.status(400).json({ error: "Search query required" });
     }
 
-    const { items, total, errors } = await searchAllIndexers({
+    const { items, total, errors, errorI18n } = await searchAllIndexers({
       query: query.trim(),
       category: categories,
       limit: pageLimit,
@@ -766,6 +790,7 @@ async function handleAggregatedIndexerSearch(req: Request, res: Response) {
       offset,
       ...(blacklistedCount > 0 ? { blacklistedCount } : {}),
       errors: errors.length > 0 ? errors : undefined,
+      errorI18n: errors.length > 0 ? errorI18n : undefined,
     });
   } catch (error) {
     routesLogger.error({ error }, "Error searching indexers");
@@ -1185,7 +1210,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(result.success ? 200 : 400).json(result);
       } catch (error) {
         routesLogger.error({ error }, "Failed to test IGDB credentials during setup");
-        return res.status(500).json({ success: false, error: "Failed to test IGDB credentials" });
+        return res.status(500).json({
+          success: false,
+          ...serviceErrorBody(
+            undefined,
+            serviceMessage("service.igdb_credentials_test_failed", {})
+          ),
+        });
       }
     }
   );
@@ -1397,12 +1428,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (certPath && keyPath) {
             // Validate the same canonical paths that were checked above and get saved below.
             const { validateCertFiles } = await import("./ssl.js"); // Dynamic import to avoid circular deps if any
-            const { valid, error } = await validateCertFiles(
+            const { valid, error, errorI18n } = await validateCertFiles(
               resolvedCertPath ?? certPath,
               resolvedKeyPath ?? keyPath
             );
             if (!valid) {
-              return res.status(400).json({ error: `Invalid SSL configuration: ${error}` });
+              return res
+                .status(400)
+                .json(
+                  serviceErrorBody(
+                    undefined,
+                    serviceMessage("service.ssl_invalid_configuration", {
+                      detail: serviceMessageValue(String(error), errorI18n),
+                    })
+                  )
+                );
             }
           } else {
             // If enabling but paths not provided in body, check if they exist in current config or are being set?
@@ -1422,9 +1462,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
 
             const { validateCertFiles } = await import("./ssl.js");
-            const { valid, error } = await validateCertFiles(effectiveCert, effectiveKey);
+            const { valid, error, errorI18n } = await validateCertFiles(
+              effectiveCert,
+              effectiveKey
+            );
             if (!valid) {
-              return res.status(400).json({ error: `Invalid SSL configuration: ${error}` });
+              return res
+                .status(400)
+                .json(
+                  serviceErrorBody(
+                    undefined,
+                    serviceMessage("service.ssl_invalid_configuration", {
+                      detail: serviceMessageValue(String(error), errorI18n),
+                    })
+                  )
+                );
             }
           }
         }
@@ -1521,13 +1573,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Validate the uploaded files specifically
         const { validateCertFiles } = await import("./ssl.js");
-        const { valid, error } = await validateCertFiles(certPath, keyPath);
+        const { valid, error, errorI18n } = await validateCertFiles(certPath, keyPath);
 
         if (!valid) {
           // Cleanup invalid files
           await fs.promises.unlink(certPath).catch(() => {});
           await fs.promises.unlink(keyPath).catch(() => {});
-          return res.status(400).json({ error: `Uploaded certificate/key are invalid: ${error}` });
+          return res
+            .status(400)
+            .json(
+              serviceErrorBody(
+                undefined,
+                serviceMessage("service.ssl_uploaded_invalid", {
+                  detail: serviceMessageValue(String(error), errorI18n),
+                })
+              )
+            );
         }
 
         // Update config to use uploaded files
@@ -2784,7 +2845,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const msg = error instanceof Error ? error.message : "Unknown error";
         routesLogger.error({ error }, "error searching IGDB for unmatched folder");
         const notFound = msg === "No matching unmatched entry for this root folder";
-        res.status(notFound ? 404 : 500).json({ error: notFound ? msg : "IGDB search failed" });
+        res
+          .status(notFound ? 404 : 500)
+          .json(
+            notFound
+              ? serviceErrorBody(error, serviceMessage("service.unmatched_entry_missing", {}))
+              : serviceErrorBody(undefined, serviceMessage("service.api_igdb_search_failed", {}))
+          );
       }
     }
   );
@@ -2807,14 +2874,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (error) {
         const msg = error instanceof Error ? error.message : "Unknown error";
         routesLogger.error({ error }, "error resolving unmatched folder");
-        // matchUnmatchedFolder throws these two plain-Error messages for the
+        // matchUnmatchedFolder throws these two source-owned messages for the
         // "client asked to match something that no longer exists" cases —
         // report them as 404s rather than 500s; everything else (IGDB
         // lookup failure, filesystem error) stays a 500.
         const notFound =
           msg === "Root folder not found" ||
           msg === "No matching unmatched entry for this root folder";
-        res.status(notFound ? 404 : 500).json({ error: msg });
+        res
+          .status(notFound ? 404 : 500)
+          .json(serviceErrorBody(error, serviceMessage("interface.unknown_error_ce512b43", {})));
       }
     }
   );
@@ -3519,7 +3588,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     app.get(path, igdbRateLimiter, async (req, res) => {
       try {
         const apiKey = await fetchRawgKey();
-        if (!apiKey) return res.status(503).json({ error: "Configure RAWG in Settings first" });
+        if (!apiKey)
+          return res.status(503).json({
+            ...serviceErrorBody(
+              undefined,
+              serviceMessage("service.rawg_configuration_required", {})
+            ),
+          });
         const parsed =
           typeof req.query.limit === "string" ? Number.parseInt(req.query.limit, 10) : 20;
         const limit = Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 40) : 20;
@@ -3529,9 +3604,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json(excludeFilteredContent(games, flags));
       } catch (error) {
         routesLogger.warn({ error }, "RAWG discovery request failed");
-        return res.status(502).json({
-          error: error instanceof Error ? error.message : "RAWG request failed",
-        });
+        return res
+          .status(502)
+          .json(serviceErrorBody(error, serviceMessage("service.rawg_request_failed", {})));
       }
     });
   };
@@ -3543,7 +3618,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Search query must be 1 to 120 characters" });
       }
       const apiKey = await fetchRawgKey();
-      if (!apiKey) return res.status(503).json({ error: "Configure RAWG in Settings first" });
+      if (!apiKey)
+        return res.status(503).json({
+          ...serviceErrorBody(undefined, serviceMessage("service.rawg_configuration_required", {})),
+        });
       const parsed =
         typeof req.query.limit === "string" ? Number.parseInt(req.query.limit, 10) : 20;
       const limit = Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 40) : 20;
@@ -3553,9 +3631,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.json(excludeFilteredContent(games, flags));
     } catch (error) {
       routesLogger.warn({ error }, "RAWG search failed");
-      return res.status(502).json({
-        error: error instanceof Error ? error.message : "RAWG search failed",
-      });
+      return res
+        .status(502)
+        .json(serviceErrorBody(error, serviceMessage("service.rawg_search_failed", {})));
     }
   });
   registerRawgListRoute("/api/rawg/popular", (key, limit) => rawgClient.popular(key, limit));
@@ -3907,15 +3985,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
               { downloaderName: downloader.name, error },
               "error getting free space"
             );
+            const value = appConfig.server.isProduction
+              ? serviceMessage("service.internal_server_error", {})
+              : serviceErrorValue(error);
             return {
               downloaderId: downloader.id,
               downloaderName: downloader.name,
               freeSpace: 0,
-              error: appConfig.server.isProduction
-                ? "Internal Server Error"
-                : error instanceof Error
-                  ? error.message
-                  : "Unknown error",
+              error: typeof value === "string" ? value : value.message,
+              errorI18n:
+                typeof value === "string" ? null : (parseServiceMessageDescriptor(value) ?? null),
             };
           }
         })
@@ -4365,7 +4444,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json(authorization);
       } catch (error) {
         routesLogger.warn({ error }, "Could not start Real-Debrid authorization");
-        return res.status(502).json({ error: "Real-Debrid account linking could not be started." });
+        return res
+          .status(502)
+          .json(
+            serviceErrorBody(undefined, serviceMessage("service.realdebrid_link_start_failed", {}))
+          );
       }
     }
   );
@@ -4390,9 +4473,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json(result);
       } catch (error) {
         routesLogger.warn({ error }, "Real-Debrid account linking did not complete");
-        return res.status(400).json({
-          error: error instanceof Error ? error.message : "Real-Debrid authorization failed.",
-        });
+        return res
+          .status(400)
+          .json(
+            serviceErrorBody(error, serviceMessage("service.realdebrid_authorization_failed", {}))
+          );
       }
     }
   );
@@ -4614,12 +4699,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const errors = results
         .filter((r): r is { success: false; downloader: Downloader; error: unknown } => !r.success)
         .map(({ downloader, error }) => {
-          const errorMessage = error instanceof Error ? error.message : "Unknown error";
+          const value = appConfig.server.isProduction
+            ? serviceMessage("service.internal_server_error", {})
+            : serviceErrorValue(error);
           routesLogger.error({ downloaderName: downloader.name, error }, "error getting downloads");
           return {
             downloaderId: downloader.id,
             downloaderName: downloader.name,
-            error: appConfig.server.isProduction ? "Internal Server Error" : errorMessage,
+            error: typeof value === "string" ? value : value.message,
+            errorI18n: typeof value === "string" ? null : parseServiceMessageDescriptor(value),
           };
         });
 
@@ -4960,7 +5048,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             taskId: task.id,
             itemName: item.downloadTitle,
             result: "skipped",
-            errorMessage: "Already linked",
+            ...persistedServiceMessage(
+              "Already linked",
+              serviceMessage("service.import_already_linked", {})
+            ),
           });
           continue;
         }
@@ -4989,7 +5080,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 taskId: task.id,
                 itemName: item.downloadTitle,
                 result: "failed",
-                errorMessage: "Game not found",
+                ...persistedServiceMessage(
+                  "Game not found",
+                  serviceMessage("service.import_game_missing", {})
+                ),
               });
               failedCount++;
               continue;
@@ -5052,7 +5146,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               taskId: task.id,
               itemName: item.downloadTitle,
               result: "failed",
-              errorMessage: "Could not resolve game",
+              ...persistedServiceMessage(
+                "Could not resolve game",
+                serviceMessage("service.import_game_unresolved", {})
+              ),
             });
             failedCount++;
             continue;
@@ -5064,7 +5161,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
               taskId: task.id,
               itemName: item.downloadTitle,
               result: "failed",
-              errorMessage: "Downloader not found",
+              ...persistedServiceMessage(
+                "Downloader not found",
+                serviceMessage("service.import_downloader_missing", {})
+              ),
             });
             failedCount++;
             continue;
@@ -5098,7 +5198,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             taskId: task.id,
             itemName: item.downloadTitle,
             result: "failed",
-            errorMessage: errMsg,
+            ...persistedServiceMessage(errMsg, serviceErrorMetadata(err)),
           });
           failedCount++;
         }
@@ -5524,7 +5624,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const { reportId } = req.params as { reportId: string };
         const result = await sendPendingReport(reportId, req.user!.id);
         if (!result.ok) {
-          return res.status(422).json({ error: result.message });
+          return res
+            .status(422)
+            .json({ error: result.message, errorI18n: serializeServiceMessageDescriptor(result) });
         }
         return res.json({ code: result.code, issueNumber: result.issueNumber });
       } catch (error) {
@@ -5655,7 +5757,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(result.success ? 200 : 400).json(result);
       } catch (error) {
         routesLogger.error({ error }, "Failed to test IGDB credentials");
-        return res.status(500).json({ success: false, error: "Failed to test IGDB credentials" });
+        return res.status(500).json({
+          success: false,
+          ...serviceErrorBody(
+            undefined,
+            serviceMessage("service.igdb_credentials_test_failed", {})
+          ),
+        });
       }
     }
   );
@@ -5686,7 +5794,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const stored = await storage.getSystemConfig("rawg.apiKey");
         const value = apiKey.trim();
         if (!value || isUnchangedSentinel(value)) {
-          if (!stored) return res.status(400).json({ error: "RAWG API key is required" });
+          if (!stored)
+            return res.status(400).json({
+              ...serviceErrorBody(undefined, serviceMessage("service.rawg_key_required", {})),
+            });
           return res.json({ success: true, configured: true });
         }
         await storage.setSystemConfig("rawg.apiKey", await encryptCredential(value));
@@ -5728,13 +5839,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
             ? submitted.trim()
             : await decryptCredential(stored ?? "");
         if (!apiKey) {
-          return res.status(400).json({ success: false, error: "RAWG API key is required" });
+          return res.status(400).json({
+            success: false,
+            ...serviceErrorBody(undefined, serviceMessage("service.rawg_key_required", {})),
+          });
         }
         const result = await rawgClient.testCredentials(apiKey);
         return res.status(result.success ? 200 : 400).json(result);
       } catch (error) {
         routesLogger.error({ error }, "Failed to test RAWG settings");
-        return res.status(500).json({ success: false, error: "Failed to test RAWG API key" });
+        return res.status(500).json({
+          success: false,
+          ...serviceErrorBody(undefined, serviceMessage("service.rawg_test_failed", {})),
+        });
       }
     }
   );
@@ -5904,17 +6021,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   );
 
-  app.post("/api/settings/apprise/test", async (_req, res) => {
+  app.post("/api/settings/apprise/test", async (req, res) => {
     try {
-      const result = await appriseClient.test();
+      const result = await appriseClient.test(req.user?.id);
       if (result.success) {
         res.json({ success: true });
       } else {
-        res.status(502).json({ error: result.error ?? "Failed to reach Apprise server" });
+        res
+          .status(502)
+          .json(
+            result.error !== undefined
+              ? { error: result.error, errorI18n: result.errorI18n ?? null }
+              : serviceErrorBody(undefined, serviceMessage("service.apprise_reach_failed", {}))
+          );
       }
     } catch (error) {
       routesLogger.error({ error }, "Apprise test failed");
-      res.status(500).json({ error: "Apprise test failed" });
+      res
+        .status(500)
+        .json(serviceErrorBody(undefined, serviceMessage("service.apprise_test_failed", {})));
     }
   });
 
@@ -6011,14 +6136,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (provider === "virustotal") {
           const vt = await readVirusTotalSettings(storage);
           if (!vt.apiKey) {
-            return res.status(400).json({ error: "No VirusTotal API key configured" });
+            return res
+              .status(400)
+              .json(
+                serviceErrorBody(
+                  undefined,
+                  serviceMessage("service.virustotal_key_unconfigured", {})
+                )
+              );
           }
           // Looks up a fixed, publicly known hash rather than an account-info
           // endpoint keyed by the API key itself — that would put the secret in
           // the URL path, where it can end up in proxy or access logs.
           const verdict = await checkVirusTotalHash(EICAR_TEST_FILE_SHA256, vt.apiKey);
           if (verdict.status === "error") {
-            return res.status(502).json({ error: verdict.error });
+            return res
+              .status(502)
+              .json({ error: verdict.error, errorI18n: verdict.errorI18n ?? null });
           }
           return res.json({ success: true });
         }
@@ -6026,23 +6160,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (provider === "clamav") {
           const clamav = await readClamAvSettings(storage);
           if (!clamav.host) {
-            return res.status(400).json({ error: "No ClamAV host configured" });
+            return res
+              .status(400)
+              .json(
+                serviceErrorBody(undefined, serviceMessage("service.clamav_host_unconfigured", {}))
+              );
           }
           try {
             const { address } = await resolveSafeAddress(normalizeHostname(clamav.host), true);
             const result = await testClamAvConnectivity(address, clamav.port);
             if (result.success) return res.json({ success: true });
-            return res.status(502).json({ error: result.error ?? "ClamAV test failed" });
+            return res
+              .status(502)
+              .json(
+                result.error !== undefined
+                  ? { error: result.error, errorI18n: result.errorI18n ?? null }
+                  : serviceErrorBody(undefined, serviceMessage("service.clamav_test_failed", {}))
+              );
           } catch (error) {
-            const message = error instanceof Error ? error.message : String(error);
-            return res.status(502).json({ error: message });
+            return res
+              .status(502)
+              .json(
+                error instanceof Error
+                  ? serviceErrorBody(error, serviceMessage("service.clamav_test_failed", {}))
+                  : { error: String(error), errorI18n: null }
+              );
           }
         }
 
-        return res.status(400).json({ error: "Unknown provider" });
+        return res
+          .status(400)
+          .json(
+            serviceErrorBody(undefined, serviceMessage("service.security_provider_unknown", {}))
+          );
       } catch (error) {
         routesLogger.error({ error }, "Security scan provider test failed");
-        return res.status(500).json({ error: "Security scan provider test failed" });
+        return res
+          .status(500)
+          .json(
+            serviceErrorBody(undefined, serviceMessage("service.security_provider_test_failed", {}))
+          );
       }
     }
   );
@@ -6556,7 +6713,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         const imageBuffer = Buffer.from(base64Data, "base64");
         const formData = new FormData();
-        if (message) formData.append("content", message);
+        if (message) {
+          let content = message;
+          // Only the explicit app heading follows the notification preference.
+          // Arbitrary user/API messages, even English lookalikes, stay unchanged.
+          const descriptor = matchingServiceMessageDescriptor(message, req.body);
+          if (descriptor?.messageKey === "interface.my_questarr_library_stats_6f07559d") {
+            try {
+              const settings = await storage.getUserSettings(req.user!.id);
+              content = localizeServiceMessage(
+                message,
+                descriptor,
+                readNotificationLanguage(settings?.notificationPreferences)
+              );
+            } catch (error) {
+              routesLogger.warn(
+                { error },
+                "Could not load Discord heading language, using English"
+              );
+            }
+          }
+          formData.append("content", content);
+        }
         formData.append(
           "file",
           new Blob([imageBuffer], { type: "image/png" }),

@@ -2,7 +2,12 @@ import { createElement } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useInterfaceLanguage } from "@/lib/interface-locale";
+import {
+  getInterfaceTextDirection,
+  getInterfaceTextLanguage,
+  translateInterfaceLabel,
+  type InterfaceLanguage,
+} from "@/lib/interface-locale";
 
 interface HiddenMutationResponse {
   hidden: boolean;
@@ -44,7 +49,6 @@ export function useHiddenMutation<TPayload = HiddenMutationPayload>(
   options?: DefaultHiddenMutationOptions | CustomHiddenMutationOptions<TPayload>
 ) {
   const { toast } = useToast();
-  const { language, t, languageFor, directionFor } = useInterfaceLanguage();
   const queryClient = useQueryClient();
 
   const isHiddenMutationPayload = (payload: unknown): payload is HiddenMutationPayload => {
@@ -57,33 +61,35 @@ export function useHiddenMutation<TPayload = HiddenMutationPayload>(
   const onSuccess = (data: HiddenMutationResponse) => {
     queryClient.invalidateQueries({ queryKey: ["/api/games"] });
     toast({
-      description: (() => {
+      description: (language: InterfaceLanguage) => {
         const message = data.hidden
           ? (options?.hiddenSuccessMessage ?? "Game hidden")
           : (options?.unhiddenSuccessMessage ?? "Game unhidden");
-        return language === "en"
-          ? t(message)
-          : createElement(
-              "span",
-              { lang: languageFor(message), dir: directionFor(message) },
-              t(message)
-            );
-      })(),
+        return createElement(
+          "span",
+          {
+            lang: getInterfaceTextLanguage(message, language),
+            dir: getInterfaceTextDirection(message, language),
+          },
+          translateInterfaceLabel(message, language)
+        );
+      },
     });
   };
 
   const onError = () => {
     toast({
-      description: (() => {
+      description: (language: InterfaceLanguage) => {
         const message = options?.errorMessage ?? "Failed to update game visibility";
-        return language === "en"
-          ? t(message)
-          : createElement(
-              "span",
-              { lang: languageFor(message), dir: directionFor(message) },
-              t(message)
-            );
-      })(),
+        return createElement(
+          "span",
+          {
+            lang: getInterfaceTextLanguage(message, language),
+            dir: getInterfaceTextDirection(message, language),
+          },
+          translateInterfaceLabel(message, language)
+        );
+      },
       variant: "destructive",
     });
   };

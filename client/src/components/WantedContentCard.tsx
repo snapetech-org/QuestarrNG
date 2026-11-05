@@ -25,7 +25,7 @@ export default function WantedContentCard() {
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
           <Layers className="h-5 w-5 shrink-0" aria-hidden="true" />
-          <InterfaceText source="Requested editions and add-ons" />
+          <InterfaceText source="interface.requested_editions_and_add_ons_ad3615f7" />
         </CardTitle>
       </CardHeader>
       <CardContent>

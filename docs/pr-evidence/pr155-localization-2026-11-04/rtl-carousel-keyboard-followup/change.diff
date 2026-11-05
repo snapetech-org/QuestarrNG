@@ -1,0 +1,16 @@
+diff --git a/client/src/components/ui/carousel.tsx b/client/src/components/ui/carousel.tsx
+index 3dd2713d..4ab3e63d 100644
+--- a/client/src/components/ui/carousel.tsx
++++ b/client/src/components/ui/carousel.tsx
+@@ -72,0 +73,2 @@ const Carousel = React.forwardRef<
++  const isRtl = orientation === "horizontal" && opts?.direction === "rtl";
++
+@@ -75 +77 @@ const Carousel = React.forwardRef<
+-      if (event.key === "ArrowLeft") {
++      if (event.key === (isRtl ? "ArrowRight" : "ArrowLeft")) {
+@@ -78 +80 @@ const Carousel = React.forwardRef<
+-      } else if (event.key === "ArrowRight") {
++      } else if (event.key === (isRtl ? "ArrowLeft" : "ArrowRight")) {
+@@ -83 +85 @@ const Carousel = React.forwardRef<
+-    [scrollPrev, scrollNext]
++    [isRtl, scrollPrev, scrollNext]

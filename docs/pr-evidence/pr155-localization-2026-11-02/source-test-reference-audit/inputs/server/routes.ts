@@ -1,0 +1,6986 @@
+import { filterReleaseFileTypes } from "./release-file-types.js";
+import { jsonCatalogClient } from "./json-catalog.js";
+import { isSameProwlarrUrl } from "../shared/prowlarr-url.js";
+import express, { type Express, type Request, type Response, type NextFunction } from "express";
+import { param } from "express-validator";
+import { createServer, type Server } from "http";
+import { storage, type IStorage } from "./storage.js";
+import { stripUndefined } from "./object-utils.js";
+import { normalizeDownloadHash, normalizeTrackedKey } from "./download-hash.js";
+import { checkDownloadStatus, withGameOperationLock } from "./cron.js";
+import { igdbClient } from "./igdb.js";
+import type { IGDBGame } from "./igdb.js";
+import { rawgClient } from "./rawg.js";
+import { pingDatabase } from "./db.js";
+import {
+  insertGameSchema,
+  insertGameDownloadSchema,
+  updateGameStatusSchema,
+  updateGameHiddenSchema,
+  updateGameUserRatingSchema,
+  updateGameInstalledVersionSchema,
+  updateGameTargetPlatformSchema,
+  insertIndexerSchema,
+  updateIndexerSchema,
+  insertDownloaderSchema,
+  updateDownloaderSchema,
+  insertNotificationSchema,
+  updateUserSettingsSchema,
+  updatePasswordSchema,
+  passwordPolicySchema,
+  insertRssFeedSchema,
+  insertReleaseBlacklistSchema,
+  insertGameFileSchema,
+  insertGameListSchema,
+  claimDownloadRequestSchema,
+  insertRootFolderSchema,
+  updateRootFolderSchema,
+  type Config,
+  type Game,
+  type Indexer,
+  type Downloader,
+  type InsertImportTaskItem,
+  type ScannedGameFile,
+  type GameFileCategory,
+} from "../shared/schema.js";
+import { isUsenetDownloaderType } from "../shared/downloader-types.js";
+import { parseJsonObject } from "../shared/json-object-utils.js";
+import {
+  localizeServiceMessage,
+  matchingServiceMessageDescriptor,
+  serviceMessage,
+  serviceMessageValue,
+  serializeServiceMessageDescriptor,
+  serviceErrorBody,
+  serviceErrorValue,
+  serviceErrorMetadata,
+  persistedServiceMessage,
+  parseServiceMessageDescriptor,
+  type ServiceMessageDescriptor,
+} from "../shared/service-messages.js";
+import { readNotificationLanguage } from "../shared/notification-language.js";
+import { torznabClient } from "./torznab.js";
+import { newznabClient } from "./newznab.js";
+import { rssService } from "./rss.js";
+import { DownloaderManager } from "./downloaders.js";
+import {
+  pollRealDebridDeviceAuth,
+  startRealDebridDeviceAuth,
+} from "./downloaders/realdebrid-auth.js";
+import { REAL_DEBRID_API_URL } from "./downloaders/realdebrid.js";
+import {
+  DOWNLOADER_DEBUG_LOGGING_CONFIG_KEY,
+  isDownloaderDebugLoggingEnabled,
+  setCachedDownloaderDebugLogging,
+} from "./downloaders/debug-logging.js";
+import { z } from "zod";
+import { routesLogger } from "./logger.js";
+import { getPendingReport, sendPendingReport } from "./error-telemetry.js";
+import {
+  SCAN_MAX_DEPTH,
+  SCAN_MAX_FILES,
+  SCAN_MAX_RESPONSE_BYTES,
+  SCAN_TIME_BUDGET_MS,
+} from "./scan-limits.js";
+import {
+  igdbRateLimiter,
+  sensitiveEndpointLimiter,
+  authRateLimiter,
+  scanRateLimiter,
+  integrationRateLimiter,
+  validate,
+  validateRequest,
+  sanitizeSearchQuery,
+  sanitizeGameId,
+  sanitizeDownloadId,
+  sanitizeIgdbId,
+  sanitizeGameStatus,
+  sanitizeGameData,
+  sanitizeIndexerData,
+  sanitizeIndexerUpdateData,
+  sanitizeDownloaderData,
+  sanitizeDownloaderTestData,
+  sanitizeProwlarrSyncData,
+  sanitizeDownloaderUpdateData,
+  sanitizeDownloaderDownloadData,
+  sanitizeIndexerSearchQuery,
+  sanitizeGameStatusParam,
+  sanitizeMatchAndAddTitle,
+  sanitizeNexusModsGameDomainQuery,
+  sanitizeNexusModsTrendingModsQuery,
+  sanitizeRootFolderData,
+  sanitizeRootFolderUpdateData,
+  sanitizeRootFolderId,
+  sanitizeLibraryScanData,
+  sanitizeUnmatchedMatchData,
+  sanitizeUnmatchedSearchData,
+} from "./middleware.js";
+import { config as appConfig } from "./config.js";
+import { configLoader } from "./config-loader.js";
+import { prowlarrClient } from "./prowlarr.js";
+import {
+  loadProwlarrSyncSettings,
+  saveProwlarrSyncSettings,
+  revokeProwlarrHttpOptIn,
+} from "./prowlarr-settings.js";
+import { isSafeUrl, safeFetch, resolveSafeAddress, normalizeHostname } from "./ssrf.js";
+import { assertWithinRoots } from "./path-security.js";
+import {
+  hashPassword,
+  comparePassword,
+  generateToken,
+  authenticateToken,
+  optionalAuthenticateToken,
+  authenticateApiKeyOrToken,
+} from "./auth.js";
+import { setAuthCookies, clearAuthCookies, csrfProtection } from "./security.js";
+import { registerOidcAuthRoutes } from "./oidc-auth.js";
+import { nexusmodsClient } from "./nexusmods.js";
+import {
+  typesafeClient,
+  TYPESAFE_URL_CONFIG_KEY,
+  TYPESAFE_KEY_CONFIG_KEY,
+  TYPESAFE_MODEL_CONFIG_KEY,
+} from "./typesafe.js";
+import { decryptCredential, encryptCredential } from "./credential-crypto.js";
+import {
+  appriseClient,
+  isAppriseConfigured,
+  normalizeAppriseMode,
+  readAppriseSettings,
+} from "./apprise.js";
+import {
+  readVirusTotalSettings,
+  readClamAvSettings,
+  checkVirusTotalHash,
+} from "./security-scan.js";
+
+// SHA-256 of the standard EICAR antivirus test file — a publicly known,
+// non-sensitive constant that VirusTotal has scanned so many times it is
+// guaranteed to return a verdict, giving a stable way to confirm an API key
+// authenticates without needing a real sample or hardcoding it in a URL path.
+const EICAR_TEST_FILE_SHA256 = "275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0";
+import net from "node:net";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import fsExtra from "fs-extra";
+import { getLogFilePath, readLastLogLines } from "./log-file.js";
+
+// Root directory for the file system browser; restrict browsing to this tree
+const FILE_BROWSER_ROOT = fs.realpathSync(process.cwd());
+
+type IgdbConfigSource = "env" | "database" | undefined;
+
+interface IgdbConfigStatus {
+  configured: boolean;
+  source: IgdbConfigSource;
+}
+
+/**
+ * Whether IGDB credentials are configured (DB takes precedence over env vars),
+ * and which source they came from. Shared between the authenticated
+ * GET /api/config endpoint and the unauthenticated GET /api/auth/status
+ * endpoint (which needs just this boolean to drive the setup wizard, without
+ * exposing anything else config-related pre-login).
+ */
+async function getIgdbConfigStatus(): Promise<IgdbConfigStatus> {
+  const dbClientId = await storage.getSystemConfig("igdb.clientId");
+  const dbClientSecret = await storage.getSystemConfig("igdb.clientSecret");
+
+  if (dbClientId && dbClientSecret) {
+    return { configured: true, source: "database" };
+  }
+  if (appConfig.igdb.isConfigured) {
+    return { configured: true, source: "env" };
+  }
+  return { configured: false, source: undefined };
+}
+
+// ── Default-deny API auth boundary ─────────────────────────────────────────
+// Every /api/* route requires authentication unless explicitly allowlisted
+// here. This is intentionally an allowlist (not a denylist of "routes that
+// need auth") so that a new route added without updating this list fails
+// safe -- it requires a token by default rather than accidentally becoming
+// public. Paths are relative to the "/api" mount point (no leading "/api").
+export const PUBLIC_API_ROUTES = new Set<string>([
+  "GET /auth/status", // setup-wizard / login-page bootstrap check, runs pre-login
+  "POST /auth/setup", // creates the first user; there is no user/token yet
+  "POST /auth/setup/test-igdb", // "Test connection" button on the setup wizard, runs pre-login
+  "POST /auth/login", // issues the token; obviously can't require one
+  "GET /auth/oidc/status", // exposes only whether server-side OIDC is configured
+  "GET /auth/oidc/login", // begins the interactive authorization-code flow
+  "GET /auth/oidc/callback", // consumes one OIDC transaction and issues the local session
+  "POST /auth/oidc/callback", // Apple returns the authorization code with response_mode=form_post
+  "GET /health", // liveness probe (docker/compose healthcheck, DAST workflow)
+  "GET /ready", // readiness probe (db/IGDB connectivity), no sensitive data
+]);
+
+function isPublicApiRequest(req: Request): boolean {
+  if (req.method === "OPTIONS") return true;
+  return PUBLIC_API_ROUTES.has(`${req.method.toUpperCase()} ${req.path}`);
+}
+
+/** Paths under the /api mount that accept an integration API key as well as a JWT. */
+function isIntegrationApiRequest(req: Request): boolean {
+  return req.path === "/integration" || req.path.startsWith("/integration/");
+}
+
+// Routes that must always run, even with a missing/expired/invalid token,
+// but should still pick up req.user/req.authSource when the token IS valid
+// (so e.g. csrfProtection still enforces the CSRF check for a cookie-backed
+// caller). Logout is the motivating case: JWTs are stateless, so the only
+// server-side effect is clearing the auth/CSRF cookies, and a user stuck
+// with an expired cookie must still be able to do that -- hard-rejecting
+// the request at the boundary would leave the stale cookies in the browser.
+const SOFT_AUTH_API_ROUTES = new Set<string>(["POST /auth/logout"]);
+
+function isSoftAuthApiRequest(req: Request): boolean {
+  return SOFT_AUTH_API_ROUTES.has(`${req.method.toUpperCase()} ${req.path}`);
+}
+
+/**
+ * Default-deny gate for the entire /api surface: anything not explicitly
+ * allowlisted above requires a valid token. Mounted before any /api route is
+ * registered so it always runs first, regardless of whether an individual
+ * route handler also happens to apply authenticateToken itself.
+ */
+export function requireAuthenticationForApi(req: Request, res: Response, next: NextFunction) {
+  if (isPublicApiRequest(req)) {
+    return next();
+  }
+  // The integration surface is the one place that also accepts a long-lived
+  // API key, for machine clients (the Playnite extension, scripts) that cannot
+  // run the interactive login flow. Everything else — key management included —
+  // stays JWT-only, so a leaked key can never mint or revoke another one.
+  if (isIntegrationApiRequest(req)) {
+    return authenticateApiKeyOrToken(req, res, next);
+  }
+  if (isSoftAuthApiRequest(req)) {
+    return optionalAuthenticateToken(req, res, next);
+  }
+  void authenticateToken(req, res, next);
+}
+
+// Configure multer for memory storage
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+});
+import {
+  searchAllIndexers,
+  filterBlacklistedReleases,
+  filterByReleaseNameBlacklist,
+  enrichWithAiAnalysis,
+  scoreSearchItems,
+} from "./search.js";
+import { parseSavedReleaseScoringConfig } from "../shared/release-scoring.js";
+import { xrelClient, DEFAULT_XREL_BASE, ALLOWED_XREL_DOMAINS } from "./xrel.js";
+import {
+  normalizeTitle,
+  cleanReleaseName,
+  releaseMatchesGame,
+  parseReleaseMetadata,
+  matchesPlatformFilter,
+  parseJsonStringArray,
+} from "../shared/title-utils.js";
+import { categorizeDownload, type DownloadCategory } from "../shared/download-categorizer.js";
+import { SUPPORT_WORKER_ORIGIN } from "../shared/support-config.js";
+import type { XrelGameStatus } from "../shared/xrel-types.js";
+import { ZipArchive } from "archiver";
+import helmet from "helmet";
+import { steamRoutes } from "./steam-routes.js";
+import { gameJournalRoutes, screenshotDirForGame } from "./game-journal-routes.js";
+import {
+  getContentFilterFlags,
+  isContentFiltered,
+  excludeFilteredContent,
+} from "./content-filter.js";
+import { normalizeInitialReleaseStatus } from "./game-status.js";
+import { quickAddGameByTitle } from "./game-quick-add.js";
+import { importRouter } from "./routes/import.js";
+import { importTasksRouter } from "./routes/import-tasks.js";
+import { systemRouter } from "./routes/system.js";
+import { pcgamingwikiRouter } from "./pcgamingwiki-router.js";
+import { hltbRouter } from "./hltb.js";
+import { probeRootFolder, isWithinDeletableRootFolder, isStrictlyInside } from "./root-folders.js";
+import {
+  scanRootFolderById,
+  rescanRootFolderById,
+  scanAllEnabledRootFolders,
+  getAllScanProgress,
+  getAllUnmatched,
+  matchUnmatchedFolder,
+  searchUnmatchedFolder,
+} from "./library-scanner.js";
+import { integrationRouter } from "./routes/integration.js";
+import { apiKeysRouter } from "./routes/api-keys.js";
+
+// Cache-Control header values for IGDB discovery endpoints
+const CC_IGDB_METADATA = "public, max-age=86400, stale-while-revalidate=3600";
+// Adult-content filtering makes game-list responses vary per user, so they must not be shared-cacheable
+const CC_IGDB_GAME_LIST_PRIVATE = "private, max-age=3600, stale-while-revalidate=600";
+
+interface StorageCacheItem {
+  downloaderId: string;
+  downloaderName: string;
+  freeSpace: number;
+  error?: string;
+  errorI18n?: ServiceMessageDescriptor | null;
+}
+
+interface StorageCache {
+  data: StorageCacheItem[] | null;
+  expiry: number;
+  ttl: number;
+}
+
+// ⚡ Bolt: Simple in-memory cache implementation to avoid external dependencies
+// Caches storage info for 30 seconds to prevent spamming downloaders
+const storageCache: StorageCache = {
+  data: null,
+  expiry: 0,
+  ttl: 30 * 1000, // 30 seconds in milliseconds
+};
+
+// Display placeholder returned in place of a stored secret; sending it back
+// unchanged on a PATCH means "keep the existing value" instead of overwriting
+// it. This is a UI marker, not a real credential -- deliberately not named
+// with a credential-like word (secret/password/token/key), since it's a
+// literal compared directly against submitted field values.
+const REDACTED_PLACEHOLDER = "********";
+
+// Whether a submitted field value is the unchanged-placeholder marker rather
+// than a real secret the caller wants to save.
+function isUnchangedSentinel(value: unknown): boolean {
+  return value === REDACTED_PLACEHOLDER;
+}
+
+// Applies a partial VirusTotal settings update, returning an error message for
+// the caller to respond with, or null once every provided field was persisted.
+async function applyVirusTotalSettingsUpdate(
+  update:
+    | {
+        enabled?: boolean;
+        apiKey?: string;
+        threshold?: number;
+        blockUnknownHashes?: boolean;
+      }
+    | undefined,
+  storage: IStorage
+): Promise<string | null> {
+  if (!update) return null;
+  const { enabled, apiKey, threshold, blockUnknownHashes } = update;
+
+  if (enabled !== undefined) {
+    await storage.setSystemConfig("security.vt.enabled", String(!!enabled));
+  }
+  if (apiKey !== undefined && !isUnchangedSentinel(apiKey)) {
+    if (typeof apiKey !== "string" || !/^[A-Za-z0-9]{0,128}$/.test(apiKey)) {
+      return "Invalid VirusTotal API key format";
+    }
+    await storage.setSystemConfig("security.vt.apiKey", apiKey.trim());
+  }
+  if (threshold !== undefined) {
+    if (typeof threshold !== "number" || !Number.isInteger(threshold) || threshold < 0) {
+      return "Threshold must be a non-negative integer";
+    }
+    await storage.setSystemConfig("security.vt.threshold", String(threshold));
+  }
+  if (blockUnknownHashes !== undefined) {
+    await storage.setSystemConfig("security.vt.blockUnknownHashes", String(!!blockUnknownHashes));
+  }
+
+  return null;
+}
+
+// Applies a partial ClamAV settings update, returning an error message for the
+// caller to respond with, or null once every provided field was persisted.
+async function applyClamAvSettingsUpdate(
+  update: { enabled?: boolean; host?: string; port?: number } | undefined,
+  storage: IStorage
+): Promise<string | null> {
+  if (!update) return null;
+  const { enabled, host, port } = update;
+
+  if (enabled !== undefined) {
+    await storage.setSystemConfig("security.clamav.enabled", String(!!enabled));
+  }
+  if (host !== undefined) {
+    if (typeof host !== "string" || host.trim().length > 255) {
+      return "Invalid ClamAV host";
+    }
+    await storage.setSystemConfig("security.clamav.host", host.trim());
+  }
+  if (port !== undefined) {
+    if (typeof port !== "number" || !Number.isInteger(port) || port < 1 || port > 65535) {
+      return "Port must be between 1 and 65535";
+    }
+    await storage.setSystemConfig("security.clamav.port", String(port));
+  }
+
+  return null;
+}
+
+// Pings a ClamAV daemon over its INSTREAM protocol and reports whether it
+// responded with PONG before the deadline. Extracted from the settings-test
+// route so that route stays a simple dispatcher over provider name.
+async function testClamAvConnectivity(
+  address: string,
+  port: number
+): Promise<{ success: boolean; error?: string; errorI18n?: string | null }> {
+  return new Promise((resolve) => {
+    const socket = new net.Socket();
+    let settled = false;
+    const finish = (outcome: { success: boolean; error?: string; errorI18n?: string | null }) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(deadline);
+      socket.destroy();
+      resolve(outcome);
+    };
+    // An absolute deadline, not an idle timeout — matches security-scan.ts's
+    // scanFileWithClamAv, so a connection that stays open without ever
+    // closing can't hang this check forever.
+    const deadline = setTimeout(
+      () =>
+        finish({
+          success: false,
+          ...serviceErrorBody(undefined, serviceMessage("service.clamav_ping_timeout", {})),
+        }),
+      10_000
+    );
+    socket.once("error", (err) => finish({ success: false, error: err.message, errorI18n: null }));
+    let data = "";
+    socket.connect(port, address, () => {
+      socket.write("zPING\0");
+    });
+    socket.on("data", (chunk) => {
+      data += chunk.toString("utf8");
+      // Accept PONG as soon as it arrives, rather than waiting for the socket
+      // to close — clamd isn't guaranteed to close the connection after
+      // replying, which would otherwise stall this check until the deadline
+      // even though the ping already succeeded.
+      if (data.includes("PONG")) {
+        finish({ success: true });
+      }
+    });
+    socket.on("close", () => {
+      const reply = data.replaceAll("\0", "").trim();
+      finish({
+        success: false,
+        ...(reply
+          ? { error: reply, errorI18n: null }
+          : serviceErrorBody(undefined, serviceMessage("service.clamav_ping_reply_missing", {}))),
+      });
+    });
+  });
+}
+
+// Validates that a Discord webhook URL uses HTTPS and points at a genuine
+// Discord webhook endpoint. Checking hostname/pathname/protocol on the parsed
+// URL (rather than a string prefix) prevents bypasses via the userinfo
+// component (e.g. "https://discord.com@evil.com/...").
+function isValidDiscordWebhook(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return (
+      url.protocol === "https:" &&
+      (url.hostname === "discord.com" || url.hostname === "discordapp.com") &&
+      url.pathname.startsWith("/api/webhooks/")
+    );
+  } catch {
+    return false;
+  }
+}
+
+// Twitch Client IDs/Secrets are alphanumeric tokens (currently 30 characters); the range is
+// intentionally loose so a length tweak on Twitch's side doesn't start rejecting valid values,
+// while still catching obvious mistakes (pasted whitespace, truncated copy, stray punctuation).
+const IGDB_CREDENTIAL_FORMAT = /^[A-Za-z0-9]{20,40}$/;
+
+/** Cheap client-id/secret shape check, so an obvious typo is rejected before any network call. */
+function validateIgdbCredentialFormat(
+  clientId: string,
+  clientSecret: string
+): { error: string } | null {
+  if (!IGDB_CREDENTIAL_FORMAT.test(clientId)) {
+    return { error: "Client ID doesn't look valid — check for extra spaces or a partial copy." };
+  }
+  if (!IGDB_CREDENTIAL_FORMAT.test(clientSecret)) {
+    return {
+      error: "Client Secret doesn't look valid — check for extra spaces or a partial copy.",
+    };
+  }
+  return null;
+}
+
+/**
+ * Masks an indexer's API key before exposing its configuration.
+ *
+ * @param indexer - The indexer configuration to sanitize
+ * @returns The indexer with its API key replaced by a redaction placeholder when configured
+ */
+function maskIndexer(indexer: Indexer): Indexer {
+  return indexer.apiKey ? { ...indexer, apiKey: REDACTED_PLACEHOLDER } : indexer;
+}
+
+// The SABnzbd archive password lives inside the free-form `settings` JSON blob
+// (alongside qBittorrent's initialState etc.), so it needs its own mask/restore
+/**
+ * Masks the archive password in serialized downloader settings.
+ *
+ * @param settingsJson - The serialized downloader settings, or `null`
+ * @returns The settings with the archive password redacted, or the original value when no archive password is configured
+ */
+function maskDownloaderSettings(settingsJson: string | null): string | null {
+  const settings = parseJsonObject(settingsJson);
+  if (!settings.archivePassword) return settingsJson;
+  return JSON.stringify({ ...settings, archivePassword: REDACTED_PLACEHOLDER });
+}
+
+/**
+ * Masks sensitive credentials in a downloader configuration.
+ *
+ * @param downloader - The downloader configuration whose credentials should be masked
+ * @returns A downloader configuration with its password and archive password redacted
+ */
+function maskDownloader(downloader: Downloader): Downloader {
+  const masked = downloader.password
+    ? { ...downloader, password: REDACTED_PLACEHOLDER }
+    : downloader;
+  const maskedSettings = maskDownloaderSettings(masked.settings);
+  return maskedSettings !== masked.settings ? { ...masked, settings: maskedSettings } : masked;
+}
+
+/**
+ * Sends a bad-request response containing a message and Zod validation issues.
+ *
+ * @param res - The response used to send the error
+ * @param error - The Zod validation error containing issue details
+ * @param message - The error message included in the response
+ * @returns The configured response
+ */
+function respondWithZodError(res: Response, error: z.ZodError, message: string): Response {
+  return res.status(400).json({ error: message, details: error.issues });
+}
+
+/**
+ * Builds a handler for a PATCH that sets one per-user field on a game: parses the body with
+ * `schema`, applies it through `update` (scoped to the authenticated user) and returns the
+ * updated game, or 404 when the game isn't the user's.
+ */
+function patchOwnGameField<T>(
+  schema: z.ZodType<T>,
+  update: (id: string, userId: string, body: T) => Promise<Game | undefined>,
+  labels: { invalid: string; log: string; failure: string }
+) {
+  return async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params as { id: string };
+      const updatedGame = await update(id, req.user!.id, schema.parse(req.body));
+      if (!updatedGame) {
+        return res.status(404).json({ error: "Game not found" });
+      }
+      return res.json(updatedGame);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return respondWithZodError(res, error, labels.invalid);
+      }
+      routesLogger.error({ error }, labels.log);
+      return res.status(500).json({ error: labels.failure });
+    }
+  };
+}
+
+// Helper to parse category query param which might be string, array, or comma-separated
+export function parseCategories(input: unknown): string[] | undefined {
+  if (!input) return undefined;
+
+  // If array, flatten and filter
+  if (Array.isArray(input)) {
+    return input.map(String).filter((c) => c.trim().length > 0);
+  }
+
+  // If string, split by comma
+  if (typeof input === "string") {
+    return input
+      .split(",")
+      .map((c) => c.trim())
+      .filter((c) => c.length > 0);
+  }
+
+  return undefined;
+}
+
+// Helper to validate setup credentials, keeping the /api/auth/setup handler's own
+// cognitive complexity low
+export function validateSetupCredentials(
+  username: unknown,
+  password: unknown
+): { error: string } | { username: string; password: string } {
+  if (!username || !password) {
+    return { error: "Username and password required" };
+  }
+
+  if (typeof username !== "string" || typeof password !== "string") {
+    return { error: "Username and password must be strings" };
+  }
+
+  const trimmedUsername = username.trim();
+  const trimmedPassword = password.trim();
+
+  if (trimmedUsername.length < 3) {
+    return { error: "Username must be at least 3 characters" };
+  }
+
+  const passwordCheck = passwordPolicySchema.safeParse(trimmedPassword);
+  if (!passwordCheck.success) {
+    return { error: passwordCheck.error.issues[0]?.message ?? "Invalid password" };
+  }
+
+  if (trimmedUsername.length > 50) {
+    return { error: "Username must be at most 50 characters" };
+  }
+
+  return { username: trimmedUsername, password: trimmedPassword };
+}
+
+// Helper to save IGDB credentials provided during setup, if they're valid. Kept separate
+// from the /api/auth/setup handler for the same reason as validateSetupCredentials above:
+// keeping the handler's own cognitive complexity low.
+async function saveIgdbCredentialsIfProvided(
+  igdbClientId: unknown,
+  igdbClientSecret: unknown
+): Promise<{ error: string } | null> {
+  if (
+    typeof igdbClientId !== "string" ||
+    typeof igdbClientSecret !== "string" ||
+    igdbClientId.trim().length === 0 ||
+    igdbClientSecret.trim().length === 0
+  ) {
+    return null;
+  }
+
+  const trimmedClientId = igdbClientId.trim();
+  const trimmedClientSecret = igdbClientSecret.trim();
+  const formatError = validateIgdbCredentialFormat(trimmedClientId, trimmedClientSecret);
+  if (formatError) {
+    return formatError;
+  }
+
+  await storage.setSystemConfig("igdb.clientId", trimmedClientId);
+  await storage.setSystemConfig("igdb.clientSecret", trimmedClientSecret);
+  routesLogger.info("IGDB credentials saved during setup");
+  return null;
+}
+
+/**
+ * Handles an aggregated indexer search request. Results are filtered by the requesting user's
+ * global release-name blacklist and, when a gameId is given, that game's blacklist, before AI
+ * enrichment. A canonical game-title search also refreshes the game's availability badge.
+ */
+async function handleAggregatedIndexerSearch(req: Request, res: Response) {
+  try {
+    const { query, category, cat } = req.query;
+    // Express may retain these as strings even after validation middleware runs.
+    const limit = Number(req.query.limit) || 50;
+    const offset = Number(req.query.offset) || 0;
+
+    const categories = parseCategories(category || cat);
+    const fileTypes = typeof req.query.fileTypes === "string" ? req.query.fileTypes.split(",") : [];
+    const fileTypeSources = fileTypes.length ? await storage.getEnabledIndexers() : [];
+    if (fileTypeSources.length > 20) {
+      return res.status(400).json({
+        error:
+          "File-type verification supports up to 20 enabled sources. Disable unused sources before using this filter.",
+      });
+    }
+    const fileTypeLimit = Math.max(1, Math.floor(20 / Math.max(1, fileTypeSources.length)));
+    // The cursor is a per-indexer offset, so advance by the requested source page
+    // size instead of the larger number of items aggregated across indexers.
+    const pageLimit = fileTypes.length ? fileTypeLimit : limit;
+
+    routesLogger.info(
+      { query, categories, limit, offset },
+      "Handling aggregated indexer search request"
+    );
+
+    if (!query || typeof query !== "string") {
+      return res.status(400).json({ error: "Search query required" });
+    }
+
+    const { items, total, errors, errorI18n } = await searchAllIndexers({
+      query: query.trim(),
+      category: categories,
+      limit: pageLimit,
+      offset,
+    });
+
+    // Global release-name blacklist (case-insensitive substring match) applies to every
+    // search regardless of gameId, so it's resolved and applied up front.
+    const gameId = req.query.gameId as string | undefined;
+    let filteredItems = items;
+    let userSettings: Awaited<ReturnType<typeof storage.getUserSettings>> | undefined;
+    let scoringGame: Awaited<ReturnType<typeof storage.getGame>> | undefined;
+    let isCanonicalGameSearch = false;
+    if (req.user) {
+      userSettings = await storage.getUserSettings(req.user.id);
+      const blacklistTerms = parseJsonStringArray(userSettings?.releaseNameBlacklist);
+      filteredItems = filterByReleaseNameBlacklist(items, blacklistTerms);
+    }
+
+    // Filter out per-game blacklisted releases when a gameId context is provided
+    if (gameId && req.user) {
+      const game = await storage.getGame(gameId);
+      if (game && game.userId === req.user.id) {
+        scoringGame = game;
+        const blacklisted = await storage.getReleaseBlacklistSet(gameId);
+        filteredItems = filterBlacklistedReleases(filteredItems, blacklisted);
+
+        // Update the "has results" flag only for canonical game-title searches so that
+        // partial/custom user-typed queries in the download dialog don't flip the badge
+        // based on a transient, narrow result set. Runs async to avoid blocking the response.
+        isCanonicalGameSearch = normalizeTitle(query.trim()) === normalizeTitle(game.title);
+      }
+    }
+
+    const blacklistedCount = items.length - filteredItems.length;
+    if (fileTypes.length) {
+      filteredItems = await filterReleaseFileTypes(filteredItems, fileTypes, fileTypeSources);
+    }
+    const enrichedItems = await enrichWithAiAnalysis(filteredItems);
+    const scoringConfig =
+      scoringGame && userSettings?.releaseScoringEnabled
+        ? parseSavedReleaseScoringConfig(userSettings.releaseScoringProfile)
+        : null;
+    const returnedItems = scoringConfig
+      ? scoreSearchItems(
+          enrichedItems,
+          { gameTitle: scoringGame!.title, platform: userSettings?.preferredPlatform ?? null },
+          scoringConfig.profile,
+          scoringConfig.formats
+        )
+      : enrichedItems;
+
+    if (scoringGame && isCanonicalGameSearch) {
+      const preferredPlatform = userSettings?.preferredPlatform ?? null;
+      const availabilityCandidates = scoringConfig ? returnedItems : filteredItems;
+      const platformFiltered = preferredPlatform
+        ? availabilityCandidates.filter((item) => {
+            const { platform } = parseReleaseMetadata(item.title);
+            return matchesPlatformFilter(platform, preferredPlatform);
+          })
+        : availabilityCandidates;
+      const hasAvailableResult = scoringConfig
+        ? platformFiltered.some((item) => item.releaseEvaluation?.accepted)
+        : platformFiltered.length > 0;
+      storage
+        .updateGameSearchResultsAvailable(scoringGame.id, hasAvailableResult)
+        .catch((err) => routesLogger.warn({ err }, "Failed to update searchResultsAvailable"));
+    }
+
+    return res.json({
+      items: returnedItems,
+      nextOffset: items.length >= pageLimit ? offset + pageLimit : null,
+      ...(fileTypes.length ? { fileTypeFilter: "torrent-manifest-only" } : {}),
+      total,
+      offset,
+      ...(blacklistedCount > 0 ? { blacklistedCount } : {}),
+      errors: errors.length > 0 ? errors : undefined,
+      errorI18n: errors.length > 0 ? errorI18n : undefined,
+    });
+  } catch (error) {
+    routesLogger.error({ error }, "Error searching indexers");
+    return res.status(500).json({ error: "Failed to search indexers" });
+  }
+}
+
+/**
+ * Validates and sanitizes pagination parameters from query string.
+ * @param query - The query parameters object
+ * @returns Validated limit and offset values
+ */
+function isUsenetProtocol(protocol: string): boolean {
+  return protocol === "newznab" || protocol === "g4u";
+}
+
+function validatePaginationParams(query: { limit?: string; offset?: string }): {
+  limit: number;
+  offset: number;
+} {
+  const limit = Math.min(Math.max(1, Number.parseInt(query.limit as string, 10) || 20), 100);
+  const offset = Math.max(0, Number.parseInt(query.offset as string, 10) || 0);
+  return { limit, offset };
+}
+
+/**
+ * Resolves the encrypted TypeSafe API key to persist for a settings update: encrypts a
+ * newly supplied key, or reuses the already-stored encrypted key when none is supplied
+ * (e.g. the user is only changing the URL or model). Returns null when no key was
+ * supplied and none is stored yet -- the caller should treat that as "key required".
+ */
+async function resolveTypesafeApiKey(
+  trimmedNewKey: string
+): Promise<{ trimmedNewKey: string; encryptedKey: string } | null> {
+  if (trimmedNewKey) {
+    return { trimmedNewKey, encryptedKey: (await encryptCredential(trimmedNewKey)) ?? "" };
+  }
+  const storedEncryptedKey = await storage.getSystemConfig(TYPESAFE_KEY_CONFIG_KEY);
+  return storedEncryptedKey ? { trimmedNewKey: "", encryptedKey: storedEncryptedKey } : null;
+}
+
+/** Filters an already-fetched list of library games according to the user's content-filter preferences. */
+async function applyContentFilter<T>(userId: string, games: T[]): Promise<T[]> {
+  const flags = await getContentFilterFlags(userId);
+  return excludeFilteredContent(games, flags);
+}
+
+// Cap how much we over-fetch from IGDB to backfill items dropped by content filtering
+const MAX_CONTENT_FILTER_FETCH_LIMIT = 100;
+
+/**
+ * Fetches games from IGDB via `fetchGames`, formats them, and applies the user's content-filter
+ * preferences, over-fetching when either filter is active so the response still has up to `limit`
+ * items instead of silently returning fewer than requested.
+ */
+async function fetchFilteredIgdbGames(
+  userId: string,
+  limit: number,
+  fetchGames: (fetchLimit: number) => Promise<IGDBGame[]>
+): Promise<Record<string, unknown>[]> {
+  const flags = await getContentFilterFlags(userId);
+  const filteringActive = flags.hideAdultContent || flags.hideAgeRestrictedContent;
+  const fetchLimit = filteringActive ? Math.min(limit * 2, MAX_CONTENT_FILTER_FETCH_LIMIT) : limit;
+  const igdbGames = await fetchGames(fetchLimit);
+  const formattedGames = igdbGames.map((game) => igdbClient.formatGameData(game));
+  return filteringActive
+    ? excludeFilteredContent(formattedGames, flags).slice(0, limit)
+    : formattedGames;
+}
+
+/** Registers a simple `?limit=` IGDB list endpoint (popular/recent/upcoming), adult-filtered and privately cached. */
+function registerIgdbListRoute(
+  app: Express,
+  path: string,
+  errorLabel: string,
+  fetchGames: (fetchLimit: number) => Promise<IGDBGame[]>
+) {
+  app.get(path, igdbRateLimiter, async (req, res) => {
+    try {
+      const { limit } = req.query;
+      const parsed = typeof limit === "string" ? parseInt(limit, 10) : NaN;
+      const limitNum = Number.isNaN(parsed) || parsed < 1 ? 20 : Math.min(parsed, 100);
+
+      const formattedGames = await fetchFilteredIgdbGames(req.user!.id, limitNum, fetchGames);
+
+      res.set("Cache-Control", CC_IGDB_GAME_LIST_PRIVATE);
+      res.json(formattedGames);
+    } catch (error) {
+      routesLogger.error({ error }, `error fetching ${errorLabel}`);
+      res.status(500).json({ error: `Failed to fetch ${errorLabel}` });
+    }
+  });
+}
+
+/** Registers a `:param`-scoped, `limit`/`offset`-paginated IGDB list endpoint (genre/platform), adult-filtered and privately cached. */
+function registerIgdbParamListRoute(
+  app: Express,
+  path: string,
+  paramName: string,
+  errorLabel: string,
+  fetchGames: (paramValue: string, fetchLimit: number, offset: number) => Promise<IGDBGame[]>
+) {
+  app.get(path, igdbRateLimiter, async (req, res) => {
+    try {
+      const rawParamValue = req.params[paramName];
+      const paramValue = typeof rawParamValue === "string" ? rawParamValue : "";
+      const { limit, offset } = validatePaginationParams(
+        req.query as { limit?: string; offset?: string }
+      );
+
+      if (!paramValue || paramValue.length > 100) {
+        return res.status(400).json({ error: `Invalid ${paramName} parameter` });
+      }
+
+      const formattedGames = await fetchFilteredIgdbGames(req.user!.id, limit, (fetchLimit) =>
+        fetchGames(paramValue, fetchLimit, offset)
+      );
+
+      res.set("Cache-Control", CC_IGDB_GAME_LIST_PRIVATE);
+      return res.json(formattedGames);
+    } catch (error) {
+      routesLogger.error({ error }, `error fetching games by ${errorLabel}`);
+      return res.status(500).json({ error: `Failed to fetch games by ${errorLabel}` });
+    }
+  });
+}
+
+/**
+ * Registers application middleware and API routes, then creates the HTTP server.
+ *
+ * @param app - The Express application to configure
+ * @returns The configured HTTP server
+ */
+export async function registerRoutes(app: Express): Promise<Server> {
+  // 🛡️ Sentinel: Add security headers with Helmet
+  // Configured to allow Vite/React (unsafe-inline/eval) in dev, and IGDB images everywhere
+  const scriptSrc = ["'self'"];
+  const connectSrc = [
+    "'self'",
+    "https://raw.githubusercontent.com",
+    "https://api.github.com",
+    SUPPORT_WORKER_ORIGIN,
+  ];
+
+  if (!appConfig.server.isProduction) {
+    scriptSrc.push("'unsafe-inline'", "'unsafe-eval'");
+    connectSrc.push("ws:", "wss:");
+  }
+
+  const isSslEnabled = appConfig.ssl.enabled && !!appConfig.ssl.certPath && !!appConfig.ssl.keyPath;
+
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          ...(helmet.contentSecurityPolicy.getDefaultDirectives() as Record<
+            string,
+            Iterable<string> | null
+          >),
+          "script-src": scriptSrc,
+          "img-src": [
+            "'self'",
+            "data:",
+            "https://images.igdb.com",
+            "https://staticdelivery.nexusmods.com",
+            // Steam achievement icons (GetSchemaForGame), served from Steam's CDN
+            "https://steamcdn-a.akamaihd.net",
+            "https://cdn.akamai.steamstatic.com",
+            "https://shared.cloudflare.steamstatic.com",
+          ],
+          "connect-src": connectSrc,
+          // Narrower than helmet's defaults (which allow any "https:" origin): fonts and
+          // styles are all self-hosted (@fontsource-variable, Tailwind), so there's no
+          // third-party font/style CDN to allow for.
+          "font-src": ["'self'", "data:"],
+          "style-src": ["'self'", "'unsafe-inline'"],
+          "upgrade-insecure-requests": isSslEnabled ? [] : null,
+        },
+      },
+      hsts: isSslEnabled,
+      crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+    })
+  );
+  // Permissions-Policy: helmet dropped built-in support (spec churn), so set it directly.
+  // Questarr uses none of these browser APIs; deny them by default for every response.
+  app.use((_req, res, next) => {
+    res.setHeader(
+      "Permissions-Policy",
+      "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+    );
+    next();
+  });
+  // Explicit robots.txt so well-behaved crawlers stay out even before
+  // fetching any other page (belt-and-suspenders alongside the X-Robots-Tag
+  // header set in app.ts). Registered here, after helmet(), so it still gets
+  // the same security headers as every other response.
+  app.get("/robots.txt", (_req, res) => {
+    res.type("text/plain").send("User-agent: *\nDisallow: /\n");
+  });
+  // API responses are personalized or dynamic unless a route explicitly opts
+  // into caching. React Query consumes fresh JSON and does not resolve a raw
+  // 304 response body, so prevent browser validation from turning a normal
+  // reload of authenticated data into a query error.
+  app.use("/api", (_req, res, next) => {
+    res.setHeader("Cache-Control", "no-store");
+    next();
+  });
+  // Default-deny auth boundary for the whole /api surface. Mounted before any
+  // /api route (including the routers below) is registered, so every /api/*
+  // request is required to authenticate unless explicitly allowlisted above.
+  app.use("/api", requireAuthenticationForApi);
+  // CSRF protection for cookie-authenticated requests. Must run after the
+  // auth boundary above so req.authSource is already populated.
+  app.use("/api", csrfProtection);
+  registerOidcAuthRoutes(app);
+  // The global limiter protects by source IP before credentials are checked;
+  // this authenticated ceiling also applies to a key across many source IPs.
+  app.use("/api/integration", integrationRateLimiter);
+
+  // Use Steam Routes
+  app.use(steamRoutes);
+  app.use(gameJournalRoutes);
+  // Use PCGamingWiki Routes
+  app.use(pcgamingwikiRouter);
+  // Use HowLongToBeat Routes
+  app.use(hltbRouter);
+
+  // ── Server logs ──────────────────────────────────────────────────────────────
+
+  app.get("/api/logs", authenticateToken, async (req, res) => {
+    try {
+      const rawLimit =
+        typeof req.query.limit === "string" ? Number.parseInt(req.query.limit, 10) : 1000;
+      const limit = Number.isNaN(rawLimit) || rawLimit < 1 ? 1000 : Math.min(rawLimit, 5000);
+
+      const logPath = getLogFilePath();
+
+      let stat: fs.Stats;
+      try {
+        stat = await fs.promises.stat(logPath);
+      } catch {
+        return res.json({ lines: [] });
+      }
+
+      if (stat.size === 0) {
+        return res.json({ lines: [] });
+      }
+
+      const lines = await readLastLogLines(logPath, limit);
+
+      return res.json({ lines });
+    } catch (error) {
+      routesLogger.error({ error }, "Failed to read server log file");
+      return res.status(500).json({ error: "Failed to read log file" });
+    }
+  });
+
+  // Auth Routes
+  app.get("/api/auth/status", async (_req, res) => {
+    try {
+      const userCount = await storage.countUsers();
+      const hasUsers = userCount > 0;
+      // Also surface IGDB configured-status here (not just hasUsers) so the
+      // unauthenticated setup wizard can decide whether to ask for IGDB
+      // credentials without needing to call the authenticated /api/config
+      // endpoint pre-login. This route stays on the public allowlist even
+      // after setup completes (existing sessions re-check it), so once a
+      // user exists, omit the igdb field entirely rather than leaving IGDB
+      // configuration status queryable by any anonymous caller forever.
+      if (!hasUsers) {
+        const igdb = await getIgdbConfigStatus();
+        return res.json({ hasUsers, igdb });
+      }
+      return res.json({ hasUsers });
+    } catch (error) {
+      routesLogger.error({ error }, "Failed to check setup status");
+      return res.status(500).json({ error: "Failed to check setup status" });
+    }
+  });
+
+  app.post(
+    "/api/auth/setup",
+    authRateLimiter,
+    validate(
+      z
+        .object({
+          username: z.string(),
+          password: z.string(),
+          igdbClientId: z.string().nullable().optional(),
+          igdbClientSecret: z.string().nullable().optional(),
+        })
+        .passthrough()
+    ),
+    async (req, res) => {
+      try {
+        // Atomic setup check and creation
+        const userCount = await storage.countUsers();
+        if (userCount > 0) {
+          return res.status(403).json({ error: "Setup already completed" });
+        }
+
+        const { username, password, igdbClientId, igdbClientSecret } = req.body;
+
+        const validated = validateSetupCredentials(username, password);
+        if ("error" in validated) {
+          return res.status(400).json({ error: validated.error });
+        }
+        const { username: trimmedUsername, password: trimmedPassword } = validated;
+
+        // Validate IGDB credential format before creating the user account: rejecting it after
+        // the account exists would leave the caller stuck (setup can't be re-run once a user
+        // exists), so a bad format -- an incomplete pair, or a non-string value, all of which
+        // saveIgdbCredentialsIfProvided would otherwise silently discard below -- must fail fast,
+        // before anything is persisted.
+        const igdbClientIdSupplied = igdbClientId !== undefined && igdbClientId !== null;
+        const igdbClientSecretSupplied =
+          igdbClientSecret !== undefined && igdbClientSecret !== null;
+        if (
+          (igdbClientIdSupplied && typeof igdbClientId !== "string") ||
+          (igdbClientSecretSupplied && typeof igdbClientSecret !== "string")
+        ) {
+          return res
+            .status(400)
+            .json({ error: "IGDB Client ID and Client Secret must be strings" });
+        }
+
+        const trimmedIgdbClientId = typeof igdbClientId === "string" ? igdbClientId.trim() : "";
+        const trimmedIgdbClientSecret =
+          typeof igdbClientSecret === "string" ? igdbClientSecret.trim() : "";
+        const hasIgdbClientId = trimmedIgdbClientId.length > 0;
+        const hasIgdbClientSecret = trimmedIgdbClientSecret.length > 0;
+
+        if (hasIgdbClientId !== hasIgdbClientSecret) {
+          return res
+            .status(400)
+            .json({ error: "Both IGDB Client ID and Client Secret are required together" });
+        }
+
+        if (hasIgdbClientId && hasIgdbClientSecret) {
+          const formatError = validateIgdbCredentialFormat(
+            trimmedIgdbClientId,
+            trimmedIgdbClientSecret
+          );
+          if (formatError) {
+            return res.status(400).json(formatError);
+          }
+        }
+
+        // Create first user
+        // Create first user atomically
+        const passwordHash = await hashPassword(trimmedPassword);
+
+        let user;
+        try {
+          user = await storage.registerSetupUser({ username: trimmedUsername, passwordHash });
+        } catch (error) {
+          if (error instanceof Error && error.message === "Setup already completed") {
+            return res.status(403).json({ error: "Setup already completed" });
+          }
+          throw error;
+        }
+
+        const token = await generateToken(user);
+
+        // Save IGDB creds if provided (format already validated above).
+        await saveIgdbCredentialsIfProvided(igdbClientId, igdbClientSecret);
+
+        routesLogger.info({ username: trimmedUsername }, "Initial setup completed");
+        // Cookie-based auth is the primary mechanism for browser clients (see
+        // server/security.ts); the token is also still returned in the body
+        // for backward compatibility with any non-browser/bearer-only client.
+        setAuthCookies(req, res, token);
+        return res.json({ token, user: { id: user.id, username: user.username } });
+      } catch (error) {
+        routesLogger.error(
+          {
+            error,
+            message: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+          },
+          "Setup failed"
+        );
+        return res.status(500).json({ error: "Setup failed. Please try again." });
+      }
+    }
+  );
+
+  // "Test connection" button on the setup wizard. Public (no user/token exists yet), but only
+  // does anything before setup completes, so it can't become a standing unauthenticated
+  // Twitch-credential probe once the instance is in normal use.
+  app.post(
+    "/api/auth/setup/test-igdb",
+    authRateLimiter,
+    validate(z.object({ clientId: z.string(), clientSecret: z.string() }).passthrough()),
+    async (req, res) => {
+      try {
+        const userCount = await storage.countUsers();
+        if (userCount > 0) {
+          return res.status(403).json({ success: false, error: "Setup already completed" });
+        }
+
+        const { clientId, clientSecret } = req.body;
+        if (typeof clientId !== "string" || typeof clientSecret !== "string") {
+          return res
+            .status(400)
+            .json({ success: false, error: "Client ID and Client Secret are required" });
+        }
+
+        const trimmedClientId = clientId.trim();
+        const trimmedClientSecret = clientSecret.trim();
+        const formatError = validateIgdbCredentialFormat(trimmedClientId, trimmedClientSecret);
+        if (formatError) {
+          return res.status(400).json({ success: false, ...formatError });
+        }
+
+        const result = await igdbClient.testCredentials(trimmedClientId, trimmedClientSecret);
+        return res.status(result.success ? 200 : 400).json(result);
+      } catch (error) {
+        routesLogger.error({ error }, "Failed to test IGDB credentials during setup");
+        return res.status(500).json({
+          success: false,
+          ...serviceErrorBody(
+            undefined,
+            serviceMessage("service.igdb_credentials_test_failed", {})
+          ),
+        });
+      }
+    }
+  );
+
+  app.post(
+    "/api/auth/login",
+    authRateLimiter,
+    validate(z.object({ username: z.string(), password: z.string() }).passthrough()),
+    async (req, res) => {
+      const { username, password } = req.body;
+
+      if (typeof username !== "string" || typeof password !== "string") {
+        return res
+          .status(400)
+          .json({ error: "Username and password are required and must be strings" });
+      }
+
+      const trimmedUsername = username.trim();
+      const trimmedPassword = password.trim();
+      const user = await storage.getUserByUsername(trimmedUsername);
+
+      // Backward-compatible check: try the raw password first (for accounts created before
+      // trimming was introduced), then fall back to the trimmed value.
+      let passwordMatches = false;
+      if (user) {
+        passwordMatches = await comparePassword(password, user.passwordHash);
+        if (!passwordMatches && trimmedPassword !== password) {
+          passwordMatches = await comparePassword(trimmedPassword, user.passwordHash);
+        }
+      }
+
+      if (!user || !passwordMatches) {
+        routesLogger.warn({ username: trimmedUsername, ip: req.ip }, "Failed login attempt");
+        return res.status(401).json({ error: "Invalid username or password" });
+      }
+
+      // Auto-migrate orphan games to this user on login
+      // This handles the transition from single-user to multi-user
+      await storage.assignOrphanGamesToUser(user.id);
+
+      const token = await generateToken(user);
+      // Cookie-based auth is the primary mechanism for browser clients (see
+      // server/security.ts); the token is also still returned in the body
+      // for backward compatibility with any non-browser/bearer-only client.
+      setAuthCookies(req, res, token);
+      return res.json({ token, user: { id: user.id, username: user.username } });
+    }
+  );
+
+  app.get("/api/auth/me", authenticateToken, (req, res) => {
+    const user = req.user!;
+    res.json({ id: user.id, username: user.username, steamId64: user.steamId64 });
+  });
+
+  // Logout must be idempotent: an expired/invalid/missing session cookie
+  // must still be cleared, otherwise the browser keeps a stale cookie
+  // forever. It's a SOFT_AUTH_API_ROUTES entry (see requireAuthenticationForApi
+  // above), which already ran optionalAuthenticateToken for this request --
+  // req.authSource is populated when a valid cookie is present, so
+  // csrfProtection (mounted before route registration) still enforces the
+  // CSRF check for cookie-authenticated callers. JWTs are stateless, so
+  // there's nothing to invalidate server-side beyond clearing the cookies.
+  app.post("/api/auth/logout", (req, res) => {
+    clearAuthCookies(req, res);
+    res.json({ success: true });
+  });
+
+  app.patch(
+    "/api/auth/password",
+    authenticateToken,
+    sensitiveEndpointLimiter,
+    validate(updatePasswordSchema),
+    async (req, res) => {
+      try {
+        const userId = req.user!.id;
+        const { currentPassword, newPassword } = updatePasswordSchema.parse(req.body);
+
+        const user = await storage.getUser(userId);
+        if (!user) {
+          return res.status(404).json({ error: "User not found" });
+        }
+
+        if (!(await comparePassword(currentPassword, user.passwordHash))) {
+          return res.status(401).json({ error: "Incorrect current password" });
+        }
+
+        const newPasswordHash = await hashPassword(newPassword);
+        await storage.updateUserPassword(userId, newPasswordHash);
+
+        routesLogger.info({ userId }, "User password updated");
+        return res.json({ success: true, message: "Password updated successfully" });
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          return respondWithZodError(res, error, "Invalid password data");
+        }
+        routesLogger.error({ error }, "Failed to update password");
+        return res.status(500).json({ error: "Failed to update password" });
+      }
+    }
+  );
+
+  // Health check endpoint
+  app.get("/api/health", async (_req, res) => {
+    // 🛡️ Sentinel: Harden health check endpoint.
+    // This liveness probe only confirms the server is responsive.
+    // For readiness checks (e.g., database connectivity), use the /api/ready endpoint.
+    res.status(200).json({ status: "ok" });
+  });
+
+  // SSL Settings - Get
+  app.get("/api/settings/ssl", authenticateToken, async (_req, res) => {
+    try {
+      const sslConfig = configLoader.getSslConfig();
+
+      let certInfo = undefined;
+      if (sslConfig.certPath) {
+        try {
+          const { getCertInfo } = await import("./ssl.js");
+          const info = await getCertInfo(sslConfig.certPath);
+          if (info.valid) {
+            certInfo = {
+              subject: info.subject,
+              issuer: info.issuer,
+              validFrom: info.validFrom,
+              validTo: info.validTo,
+              selfSigned: info.selfSigned,
+            };
+          }
+        } catch (error) {
+          routesLogger.warn({ error }, "Failed to get certificate info");
+        }
+      }
+
+      res.json({ ...sslConfig, certInfo });
+    } catch (error) {
+      routesLogger.error({ error }, "Failed to fetch SSL settings");
+      res.status(500).json({ error: "Failed to fetch SSL settings" });
+    }
+  });
+
+  // SSL Settings - Update
+  app.patch(
+    "/api/settings/ssl",
+    authenticateToken,
+    sensitiveEndpointLimiter,
+    validate(
+      z
+        .object({
+          enabled: z.boolean(),
+          port: z.number(),
+          certPath: z.string().optional(),
+          keyPath: z.string().optional(),
+          redirectHttp: z.boolean().optional(),
+        })
+        .passthrough()
+    ),
+    async (req, res) => {
+      try {
+        const { enabled, port, certPath, keyPath, redirectHttp } = req.body;
+
+        // Basic validation
+        if (typeof enabled !== "boolean")
+          return res.status(400).json({ error: "Invalid 'enabled' value" });
+        if (typeof port !== "number")
+          return res.status(400).json({ error: "Invalid 'port' value" });
+
+        if (
+          (certPath !== undefined && typeof certPath !== "string") ||
+          (keyPath !== undefined && typeof keyPath !== "string")
+        ) {
+          return res.status(400).json({ error: "Invalid certificate or key path" });
+        }
+
+        // Canonicalize both paths and confine them to the configured file browser
+        // root or Questarr's private SSL directory.
+        let resolvedCertPath: string | undefined;
+        let resolvedKeyPath: string | undefined;
+        if (certPath || keyPath) {
+          const allowedSslRoots = [
+            FILE_BROWSER_ROOT,
+            path.join(configLoader.getConfigDir(), "ssl"),
+          ];
+          if (certPath) {
+            try {
+              resolvedCertPath = await assertWithinRoots(
+                certPath,
+                allowedSslRoots,
+                "Access to cert path is not allowed"
+              );
+            } catch {
+              return res.status(403).json({ error: "Access to cert path is not allowed" });
+            }
+          }
+          if (keyPath) {
+            try {
+              resolvedKeyPath = await assertWithinRoots(
+                keyPath,
+                allowedSslRoots,
+                "Access to key path is not allowed"
+              );
+            } catch {
+              return res.status(403).json({ error: "Access to key path is not allowed" });
+            }
+          }
+        }
+
+        // Validate if enabling SSL
+        if (enabled) {
+          if (certPath && keyPath) {
+            // Validate the same canonical paths that were checked above and get saved below.
+            const { validateCertFiles } = await import("./ssl.js"); // Dynamic import to avoid circular deps if any
+            const { valid, error, errorI18n } = await validateCertFiles(
+              resolvedCertPath ?? certPath,
+              resolvedKeyPath ?? keyPath
+            );
+            if (!valid) {
+              return res
+                .status(400)
+                .json(
+                  serviceErrorBody(
+                    undefined,
+                    serviceMessage("service.ssl_invalid_configuration", {
+                      detail: serviceMessageValue(String(error), errorI18n),
+                    })
+                  )
+                );
+            }
+          } else {
+            // If enabling but paths not provided in body, check if they exist in current config or are being set?
+            // Actually, if they are undefined in body, we might be keeping existing ones.
+            // But simpler to just require them if they are changing.
+            // If they are missing in body, let's look up current config
+            const current = configLoader.getSslConfig();
+            // current.certPath/keyPath were already root-contained when they were saved,
+            // so only the newly supplied (resolved) values need the same treatment here.
+            const effectiveCert = certPath ? resolvedCertPath : current.certPath;
+            const effectiveKey = keyPath ? resolvedKeyPath : current.keyPath;
+
+            if (!effectiveCert || !effectiveKey) {
+              return res
+                .status(400)
+                .json({ error: "Certificate and key paths are required to enable SSL" });
+            }
+
+            const { validateCertFiles } = await import("./ssl.js");
+            const { valid, error, errorI18n } = await validateCertFiles(
+              effectiveCert,
+              effectiveKey
+            );
+            if (!valid) {
+              return res
+                .status(400)
+                .json(
+                  serviceErrorBody(
+                    undefined,
+                    serviceMessage("service.ssl_invalid_configuration", {
+                      detail: serviceMessageValue(String(error), errorI18n),
+                    })
+                  )
+                );
+            }
+          }
+        }
+
+        await configLoader.saveConfig({
+          ssl: {
+            enabled,
+            port,
+            certPath: resolvedCertPath,
+            keyPath: resolvedKeyPath,
+            redirectHttp,
+          },
+        });
+
+        routesLogger.info("SSL settings updated");
+        return res.json({ success: true, message: "SSL settings updated. Restart required." });
+      } catch (error) {
+        routesLogger.error({ error }, "Failed to update SSL settings");
+        return res.status(500).json({ error: "Failed to update SSL settings" });
+      }
+    }
+  );
+
+  // Generate Self-Signed Cert
+  app.post(
+    "/api/settings/ssl/generate",
+    authenticateToken,
+    sensitiveEndpointLimiter,
+    async (_req, res) => {
+      try {
+        const { generateSelfSignedCert } = await import("./ssl.js");
+        const { certPath, keyPath } = await generateSelfSignedCert();
+
+        // Automatically update config to use these
+        const currentSsl = configLoader.getSslConfig();
+        await configLoader.saveConfig({
+          ssl: {
+            ...currentSsl,
+            certPath,
+            keyPath,
+          },
+        });
+
+        routesLogger.info("Generated self-signed certificate");
+        res.json({ success: true, message: "Certificate generated", certPath, keyPath });
+      } catch (error) {
+        routesLogger.error({ error }, "Failed to generate certificate");
+        res.status(500).json({ error: "Failed to generate certificate" });
+      }
+    }
+  );
+
+  // Upload Certificate and Key
+  app.post(
+    "/api/settings/ssl/upload",
+    authenticateToken,
+    sensitiveEndpointLimiter,
+    upload.fields([
+      { name: "cert", maxCount: 1 },
+      { name: "key", maxCount: 1 },
+    ]),
+    async (req, res) => {
+      try {
+        const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+        const certFile = files["cert"]?.[0];
+        const keyFile = files["key"]?.[0];
+
+        if (!certFile || !keyFile) {
+          return res
+            .status(400)
+            .json({ error: "Both certificate and private key files are required" });
+        }
+
+        const { ensureSslDir } = await import("./ssl.js");
+        await ensureSslDir();
+
+        const sslDir = path.join(configLoader.getConfigDir(), "ssl");
+        const certPath = path.join(sslDir, "uploaded.crt");
+        const keyPath = path.join(sslDir, "uploaded.key");
+
+        // Simple validation: Check if they look like PEM files
+        const certContent = certFile.buffer.toString("utf8");
+        const keyContent = keyFile.buffer.toString("utf8");
+
+        if (!certContent.includes("BEGIN CERTIFICATE")) {
+          return res.status(400).json({ error: "Invalid certificate file format (PEM expected)" });
+        }
+        if (!keyContent.includes("PRIVATE KEY")) {
+          return res.status(400).json({ error: "Invalid private key file format (PEM expected)" });
+        }
+
+        await fs.promises.writeFile(certPath, certContent);
+        await fs.promises.writeFile(keyPath, keyContent);
+
+        // Validate the uploaded files specifically
+        const { validateCertFiles } = await import("./ssl.js");
+        const { valid, error, errorI18n } = await validateCertFiles(certPath, keyPath);
+
+        if (!valid) {
+          // Cleanup invalid files
+          await fs.promises.unlink(certPath).catch(() => {});
+          await fs.promises.unlink(keyPath).catch(() => {});
+          return res
+            .status(400)
+            .json(
+              serviceErrorBody(
+                undefined,
+                serviceMessage("service.ssl_uploaded_invalid", {
+                  detail: serviceMessageValue(String(error), errorI18n),
+                })
+              )
+            );
+        }
+
+        // Update config to use uploaded files
+        const currentSsl = configLoader.getSslConfig();
+        await configLoader.saveConfig({
+          ssl: {
+            ...currentSsl,
+            certPath,
+            keyPath,
+          },
+        });
+
+        routesLogger.info("Uploaded SSL certificate and key");
+        return res.json({
+          success: true,
+          message: "Certificate uploaded successfully",
+          certPath,
+          keyPath,
+        });
+      } catch (error) {
+        routesLogger.error({ error }, "Failed to upload certificate");
+        return res.status(500).json({ error: "Failed to upload certificate" });
+      }
+    }
+  );
+
+  // File System Browser
+  app.get(
+    "/api/system/filesystem",
+    authenticateToken,
+    sensitiveEndpointLimiter,
+    async (req, res) => {
+      try {
+        // Treat the query path as relative to the FILE_BROWSER_ROOT
+        const rawPath = req.query.path;
+
+        // Normalize and validate the user-controlled path input.
+        // Ensure we are working with a single string value to avoid
+        // type confusion when multiple "path" parameters are supplied.
+        let queryPath: string;
+        if (rawPath == null) {
+          queryPath = ".";
+        } else if (typeof rawPath === "string") {
+          queryPath = rawPath;
+        } else if (Array.isArray(rawPath) && typeof rawPath[0] === "string") {
+          // Use the first provided value if multiple are supplied
+          queryPath = rawPath[0];
+        } else {
+          return res.status(400).json({ error: "Invalid path parameter" });
+        }
+
+        // Basic validation of user-controlled path input before resolving.
+        // Disallow NUL bytes and absolute paths; traversal outside the root
+        // is prevented by the subsequent normalizedRoot checks.
+        if (queryPath.includes("\0")) {
+          return res.status(403).json({ error: "Access to this path is not allowed" });
+        }
+        if (path.isAbsolute(queryPath)) {
+          return res.status(403).json({ error: "Access to this path is not allowed" });
+        }
+
+        // Resolve against the root and normalize. The following checks verify both
+        // lexical and canonical containment before the filesystem is accessed.
+        // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- checked lexically and again after realpath() before any filesystem read.
+        const resolvedPath = path.resolve(FILE_BROWSER_ROOT, queryPath); // nosemgrep: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal -- lexical and canonical containment checks run before filesystem access.
+        const relativePath = path.relative(FILE_BROWSER_ROOT, resolvedPath);
+        if (
+          relativePath === ".." ||
+          relativePath.startsWith(".." + path.sep) ||
+          path.isAbsolute(relativePath)
+        ) {
+          return res.status(403).json({ error: "Access to this path is not allowed" });
+        }
+
+        // Resolve any symbolic links
+        let currentPath: string;
+        try {
+          currentPath = await fs.promises.realpath(resolvedPath);
+        } catch (error) {
+          const fsError = error as NodeJS.ErrnoException;
+          if (fsError.code === "ENOENT") {
+            return res.status(404).json({ error: "Path not found" });
+          }
+          throw error;
+        }
+
+        const canonicalRelativePath = path.relative(FILE_BROWSER_ROOT, currentPath);
+        if (
+          canonicalRelativePath === ".." ||
+          canonicalRelativePath.startsWith(".." + path.sep) ||
+          path.isAbsolute(canonicalRelativePath)
+        ) {
+          return res.status(403).json({ error: "Access to this path is not allowed" });
+        }
+
+        // Basic security check: ensure path exists
+        if (!fs.existsSync(currentPath)) {
+          return res.status(404).json({ error: "Path not found" });
+        }
+
+        const stats = await fs.promises.stat(currentPath);
+        if (!stats.isDirectory()) {
+          return res.status(400).json({ error: "Path is not a directory" });
+        }
+
+        const entries = await fs.promises.readdir(currentPath, { withFileTypes: true });
+
+        const files = await Promise.all(
+          entries.map(async (entry) => {
+            // entry.name comes from readdir on the already-canonicalized in-root directory.
+            // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+            const fullPath = path.join(currentPath, entry.name); // nosemgrep: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal -- entry.name comes from readdir of the canonical in-root directory; symlinks are rejected.
+            // Do not follow symlinks from the file browser: even a metadata-only
+            // stat can reveal whether a link points to a directory outside this root.
+            const isDirectory = entry.isDirectory();
+
+            const relativePath = path.relative(FILE_BROWSER_ROOT, fullPath);
+
+            return {
+              name: entry.name,
+              path: relativePath,
+              isDirectory,
+              size: 0,
+            };
+          })
+        );
+
+        // Sort directories first
+        files.sort((a, b) => {
+          if (a.isDirectory === b.isDirectory) {
+            return a.name.localeCompare(b.name);
+          }
+          return a.isDirectory ? -1 : 1;
+        });
+        const parentPath = path.dirname(currentPath);
+        const parentRelativePath = path.relative(FILE_BROWSER_ROOT, parentPath);
+
+        // Only return parent if it's different (not root)
+        const parent =
+          parentPath !== currentPath
+            ? {
+                name: "..",
+                path: parentRelativePath,
+                isDirectory: true,
+                size: 0,
+              }
+            : null;
+        const currentRelativePath = path.relative(FILE_BROWSER_ROOT, currentPath);
+
+        return res.json({
+          path: currentRelativePath,
+          parent,
+          files,
+        });
+      } catch (error) {
+        routesLogger.error({ error }, "Failed to list directory");
+        return res.status(500).json({ error: "Failed to list directory" });
+      }
+    }
+  );
+
+  // Configuration endpoint - read-only access to key settings. Requires
+  // authentication (enforced by the default-deny API auth boundary below);
+  // the unauthenticated setup flow instead uses the `igdb` field on
+  // GET /api/auth/status, which exposes only the configured/source booleans.
+  app.get("/api/config", async (_req, res) => {
+    try {
+      // 🛡️ Sentinel: Harden config endpoint to prevent information disclosure.
+      // Only expose boolean flags indicating if services are configured, not
+      // sensitive details like database URLs or partial API keys.
+      // clientId is intentionally omitted here; use the authenticated
+      // GET /api/settings/igdb endpoint to retrieve it.
+      const { configured: isConfigured, source } = await getIgdbConfigStatus();
+
+      const xrelApiBase =
+        (await storage.getSystemConfig("xrel_api_base"))?.trim() ||
+        process.env.XREL_API_BASE ||
+        DEFAULT_XREL_BASE;
+
+      const rawgApiKey = await storage.getSystemConfig("rawg.apiKey");
+      const config: Config = {
+        igdb: {
+          configured: isConfigured,
+          source,
+        },
+        rawg: {
+          configured: Boolean(rawgApiKey),
+          source: rawgApiKey ? "database" : undefined,
+        },
+        xrel: { apiBase: xrelApiBase },
+      };
+      res.json(config);
+    } catch (error) {
+      routesLogger.error({ error }, "error fetching config");
+      res.status(500).json({ error: "Failed to fetch configuration" });
+    }
+  });
+
+  // Mount Feature Routers. No per-mount authenticateToken here: the
+  // default-deny boundary (requireAuthenticationForApi, mounted above
+  // before any /api route is registered) already authenticates every
+  // request to these paths -- none of them are in PUBLIC_API_ROUTES.
+  // Repeating the check here bought no additional protection (it re-runs
+  // the identical jwt.verify + storage.getUser after the same middleware
+  // already accepted the request) while doubling the per-request auth cost.
+  app.use("/api/imports", importRouter);
+  app.use("/api/import-tasks", importTasksRouter);
+  app.use("/api/system", systemRouter);
+  // Authenticated by the /api gate above (JWT or integration API key); same
+  // reasoning as the mounts above.
+  app.use("/api/integration", integrationRouter);
+  app.use("/api/api-keys", apiKeysRouter);
+
+  // Editions and add-ons a SeerrNG request asked for that are not acquired yet.
+  app.get("/api/wanted-content", async (req, res) => {
+    try {
+      const { summarizeWantedRequest } = await import("./wanted-content.js");
+      const rows = await storage.getOpenSelectionRequests(req.user!.id);
+      const items = await Promise.all(
+        rows.map(async (row) => {
+          const game = row.gameId ? await storage.getGame(row.gameId) : undefined;
+          return summarizeWantedRequest(row, game?.title);
+        })
+      );
+      res.json(items.filter((item) => item !== null));
+    } catch (error) {
+      routesLogger.error({ error }, "Error listing wanted content");
+      res.status(500).json({ error: "Failed to list wanted content" });
+    }
+  });
+
+  // Check Prowlarr's management API and each proxied feed separately.
+  app.post(
+    "/api/indexers/prowlarr/diagnose",
+    sensitiveEndpointLimiter,
+    validate(
+      z
+        .object({
+          url: z.string().min(1),
+          apiKey: z.string().min(1),
+          allowInsecureLan: z.boolean().default(false),
+        })
+        .passthrough()
+    ),
+    async (req, res, next) => {
+      try {
+        const { url, allowInsecureLan = false } = req.body;
+        let { apiKey } = req.body;
+        if (typeof url !== "string" || !url || typeof apiKey !== "string" || !apiKey) {
+          return res.status(400).json({ error: "URL and API Key are required" });
+        }
+        if (typeof allowInsecureLan !== "boolean") {
+          return res.status(400).json({ error: "Invalid insecure LAN setting" });
+        }
+        if (isUnchangedSentinel(apiKey)) {
+          const saved = await loadProwlarrSyncSettings();
+          if (!saved?.apiKey || saved.url !== url) {
+            return res.status(400).json({ error: "Enter the Prowlarr API key again for this URL" });
+          }
+          apiKey = saved.apiKey;
+        }
+        if (!(await isSafeUrl(url))) {
+          return res.status(400).json({ error: "Invalid or unsafe URL" });
+        }
+        return res.json(await prowlarrClient.diagnose(url, apiKey, allowInsecureLan));
+      } catch (error) {
+        return next(error);
+      }
+    }
+  );
+
+  // Last-used Prowlarr sync settings prefill the dialog. The API key is stored
+  // encrypted and only a redaction placeholder is returned to the browser.
+  app.get("/api/indexers/prowlarr/settings", async (_req, res, next) => {
+    try {
+      const saved = await loadProwlarrSyncSettings();
+      if (!saved) return res.json(null);
+      return res.json({
+        url: saved.url,
+        apiKey: REDACTED_PLACEHOLDER,
+        allowInsecureLan: saved.allowInsecureLan,
+        priority: saved.priority ?? null,
+        categories: saved.categories,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  // Sync indexers from Prowlarr and remember the last successful dialog values.
+  app.post(
+    "/api/indexers/prowlarr/sync",
+    sensitiveEndpointLimiter,
+    sanitizeProwlarrSyncData,
+    validate(z.object({ url: z.string().min(1), apiKey: z.string().min(1) }).passthrough()),
+    validateRequest,
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const { url, allowInsecureLan, priority, categories } = req.body;
+        let { apiKey } = req.body;
+
+        if (!url || !apiKey) {
+          return res.status(400).json({ error: "URL and API Key are required" });
+        }
+
+        // The prefilled dialog sends the placeholder for "use the saved key".
+        // It is only honoured for the saved URL, so the stored key can never
+        // be sent to a different host.
+        if (isUnchangedSentinel(apiKey)) {
+          const saved = await loadProwlarrSyncSettings();
+          if (!saved?.apiKey || !isSameProwlarrUrl(saved.url, url)) {
+            return res.status(400).json({ error: "Enter the Prowlarr API key again for this URL" });
+          }
+          apiKey = saved.apiKey;
+        }
+
+        // Revocation is local: it must also work when DNS validation fails.
+        if (allowInsecureLan === false) await revokeProwlarrHttpOptIn(url);
+
+        if (!(await isSafeUrl(url))) {
+          return res.status(400).json({ error: "Invalid or unsafe URL" });
+        }
+
+        const indexers = await prowlarrClient.getIndexers(url, apiKey, {
+          allowInsecureLan,
+          priority,
+          categories,
+        });
+
+        // ⚡ Bolt: Use batched sync method to handle all indexers in a single transaction
+        const results = await storage.syncIndexers(indexers);
+
+        // Remembering the dialog is a convenience: a failure here must not
+        // report a sync that already happened as failed.
+        try {
+          await saveProwlarrSyncSettings({
+            url,
+            apiKey,
+            allowInsecureLan: allowInsecureLan === true,
+            priority,
+            categories: categories ?? [],
+          });
+        } catch (error) {
+          routesLogger.warn({ error }, "failed to save Prowlarr sync settings");
+        }
+
+        return res.json({
+          success: true,
+          message: `Synced indexers from Prowlarr: ${results.added} added, ${results.updated} updated`,
+          results,
+        });
+      } catch (error) {
+        return next(error);
+      }
+    }
+  );
+
+  app.get("/api/ready", async (_req, res) => {
+    let isHealthy = true;
+
+    // Check database connectivity
+    try {
+      await pingDatabase();
+    } catch (error) {
+      routesLogger.error({ error }, "database health check failed");
+      isHealthy = false;
+    }
+
+    // Check IGDB API connectivity
+    try {
+      // Try to get popular games with a minimal limit to test connectivity
+      await igdbClient.getPopularGames(1);
+    } catch (error) {
+      routesLogger.error({ error }, "igdb health check failed");
+      isHealthy = false;
+    }
+
+    if (isHealthy) {
+      res.status(200).json({ status: "ok" });
+    } else {
+      res.status(503).json({ status: "error" });
+    }
+  });
+
+  // Lightweight dashboard stats for external status widgets (Homepage, Homarr, Organizr, etc.)
+  app.get("/api/status", authenticateToken, async (req, res) => {
+    try {
+      const status = await storage.getDashboardStatus(req.user!.id);
+      // User-specific data: never let a shared/browser cache reuse this across accounts.
+      res.set("Cache-Control", "no-store");
+      res.json(status);
+    } catch (error) {
+      routesLogger.error({ error }, "Failed to get dashboard status");
+      res.status(500).json({ error: "Failed to get dashboard status" });
+    }
+  });
+
+  // Game collection routes
+
+  // Get all games in collection
+  app.get("/api/games", async (req, res) => {
+    try {
+      const { search, includeHidden, status } = req.query;
+
+      const userId = req.user!.id;
+      const showHidden = includeHidden === "true";
+
+      let games;
+      if (search && typeof search === "string" && search.trim()) {
+        games = await storage.searchUserGames(userId, search.trim(), showHidden);
+      } else {
+        let statuses: string[] | undefined;
+        if (status) {
+          const statusValues = Array.isArray(status) ? status : [status];
+          statuses = statusValues
+            .flatMap((s) => String(s).split(","))
+            .map((s) => s.trim())
+            .filter((s) => s.length > 0);
+          if (statuses.length === 0) {
+            statuses = undefined;
+          }
+        }
+
+        games = await storage.getUserGames(userId, showHidden, statuses);
+      }
+
+      games = await applyContentFilter(userId, games);
+
+      res.json(games);
+    } catch (error) {
+      routesLogger.error({ error }, "error fetching games");
+      res.status(500).json({ error: "Failed to fetch games" });
+    }
+  });
+
+  // User-owned custom lists. Membership writes are checked by storage against
+  // both the list owner and the game's owner, so a guessed ID cannot cross users.
+  app.get("/api/game-lists", async (req, res) => {
+    try {
+      res.json(await storage.getGameLists(req.user!.id));
+    } catch (error) {
+      routesLogger.error({ error }, "error fetching game lists");
+      res.status(500).json({ error: "Failed to fetch game lists" });
+    }
+  });
+
+  app.post(
+    "/api/game-lists",
+    sensitiveEndpointLimiter,
+    validate(insertGameListSchema),
+    async (req, res) => {
+      const parsed = insertGameListSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res
+          .status(400)
+          .json({ error: "Invalid game list data", details: parsed.error.issues });
+      }
+
+      try {
+        const userId = req.user!.id;
+        const lists = await storage.getGameLists(userId);
+        if (
+          lists.some(
+            (list) => list.name.toLocaleLowerCase() === parsed.data.name.toLocaleLowerCase()
+          )
+        ) {
+          return res.status(409).json({ error: "A list with that name already exists" });
+        }
+        return res.status(201).json(await storage.createGameList(userId, parsed.data.name));
+      } catch (error) {
+        routesLogger.error({ error }, "error creating game list");
+        return res.status(500).json({ error: "Failed to create game list" });
+      }
+    }
+  );
+
+  app.patch(
+    "/api/game-lists/:listId",
+    sensitiveEndpointLimiter,
+    validate(insertGameListSchema),
+    async (req, res) => {
+      const listId = z.string().uuid().safeParse(req.params.listId);
+      const parsed = insertGameListSchema.safeParse(req.body);
+      if (!listId.success || !parsed.success) {
+        return res.status(400).json({ error: "Invalid game list data" });
+      }
+
+      try {
+        const userId = req.user!.id;
+        const lists = await storage.getGameLists(userId);
+        if (
+          lists.some(
+            (list) =>
+              list.id !== listId.data &&
+              list.name.toLocaleLowerCase() === parsed.data.name.toLocaleLowerCase()
+          )
+        ) {
+          return res.status(409).json({ error: "A list with that name already exists" });
+        }
+        const updated = await storage.renameGameList(userId, listId.data, parsed.data.name);
+        return updated ? res.json(updated) : res.status(404).json({ error: "Game list not found" });
+      } catch (error) {
+        routesLogger.error({ error }, "error renaming game list");
+        return res.status(500).json({ error: "Failed to rename game list" });
+      }
+    }
+  );
+
+  app.delete("/api/game-lists/:listId", sensitiveEndpointLimiter, async (req, res) => {
+    const listId = z.string().uuid().safeParse(req.params.listId);
+    if (!listId.success) return res.status(400).json({ error: "Invalid game list ID" });
+    try {
+      const removed = await storage.deleteGameList(req.user!.id, listId.data);
+      return removed
+        ? res.status(204).end()
+        : res.status(404).json({ error: "Game list not found" });
+    } catch (error) {
+      routesLogger.error({ error }, "error deleting game list");
+      return res.status(500).json({ error: "Failed to delete game list" });
+    }
+  });
+
+  app.get("/api/game-lists/:listId/games", async (req, res) => {
+    const listId = z.string().uuid().safeParse(req.params.listId);
+    if (!listId.success) return res.status(400).json({ error: "Invalid game list ID" });
+    try {
+      const games = await storage.getGameListGames(req.user!.id, listId.data);
+      return games ? res.json(games) : res.status(404).json({ error: "Game list not found" });
+    } catch (error) {
+      routesLogger.error({ error }, "error fetching game list games");
+      return res.status(500).json({ error: "Failed to fetch game list games" });
+    }
+  });
+
+  app.post(
+    "/api/game-lists/:listId/games",
+    sensitiveEndpointLimiter,
+    validate(z.object({ gameId: z.string().uuid() }).passthrough()),
+    async (req, res) => {
+      const listId = z.string().uuid().safeParse(req.params.listId);
+      const gameId = z.string().uuid().safeParse(req.body?.gameId);
+      if (!listId.success || !gameId.success) {
+        return res.status(400).json({ error: "Invalid game list membership data" });
+      }
+      try {
+        const added = await storage.addGameToList(req.user!.id, listId.data, gameId.data);
+        return added
+          ? res.status(204).end()
+          : res.status(404).json({ error: "Game or list not found" });
+      } catch (error) {
+        routesLogger.error({ error }, "error adding game to list");
+        return res.status(500).json({ error: "Failed to add game to list" });
+      }
+    }
+  );
+
+  app.delete(
+    "/api/game-lists/:listId/games/:gameId",
+    sensitiveEndpointLimiter,
+    async (req, res) => {
+      const listId = z.string().uuid().safeParse(req.params.listId);
+      const gameId = z.string().uuid().safeParse(req.params.gameId);
+      if (!listId.success || !gameId.success) {
+        return res.status(400).json({ error: "Invalid game list membership data" });
+      }
+      try {
+        const removed = await storage.removeGameFromList(req.user!.id, listId.data, gameId.data);
+        return removed
+          ? res.status(204).end()
+          : res.status(404).json({ error: "Game or list not found" });
+      } catch (error) {
+        routesLogger.error({ error }, "error removing game from list");
+        return res.status(500).json({ error: "Failed to remove game from list" });
+      }
+    }
+  );
+
+  // Get games by status
+  app.get(
+    "/api/games/status/:status",
+    sanitizeGameStatusParam,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { status } = req.params as { status: string };
+        const { includeHidden } = req.query;
+
+        const userId = req.user!.id;
+        const showHidden = includeHidden === "true";
+
+        let games = await storage.getUserGamesByStatus(userId, status, showHidden);
+        games = await applyContentFilter(userId, games);
+        res.json(games);
+      } catch (error) {
+        routesLogger.error({ error }, "error fetching games by status");
+        res.status(500).json({ error: "Failed to fetch games" });
+      }
+    }
+  );
+
+  // Search user's collection
+  app.get(
+    "/api/games/search",
+    sanitizeSearchQuery,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { q, includeHidden } = req.query;
+
+        const userId = req.user!.id;
+        const showHidden = includeHidden === "true";
+
+        if (!q || typeof q !== "string") {
+          return res.status(400).json({ error: "Search query required" });
+        }
+        let games = await storage.searchUserGames(userId, q, showHidden);
+        games = await applyContentFilter(userId, games);
+        return res.json(games);
+      } catch (error) {
+        routesLogger.error({ error }, "error searching games");
+        return res.status(500).json({ error: "Failed to search games" });
+      }
+    }
+  );
+
+  // Add game to collection
+  app.post(
+    "/api/games",
+    sensitiveEndpointLimiter,
+    sanitizeGameData,
+    validate(insertGameSchema.safeExtend({ userId: z.string().optional() })),
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        routesLogger.debug({ body: req.body }, "received game data");
+
+        const userId = req.user!.id;
+        const gameData = insertGameSchema.parse({ ...req.body, userId });
+
+        const userGames = await storage.getUserGames(userId, true); // Check against all games including hidden
+        const existingGame = userGames.find((g) =>
+          gameData.igdbId != null
+            ? g.igdbId === gameData.igdbId
+            : gameData.rawgId != null
+              ? g.rawgId === gameData.rawgId
+              : g.title.toLowerCase() === gameData.title.toLowerCase()
+        );
+
+        if (existingGame) {
+          return res.status(409).json({ error: "Game already in collection", game: existingGame });
+        }
+
+        // Avoid a misleading release notification for games already released at add time.
+        const normalizedGameData = normalizeInitialReleaseStatus(gameData);
+        const game = await storage.addGame(normalizedGameData);
+        return res.status(201).json(game);
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          routesLogger.warn({ errors: error.issues }, "validation error");
+          return respondWithZodError(res, error, "Invalid game data");
+        }
+        routesLogger.error({ error }, "error adding game");
+        return res.status(500).json({ error: "Failed to add game" });
+      }
+    }
+  );
+
+  // Update game status
+  app.patch(
+    "/api/games/:id/status",
+    sensitiveEndpointLimiter,
+    sanitizeGameId,
+    sanitizeGameStatus,
+    validate(updateGameStatusSchema),
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { id } = req.params as { id: string };
+        const userId = req.user!.id;
+        const statusUpdate = updateGameStatusSchema.parse(req.body);
+
+        if (!(await resolveOwnedGame(id, userId, res))) return;
+
+        const updatedGame = await storage.updateGameStatus(id, statusUpdate);
+        if (!updatedGame) {
+          return res.status(404).json({ error: "Game not found" });
+        }
+
+        return res.json(updatedGame);
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          return respondWithZodError(res, error, "Invalid status data");
+        }
+        routesLogger.error({ error }, "error updating game status");
+        return res.status(500).json({ error: "Failed to update game status" });
+      }
+    }
+  );
+
+  // Update game visibility (hidden status)
+  app.patch(
+    "/api/games/:id/hidden",
+    sensitiveEndpointLimiter,
+    sanitizeGameId,
+    validate(updateGameHiddenSchema),
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { id } = req.params as { id: string };
+        const userId = req.user!.id;
+        const { hidden } = updateGameHiddenSchema.parse(req.body);
+
+        if (!(await resolveOwnedGame(id, userId, res))) return;
+
+        const updatedGame = await storage.updateGameHidden(id, hidden);
+        if (!updatedGame) {
+          return res.status(404).json({ error: "Game not found" });
+        }
+
+        return res.json(updatedGame);
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          return respondWithZodError(res, error, "Invalid hidden data");
+        }
+        routesLogger.error({ error }, "error updating game visibility");
+        return res.status(500).json({ error: "Failed to update game visibility" });
+      }
+    }
+  );
+
+  // Update personal user rating (0.5–10 in 0.5 increments, or null to clear)
+  app.patch(
+    "/api/games/:id/user-rating",
+    sensitiveEndpointLimiter,
+    sanitizeGameId,
+    validate(updateGameUserRatingSchema),
+    validateRequest,
+    patchOwnGameField(
+      updateGameUserRatingSchema,
+      (id, userId, { userRating }) => storage.updateGameUserRating(id, userId, userRating),
+      {
+        invalid: "Invalid user rating data",
+        log: "error updating game user rating",
+        failure: "Failed to update user rating",
+      }
+    )
+  );
+
+  // Set the version of the game the user has installed (free text), or null to clear it.
+  // Used to skip "update available" notifications for releases that aren't newer.
+  app.patch(
+    "/api/games/:id/installed-version",
+    sensitiveEndpointLimiter,
+    sanitizeGameId,
+    validate(updateGameInstalledVersionSchema),
+    validateRequest,
+    patchOwnGameField(
+      updateGameInstalledVersionSchema,
+      async (id, userId, { installedVersion }) => {
+        const game = await storage.updateGameInstalledVersion(id, userId, installedVersion);
+        // Lets the user's other tabs refresh their games query, which is otherwise never stale.
+        if (game) (await import("./socket.js")).notifyUser("gameUpdated", game.id, userId);
+        return game;
+      },
+      {
+        invalid: "Invalid installed version data",
+        log: "error updating game installed version",
+        failure: "Failed to update installed version",
+      }
+    )
+  );
+
+  // Update the per-game download target, or clear it to use the account default.
+  app.patch(
+    "/api/games/:id/target-platform",
+    sensitiveEndpointLimiter,
+    sanitizeGameId,
+    validate(updateGameTargetPlatformSchema),
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { id } = req.params as { id: string };
+        const userId = req.user!.id;
+        const target = updateGameTargetPlatformSchema.parse(req.body);
+
+        if (!(await resolveOwnedGame(id, userId, res))) return;
+
+        const updatedGame = await storage.updateGame(id, target);
+        if (!updatedGame) {
+          return res.status(404).json({ error: "Game not found" });
+        }
+
+        return res.json(updatedGame);
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          return respondWithZodError(res, error, "Invalid target platform data");
+        }
+        routesLogger.error({ error }, "error updating game target platform");
+        return res.status(500).json({ error: "Failed to update target platform" });
+      }
+    }
+  );
+
+  const gameExpansionSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    coverUrl: z.string(),
+    releaseDate: z.string(),
+    category: z.enum(["main", "update", "dlc", "extra", "packs"]),
+    gameType: z.number().optional(),
+    igdbUrl: z.string().optional(),
+  });
+
+  // Refresh metadata for all games
+  app.post("/api/games/refresh-metadata", igdbRateLimiter, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const userGames = await storage.getUserGames(userId, true);
+
+      routesLogger.info({ userId, gameCount: userGames.length }, "starting metadata refresh");
+
+      let updatedCount = 0;
+      let errorCount = 0;
+      const gamesByIgdbId = new Map<number, Game[]>();
+      const igdbIds = new Set<number>();
+      for (const game of userGames) {
+        if (game.igdbId === null || game.igdbId === undefined) continue;
+        igdbIds.add(game.igdbId);
+        const matchingGames = gamesByIgdbId.get(game.igdbId) ?? [];
+        matchingGames.push(game);
+        gamesByIgdbId.set(game.igdbId, matchingGames);
+      }
+
+      const processedIgdbIds = new Set<number>();
+      // IGDB returns at most 100 games per request. Persist each fetched group
+      // before loading the next one, while retaining 50-game DB transactions.
+      const DB_BATCH_SIZE = 50;
+      for await (const igdbBatch of igdbClient.getGamesByIdsBatches([...igdbIds])) {
+        for (const id of igdbBatch.requestedIds) processedIgdbIds.add(id);
+        const igdbGameMap = new Map(igdbBatch.games.map((game) => [game.id, game]));
+        const gamesInBatch = igdbBatch.requestedIds.flatMap((id) => gamesByIgdbId.get(id) ?? []);
+
+        for (let i = 0; i < gamesInBatch.length; i += DB_BATCH_SIZE) {
+          const chunk = gamesInBatch.slice(i, i + DB_BATCH_SIZE);
+          const updates: { id: string; data: Partial<Game> }[] = [];
+
+          for (const game of chunk) {
+            const igdbGame = game.igdbId == null ? undefined : igdbGameMap.get(game.igdbId);
+            if (!igdbGame) {
+              errorCount++;
+              continue;
+            }
+
+            try {
+              const updatedData = igdbClient.formatGameData(igdbGame);
+              updates.push({
+                id: game.id,
+                data: {
+                  publishers: updatedData.publishers as string[],
+                  developers: updatedData.developers as string[],
+                  summary: updatedData.summary as string,
+                  rating: updatedData.rating as number | null,
+                  genres: updatedData.genres as string[],
+                  themes: updatedData.themes as string[],
+                  isAdultContent: updatedData.isAdultContent as boolean,
+                  isAgeRestricted: updatedData.isAgeRestricted as boolean,
+                  platforms: updatedData.platforms as string[],
+                  coverUrl: updatedData.coverUrl as string,
+                  screenshots: updatedData.screenshots as string[],
+                  releaseDate: updatedData.releaseDate as string,
+                  earlyAccess: updatedData.earlyAccess as boolean,
+                  igdbWebsites: z
+                    .array(z.object({ url: z.string(), category: z.number() }))
+                    .catch([])
+                    .parse(updatedData.igdbWebsites),
+                  expansions: gameExpansionSchema.array().catch([]).parse(updatedData.expansions),
+                  aggregatedRating: (updatedData.aggregatedRating as number | undefined) ?? null,
+                },
+              });
+            } catch (error) {
+              routesLogger.error(
+                { gameId: game.id, error },
+                "failed to prepare metadata update for game"
+              );
+              errorCount++;
+            }
+          }
+
+          if (updates.length > 0) {
+            try {
+              await storage.updateGamesBatch(updates);
+              updatedCount += updates.length;
+            } catch (error) {
+              routesLogger.error({ error }, "failed to execute batch update");
+              errorCount += updates.length;
+            }
+          }
+        }
+      }
+
+      // An unconfigured IGDB client yields no batches; report those games as
+      // unrefreshed instead of returning a misleading zero-error success.
+      errorCount += userGames.filter(
+        (game) => game.igdbId != null && !processedIgdbIds.has(game.igdbId)
+      ).length;
+
+      routesLogger.info({ userId, updatedCount, errorCount }, "metadata refresh completed");
+
+      res.json({
+        success: true,
+        message: `Successfully refreshed metadata for ${updatedCount} games.${errorCount > 0 ? ` Failed for ${errorCount} games.` : ""}`,
+        updatedCount,
+        errorCount,
+      });
+    } catch (error) {
+      routesLogger.error({ error }, "error refreshing metadata");
+      res.status(500).json({ error: "Failed to refresh metadata" });
+    }
+  });
+
+  // Check library health: drifted libraryPaths and orphaned folders on disk
+  app.post("/api/games/library-health-check", sensitiveEndpointLimiter, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const userGames = await storage.getUserGames(userId, true);
+      const config = await storage.getImportConfig(userId);
+      // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- this health check uses the authenticated owner's explicitly configured library root.
+      const resolvedRoot = path.resolve(config.libraryRoot);
+
+      const gamesWithPath = userGames.filter(
+        (g): g is typeof g & { libraryPath: string } => !!g.libraryPath
+      );
+      const driftedChecks = await Promise.all(
+        gamesWithPath.map(async (game) => ({
+          game,
+          exists: await fsExtra.pathExists(game.libraryPath),
+        }))
+      );
+      const drifted = driftedChecks
+        .filter(({ exists }) => !exists)
+        .map(({ game }) => ({ id: game.id, title: game.title, libraryPath: game.libraryPath }));
+
+      // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- persisted paths belong to this owner's games and are only compared against directory entries.
+      const knownPaths = new Set(gamesWithPath.map((g) => path.resolve(g.libraryPath)));
+      const orphaned: Array<{ path: string }> = [];
+
+      if (await fsExtra.pathExists(resolvedRoot)) {
+        let platformDirs: string[] = [];
+        try {
+          platformDirs = (await fsExtra.readdir(resolvedRoot, { withFileTypes: true }))
+            .filter((entry) => entry.isDirectory())
+            .map((entry) => entry.name);
+        } catch (dirError) {
+          routesLogger.warn(
+            { dirError, resolvedRoot },
+            "failed to read library root during health check"
+          );
+        }
+
+        for (const platformDir of platformDirs) {
+          // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- platformDir is returned by readdir for the configured library root.
+          const platformPath = path.join(resolvedRoot, platformDir);
+          try {
+            const children = await fsExtra.readdir(platformPath);
+            for (const child of children) {
+              // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- child is returned by readdir for the configured platform directory.
+              const childPath = path.resolve(path.join(platformPath, child));
+              if (!knownPaths.has(childPath)) {
+                orphaned.push({ path: childPath });
+              }
+            }
+          } catch (dirError) {
+            routesLogger.warn(
+              { dirError, platformPath },
+              "failed to read platform dir during health check"
+            );
+          }
+        }
+      }
+
+      res.json({ drifted, orphaned, libraryRoot: resolvedRoot });
+    } catch (error) {
+      routesLogger.error({ error }, "error running library health check");
+      res.status(500).json({ error: "Failed to run library health check" });
+    }
+  });
+
+  // ==========================================================================
+  // Root folders — extra directories scanned (read-only discovery) for games
+  // already on disk outside the configured library root, e.g. an older
+  // library or a secondary drive. Separate from the library root used by the
+  // download-import pipeline.
+  // ==========================================================================
+
+  // Fire-and-forget; progress is available via GET /api/library/scan/status.
+  // `queueIfRunning` is for settings changes: a scan already running for the
+  // folder still uses its old path, so another one is queued behind it.
+  const startRootFolderScan = (
+    rootFolderId: string,
+    userId: string,
+    { queueIfRunning = false }: { queueIfRunning?: boolean } = {}
+  ): void => {
+    const scan = queueIfRunning ? rescanRootFolderById : scanRootFolderById;
+    scan(rootFolderId, userId).catch((err) =>
+      routesLogger.error({ err }, "scanRootFolderById crashed")
+    );
+  };
+
+  app.get("/api/root-folders", authenticateToken, async (_req: Request, res: Response) => {
+    try {
+      const folders = await storage.getAllRootFolders();
+      res.json(folders);
+    } catch (error) {
+      routesLogger.error({ error }, "error listing root folders");
+      res.status(500).json({ error: "Failed to list root folders" });
+    }
+  });
+
+  app.post(
+    "/api/root-folders",
+    authenticateToken,
+    sensitiveEndpointLimiter,
+    sanitizeRootFolderData,
+    validate(insertRootFolderSchema),
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const data = insertRootFolderSchema.parse(req.body);
+        // Canonicalize before the uniqueness check and probe so equivalent
+        // paths (`/mnt/games`, `/mnt/games/.`, `/mnt/other/../games`) can't
+        // bypass the unique-path constraint and get scanned as duplicates.
+        // Root folders are intentionally arbitrary administrator-configured absolute paths.
+        // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- root folder paths are explicit owner configuration, validated by probing the selected directory before storage.
+        data.path = path.resolve(data.path); // nosemgrep: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal -- owner-supplied root-folder configuration is validated as an absolute existing directory before storage.
+
+        const existing = await storage.getRootFolderByPath(data.path);
+        if (existing) {
+          return res.status(409).json({ error: "A root folder with this path already exists" });
+        }
+
+        const probe = await probeRootFolder(data.path);
+        if (!probe.accessible) {
+          return res.status(400).json({
+            error: "Path is not accessible",
+            details: probe.error ?? "Path must exist and be a readable directory",
+          });
+        }
+
+        const folder = await storage.addRootFolder(data);
+        const withHealth = await storage.updateRootFolderHealth(folder.id, {
+          accessible: probe.accessible,
+          diskFreeBytes: probe.diskFreeBytes,
+          diskTotalBytes: probe.diskTotalBytes,
+        });
+
+        // Scan right away so games already in the folder show up without a
+        // separate "Scan" click. Fire-and-forget, like POST /api/library/scan.
+        if (folder.enabled) startRootFolderScan(folder.id, req.user!.id, { queueIfRunning: true });
+
+        return res.status(201).json(withHealth ?? folder);
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          return respondWithZodError(res, error, "Invalid root folder data");
+        }
+        routesLogger.error({ error }, "error creating root folder");
+        return res.status(500).json({ error: "Failed to create root folder" });
+      }
+    }
+  );
+
+  app.patch(
+    "/api/root-folders/:id",
+    authenticateToken,
+    sensitiveEndpointLimiter,
+    sanitizeRootFolderId,
+    sanitizeRootFolderUpdateData,
+    validate(updateRootFolderSchema),
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { id } = req.params as { id: string };
+        const updates = updateRootFolderSchema.parse(req.body);
+        const before = await storage.getRootFolder(id);
+        if (!before) return res.status(404).json({ error: "Root folder not found" });
+        // Rescan when a folder is switched on or pointed at a new path, so the
+        // Discover list reflects what is on disk there without a manual scan.
+        const shouldScan = (folder: { enabled: boolean; path: string }) =>
+          folder.enabled && (!before.enabled || folder.path !== before.path);
+
+        if (updates.path) {
+          // Same canonicalization as the create route — resolve before the
+          // uniqueness check and probe so equivalent paths can't collide.
+          // Root folders are intentionally arbitrary administrator-configured absolute paths.
+          // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- root folder paths are explicit owner configuration, validated by probing the selected directory before storage.
+          updates.path = path.resolve(updates.path); // nosemgrep: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal -- owner-supplied root-folder configuration is validated as an absolute existing directory before storage.
+          const clash = await storage.getRootFolderByPath(updates.path);
+          if (clash && clash.id !== id) {
+            return res.status(409).json({ error: "Another root folder already uses this path" });
+          }
+
+          // Re-probe on every path change so stale health from the old path
+          // is never carried over onto the new one.
+          const probe = await probeRootFolder(updates.path);
+          if (!probe.accessible) {
+            return res.status(400).json({
+              error: "Path is not accessible",
+              details: probe.error ?? "Path must exist and be a readable directory",
+            });
+          }
+          const folder = await storage.updateRootFolder(id, updates);
+          if (!folder) return res.status(404).json({ error: "Root folder not found" });
+          const withHealth = await storage.updateRootFolderHealth(folder.id, {
+            accessible: probe.accessible,
+            diskFreeBytes: probe.diskFreeBytes,
+            diskTotalBytes: probe.diskTotalBytes,
+          });
+          if (shouldScan(folder)) {
+            startRootFolderScan(folder.id, req.user!.id, { queueIfRunning: true });
+          }
+          return res.json(withHealth ?? folder);
+        }
+
+        const folder = await storage.updateRootFolder(id, updates);
+        if (!folder) return res.status(404).json({ error: "Root folder not found" });
+        if (shouldScan(folder)) {
+          startRootFolderScan(folder.id, req.user!.id, { queueIfRunning: true });
+        }
+        return res.json(folder);
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          return respondWithZodError(res, error, "Invalid root folder data");
+        }
+        routesLogger.error({ error }, "error updating root folder");
+        return res.status(500).json({ error: "Failed to update root folder" });
+      }
+    }
+  );
+
+  app.delete(
+    "/api/root-folders/:id",
+    authenticateToken,
+    sensitiveEndpointLimiter,
+    sanitizeRootFolderId,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { id } = req.params as { id: string };
+        const success = await storage.removeRootFolder(id);
+        if (!success) return res.status(404).json({ error: "Root folder not found" });
+        return res.status(204).send();
+      } catch (error) {
+        routesLogger.error({ error }, "error deleting root folder");
+        return res.status(500).json({ error: "Failed to delete root folder" });
+      }
+    }
+  );
+
+  // Force-refresh accessibility + disk stats for one root folder.
+  app.post(
+    "/api/root-folders/:id/health-check",
+    authenticateToken,
+    sensitiveEndpointLimiter,
+    sanitizeRootFolderId,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { id } = req.params as { id: string };
+        const folder = await storage.getRootFolder(id);
+        if (!folder) return res.status(404).json({ error: "Root folder not found" });
+
+        const probe = await probeRootFolder(folder.path);
+        const updated = await storage.updateRootFolderHealth(folder.id, {
+          accessible: probe.accessible,
+          diskFreeBytes: probe.diskFreeBytes,
+          diskTotalBytes: probe.diskTotalBytes,
+        });
+        return res.json({ ...updated, error: probe.error ?? null });
+      } catch (error) {
+        routesLogger.error({ error }, "error running root folder health check");
+        return res.status(500).json({ error: "Failed to run health check" });
+      }
+    }
+  );
+
+  // ==========================================================================
+  // Library scanner — scans configured root folders for games not yet
+  // tracked in Questarr and matches them against IGDB.
+  // ==========================================================================
+
+  app.post(
+    "/api/library/scan",
+    authenticateToken,
+    sensitiveEndpointLimiter,
+    sanitizeLibraryScanData,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const userId = req.user!.id;
+        const { rootFolderId } = (req.body ?? {}) as { rootFolderId?: string };
+        if (rootFolderId) {
+          const folder = await storage.getRootFolder(rootFolderId);
+          if (!folder) return res.status(404).json({ error: "Root folder not found" });
+          startRootFolderScan(rootFolderId, userId);
+          return res.status(202).json({ accepted: true, rootFolderId });
+        }
+        scanAllEnabledRootFolders(userId).catch((err) =>
+          routesLogger.error({ err }, "scanAllEnabledRootFolders crashed")
+        );
+        return res.status(202).json({ accepted: true, rootFolderId: null });
+      } catch (error) {
+        routesLogger.error({ error }, "error starting library scan");
+        return res.status(500).json({ error: "Failed to start library scan" });
+      }
+    }
+  );
+
+  app.get("/api/library/scan/status", authenticateToken, async (_req: Request, res: Response) => {
+    try {
+      res.json(getAllScanProgress());
+    } catch (error) {
+      routesLogger.error({ error }, "error reading scan status");
+      res.status(500).json({ error: "Failed to read scan status" });
+    }
+  });
+
+  app.get(
+    "/api/library/scan/unmatched",
+    authenticateToken,
+    async (_req: Request, res: Response) => {
+      try {
+        res.json(getAllUnmatched());
+      } catch (error) {
+        routesLogger.error({ error }, "error reading unmatched list");
+        res.status(500).json({ error: "Failed to read unmatched list" });
+      }
+    }
+  );
+
+  app.post(
+    "/api/library/scan/unmatched/search",
+    authenticateToken,
+    igdbRateLimiter,
+    sanitizeUnmatchedSearchData,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { rootFolderId, folderName, query } = req.body as {
+          rootFolderId: string;
+          folderName: string;
+          query: string;
+        };
+        res.json(await searchUnmatchedFolder(rootFolderId, folderName, query));
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : "Unknown error";
+        routesLogger.error({ error }, "error searching IGDB for unmatched folder");
+        const notFound = msg === "No matching unmatched entry for this root folder";
+        res
+          .status(notFound ? 404 : 500)
+          .json(
+            notFound
+              ? serviceErrorBody(error, serviceMessage("service.unmatched_entry_missing", {}))
+              : serviceErrorBody(undefined, serviceMessage("service.api_igdb_search_failed", {}))
+          );
+      }
+    }
+  );
+
+  app.post(
+    "/api/library/scan/unmatched/match",
+    authenticateToken,
+    sensitiveEndpointLimiter,
+    sanitizeUnmatchedMatchData,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { rootFolderId, folderName, igdbId } = req.body as {
+          rootFolderId: string;
+          folderName: string;
+          igdbId: number;
+        };
+        const result = await matchUnmatchedFolder(rootFolderId, folderName, igdbId, req.user!.id);
+        res.json(result);
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : "Unknown error";
+        routesLogger.error({ error }, "error resolving unmatched folder");
+        // matchUnmatchedFolder throws these two source-owned messages for the
+        // "client asked to match something that no longer exists" cases —
+        // report them as 404s rather than 500s; everything else (IGDB
+        // lookup failure, filesystem error) stays a 500.
+        const notFound =
+          msg === "Root folder not found" ||
+          msg === "No matching unmatched entry for this root folder";
+        res
+          .status(notFound ? 404 : 500)
+          .json(serviceErrorBody(error, serviceMessage("interface.unknown_error_ce512b43", {})));
+      }
+    }
+  );
+
+  // Remove game from collection
+  type FileDeletionResult =
+    | { deleted: true; path: string | null }
+    | { deleted: false; reason: "outside-library-root" | "delete-failed"; path: string };
+
+  app.delete(
+    "/api/games/:id",
+    sensitiveEndpointLimiter,
+    sanitizeGameId,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { id } = req.params as { id: string };
+        const userId = req.user!.id;
+        const deleteFiles = req.query.deleteFiles === "true";
+
+        const game = await resolveOwnedGame(id, userId, res);
+        if (!game) return;
+
+        let fileDeletion: FileDeletionResult | null = null;
+
+        if (deleteFiles) {
+          if (game.libraryPath) {
+            const ownerId = game.userId ?? userId;
+            const [config, rommConfig] = await Promise.all([
+              storage.getImportConfig(ownerId),
+              storage.getRomMConfig(ownerId),
+            ]);
+            // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- the target is checked against the owner's configured roots and canonicalized before deletion.
+            const resolvedTarget = path.resolve(game.libraryPath);
+            const configuredRoots = [config.libraryRoot];
+            if (rommConfig.enabled) configuredRoots.push(rommConfig.libraryRoot);
+
+            // Require the target to be strictly below one of this user's active
+            // library roots, then canonicalize it so a symlink cannot redirect
+            // deletion outside that root. Never let a game path delete the root
+            // itself. RomM has its own library root, separate from PC imports.
+            let safeConfiguredTarget: string | null = null;
+            for (const root of configuredRoots) {
+              // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- the configured root is used for containment and canonical containment is checked before deletion.
+              if (!isStrictlyInside(path.resolve(root), resolvedTarget)) continue;
+              try {
+                safeConfiguredTarget = await assertWithinRoots(
+                  resolvedTarget,
+                  [root],
+                  "Game file path is outside the configured library root"
+                );
+                break;
+              } catch {
+                // A symlinked target may look contained lexically but resolve
+                // outside this root; try other explicitly configured roots.
+              }
+            }
+            // Games discovered by the root-folder scanner live outside the
+            // configured library root by design. Allow deleting their files
+            // too, but only when the user has explicitly opted that specific
+            // root folder in to deletion — discovery itself never does.
+            const canDelete =
+              safeConfiguredTarget !== null || (await isWithinDeletableRootFolder(resolvedTarget));
+
+            if (canDelete) {
+              try {
+                await fsExtra.remove(safeConfiguredTarget ?? resolvedTarget);
+                fileDeletion = { deleted: true, path: game.libraryPath };
+              } catch (fileError) {
+                routesLogger.warn(
+                  { fileError, gameId: id, libraryPath: game.libraryPath },
+                  "failed to delete library files for game"
+                );
+                fileDeletion = { deleted: false, reason: "delete-failed", path: game.libraryPath };
+              }
+            } else {
+              routesLogger.warn(
+                { gameId: id, libraryPath: game.libraryPath },
+                "skipped deleting library files: path outside configured library root"
+              );
+              fileDeletion = {
+                deleted: false,
+                reason: "outside-library-root",
+                path: game.libraryPath,
+              };
+            }
+          } else {
+            fileDeletion = { deleted: true, path: null };
+          }
+        }
+
+        const success = await storage.removeGame(id);
+
+        if (!success) {
+          return res.status(404).json({ error: "Game not found" });
+        }
+
+        // Journal screenshots aren't part of the library/download files handled
+        // above -- clean up their directory separately so they don't linger on
+        // disk after the game (and its DB rows, via ON DELETE cascade) is gone.
+        await fs.promises
+          .rm(screenshotDirForGame(id), { recursive: true, force: true })
+          .catch((error) => {
+            routesLogger.warn({ error, gameId: id }, "Failed to remove screenshot directory");
+          });
+
+        return res.status(200).json({ success: true, fileDeletion });
+      } catch (error) {
+        routesLogger.error({ error }, "error removing game");
+        return res.status(500).json({ error: "Failed to remove game" });
+      }
+    }
+  );
+
+  // Get downloads for a specific game
+  app.get(
+    "/api/games/:id/downloads",
+    sanitizeGameId,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { id } = req.params as { id: string };
+        const userId = req.user!.id;
+        const game = await resolveOwnedGame(id, userId, res);
+        if (!game) return;
+        const downloads = await storage.getDownloadsByGameId(id);
+        res.json(downloads);
+      } catch (error) {
+        routesLogger.error({ error }, "error fetching game downloads");
+        res.status(500).json({ error: "Failed to fetch game downloads" });
+      }
+    }
+  );
+
+  // ── Release Blacklist routes ──
+
+  /** Resolves a game by id and verifies ownership; sends 404/403 and returns null on failure. */
+  async function resolveOwnedGame(
+    gameId: string,
+    userId: string,
+    res: Response
+  ): Promise<Awaited<ReturnType<typeof storage.getGame>> | null> {
+    const game = await storage.getGame(gameId);
+    if (!game) {
+      res.status(404).json({ error: "Game not found" });
+      return null;
+    }
+    if (game.userId !== userId) {
+      res.status(403).json({ error: "Forbidden" });
+      return null;
+    }
+    return game;
+  }
+
+  // Add release to blacklist for a specific game
+  app.post(
+    "/api/games/:gameId/blacklist",
+    authenticateToken,
+    validate(insertReleaseBlacklistSchema.omit({ gameId: true })),
+    async (req: Request, res: Response) => {
+      try {
+        const { gameId } = req.params as { gameId: string };
+        const userId = req.user!.id;
+
+        if (!(await resolveOwnedGame(gameId, userId, res))) return;
+
+        const parsed = insertReleaseBlacklistSchema.safeParse({ ...req.body, gameId });
+        if (!parsed.success) {
+          return respondWithZodError(res, parsed.error, "Invalid data");
+        }
+        const { releaseTitle } = parsed.data;
+        if (!releaseTitle || releaseTitle.length > 500) {
+          return res.status(400).json({ error: "releaseTitle required (max 500 chars)" });
+        }
+
+        const entry = await storage.addReleaseBlacklist(parsed.data);
+        // Best-effort: a blacklisted release is filtered out of search entirely, so any
+        // pending AI review hold for it is now moot. Never let this fail the blacklist
+        // request itself. Holds are keyed by normalized title (see cron.ts), so clear
+        // using the same normalization rather than the raw releaseTitle.
+        storage.clearAiAutoDownloadHold(gameId, normalizeTitle(releaseTitle)).catch((error) => {
+          routesLogger.warn({ error, gameId }, "Failed to clear AI auto-download hold");
+        });
+        return res.status(201).json(entry);
+      } catch (error) {
+        routesLogger.error({ error }, "error adding to blacklist");
+        return res.status(500).json({ error: "Failed to add to blacklist" });
+      }
+    }
+  );
+
+  // List blacklisted releases for a game
+  app.get(
+    "/api/games/:gameId/blacklist",
+    authenticateToken,
+    async (req: Request, res: Response) => {
+      try {
+        const { gameId } = req.params as { gameId: string };
+        const userId = req.user!.id;
+
+        if (!(await resolveOwnedGame(gameId, userId, res))) return;
+
+        const entries = await storage.getReleaseBlacklist(gameId);
+        res.json(entries);
+      } catch (error) {
+        routesLogger.error({ error }, "error listing blacklist");
+        res.status(500).json({ error: "Failed to list blacklist" });
+      }
+    }
+  );
+
+  // Remove a blacklist entry
+  app.delete(
+    "/api/games/:gameId/blacklist/:id",
+    authenticateToken,
+    async (req: Request, res: Response) => {
+      try {
+        const { gameId, id } = req.params as { gameId: string; id: string };
+        const userId = req.user!.id;
+
+        if (!(await resolveOwnedGame(gameId, userId, res))) return;
+
+        const deleted = await storage.removeReleaseBlacklist(id, gameId);
+        if (!deleted) return res.status(404).json({ error: "Blacklist entry not found" });
+        return res.status(204).send();
+      } catch (error) {
+        routesLogger.error({ error }, "error removing from blacklist");
+        return res.status(500).json({ error: "Failed to remove from blacklist" });
+      }
+    }
+  );
+
+  // List all blacklisted releases across all user's games (for Settings page)
+  app.get("/api/blacklist", authenticateToken, async (req: Request, res: Response) => {
+    try {
+      const userId = req.user!.id;
+      const entries = await storage.getAllReleaseBlacklists(userId);
+      res.json(entries);
+    } catch (error) {
+      routesLogger.error({ error }, "error listing all blacklists");
+      res.status(500).json({ error: "Failed to list blacklists" });
+    }
+  });
+  const gameIdParamValidation = [
+    param("gameId").trim().isUUID().withMessage("Invalid game ID format"),
+  ];
+  const gameFileIdParamValidation = [
+    param("id").trim().isUUID().withMessage("Invalid game file ID format"),
+  ];
+  const gameFileBodyValidation = [
+    validate(
+      z
+        .object({
+          gameId: z.string().uuid("Invalid game ID format"),
+          downloadId: z.string().uuid("Invalid download ID format").nullable().optional(),
+          category: z.enum(["main", "dlc", "update", "extra"] as const, {
+            message: "Invalid game file category",
+          }),
+        })
+        .passthrough()
+    ),
+  ];
+
+  // A missing path, a path that isn't a directory, or a symlink cycle are expected
+  // conditions for a stale/misconfigured library path — treat them as "nothing here".
+  // Anything else (EACCES, EPERM, other I/O failures) is a real failure and should
+  // surface as a 500 rather than silently reporting an empty or partial scan.
+  const isExpectedFsError = (error: unknown): boolean =>
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    ["ENOENT", "ENOTDIR", "ELOOP"].includes((error as NodeJS.ErrnoException).code ?? "");
+  const realpathOrNull = async (target: string): Promise<string | null> => {
+    try {
+      return await fs.promises.realpath(target);
+    } catch (error) {
+      if (isExpectedFsError(error)) return null;
+      throw error;
+    }
+  };
+  const isContained = (candidate: string, root: string) => {
+    const relativePath = path.relative(root, candidate);
+    return (
+      relativePath === "" ||
+      (relativePath !== ".." &&
+        !relativePath.startsWith(`..${path.sep}`) &&
+        !path.isAbsolute(relativePath))
+    );
+  };
+  /**
+   * Canonical library root and game folder for a game, or null when the game has no
+   * folder or its folder resolves outside the configured library root.
+   */
+  const resolveGameScanRoots = async (
+    game: { libraryPath?: string | null },
+    userId: string
+  ): Promise<{ libraryRoot: string; scanRoot: string } | null> => {
+    if (!game.libraryPath) return null;
+    const importConfig = await storage.getImportConfig(userId);
+    const libraryRoot = await realpathOrNull(importConfig.libraryRoot);
+    const scanRoot = await realpathOrNull(game.libraryPath);
+    if (!libraryRoot || !scanRoot || !isContained(scanRoot, libraryRoot)) return null;
+    return { libraryRoot, scanRoot };
+  };
+
+  // Recursively scan a game library folder. This endpoint is read-only; imports are handled separately.
+  // The walk streams directory entries and is bounded by file count, encoded response
+  // size, nesting depth, and wall-clock time. It is also rate-limited per user.
+  app.get(
+    "/api/games/:gameId/files",
+    authenticateToken,
+    scanRateLimiter,
+    gameIdParamValidation,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { gameId } = req.params as { gameId: string };
+        const game = await resolveOwnedGame(gameId, req.user!.id, res);
+        if (!game) return;
+
+        const roots = await resolveGameScanRoots(game, req.user!.id);
+        if (!roots) return res.json({ files: [], truncated: false });
+        const { libraryRoot, scanRoot } = roots;
+
+        const categoryDirs = new Set<DownloadCategory>(["dlc", "update", "extra", "packs"]);
+        const isCategoryDirName = (name: string): name is DownloadCategory =>
+          categoryDirs.has(name as DownloadCategory);
+        // "packs" is recognized as a category-inheriting folder name, but game_files only
+        // persists the four categories the UI groups by ("main" | "dlc" | "update" | "extra").
+        // Normalize it (and the same category from filename-based categorizeDownload
+        // matches) to "extra" so scan results are always postable via POST /api/game-files.
+        const normalizeCategory = (category: DownloadCategory): GameFileCategory =>
+          category === "packs" ? "extra" : category;
+        const files: ScannedGameFile[] = [];
+        let truncated = false;
+        let stopScanning = false;
+        const deadline = Date.now() + SCAN_TIME_BUDGET_MS;
+        let responseBytes = Buffer.byteLength(JSON.stringify({ files: [], truncated: false }));
+        const walk = async (
+          dir: string,
+          depth: number,
+          inheritedCategory?: DownloadCategory
+        ): Promise<void> => {
+          if (stopScanning) return;
+          if (depth > SCAN_MAX_DEPTH) {
+            truncated = true;
+            return;
+          }
+          if (Date.now() >= deadline) {
+            truncated = true;
+            stopScanning = true;
+            return;
+          }
+          const canonicalDir = await realpathOrNull(dir);
+          if (!canonicalDir || !isContained(canonicalDir, libraryRoot)) return;
+          let directory: fs.Dir;
+          try {
+            directory = await fs.promises.opendir(canonicalDir);
+          } catch (error) {
+            if (isExpectedFsError(error)) return;
+            throw error;
+          }
+          try {
+            // Async directory iteration avoids materializing an arbitrarily large
+            // directory in memory before the scan budgets can stop the walk.
+            for await (const entry of directory) {
+              // File-count and time budgets stop the whole walk. A depth limit
+              // only skips that subtree so sibling files at an allowed depth remain visible.
+              if (stopScanning || files.length >= SCAN_MAX_FILES || Date.now() >= deadline) {
+                truncated = true;
+                stopScanning = true;
+                break;
+              }
+              // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- entry.name comes from readdir; the directory and resolved file are both checked inside the root.
+              const fullPath = path.join(canonicalDir, entry.name);
+              if (entry.isDirectory()) {
+                const lowerName = entry.name.toLowerCase();
+                const nextCategory = isCategoryDirName(lowerName) ? lowerName : inheritedCategory;
+                await walk(fullPath, depth + 1, nextCategory);
+                continue;
+              }
+              if (!entry.isFile()) continue;
+              const canonicalFile = await realpathOrNull(fullPath);
+              if (!canonicalFile || !isContained(canonicalFile, libraryRoot)) continue;
+              let stat: Awaited<ReturnType<typeof fs.promises.stat>>;
+              try {
+                stat = await fs.promises.stat(canonicalFile);
+              } catch (error) {
+                if (isExpectedFsError(error)) continue;
+                throw error;
+              }
+              if (Date.now() >= deadline) {
+                truncated = true;
+                stopScanning = true;
+                break;
+              }
+              const category = normalizeCategory(
+                inheritedCategory ?? categorizeDownload(path.parse(entry.name).name).category
+              );
+              const file: ScannedGameFile = {
+                name: entry.name,
+                path: canonicalFile,
+                category,
+                size: stat.size,
+              };
+              const recordBytes = Buffer.byteLength(JSON.stringify(file));
+              const separatorBytes = files.length > 0 ? 1 : 0;
+              if (responseBytes + separatorBytes + recordBytes > SCAN_MAX_RESPONSE_BYTES) {
+                truncated = true;
+                stopScanning = true;
+                break;
+              }
+              responseBytes += separatorBytes + recordBytes;
+              files.push(file);
+            }
+          } catch (error) {
+            if (isExpectedFsError(error)) return;
+            throw error;
+          } finally {
+            // Async iteration normally closes the handle on completion or break;
+            // this is a no-op if it has already closed.
+            await directory.close().catch(() => undefined);
+          }
+        };
+        await walk(scanRoot, 0);
+        // A category the user picked by hand wins over the folder/filename guess.
+        const overrides = new Map(
+          (await storage.getGameFiles(gameId))
+            .filter((f) => f.categoryOverridden)
+            .map((f) => [f.filePath, f.category])
+        );
+        for (const file of files) {
+          const override = overrides.get(file.path);
+          if (override) file.category = override;
+        }
+        return res.json({ files, truncated });
+      } catch (error) {
+        routesLogger.error({ error }, "error scanning game files");
+        return res.status(500).json({ error: "Failed to scan game files" });
+      }
+    }
+  );
+
+  // Override the category of a file found by the library scan. The file stays where it
+  // is on disk; the choice is stored in game_files and applied by later scans.
+  app.patch(
+    "/api/games/:gameId/files/category",
+    authenticateToken,
+    gameIdParamValidation,
+    validate(
+      z
+        .object({
+          path: z.string().min(1, "File path is required"),
+          category: z.enum(["main", "dlc", "update", "extra"] as const, {
+            message: "Invalid game file category",
+          }),
+        })
+        .passthrough()
+    ),
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { gameId } = req.params as { gameId: string };
+        const { path: requestedPath, category } = req.body as {
+          path: string;
+          category: GameFileCategory;
+        };
+        const game = await resolveOwnedGame(gameId, req.user!.id, res);
+        if (!game) return;
+
+        const roots = await resolveGameScanRoots(game, req.user!.id);
+        if (!roots) {
+          return res.status(404).json({ error: "File not found in this game's folder" });
+        }
+        // Check containment on the resolved string before touching the filesystem, then
+        // again on the real path so a symlink can't lead outside the game's folder.
+        // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal -- containment is checked before filesystem access and again after realpath; route tests cover traversal and symlink escapes.
+        const resolvedPath = path.resolve(roots.scanRoot, requestedPath); // nosemgrep: javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal -- containment is checked before access and again after realpath; traversal and symlink escapes are covered by route tests.
+        if (!isContained(resolvedPath, roots.scanRoot)) {
+          return res.status(404).json({ error: "File not found in this game's folder" });
+        }
+        const filePath = await realpathOrNull(resolvedPath);
+        if (!filePath || !isContained(filePath, roots.scanRoot)) {
+          return res.status(404).json({ error: "File not found in this game's folder" });
+        }
+        const stat = await fs.promises.stat(filePath);
+        if (!stat.isFile()) {
+          return res.status(404).json({ error: "File not found in this game's folder" });
+        }
+
+        const existing = (await storage.getGameFiles(gameId)).find((f) => f.filePath === filePath);
+        if (existing) {
+          await storage.updateGameFileCategory(existing.id, category);
+        } else {
+          const created = await storage.addGameFile({
+            gameId,
+            downloadId: null,
+            originalName: path.basename(filePath),
+            storedName: path.basename(filePath),
+            category,
+            filePath,
+            fileSize: stat.size,
+          });
+          await storage.updateGameFileCategory(created.id, category);
+        }
+        return res.json({ path: filePath, category });
+      } catch (error) {
+        routesLogger.error({ error }, "error updating game file category");
+        return res.status(500).json({ error: "Failed to update file category" });
+      }
+    }
+  );
+
+  // Get game files for a specific game, grouped by category
+  app.get(
+    "/api/games/:gameId/content",
+    authenticateToken,
+    gameIdParamValidation,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { gameId } = req.params as { gameId: string };
+        const userId = req.user!.id;
+
+        const game = await resolveOwnedGame(gameId, userId, res);
+        if (!game) return;
+
+        const gameFiles = await storage.getGameFiles(gameId);
+
+        const CATEGORIES = [
+          { category: "main", label: "Main Game" },
+          { category: "dlc", label: "DLC & Expansions" },
+          { category: "update", label: "Updates & Patches" },
+          { category: "extra", label: "Extras" },
+        ] as const;
+
+        const slots = CATEGORIES.map(({ category, label }) => {
+          const files = gameFiles
+            .filter((f) => f.category === category)
+            .map((f) => ({
+              id: f.id,
+              originalName: f.originalName,
+              storedName: f.storedName,
+              downloadId: f.downloadId,
+              fileSize: f.fileSize,
+              createdAt: f.createdAt,
+            }));
+          return { category, label, present: files.length > 0, files };
+        });
+
+        res.json({ slots });
+      } catch (error) {
+        routesLogger.error({ error }, "error fetching game content");
+        res.status(500).json({ error: "Failed to fetch game content" });
+      }
+    }
+  );
+
+  // Get game files by download
+  app.get(
+    "/api/game-files/by-download/:downloadId",
+    authenticateToken,
+    sanitizeDownloadId,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { downloadId } = req.params as { downloadId: string };
+        const download = await storage.getGameDownload(downloadId, req.user!.id);
+        if (!download) {
+          return res.status(404).json({ error: "Download not found" });
+        }
+        const files = await storage.getGameFilesByDownload(downloadId);
+        return res.json(files);
+      } catch (error) {
+        routesLogger.error({ error }, "error fetching game files by download");
+        return res.status(500).json({ error: "Failed to fetch game files" });
+      }
+    }
+  );
+
+  // Create a game file record
+  app.post(
+    "/api/game-files",
+    authenticateToken,
+    gameFileBodyValidation,
+    validate(insertGameFileSchema),
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const parsed = insertGameFileSchema.parse(req.body);
+        const game = await resolveOwnedGame(parsed.gameId, req.user!.id, res);
+        if (!game) return;
+        if (parsed.downloadId) {
+          const download = await storage.getGameDownload(parsed.downloadId, req.user!.id);
+          if (!download || download.gameId !== parsed.gameId) {
+            return res.status(404).json({ error: "Download not found for game" });
+          }
+        }
+        const gameFile = await storage.addGameFile(parsed);
+        return res.status(201).json(gameFile);
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          return respondWithZodError(res, error, "Invalid game file data");
+        }
+        routesLogger.error({ error }, "error creating game file");
+        return res.status(500).json({ error: "Failed to create game file" });
+      }
+    }
+  );
+
+  // Delete a game file record
+  app.delete(
+    "/api/game-files/:id",
+    authenticateToken,
+    gameFileIdParamValidation,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { id } = req.params as { id: string };
+        const gameFile = await storage.getGameFile(id);
+        if (!gameFile) {
+          return res.status(404).json({ error: "Game file not found" });
+        }
+        if (!(await resolveOwnedGame(gameFile.gameId, req.user!.id, res))) return;
+        const deleted = await storage.removeGameFile(id);
+        if (!deleted) {
+          return res.status(404).json({ error: "Game file not found" });
+        }
+        return res.json({ success: true });
+      } catch (error) {
+        routesLogger.error({ error }, "error deleting game file");
+        return res.status(500).json({ error: "Failed to delete game file" });
+      }
+    }
+  );
+
+  // IGDB discovery routes
+
+  // Search IGDB for games
+  app.get(
+    "/api/igdb/search",
+    igdbRateLimiter,
+    sanitizeSearchQuery,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { q, limit, includeUndated, platform, year } = req.query;
+        if (!q || typeof q !== "string") {
+          return res.status(400).json({ error: "Search query required" });
+        }
+
+        const parsedLimit =
+          typeof limit === "number"
+            ? limit
+            : typeof limit === "string"
+              ? Number.parseInt(limit, 10)
+              : NaN;
+        const limitNum =
+          Number.isNaN(parsedLimit) || parsedLimit < 1 ? 20 : Math.min(parsedLimit, 100);
+        // Express 5 exposes req.query as a fresh object on each access, so the
+        // express-validator sanitizers do not persist their coerced values there.
+        // Read the validated strings directly to keep the route's established types.
+        const includeUndatedValue = includeUndated === "true";
+        const platformId =
+          typeof platform === "number"
+            ? platform
+            : typeof platform === "string"
+              ? Number.parseInt(platform, 10)
+              : undefined;
+        const releaseYear =
+          typeof year === "number"
+            ? year
+            : typeof year === "string"
+              ? Number.parseInt(year, 10)
+              : undefined;
+        const searchOptions = {
+          ...(includeUndatedValue ? { includeUndated: true, undatedFirst: true } : {}),
+          ...(platformId !== undefined && Number.isFinite(platformId) ? { platformId } : {}),
+          ...(releaseYear !== undefined && Number.isFinite(releaseYear) ? { releaseYear } : {}),
+        };
+        const formattedGames = await fetchFilteredIgdbGames(req.user!.id, limitNum, (fetchLimit) =>
+          igdbClient.searchGames(q, fetchLimit, searchOptions)
+        );
+
+        res.set("Cache-Control", CC_IGDB_GAME_LIST_PRIVATE);
+        return res.json(formattedGames);
+      } catch (error) {
+        routesLogger.error({ error }, "error searching IGDB");
+        return res.status(500).json({ error: "Failed to search games" });
+      }
+    }
+  );
+
+  const fetchRawgKey = async () => {
+    const encrypted = await storage.getSystemConfig("rawg.apiKey");
+    return encrypted ? await decryptCredential(encrypted) : "";
+  };
+  const registerRawgListRoute = (
+    path: string,
+    getGames: (apiKey: string, limit: number) => Promise<Record<string, unknown>[]>
+  ) => {
+    app.get(path, igdbRateLimiter, async (req, res) => {
+      try {
+        const apiKey = await fetchRawgKey();
+        if (!apiKey)
+          return res.status(503).json({
+            ...serviceErrorBody(
+              undefined,
+              serviceMessage("service.rawg_configuration_required", {})
+            ),
+          });
+        const parsed =
+          typeof req.query.limit === "string" ? Number.parseInt(req.query.limit, 10) : 20;
+        const limit = Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 40) : 20;
+        const flags = await getContentFilterFlags(req.user!.id);
+        const games = await getGames(apiKey, limit);
+        res.set("Cache-Control", "private, no-store");
+        return res.json(excludeFilteredContent(games, flags));
+      } catch (error) {
+        routesLogger.warn({ error }, "RAWG discovery request failed");
+        return res
+          .status(502)
+          .json(serviceErrorBody(error, serviceMessage("service.rawg_request_failed", {})));
+      }
+    });
+  };
+
+  app.get("/api/rawg/search", igdbRateLimiter, async (req, res) => {
+    try {
+      const query = typeof req.query.q === "string" ? req.query.q.trim() : "";
+      if (!query || query.length > 120) {
+        return res.status(400).json({ error: "Search query must be 1 to 120 characters" });
+      }
+      const apiKey = await fetchRawgKey();
+      if (!apiKey)
+        return res.status(503).json({
+          ...serviceErrorBody(undefined, serviceMessage("service.rawg_configuration_required", {})),
+        });
+      const parsed =
+        typeof req.query.limit === "string" ? Number.parseInt(req.query.limit, 10) : 20;
+      const limit = Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 40) : 20;
+      const flags = await getContentFilterFlags(req.user!.id);
+      const games = await rawgClient.search(apiKey, query, limit);
+      res.set("Cache-Control", "private, no-store");
+      return res.json(excludeFilteredContent(games, flags));
+    } catch (error) {
+      routesLogger.warn({ error }, "RAWG search failed");
+      return res
+        .status(502)
+        .json(serviceErrorBody(error, serviceMessage("service.rawg_search_failed", {})));
+    }
+  });
+  registerRawgListRoute("/api/rawg/popular", (key, limit) => rawgClient.popular(key, limit));
+  registerRawgListRoute("/api/rawg/recent", (key, limit) => rawgClient.recent(key, limit));
+  registerRawgListRoute("/api/rawg/upcoming", (key, limit) => rawgClient.upcoming(key, limit));
+
+  // New discover endpoint for personalized recommendations
+  app.get("/api/games/discover", igdbRateLimiter, async (req, res) => {
+    try {
+      const rawLimit = req.query.limit;
+      const parsedLimit = typeof rawLimit === "string" ? parseInt(rawLimit, 10) : NaN;
+      const limit = Number.isNaN(parsedLimit) || parsedLimit < 1 ? 20 : Math.min(parsedLimit, 100);
+      const userId = req.user!.id;
+
+      // Get user's current games for recommendations
+      const userGames = await storage.getUserGames(userId, true);
+      const recommendationSeeds = userGames.map((g) => ({
+        genres: g.genres || undefined,
+        platforms: g.platforms || undefined,
+        igdbId: g.igdbId ?? undefined,
+      }));
+
+      const formattedGames = await fetchFilteredIgdbGames(userId, limit, (fetchLimit) =>
+        igdbClient.getRecommendations(recommendationSeeds, fetchLimit)
+      );
+
+      res.set("Cache-Control", CC_IGDB_GAME_LIST_PRIVATE);
+      res.json(formattedGames);
+    } catch (error) {
+      routesLogger.error({ error }, "error getting game recommendations");
+      res.status(500).json({ error: "Failed to get recommendations" });
+    }
+  });
+
+  // Get popular games
+  registerIgdbListRoute(app, "/api/igdb/popular", "popular games", (fetchLimit) =>
+    igdbClient.getPopularGames(fetchLimit)
+  );
+
+  // Get recent releases
+  registerIgdbListRoute(app, "/api/igdb/recent", "recent releases", (fetchLimit) =>
+    igdbClient.getRecentReleases(fetchLimit)
+  );
+
+  // Get upcoming releases
+  registerIgdbListRoute(app, "/api/igdb/upcoming", "upcoming releases", (fetchLimit) =>
+    igdbClient.getUpcomingReleases(fetchLimit)
+  );
+
+  // Get games by genre
+  registerIgdbParamListRoute(
+    app,
+    "/api/igdb/genre/:genre",
+    "genre",
+    "genre",
+    (genre, fetchLimit, offset) => igdbClient.getGamesByGenre(genre, fetchLimit, offset)
+  );
+
+  // Get games by platform
+  registerIgdbParamListRoute(
+    app,
+    "/api/igdb/platform/:platform",
+    "platform",
+    "platform",
+    (platform, fetchLimit, offset) => igdbClient.getGamesByPlatform(platform, fetchLimit, offset)
+  );
+
+  // Get available genres (for UI dropdowns/filters)
+  app.get("/api/igdb/genres", igdbRateLimiter, async (_req, res) => {
+    try {
+      const genres = await igdbClient.getGenres();
+      res.set("Cache-Control", CC_IGDB_METADATA);
+      res.json(genres);
+    } catch (error) {
+      routesLogger.error({ error }, "Error fetching genres");
+      res.status(500).json({ error: "Failed to fetch genres" });
+    }
+  });
+
+  // Get available platforms (for UI dropdowns/filters)
+  app.get("/api/igdb/platforms", igdbRateLimiter, async (_req, res) => {
+    try {
+      const platforms = await igdbClient.getPlatforms();
+      res.set("Cache-Control", CC_IGDB_METADATA);
+      res.json(platforms);
+    } catch (error) {
+      routesLogger.error({ error }, "Error fetching platforms");
+      res.status(500).json({ error: "Failed to fetch platforms" });
+    }
+  });
+
+  // Get game details by IGDB ID
+  app.get(
+    "/api/igdb/game/:id",
+    igdbRateLimiter,
+    sanitizeIgdbId,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { id } = req.params as { id: string };
+        const igdbId = parseInt(id);
+
+        if (isNaN(igdbId)) {
+          return res.status(400).json({ error: "Invalid game ID" });
+        }
+
+        const igdbGame = await igdbClient.getGameById(igdbId);
+        if (!igdbGame) {
+          return res.status(404).json({ error: "Game not found" });
+        }
+
+        const formattedGame = igdbClient.formatGameData(igdbGame);
+        const timeToBeat = (await igdbClient.getTimeToBeats([igdbId])).get(igdbId);
+        if (timeToBeat) {
+          formattedGame.timeToBeatHastily = timeToBeat.hastily ?? null;
+          formattedGame.timeToBeatNormally = timeToBeat.normally ?? null;
+          formattedGame.timeToBeatCompletely = timeToBeat.completely ?? null;
+        }
+        res.set("Cache-Control", CC_IGDB_GAME_LIST_PRIVATE);
+        const filterFlags = await getContentFilterFlags(req.user!.id);
+        if (
+          isContentFiltered(
+            formattedGame as { isAdultContent?: boolean; isAgeRestricted?: boolean },
+            filterFlags
+          )
+        ) {
+          return res.status(404).json({ error: "Game not found" });
+        }
+        return res.json(formattedGame);
+      } catch (error) {
+        routesLogger.error({ error }, "error fetching game details");
+        return res.status(500).json({ error: "Failed to fetch game details" });
+      }
+    }
+  );
+
+  // Indexer management routes
+
+  // Get all indexers
+  app.get("/api/indexers", async (_req, res) => {
+    try {
+      const indexers = await storage.getAllIndexers();
+      res.json(indexers.map(maskIndexer));
+    } catch (error) {
+      routesLogger.error({ error }, "error fetching indexers");
+      res.status(500).json({ error: "Failed to fetch indexers" });
+    }
+  });
+
+  // Get enabled indexers only
+  app.get("/api/indexers/enabled", async (_req, res) => {
+    try {
+      const indexers = await storage.getEnabledIndexers();
+      res.json(indexers.map(maskIndexer));
+    } catch (error) {
+      routesLogger.error({ error }, "error fetching enabled indexers");
+      res.status(500).json({ error: "Failed to fetch enabled indexers" });
+    }
+  });
+
+  // Aggregated search across all enabled indexers
+  app.get(
+    "/api/indexers/search",
+    optionalAuthenticateToken,
+    sanitizeIndexerSearchQuery,
+    validateRequest,
+    handleAggregatedIndexerSearch
+  );
+
+  // Get single indexer
+  app.get("/api/indexers/:id", async (req, res) => {
+    try {
+      const { id } = req.params as { id: string };
+      const indexer = await storage.getIndexer(id);
+      if (!indexer) {
+        return res.status(404).json({ error: "Indexer not found" });
+      }
+      return res.json(maskIndexer(indexer));
+    } catch (error) {
+      routesLogger.error({ error }, "error fetching indexer");
+      return res.status(500).json({ error: "Failed to fetch indexer" });
+    }
+  });
+
+  // Add new indexer
+  app.post(
+    "/api/indexers",
+    sensitiveEndpointLimiter,
+    sanitizeIndexerData,
+    validate(insertIndexerSchema),
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const indexerData = insertIndexerSchema.parse(req.body);
+
+        if (!(await isSafeUrl(indexerData.url))) {
+          return res.status(400).json({ error: "Invalid or unsafe URL" });
+        }
+
+        const indexer = await storage.addIndexer(indexerData);
+        return res.status(201).json(maskIndexer(indexer));
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          return respondWithZodError(res, error, "Invalid indexer data");
+        }
+        routesLogger.error({ error }, "error adding indexer");
+        return res.status(500).json({ error: "Failed to add indexer" });
+      }
+    }
+  );
+
+  // Update indexer
+  app.patch(
+    "/api/indexers/:id",
+    sensitiveEndpointLimiter,
+    sanitizeIndexerUpdateData,
+    validate(updateIndexerSchema),
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { id } = req.params as { id: string };
+        const parsedUpdates = updateIndexerSchema.safeParse(req.body);
+        if (!parsedUpdates.success) {
+          return respondWithZodError(res, parsedUpdates.error, "Invalid indexer data");
+        }
+        const updates = Object.fromEntries(
+          Object.entries(parsedUpdates.data).filter(([, value]) => value !== undefined)
+        ) as Parameters<typeof storage.updateIndexer>[1];
+
+        if (updates.url && !(await isSafeUrl(updates.url))) {
+          return res.status(400).json({ error: "Invalid or unsafe URL" });
+        }
+
+        // A masked sentinel means "keep the existing API key unchanged".
+        if (isUnchangedSentinel(updates.apiKey)) {
+          delete updates.apiKey;
+        }
+
+        const indexer = await storage.updateIndexer(id, updates);
+        if (!indexer) {
+          return res.status(404).json({ error: "Indexer not found" });
+        }
+        return res.json(maskIndexer(indexer));
+      } catch (error) {
+        routesLogger.error({ error }, "error updating indexer");
+        return res.status(500).json({ error: "Failed to update indexer" });
+      }
+    }
+  );
+
+  // Delete indexer
+  app.delete("/api/indexers/:id", sensitiveEndpointLimiter, async (req, res) => {
+    try {
+      const { id } = req.params as { id: string };
+      const success = await storage.removeIndexer(id);
+      if (!success) {
+        return res.status(404).json({ error: "Indexer not found" });
+      }
+      return res.status(204).send();
+    } catch (error) {
+      routesLogger.error({ error }, "error deleting indexer");
+      return res.status(500).json({ error: "Failed to delete indexer" });
+    }
+  });
+
+  // Downloader management routes
+
+  // Get all downloaders
+  // Verbose debug logging of full downloader responses (qBittorrent, Transmission,
+  // rTorrent, Deluge, Synology, sabnzbd, nzbget). Off by default - meant to be
+  // toggled on temporarily while diagnosing a downloader integration issue.
+  app.get("/api/downloaders/debug-logging", async (_req, res) => {
+    try {
+      res.json({ enabled: isDownloaderDebugLoggingEnabled() });
+    } catch (error) {
+      routesLogger.error({ error }, "error fetching downloader debug logging setting");
+      res.status(500).json({ error: "Failed to fetch downloader debug logging setting" });
+    }
+  });
+
+  app.put(
+    "/api/downloaders/debug-logging",
+    validate(z.object({ enabled: z.boolean() }).passthrough()),
+    validateRequest,
+    async (req, res) => {
+      try {
+        const { enabled } = req.body as { enabled: boolean };
+        await storage.setSystemConfig(
+          DOWNLOADER_DEBUG_LOGGING_CONFIG_KEY,
+          enabled ? "true" : "false"
+        );
+        setCachedDownloaderDebugLogging(enabled);
+        routesLogger.info({ enabled }, "Downloader debug logging setting updated");
+        res.json({ enabled });
+      } catch (error) {
+        routesLogger.error({ error }, "error updating downloader debug logging setting");
+        res.status(500).json({ error: "Failed to update downloader debug logging setting" });
+      }
+    }
+  );
+
+  app.get("/api/downloaders", async (_req, res) => {
+    try {
+      const downloaders = await storage.getAllDownloaders();
+      res.json(downloaders.map(maskDownloader));
+    } catch (error) {
+      routesLogger.error({ error }, "error fetching downloaders");
+      res.status(500).json({ error: "Failed to fetch downloaders" });
+    }
+  });
+
+  // Get enabled downloaders only
+  app.get("/api/downloaders/enabled", async (_req, res) => {
+    try {
+      const downloaders = await storage.getEnabledDownloaders();
+      res.json(downloaders.map(maskDownloader));
+    } catch (error) {
+      routesLogger.error({ error }, "error fetching enabled downloaders");
+      res.status(500).json({ error: "Failed to fetch enabled downloaders" });
+    }
+  });
+
+  // Get free space for all enabled downloaders
+  app.get("/api/downloaders/storage", async (_req, res) => {
+    try {
+      // ⚡ Bolt: Check cache first
+      if (storageCache.data && Date.now() < storageCache.expiry) {
+        return res.json(storageCache.data);
+      }
+
+      const enabledDownloaders = await storage.getEnabledDownloaders();
+      routesLogger.debug(
+        { count: enabledDownloaders.length },
+        "fetching storage info for downloaders"
+      );
+      // ⚡ Bolt: Fetch storage info from all downloaders in parallel
+      const storageInfo: StorageCacheItem[] = await Promise.all(
+        enabledDownloaders.map(async (downloader) => {
+          try {
+            const freeSpace = await DownloaderManager.getFreeSpace(downloader);
+            routesLogger.debug({ name: downloader.name, freeSpace }, "retrieved free space");
+            return {
+              downloaderId: downloader.id,
+              downloaderName: downloader.name,
+              freeSpace,
+            };
+          } catch (error) {
+            routesLogger.error(
+              { downloaderName: downloader.name, error },
+              "error getting free space"
+            );
+            const value = appConfig.server.isProduction
+              ? serviceMessage("service.internal_server_error", {})
+              : serviceErrorValue(error);
+            return {
+              downloaderId: downloader.id,
+              downloaderName: downloader.name,
+              freeSpace: 0,
+              error: typeof value === "string" ? value : value.message,
+              errorI18n:
+                typeof value === "string" ? null : (parseServiceMessageDescriptor(value) ?? null),
+            };
+          }
+        })
+      );
+
+      // ⚡ Bolt: Cache the result
+      storageCache.data = storageInfo;
+      storageCache.expiry = Date.now() + storageCache.ttl;
+
+      return res.json(storageInfo);
+    } catch (error) {
+      routesLogger.error({ error }, "error getting all storage info");
+      return res.status(500).json({ error: "Failed to get storage info" });
+    }
+  });
+
+  // Get single downloader
+  app.get("/api/downloaders/:id", async (req, res) => {
+    try {
+      const { id } = req.params as { id: string };
+      const downloader = await storage.getDownloader(id);
+      if (!downloader) {
+        return res.status(404).json({ error: "Downloader not found" });
+      }
+      return res.json(maskDownloader(downloader));
+    } catch (error) {
+      routesLogger.error({ error }, "error fetching downloader");
+      return res.status(500).json({ error: "Failed to fetch downloader" });
+    }
+  });
+
+  // Add new downloader
+  app.post(
+    "/api/downloaders",
+    sensitiveEndpointLimiter,
+    sanitizeDownloaderData,
+    validate(insertDownloaderSchema),
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const downloaderData = insertDownloaderSchema.parse(req.body);
+        if (downloaderData.type === "realdebrid") {
+          downloaderData.url = REAL_DEBRID_API_URL;
+          downloaderData.port = null;
+          downloaderData.useSsl = true;
+          downloaderData.urlPath = null;
+          downloaderData.username = null;
+          downloaderData.password = null;
+        }
+
+        if (!(await isSafeUrl(downloaderData.url))) {
+          return res.status(400).json({ error: "Invalid or unsafe URL" });
+        }
+
+        const downloader = await storage.addDownloader(downloaderData);
+        return res.status(201).json(maskDownloader(downloader));
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          return respondWithZodError(res, error, "Invalid downloader data");
+        }
+        routesLogger.error({ error }, "error adding downloader");
+        return res.status(500).json({ error: "Failed to add downloader" });
+      }
+    }
+  );
+
+  // Update downloader
+  app.patch(
+    "/api/downloaders/:id",
+    sensitiveEndpointLimiter,
+    sanitizeDownloaderUpdateData,
+    validate(updateDownloaderSchema),
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { id } = req.params as { id: string };
+        const parsedUpdates = updateDownloaderSchema.safeParse(req.body);
+        if (!parsedUpdates.success) {
+          return respondWithZodError(res, parsedUpdates.error, "Invalid downloader data");
+        }
+        const updates = Object.fromEntries(
+          Object.entries(parsedUpdates.data).filter(([, value]) => value !== undefined)
+        ) as Parameters<typeof storage.updateDownloader>[1];
+
+        const currentDownloader = await storage.getDownloader(id);
+        if (!currentDownloader) {
+          return res.status(404).json({ error: "Downloader not found" });
+        }
+        const resultingType = updates.type ?? currentDownloader.type;
+        if (resultingType === "realdebrid") {
+          const stagingPath = updates.downloadPath ?? currentDownloader.downloadPath;
+          if (typeof stagingPath !== "string" || !path.isAbsolute(stagingPath)) {
+            return res.status(400).json({
+              error: "Real-Debrid needs an absolute local staging path on the QuestarrNG server.",
+            });
+          }
+          updates.url = REAL_DEBRID_API_URL;
+          updates.port = null;
+          updates.useSsl = true;
+          updates.urlPath = null;
+          updates.username = null;
+          if (currentDownloader.type !== "realdebrid") updates.password = null;
+        } else if (currentDownloader.type === "realdebrid") {
+          updates.password = null;
+        }
+
+        if (updates.url && !(await isSafeUrl(updates.url))) {
+          return res.status(400).json({ error: "Invalid or unsafe URL" });
+        }
+
+        // A masked sentinel means "keep the existing password unchanged".
+        if (isUnchangedSentinel(updates.password)) {
+          delete updates.password;
+        }
+
+        // Same masked-sentinel handling for the archive password nested inside
+        // `settings` -- restore the stored value instead of overwriting it with
+        // the redaction placeholder the UI echoes back unchanged.
+        if (typeof updates.settings === "string") {
+          const incomingSettings = parseJsonObject(updates.settings);
+          if (isUnchangedSentinel(incomingSettings.archivePassword)) {
+            const existing = await storage.getDownloader(id);
+            const existingPassword = parseJsonObject(existing?.settings).archivePassword;
+            if (existingPassword) {
+              incomingSettings.archivePassword = existingPassword;
+            } else {
+              delete incomingSettings.archivePassword;
+            }
+            updates.settings = JSON.stringify(incomingSettings);
+          }
+        }
+
+        const downloader = await storage.updateDownloader(id, updates);
+        if (!downloader) {
+          return res.status(404).json({ error: "Downloader not found" });
+        }
+        return res.json(maskDownloader(downloader));
+      } catch (error) {
+        routesLogger.error({ error }, "error updating downloader");
+        return res.status(500).json({ error: "Failed to update downloader" });
+      }
+    }
+  );
+
+  // Delete downloader
+  app.delete("/api/downloaders/:id", sensitiveEndpointLimiter, async (req, res) => {
+    try {
+      const { id } = req.params as { id: string };
+      const success = await storage.removeDownloader(id);
+      if (!success) {
+        return res.status(404).json({ error: "Downloader not found" });
+      }
+      return res.status(204).send();
+    } catch (error) {
+      routesLogger.error({ error }, "error deleting downloader");
+      return res.status(500).json({ error: "Failed to delete downloader" });
+    }
+  });
+
+  // Torznab search routes
+
+  // Search for games using configured indexers (alias for /api/indexers/search)
+  app.get(
+    "/api/search",
+    optionalAuthenticateToken,
+    sanitizeIndexerSearchQuery,
+    validateRequest,
+    handleAggregatedIndexerSearch
+  );
+
+  // Test indexer connection with provided configuration (doesn't require saving first)
+  app.post(
+    "/api/indexers/test",
+    validate(
+      z
+        .object({
+          name: z.string().optional(),
+          url: z.string().min(1),
+          apiKey: z.string().optional(),
+          protocol: z.enum(["torznab", "newznab", "g4u", "json-catalog"]).optional(),
+          enabled: z.boolean().optional(),
+          priority: z.number().int().positive().optional(),
+          categories: z.array(z.unknown()).optional(),
+          rssEnabled: z.boolean().optional(),
+          autoSearchEnabled: z.boolean().optional(),
+          allowInsecureLan: z.boolean().optional(),
+        })
+        .passthrough()
+    ),
+    async (req, res) => {
+      try {
+        const {
+          name,
+          url,
+          apiKey,
+          protocol,
+          enabled,
+          priority,
+          categories,
+          rssEnabled,
+          autoSearchEnabled,
+          allowInsecureLan,
+        } = req.body;
+
+        if (!url || (!apiKey && protocol !== "json-catalog")) {
+          return res.status(400).json({ error: "URL and API key are required" });
+        }
+
+        if (allowInsecureLan !== undefined && typeof allowInsecureLan !== "boolean") {
+          return res.status(400).json({ error: "Invalid insecure LAN setting" });
+        }
+
+        if (!(await isSafeUrl(url))) {
+          return res.status(400).json({ error: "Invalid or unsafe URL" });
+        }
+
+        const resolvedProtocol: string = protocol || "torznab";
+
+        // Create a temporary indexer object for testing
+        const tempIndexer: Indexer = {
+          id: "test",
+          name: name || "Test Connection",
+          url,
+          apiKey,
+          protocol: resolvedProtocol,
+          enabled: enabled ?? true,
+          priority: priority ?? 1,
+          categories: categories || [],
+          rssEnabled: rssEnabled ?? true,
+          autoSearchEnabled: autoSearchEnabled ?? true,
+          // Mirror the form's opt-in, or testing a plain-HTTP LAN indexer always
+          // fails with 401 because the key is withheld.
+          allowInsecureLan: allowInsecureLan === true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        const client =
+          resolvedProtocol === "json-catalog"
+            ? jsonCatalogClient
+            : isUsenetProtocol(resolvedProtocol)
+              ? newznabClient
+              : torznabClient;
+        const result = await client.testConnection(tempIndexer);
+        return res.json(result);
+      } catch (error) {
+        routesLogger.error({ error }, "error testing indexer");
+        return res.status(500).json({
+          error: "Failed to test indexer connection",
+        });
+      }
+    }
+  );
+
+  // Test existing indexer connection by ID
+  app.post("/api/indexers/:id/test", async (req, res) => {
+    try {
+      const { id } = req.params as { id: string };
+      const indexer = await storage.getIndexer(id);
+
+      if (!indexer) {
+        return res.status(404).json({ error: "Indexer not found" });
+      }
+
+      const testClient =
+        indexer.protocol === "json-catalog"
+          ? jsonCatalogClient
+          : isUsenetProtocol(indexer.protocol)
+            ? newznabClient
+            : torznabClient;
+      const result = await testClient.testConnection(indexer);
+      return res.json(result);
+    } catch (error) {
+      routesLogger.error({ error }, "error testing indexer");
+      return res.status(500).json({
+        error: "Failed to test indexer connection",
+      });
+    }
+  });
+
+  // Get available categories from an indexer
+  app.get("/api/indexers/:id/categories", async (req, res) => {
+    try {
+      const { id } = req.params as { id: string };
+      const indexer = await storage.getIndexer(id);
+
+      if (!indexer) {
+        return res.status(404).json({ error: "Indexer not found" });
+      }
+
+      if (indexer.protocol === "json-catalog") return res.json([]);
+      const categoriesClient = isUsenetProtocol(indexer.protocol) ? newznabClient : torznabClient;
+      const categories = await categoriesClient.getCategories(indexer);
+      return res.json(categories);
+    } catch (error) {
+      routesLogger.error({ error }, "error getting categories");
+      return res.status(500).json({ error: "Failed to get categories" });
+    }
+  });
+
+  // Search specific indexer
+  app.get(
+    "/api/indexers/:id/search",
+    sanitizeIndexerSearchQuery,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { id } = req.params as { id: string };
+        const { query, category, cat, limit = 50, offset = 0 } = req.query;
+
+        if (!query || typeof query !== "string") {
+          return res.status(400).json({ error: "Search query required" });
+        }
+
+        const indexer = await storage.getIndexer(id);
+        if (!indexer) {
+          return res.status(404).json({ error: "Indexer not found" });
+        }
+
+        const trimmedQuery = query.trim();
+        const isG4u = indexer.protocol === "g4u";
+        const searchParams = {
+          query: isG4u ? trimmedQuery.replace(/ /g, ".") : trimmedQuery,
+          category: parseCategories(category || cat),
+          limit: parseInt(limit as string) || 50,
+          offset: parseInt(offset as string) || 0,
+        };
+
+        let results;
+        if (indexer.protocol === "json-catalog") {
+          results = await jsonCatalogClient.search(indexer, searchParams);
+        } else if (isUsenetProtocol(indexer.protocol)) {
+          results = await newznabClient.search(indexer, searchParams);
+        } else {
+          results = await torznabClient.searchGames(indexer, searchParams);
+        }
+        return res.json(results);
+      } catch (error) {
+        routesLogger.error({ error }, "error searching specific indexer");
+        return res.status(500).json({ error: "Failed to search indexer" });
+      }
+    }
+  );
+
+  // Downloader integration routes
+
+  // Test downloader connection with provided configuration (doesn't require saving first)
+  app.post(
+    "/api/downloaders/test",
+    sanitizeDownloaderTestData,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const {
+          type,
+          url,
+          port,
+          useSsl,
+          urlPath,
+          username,
+          password,
+          downloadPath,
+          category,
+          label,
+          addStopped,
+          removeCompleted,
+          postImportCategory,
+          settings,
+          allowSelfSignedCertificate,
+          allowInsecureLan,
+        } = req.body;
+
+        // Check for SSRF
+        if (!(await isSafeUrl(url))) {
+          return res.status(400).json({ error: "Invalid or unsafe URL" });
+        }
+
+        // Create a temporary downloader object for testing
+        const tempDownloader: Downloader = {
+          id: "test",
+          name: "Test Connection",
+          type,
+          url,
+          port: port || null,
+          useSsl: useSsl ?? false,
+          urlPath: urlPath || null,
+          username: username || null,
+          password: password || null,
+          enabled: true,
+          priority: 1,
+          downloadPath: downloadPath || null,
+          category: category || null,
+          label: label || "Questarr",
+          addStopped: addStopped ?? false,
+          removeCompleted: removeCompleted ?? false,
+          postImportCategory: postImportCategory || null,
+          settings: settings || null,
+          allowSelfSignedCertificate: allowSelfSignedCertificate ?? false,
+          allowInsecureLan: allowInsecureLan === true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        const result = await DownloaderManager.testDownloader(tempDownloader);
+        return res.json(result);
+      } catch (error) {
+        routesLogger.error({ error }, "error testing downloader");
+        return res.status(500).json({
+          error: "Failed to test downloader connection",
+        });
+      }
+    }
+  );
+
+  // Test existing downloader connection by ID
+  app.post("/api/downloaders/:id/test", async (req, res) => {
+    try {
+      const { id } = req.params as { id: string };
+      const downloader = await storage.getDownloader(id);
+
+      if (!downloader) {
+        return res.status(404).json({ error: "Downloader not found" });
+      }
+
+      const result = await DownloaderManager.testDownloader(downloader);
+      return res.json(result);
+    } catch (error) {
+      routesLogger.error({ error }, "error testing downloader");
+      return res.status(500).json({
+        error: "Failed to test downloader connection",
+      });
+    }
+  });
+
+  app.post(
+    "/api/downloaders/:id/realdebrid/auth/start",
+    sensitiveEndpointLimiter,
+    async (req, res) => {
+      try {
+        const downloaderId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+        if (!downloaderId) return res.status(400).json({ error: "Downloader ID is required" });
+        const downloader = await storage.getDownloader(downloaderId);
+        if (!downloader || downloader.type !== "realdebrid") {
+          return res.status(404).json({ error: "Real-Debrid downloader not found" });
+        }
+        const authorization = await startRealDebridDeviceAuth(downloader.id);
+        return res.json(authorization);
+      } catch (error) {
+        routesLogger.warn({ error }, "Could not start Real-Debrid authorization");
+        return res
+          .status(502)
+          .json(
+            serviceErrorBody(undefined, serviceMessage("service.realdebrid_link_start_failed", {}))
+          );
+      }
+    }
+  );
+
+  app.post(
+    "/api/downloaders/:id/realdebrid/auth/poll",
+    sensitiveEndpointLimiter,
+    validate(z.object({ handle: z.string().uuid() }).passthrough()),
+    async (req, res) => {
+      const handle = req.body && typeof req.body.handle === "string" ? req.body.handle : "";
+      if (!/^[0-9a-f-]{36}$/i.test(handle)) {
+        return res.status(400).json({ error: "Invalid Real-Debrid authorization session." });
+      }
+      try {
+        const downloaderId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+        if (!downloaderId) return res.status(400).json({ error: "Downloader ID is required" });
+        const downloader = await storage.getDownloader(downloaderId);
+        if (!downloader || downloader.type !== "realdebrid") {
+          return res.status(404).json({ error: "Real-Debrid downloader not found" });
+        }
+        const result = await pollRealDebridDeviceAuth(downloader, handle);
+        return res.json(result);
+      } catch (error) {
+        routesLogger.warn({ error }, "Real-Debrid account linking did not complete");
+        return res
+          .status(400)
+          .json(
+            serviceErrorBody(error, serviceMessage("service.realdebrid_authorization_failed", {}))
+          );
+      }
+    }
+  );
+
+  // Add download to downloader
+  app.post(
+    "/api/downloaders/:id/downloads",
+    sensitiveEndpointLimiter,
+    sanitizeDownloaderDownloadData,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { id } = req.params as { id: string };
+        const { url, title, category, downloadPath, priority, downloadType, password } = req.body;
+
+        if (!url || !title) {
+          return res.status(400).json({ error: "URL and title are required" });
+        }
+
+        const downloader = await storage.getDownloader(id);
+        if (!downloader) {
+          return res.status(404).json({ error: "Downloader not found" });
+        }
+
+        if (!downloader.enabled) {
+          return res.status(400).json({ error: "Downloader is disabled" });
+        }
+
+        const result = await DownloaderManager.addDownload(downloader, {
+          url,
+          title,
+          category,
+          downloadPath,
+          priority,
+          downloadType,
+          password,
+        });
+
+        return res.json(result);
+      } catch (error) {
+        routesLogger.error({ error }, "error adding download");
+        return res.status(500).json({
+          error: "Failed to add download",
+        });
+      }
+    }
+  );
+
+  // Get all downloads from a downloader
+  app.get("/api/downloaders/:id/downloads", async (req, res) => {
+    try {
+      const { id } = req.params as { id: string };
+      const downloader = await storage.getDownloader(id);
+
+      if (!downloader) {
+        return res.status(404).json({ error: "Downloader not found" });
+      }
+
+      const downloads = await DownloaderManager.getAllDownloads(downloader);
+      return res.json(downloads);
+    } catch (error) {
+      routesLogger.error({ error }, "error getting downloads");
+      return res.status(500).json({ error: "Failed to get downloads" });
+    }
+  });
+
+  // Get specific download status
+  app.get("/api/downloaders/:id/downloads/:downloadId", async (req, res) => {
+    try {
+      const { id, downloadId } = req.params as { id: string; downloadId: string };
+      const downloader = await storage.getDownloader(id);
+
+      if (!downloader) {
+        return res.status(404).json({ error: "Downloader not found" });
+      }
+
+      const download = await DownloaderManager.getDownloadStatus(downloader, downloadId);
+      if (!download) {
+        return res.status(404).json({ error: "Download not found" });
+      }
+
+      return res.json(download);
+    } catch (error) {
+      routesLogger.error({ error }, "error getting download status");
+      return res.status(500).json({ error: "Failed to get download status" });
+    }
+  });
+
+  // Get detailed download information (files, trackers, etc.)
+  app.get("/api/downloaders/:id/downloads/:downloadId/details", async (req, res) => {
+    try {
+      const { id, downloadId } = req.params as { id: string; downloadId: string };
+      const downloader = await storage.getDownloader(id);
+
+      if (!downloader) {
+        return res.status(404).json({ error: "Downloader not found" });
+      }
+
+      const details = await DownloaderManager.getDownloadDetails(downloader, downloadId);
+      if (!details) {
+        return res.status(404).json({ error: "Download not found" });
+      }
+
+      return res.json(details);
+    } catch (error) {
+      routesLogger.error({ error }, "Error getting download details");
+      return res.status(500).json({ error: "Failed to get download details" });
+    }
+  });
+
+  // Pause download
+  app.post("/api/downloaders/:id/downloads/:downloadId/pause", async (req, res) => {
+    try {
+      const { id, downloadId } = req.params as { id: string; downloadId: string };
+      const downloader = await storage.getDownloader(id);
+
+      if (!downloader) {
+        return res.status(404).json({ error: "Downloader not found" });
+      }
+
+      const result = await DownloaderManager.pauseDownload(downloader, downloadId);
+      return res.json(result);
+    } catch (error) {
+      routesLogger.error({ error }, "error pausing download");
+      return res.status(500).json({
+        error: "Failed to pause download",
+      });
+    }
+  });
+
+  // Resume download
+  app.post("/api/downloaders/:id/downloads/:downloadId/resume", async (req, res) => {
+    try {
+      const { id, downloadId } = req.params as { id: string; downloadId: string };
+      const downloader = await storage.getDownloader(id);
+
+      if (!downloader) {
+        return res.status(404).json({ error: "Downloader not found" });
+      }
+
+      const result = await DownloaderManager.resumeDownload(downloader, downloadId);
+      return res.json(result);
+    } catch (error) {
+      routesLogger.error({ error }, "error resuming download");
+      return res.status(500).json({
+        error: "Failed to resume download",
+      });
+    }
+  });
+
+  // Remove download
+  app.delete("/api/downloaders/:id/downloads/:downloadId", async (req, res) => {
+    try {
+      const { id, downloadId } = req.params as { id: string; downloadId: string };
+      const { deleteFiles = false } = req.query;
+
+      const downloader = await storage.getDownloader(id);
+      if (!downloader) {
+        return res.status(404).json({ error: "Downloader not found" });
+      }
+
+      const result = await DownloaderManager.removeDownload(
+        downloader,
+        downloadId,
+        deleteFiles === "true"
+      );
+
+      return res.json(result);
+    } catch (error) {
+      routesLogger.error({ error }, "error removing download");
+      return res.status(500).json({
+        error: "Failed to remove download",
+      });
+    }
+  });
+
+  // Get aggregated downloads from all enabled downloaders
+  app.get("/api/downloads", async (_req, res) => {
+    try {
+      const enabledDownloaders = await storage.getEnabledDownloaders();
+      const [trackedKeys, gameStatuses] = await Promise.all([
+        storage.getTrackedDownloadKeys(),
+        storage.getTrackedDownloadGameStatuses().catch((err) => {
+          routesLogger.error({ err }, "Failed to fetch tracked download game statuses");
+          return new Map<string, string>();
+        }),
+      ]);
+      // ⚡ Bolt: Fetch downloads from all downloaders in parallel to reduce latency.
+      const results = await Promise.all(
+        enabledDownloaders.map(async (downloader) => {
+          try {
+            const downloads = await DownloaderManager.getAllDownloads(downloader);
+            return {
+              success: true as const,
+              data: downloads.map((download) => {
+                const keyNormal = `${downloader.id}:${download.id}`;
+                const keyLower = `${downloader.id}:${download.id.toLowerCase()}`;
+                return {
+                  ...download,
+                  downloaderId: downloader.id,
+                  downloaderName: downloader.name,
+                  trackedByQuestarr: trackedKeys.has(keyNormal) || trackedKeys.has(keyLower),
+                  gameStatus: gameStatuses.get(keyNormal) ?? gameStatuses.get(keyLower),
+                  downloaderCategory: downloader.category ?? undefined,
+                };
+              }),
+            };
+          } catch (error) {
+            return {
+              success: false as const,
+              downloader,
+              error,
+            };
+          }
+        })
+      );
+
+      const allDownloads = results.flatMap((r) => (r.success ? r.data : []));
+      const errors = results
+        .filter((r): r is { success: false; downloader: Downloader; error: unknown } => !r.success)
+        .map(({ downloader, error }) => {
+          const value = appConfig.server.isProduction
+            ? serviceMessage("service.internal_server_error", {})
+            : serviceErrorValue(error);
+          routesLogger.error({ downloaderName: downloader.name, error }, "error getting downloads");
+          return {
+            downloaderId: downloader.id,
+            downloaderName: downloader.name,
+            error: typeof value === "string" ? value : value.message,
+            errorI18n: typeof value === "string" ? null : parseServiceMessageDescriptor(value),
+          };
+        });
+
+      res.json({
+        downloads: allDownloads,
+        errors,
+      });
+    } catch (error) {
+      routesLogger.error({ error }, "error getting all downloads");
+      res.status(500).json({ error: "Failed to get downloads" });
+    }
+  });
+
+  app.get("/api/downloads/summary", authenticateToken, async (req, res) => {
+    try {
+      const summary = await storage.getDownloadSummaryByGame(req.user!.id);
+      res.json(summary);
+    } catch (error) {
+      routesLogger.error({ module: "routes", error }, "Failed to get download summary");
+      res.status(500).json({ error: "Failed to get download summary" });
+    }
+  });
+
+  // Scan all downloads and return those not yet linked to any game, grouped by base title with library matches
+  app.get("/api/downloads/scan", authenticateToken, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      const enabledDownloaders = await storage.getEnabledDownloaders();
+      const rawTrackedKeys = await storage.getTrackedDownloadKeys();
+      // Normalise torrent hashes so case differences in stored vs. live hashes never cause
+      // false "untracked" results, while leaving case-sensitive Usenet ids untouched.
+      const trackedKeys = new Set(Array.from(rawTrackedKeys).map(normalizeTrackedKey));
+
+      // Fetch downloads from all downloaders in parallel
+      const allDownloads: Array<{
+        downloaderId: string;
+        downloaderName: string;
+        downloadId: string;
+        downloadHash: string;
+        downloadTitle: string;
+        status: string;
+        downloadType: "torrent" | "usenet";
+      }> = [];
+
+      await Promise.all(
+        enabledDownloaders.map(async (downloader) => {
+          try {
+            const downloads = await DownloaderManager.getAllDownloads(downloader);
+            for (const d of downloads) {
+              const key = `${downloader.id}:${normalizeDownloadHash(d.id)}`;
+              if (!trackedKeys.has(key)) {
+                allDownloads.push({
+                  downloaderId: downloader.id,
+                  downloaderName: downloader.name,
+                  downloadId: d.id,
+                  downloadHash: normalizeDownloadHash(d.id),
+                  downloadTitle: d.name,
+                  status: d.status,
+                  downloadType: d.downloadType ?? "torrent",
+                });
+              }
+            }
+          } catch (error) {
+            routesLogger.warn(
+              { error, downloaderName: downloader.name },
+              "Failed to fetch downloads from downloader during scan, skipping."
+            );
+          }
+        })
+      );
+
+      // Categorize and group by normalized base title
+      type DownloadScanItem = (typeof allDownloads)[0] & {
+        category: string;
+        categoryConfidence: number;
+      };
+      const groupMap = new Map<string, { baseTitle: string; downloads: DownloadScanItem[] }>();
+
+      for (const d of allDownloads) {
+        const { category, confidence } = categorizeDownload(d.downloadTitle);
+        const baseTitle = normalizeTitle(cleanReleaseName(d.downloadTitle));
+        const key = baseTitle || normalizeTitle(d.downloadTitle);
+
+        if (!groupMap.has(key)) {
+          groupMap.set(key, { baseTitle: key, downloads: [] });
+        }
+        groupMap.get(key)!.downloads.push({ ...d, category, categoryConfidence: confidence });
+      }
+
+      // Try to match each group against user's library
+      const userGames = await storage.getUserGames(userId, false);
+
+      // Pre-calculate cleaned download titles and normalised game titles to avoid
+      // redundant string operations inside the O(N×M) matching loop.
+      const normalizedGameTitles = userGames.map((game) => ({
+        game,
+        normTitle: normalizeTitle(game.title),
+      }));
+
+      const groups = Array.from(groupMap.values()).map((group) => {
+        const cleanedDlTitles = group.downloads.map((d) => cleanReleaseName(d.downloadTitle));
+
+        // Find best library match using any download in the group
+        let libraryMatch: { game: (typeof userGames)[0]; confidence: number } | null = null;
+
+        outer: for (const { game } of normalizedGameTitles) {
+          for (const dlTitle of cleanedDlTitles) {
+            if (releaseMatchesGame(dlTitle, game.title)) {
+              libraryMatch = { game, confidence: 0.9 };
+              break outer;
+            }
+          }
+        }
+
+        return {
+          baseTitle: group.baseTitle,
+          downloads: group.downloads,
+          libraryMatch: libraryMatch
+            ? { game: libraryMatch.game, confidence: libraryMatch.confidence }
+            : null,
+        };
+      });
+
+      res.json({ groups });
+    } catch (error) {
+      routesLogger.error({ error }, "error scanning downloads");
+      res.status(500).json({ error: "Failed to scan downloads" });
+    }
+  });
+
+  // Claim (link) a download client entry to a game in the library
+  app.post(
+    "/api/downloads/claim",
+    authenticateToken,
+    validate(claimDownloadRequestSchema),
+    async (req, res) => {
+      try {
+        const userId = req.user!.id;
+
+        const parsed = claimDownloadRequestSchema.safeParse(req.body);
+        if (!parsed.success) {
+          return respondWithZodError(res, parsed.error, "Invalid request");
+        }
+        const {
+          downloaderId,
+          downloadHash,
+          downloadTitle,
+          currentStatus,
+          category,
+          gameId,
+          newGame,
+        } = parsed.data;
+
+        if (!gameId && !newGame) {
+          return res.status(400).json({ error: "Provide either gameId or newGame" });
+        }
+
+        // Prevent duplicate: reject if this download is already linked to any game
+        const trackedKeys = new Set(
+          Array.from(await storage.getTrackedDownloadKeys()).map(normalizeTrackedKey)
+        );
+        if (trackedKeys.has(`${downloaderId}:${normalizeDownloadHash(downloadHash)}`)) {
+          return res.status(409).json({ error: "This download is already linked to a game" });
+        }
+
+        const isAlreadyComplete = currentStatus === "completed" || currentStatus === "seeding";
+        const importConfig = isAlreadyComplete ? await storage.getImportConfig(userId) : undefined;
+        // Keep completed claims pollable when post-processing is enabled. The normal completion
+        // checker then resolves client paths and starts the same import flow used for Questarr-added
+        // downloads. Without post-processing, preserve the terminal completed status.
+        const shouldPostProcessClaim = Boolean(
+          isAlreadyComplete && importConfig?.enablePostProcessing
+        );
+        const downloadStatus = shouldPostProcessClaim
+          ? "downloading"
+          : isAlreadyComplete
+            ? "completed"
+            : currentStatus === "downloading"
+              ? "downloading"
+              : currentStatus === "paused"
+                ? "paused"
+                : "downloading";
+
+        let resolvedGameId: string | undefined = undefined;
+
+        if (gameId) {
+          const existing = await storage.getGame(gameId);
+          if (!existing || existing.userId !== userId) {
+            return res.status(404).json({ error: "Game not found" });
+          }
+          resolvedGameId = gameId;
+
+          // Update game status if this is the main download
+          if (category === "main") {
+            const targetStatus = downloadStatus === "completed" ? "owned" : "downloading";
+            if (
+              (targetStatus === "downloading" && existing.status === "wanted") ||
+              (targetStatus === "owned" &&
+                (existing.status === "wanted" || existing.status === "downloading"))
+            ) {
+              await storage.updateGameStatus(existing.id, { status: targetStatus });
+            }
+          }
+        } else {
+          // Avoid duplicates: reuse an existing library entry for the same IGDB game
+          if (newGame!.igdbId != null) {
+            const existing = await storage.getGameByIgdbId(newGame!.igdbId);
+            if (existing && existing.userId === userId) {
+              resolvedGameId = existing.id;
+              if (category === "main") {
+                const targetStatus = downloadStatus === "completed" ? "owned" : "downloading";
+                if (
+                  (targetStatus === "downloading" && existing.status === "wanted") ||
+                  (targetStatus === "owned" &&
+                    (existing.status === "wanted" || existing.status === "downloading"))
+                ) {
+                  await storage.updateGameStatus(existing.id, { status: targetStatus });
+                }
+              }
+            }
+          }
+
+          if (!resolvedGameId) {
+            // Determine initial game status
+            const initialGameStatus =
+              category === "main"
+                ? downloadStatus === "completed"
+                  ? "owned"
+                  : "downloading"
+                : "wanted";
+
+            const game = await storage.addGame(
+              normalizeInitialReleaseStatus(
+                insertGameSchema.parse({
+                  ...newGame,
+                  userId,
+                  status: initialGameStatus,
+                })
+              )
+            );
+            resolvedGameId = game.id;
+          }
+        }
+
+        const downloader = await storage.getDownloader(downloaderId);
+        if (!downloader) {
+          return res.status(404).json({ error: "Downloader not found" });
+        }
+
+        await storage.addGameDownload(
+          insertGameDownloadSchema.parse({
+            gameId: resolvedGameId!,
+            downloaderId,
+            downloadHash: normalizeDownloadHash(downloadHash),
+            downloadTitle,
+            downloadType: isUsenetDownloaderType(downloader.type) ? "usenet" : "torrent",
+            status: downloadStatus,
+            category,
+          })
+        );
+
+        if (shouldPostProcessClaim) {
+          // Run the regular completion check promptly; don't make the user wait for the next cron
+          // interval, and don't hold the claim response open on downloader I/O or extraction.
+          void checkDownloadStatus().catch((error) => {
+            routesLogger.error(
+              { error, gameId: resolvedGameId },
+              "Failed to process claimed download"
+            );
+          });
+        }
+
+        // Clear stale "search results available" flag now that the game has a linked download
+        await storage.updateGameSearchResultsAvailable(resolvedGameId, false);
+
+        return res.json({ success: true, gameId: resolvedGameId });
+      } catch (error) {
+        routesLogger.error({ error }, "error claiming download");
+        return res.status(500).json({ error: "Failed to claim download" });
+      }
+    }
+  );
+
+  // Batch-claim multiple unlinked downloads in a single tracked import task
+  app.post(
+    "/api/downloads/claim-batch",
+    authenticateToken,
+    validate(z.object({ items: z.array(claimDownloadRequestSchema).min(1) }).passthrough()),
+    async (req, res) => {
+      const userId = req.user!.id;
+      const rawItems = req.body?.items;
+      if (!Array.isArray(rawItems) || rawItems.length === 0) {
+        return res.status(400).json({ error: "items must be a non-empty array" });
+      }
+
+      const parsedItems: (typeof claimDownloadRequestSchema._output)[] = [];
+      for (const raw of rawItems) {
+        const parsed = claimDownloadRequestSchema.safeParse(raw);
+        if (!parsed.success) {
+          return respondWithZodError(res, parsed.error, "Invalid item in batch");
+        }
+        parsedItems.push(parsed.data);
+      }
+
+      const hasCompletedItems = parsedItems.some(
+        (item) => item.currentStatus === "completed" || item.currentStatus === "seeding"
+      );
+      const importConfig = hasCompletedItems ? await storage.getImportConfig(userId) : undefined;
+      let shouldPostProcessClaim = false;
+
+      const task = await storage.createImportTask({
+        userId,
+        taskType: "bulk_add",
+        triggeredBy: "manual",
+      });
+      await storage.startImportTask(task.id);
+      (await import("./socket.js")).notifyUser(
+        "importTaskUpdate",
+        {
+          taskId: task.id,
+          status: "in_progress",
+        },
+        userId
+      );
+
+      const trackedKeys = new Set(
+        Array.from(await storage.getTrackedDownloadKeys()).map(normalizeTrackedKey)
+      );
+      let addedCount = 0;
+      let failedCount = 0;
+      const taskItemsToInsert: InsertImportTaskItem[] = [];
+      const igdbIdToGameId = new Map<number, string>();
+
+      for (const item of parsedItems) {
+        const key = `${item.downloaderId}:${normalizeDownloadHash(item.downloadHash)}`;
+        if (trackedKeys.has(key)) {
+          taskItemsToInsert.push({
+            taskId: task.id,
+            itemName: item.downloadTitle,
+            result: "skipped",
+            ...persistedServiceMessage(
+              "Already linked",
+              serviceMessage("service.import_already_linked", {})
+            ),
+          });
+          continue;
+        }
+        try {
+          const isAlreadyComplete =
+            item.currentStatus === "completed" || item.currentStatus === "seeding";
+          const shouldPostProcessItem = Boolean(
+            isAlreadyComplete && importConfig?.enablePostProcessing
+          );
+          const downloadStatus = shouldPostProcessItem
+            ? "downloading"
+            : isAlreadyComplete
+              ? "completed"
+              : item.currentStatus === "downloading"
+                ? "downloading"
+                : item.currentStatus === "paused"
+                  ? "paused"
+                  : "downloading";
+
+          let resolvedGameId: string | undefined;
+
+          if (item.gameId) {
+            const existing = await storage.getGame(item.gameId);
+            if (!existing || existing.userId !== userId) {
+              taskItemsToInsert.push({
+                taskId: task.id,
+                itemName: item.downloadTitle,
+                result: "failed",
+                ...persistedServiceMessage(
+                  "Game not found",
+                  serviceMessage("service.import_game_missing", {})
+                ),
+              });
+              failedCount++;
+              continue;
+            }
+            resolvedGameId = item.gameId;
+            if (item.category === "main") {
+              const targetStatus = downloadStatus === "completed" ? "owned" : "downloading";
+              if (
+                (targetStatus === "downloading" && existing.status === "wanted") ||
+                (targetStatus === "owned" &&
+                  (existing.status === "wanted" || existing.status === "downloading"))
+              ) {
+                await storage.updateGameStatus(existing.id, { status: targetStatus });
+              }
+            }
+          } else if (item.newGame) {
+            if (item.newGame.igdbId != null) {
+              const cached = igdbIdToGameId.get(item.newGame.igdbId);
+              if (cached) {
+                resolvedGameId = cached;
+              } else {
+                const existing = await storage.getGameByIgdbId(item.newGame.igdbId);
+                if (existing && existing.userId === userId) {
+                  resolvedGameId = existing.id;
+                  igdbIdToGameId.set(item.newGame.igdbId, existing.id);
+                  if (item.category === "main") {
+                    const targetStatus = downloadStatus === "completed" ? "owned" : "downloading";
+                    if (
+                      (targetStatus === "downloading" && existing.status === "wanted") ||
+                      (targetStatus === "owned" &&
+                        (existing.status === "wanted" || existing.status === "downloading"))
+                    ) {
+                      await storage.updateGameStatus(existing.id, { status: targetStatus });
+                    }
+                  }
+                }
+              }
+            }
+            if (!resolvedGameId) {
+              const initialStatus =
+                item.category === "main"
+                  ? downloadStatus === "completed"
+                    ? "owned"
+                    : "downloading"
+                  : "wanted";
+              const game = await storage.addGame(
+                normalizeInitialReleaseStatus(
+                  insertGameSchema.parse({ ...item.newGame, userId, status: initialStatus })
+                )
+              );
+              resolvedGameId = game.id;
+              if (item.newGame.igdbId != null) {
+                igdbIdToGameId.set(item.newGame.igdbId, game.id);
+              }
+            }
+          }
+
+          if (!resolvedGameId) {
+            taskItemsToInsert.push({
+              taskId: task.id,
+              itemName: item.downloadTitle,
+              result: "failed",
+              ...persistedServiceMessage(
+                "Could not resolve game",
+                serviceMessage("service.import_game_unresolved", {})
+              ),
+            });
+            failedCount++;
+            continue;
+          }
+
+          const downloader = await storage.getDownloader(item.downloaderId);
+          if (!downloader) {
+            taskItemsToInsert.push({
+              taskId: task.id,
+              itemName: item.downloadTitle,
+              result: "failed",
+              ...persistedServiceMessage(
+                "Downloader not found",
+                serviceMessage("service.import_downloader_missing", {})
+              ),
+            });
+            failedCount++;
+            continue;
+          }
+
+          await storage.addGameDownload(
+            insertGameDownloadSchema.parse({
+              gameId: resolvedGameId,
+              downloaderId: item.downloaderId,
+              downloadHash: normalizeDownloadHash(item.downloadHash),
+              downloadTitle: item.downloadTitle,
+              downloadType: isUsenetDownloaderType(downloader.type) ? "usenet" : "torrent",
+              status: downloadStatus,
+              category: item.category,
+            })
+          );
+          shouldPostProcessClaim ||= shouldPostProcessItem;
+          await storage.updateGameSearchResultsAvailable(resolvedGameId, false);
+
+          trackedKeys.add(key);
+          taskItemsToInsert.push({
+            taskId: task.id,
+            itemName: item.downloadTitle,
+            result: "added",
+            gameId: resolvedGameId,
+          });
+          addedCount++;
+        } catch (err) {
+          const errMsg = err instanceof Error ? err.message : "Unknown error";
+          taskItemsToInsert.push({
+            taskId: task.id,
+            itemName: item.downloadTitle,
+            result: "failed",
+            ...persistedServiceMessage(errMsg, serviceErrorMetadata(err)),
+          });
+          failedCount++;
+        }
+      }
+
+      await storage.addImportTaskItemsBatch(taskItemsToInsert);
+      const skippedCount = parsedItems.length - addedCount - failedCount;
+      const finalStatus = failedCount > 0 ? "completed_with_errors" : "completed";
+      await storage.updateImportTask(task.id, {
+        status: finalStatus,
+        completedAt: new Date(),
+        totalItems: parsedItems.length,
+        addedItems: addedCount,
+        skippedItems: skippedCount,
+        failedItems: failedCount,
+      });
+      (await import("./socket.js")).notifyUser(
+        "importTaskUpdate",
+        {
+          taskId: task.id,
+          status: finalStatus,
+        },
+        userId
+      );
+
+      if (shouldPostProcessClaim) {
+        void checkDownloadStatus().catch((error) => {
+          routesLogger.error({ error, taskId: task.id }, "Failed to process claimed downloads");
+        });
+      }
+
+      return res.json({ success: true, taskId: task.id, addedCount, failedCount, skippedCount });
+    }
+  );
+
+  // Remove a linked download record from a game
+  app.delete(
+    "/api/games/:id/downloads/:downloadId",
+    sanitizeGameId,
+    sanitizeDownloadId,
+    validateRequest,
+    authenticateToken,
+    async (req: Request, res: Response) => {
+      try {
+        const { id, downloadId } = req.params as { id: string; downloadId: string };
+        const userId = req.user!.id;
+        const game = await storage.getGame(id);
+        if (!game || game.userId !== userId) {
+          return res.status(404).json({ error: "Game not found" });
+        }
+        const removed = await storage.removeGameDownload(downloadId, id);
+        if (!removed) {
+          return res.status(404).json({ error: "Download record not found" });
+        }
+        return res.json({ success: true });
+      } catch (error) {
+        routesLogger.error({ error }, "error removing game download");
+        return res.status(500).json({ error: "Failed to remove download" });
+      }
+    }
+  );
+
+  // Add download to best available downloader
+  app.post(
+    "/api/downloads",
+    sensitiveEndpointLimiter,
+    sanitizeDownloaderDownloadData,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const {
+          url,
+          title,
+          category,
+          downloadPath,
+          priority,
+          gameId,
+          downloadType,
+          password,
+          releaseCategory,
+        } = req.body;
+
+        if (!url || !title) {
+          return res.status(400).json({ error: "URL and title are required" });
+        }
+
+        // gameId comes from the request body, so verify ownership before
+        // touching the downloader: otherwise a user who knows another user's
+        // game UUID could link a download to that game and flip its status.
+        const ownedGame = gameId ? await resolveOwnedGame(gameId, req.user!.id, res) : undefined;
+        if (gameId && !ownedGame) return;
+
+        const enabledDownloaders = await storage.getEnabledDownloaders();
+        if (enabledDownloaders.length === 0) {
+          return res.status(400).json({ error: "No downloaders configured" });
+        }
+
+        let result:
+          Awaited<ReturnType<typeof DownloaderManager.addDownloadWithFallback>> | undefined;
+        let requestError: { status: number; error: string } | undefined;
+        const dispatchDownload = async () => {
+          let claimedSeerrOperation = false;
+          try {
+            if (gameId) {
+              const currentGame = await storage.getGame(gameId);
+              if (!currentGame || currentGame.userId !== req.user!.id) {
+                requestError = { status: 404, error: "Game not found" };
+                return;
+              }
+              if (currentGame.seerrExternalRequestId) {
+                if (currentGame.seerrCancelled || currentGame.status === "shelved") {
+                  requestError = {
+                    status: 409,
+                    error: "This SeerrNG request was cancelled and cannot accept a download.",
+                  };
+                  return;
+                }
+                claimedSeerrOperation = await storage.claimSeerrOperation(gameId);
+                if (!claimedSeerrOperation) {
+                  requestError = {
+                    status: 409,
+                    error: "Another acquisition or cancellation operation is in progress.",
+                  };
+                  return;
+                }
+              }
+            }
+
+            // Try downloaders by priority order with automatic fallback.
+            result = await DownloaderManager.addDownloadWithFallback(enabledDownloaders, {
+              url,
+              title,
+              category,
+              downloadPath,
+              priority,
+              downloadType,
+              password,
+            });
+
+            if (result.success === false) return;
+
+            if (gameId && result.success) {
+              // A direct user choice resolves any AI hold for this release.
+              // Keep it best-effort so notification cleanup cannot undo a started download.
+              storage.clearAiAutoDownloadHold(gameId, normalizeTitle(title)).catch((error) => {
+                routesLogger.warn({ error, gameId }, "Failed to clear AI auto-download hold");
+              });
+            }
+
+            // For async qBittorrent adds, the correlation tag creates a tracked
+            // record before the real torrent hash is available.
+            const rawDownloadHash = result.id ?? result.correlationTag;
+            const downloadHash = rawDownloadHash
+              ? normalizeDownloadHash(rawDownloadHash)
+              : rawDownloadHash;
+            if (gameId && result.success && downloadHash && result.downloaderId) {
+              try {
+                await storage.addGameDownload({
+                  gameId,
+                  downloaderId: result.downloaderId,
+                  downloadHash,
+                  downloadTitle: title,
+                  status: "downloading",
+                  downloadType: downloadType || "torrent",
+                  category: releaseCategory ?? null,
+                });
+
+                await storage.updateGameStatus(
+                  gameId,
+                  { status: "downloading" },
+                  { preserveCurated: true }
+                );
+                await storage.updateGameSearchResultsAvailable(gameId, false);
+              } catch (error) {
+                routesLogger.error({ error, gameId }, "Failed to link download to game");
+                // The download succeeded; preserve the existing response contract.
+              }
+            }
+          } finally {
+            if (claimedSeerrOperation && gameId) {
+              await storage.finishSeerrOperation(gameId);
+            }
+          }
+        };
+
+        if (gameId) await withGameOperationLock(gameId, dispatchDownload);
+        else await dispatchDownload();
+
+        if (requestError)
+          return res.status(requestError.status).json({ error: requestError.error });
+        if (!result) return res.status(500).json({ error: "Download could not be started" });
+        if (result.success === false) return res.status(500).json(result);
+
+        return res.json(result);
+      } catch (error) {
+        routesLogger.error({ error }, "error adding download");
+        return res.status(500).json({
+          error: "Failed to add download",
+        });
+      }
+    }
+  );
+
+  // Download bundle of downloads as ZIP
+  app.post(
+    "/api/downloads/bundle",
+    sensitiveEndpointLimiter,
+    validate(
+      z
+        .object({
+          downloads: z.array(
+            z
+              .object({
+                link: z.string().min(1),
+                title: z.string().min(1),
+                downloadType: z.string().optional(),
+              })
+              .passthrough()
+          ),
+        })
+        .passthrough()
+    ),
+    async (req, res) => {
+      try {
+        const { downloads } = req.body;
+        if (!downloads || !Array.isArray(downloads)) {
+          return res.status(400).json({ error: "No downloads provided" });
+        }
+
+        // Bundle links may come from a private Prowlarr or indexer service. Only
+        // those exact configured origins get private-network access; arbitrary
+        // client-supplied URLs and redirect targets remain public-only.
+        const allowedPrivateOrigins = [
+          ...new Set(
+            (await storage.getAllIndexers()).flatMap((indexer) => {
+              try {
+                const url = new URL(indexer.url);
+                return url.protocol === "http:" || url.protocol === "https:" ? [url.origin] : [];
+              } catch {
+                return [];
+              }
+            })
+          ),
+        ];
+        const bundleFetchPolicy = { allowPrivate: false, allowedPrivateOrigins } as const;
+
+        const archive = new ZipArchive({ zlib: { level: 9 } });
+
+        res.attachment("download-bundle.zip");
+        archive.pipe(res);
+
+        // ⚡ Bolt: Fetch all downloads in parallel to significantly reduce wait time
+        // for the user compared to sequential processing.
+        // We process in chunks to prevent overwhelming external servers or our own network.
+        const CONCURRENCY_LIMIT = 5;
+        for (let i = 0; i < downloads.length; i += CONCURRENCY_LIMIT) {
+          const chunk = downloads.slice(i, i + CONCURRENCY_LIMIT);
+          await Promise.all(
+            chunk.map(async (download: { link: string; title: string; downloadType?: string }) => {
+              try {
+                if (!(await isSafeUrl(download.link, bundleFetchPolicy))) {
+                  routesLogger.warn("Skipping unsafe URL in bundle");
+                  return;
+                }
+
+                const response = await safeFetch(download.link, bundleFetchPolicy);
+                if (response.ok) {
+                  const buffer = await response.arrayBuffer();
+                  // Try to detect if it's a usenet item based on title or link if downloadType not present
+                  const isUsenet =
+                    download.downloadType === "usenet" ||
+                    download.link.includes("newznab") ||
+                    download.title.toLowerCase().includes(".nzb");
+                  const extension = isUsenet ? "nzb" : "torrent";
+                  const filename = `${download.title.replace(/[<>:"/\\|?*]/g, "_")}.${extension}`;
+                  archive.append(Buffer.from(buffer), { name: filename });
+                }
+              } catch (error) {
+                routesLogger.error(
+                  { error, title: download.title },
+                  "Error adding download to bundle"
+                );
+              }
+            })
+          );
+        }
+
+        await archive.finalize();
+
+        return;
+      } catch (error) {
+        routesLogger.error({ error }, "Error creating bundle");
+        return res.status(500).json({ error: "Failed to create bundle" });
+      }
+    }
+  );
+
+  // Notification routes
+  app.get("/api/notifications", authenticateToken, async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const notifications = await storage.getNotifications(req.user!.id, limit);
+      res.json(notifications);
+    } catch (error) {
+      routesLogger.error({ error }, "error fetching notifications");
+      res.status(500).json({ error: "Failed to fetch notifications" });
+    }
+  });
+
+  app.get("/api/notifications/unread-count", authenticateToken, async (req, res) => {
+    try {
+      const count = await storage.getUnreadNotificationsCount(req.user!.id);
+      res.json({ count });
+    } catch (error) {
+      routesLogger.error({ error }, "error fetching unread count");
+      res.status(500).json({ error: "Failed to fetch unread count" });
+    }
+  });
+
+  app.post(
+    "/api/notifications",
+    authenticateToken,
+    validate(insertNotificationSchema.omit({ userId: true })),
+    validateRequest,
+    async (req, res) => {
+      try {
+        const notificationData = insertNotificationSchema.parse({
+          ...req.body,
+          userId: req.user!.id,
+        });
+        const notification = await storage.addNotification(notificationData);
+
+        // Notify via WebSocket
+        // dynamic import to avoid circular dependency issues if they exist,
+        // or just import it at top if safe.
+        // Ideally notifications are triggered by events, not by API, but this is good for testing.
+        const { notifyUser } = await import("./socket.js");
+        notifyUser("notification", notification, notification.userId);
+        void appriseClient.send(notification);
+
+        return res.status(201).json(notification);
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          return respondWithZodError(res, error, "Invalid notification data");
+        }
+        routesLogger.error({ error }, "error adding notification");
+        return res.status(500).json({ error: "Failed to add notification" });
+      }
+    }
+  );
+
+  app.put("/api/notifications/:id/read", authenticateToken, async (req, res) => {
+    try {
+      const { id } = req.params as { id: string };
+      const notification = await storage.markNotificationAsRead(id, req.user!.id);
+      if (!notification) {
+        return res.status(404).json({ error: "Notification not found" });
+      }
+      return res.json(notification);
+    } catch (error) {
+      routesLogger.error({ error }, "error marking notification as read");
+      return res.status(500).json({ error: "Failed to mark notification as read" });
+    }
+  });
+
+  app.put("/api/notifications/read-all", authenticateToken, async (req, res) => {
+    try {
+      await storage.markAllNotificationsAsRead(req.user!.id);
+      res.json({ success: true });
+    } catch (error) {
+      routesLogger.error({ error }, "error marking all notifications as read");
+      res.status(500).json({ error: "Failed to mark all notifications as read" });
+    }
+  });
+
+  app.delete("/api/notifications", authenticateToken, async (req, res) => {
+    try {
+      await storage.deleteReadNotifications(req.user!.id);
+      res.status(204).send();
+    } catch (error) {
+      routesLogger.error({ error }, "error clearing notifications");
+      res.status(500).json({ error: "Failed to clear notifications" });
+    }
+  });
+
+  // ── Automatic error-telemetry routes ────────────────────────────────────────
+  // Backs the consent flow opened from an "error-detected" notification's link
+  // (`error-report:<reportId>`), see SendErrorReportDialog and error-telemetry.ts.
+  // Reports are scoped to the authenticated user: getPendingReport/sendPendingReport
+  // only return a report that belongs to req.user!.id.
+
+  const telemetryReportIdValidation = [
+    param("reportId").trim().isUUID().withMessage("Invalid report ID format"),
+  ];
+
+  app.get(
+    "/api/telemetry/pending/:reportId",
+    authenticateToken,
+    telemetryReportIdValidation,
+    validateRequest,
+    (req: Request, res: Response) => {
+      const { reportId } = req.params as { reportId: string };
+      const report = getPendingReport(reportId, req.user!.id);
+      if (!report) {
+        return res.status(404).json({ error: "This report is no longer available." });
+      }
+      return res.json({
+        lineCount: report.lineCount,
+        appVersion: report.appVersion,
+        platform: report.platform,
+        timestamp: report.timestamp,
+      });
+    }
+  );
+
+  app.post(
+    "/api/telemetry/pending/:reportId/send",
+    authenticateToken,
+    telemetryReportIdValidation,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const { reportId } = req.params as { reportId: string };
+        const result = await sendPendingReport(reportId, req.user!.id);
+        if (!result.ok) {
+          return res
+            .status(422)
+            .json({ error: result.message, errorI18n: serializeServiceMessageDescriptor(result) });
+        }
+        return res.json({ code: result.code, issueNumber: result.issueNumber });
+      } catch (error) {
+        routesLogger.error({ error }, "error sending pending telemetry report");
+        return res.status(500).json({ error: "Failed to send diagnostic report" });
+      }
+    }
+  );
+
+  // IGDB Configuration endpoint
+  app.get("/api/settings/igdb", async (_req, res) => {
+    try {
+      const dbClientId = await storage.getSystemConfig("igdb.clientId");
+      const dbClientSecret = await storage.getSystemConfig("igdb.clientSecret");
+
+      let clientId: string | undefined;
+      let source: "env" | "database" | undefined;
+
+      if (dbClientId && dbClientSecret) {
+        clientId = dbClientId;
+        source = "database";
+      } else if (appConfig.igdb.isConfigured) {
+        clientId = appConfig.igdb.clientId;
+        source = "env";
+      }
+
+      res.json({
+        configured: !!(dbClientId && dbClientSecret) || appConfig.igdb.isConfigured,
+        source,
+        clientId,
+      });
+    } catch (error) {
+      routesLogger.error({ error }, "Failed to fetch IGDB credentials");
+      res.status(500).json({ error: "Failed to fetch IGDB credentials" });
+    }
+  });
+
+  app.post(
+    "/api/settings/igdb",
+    sensitiveEndpointLimiter,
+    validate(z.object({ clientId: z.string(), clientSecret: z.string().optional() }).passthrough()),
+    async (req, res) => {
+      try {
+        const { clientId, clientSecret } = req.body;
+
+        if (typeof clientId !== "string" || !clientId.trim()) {
+          return res.status(400).json({ error: "Client ID is required" });
+        }
+        if (clientSecret !== undefined && typeof clientSecret !== "string") {
+          return res.status(400).json({ error: "Client Secret must be a string" });
+        }
+
+        // Whether it's safe to omit clientSecret and keep the existing one: only when a DB
+        // secret already exists to pair with the (possibly updated) DB clientId. An
+        // env-only-configured instance has no DB secret to pair with, so saving just a new
+        // clientId here would leave a DB clientId with no DB secret -- getCredentials() only
+        // uses DB creds when BOTH are present together, so it would silently fall back to the
+        // full env pair (including the old env clientId), making this update a silent no-op.
+        const dbSecret = await storage.getSystemConfig("igdb.clientSecret");
+        const canOmitSecret = !!dbSecret;
+
+        const isMaskedValue = isUnchangedSentinel(clientSecret);
+        const hasNewSecret = !!clientSecret && !isMaskedValue;
+
+        if (!canOmitSecret && !hasNewSecret) {
+          return res.status(400).json({ error: "Client Secret is required" });
+        }
+
+        const trimmedClientId = clientId.trim();
+        const formatError = validateIgdbCredentialFormat(
+          trimmedClientId,
+          hasNewSecret ? clientSecret.trim() : "x".repeat(30) // skip re-checking an unchanged stored secret
+        );
+        if (formatError) {
+          return res.status(400).json(formatError);
+        }
+
+        await storage.setSystemConfig("igdb.clientId", trimmedClientId);
+
+        if (hasNewSecret) {
+          await storage.setSystemConfig("igdb.clientSecret", clientSecret.trim());
+        }
+
+        routesLogger.info("IGDB credentials updated via settings");
+        return res.json({ success: true });
+      } catch (error) {
+        routesLogger.error({ error }, "Failed to update IGDB credentials");
+        return res.status(500).json({ error: "Failed to update IGDB credentials" });
+      }
+    }
+  );
+
+  // Verifies a Client ID/Secret pair against Twitch/IGDB before the user saves it, so a typo
+  // or expired secret is caught immediately instead of surfacing later as a failed search.
+  // clientSecret may be the masked placeholder, meaning "use the already-saved secret".
+  app.post(
+    "/api/settings/igdb/test",
+    sensitiveEndpointLimiter,
+    validate(z.object({ clientId: z.string(), clientSecret: z.string().optional() }).passthrough()),
+    async (req, res) => {
+      try {
+        const { clientId, clientSecret } = req.body;
+
+        if (typeof clientId !== "string" || !clientId.trim()) {
+          return res.status(400).json({ success: false, error: "Client ID is required" });
+        }
+
+        let secretToTest: string;
+        if (isUnchangedSentinel(clientSecret)) {
+          const dbSecret = await storage.getSystemConfig("igdb.clientSecret");
+          secretToTest = dbSecret ?? appConfig.igdb.clientSecret ?? "";
+          if (!secretToTest) {
+            return res.status(400).json({ success: false, error: "Client Secret is required" });
+          }
+        } else if (typeof clientSecret === "string" && clientSecret.trim()) {
+          secretToTest = clientSecret.trim();
+        } else {
+          return res.status(400).json({ success: false, error: "Client Secret is required" });
+        }
+
+        const trimmedClientId = clientId.trim();
+        const formatError = validateIgdbCredentialFormat(trimmedClientId, secretToTest);
+        if (formatError) {
+          return res.status(400).json({ success: false, ...formatError });
+        }
+
+        const result = await igdbClient.testCredentials(trimmedClientId, secretToTest);
+        return res.status(result.success ? 200 : 400).json(result);
+      } catch (error) {
+        routesLogger.error({ error }, "Failed to test IGDB credentials");
+        return res.status(500).json({
+          success: false,
+          ...serviceErrorBody(
+            undefined,
+            serviceMessage("service.igdb_credentials_test_failed", {})
+          ),
+        });
+      }
+    }
+  );
+
+  // RAWG is an optional, additive metadata provider. Its API key is stored
+  // encrypted and is never returned to the browser.
+  app.get("/api/settings/rawg", async (_req, res) => {
+    try {
+      res.set("Cache-Control", "no-store");
+      const stored = await storage.getSystemConfig("rawg.apiKey");
+      return res.json({ configured: Boolean(stored), apiKey: stored ? "********" : "" });
+    } catch (error) {
+      routesLogger.error({ error }, "Failed to read RAWG settings");
+      return res.status(500).json({ error: "Failed to read RAWG settings" });
+    }
+  });
+
+  app.post(
+    "/api/settings/rawg",
+    sensitiveEndpointLimiter,
+    validate(z.object({ apiKey: z.string().max(512) }).passthrough()),
+    async (req, res) => {
+      try {
+        const apiKey = req.body?.apiKey;
+        if (typeof apiKey !== "string" || apiKey.trim().length > 512) {
+          return res.status(400).json({ error: "A valid RAWG API key is required" });
+        }
+        const stored = await storage.getSystemConfig("rawg.apiKey");
+        const value = apiKey.trim();
+        if (!value || isUnchangedSentinel(value)) {
+          if (!stored)
+            return res.status(400).json({
+              ...serviceErrorBody(undefined, serviceMessage("service.rawg_key_required", {})),
+            });
+          return res.json({ success: true, configured: true });
+        }
+        await storage.setSystemConfig("rawg.apiKey", await encryptCredential(value));
+        rawgClient.clearCache();
+        return res.json({ success: true, configured: true });
+      } catch (error) {
+        routesLogger.error({ error }, "Failed to save RAWG settings");
+        return res.status(500).json({ error: "Failed to save RAWG settings" });
+      }
+    }
+  );
+
+  app.delete("/api/settings/rawg", sensitiveEndpointLimiter, async (_req, res) => {
+    try {
+      await storage.deleteSystemConfig("rawg.apiKey");
+      rawgClient.clearCache();
+      return res.status(204).send();
+    } catch (error) {
+      routesLogger.error({ error }, "Failed to remove RAWG settings");
+      return res.status(500).json({ error: "Failed to remove RAWG settings" });
+    }
+  });
+
+  app.post(
+    "/api/settings/rawg/test",
+    sensitiveEndpointLimiter,
+    validate(z.object({ apiKey: z.string().optional() }).passthrough()),
+    async (req, res) => {
+      try {
+        const submitted = req.body?.apiKey;
+        if (submitted !== undefined && typeof submitted !== "string") {
+          return res.status(400).json({ success: false, error: "API key must be a string" });
+        }
+        const stored = await storage.getSystemConfig("rawg.apiKey");
+        const apiKey =
+          typeof submitted === "string" &&
+          submitted.trim() &&
+          !isUnchangedSentinel(submitted.trim())
+            ? submitted.trim()
+            : await decryptCredential(stored ?? "");
+        if (!apiKey) {
+          return res.status(400).json({
+            success: false,
+            ...serviceErrorBody(undefined, serviceMessage("service.rawg_key_required", {})),
+          });
+        }
+        const result = await rawgClient.testCredentials(apiKey);
+        return res.status(result.success ? 200 : 400).json(result);
+      } catch (error) {
+        routesLogger.error({ error }, "Failed to test RAWG settings");
+        return res.status(500).json({
+          success: false,
+          ...serviceErrorBody(undefined, serviceMessage("service.rawg_test_failed", {})),
+        });
+      }
+    }
+  );
+
+  app.get("/api/settings/discord", async (_req, res) => {
+    try {
+      const webhookUrl = await storage.getSystemConfig("discord.webhookUrl");
+      const isConfigured = !!(webhookUrl && webhookUrl.length > 0);
+      res.json({
+        configured: isConfigured,
+        webhookUrl: isConfigured ? REDACTED_PLACEHOLDER : undefined,
+      });
+    } catch (error) {
+      routesLogger.error({ error }, "Failed to fetch Discord settings");
+      res.status(500).json({ error: "Failed to fetch Discord settings" });
+    }
+  });
+
+  // Exposes only whether a Steam Web API key is configured server-side, so the
+  // client can conditionally show the achievements section in the game details
+  // Journal tab without ever seeing the key itself.
+  app.get("/api/settings/steam", async (_req, res) => {
+    res.json({ apiKeyConfigured: appConfig.steam.isConfigured });
+  });
+
+  app.post(
+    "/api/settings/discord",
+    sensitiveEndpointLimiter,
+    validate(z.object({ webhookUrl: z.string().optional() }).passthrough()),
+    async (req, res) => {
+      try {
+        const { webhookUrl } = req.body as { webhookUrl?: string };
+
+        // A masked sentinel means "keep the existing webhook URL unchanged".
+        if (isUnchangedSentinel(webhookUrl)) {
+          return res.json({ success: true });
+        }
+
+        if (webhookUrl && !isValidDiscordWebhook(webhookUrl)) {
+          return res.status(400).json({ error: "Invalid Discord webhook URL" });
+        }
+        await storage.setSystemConfig("discord.webhookUrl", webhookUrl?.trim() ?? "");
+        return res.json({ success: true });
+      } catch (error) {
+        routesLogger.error({ error }, "Failed to update Discord settings");
+        return res.status(500).json({ error: "Failed to update Discord settings" });
+      }
+    }
+  );
+
+  // Apprise settings
+  app.get("/api/settings/apprise", async (_req, res) => {
+    try {
+      const settings = await readAppriseSettings(storage);
+      res.json({
+        configured: isAppriseConfigured(settings),
+        mode: settings.mode,
+        apiUrl: settings.apiUrl,
+        key: settings.key,
+        urls: settings.urls,
+        username: settings.username ?? "",
+        // Based on the stored value, not the decrypted one: CLI mode never decrypts the
+        // password, and the masked field must still round-trip when switching back to API.
+        password: (await storage.getSystemConfig("apprise.password")) ? REDACTED_PLACEHOLDER : "",
+      });
+    } catch (error) {
+      routesLogger.error({ error }, "Failed to fetch Apprise settings");
+      res.status(500).json({ error: "Failed to fetch Apprise settings" });
+    }
+  });
+
+  app.post(
+    "/api/settings/apprise",
+    validate(
+      z
+        .object({
+          mode: z.enum(["api", "cli"]).optional(),
+          apiUrl: z.string().optional(),
+          key: z.string().optional(),
+          urls: z.string().optional(),
+          username: z.string().optional(),
+          password: z.string().optional(),
+        })
+        .passthrough()
+    ),
+    async (req, res) => {
+      try {
+        const { apiUrl, key, urls, username, password } = req.body as {
+          mode?: string;
+          apiUrl?: string;
+          key?: string;
+          urls?: string;
+          username?: string;
+          password?: string;
+        };
+        const mode = normalizeAppriseMode(
+          typeof req.body?.mode === "string" ? req.body.mode : undefined
+        );
+
+        if (
+          typeof req.body?.mode === "string" &&
+          req.body.mode !== "api" &&
+          req.body.mode !== "cli"
+        ) {
+          return res.status(400).json({ error: "Invalid Apprise mode" });
+        }
+
+        if (
+          (apiUrl !== undefined && typeof apiUrl !== "string") ||
+          (key !== undefined && typeof key !== "string") ||
+          (urls !== undefined && typeof urls !== "string") ||
+          (username !== undefined && typeof username !== "string") ||
+          (password !== undefined && typeof password !== "string")
+        ) {
+          return res.status(400).json({ error: "Invalid request payload types" });
+        }
+
+        // HTTP Basic Auth splits on the first colon, and apprise-api rejects one in APPRISE_USER.
+        if (username?.includes(":")) {
+          return res.status(400).json({ error: "Username cannot contain a colon" });
+        }
+
+        if (mode === "api") {
+          if (!apiUrl || apiUrl.trim().length === 0) {
+            return res.status(400).json({ error: "API URL is required in API mode" });
+          }
+          if (!key?.trim() && !urls?.trim()) {
+            return res.status(400).json({ error: "Provide a config key or notification URLs" });
+          }
+        } else if (!urls || urls.trim().length === 0) {
+          return res.status(400).json({ error: "Notification URLs are required in CLI mode" });
+        }
+
+        if (apiUrl?.trim()) {
+          try {
+            const parsed = new URL(apiUrl.trim());
+            if (!["http:", "https:"].includes(parsed.protocol)) {
+              return res.status(400).json({ error: "API URL must use http:// or https://" });
+            }
+          } catch {
+            return res.status(400).json({ error: "API URL is not a valid URL" });
+          }
+        }
+        await storage.setSystemConfig("apprise.mode", mode);
+        if (apiUrl !== undefined) {
+          await storage.setSystemConfig("apprise.apiUrl", apiUrl.trim());
+        }
+        if (key !== undefined) {
+          await storage.setSystemConfig("apprise.key", key.trim());
+        }
+        if (urls !== undefined) {
+          await storage.setSystemConfig("apprise.urls", urls.trim());
+        }
+        if (username !== undefined) {
+          await storage.setSystemConfig("apprise.username", username.trim());
+        }
+        if (password !== undefined && !isUnchangedSentinel(password)) {
+          await storage.setSystemConfig("apprise.password", await encryptCredential(password));
+        }
+
+        appriseClient.configure(await readAppriseSettings(storage));
+        return res.json({ success: true });
+      } catch (error) {
+        routesLogger.error({ error }, "Failed to update Apprise settings");
+        return res.status(500).json({ error: "Failed to update Apprise settings" });
+      }
+    }
+  );
+
+  app.post("/api/settings/apprise/test", async (req, res) => {
+    try {
+      const result = await appriseClient.test(req.user?.id);
+      if (result.success) {
+        res.json({ success: true });
+      } else {
+        res
+          .status(502)
+          .json(
+            result.error !== undefined
+              ? { error: result.error, errorI18n: result.errorI18n ?? null }
+              : serviceErrorBody(undefined, serviceMessage("service.apprise_reach_failed", {}))
+          );
+      }
+    } catch (error) {
+      routesLogger.error({ error }, "Apprise test failed");
+      res
+        .status(500)
+        .json(serviceErrorBody(undefined, serviceMessage("service.apprise_test_failed", {})));
+    }
+  });
+
+  // Security & Scanning settings (Settings > Post-Processing > Security & Scanning)
+  app.get("/api/settings/security-scan", async (_req, res) => {
+    try {
+      const [vt, clamav] = await Promise.all([
+        readVirusTotalSettings(storage),
+        readClamAvSettings(storage),
+      ]);
+      res.json({
+        virusTotal: {
+          enabled: vt.enabled,
+          apiKey: vt.apiKey ? REDACTED_PLACEHOLDER : "",
+          threshold: vt.threshold,
+          blockUnknownHashes: vt.blockUnknownHashes,
+        },
+        clamav: {
+          enabled: clamav.enabled,
+          host: clamav.host ?? "",
+          port: clamav.port,
+        },
+      });
+    } catch (error) {
+      routesLogger.error({ error }, "Failed to fetch security scan settings");
+      res.status(500).json({ error: "Failed to fetch security scan settings" });
+    }
+  });
+
+  app.post(
+    "/api/settings/security-scan",
+    sensitiveEndpointLimiter,
+    validate(
+      z
+        .object({
+          virusTotal: z
+            .object({
+              enabled: z.boolean().optional(),
+              apiKey: z.string().optional(),
+              threshold: z.number().optional(),
+              blockUnknownHashes: z.boolean().optional(),
+            })
+            .passthrough()
+            .optional(),
+          clamav: z
+            .object({
+              enabled: z.boolean().optional(),
+              host: z.string().optional(),
+              port: z.number().optional(),
+            })
+            .passthrough()
+            .optional(),
+        })
+        .passthrough()
+    ),
+    async (req, res) => {
+      try {
+        const body = req.body as {
+          virusTotal?: {
+            enabled?: boolean;
+            apiKey?: string;
+            threshold?: number;
+            blockUnknownHashes?: boolean;
+          };
+          clamav?: { enabled?: boolean; host?: string; port?: number };
+        };
+
+        const vtError = await applyVirusTotalSettingsUpdate(body.virusTotal, storage);
+        if (vtError) {
+          return res.status(400).json({ error: vtError });
+        }
+
+        const clamAvError = await applyClamAvSettingsUpdate(body.clamav, storage);
+        if (clamAvError) {
+          return res.status(400).json({ error: clamAvError });
+        }
+
+        return res.json({ success: true });
+      } catch (error) {
+        routesLogger.error({ error }, "Failed to update security scan settings");
+        return res.status(500).json({ error: "Failed to update security scan settings" });
+      }
+    }
+  );
+
+  app.post(
+    "/api/settings/security-scan/test",
+    sensitiveEndpointLimiter,
+    validate(z.object({ provider: z.enum(["virustotal", "clamav"]).optional() }).passthrough()),
+    async (req, res) => {
+      try {
+        const { provider } = req.body as { provider?: string };
+
+        if (provider === "virustotal") {
+          const vt = await readVirusTotalSettings(storage);
+          if (!vt.apiKey) {
+            return res
+              .status(400)
+              .json(
+                serviceErrorBody(
+                  undefined,
+                  serviceMessage("service.virustotal_key_unconfigured", {})
+                )
+              );
+          }
+          // Looks up a fixed, publicly known hash rather than an account-info
+          // endpoint keyed by the API key itself — that would put the secret in
+          // the URL path, where it can end up in proxy or access logs.
+          const verdict = await checkVirusTotalHash(EICAR_TEST_FILE_SHA256, vt.apiKey);
+          if (verdict.status === "error") {
+            return res
+              .status(502)
+              .json({ error: verdict.error, errorI18n: verdict.errorI18n ?? null });
+          }
+          return res.json({ success: true });
+        }
+
+        if (provider === "clamav") {
+          const clamav = await readClamAvSettings(storage);
+          if (!clamav.host) {
+            return res
+              .status(400)
+              .json(
+                serviceErrorBody(undefined, serviceMessage("service.clamav_host_unconfigured", {}))
+              );
+          }
+          try {
+            const { address } = await resolveSafeAddress(normalizeHostname(clamav.host), true);
+            const result = await testClamAvConnectivity(address, clamav.port);
+            if (result.success) return res.json({ success: true });
+            return res
+              .status(502)
+              .json(
+                result.error !== undefined
+                  ? { error: result.error, errorI18n: result.errorI18n ?? null }
+                  : serviceErrorBody(undefined, serviceMessage("service.clamav_test_failed", {}))
+              );
+          } catch (error) {
+            return res
+              .status(502)
+              .json(
+                error instanceof Error
+                  ? serviceErrorBody(error, serviceMessage("service.clamav_test_failed", {}))
+                  : { error: String(error), errorI18n: null }
+              );
+          }
+        }
+
+        return res
+          .status(400)
+          .json(
+            serviceErrorBody(undefined, serviceMessage("service.security_provider_unknown", {}))
+          );
+      } catch (error) {
+        routesLogger.error({ error }, "Security scan provider test failed");
+        return res
+          .status(500)
+          .json(
+            serviceErrorBody(undefined, serviceMessage("service.security_provider_test_failed", {}))
+          );
+      }
+    }
+  );
+
+  // User Settings routes
+  app.get("/api/settings", async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      let settings = await storage.getUserSettings(userId);
+
+      // Create default settings if they don't exist
+      if (!settings) {
+        settings = await storage.createUserSettings({ userId });
+      }
+
+      res.json(settings);
+    } catch (error) {
+      routesLogger.error({ error }, "error fetching settings");
+      res.status(500).json({ error: "Failed to fetch settings" });
+    }
+  });
+
+  app.patch("/api/settings", validate(updateUserSettingsSchema), async (req, res, next) => {
+    try {
+      const userId = req.user!.id;
+
+      // Validate the request body
+      const updates = updateUserSettingsSchema.parse(req.body);
+
+      let settings = await storage.getUserSettings(userId);
+
+      if (!settings) {
+        // Create with updates if doesn't exist
+        settings = await storage.createUserSettings({ userId, ...updates });
+      } else {
+        settings = await storage.updateUserSettings(userId, updates);
+      }
+
+      if (!settings) {
+        return res.status(404).json({ error: "Settings not found" });
+      }
+
+      return res.json(settings);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        routesLogger.error({ error: error.issues }, "validation error in settings update");
+        return respondWithZodError(res, error, "Invalid settings data");
+      }
+      return next(error);
+    }
+  });
+
+  // xREL.to settings (API base URL in system config; scene/p2p in user settings)
+  app.patch(
+    "/api/settings/xrel",
+    validate(
+      z
+        .object({
+          apiBase: z.string().optional(),
+          xrelSceneReleases: z.boolean().optional(),
+          xrelP2pReleases: z.boolean().optional(),
+        })
+        .passthrough()
+    ),
+    async (req, res, next) => {
+      try {
+        const userId = req.user!.id;
+        const body = req.body as {
+          apiBase?: string;
+          xrelSceneReleases?: boolean;
+          xrelP2pReleases?: boolean;
+        };
+
+        if (typeof body.apiBase !== "undefined") {
+          const v = typeof body.apiBase === "string" ? body.apiBase.trim() : "";
+          if (v !== "") {
+            if (!/^https?:\/\/[^\s]+$/i.test(v)) {
+              return res.status(400).json({
+                error: "Invalid API base URL",
+                message:
+                  "Must be a valid URL (e.g. https://xrel-api.nfos.to or https://api.xrel.to)",
+              });
+            }
+
+            if (!(await isSafeUrl(v))) {
+              return res.status(400).json({
+                error: "Unsafe API base URL",
+                message: "The provided URL is not allowed for security reasons.",
+              });
+            }
+
+            try {
+              const url = new URL(v);
+              if (!ALLOWED_XREL_DOMAINS.includes(url.hostname)) {
+                return res.status(400).json({
+                  error: "Unauthorized xREL API domain",
+                  message: `The provided domain is not in the allowed list: ${ALLOWED_XREL_DOMAINS.join(", ")}`,
+                });
+              }
+            } catch {
+              return res.status(400).json({
+                error: "Invalid API base URL",
+                message: "The provided string is not a valid URL.",
+              });
+            }
+          }
+          await storage.setSystemConfig("xrel_api_base", v);
+        }
+
+        if (
+          typeof body.xrelSceneReleases === "boolean" ||
+          typeof body.xrelP2pReleases === "boolean"
+        ) {
+          const updates: Record<string, boolean> = {};
+          if (typeof body.xrelSceneReleases === "boolean")
+            updates.xrelSceneReleases = body.xrelSceneReleases;
+          if (typeof body.xrelP2pReleases === "boolean")
+            updates.xrelP2pReleases = body.xrelP2pReleases;
+          await storage.updateUserSettings(userId, updates);
+        }
+
+        const apiBase =
+          (await storage.getSystemConfig("xrel_api_base"))?.trim() ||
+          process.env.XREL_API_BASE ||
+          DEFAULT_XREL_BASE;
+        const settings = await storage.getUserSettings(userId);
+        return res.json({
+          success: true,
+          xrel: { apiBase },
+          settings: settings
+            ? {
+                xrelSceneReleases: settings.xrelSceneReleases,
+                xrelP2pReleases: settings.xrelP2pReleases,
+              }
+            : undefined,
+        });
+      } catch (error) {
+        return next(error);
+      }
+    }
+  );
+
+  // xREL.to API proxy (rate-limited on xREL side; base URL from app settings)
+  app.get("/api/xrel/latest", async (req, res, next) => {
+    try {
+      const page = req.query.page ? parseInt(String(req.query.page), 10) : 1;
+      const baseUrl =
+        (await storage.getSystemConfig("xrel_api_base"))?.trim() ||
+        process.env.XREL_API_BASE ||
+        DEFAULT_XREL_BASE;
+
+      // Use getLatestGames which handles pagination correctly across game-filtered results
+      const result = await xrelClient.getLatestGames({
+        page,
+        perPage: 20,
+        baseUrl,
+      });
+
+      const userId = req.user!.id;
+      const userGames = await storage.getUserGames(userId);
+      const wantedGames = userGames.filter((g) => g.status === "wanted");
+
+      // Mark releases that match a wanted game
+      // ⚡ Bolt: Optimize matching for large collections by pre-processing wanted games
+      // and using a Set for O(1) exact-match lookups.
+      const wantedGamesLookup = wantedGames.map((g) => {
+        const norm = normalizeTitle(g.title);
+        return {
+          game: g,
+          normalized: norm,
+          regex:
+            norm.length >= 5
+              ? new RegExp(`\\b${norm.replace(/[.*+?^${}()|[\\]/g, "\\$&")}\\b`, "i") // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- normalized title text is regex-escaped before interpolation.
+              : null,
+          words: norm.split(" ").filter((w: string) => w.length > 2),
+        };
+      });
+      // Map normalized title -> Game
+      const gamesMap = new Map<string, Game>();
+      wantedGamesLookup.forEach((gl) => gamesMap.set(gl.normalized, gl.game));
+
+      // Collect potential titles for batch matching
+      const candidatesToMatch = new Set<string>();
+
+      const listWithMatches = result.list.map((rel) => {
+        const relExtTitleNorm = rel.ext_info?.title ? normalizeTitle(rel.ext_info.title) : null;
+        const relDirCleaned = cleanReleaseName(rel.dirname);
+        const relDirNorm = normalizeTitle(relDirCleaned);
+
+        let matchedGame: Game | undefined;
+
+        // Fast path: Exact normalized match
+        if (relExtTitleNorm && gamesMap.has(relExtTitleNorm)) {
+          matchedGame = gamesMap.get(relExtTitleNorm);
+        } else if (gamesMap.has(relDirNorm)) {
+          matchedGame = gamesMap.get(relDirNorm);
+        }
+
+        if (!matchedGame) {
+          // Slow path: Fuzzy matching (inclusion, word-based)
+          const relDirLower = rel.dirname.toLowerCase().replace(/[._-]/g, " ");
+          const relExtRegex =
+            relExtTitleNorm && relExtTitleNorm.length >= 5
+              ? new RegExp(`\\b${relExtTitleNorm.replace(/[.*+?^${}()|[\\]/g, "\\$&")}\\b`, "i") // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp -- normalized release title text is regex-escaped before interpolation.
+              : null;
+
+          const found = wantedGamesLookup.find((gl) => {
+            if (relExtTitleNorm) {
+              if (gl.regex && gl.regex.test(relExtTitleNorm)) return true;
+              if (relExtRegex && relExtRegex.test(gl.normalized)) return true;
+            }
+            if (gl.regex && gl.regex.test(relDirNorm)) return true;
+            if (gl.words.length > 0 && gl.words.every((word: string) => relDirLower.includes(word)))
+              return true;
+            return false;
+          });
+          matchedGame = found?.game;
+        }
+
+        // If still no match, prepare for IGDB search
+        if (!matchedGame) {
+          // User feedback: xREL title is often "Indie-Spiele", so rely on dirname
+          const title = cleanReleaseName(rel.dirname);
+          if (title.length > 2) {
+            candidatesToMatch.add(title);
+          }
+        }
+
+        return {
+          ...rel,
+          libraryStatus: matchedGame?.status,
+          gameId: matchedGame?.id,
+          // Keep isWanted for backward compatibility
+          isWanted: matchedGame?.status === "wanted",
+        };
+      });
+
+      // Batch search IGDB for unmatched titles
+      const candidatesArray = Array.from(candidatesToMatch);
+      // routesLogger.debug({ count: candidatesArray.length, candidates: candidatesArray }, "Batch searching IGDB");
+
+      const igdbMatches = await igdbClient.batchSearchGames(candidatesArray);
+
+      if (igdbMatches.size > 0) {
+        routesLogger.debug(
+          {
+            count: igdbMatches.size,
+            matches: Array.from(igdbMatches.entries()).map(([k, v]) => `${k} => ${v?.name}`),
+          },
+          "IGDB Matches found"
+        );
+      }
+
+      // Attach IGDB match candidates to results
+      const finallist = listWithMatches.map((item) => {
+        if (item.libraryStatus) return item;
+
+        const title = cleanReleaseName(item.dirname);
+        const match = igdbMatches.get(title);
+
+        if (match) {
+          const formattedMatch = igdbClient.formatGameData(match);
+          return {
+            ...item,
+            matchCandidate: formattedMatch,
+          };
+        }
+        return item;
+      });
+
+      res.json({ ...result, list: finallist });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get("/api/xrel/search", async (req, res, next) => {
+    try {
+      const q = typeof req.query.q === "string" ? req.query.q.trim() : "";
+      if (!q) {
+        return res.status(400).json({ error: "Search query (q) required" });
+      }
+      const scene = req.query.scene !== "false" && req.query.scene !== "0";
+      const p2p = req.query.p2p === "true" || req.query.p2p === "1";
+      const limit = req.query.limit
+        ? Math.min(100, Math.max(1, parseInt(String(req.query.limit), 10)))
+        : 25;
+      const baseUrl =
+        (await storage.getSystemConfig("xrel_api_base"))?.trim() ||
+        process.env.XREL_API_BASE ||
+        DEFAULT_XREL_BASE;
+      const list = await xrelClient.searchReleases(q, { scene, p2p, limit, baseUrl });
+      return res.json({ results: list });
+    } catch (error) {
+      return next(error);
+    }
+  });
+
+  // Known xREL crack status for a specific game in the user's collection --
+  // which crack types (cracked, hypervisor bypass) have a matching release,
+  // regardless of when. crackTypes is empty when xREL has no match yet.
+  app.get(
+    "/api/games/:id/xrel-status",
+    sanitizeGameId,
+    validateRequest,
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        res.set("Cache-Control", "no-store");
+        const { id } = req.params as { id: string };
+        const userId = req.user!.id;
+        const game = await resolveOwnedGame(id, userId, res);
+        if (!game) return;
+
+        const baseUrl =
+          (await storage.getSystemConfig("xrel_api_base"))?.trim() ||
+          process.env.XREL_API_BASE ||
+          DEFAULT_XREL_BASE;
+
+        const results = await xrelClient.searchReleases(game.title, {
+          scene: true,
+          p2p: true,
+          limit: 25,
+          baseUrl,
+        });
+
+        const matches = results.filter(
+          (r) =>
+            xrelClient.releaseMatchesGame(r.dirname, game.title) ||
+            (r.ext_info?.title && xrelClient.titleMatches(r.ext_info.title, game.title))
+        );
+
+        const crackTypes = (["cracked", "hypervisor"] as const).filter((type) =>
+          matches.some((r) => r.crackType === type)
+        );
+
+        const response: XrelGameStatus = { crackTypes };
+        return res.json(response);
+      } catch (error) {
+        return next(error);
+      }
+    }
+  );
+
+  // Match and add game from name (Quick Add). Shares its search/filter/dedupe
+  // logic with the integration API's POST /api/integration/games/request
+  // (server/game-quick-add.ts) so the two entry points can't drift apart.
+  app.post(
+    "/api/games/match-and-add",
+    sanitizeMatchAndAddTitle,
+    validateRequest,
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const { title } = req.body;
+
+        const userId = req.user!.id;
+
+        const result = await quickAddGameByTitle(userId, title);
+
+        switch (result.outcome) {
+          case "not_found":
+            return res.status(404).json({ error: "No game found on IGDB for this title" });
+          case "duplicate":
+            return res.status(409).json({ error: "Game already in collection", game: result.game });
+          case "added":
+            routesLogger.info(
+              { userId, title: result.game.title, igdbId: result.game.igdbId },
+              "Game quick-added from matching"
+            );
+            return res.status(201).json(result.game);
+        }
+
+        return;
+      } catch (error) {
+        return next(error);
+      }
+    }
+  );
+
+  // RSS Feeds Routes
+  app.get("/api/rss/feeds", async (_req, res) => {
+    try {
+      const feeds = await storage.getAllRssFeeds();
+      res.json(feeds);
+    } catch (error) {
+      routesLogger.error({ error }, "Failed to fetch RSS feeds");
+      res.status(500).json({ error: "Failed to fetch RSS feeds" });
+    }
+  });
+
+  app.post("/api/rss/feeds", validate(insertRssFeedSchema), async (req, res) => {
+    try {
+      const feedData = insertRssFeedSchema.parse(req.body);
+
+      if (!(await isSafeUrl(feedData.url))) {
+        return res.status(400).json({ error: "Invalid or unsafe URL" });
+      }
+
+      const feed = await storage.addRssFeed(feedData);
+      // Trigger immediate refresh for new feed
+      rssService.refreshFeed(feed).catch((err) => {
+        routesLogger.error({ error: err }, "Initial RSS feed refresh failed");
+      });
+      return res.status(201).json(feed);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.issues });
+      }
+      // Fallback for when instanceof fails (e.g. different zod versions/contexts)
+      if (
+        error &&
+        typeof error === "object" &&
+        "name" in error &&
+        (error as { name: string }).name === "ZodError" &&
+        ("errors" in error || "issues" in error)
+      ) {
+        const zodErr = error as { errors?: unknown; issues?: unknown };
+        return res.status(400).json({ error: zodErr.errors || zodErr.issues });
+      }
+      routesLogger.error({ error }, "Failed to add RSS feed");
+      return res.status(500).json({ error: "Failed to add RSS feed" });
+    }
+  });
+
+  app.put("/api/rss/feeds/:id", validate(insertRssFeedSchema.partial()), async (req, res) => {
+    try {
+      const updates = insertRssFeedSchema.partial().parse(req.body);
+
+      if (updates.url && !(await isSafeUrl(updates.url))) {
+        return res.status(400).json({ error: "Invalid or unsafe URL" });
+      }
+
+      const feedId = typeof req.params.id === "string" ? req.params.id : "";
+      const feed = await storage.updateRssFeed(feedId, stripUndefined(updates));
+      if (!feed) {
+        return res.status(404).json({ error: "Feed not found" });
+      }
+      return res.json(feed);
+    } catch (error) {
+      routesLogger.error({ error }, "Failed to update RSS feed");
+      return res.status(500).json({ error: "Failed to update RSS feed" });
+    }
+  });
+
+  app.delete("/api/rss/feeds/:id", async (req, res) => {
+    try {
+      const success = await storage.removeRssFeed(req.params.id);
+      if (!success) {
+        return res.status(404).json({ error: "Feed not found" });
+      }
+      return res.status(204).send();
+    } catch (error) {
+      routesLogger.error({ error }, "Failed to delete RSS feed");
+      return res.status(500).json({ error: "Failed to delete RSS feed" });
+    }
+  });
+
+  app.get("/api/rss/items", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(String(req.query.limit)) : 100;
+      const items = await storage.getAllRssFeedItems(limit);
+      res.json(items);
+    } catch (error) {
+      routesLogger.error({ error }, "Failed to fetch RSS items");
+      res.status(500).json({ error: "Failed to fetch RSS items" });
+    }
+  });
+
+  app.post("/api/rss/refresh", async (_req, res) => {
+    try {
+      await rssService.refreshFeeds();
+      res.json({ success: true });
+    } catch (error) {
+      routesLogger.error({ error }, "Failed to refresh RSS feeds");
+      res.status(500).json({ error: "Failed to refresh RSS feeds" });
+    }
+  });
+
+  app.post(
+    "/api/stats/discord-share",
+    validate(
+      z.object({ image: z.string().optional(), message: z.string().optional() }).passthrough()
+    ),
+    async (req, res) => {
+      try {
+        const webhookUrl = await storage.getSystemConfig("discord.webhookUrl");
+        if (!webhookUrl) {
+          return res.status(400).json({
+            error: "Discord webhook not configured. Go to Settings → Services to set it up.",
+          });
+        }
+
+        if (!isValidDiscordWebhook(webhookUrl)) {
+          routesLogger.error(
+            { webhookUrl },
+            "Attempted to use an invalid Discord webhook URL for sharing."
+          );
+          return res.status(400).json({ error: "Invalid Discord webhook URL configured." });
+        }
+
+        const { image, message } = req.body as { image?: string; message?: string };
+        if (!image) return res.status(400).json({ error: "No image data provided" });
+
+        if (!/^data:image\/(png|jpeg|gif|webp);base64,/.test(image)) {
+          return res
+            .status(400)
+            .json({ error: "Invalid image format. Only PNG, JPEG, GIF, and WebP are supported." });
+        }
+
+        const base64Data = image.split(",")[1];
+        if (!base64Data) return res.status(400).json({ error: "Invalid image data" });
+
+        const imageBuffer = Buffer.from(base64Data, "base64");
+        const formData = new FormData();
+        if (message) {
+          let content = message;
+          // Only the explicit app heading follows the notification preference.
+          // Arbitrary user/API messages, even English lookalikes, stay unchanged.
+          const descriptor = matchingServiceMessageDescriptor(message, req.body);
+          if (descriptor?.messageKey === "interface.my_questarr_library_stats_6f07559d") {
+            try {
+              const settings = await storage.getUserSettings(req.user!.id);
+              content = localizeServiceMessage(
+                message,
+                descriptor,
+                readNotificationLanguage(settings?.notificationPreferences)
+              );
+            } catch (error) {
+              routesLogger.warn(
+                { error },
+                "Could not load Discord heading language, using English"
+              );
+            }
+          }
+          formData.append("content", content);
+        }
+        formData.append(
+          "file",
+          new Blob([imageBuffer], { type: "image/png" }),
+          "questarr-stats.png"
+        );
+
+        const discordRes = await safeFetch(webhookUrl, {
+          method: "POST",
+          body: formData,
+          allowPrivate: false,
+        });
+        if (!discordRes.ok) {
+          const errorText = await discordRes.text().catch(() => "Unknown Discord error");
+          routesLogger.error(
+            { status: discordRes.status, error: errorText },
+            "Discord webhook request failed"
+          );
+          return res.status(502).json({ error: "Failed to post to Discord" });
+        }
+
+        return res.json({ success: true });
+      } catch (error) {
+        routesLogger.error({ error }, "Failed to share stats to Discord");
+        return res.status(500).json({ error: "Failed to share stats to Discord" });
+      }
+    }
+  );
+
+  // ── NexusMods settings ───────────────────────────────────────────────────────
+
+  app.get("/api/settings/nexusmods", async (_req, res) => {
+    try {
+      const dbKey = await storage.getSystemConfig("nexusmods.apiKey");
+      const configured = !!(dbKey && dbKey.length > 0) || nexusmodsClient.isConfigured();
+      let source: "env" | "database" | undefined;
+      if (dbKey && dbKey.length > 0) {
+        source = "database";
+      } else if (process.env.NEXUSMODS_API_KEY) {
+        source = "env";
+      }
+      res.json({ configured, source });
+    } catch (error) {
+      routesLogger.error({ error }, "Failed to fetch NexusMods settings");
+      res.status(500).json({ error: "Failed to fetch NexusMods settings" });
+    }
+  });
+
+  app.post(
+    "/api/settings/nexusmods",
+    sensitiveEndpointLimiter,
+    validate(z.object({ apiKey: z.string().min(1) }).passthrough()),
+    async (req, res) => {
+      try {
+        const { apiKey } = req.body as { apiKey?: string };
+        if (!apiKey || apiKey.trim().length === 0) {
+          return res.status(400).json({ error: "API key is required" });
+        }
+        await storage.setSystemConfig("nexusmods.apiKey", apiKey.trim());
+        nexusmodsClient.configure(apiKey.trim());
+        routesLogger.info("NexusMods API key updated via settings");
+        return res.json({ success: true });
+      } catch (error) {
+        routesLogger.error({ error }, "Failed to update NexusMods settings");
+        return res.status(500).json({ error: "Failed to update NexusMods settings" });
+      }
+    }
+  );
+
+  // ── TypeSafe (Jev) AI settings ────────────────────────────────────────────────
+
+  app.get("/api/settings/typesafe", async (_req, res) => {
+    try {
+      const [dbUrl, dbKey, dbModel] = await Promise.all([
+        storage.getSystemConfig(TYPESAFE_URL_CONFIG_KEY),
+        storage.getSystemConfig(TYPESAFE_KEY_CONFIG_KEY),
+        storage.getSystemConfig(TYPESAFE_MODEL_CONFIG_KEY),
+      ]);
+      const configured = !!(dbKey && dbKey.length > 0);
+      res.json({
+        configured,
+        apiUrl: dbUrl && dbUrl.length > 0 ? dbUrl : undefined,
+        model: dbModel && dbModel.length > 0 ? dbModel : undefined,
+      });
+    } catch (error) {
+      routesLogger.error({ error }, "Failed to fetch TypeSafe settings");
+      res.status(500).json({ error: "Failed to fetch TypeSafe settings" });
+    }
+  });
+
+  app.post(
+    "/api/settings/typesafe",
+    sensitiveEndpointLimiter,
+    validate(
+      z
+        .object({
+          apiUrl: z.string().optional(),
+          apiKey: z.string().optional(),
+          model: z.string().optional(),
+        })
+        .passthrough()
+    ),
+    async (req, res) => {
+      try {
+        const { apiUrl, apiKey, model } = req.body as {
+          apiUrl?: unknown;
+          apiKey?: unknown;
+          model?: unknown;
+        };
+        // apiKey is optional on an update: omitting it (e.g. to change only the URL or model)
+        // reuses the already-stored encrypted key rather than forcing it to be re-entered.
+        if (apiKey !== undefined && typeof apiKey !== "string") {
+          return res.status(400).json({ error: "Invalid API key" });
+        }
+        if (apiUrl !== undefined && typeof apiUrl !== "string") {
+          return res.status(400).json({ error: "Invalid API URL" });
+        }
+        if (model !== undefined && typeof model !== "string") {
+          return res.status(400).json({ error: "Invalid model" });
+        }
+
+        const trimmedUrl = apiUrl?.trim() ?? "";
+        if (trimmedUrl) {
+          // TypeSafeClient always calls safeFetch with requireHttps -- reject anything that
+          // would fail that check at save time rather than let every analysis call fail later.
+          let parsed: URL;
+          try {
+            parsed = new URL(trimmedUrl);
+          } catch {
+            return res.status(400).json({ error: "Invalid or unsafe URL" });
+          }
+          if (parsed.protocol !== "https:" || !(await isSafeUrl(trimmedUrl))) {
+            return res.status(400).json({ error: "API URL must be a safe HTTPS URL" });
+          }
+        }
+
+        const resolvedKey = await resolveTypesafeApiKey(apiKey?.trim() ?? "");
+        if (!resolvedKey) {
+          return res.status(400).json({ error: "API key is required" });
+        }
+
+        const trimmedModel = model?.trim() ?? "";
+        await storage.setSystemConfigBatch([
+          { key: TYPESAFE_URL_CONFIG_KEY, value: trimmedUrl },
+          { key: TYPESAFE_KEY_CONFIG_KEY, value: resolvedKey.encryptedKey },
+          { key: TYPESAFE_MODEL_CONFIG_KEY, value: trimmedModel },
+        ]);
+        if (resolvedKey.trimmedNewKey) {
+          typesafeClient.configure(
+            trimmedUrl || null,
+            resolvedKey.trimmedNewKey,
+            trimmedModel || null
+          );
+        } else {
+          // Reusing the stored key -- invalidate the in-memory cache so the next call reloads
+          // and decrypts it (and picks up the new URL/model) from storage instead of retaining
+          // stale values from before this save.
+          typesafeClient.invalidate();
+        }
+        routesLogger.info("TypeSafe API settings updated");
+        return res.json({ success: true });
+      } catch (error) {
+        routesLogger.error({ error }, "Failed to update TypeSafe settings");
+        return res.status(500).json({ error: "Failed to update TypeSafe settings" });
+      }
+    }
+  );
+
+  app.delete("/api/settings/typesafe", sensitiveEndpointLimiter, async (_req, res) => {
+    try {
+      await storage.setSystemConfigBatch([
+        { key: TYPESAFE_URL_CONFIG_KEY, value: "" },
+        { key: TYPESAFE_KEY_CONFIG_KEY, value: "" },
+        { key: TYPESAFE_MODEL_CONFIG_KEY, value: "" },
+      ]);
+      typesafeClient.configure(null, null, null);
+      routesLogger.info("TypeSafe API settings cleared");
+      return res.json({ success: true });
+    } catch (error) {
+      routesLogger.error({ error }, "Failed to clear TypeSafe settings");
+      return res.status(500).json({ error: "Failed to clear TypeSafe settings" });
+    }
+  });
+
+  // ── NexusMods game lookup ─────────────────────────────────────────────────────
+
+  app.get(
+    "/api/nexusmods/game-domain",
+    sanitizeNexusModsGameDomainQuery,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const title = (req.query.title as string).trim();
+        if (!nexusmodsClient.isConfigured()) {
+          return res.json({ configured: false, domain: null });
+        }
+        const domain = await nexusmodsClient.findGameDomain(title);
+        return res.json({ configured: true, domain });
+      } catch (error) {
+        routesLogger.error({ error }, "Failed to look up NexusMods game domain");
+        return res.status(500).json({ error: "Failed to look up NexusMods game domain" });
+      }
+    }
+  );
+
+  app.get(
+    "/api/nexusmods/trending-mods",
+    sanitizeNexusModsTrendingModsQuery,
+    validateRequest,
+    async (req: Request, res: Response) => {
+      try {
+        const domain = (req.query.domain as string).trim();
+        const limit = req.query.limit ? Number(req.query.limit) : 10;
+        const mods = await nexusmodsClient.getTrendingMods(domain, limit);
+        res.json(mods);
+      } catch (error) {
+        routesLogger.error({ error }, "Failed to fetch NexusMods trending mods");
+        res.status(500).json({ error: "Failed to fetch NexusMods trending mods" });
+      }
+    }
+  );
+
+  // Unknown API paths must not fall through to the SPA catch-all, which would
+  // answer them with index.html and a 200 that clients then fail to parse.
+  app.use("/api", (_req: Request, res: Response) => {
+    res.status(404).json({ error: "Not found" });
+  });
+
+  // Reverse-proxy subdirectory support: when QUESTARR_BASE_PATH is set
+  // (e.g. "/Questarr"), mount the whole app under that prefix so it can be
+  // served from https://host/Questarr/ without the reverse proxy needing to
+  // rewrite the path. Health checks stay reachable at the unprefixed
+  // /api/health too, since Docker/orchestrator healthchecks hit the
+  // container directly rather than through the proxy.
+  const basePath = appConfig.server.basePath;
+  let rootApp: Express = app;
+  if (basePath) {
+    rootApp = express();
+    rootApp.use(basePath, app);
+    rootApp.get("/api/health", (_req, res) => {
+      res.status(200).json({ status: "ok" });
+    });
+    rootApp.get("/", (_req, res) => {
+      res.redirect(302, `${basePath}/`);
+    });
+  }
+
+  const httpServer = createServer(rootApp);
+  return httpServer;
+}

@@ -1,3 +1,4 @@
+import { ServiceMessageError } from "../../shared/service-messages.js";
 import path from "node:path";
 import { downloadersLogger } from "../logger.js";
 import { isSafeUrl, safeFetch } from "../ssrf.js";
@@ -51,11 +52,15 @@ export function assertCredentialsAllowed(
   credentialKind = "credentials"
 ): void {
   if (downloaderAllowsCredentials(downloader, resolvedUrl)) return;
-  throw new Error(
-    `${clientName}: refusing to send ${credentialKind} over unencrypted HTTP. ` +
-      "QuestarrNG received Allow insecure LAN as disabled for this request. Enable SSL or " +
-      "turn on 'Allow insecure LAN' in the downloader settings or current test form."
-  );
+  const key =
+    credentialKind === "credentials"
+      ? "service.credentials_http_refused"
+      : credentialKind === "password"
+        ? "service.password_http_refused"
+        : credentialKind === "API key"
+          ? "service.api_key_http_refused"
+          : "service.credential_kind_http_refused";
+  throw new ServiceMessageError(key, { client: clientName, credentialKind });
 }
 
 /** Builds an HTTP Basic `Authorization` header value from a username and password. */
@@ -119,7 +124,7 @@ export async function fetchWithMagnetDetection(
 
   const fetchUrl = async (targetUrl: string) => {
     if (!(await isSafeUrl(targetUrl))) {
-      throw new Error(`Unsafe URL blocked: ${targetUrl}`);
+      throw new ServiceMessageError("service.unsafe_url_blocked", { url: targetUrl });
     }
     return safeFetch(targetUrl, {
       method: "GET",
@@ -188,7 +193,7 @@ export async function fetchWithMagnetDetection(
     return { response };
   }
 
-  throw new Error(`Too many redirects (max ${maxRedirects})`);
+  throw new ServiceMessageError("service.redirect_limit", { limit: maxRedirects });
 }
 
 /**
@@ -456,14 +461,14 @@ export function buildRemoteImportPath(downloadDir: string, relativePath: string)
     path.posix.isAbsolute(relativePath) ||
     path.win32.isAbsolute(relativePath)
   ) {
-    throw new Error("Download path must be relative to its download directory");
+    throw new ServiceMessageError("service.download_path_relative_required", {});
   }
 
   const separator = normalizedDir.includes("\\") ? "\\" : "/";
   const normalizedRelative = relativePath.replace(/[\\/]/g, separator);
   const relativeSegments = normalizedRelative.split(/[\\/]/);
   if (relativeSegments.includes("..")) {
-    throw new Error("Download path escapes its download directory");
+    throw new ServiceMessageError("service.download_path_escapes_directory", {});
   }
 
   const lastSegment = normalizedDir.split(/[\\/]/).pop()?.toLowerCase();

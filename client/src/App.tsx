@@ -1,3 +1,4 @@
+import { InterfaceDirectionProvider } from "@/components/InterfaceDirectionProvider";
 import { Router as WouterRouter, Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -7,7 +8,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSidebar";
 import Header from "@/components/Header";
 import MobileBottomNav from "@/components/MobileBottomNav";
-import { getPageTitle } from "@/components/navigation-items";
+import { getPageMessageId, getPageTitle } from "@/components/navigation-items";
 import { useInterfaceLanguage } from "@/lib/interface-locale";
 import { useRegionalPreference } from "@/lib/regional-format";
 import { useBackgroundNotifications } from "@/hooks/use-background-notifications";
@@ -159,11 +160,21 @@ function AppContent() {
 
 function AppShell() {
   const [location, navigate] = useLocation();
-  const { t, languageFor, directionFor } = useInterfaceLanguage();
+  const { t, tId, languageFor, directionFor, languageForId, directionForId } =
+    useInterfaceLanguage();
+  const pageTitleSource = getPageTitle(location);
+  const pageTitleMessageId = getPageMessageId(location);
+  const pageTitle = pageTitleMessageId ? tId(pageTitleMessageId) : t(pageTitleSource);
+  const pageTitleLanguage = pageTitleMessageId
+    ? languageForId(pageTitleMessageId)
+    : languageFor(pageTitleSource);
+  const pageTitleDirection = pageTitleMessageId
+    ? directionForId(pageTitleMessageId)
+    : directionFor(pageTitleSource);
   const regionalFormat = useRegionalPreference();
 
   useEffect(() => {
-    document.title = t("QuestarrNG - Video Game Management");
+    document.title = t("interface.questarrng_video_game_management_1a51f232");
   }, [t]);
 
   useKonamiCode(() => navigate(routePaths.play));
@@ -219,9 +230,9 @@ function AppShell() {
                 <AppSidebar activeItem={location} onNavigate={navigate} />
                 <div className="flex flex-col flex-1 min-w-0">
                   <Header
-                    title={t(getPageTitle(location))}
-                    titleLanguage={languageFor(getPageTitle(location))}
-                    titleDirection={directionFor(getPageTitle(location))}
+                    title={pageTitle}
+                    titleLanguage={pageTitleLanguage}
+                    titleDirection={pageTitleDirection}
                   />
                   <main className="flex-1 overflow-hidden pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
                     <AppContent />
@@ -240,9 +251,11 @@ function AppShell() {
 
 function App() {
   return (
-    <WouterRouter {...(routerBase !== undefined ? { base: routerBase } : {})}>
-      <AppShell />
-    </WouterRouter>
+    <InterfaceDirectionProvider>
+      <WouterRouter {...(routerBase !== undefined ? { base: routerBase } : {})}>
+        <AppShell />
+      </WouterRouter>
+    </InterfaceDirectionProvider>
   );
 }
 

@@ -1,12 +1,14 @@
 /** @vitest-environment jsdom */
 import React from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createTestQueryClient, getRequestUrl } from "./test-utils";
+import { serviceMessage } from "@shared/service-messages";
 import SecurityScanSettings from "../src/components/SecurityScanSettings";
+import { setInterfaceLanguage } from "../src/lib/interface-locale";
 
 const mockToast = vi.fn();
 vi.mock("@/hooks/use-toast", () => ({
@@ -47,12 +49,36 @@ function renderComponent() {
 }
 
 describe("SecurityScanSettings", () => {
+  it.each([true, false])("keeps provider test error ownership in its toast: %s", async (typed) => {
+    const { apiRequest, ApiError } = await import("@/lib/queryClient");
+    const fragment = serviceMessage("service.clamav_ping_timeout", {});
+    vi.mocked(apiRequest).mockRejectedValueOnce(
+      new ApiError(502, fragment.message, {
+        error: fragment.message,
+        errorI18n: typed ? fragment : null,
+      })
+    );
+    mockFetch({ ...defaultSettings, clamav: { enabled: false, host: "clamav", port: 3310 } });
+    renderComponent();
+    const buttons = await screen.findAllByRole("button", { name: "Test" });
+    await waitFor(() => expect(buttons.at(-1)).not.toBeDisabled());
+    fireEvent.click(buttons.at(-1)!);
+    await waitFor(() => expect(mockToast).toHaveBeenCalled());
+    const toast = mockToast.mock.calls.at(-1)?.[0];
+    const detail = render(<>{toast.description}</>);
+    expect(detail.container).toHaveTextContent(fragment.message);
+    expect(detail.container.querySelector("bdi")).toHaveAttribute("lang", typed ? "en" : "und");
+    detail.unmount();
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
+    act(() => setInterfaceLanguage("en"));
     mockFetch();
   });
 
   afterEach(() => {
+    act(() => setInterfaceLanguage("en"));
     vi.restoreAllMocks();
   });
 
@@ -105,7 +131,20 @@ describe("SecurityScanSettings", () => {
         })
       );
     });
-    expect(mockToast).toHaveBeenCalledWith(expect.objectContaining({ title: "Settings Saved" }));
+    await waitFor(() => {
+      expect(mockToast).toHaveBeenCalledWith(
+        expect.objectContaining({ title: expect.any(Object), description: expect.any(Object) })
+      );
+    });
+    const options = mockToast.mock.calls.find(([value]) => value.title)?.[0];
+    const { container } = render(
+      <>
+        {options?.title}
+        {options?.description}
+      </>
+    );
+    expect(container).toHaveTextContent("Settings Saved");
+    expect(container).toHaveTextContent("Security scan configuration updated.");
   });
 
   it("tests the VirusTotal provider and shows a success toast", async () => {
@@ -122,7 +161,9 @@ describe("SecurityScanSettings", () => {
       });
     });
     await waitFor(() => {
-      expect(mockToast).toHaveBeenCalledWith(expect.objectContaining({ title: "Test Successful" }));
+      expect(mockToast).toHaveBeenCalledWith(
+        expect.objectContaining({ title: expect.any(Object), description: expect.any(Object) })
+      );
     });
   });
 
@@ -152,12 +193,35 @@ describe("SecurityScanSettings", () => {
     await waitFor(() => {
       expect(mockToast).toHaveBeenCalledWith(
         expect.objectContaining({
-          title: "Test Failed",
-          description: "VirusTotal rejected the API key",
+          title: expect.any(Object),
+          description: expect.any(Object),
           variant: "destructive",
         })
       );
     });
+    const options = mockToast.mock.calls.find(([value]) => value.variant === "destructive")?.[0];
+    expect(options?.description).toBeTruthy();
+    const { container } = render(<>{options?.description}</>);
+    expect(container).toHaveTextContent("VirusTotal rejected the API key");
+  });
+
+  it("localizes a fixed ClamAV test error and keeps dynamic provider errors unchanged", async () => {
+    const { apiRequest } = await import("@/lib/queryClient");
+    vi.mocked(apiRequest).mockRejectedValueOnce(new Error("Connection to ClamAV timed out"));
+    renderComponent();
+    await screen.findByText("Local ClamAV (Deep Scan)");
+    act(() => setInterfaceLanguage("es"));
+
+    fireEvent.click(screen.getAllByRole("button", { name: "Prueba" })[1]);
+
+    await waitFor(() => {
+      expect(mockToast).toHaveBeenCalledWith(
+        expect.objectContaining({ title: expect.any(Object), variant: "destructive" })
+      );
+    });
+    const options = mockToast.mock.calls.find(([value]) => value.variant === "destructive")?.[0];
+    const { container } = render(<>{options?.description}</>);
+    expect(container).toHaveTextContent("Se agotó el tiempo de conexión con ClamAV");
   });
 
   it("toggles the VirusTotal enable switch", async () => {

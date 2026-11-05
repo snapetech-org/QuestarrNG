@@ -41,6 +41,7 @@ import { getSocket } from "@/lib/socket";
 import type { RootFolder } from "@shared/schema";
 import { FileBrowser } from "./FileBrowser";
 import { InterfaceText } from "@/components/InterfaceText";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import { ApiErrorDetailText } from "@/components/ApiErrorDetailText";
 import { formatInterfaceMessage, useInterfaceLanguage } from "@/lib/interface-locale";
 
@@ -57,6 +58,7 @@ interface ScanProgress {
   errors: number;
   currentCandidate?: string;
   errorMessage?: string;
+  errorMessageI18n?: string | null;
 }
 
 interface UnmatchedEntry {
@@ -199,7 +201,11 @@ export function RootFolderDiscovery() {
       invalidateAll();
     },
     onError: (error: Error) => {
-      toast({ title: "Could Not Add Folder", description: error.message, variant: "destructive" });
+      toast({
+        title: "Could Not Add Folder",
+        description: <ApiErrorDescription error={error} />,
+        variant: "destructive",
+      });
     },
   });
 
@@ -228,7 +234,7 @@ export function RootFolderDiscovery() {
     onError: (error: Error) => {
       toast({
         title: "Could Not Update Delete Permission",
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },
@@ -250,7 +256,11 @@ export function RootFolderDiscovery() {
       queryClient.invalidateQueries({ queryKey: ["/api/root-folders"] });
     },
     onError: (error: Error) => {
-      toast({ title: "Delete Failed", description: error.message, variant: "destructive" });
+      toast({
+        title: "Delete Failed",
+        description: <ApiErrorDescription error={error} />,
+        variant: "destructive",
+      });
     },
   });
 
@@ -263,7 +273,11 @@ export function RootFolderDiscovery() {
       invalidateAll();
     },
     onError: (error: Error) => {
-      toast({ title: "Scan Failed to Start", description: error.message, variant: "destructive" });
+      toast({
+        title: "Scan Failed to Start",
+        description: <ApiErrorDescription error={error} />,
+        variant: "destructive",
+      });
     },
   });
 
@@ -277,7 +291,11 @@ export function RootFolderDiscovery() {
       queryClient.invalidateQueries({ queryKey: ["/api/games"] });
     },
     onError: (error: Error) => {
-      toast({ title: "Match Failed", description: error.message, variant: "destructive" });
+      toast({
+        title: "Match Failed",
+        description: <ApiErrorDescription error={error} />,
+        variant: "destructive",
+      });
     },
   });
 
@@ -363,7 +381,7 @@ export function RootFolderDiscovery() {
                     onClick={() => addMutation.mutate()}
                     disabled={!newPath.trim() || addMutation.isPending}
                   >
-                    {addMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {addMutation.isPending && <Loader2 className="me-2 h-4 w-4 animate-spin" />}
                     <InterfaceText source={"Add Root Folder"} />
                   </Button>
                 </div>
@@ -384,7 +402,7 @@ export function RootFolderDiscovery() {
               source={
                 "and linked to their folder on disk, but that folder stays outside your library root — it is never moved, renamed, or deleted by Questarr unless you turn on"
               }
-            />
+            />{" "}
             <strong>
               <InterfaceText source={"Allow Delete"} />
             </strong>{" "}
@@ -472,7 +490,7 @@ export function RootFolderDiscovery() {
                       onCheckedChange={(enabled) =>
                         toggleMutation.mutate({ id: folder.id, enabled })
                       }
-                      aria-label={formatInterfaceMessage("Enable {path}", {
+                      aria-label={formatInterfaceMessage("interface.enable_path_0220093b", {
                         path: String(folder.path ?? ""),
                       })}
                     />
@@ -483,9 +501,12 @@ export function RootFolderDiscovery() {
                       onCheckedChange={(allowDelete) =>
                         allowDeleteMutation.mutate({ id: folder.id, allowDelete })
                       }
-                      aria-label={formatInterfaceMessage("Allow deleting files in {path}", {
-                        path: String(folder.path ?? ""),
-                      })}
+                      aria-label={formatInterfaceMessage(
+                        "interface.allow_deleting_files_in_path_f384e71d",
+                        {
+                          path: String(folder.path ?? ""),
+                        }
+                      )}
                     />
                   </TableCell>
                   <TableCell>
@@ -493,7 +514,7 @@ export function RootFolderDiscovery() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        aria-label={formatInterfaceMessage("Scan {path}", {
+                        aria-label={formatInterfaceMessage("interface.scan_path_1e763d0d", {
                           path: String(folder.path ?? ""),
                         })}
                         disabled={
@@ -508,9 +529,12 @@ export function RootFolderDiscovery() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        aria-label={formatInterfaceMessage("Recheck health of {path}", {
-                          path: String(folder.path ?? ""),
-                        })}
+                        aria-label={formatInterfaceMessage(
+                          "interface.recheck_health_of_path_40380028",
+                          {
+                            path: String(folder.path ?? ""),
+                          }
+                        )}
                         disabled={healthCheckMutation.isPending}
                         onClick={() => healthCheckMutation.mutate(folder.id)}
                       >
@@ -519,7 +543,7 @@ export function RootFolderDiscovery() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        aria-label={formatInterfaceMessage("Delete {path}", {
+                        aria-label={formatInterfaceMessage("interface.delete_path_d1d3ca3f", {
                           path: String(folder.path ?? ""),
                         })}
                         className="text-destructive hover:text-destructive"
@@ -549,13 +573,22 @@ export function RootFolderDiscovery() {
               } else {
                 badgeVariant = "default";
               }
+              const scanStatusLabel = Object.hasOwn(SCAN_STATUS_LABEL_TEXT, p.status)
+                ? SCAN_STATUS_LABEL_TEXT[p.status]
+                : undefined;
 
               return (
                 <div key={p.rootFolderId} className="rounded-md border p-3 space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-mono">{p.rootFolderPath}</span>
+                    <span className="font-mono">
+                      <bdi dir="ltr" lang="und">{p.rootFolderPath}</bdi>
+                    </span>
                     <Badge variant={badgeVariant}>
-                      <InterfaceText source={SCAN_STATUS_LABEL_TEXT[p.status] ?? p.status} />
+                      {scanStatusLabel ? (
+                        <InterfaceText source={scanStatusLabel} />
+                      ) : (
+                        <bdi lang="und" dir="auto">{p.status}</bdi>
+                      )}
                     </Badge>
                   </div>
                   {p.totalCandidates > 0 && (
@@ -570,13 +603,18 @@ export function RootFolderDiscovery() {
                     {p.currentCandidate && p.status === "running" && (
                       <>
                         {" "}
-                        <InterfaceText source={"· currently:"} /> {p.currentCandidate}
+                        <InterfaceText source={"· currently:"} />{" "}
+                        <bdi dir="auto" lang="und">{p.currentCandidate}</bdi>
                       </>
                     )}
                   </p>
                   {p.errorMessage && (
                     <p className="text-xs text-destructive">
-                      <ApiErrorDetailText source={p.errorMessage} />
+                      <ApiErrorDetailText
+                        source={p.errorMessage}
+                        metadata={p.errorMessageI18n}
+                        legacyApiFallback={false}
+                      />
                     </p>
                   )}
                 </div>
@@ -648,7 +686,11 @@ function UnmatchedEntryCard({ entry, matchPending, onMatch }: UnmatchedEntryCard
       );
     },
     onError: (error: Error) => {
-      toast({ title: t("Search Failed"), description: error.message, variant: "destructive" });
+      toast({
+        title: "interface.search_failed_9104d446",
+        description: <ApiErrorDescription error={error} />,
+        variant: "destructive",
+      });
     },
   });
 
@@ -660,8 +702,12 @@ function UnmatchedEntryCard({ entry, matchPending, onMatch }: UnmatchedEntryCard
 
   return (
     <div className="rounded-md border p-3 space-y-2">
-      <p className="text-sm font-medium">{entry.folderName}</p>
-      <p className="text-xs text-muted-foreground font-mono">{entry.absolutePath}</p>
+      <p className="text-sm font-medium">
+        <bdi dir="auto" lang="und">{entry.folderName}</bdi>
+      </p>
+      <p className="text-xs text-muted-foreground font-mono">
+        <bdi dir="ltr" lang="und">{entry.absolutePath}</bdi>
+      </p>
       {entry.candidates.length === 0 ? (
         <p className="text-xs text-muted-foreground">
           <InterfaceText
@@ -690,18 +736,20 @@ function UnmatchedEntryCard({ entry, matchPending, onMatch }: UnmatchedEntryCard
         <Label
           htmlFor={searchId}
           className="sr-only"
-          lang={languageFor("Search IGDB for {name}")}
-          dir={directionFor("Search IGDB for {name}")}
+          lang={languageFor("interface.search_igdb_for_name_44a43523")}
+          dir={directionFor("interface.search_igdb_for_name_44a43523")}
         >
-          {formatInterfaceMessage("Search IGDB for {name}", { name: entry.folderName })}
+          {formatInterfaceMessage("interface.search_igdb_for_name_44a43523", {
+            name: entry.folderName,
+          })}
         </Label>
         <Input
           id={searchId}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={t("Not listed? Search IGDB by name")}
-          lang={languageFor("Not listed? Search IGDB by name")}
-          dir={directionFor("Not listed? Search IGDB by name")}
+          placeholder={t("interface.not_listed_search_igdb_by_name_a6670652")}
+          lang={languageFor("interface.not_listed_search_igdb_by_name_a6670652")}
+          dir={directionFor("interface.not_listed_search_igdb_by_name_a6670652")}
           className="h-9"
         />
         <Button
@@ -716,8 +764,12 @@ function UnmatchedEntryCard({ entry, matchPending, onMatch }: UnmatchedEntryCard
           ) : (
             <Search className="h-4 w-4" />
           )}
-          <span className="ml-1" lang={languageFor("Search")} dir={directionFor("Search")}>
-            {t("Search")}
+          <span
+            className="ms-1"
+            lang={languageFor("navigation.search")}
+            dir={directionFor("navigation.search")}
+          >
+            {t("navigation.search")}
           </span>
         </Button>
       </form>

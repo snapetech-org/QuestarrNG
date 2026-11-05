@@ -1,5 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import {
+  serviceMessage,
+  ServiceMessageError,
+  serializeServiceMessageDescriptor,
+  localizeServiceMessage,
+} from "../../shared/service-messages.js";
 import type { Downloader } from "../../shared/schema.js";
 
 const safeFetchMock = vi.fn();
@@ -80,6 +86,61 @@ const spyOnFetchWithFallback = (client: InstanceType<typeof SABnzbdClient>) =>
   );
 
 describe("sabnzbd remaining regression coverage", () => {
+  it.each([
+    ["pauseDownload", "service.nzb_paused"],
+    ["resumeDownload", "service.nzb_resumed"],
+    ["removeDownload", "service.nzb_removed"],
+  ] as const)("tags app-owned %s results and retains provider lookalikes", async (method, key) => {
+    const client = new SABnzbdClient(createDownloader());
+    const rpc = spyOnFetchWithFallback(client);
+    rpc.mockResolvedValueOnce(Response.json({ status: true }));
+    const success = await client[method]("item:العربية");
+    expect(success).toEqual({ success: true, ...serviceMessage(key, {}) });
+    const descriptor = serializeServiceMessageDescriptor(success);
+    expect(descriptor).not.toBeNull();
+    expect(localizeServiceMessage(success.message, descriptor, "ar")).toBe(success.message);
+    const typed = new ServiceMessageError("service.unsafe_url_blocked", {
+      url: "https://example.invalid/user/العربية",
+    });
+    rpc.mockRejectedValueOnce(typed);
+    const tagged = await client[method]("item");
+    expect(tagged).toMatchObject({
+      success: false,
+      message: typed.message,
+      messageKey: typed.messageKey,
+    });
+    rpc.mockRejectedValueOnce(new Error(typed.message));
+    const provider = await client[method]("item");
+    expect(provider).toEqual({ success: false, message: typed.message });
+    expect(serializeServiceMessageDescriptor(provider)).toBeNull();
+  });
+
+  it("tags duplicate wrapper text without tagging opaque provider details", () => {
+    const client = new SABnzbdClient(createDownloader()) as unknown as {
+      parseAddFileResponse(data: { status?: boolean; error?: string; nzo_ids?: string[] }): {
+        success: boolean;
+        message: string;
+      };
+    };
+    const detail = "duplicate: Failed to pause NZB /user/العربية {error}";
+    const duplicate = client.parseAddFileResponse({ error: detail });
+    expect(duplicate).toEqual({
+      success: true,
+      ...serviceMessage("service.nzb_already_exists", { error: detail }),
+    });
+    const stored = serializeServiceMessageDescriptor(duplicate);
+    expect(stored).not.toBeNull();
+    expect(JSON.parse(stored!)).not.toHaveProperty("messageDetails");
+    expect(client.parseAddFileResponse({ error: "Failed to pause NZB" })).toEqual({
+      success: false,
+      message: "Failed to pause NZB",
+    });
+    expect(client.parseAddFileResponse({ status: false })).toEqual({
+      success: false,
+      ...serviceMessage("service.nzb_add_rejected", {}),
+    });
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     safeFetchMock.mockReset();
@@ -123,6 +184,15 @@ describe("sabnzbd remaining regression coverage", () => {
       success: false,
       message:
         "Failed to connect to SABnzbd at http://sab.local: HTTP 500: Broken - No error details",
+      ...serviceMessage("service.connection_failed_at", {
+        client: "SABnzbd",
+        url: "http://sab.local",
+        error: serviceMessage("service.http_error_status", {
+          status: 500,
+          statusText: "Broken",
+          error: serviceMessage("service.no_error_details", {}),
+        }),
+      }),
     });
 
     safeFetchMock.mockResolvedValueOnce({
@@ -140,7 +210,10 @@ describe("sabnzbd remaining regression coverage", () => {
       client.addDownload({ url: "http://indexer.local/bad.nzb", title: "Broken NZB" })
     ).resolves.toEqual({
       success: false,
-      message: "HTTP 503: No error details",
+      ...serviceMessage("service.http_error", {
+        status: 503,
+        error: serviceMessage("service.no_error_details", {}),
+      }),
     });
 
     safeFetchMock.mockResolvedValueOnce({
@@ -156,7 +229,7 @@ describe("sabnzbd remaining regression coverage", () => {
     ).resolves.toEqual({
       success: true,
       id: "sab-1",
-      message: "NZB added successfully",
+      ...serviceMessage("service.nzb_added", {}),
     });
 
     safeFetchMock.mockRejectedValueOnce("boom");
@@ -164,7 +237,9 @@ describe("sabnzbd remaining regression coverage", () => {
       client.addDownload({ url: "http://indexer.local/throw.nzb", title: "Thrown NZB" })
     ).resolves.toEqual({
       success: false,
-      message: "Failed to add NZB to SABnzbd: Unknown error",
+      ...serviceMessage("service.nzb_sabnzbd_add_failed", {
+        error: serviceMessage("interface.unknown_error_ce512b43", {}),
+      }),
     });
   });
 
@@ -282,6 +357,8 @@ describe("sabnzbd remaining regression coverage", () => {
       success: false,
       message:
         "Refusing to send the archive password over an insecure connection. Enable SSL for this SABnzbd downloader, or remove the archive password.",
+      messageKey: "service.archive_password_https",
+      messageValues: { client: "SABnzbd" },
     });
     expect(fetchWithFallbackSpy).not.toHaveBeenCalled();
   });
@@ -360,7 +437,7 @@ describe("sabnzbd remaining regression coverage", () => {
       })
     ).resolves.toEqual({
       success: false,
-      message: "Failed to add NZB to SABnzbd: self-signed certificate",
+      ...serviceMessage("service.nzb_sabnzbd_add_failed", { error: "self-signed certificate" }),
     });
     const postCall = safeFetchMock.mock.calls.find(
       ([, options]) => (options as RequestInit)?.method === "POST"
@@ -555,7 +632,7 @@ describe("sabnzbd remaining regression coverage", () => {
     fetchWithFallbackSpy.mockRejectedValueOnce("pause boom");
     await expect(client.pauseDownload("sab-1")).resolves.toEqual({
       success: false,
-      message: "Unknown error",
+      ...serviceMessage("interface.unknown_error_ce512b43", {}),
     });
 
     fetchWithFallbackSpy.mockRejectedValueOnce(new Error("space boom"));

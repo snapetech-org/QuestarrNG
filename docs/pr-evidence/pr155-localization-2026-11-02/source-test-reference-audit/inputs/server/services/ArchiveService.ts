@@ -1,0 +1,885 @@
+import {
+  serviceMessage,
+  ServiceMessageError,
+  serviceMessageValue,
+  serviceErrorMetadata,
+  tagServiceMessageError,
+  type ServiceMessageFragment,
+} from "../../shared/service-messages.js";
+import { execFile } from "node:child_process";
+import { accessSync, constants as fsConstants } from "node:fs";
+import path from "node:path";
+import fs from "fs-extra";
+import { logger } from "../logger.js";
+import { EXTRACT_STAGING_PREFIX } from "./extract-staging.js";
+
+type ArchiveTool = "7zip" | "unrar";
+type ExecFileResult = { stdout: string; stderr: string };
+
+export interface ArchiveEntry {
+  name: string;
+  size: number;
+  isDirectory?: boolean;
+  isLink?: boolean;
+}
+
+const EXEC_TIMEOUT_MS = 30 * 60_000;
+const EXEC_MAX_BUFFER = 10 * 1024 * 1024;
+const DEFAULT_ARCHIVE_MAX_ENTRIES = 50_000;
+const DEFAULT_ARCHIVE_MAX_EXPANDED_BYTES = 250 * 1024 ** 3;
+const MAX_ARCHIVE_PATH_DEPTH = 64;
+
+function configuredLimit(name: string, fallback: number): number {
+  const configured = process.env[name];
+  if (configured === undefined) return fallback;
+  const value = Number(configured);
+  return Number.isSafeInteger(value) && value > 0 ? value : fallback;
+}
+
+const ARCHIVE_MAX_ENTRIES = configuredLimit("ARCHIVE_MAX_ENTRIES", DEFAULT_ARCHIVE_MAX_ENTRIES);
+const ARCHIVE_MAX_EXPANDED_BYTES = configuredLimit(
+  "ARCHIVE_MAX_EXPANDED_BYTES",
+  DEFAULT_ARCHIVE_MAX_EXPANDED_BYTES
+);
+
+// A download client marking a transfer "complete" doesn't guarantee the file is fully
+// synced/renamed into its final location yet — e.g. NFS/SMB write-back lag between the
+// downloader's host and Questarr's, or a client doing a last move/rename right as the
+// completion event fires. Reading the archive at that instant can see a truncated file,
+// which surfaces as the exact same decode error a genuinely corrupt archive would produce.
+// Retry the integrity test a couple of times with a short gap before concluding the archive
+// itself is bad — cheap for a real failure (which fails fast, as seen in practice), and
+// turns a spurious "corrupt" report into a successful import if it was just a timing race.
+const ARCHIVE_TEST_MAX_ATTEMPTS = 3;
+const ARCHIVE_TEST_RETRY_DELAYS_MS = [3_000, 8_000];
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Marks errors that retrying can never fix (missing binary, unsupported format) so the
+// integrity-test retry loop below can fail fast on them instead of burning several seconds
+// re-running a check that will deterministically fail the same way every time.
+class NonRetryableArchiveError extends Error {
+  constructor(message: string | ServiceMessageFragment = "", options?: ErrorOptions) {
+    super(typeof message === "string" ? message : message.message, options);
+    if (typeof message !== "string") tagServiceMessageError(this, message);
+  }
+}
+
+// A password-protected archive fails the exact same way every attempt — retrying it burns
+// the same ~11s of delay as a genuinely corrupt archive for no benefit, and the generic
+// "corrupt or incomplete, re-download" message this file's testArchive() throws afterward
+// is actively wrong for this case (the archive is fine, it's just encrypted). Callers
+// (ImportManager) catch this specifically to route the download to manual review with a
+// password prompt instead of the generic failure message.
+export class ArchivePasswordRequiredError extends Error {
+  constructor(message: string | ServiceMessageFragment = "", options?: ErrorOptions) {
+    super(typeof message === "string" ? message : message.message, options);
+    if (typeof message !== "string") tagServiceMessageError(this, message);
+  }
+}
+
+// Both unrar and 7-Zip mention "password" in every message they produce for an encrypted
+// archive they can't read (unrar: e.g. a prompt-refusal or "wrong password" notice; 7-Zip:
+// "Wrong password?"). Matching on the bare word "password" would also fire on a genuinely
+// corrupt archive whose path/filename happens to contain it (e.g. "MyPasswordVault.rar"),
+// since runTool's error text can include the file path — so this requires one of the actual
+// diagnostic phrases both tools use for an encryption failure, not just the word appearing
+// anywhere in the message.
+function isPasswordProtectedError(message: string): boolean {
+  return /wrong password|password protected|password is incorrect|password required|enter password/i.test(
+    message
+  );
+}
+
+// Resolves a CLI tool to a fixed, unwriteable absolute path — rather than letting execFile
+// search $PATH for a bare command name — to avoid executing an attacker-controlled binary
+// that could be placed earlier on the PATH. Mirrors server/apprise.ts's resolveAppriseBinary.
+function makeBinaryResolver(envVar: string, candidates: string[]): () => string | null {
+  let cached: string | null | undefined;
+  return () => {
+    if (cached !== undefined) {
+      return cached;
+    }
+    // An explicit override replaces the built-in candidates entirely rather than adding to
+    // them: if an operator points this at a specific binary, a typo'd or missing path should
+    // fail loudly instead of silently falling back to a different tool they didn't ask for.
+    const envPath = process.env[envVar];
+    const searchList = envPath ? [envPath] : candidates;
+    cached =
+      searchList.find((candidate) => {
+        try {
+          accessSync(candidate, fsConstants.X_OK);
+          return true;
+        } catch {
+          return false;
+        }
+      }) ?? null;
+    return cached;
+  };
+}
+
+// Alpine's `node:*-alpine` base is musl-libc only — it ships no
+// /lib64/ld-linux-x86-64.so.2, so a glibc-linked binary (like the one the npm `7zip-bin`
+// package bundles) can never execute there regardless of its permission bits; every attempt
+// fails with ENOENT on the missing loader, not EACCES. Alpine's own `7zip` package (`apk add
+// 7zip`) ships a musl-native build instead — command-line compatible with legacy 7za/7z — so
+// resolve that on disk rather than depending on the npm package's binary.
+const resolveSevenZipBinary = makeBinaryResolver("SEVENZIP_PATH", [
+  "/usr/bin/7zz",
+  "/usr/bin/7z",
+  "/usr/lib/7zip/7zz",
+]);
+
+// Alpine dropped its own `unrar` package (RARLAB's license doesn't meet Alpine's packaging
+// policy for main/community, even though it's free to use and redistribute), so this image
+// bundles RARLAB's official Linux binary directly (see Dockerfile) rather than relying on an
+// apk package. unrar reads legacy and RAR5 archives, including multi-volume sets — both
+// classic `.rNN` and modern `.partN.rar` naming — automatically, as long as every volume
+// sits alongside the base archive (which it does: they're all in the same download folder).
+const resolveUnrarBinary = makeBinaryResolver("UNRAR_PATH", [
+  "/usr/local/bin/unrar",
+  "/usr/bin/unrar",
+]);
+
+function resolveTool(filePath: string): ArchiveTool {
+  return path.extname(filePath).toLowerCase() === ".rar" ? "unrar" : "7zip";
+}
+
+function runTool(binary: string, args: string[], toolLabel: string): Promise<ExecFileResult> {
+  return new Promise((resolve, reject) => {
+    execFile(
+      binary,
+      args,
+      {
+        encoding: "utf8",
+        timeout: EXEC_TIMEOUT_MS,
+        windowsHide: true,
+        maxBuffer: EXEC_MAX_BUFFER,
+      },
+      (error, stdout, stderr) => {
+        if (error) {
+          const detail = (stderr || stdout || error.message).trim().slice(0, 500);
+          reject(
+            new ServiceMessageError("service.archive_tool_failed", { tool: toolLabel, detail })
+          );
+          return;
+        }
+        resolve({ stdout, stderr });
+      }
+    );
+  });
+}
+
+function runSevenZip(args: string[]): Promise<ExecFileResult> {
+  const binary = resolveSevenZipBinary();
+  if (!binary) {
+    return Promise.reject(
+      new NonRetryableArchiveError(serviceMessage("service.archive_seven_zip_missing", {}))
+    );
+  }
+  return runTool(binary, args, "7-Zip");
+}
+
+function runUnrar(args: string[]): Promise<ExecFileResult> {
+  const binary = resolveUnrarBinary();
+  if (!binary) {
+    return Promise.reject(
+      new NonRetryableArchiveError(serviceMessage("service.archive_unrar_missing", {}))
+    );
+  }
+  return runTool(binary, args, "unrar");
+}
+
+// Splits one listing block into its "key<separator>value" fields.
+function parseListingFields(block: string, separator: string): Record<string, string> {
+  const fields: Record<string, string> = {};
+  for (const line of block.split(/\r?\n/)) {
+    const separatorIndex = line.indexOf(separator);
+    if (separatorIndex === -1) continue;
+    fields[line.slice(0, separatorIndex).trim()] = line
+      .slice(separatorIndex + separator.length)
+      .trim();
+  }
+  return fields;
+}
+
+// Directories may omit Size; anything else unparseable is -1 so preflight rejects it.
+function parseEntrySize(size: string | undefined, isDirectory: boolean): number {
+  const value = size === undefined && isDirectory ? 0 : Number(size);
+  return Number.isSafeInteger(value) && value >= 0 ? value : -1;
+}
+
+function makeEntry(
+  name: string,
+  size: number,
+  isDirectory: boolean,
+  isLink: boolean
+): ArchiveEntry {
+  return {
+    name,
+    size,
+    ...(isDirectory ? { isDirectory: true } : {}),
+    ...(isLink ? { isLink: true } : {}),
+  };
+}
+
+// Parses `7z l -slt` output: a blank-line-delimited series of "Key = Value" blocks. The
+// archive's own block (the one carrying "Type") is skipped; each other block with a Path
+// describes one entry, including directories, so preflight bounds the filesystem work
+// caused by both files and directory trees. Zip-like formats flag directories with
+// "Folder = +", while 7z archives omit Folder and mark them with a "D" attribute.
+function parseSevenZipSltListing(stdout: string): ArchiveEntry[] {
+  const entries: ArchiveEntry[] = [];
+  for (const block of stdout.split(/\r?\n\r?\n/)) {
+    const fields = parseListingFields(block, " = ");
+    if (!fields.Path || "Type" in fields) continue;
+    if (!("Folder" in fields || "Attributes" in fields || "Size" in fields)) continue;
+    const attributes = fields.Attributes ?? "";
+    const isDirectory = fields.Folder === "+" || attributes.startsWith("D");
+    // Some formats print empty "Symbolic Link =" / "Hard Link =" fields for every
+    // entry; only a non-empty target marks a link.
+    const isLink =
+      Boolean(fields["Symbolic Link"] || fields["Hard Link"]) || /\blrwx/.test(attributes);
+    entries.push(
+      makeEntry(fields.Path, parseEntrySize(fields.Size, isDirectory), isDirectory, isLink)
+    );
+  }
+  return entries;
+}
+
+// Parses `unrar lt -v` output. Each "Archive:" line opens a volume; each blank-line-
+// delimited block with a "Name:" field describes one entry. A file split across volumes
+// is listed once per volume it spans: as the last entry of one volume and again as the
+// first entry of the next, so that continuation is dropped instead of counted twice.
+// Any type other than File or Directory (symbolic link, hard link, file copy, ...) is
+// reported as a link so preflight refuses it.
+function parseUnrarTechnicalListing(stdout: string): ArchiveEntry[] {
+  const entries: ArchiveEntry[] = [];
+  // UnRAR prints a header for every volume a file spans. Its `Ratio:` field marks the
+  // pieces: `-->` continues in the next volume, `<->` spans both sides, `<--` ends here.
+  // Only a piece split on both sides of a boundary is a continuation; a genuine
+  // same-named entry has no markers and must still count against the limits.
+  let previous: { entry: ArchiveEntry; splitAfter: boolean } | undefined;
+  for (const block of stdout.split(/\r?\n\s*\r?\n/)) {
+    const fields = parseListingFields(block, ": ");
+    if (!fields.Name || !fields.Type) continue;
+    const isDirectory = fields.Type === "Directory";
+    const entry = makeEntry(
+      fields.Name,
+      parseEntrySize(fields.Size, isDirectory),
+      isDirectory,
+      fields.Type !== "File" && !isDirectory
+    );
+    const splitBefore = fields.Ratio === "<--" || fields.Ratio === "<->";
+    const continuesPrevious =
+      splitBefore &&
+      previous?.splitAfter === true &&
+      previous.entry.name === entry.name &&
+      previous.entry.size === entry.size;
+    if (!continuesPrevious) entries.push(entry);
+    previous = { entry, splitAfter: fields.Ratio === "-->" || fields.Ratio === "<->" };
+  }
+  return entries;
+}
+
+// Splits an archive entry name into path segments, rejecting absolute, drive-letter,
+// NUL-containing, `..` and overly deep names.
+function safeEntrySegments(name: string): string[] {
+  const normalizedName = name.replaceAll("\\", "/");
+  const segments = normalizedName.split("/");
+  if (
+    !normalizedName ||
+    normalizedName.startsWith("/") ||
+    /^[a-z]:/i.test(normalizedName) ||
+    normalizedName.includes("\0") ||
+    segments.includes("..") ||
+    segments.length > MAX_ARCHIVE_PATH_DEPTH
+  ) {
+    throw new ServiceMessageError("service.archive_unsafe_entry_path", {});
+  }
+  return segments;
+}
+
+function validateArchiveEntries(entries: ArchiveEntry[], outputDir: string): void {
+  if (entries.length > ARCHIVE_MAX_ENTRIES) {
+    throw new ServiceMessageError("service.archive_too_many_entries", {
+      limit: ARCHIVE_MAX_ENTRIES,
+    });
+  }
+
+  const root = path.resolve(outputDir);
+  const rootPrefix = root.endsWith(path.sep) ? root : `${root}${path.sep}`;
+  let expandedBytes = 0;
+
+  for (const entry of entries) {
+    if (!Number.isSafeInteger(entry.size) || entry.size < 0) {
+      throw new ServiceMessageError("service.archive_invalid_entry_size", {});
+    }
+    if (entry.isLink) {
+      throw new ServiceMessageError("service.archive_link_entry_refused", {});
+    }
+
+    const segments = safeEntrySegments(entry.name);
+    const resolvedEntry = path.resolve(root, ...segments);
+    // An explicit "." or "./" entry (tar -cf archive.tar .) names the root itself.
+    if (resolvedEntry !== root && !resolvedEntry.startsWith(rootPrefix)) {
+      throw new ServiceMessageError("service.archive_entry_outside_directory", {});
+    }
+
+    if (entry.size > ARCHIVE_MAX_EXPANDED_BYTES - expandedBytes) {
+      throw new ServiceMessageError("service.archive_expanded_limit_exceeded", {
+        bytes: ARCHIVE_MAX_EXPANDED_BYTES,
+      });
+    }
+    expandedBytes += entry.size;
+  }
+}
+
+// Merges into the library run one at a time, process-wide: each is a quick series of
+// renames, and serializing them means a merge's rollback can never overwrite or remove
+// what a concurrent import into the same (or an overlapping) folder just placed.
+let mergeQueue: Promise<unknown> = Promise.resolve();
+function serializeMerge<T>(fn: () => Promise<T>): Promise<T> {
+  const run = mergeQueue.then(fn, fn);
+  mergeQueue = run.catch(() => undefined);
+  return run;
+}
+
+export class ArchiveService {
+  // -y: assume yes on any prompt; -p<password> supplies a password when one is given,
+  // otherwise -p- refuses to prompt for one (fail instead of hanging on an encrypted
+  // archive); --: end of switches, so a filename starting with "-" can't be parsed as a flag.
+  private async runSingleTest(
+    filePath: string,
+    tool: ArchiveTool,
+    password?: string
+  ): Promise<void> {
+    if (tool === "unrar") {
+      await runUnrar(["t", "-y", password ? `-p${password}` : "-p-", "--", filePath]);
+    } else {
+      await runSevenZip(["t", "-y", ...(password ? [`-p${password}`] : []), "--", filePath]);
+    }
+  }
+
+  private async listEntriesForExtraction(
+    filePath: string,
+    password?: string
+  ): Promise<ArchiveEntry[]> {
+    let lastErr: unknown;
+    for (let attempt = 1; attempt <= ARCHIVE_TEST_MAX_ATTEMPTS; attempt++) {
+      try {
+        return await this.listEntries(filePath, password);
+      } catch (err) {
+        this.classifyNonRetryableFailure(err, password);
+        lastErr = err;
+        if (attempt < ARCHIVE_TEST_MAX_ATTEMPTS) {
+          logger.warn(
+            { err, filePath, attempt },
+            "Archive listing failed — retrying in case the file is still settling on disk"
+          );
+          await delay(ARCHIVE_TEST_RETRY_DELAYS_MS[attempt - 1] ?? 3_000);
+        }
+      }
+    }
+    throw lastErr;
+  }
+
+  // Some failures short-circuit the retry loop entirely because retrying can never change the
+  // outcome: a missing binary won't appear, and a password-protected archive fails identically
+  // every time. Both re-throw as a more specific error type for the caller; anything else
+  // returns normally so testArchive's loop can retry it as a possible transient read.
+  private classifyNonRetryableFailure(err: unknown, password?: string): void {
+    if (err instanceof NonRetryableArchiveError) {
+      throw err;
+    }
+    if (err instanceof Error && isPasswordProtectedError(err.message)) {
+      throw new ArchivePasswordRequiredError(
+        serviceMessage(
+          password
+            ? "service.api_archive_password_rejected"
+            : "service.api_archive_password_required",
+          {}
+        )
+      );
+    }
+  }
+
+  private async testArchive(filePath: string, tool: ArchiveTool, password?: string): Promise<void> {
+    logger.debug({ filePath, tool, hasPassword: !!password }, "Testing archive before extraction");
+
+    let lastErr: unknown;
+    for (let attempt = 1; attempt <= ARCHIVE_TEST_MAX_ATTEMPTS; attempt++) {
+      try {
+        await this.runSingleTest(filePath, tool, password);
+        if (attempt > 1) {
+          logger.info({ filePath, tool, attempt }, "Archive test succeeded after retry");
+        }
+        return;
+      } catch (err) {
+        this.classifyNonRetryableFailure(err, password);
+        lastErr = err;
+        if (attempt < ARCHIVE_TEST_MAX_ATTEMPTS) {
+          logger.warn(
+            { err, filePath, tool, attempt },
+            "Archive test failed — retrying in case the file is still settling on disk"
+          );
+          await delay(ARCHIVE_TEST_RETRY_DELAYS_MS[attempt - 1] ?? 3_000);
+          continue;
+        }
+        logger.error(
+          { err, filePath, tool, attempts: attempt },
+          "Archive test failed — archive will not be extracted"
+        );
+      }
+    }
+
+    // By this point retries are exhausted, so a transient "still settling on disk" read is
+    // ruled out — whatever's left genuinely can't be extracted (corrupt, truncated, or an
+    // unsupported variant). Surface that plainly instead of the bare tool error text.
+    const detail = lastErr instanceof Error ? lastErr.message : String(lastErr);
+    throw new ServiceMessageError("service.archive_corrupt_or_incomplete", {
+      detail: serviceMessageValue(detail, serviceErrorMetadata(lastErr)),
+    });
+  }
+
+  /**
+   * Moves everything under stagingDir into destDir, merging directories and replacing
+   * same-named files, and leaves every other file already in destDir untouched.
+   *
+   * Every conflict is checked before the first file moves, so a refused merge leaves
+   * destDir exactly as it was: a file and a directory at the same path, an existing
+   * symlink where the archive has a directory (descending into it would write outside
+   * destDir), or a top-level entry using the staging directory's reserved name. A file
+   * being replaced is first set aside in backupDir, so an I/O failure part-way through
+   * the moves restores every file already replaced and removes every file already added.
+   * @returns Final paths (under destDir) of the files moved.
+   */
+  /** Hard-links `src` to `dest`, copying instead when linking is not possible; never leaves a partial copy. */
+  private async backupFile(src: string, dest: string): Promise<void> {
+    try {
+      await fs.link(src, dest);
+      return;
+    } catch {
+      // Cross-device or unsupported filesystem: fall back to a copy.
+    }
+    try {
+      await fs.copy(src, dest, { preserveTimestamps: true });
+    } catch (err) {
+      await fs.remove(dest).catch(() => undefined);
+      throw err;
+    }
+  }
+
+  private async mergeExtracted(
+    stagingDir: string,
+    destDir: string,
+    backupDir: string
+  ): Promise<string[]> {
+    const dirsToCreate: string[] = [];
+    const filesToMove: Array<{ from: string; to: string; replaces: boolean }> = [];
+
+    const plan = async (srcDir: string, targetDir: string): Promise<void> => {
+      const entries = await fs.readdir(srcDir, { withFileTypes: true });
+      for (const entry of entries) {
+        const srcPath = path.join(srcDir, entry.name);
+        const targetPath = path.join(targetDir, entry.name);
+        if (srcDir === stagingDir && entry.name.startsWith(EXTRACT_STAGING_PREFIX)) {
+          throw new ServiceMessageError("service.archive_reserved_staging_name", {
+            name: entry.name,
+          });
+        }
+        const existing = await fs.lstat(targetPath).catch(() => undefined);
+        if (entry.isDirectory()) {
+          if (existing?.isSymbolicLink()) {
+            throw new ServiceMessageError("service.archive_destination_symlink", {
+              path: targetPath,
+            });
+          }
+          if (existing && !existing.isDirectory()) {
+            throw new ServiceMessageError("service.archive_directory_over_file", {
+              path: targetPath,
+            });
+          }
+          if (!existing) dirsToCreate.push(targetPath);
+          await plan(srcPath, targetPath);
+        } else {
+          if (existing?.isDirectory()) {
+            throw new ServiceMessageError("service.archive_file_over_directory", {
+              path: targetPath,
+            });
+          }
+          // A symlink at a file's path is replaced by the rename itself, never followed.
+          filesToMove.push({ from: srcPath, to: targetPath, replaces: !!existing });
+        }
+      }
+    };
+    await plan(stagingDir, destDir);
+
+    // A replaced file is backed up by hard link (a copy when the filesystem has none),
+    // then the new version is renamed over it in one atomic step: the installed file is
+    // never missing, even if the process dies mid-merge. Rollback only touches what this
+    // merge itself put in place (a file is recorded as done after its own rename lands),
+    // and merges are serialized (serializeMerge), so no other import writes these paths
+    // while this one runs.
+    const done: Array<{ to: string; backup: string | undefined }> = [];
+    try {
+      for (const dir of dirsToCreate) await fs.ensureDir(dir);
+      if (filesToMove.some(({ replaces }) => replaces)) await fs.ensureDir(backupDir);
+      for (const [index, { from, to, replaces }] of filesToMove.entries()) {
+        if (replaces) {
+          const backup = path.join(backupDir, String(index));
+          await this.backupFile(to, backup);
+          try {
+            await fs.rename(from, to);
+          } catch (err) {
+            // The original is untouched when the rename fails; drop its now-useless backup.
+            await fs.remove(backup).catch(() => undefined);
+            throw err;
+          }
+          done.push({ to, backup });
+        } else {
+          await fs.move(from, to);
+          done.push({ to, backup: undefined });
+        }
+      }
+    } catch (err) {
+      let unrestored = 0;
+      const leftovers: string[] = [];
+      const restore = async (to: string, backup: string | undefined): Promise<void> => {
+        await (backup ? fs.rename(backup, to) : fs.remove(to)).catch((rollbackErr: unknown) => {
+          if (backup) unrestored++;
+          else leftovers.push(to);
+          logger.error(
+            { err: rollbackErr, path: to, backup },
+            "Could not roll back extracted file"
+          );
+        });
+      };
+      for (const { to, backup } of done.reverse()) await restore(to, backup);
+      for (const dir of [...dirsToCreate].reverse()) {
+        await fs.rmdir(dir).catch(() => undefined);
+      }
+      if (unrestored > 0 || leftovers.length > 0) {
+        const detail = err instanceof Error ? err.message : String(err);
+        const problems: ServiceMessageFragment[] = [];
+        if (unrestored > 0) {
+          problems.push(
+            serviceMessage("service.archive_rollback_originals_retained", {
+              count: unrestored,
+              path: backupDir,
+            })
+          );
+        }
+        if (leftovers.length > 0) {
+          problems.push(
+            serviceMessage("service.archive_rollback_extracted_remaining", {
+              paths: leftovers.join(", "),
+            })
+          );
+        }
+        // The branch guarantees at least one problem; keep child ownership through the join.
+        const problemMessage = problems
+          .slice(1)
+          .reduce(
+            (left, right) => serviceMessage("service.joined_errors", { left, right }),
+            problems[0]!
+          );
+        throw new ServiceMessageError(
+          "service.archive_rollback_incomplete",
+          {
+            detail: serviceMessageValue(detail, serviceErrorMetadata(err)),
+            problems: problemMessage,
+          },
+          { cause: err }
+        );
+      }
+      throw err;
+    }
+    return filesToMove.map(({ to }) => to);
+  }
+
+  private async extractWithUnrar(
+    filePath: string,
+    outputDir: string,
+    password?: string
+  ): Promise<void> {
+    // Trailing separator tells unrar the operand is a destination directory. -idq suppresses
+    // the per-file "Extracting..." progress output — without it, a large multi-file archive
+    // can exceed execFile's maxBuffer and fail with ERR_CHILD_PROCESS_STDIO_MAXBUFFER after
+    // extraction has already started.
+    await runUnrar([
+      "x",
+      "-idq",
+      "-y",
+      password ? `-p${password}` : "-p-",
+      "--",
+      filePath,
+      outputDir + path.sep,
+    ]);
+  }
+
+  private async extractWith7zip(
+    filePath: string,
+    outputDir: string,
+    password?: string
+  ): Promise<void> {
+    // -bso0/-bsp0 silence 7-Zip's normal output and progress streams for the same
+    // maxBuffer-overflow reason as unrar's -idq above.
+    await runSevenZip([
+      "x",
+      "-bso0",
+      "-bsp0",
+      "-y",
+      ...(password ? [`-p${password}`] : []),
+      `-o${outputDir}`,
+      "--",
+      filePath,
+    ]);
+  }
+
+  /**
+   * Extracts an archive to a specified output directory.
+   * @param filePath Full path to the archive file.
+   * @param outputDir Directory where contents should be extracted.
+   * @param password Password to supply for an encrypted archive. Omit for an unencrypted
+   *   one; if the archive turns out to require one, `extract` rejects with
+   *   {@link ArchivePasswordRequiredError} rather than the generic corruption message.
+   * @returns Paths of files reported as extracted.
+   */
+  async extract(filePath: string, outputDir: string, password?: string): Promise<string[]> {
+    const tool = resolveTool(filePath);
+    logger.debug({ filePath, outputDir, tool, hasPassword: !!password }, "Extracting archive");
+
+    // Inspect and bound attacker-controlled metadata before running the integrity check,
+    // which may decompress every entry. Validate before touching the filesystem, so a
+    // failing/unsupported archive never leaves behind an empty output directory.
+    const entries = await this.listEntriesForExtraction(filePath, password);
+    validateArchiveEntries(entries, outputDir);
+    await this.testArchive(filePath, tool, password);
+
+    // Extract into a private staging directory inside outputDir, then merge the result
+    // into outputDir without deleting anything already there. outputDir is the game's
+    // folder in the library (ImportManager extracts straight into the destination), so it
+    // can already hold an installed copy of the game — a patch or update being imported
+    // over it must only add or replace the files it ships, never wipe the install.
+    // Staging also keeps a failed extraction from half-overwriting that install. Each run
+    // gets its own uniquely named staging directory, so two imports into the same folder
+    // can't delete or mix each other's output. It sits inside outputDir so the merge is a
+    // same-filesystem rename, and its reserved name can't collide with the archive volumes
+    // the move/copy modes relocate into outputDir before extracting.
+    await fs.ensureDir(outputDir);
+    const stagingDir = await fs.mkdtemp(path.join(outputDir, EXTRACT_STAGING_PREFIX));
+    const backupDir = `${stagingDir}.bak`;
+
+    let extractedFiles: string[];
+    let merged = false;
+    try {
+      if (tool === "unrar") {
+        await this.extractWithUnrar(filePath, stagingDir, password);
+      } else {
+        await this.extractWith7zip(filePath, stagingDir, password);
+      }
+      extractedFiles = await serializeMerge(() =>
+        this.mergeExtracted(stagingDir, outputDir, backupDir)
+      );
+      merged = true;
+    } catch (err) {
+      logger.error({ err, filePath, tool }, "Extraction failed");
+      throw err;
+    } finally {
+      await fs.remove(stagingDir).catch((err: unknown) => {
+        logger.warn({ err, dir: stagingDir }, "Could not remove extraction staging directory");
+      });
+      // After a successful merge the backups are the replaced originals, no longer needed.
+      // After a failed one a complete rollback leaves the directory empty; anything still
+      // in it is an original file the rollback couldn't put back, so it is kept.
+      if (merged) {
+        await fs.remove(backupDir).catch((err: unknown) => {
+          logger.warn(
+            { err, dir: backupDir },
+            "Could not remove extraction backup directory; it only holds replaced files and can be deleted"
+          );
+        });
+      } else {
+        await fs.rmdir(backupDir).catch((err: NodeJS.ErrnoException) => {
+          if (err.code === "ENOENT") return;
+          logger.warn(
+            { err, dir: backupDir },
+            "Extraction backup directory left in place after a failed import; check its files before deleting it"
+          );
+        });
+      }
+    }
+
+    if (extractedFiles.length === 0) {
+      logger.warn(
+        { filePath, outputDir, tool },
+        "Extraction reported success but produced no files — the archive format or contents may not be fully supported"
+      );
+    } else {
+      logger.debug({ count: extractedFiles.length, tool }, "Extraction complete");
+    }
+
+    return extractedFiles;
+  }
+
+  /**
+   * Disc images (.iso, .iso.NNN) only count when `includeDiscImages` is set, for an
+   * explicit unpack request: console games and most PC releases are used as the image
+   * itself (loaded by an emulator or mounted), so auto-unpacking one would replace a
+   * working game with loose, unusable files.
+   */
+  isArchive(filePath: string, options?: { includeDiscImages?: boolean }): boolean {
+    const name = path.basename(filePath).toLowerCase();
+    const ext = path.extname(name);
+    if (/\.iso(\.\d{3})?$/i.test(name)) return options?.includeDiscImages === true;
+    if ([".zip", ".7z", ".rar", ".gz", ".tar", ".bz2"].includes(ext)) return true;
+    // Numbered multi-volume continuations don't carry a recognized extname on their own
+    // (path.extname("game.7z.001") is ".001") but are still archives: classic RAR .rNN,
+    // 7-Zip/zip .NNN splits ("game.7z.001", "game.zip.002"), and a bare "game.001" with
+    // no format tag. Without this, a directory containing only numbered volumes (no
+    // plain .rar/.7z/.zip file) would never be recognized as containing an archive at
+    // all, and resolveArchive would import the volumes as loose files unextracted.
+    return /\.(r\d{2,3}|7z\.\d{3}|zip\.\d{3}|\d{3})$/i.test(name);
+  }
+
+  /**
+   * Lists an archive's file and directory entries without extracting it.
+   *
+   * RAR archives are listed with unrar's technical listing (`lt`): the Alpine 7-Zip
+   * build the image ships is compiled without the RAR codec, so it cannot open them.
+   * Every other format goes through 7-Zip's `-slt` mode, a stable block-per-entry
+   * format regardless of archive type.
+   */
+  async listEntries(filePath: string, password?: string): Promise<ArchiveEntry[]> {
+    logger.debug({ filePath }, "Listing archive contents");
+    const passwordArg = password ? `-p${password}` : "-p-";
+    if (resolveTool(filePath) === "unrar") {
+      // -v lists every volume of a multi-volume set, not just the first.
+      const { stdout } = await runUnrar(["lt", "-v", passwordArg, "--", filePath]);
+      return parseUnrarTechnicalListing(stdout);
+    }
+    const { stdout } = await runSevenZip(["l", "-slt", passwordArg, "--", filePath]);
+    return parseSevenZipSltListing(stdout);
+  }
+
+  /**
+   * Checks whether every file inside the archive already exists as a loose
+   * file (same relative path and size) under baseDir — i.e. the archive has
+   * already been extracted alongside itself by something upstream (a
+   * download client's own post-processing, for example). Listing failures
+   * (unsupported or unreadable archive) are treated as
+   * "can't tell" rather than propagated — this check is purely an
+   * optimization to skip redundant extraction, never load-bearing for
+   * correctness, so a failure here should fall through to a normal
+   * extraction rather than fail the import.
+   */
+  async isAlreadyExtracted(archivePath: string, baseDir: string): Promise<boolean> {
+    let entries: ArchiveEntry[];
+    try {
+      entries = await this.listEntries(archivePath);
+    } catch (err) {
+      logger.debug(
+        { err, archivePath },
+        "[ArchiveService] Could not list archive contents to check for a prior extraction — assuming not extracted"
+      );
+      return false;
+    }
+    const files = entries.filter((entry) => !entry.isDirectory);
+    if (files.length === 0) return false;
+
+    const resolvedBaseDir = path.resolve(baseDir);
+    for (const entry of files) {
+      const normalizedName = entry.name.split(/[/\\]+/).join(path.sep);
+      const candidatePath = path.resolve(baseDir, normalizedName);
+      // entry.name comes from the archive's own (attacker-controllable) listing, not from
+      // baseDir's contents — a crafted entry like "../elsewhere/file" would otherwise let
+      // an external file the archive doesn't actually contain satisfy the match below.
+      if (
+        candidatePath !== resolvedBaseDir &&
+        !candidatePath.startsWith(resolvedBaseDir + path.sep)
+      ) {
+        return false;
+      }
+      try {
+        const stats = await fs.stat(candidatePath);
+        if (stats.isDirectory() || stats.size !== entry.size) return false;
+      } catch {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Given a main archive path and the absolute paths of its siblings,
+   * returns the subset that belongs to the same archive: the main archive
+   * itself plus any split/multi-part volume companions (.r00, .part2.rar,
+   * .7z.002, etc).
+   */
+  findVolumeSiblings(archivePath: string, siblingPaths: string[]): string[] {
+    const resolvedArchive = path.resolve(archivePath);
+    const archiveBasename = path.basename(archivePath);
+
+    // A volume-suffix pattern (.partN.rar, .rNN, .7z.NNN, .zip.NNN, bare .NNN) has to be
+    // stripped as its own alternative before the plain single-extension fallback: the
+    // "main" archive passed in is often itself a numbered volume (e.g. 7-Zip splits
+    // produce "Game.7z.001"/"Game.7z.002" with no separate "Game.7z"), and stripping
+    // only a plain extension would leave the stem as "Game.7z.001", which then never
+    // matches sibling "Game.7z.002" (whose own stem, by the same logic, would be
+    // "Game.7z.002" — never equal). Matching the whole numbered-volume tail first
+    // reduces every volume to the same "Game" stem regardless of which one was passed in.
+    const stem = archiveBasename.replace(
+      /\.(part\d+\.rar|r\d{2,3}|7z\.\d{3}|zip\.\d{3}|\d{3}|rar|zip|7z|gz|tar|iso|bz2)$/i,
+      ""
+    );
+
+    // Which multi-volume naming scheme applies is determined by the selected archive's
+    // own suffix — these schemes are format-specific and never mixed within one release,
+    // so matching any numbered-suffix pattern regardless of family (as a single shared
+    // regex previously did) could pull in an unrelated archive's volumes that merely
+    // share a filename prefix, e.g. "Game.rar" incorrectly matching "Game.7z.001".
+    let volumeKind: "part-rar" | "rar" | "7z" | "zip" | "numbered" | null;
+    if (/\.part\d+\.rar$/i.test(archiveBasename)) {
+      volumeKind = "part-rar";
+    } else if (/\.(rar|r\d{2,3})$/i.test(archiveBasename)) {
+      volumeKind = "rar";
+    } else if (/\.7z(\.\d{3})?$/i.test(archiveBasename)) {
+      volumeKind = "7z";
+    } else if (/\.zip(\.\d{3})?$/i.test(archiveBasename)) {
+      volumeKind = "zip";
+    } else if (/\.\d{3}$/.test(archiveBasename)) {
+      volumeKind = "numbered";
+    } else {
+      volumeKind = null;
+    }
+    const stemPrefix = stem.toLowerCase() + ".";
+
+    return siblingPaths.filter((siblingPath) => {
+      if (path.resolve(siblingPath) === resolvedArchive) return true;
+      if (!volumeKind) return false;
+
+      const siblingName = path.basename(siblingPath).toLowerCase();
+      if (!siblingName.startsWith(stemPrefix)) return false;
+      const suffix = siblingName.slice(stemPrefix.length);
+
+      switch (volumeKind) {
+        case "part-rar":
+          return /^part\d+\.rar$/.test(suffix);
+        case "rar":
+          return /^r\d{2,3}$/.test(suffix);
+        case "7z":
+          return /^7z\.\d{3}$/.test(suffix);
+        case "zip":
+          return /^zip\.\d{3}$/.test(suffix);
+        case "numbered":
+          return /^\d{3}$/.test(suffix);
+        default:
+          return false;
+      }
+    });
+  }
+}

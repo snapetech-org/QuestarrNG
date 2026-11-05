@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "artifact": "QuestarrNG PR #155 current-head catalog coverage addendum",
+  "repo": "snapetech-org/QuestarrNG",
+  "pullRequest": 155,
+  "reviewedAt": "2026-11-03",
+  "prState": {
+    "state": "OPEN",
+    "isDraft": false,
+    "readyForReview": true,
+    "baseRef": "main",
+    "headRef": "codex/localization-foundations-20261028",
+    "inputHead": "0ea966692f4dec72e8830ebc1f085549968c587e",
+    "inputTree": "edc78b5261b481ab8afd044df8371bb21f5d4d14",
+    "branchRefAtAttestation": "0ea966692f4dec72e8830ebc1f085549968c587e",
+    "pullRefAtAttestation": "0ea966692f4dec72e8830ebc1f085549968c587e"
+  },
+  "audit": {
+    "path": "docs/pr-evidence/pr155-localization-2026-11-02/catalog-reconciliation-audit-2026-11-02.md",
+    "auditHead": "47e57bdff5918e6444417d140511b3f2713cf7fd",
+    "auditTree": "f70952821dcc37e4df3236caf609e1bc3af7d11e",
+    "sha256": "e0033a66c3f61ab750041ff97d2944c3e649134c7adb48d754bea14fe66c1ca6",
+    "checksumListPath": "docs/pr-evidence/pr155-localization-2026-11-02/SHA256SUMS",
+    "checksumListSha256": "cd98ea36c0c37f51bd391409c14b5b93faf5241debc4db7d5104b59d886be0be",
+    "verifiedFromChecksumList": true
+  },
+  "coverage": {
+    "canonicalSourceIds": 2590,
+    "directLocales": [
+      "es",
+      "zh-Hans",
+      "hi",
+      "de",
+      "ja",
+      "fr",
+      "pt-BR",
+      "ar",
+      "ko",
+      "zh-Hant",
+      "vi",
+      "id"
+    ],
+    "directLocaleCount": 12,
+    "directCells": 31080,
+    "directCellsPerLocale": 2590,
+    "formalReviewRecords": 36960,
+    "domainContextRecords": 5880,
+    "resolvedFormalReviewRecords": 36960,
+    "activeUnresolvedRecords": 0,
+    "reviewIndexUniqueCells": 4284,
+    "reviewIndexSourceIds": 357,
+    "priorEvidenceFiles": 85,
+    "priorEvidenceRows": 35692,
+    "priorEvidenceUniqueCells": 33696,
+    "duplicateRechecks": 1996,
+    "directTargetChangesSinceIndexInput": 2876,
+    "directTargetChangesCoveredByIndex": 2872,
+    "separatelyReattestedChanges": 4,
+    "deterministicUncoveredSemanticSlice": false
+  },
+  "currentHeadComparison": {
+    "evidencePath": "docs/pr-evidence/pr155-localization-2026-11-03/current-head-coverage/audit-to-input-head-compare.json",
+    "baseAuditHead": "47e57bdff5918e6444417d140511b3f2713cf7fd",
+    "inputHead": "0ea966692f4dec72e8830ebc1f085549968c587e",
+    "interveningCommits": [
+      "1ab1c680fda2da8c4933fa78b529ef29e29ffc90",
+      "be131f2d42988bb8f4a271e4df428985da15b53b",
+      "0ea966692f4dec72e8830ebc1f085549968c587e"
+    ],
+    "changedLocalizationPaths": [
+      "localization/source-coverage.json"
+    ],
+    "localeCatalogPathsChanged": [],
+    "exactCatalogCoverageCarriesForward": true
+  },
+  "pendingGates": [
+    "qualified native-speaker signoff",
+    "broader browser coverage, including mobile and RTL",
+    "populated provider-backed results",
+    "private-JIT functional validation",
+    "two source-branch test-reference gaps, tracked separately from translation coverage"
+  ],
+  "repositoryChangesInAddendum": [
+    "documentation only"
+  ],
+  "testsBuildsScansCi": "not run",
+  "workflowChanges": false,
+  "releaseOrTag": false
+}

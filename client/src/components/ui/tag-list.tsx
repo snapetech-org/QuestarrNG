@@ -61,11 +61,13 @@ export function TagList({
               badgeVariants({ variant: "outline" }),
               "cursor-pointer text-muted-foreground hover:text-foreground"
             )}
-            aria-label={formatInterfaceMessage("Show {count} more items", { count: overflow })}
-            lang={languageFor("Show {count} more items")}
-            dir={directionFor("Show {count} more items")}
+            aria-label={formatInterfaceMessage("interface.show_count_more_items_4b683ae8", {
+              count: overflow,
+            })}
+            lang={languageFor("interface.show_count_more_items_4b683ae8")}
+            dir={directionFor("interface.show_count_more_items_4b683ae8")}
           >
-            {formatInterfaceMessage("+{count} more", { count: overflow })}
+            {formatInterfaceMessage("interface.count_more_1b6a0c82", { count: overflow })}
           </PopoverTrigger>
           <PopoverContent className="w-auto max-w-64 p-3">
             <div className="flex flex-wrap gap-1.5">

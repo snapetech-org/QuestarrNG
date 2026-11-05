@@ -566,6 +566,10 @@ describe("TorznabClient — testConnection", () => {
     const result = await client.testConnection(makeIndexer());
     expect(result.success).toBe(true);
     expect(result.message).toContain("Successfully connected");
+    expect(result).toMatchObject({
+      messageKey: "service.connected_named",
+      messageValues: { name: makeIndexer().name },
+    });
   });
 
   it("reports failure with the underlying error message", async () => {

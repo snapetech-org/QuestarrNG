@@ -1,8 +1,11 @@
+import { parseServiceMessageDescriptor } from "../../shared/service-messages.js";
 import { describe, it, expect } from "vitest";
 import {
   indexerAllowsApiKey,
   resolveSearchCategories,
   withheldApiKeyHint,
+  indexerHttpErrorMessage,
+  formatIndexerHttpError,
 } from "../indexer-caps.js";
 
 describe("indexerAllowsApiKey", () => {
@@ -89,4 +92,45 @@ describe("withheldApiKeyHint", () => {
       ""
     );
   });
+});
+
+describe("indexer HTTP message metadata", () => {
+  it.each([
+    {
+      url: "http://indexer.example",
+      allowInsecureLan: false,
+      status: 401,
+      key: "service.indexer_http_key_withheld",
+    },
+    {
+      url: "http://indexer.example",
+      allowInsecureLan: false,
+      status: 403,
+      key: "service.indexer_http_key_withheld",
+    },
+    {
+      url: "https://indexer.example",
+      allowInsecureLan: false,
+      status: 401,
+      key: "service.indexer_http_key_check",
+    },
+    {
+      url: "https://indexer.example",
+      allowInsecureLan: false,
+      status: 503,
+      key: "service.indexer_http_error",
+    },
+  ])(
+    "retains exact English for status $status / $key without storing the API key",
+    ({ url, allowInsecureLan, status, key }) => {
+      const indexer = { url, allowInsecureLan, apiKey: "never-in-the-descriptor" };
+      const statusText = "Provider العربية: {error}";
+      const fragment = indexerHttpErrorMessage(indexer, status, statusText);
+      expect(fragment.message).toBe(formatIndexerHttpError(indexer, status, statusText));
+      const metadata = parseServiceMessageDescriptor(fragment);
+      expect(metadata?.messageKey).toBe(key);
+      expect(metadata?.messageValues).toEqual({ status, statusText });
+      expect(JSON.stringify(metadata)).not.toContain(indexer.apiKey);
+    }
+  );
 });
