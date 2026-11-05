@@ -2,3 +2,6 @@ apprise==2.0.1
 
 # Keep the TLS trust-store dependency on a patched release.
 certifi>=2026.10.19
+
+# Reject the OAuth device-flow token disclosure fixed in 4.0.1.
+oauthlib>=4.0.1
