@@ -1,1 +1,4 @@
 apprise==2.0.1
+
+# Keep the TLS trust-store dependency on a patched release.
+certifi>=2026.10.19
