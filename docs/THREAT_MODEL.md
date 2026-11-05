@@ -102,15 +102,18 @@ Eight named trust boundaries:
    INSTREAM TCP protocol at a DNS-validated address. That connection is not encrypted, so
    operators should keep the configured daemon on a trusted network.
 8. **GitHub Actions ↔ candidate source** — pull-request code, lockfiles, and generated
-   reports are untrusted. Test and build jobs run on GitHub-hosted Ubuntu with a read-only
-   token and no repository secrets; only trusted pushes and manual runs on `main` use the
-   shared runner. External-fork release-note validation stays on the separate public-fork
-   runner group. Codecov reports are uploaded by a
-   default-branch `workflow_run` job only for same-repository pushes to `main`, behind the
-   `codecov-main` environment restricted to `main`. The uploader checks out only the trusted
-   repository default branch; Codecov's `override_commit` associates reports with the exact
-   triggering CI commit without checking out workflow-run source code in the secret-bearing
-   job. Discord tag announcements run from a default-branch `workflow_run` workflow only
+   reports are untrusted. Build, test, scan, package, and release jobs use compatible
+   private ephemeral JIT runners with read-only permissions where possible; no hosted
+   runner fallback is allowed. Public-fork code uses the isolated disposable `public-fork-jit`
+   group without secrets. The current CI workflow is manually dispatched from `main`.
+   Codecov reports are uploaded by a default-branch `workflow_run` job only for a
+   non-cancelled, same-repository manual CI dispatch from `main`, behind the
+   `codecov-main` environment restricted to `main`. Coverage uploads require a successful
+   run; an available JUnit report can upload after a failed run. The uploader checks out
+   only the trusted repository default branch; Codecov's `override_commit` associates
+   reports with the exact triggering CI commit without checking out workflow-run source
+   code in the secret-bearing job.
+   Discord tag announcements run from a default-branch `workflow_run` workflow only
    after the trusted image-release workflow
    succeeds; manual announcements are limited to dispatches from `main`. Both use the
    `discord-release` environment, restricted to `main`. The old repository-level webhook
@@ -243,20 +246,21 @@ Prowlarr links.
 ### 4.8 GitHub Actions candidate validation
 
 Pull-request source, dependency lockfiles, and generated coverage/JUnit files are untrusted
-inputs. The `CI` workflow runs pull-request tests and builds on GitHub-hosted Ubuntu with
-`contents: read`, no repository secrets, and checkout credentials disabled. The workflow
-uses the repository's locked npm dependencies and native test/build commands. Trusted
-pushes and manual runs on `main` may use the shared runner; pull requests do not. The
-separate `fork-safe-validation` workflow handles external-fork release-note checks through
-the public-fork runner group and also has only read access.
+inputs. The current `CI` workflow is manually dispatched from `main`; its jobs use private
+ephemeral JIT runners with read-only permissions where possible and checkout credentials
+disabled. No GitHub-hosted runner fallback is allowed. Public-fork validation uses the
+isolated disposable `public-fork-jit` group with no secrets and minimal read access.
 
-Coverage and JUnit reports are collected from the hosted CI job as an ordinary artifact.
-The Codecov upload workflow is loaded from the default branch, accepts reports only
-from the matching attempt of a same-repository `main` push, and uses the `codecov-main`
-environment. It checks out only trusted default-branch code and uses the triggering run's
-commit SHA as Codecov's report override. Its event and environment restrictions prevent
-pull-request workflows from obtaining the Codecov token. The Codecov token must be stored
-as an environment secret, not a repository-wide or organization-wide secret. The release
+Coverage and JUnit reports are collected from the private-JIT CI run as an ordinary
+artifact. The Codecov upload workflow is loaded from the default branch and accepts
+reports only from the matching attempt of a non-cancelled same-repository manual CI
+dispatch from `main`, using the `codecov-main` environment. Coverage uploads require a
+successful run; an available JUnit report can upload after a failed run. It checks out
+only trusted default-branch code and uses the triggering run's commit SHA as Codecov's
+report override. Its event and environment restrictions prevent pull-request workflows
+from obtaining the Codecov token.
+The Codecov token must be stored as an environment secret, not a repository-wide or
+organization-wide secret. The release
 announcement job uses the `discord-release` environment and its `DISCORD_WEBHOOK`
 secret. The former repository-level webhook secret has been removed, so
 same-repository pull-request workflows cannot read it. The environment is
@@ -327,13 +331,14 @@ linked file as the source of truth.
 - **Secrets scanning / dependency hygiene:** GitHub secret scanning and push protection,
   `.github/workflows/ci.yml` (`secretlint`), `.github/dependabot.yml`, and
   `.github/workflows/dependency-review.yml`
-- **SAST:** CodeQL advanced setup in `.github/workflows/codeql.yml` (JavaScript/TypeScript,
-  C#, and GitHub Actions) plus Semgrep in `.github/workflows/sast.yml`
+- **SAST:** Semgrep in `.github/workflows/sast.yml` and
+  `.github/workflows/semgrep-community.yml`. The current change set removes
+  CodeQL workflows under the organization policy.
 - **Container image scanning:** Trivy builds a local production image in
-  `.github/workflows/vulnerability-scan.yml` on main pushes, weekly, and pull
-  requests that change image or dependency inputs. The tag-triggered
-  `.github/workflows/fork-image.yml` scan checks the exact multi-architecture
-  release digest before publishing version and `latest` tags.
+  `.github/workflows/vulnerability-scan.yml` through an explicit private-JIT
+  dispatch from `main`. The release workflow checks the exact
+  multi-architecture image digest before publishing version and `latest` tags.
+  These scans do not start from main pushes or a schedule.
 - **Supply-chain scoring:** `.github/workflows/scorecard.yml` (OpenSSF Scorecard)
 - **SBOM:** [`docs/SBOM.md`](./SBOM.md) — Syft-generated, attached to Docker releases
 - **Disclosure process / access governance:** [`docs/SECURITY.md`](SECURITY.md),

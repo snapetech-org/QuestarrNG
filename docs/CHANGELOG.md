@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Security
+
+- CodeQL workflows and CodeQL Action SARIF uploads are disabled by organization policy. Private-JIT Semgrep, Trivy, and Scorecard workflows remain available through their configured dispatches; SARIF reports stay as workflow artifacts, and the release gate no longer waits for CodeQL analyses.
+
 User-facing pull requests add validated fragments under [`release-notes/`](../release-notes/).
 The release workflow adds those fragments to the versioned release notes and
 Discord announcement while this file remains the chronological changelog.

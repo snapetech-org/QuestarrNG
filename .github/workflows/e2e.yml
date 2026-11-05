@@ -1,11 +1,28 @@
 # ng-runner-policy: private-jit-only-v1
 name: E2E
 
+
+run-name: >-
+  ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') &&
+      format('action:ci:pool:private:tag:{0}', github.ref_name) ||
+      github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/tags/') &&
+      format('action:{0}:pool:{1}:tag:{2}', inputs.action || 'ci', inputs.runner_pool || 'private', github.ref_name) ||
+      github.event_name == 'workflow_dispatch' &&
+      format('action:{0}:pool:{1}', inputs.action || 'ci', inputs.runner_pool || 'private') || format('action:ci:pool:private') }}
 on:
-  push:
-    tags:
-      - '**'
+
   workflow_dispatch:
+    inputs:
+      action:
+        description: Required manual workflow action
+        type: choice
+        options: [ci]
+        required: true
+      runner_pool:
+        description: Required private JIT runner pool
+        type: choice
+        options: [private]
+        required: true
 
 concurrency:
   group: e2e-${{ github.run_id }}-${{ github.run_attempt }}
@@ -17,7 +34,19 @@ permissions:
 jobs:
   playwright:
     name: Playwright e2e
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'ci' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        true
+      )
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-playwright"]}}', github.run_id)) }}
     timeout-minutes: 20
 
     steps:
@@ -83,4 +112,3 @@ jobs:
       - name: Stop test server
         if: always()
         run: kill "$(cat e2e-server.pid)" 2>/dev/null || true
-

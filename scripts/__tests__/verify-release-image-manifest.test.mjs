@@ -101,8 +101,9 @@ describe("release image manifest verification", () => {
     const platformBuild = workflow.jobs["build-source-image"];
     const nativeRunners = platformBuild.strategy.matrix.include.map((entry) => entry.runner);
     expect(platformBuild.needs).toBe("release-security");
-    expect(nativeRunners).toContain("ubuntu-24.04");
-    expect(nativeRunners).toContain("ubuntu-24.04-arm");
+    expect(nativeRunners).toContain("linux-x64");
+    expect(nativeRunners).toContain("linux-arm64");
+    expect(platformBuild["runs-on"]).toContain("ng-shared-main-jit");
     expect(
       platformBuild.steps.some((step) => step.uses?.startsWith("step-security/setup-qemu-action@"))
     ).toBe(false);
@@ -168,6 +169,6 @@ describe("release image manifest verification", () => {
     expect(publishIndex).toBeGreaterThan(attachIndex);
     expect(attachStep.run).toContain("docker buildx imagetools create");
     expect(attachStep.env.BUILD_DIGEST).toBe("${{ needs.publish.outputs.digest }}");
-    expect(attachStep.env.TAG).toBe("${{ github.ref_name }}");
+    expect(attachStep.env.TAG).toBe("${{ inputs.release_tag }}");
   });
 });

@@ -1,11 +1,32 @@
+# packer-windows-jit-v1
 # ng-runner-policy: private-jit-only-v1
 name: Publish QuestarrNG image
 
+
+run-name: >-
+  ${{ github.event_name == 'workflow_dispatch' && inputs.action == 'release' && inputs.release_tag != '' &&
+      format('action:{0}:pool:{1}:tag:{2}', inputs.action, inputs.runner_pool, inputs.release_tag) ||
+      github.event_name == 'workflow_dispatch' && inputs.action == 'release' && (inputs.finalize_release_tag || inputs.announce_release_tag) != '' &&
+      format('action:{0}:pool:{1}:tag:{2}', inputs.action, inputs.runner_pool, inputs.finalize_release_tag || inputs.announce_release_tag) ||
+      format('action:{0}:pool:{1}', inputs.action, inputs.runner_pool) }}
 on:
-  push:
-    tags: ["v*"]
+
   workflow_dispatch:
     inputs:
+      action:
+        description: Required manual workflow action
+        type: choice
+        options: [release, smoke]
+        required: true
+      runner_pool:
+        description: Required private JIT runner pool
+        type: choice
+        options: [private]
+        required: true
+      release_tag:
+        description: Build and publish this existing v* tag from main
+        required: false
+        type: string
       announce_release_tag:
         description: Announce an already-published release without rebuilding the image
         required: false
@@ -26,8 +47,19 @@ concurrency:
 
 jobs:
   release-security:
-    if: github.repository_id == '1388297896' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          (inputs.action == 'smoke' || inputs.action == 'release') &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && inputs.action == 'release' && inputs.release_tag != ''
+      )
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-release-security"]}}', github.run_id)) }}
     permissions:
       contents: read
       security-events: read
@@ -35,10 +67,12 @@ jobs:
       vulnerability-alerts: read
     outputs:
       version: ${{ steps.validate.outputs.version }}
+      release_sha: ${{ steps.validate.outputs.release_sha }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.release_tag }}
           fetch-depth: 0
           persist-credentials: false
 
@@ -46,9 +80,13 @@ jobs:
         id: validate
         shell: bash
         env:
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ inputs.release_tag }}
         run: |
           set -euo pipefail
+          git fetch --no-tags origin main
+          release_sha="$(git rev-parse HEAD)"
+          git merge-base --is-ancestor "$release_sha" origin/main
+          echo "release_sha=$release_sha" >> "$GITHUB_OUTPUT"
           version="$(node -p "require('./package.json').version")"
           if [[ "$TAG" != "v$version" ]]; then
             echo "Tag $TAG does not match package version $version."
@@ -72,11 +110,6 @@ jobs:
             echo 'The production image version label must be driven by the validated build argument.' >&2
             exit 1
           fi
-          git fetch origin main:refs/remotes/origin/main
-          git merge-base --is-ancestor "$GITHUB_SHA" origin/main || {
-            echo "Release tag $TAG is not on main."
-            exit 1
-          }
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Set up Node.js for release security checks
@@ -91,7 +124,18 @@ jobs:
         run: node scripts/check-release-security.mjs
 
   build-source-image:
-    if: github.repository_id == '1388297896' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          (inputs.action == 'smoke' || inputs.action == 'release') &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && inputs.action == 'release' && inputs.release_tag != ''
+      )
     needs: release-security
     strategy:
       fail-fast: false
@@ -99,11 +143,11 @@ jobs:
         include:
           - arch: amd64
             platform: linux/amd64
-            runner: ubuntu-24.04
+            runner: linux-x64
           - arch: arm64
             platform: linux/arm64
-            runner: ubuntu-24.04-arm
-    runs-on: ${{ matrix.runner == 'ubuntu-24.04' && fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-{1}-build-source-image"]}}', github.run_id, strategy.job-index)) || fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","arm64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-{1}-build-source-image"]}}', github.run_id, strategy.job-index)) }}
+            runner: linux-arm64
+    runs-on: ${{ matrix.runner == 'linux-x64' && fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-{1}-build-source-image"]}}', github.run_id, strategy.job-index)) || fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","arm64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-{1}-build-source-image"]}}', github.run_id, strategy.job-index)) }}
     permissions:
       contents: read
       packages: write
@@ -111,6 +155,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.release_tag }}
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Set image name
@@ -164,21 +210,34 @@ jobs:
           retention-days: 1
 
   publish:
-    if: github.repository_id == '1388297896' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          (inputs.action == 'smoke' || inputs.action == 'release') &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && inputs.action == 'release' && inputs.release_tag != ''
+      )
     needs: [release-security, build-source-image]
     env:
       TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db:2
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-publish"]}}', github.run_id)) }}
     permissions:
       contents: read
       packages: write
     outputs:
       image: ${{ steps.image.outputs.name }}
       digest: ${{ steps.publish-image.outputs.digest }}
+      release_sha: ${{ needs.release-security.outputs.release_sha }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.release_tag }}
           fetch-depth: 0
           persist-credentials: false
 
@@ -207,14 +266,13 @@ jobs:
         shell: bash
         env:
           IMAGE: ${{ steps.image.outputs.name }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+          RELEASE_SHA: ${{ needs.release-security.outputs.release_sha }}
         run: |
           set -euo pipefail
-          if [[ "$GITHUB_REF" != refs/tags/v* ]]; then
-            echo "Production image publication requires a version tag push." >&2
-            exit 1
-          fi
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
           node scripts/fork-image-tags.mjs \
-            "$IMAGE" "$GITHUB_REF" "$GITHUB_REF_NAME" "$GITHUB_SHA" "$GITHUB_OUTPUT"
+            "$IMAGE" "refs/tags/$RELEASE_TAG" "$RELEASE_TAG" "$RELEASE_SHA" "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: step-security/setup-buildx-action@e50058a0fcd8d1a7d626c905502d010a468bf238 # v4.4.1
@@ -232,6 +290,7 @@ jobs:
         env:
           IMAGE: ${{ steps.image.outputs.name }}
           TAGS: ${{ steps.tags.outputs.tags }}
+          RELEASE_SHA: ${{ needs.release-security.outputs.release_sha }}
         run: |
           set -euo pipefail
           amd64_digest="$(cat image-digests/digest-amd64)"
@@ -243,7 +302,7 @@ jobs:
             fi
           done
           mapfile -t tags < <(printf '%s\n' "$TAGS" | sed '/^$/d')
-          if [[ ${#tags[@]} -ne 1 || "${tags[0]}" != "${IMAGE}:sha-${GITHUB_SHA}" ]]; then
+          if [[ ${#tags[@]} -ne 1 || "${tags[0]}" != "${IMAGE}:sha-${RELEASE_SHA}" ]]; then
             echo "Expected exactly the immutable source-image tag for this commit." >&2
             exit 1
           fi
@@ -300,7 +359,7 @@ jobs:
       - name: Smoke test published image and SeerrNG route
         shell: bash
         env:
-          IMAGE: ${{ steps.image.outputs.name }}:sha-${{ github.sha }}
+          IMAGE: ${{ steps.image.outputs.name }}:sha-${{ needs.publish.outputs.release_sha }}
         run: |
           set -euo pipefail
           docker volume create questarrng-smoke-data
@@ -352,15 +411,30 @@ jobs:
           test "$(docker exec questarrng-rootless-smoke id -u)" = "1000"
 
   addon-smoke:
-    if: github.repository_id == '1388297896'
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          (inputs.action == 'smoke' || inputs.action == 'release') &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        github.repository_id == '1388297896'
+      )
     needs: publish
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-addon-smoke"]}}', github.run_id)) }}
     permissions:
       contents: read
       packages: read
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.release_tag }}
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Log in to GHCR
         uses: step-security/docker-login-action@8c7b695d8738c5699a679ff5254baf0f19f20a94 # v4.6.0
@@ -403,20 +477,31 @@ jobs:
 
   build-windows-installer:
     name: Build Windows installer
-    if: github.repository_id == '1388297896' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    if: github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && inputs.action == 'release' && inputs.release_tag != ''
     needs: [publish, addon-smoke]
     permissions:
       actions: read
       contents: write
     uses: ./.github/workflows/windows-installer.yml
     with:
-      source_ref: ${{ github.sha }}
-      release_tag: ${{ github.ref_name }}
+      source_ref: ${{ inputs.release_tag }}
+      release_tag: ${{ inputs.release_tag }}
 
   release:
-    if: github.repository_id == '1388297896' && startsWith(github.ref, 'refs/tags/v')
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          (inputs.action == 'smoke' || inputs.action == 'release') &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && inputs.action == 'release' && inputs.release_tag != ''
+      )
     needs: [publish, addon-smoke, build-windows-installer]
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-release"]}}', github.run_id)) }}
     permissions:
       actions: read
       contents: write
@@ -434,7 +519,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.release_tag }}
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup Node.js 22.x
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -444,13 +531,13 @@ jobs:
       - name: Download verified Windows installer
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          name: questarr-windows-installer-${{ github.ref_name }}
+          name: questarr-windows-installer-${{ inputs.release_tag }}
           path: release-assets
 
       - name: Package versioned Helm chart
         shell: bash
         env:
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ inputs.release_tag }}
         run: |
           set -euo pipefail
           VERSION="${TAG#v}"
@@ -470,7 +557,7 @@ jobs:
       - name: Verify release asset inventory and checksums
         shell: bash
         env:
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ inputs.release_tag }}
         run: |
           set -euo pipefail
           VERSION="${TAG#v}"
@@ -485,7 +572,7 @@ jobs:
       - name: Upload versioned release asset bundle for recovery
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: questarr-release-assets-${{ github.ref_name }}
+          name: questarr-release-assets-${{ inputs.release_tag }}
           path: release-assets/*
           if-no-files-found: error
           retention-days: 90
@@ -493,22 +580,22 @@ jobs:
       - name: Require clean security findings and completed source scans
         env:
           GH_TOKEN: ${{ secrets.SECURITY_READ_TOKEN || github.token }}
-          RELEASE_REF: ${{ github.ref }}
+          RELEASE_REF: refs/tags/${{ inputs.release_tag }}
         run: node scripts/check-release-security.mjs
 
       - name: Add curated release-note fragments
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ inputs.release_tag }}
         run: |
           set -euo pipefail
           VERSION="${TAG#v}"
-          RELEASE_DATE="$(git show -s --format=%cs "$GITHUB_SHA")"
+          RELEASE_DATE="$(git show -s --format=%cs "$RELEASE_SHA")"
           previous_tag="$(scripts/release-notes-base-tag.sh "$TAG")"
           node scripts/assemble-release-notes.mjs \
             --previous-tag "$previous_tag" \
-            --head "$GITHUB_SHA" \
+            --head "$RELEASE_SHA" \
             --version "$VERSION" \
             --date "$RELEASE_DATE" \
             --changelog docs/CHANGELOG.md \
@@ -522,7 +609,7 @@ jobs:
       - name: Add image pull instructions
         shell: bash
         env:
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ inputs.release_tag }}
           IMAGE: ${{ needs.publish.outputs.image }}
         run: |
           set -euo pipefail
@@ -548,8 +635,8 @@ jobs:
       - name: Create draft GitHub release with verified assets
         uses: step-security/action-gh-release@44319d37c8b7966bf07f89f0cbf63408141446df # v3.0.3
         with:
-          tag_name: ${{ github.ref_name }}
-          name: QuestarrNG ${{ github.ref_name }}
+          tag_name: ${{ inputs.release_tag }}
+          name: QuestarrNG ${{ inputs.release_tag }}
           body_path: changelog-section.md
           draft: true
           files: release-assets/*
@@ -558,7 +645,7 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ inputs.release_tag }}
         run: |
           set -euo pipefail
           VERSION="${TAG#v}"
@@ -609,7 +696,7 @@ jobs:
         env:
           IMAGE: ${{ needs.publish.outputs.image }}
           BUILD_DIGEST: ${{ needs.publish.outputs.digest }}
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ inputs.release_tag }}
         run: |
           set -euo pipefail
           VERSION="${TAG#v}"
@@ -630,7 +717,7 @@ jobs:
           IMAGE: ${{ needs.publish.outputs.image }}
           DOCKERHUB_IMAGE: docker.io/snapetech/questarrng
           BUILD_DIGEST: ${{ needs.publish.outputs.digest }}
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ inputs.release_tag }}
         run: |
           set -euo pipefail
           VERSION="${TAG#v}"
@@ -644,14 +731,14 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ inputs.release_tag }}
         run: gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --draft=false
 
       - name: Verify published release assets
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ inputs.release_tag }}
         run: |
           set -euo pipefail
           VERSION="${TAG#v}"
@@ -664,16 +751,27 @@ jobs:
 
   sync-release-metadata:
     name: Sync release metadata directly to main
-    if: github.repository_id == '1388297896' && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && needs.release.result == 'success' && needs.publish.result == 'success'
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          (inputs.action == 'smoke' || inputs.action == 'release') &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && inputs.action == 'release' && inputs.release_tag != '' && needs.release.result == 'success' && needs.publish.result == 'success'
+      )
     needs: [release, publish]
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-sync-release-metadata"]}}', github.run_id)) }}
     permissions:
       contents: write
     env:
       IMAGE: ${{ needs.publish.outputs.image }}
       IMAGE_DIGEST: ${{ needs.publish.outputs.digest }}
-      TAG: ${{ github.ref_name }}
-      RELEASE_SHA: ${{ github.sha }}
+      TAG: ${{ inputs.release_tag }}
+      RELEASE_SHA: ${{ needs.publish.outputs.release_sha }}
     steps:
       - name: Checkout main
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -713,10 +811,21 @@ jobs:
           git push origin HEAD:refs/heads/main
 
   finalize-release:
-    if: github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.finalize_release_tag != ''
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          (inputs.action == 'smoke' || inputs.action == 'release') &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.finalize_release_tag != ''
+      )
     env:
       TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db:2
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-finalize-release"]}}', github.run_id)) }}
     permissions:
       actions: read
       contents: write
@@ -1082,9 +1191,20 @@ jobs:
 
   sync-finalized-metadata:
     name: Sync recovered release metadata directly to main
-    if: github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.finalize_release_tag != '' && needs['finalize-release'].result == 'success'
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          (inputs.action == 'smoke' || inputs.action == 'release') &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.finalize_release_tag != '' && needs['finalize-release'].result == 'success'
+      )
     needs: [finalize-release]
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-sync-finalized-metadata"]}}', github.run_id)) }}
     permissions:
       contents: write
     env:
@@ -1134,8 +1254,19 @@ jobs:
   announce-release:
     name: Announce release to Discord
     needs: [release, finalize-release, sync-finalized-metadata]
-    if: ${{ always() && github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && ((inputs.finalize_release_tag == '' && inputs.announce_release_tag != '') || (inputs.finalize_release_tag != '' && needs['finalize-release'].result == 'success' && needs['sync-finalized-metadata'].result == 'success')) }}
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}"]}}', github.run_id)) }}
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          (inputs.action == 'smoke' || inputs.action == 'release') &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        always() && github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && ((inputs.finalize_release_tag == '' && inputs.announce_release_tag != '') || (inputs.finalize_release_tag != '' && needs['finalize-release'].result == 'success' && needs['sync-finalized-metadata'].result == 'success'))
+      )
+    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-announce-release"]}}', github.run_id)) }}
     environment:
       name: discord-release
     permissions:
@@ -1143,12 +1274,12 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-      TAG: ${{ inputs.finalize_release_tag || inputs.announce_release_tag || github.ref_name }}
+      TAG: ${{ inputs.finalize_release_tag || inputs.announce_release_tag || inputs.release_tag }}
     steps:
       - name: Checkout release tooling
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ inputs.finalize_release_tag || inputs.announce_release_tag || inputs.release_tag }}
           persist-credentials: false
 
       - name: Set up Node.js

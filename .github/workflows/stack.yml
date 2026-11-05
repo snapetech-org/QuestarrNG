@@ -6,11 +6,28 @@ name: Real stack
 # client's download and the import into the library (tests/stack/).
 
 # Slow (real daemons, a minute per download check), so it runs on release tags or on demand.
+
+run-name: >-
+  ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') &&
+      format('action:ci:pool:private:tag:{0}', github.ref_name) ||
+      github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/tags/') &&
+      format('action:{0}:pool:{1}:tag:{2}', inputs.action || 'ci', inputs.runner_pool || 'private', github.ref_name) ||
+      github.event_name == 'workflow_dispatch' &&
+      format('action:{0}:pool:{1}', inputs.action || 'ci', inputs.runner_pool || 'private') || format('action:ci:pool:private') }}
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - '**'
+    inputs:
+      action:
+        description: Required manual workflow action
+        type: choice
+        options: [ci]
+        required: true
+      runner_pool:
+        description: Required private JIT runner pool
+        type: choice
+        options: [private]
+        required: true
+
 concurrency:
   group: stack-${{ github.ref }}
   cancel-in-progress: false
@@ -21,6 +38,18 @@ permissions:
 jobs:
   stack:
     name: Real-stack journey
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'ci' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        true
+      )
     runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-stack"]}}', github.run_id)) }}
     timeout-minutes: 25
 

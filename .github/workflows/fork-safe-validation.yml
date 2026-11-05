@@ -13,7 +13,9 @@ jobs:
       github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name &&
       github.event.pull_request.base.repo.full_name == 'snapetech-org/QuestarrNG' &&
       github.event.pull_request.base.ref == 'main'
-    runs-on: ${{ fromJSON('{"group":"public-fork-jit","labels":["self-hosted","linux","x64","public-pr-questarrng"]}') }}
+    runs-on:
+      group: public-fork-jit
+      labels: [self-hosted, linux, x64, public-pr-questarrng, "ng-public-run-${{ github.run_id }}"]
     timeout-minutes: 10
     permissions:
       contents: read
@@ -36,4 +38,3 @@ jobs:
           body_file="$RUNNER_TEMP/pr-body.md"
           printf '%s' "$PR_BODY" > "$body_file"
           node scripts/check-release-notes.mjs --base "$BASE_SHA" --head "$HEAD_SHA" --pr-body "$body_file" --summary-file "$GITHUB_STEP_SUMMARY"
-

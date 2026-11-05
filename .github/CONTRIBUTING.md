@@ -88,13 +88,12 @@ npm run test:e2e
 
 #### Running tests in CI
 
-`.github/workflows/ci.yml` runs on every push and pull request to `main` and
-`release/*` branches and can be triggered manually. It checks documentation
-changes as well as code changes. Its jobs cover release-note validation,
-dependency and secret scanning, Windows service publishing, unit tests, linting,
-type checking, application builds, and Docker image builds:
+`.github/workflows/ci.yml` is manually dispatched from `main` with
+`action=ci` and `runner_pool=private`. It currently has no push or pull-request
+trigger. The jobs cover dependency and secret scanning, Windows service
+publishing, unit tests, linting, type checking, application builds, and Docker
+image builds:
 
-- `release-notes`: verifies that each non-bot pull request adds a validated release-note fragment or explicitly opts out.
 - `sca-scan`: `npm run secretlint`, `npm run check:overrides`, the full dependency `npm audit` gate and the production license allow-list.
 - `windows-service`: restores and publishes the locked Windows service host.
 - `test`: the whole Vitest suite with coverage, in one job:
@@ -105,15 +104,17 @@ type checking, application builds, and Docker image builds:
 
   CI installs the locked dependencies with `npm ci --ignore-scripts` and runs
   Playwright separately. Coverage thresholds come from `vitest.config.ts`; a
-  default-branch `workflow_run` uploads reports to Codecov only for trusted
-  pushes to `main`.
+  default-branch `workflow_run` accepts reports only from a private-JIT CI
+  dispatch on `main`. Coverage uploads require a successful run; available
+  JUnit results can still upload when tests fail.
 
 - `build`: CI runs `npm run format:check`, `npm run lint`, `npm run check`
-  (TypeScript), and `npm run build` on Node 22.23.4 (plus 26.x on pushes to
-  `main`/`release/*`).
-- `docker-build`: builds the image. It always runs on pushes; on a PR it runs when the PR touches the `Dockerfile`, `.dockerignore`, `entrypoint.sh`, `package*.json`, `requirements/`, migrations or `ci.yml`.
+  (TypeScript), and `npm run build` on Node 22.23.4 and 26.x.
+- `docker-build`: builds and verifies the container image when its configured
+  manual-run change filter selects it.
 
-Playwright E2E tests run in CI and `.github/workflows/e2e.yml`. A new push to a PR cancels the CI, E2E, CodeQL and SAST runs still going for its previous commit.
+Playwright E2E tests are also available in `.github/workflows/e2e.yml` through
+an explicit private-JIT dispatch from `main`.
 
 **Interpreting a CI failure:** check the "Tests" step logs first for the failing test name and assertion; a failure in `lint` or `check` instead means a style or type error, not a broken test — fix those before re-pushing. If the Codecov upload step fails but the tests themselves passed, that's usually a Codecov/token issue rather than a code problem.
 

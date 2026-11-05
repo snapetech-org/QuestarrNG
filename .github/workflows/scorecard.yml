@@ -4,14 +4,31 @@
 # policy, and support documentation.
 
 name: Scorecard supply-chain security
+
+run-name: >-
+  ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') &&
+      format('action:ci:pool:private:tag:{0}', github.ref_name) ||
+      github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/tags/') &&
+      format('action:{0}:pool:{1}:tag:{2}', inputs.action || 'ci', inputs.runner_pool || 'private', github.ref_name) ||
+      github.event_name == 'workflow_dispatch' &&
+      format('action:{0}:pool:{1}', inputs.action || 'ci', inputs.runner_pool || 'private') || format('action:ci:pool:private') }}
 on:
   branch_protection_rule:
   workflow_dispatch:
+    inputs:
+      action:
+        description: Required manual workflow action
+        type: choice
+        options: [ci]
+        required: true
+      runner_pool:
+        description: Required private JIT runner pool
+        type: choice
+        options: [private]
+        required: true
   # To guarantee Maintained check is occasionally updated. See
   # https://github.com/ossf/scorecard/blob/main/docs/checks.md#maintained
-  push:
-    tags:
-      - '**'
+
 permissions:
   contents: read
 
@@ -26,10 +43,19 @@ jobs:
     # runner used by other main-branch jobs does not provide Docker.
     runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-analysis"]}}', github.run_id)) }}
     # `publish_results: true` only works when run from the default branch. conditional can be removed if disabled.
-    if: github.event.repository.default_branch == github.ref_name || github.event_name == 'pull_request'
+    if: >-
+      (
+        github.event_name != 'workflow_dispatch' ||
+        (
+          github.ref == 'refs/heads/main' &&
+          inputs.action == 'ci' &&
+          inputs.runner_pool == 'private'
+        )
+      ) &&
+      (
+        github.event.repository.default_branch == github.ref_name || github.event_name == 'pull_request'
+      )
     permissions:
-      # Needed to upload the results to code-scanning dashboard.
-      security-events: write
       # Needed to publish results and get a badge (see publish_results below).
       id-token: write
       # Uncomment the permissions below if installing in a private repository.
@@ -78,11 +104,3 @@ jobs:
           name: SARIF file
           path: results.sarif
           retention-days: 5
-
-      # Upload the results to GitHub's code scanning dashboard (optional).
-      # Commenting out will disable upload of results to your repo's Code Scanning dashboard
-      - name: "Upload to code-scanning"
-        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
-        with:
-          sarif_file: results.sarif
-
