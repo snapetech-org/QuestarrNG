@@ -1,3 +1,4 @@
+import { expectToastText } from "./toast-text";
 /** @vitest-environment jsdom */
 import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -107,7 +108,7 @@ describe("PathMappingSettings", () => {
 
     await waitFor(() => {
       expect(mockToast).toHaveBeenCalledWith(
-        expect.objectContaining({ title: "Validation Error" })
+        expect.objectContaining({ title: expectToastText("Validation Error") })
       );
     });
   });
@@ -135,7 +136,9 @@ describe("PathMappingSettings", () => {
     });
 
     await waitFor(() => {
-      expect(mockToast).toHaveBeenCalledWith(expect.objectContaining({ title: "Mapping Added" }));
+      expect(mockToast).toHaveBeenCalledWith(
+        expect.objectContaining({ title: expectToastText("Mapping Added") })
+      );
     });
   });
 

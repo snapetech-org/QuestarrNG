@@ -1,3 +1,4 @@
+import { expectToastText } from "../../__tests__/toast-text";
 // @vitest-environment jsdom
 import React from "react";
 import "@testing-library/jest-dom";
@@ -111,7 +112,7 @@ describe("RssSettings", () => {
     });
     expect(name).toHaveValue("");
     expect(url).toHaveValue("");
-    expect(mockState.toast).toHaveBeenCalledWith({ description: "Feed added" });
+    expect(mockState.toast).toHaveBeenCalledWith({ description: expectToastText("Feed added") });
   });
 
   it("shows feed health and handles toggle, delete, and add failures", async () => {
@@ -153,7 +154,7 @@ describe("RssSettings", () => {
     await waitFor(() => {
       expect(mockState.apiRequest).toHaveBeenCalledWith("DELETE", "/api/rss/feeds/feed-1");
     });
-    expect(mockState.toast).toHaveBeenCalledWith({ description: "Feed removed" });
+    expect(mockState.toast).toHaveBeenCalledWith({ description: expectToastText("Feed removed") });
 
     mockState.apiRequest.mockRejectedValueOnce(new Error("server unavailable"));
     fireEvent.change(screen.getByPlaceholderText("e.g. My Custom Feed"), {
@@ -166,7 +167,7 @@ describe("RssSettings", () => {
 
     await waitFor(() => {
       expect(mockState.toast).toHaveBeenCalledWith({
-        description: "Failed to add feed",
+        description: expectToastText("Failed to add feed"),
         variant: "destructive",
       });
     });

@@ -1,3 +1,4 @@
+import { expectToastText } from "./toast-text";
 /** @vitest-environment jsdom */
 import React from "react";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -119,7 +120,10 @@ describe("FileCategorySelect", () => {
 
     await waitFor(() =>
       expect(mockToast).toHaveBeenCalledWith(
-        expect.objectContaining({ title: "Could not change the category", variant: "destructive" })
+        expect.objectContaining({
+          title: expectToastText("Could not change the category"),
+          variant: "destructive",
+        })
       )
     );
   });

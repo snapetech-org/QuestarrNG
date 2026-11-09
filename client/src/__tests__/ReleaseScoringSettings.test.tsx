@@ -1,3 +1,4 @@
+import { expectToastText } from "../../__tests__/toast-text";
 // @vitest-environment jsdom
 import React from "react";
 import "@testing-library/jest-dom";
@@ -135,8 +136,8 @@ describe("ReleaseScoringSettings", () => {
     });
     await waitFor(() => {
       expect(mockState.toast).toHaveBeenCalledWith({
-        title: "Release scoring saved",
-        description: "Manual and automatic searches will use this profile.",
+        title: expectToastText("Release scoring saved"),
+        description: expectToastText("Manual and automatic searches will use this profile."),
       });
     });
   });
@@ -226,8 +227,8 @@ describe("ReleaseScoringSettings", () => {
     fireEvent.click(screen.getByRole("button", { name: "Save Release Scoring" }));
     await waitFor(() => {
       expect(mockState.toast).toHaveBeenCalledWith({
-        title: "Release scoring saved",
-        description: "Your profile is saved and scoring remains disabled.",
+        title: expectToastText("Release scoring saved"),
+        description: expectToastText("Your profile is saved and scoring remains disabled."),
       });
     });
     mockState.apiRequest.mockClear();
@@ -247,8 +248,10 @@ describe("ReleaseScoringSettings", () => {
     fireEvent.click(saveAfterRemoval);
     await waitFor(() => {
       expect(mockState.toast).toHaveBeenCalledWith({
-        title: "Could not save release scoring",
-        description: "Check the scoring profile and custom format conditions before saving.",
+        title: expectToastText("Could not save release scoring"),
+        description: expectToastText(
+          "Check the scoring profile and custom format conditions before saving."
+        ),
         variant: "destructive",
       });
     });

@@ -1,3 +1,4 @@
+import { expectToastText } from "./toast-text";
 /** @vitest-environment jsdom */
 import React from "react";
 import "@testing-library/jest-dom";
@@ -122,8 +123,8 @@ describe("SendLogsDialog", () => {
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith("ABCD");
     });
     expect(toastMock).toHaveBeenCalledWith({
-      title: "Copied",
-      description: "Code ABCD copied to clipboard",
+      title: expectToastText("Copied"),
+      description: expectToastText("Code ABCD copied to clipboard"),
     });
 
     expect(screen.getByRole("link", { name: "Create GitHub issue" })).toHaveAttribute(
@@ -173,8 +174,8 @@ describe("SendLogsDialog", () => {
     fireEvent.click(screen.getByRole("button", { name: "Copy support code" }));
     await waitFor(() => {
       expect(toastMock).toHaveBeenCalledWith({
-        title: "Copy failed",
-        description: "Clipboard access denied",
+        title: expectToastText("Copy failed"),
+        description: expectToastText("Clipboard access denied"),
         variant: "destructive",
       });
     });
@@ -199,8 +200,8 @@ describe("SendLogsDialog", () => {
     await waitFor(() => {
       expect(execCommandMock).toHaveBeenCalledWith("copy");
       expect(toastMock).toHaveBeenCalledWith({
-        title: "Copied",
-        description: "Code QWER copied to clipboard",
+        title: expectToastText("Copied"),
+        description: expectToastText("Code QWER copied to clipboard"),
       });
     });
   });
@@ -223,8 +224,8 @@ describe("SendLogsDialog", () => {
 
     await waitFor(() => {
       expect(toastMock).toHaveBeenCalledWith({
-        title: "Copy failed",
-        description: "Clipboard access denied",
+        title: expectToastText("Copy failed"),
+        description: expectToastText("Clipboard access denied"),
         variant: "destructive",
       });
     });

@@ -1,3 +1,4 @@
+import { expectToastText } from "./toast-text";
 /** @vitest-environment jsdom */
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
@@ -88,7 +89,9 @@ describe("useHiddenMutation", () => {
       expect(apiRequest).toHaveBeenCalledWith("PATCH", "/api/games/game-1/hidden", {
         hidden: true,
       });
-      expect(toastSpy).toHaveBeenCalledWith(expect.objectContaining({ description: "Hidden OK" }));
+      expect(toastSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ description: expectToastText("Hidden OK") })
+      );
     });
 
     vi.mocked(apiRequest).mockResolvedValueOnce({
@@ -99,7 +102,7 @@ describe("useHiddenMutation", () => {
 
     await waitFor(() => {
       expect(toastSpy).toHaveBeenCalledWith(
-        expect.objectContaining({ description: "Unhidden OK" })
+        expect.objectContaining({ description: expectToastText("Unhidden OK") })
       );
     });
   });
@@ -111,7 +114,7 @@ describe("useHiddenMutation", () => {
 
     await waitFor(() => {
       expect(toastSpy).toHaveBeenCalledWith(
-        expect.objectContaining({ description: "Custom hidden" })
+        expect.objectContaining({ description: expectToastText("Custom hidden") })
       );
     });
 
@@ -125,7 +128,10 @@ describe("useHiddenMutation", () => {
 
     await waitFor(() => {
       expect(toastSpy).toHaveBeenCalledWith(
-        expect.objectContaining({ description: "Hidden failed", variant: "destructive" })
+        expect.objectContaining({
+          description: expectToastText("Hidden failed"),
+          variant: "destructive",
+        })
       );
     });
 

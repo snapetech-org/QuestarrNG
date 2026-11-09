@@ -1,3 +1,4 @@
+import { expectToastText } from "./toast-text";
 /** @vitest-environment jsdom */
 import React from "react";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -333,7 +334,7 @@ describe("RootFolderDiscovery", () => {
     });
     await waitFor(() => {
       expect(mockToast).toHaveBeenCalledWith(
-        expect.objectContaining({ title: "Root Folder Added" })
+        expect.objectContaining({ title: expectToastText("Root Folder Added") })
       );
     });
   });
@@ -381,7 +382,7 @@ describe("RootFolderDiscovery", () => {
     });
     await waitFor(() => {
       expect(mockToast).toHaveBeenCalledWith(
-        expect.objectContaining({ title: "Deletion Allowed" })
+        expect.objectContaining({ title: expectToastText("Deletion Allowed") })
       );
     });
   });

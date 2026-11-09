@@ -1,3 +1,4 @@
+import { expectToastText } from "./toast-text";
 /** @vitest-environment jsdom */
 import React from "react";
 import "@testing-library/jest-dom";
@@ -186,7 +187,7 @@ describe("ImportReviewModal", () => {
 
       expect(mockToast).toHaveBeenCalledWith(
         expect.objectContaining({
-          title: "Validation Error",
+          title: expectToastText("Validation Error"),
           description: expect.stringContaining("password-protected"),
         })
       );
@@ -212,7 +213,7 @@ describe("ImportReviewModal", () => {
       );
       await waitFor(() =>
         expect(mockToast).toHaveBeenCalledWith(
-          expect.objectContaining({ title: "Import Confirmed" })
+          expect.objectContaining({ title: expectToastText("Import Confirmed") })
         )
       );
     });
@@ -230,7 +231,7 @@ describe("ImportReviewModal", () => {
       await waitFor(() =>
         expect(mockToast).toHaveBeenCalledWith(
           expect.objectContaining({
-            title: "Incorrect Password",
+            title: expectToastText("Incorrect Password"),
             description: expect.objectContaining({
               type: "span",
               props: expect.objectContaining({

@@ -1,3 +1,4 @@
+import { expectToastText } from "./toast-text";
 /** @vitest-environment jsdom */
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -116,7 +117,7 @@ describe("claim dialog regressions", () => {
       failed
         ? {
             title: `Some downloads failed to link (${added} linked)`,
-            description: "Check your downloads.",
+            description: expectToastText("Check your downloads."),
             variant: "destructive",
           }
         : { title: `Downloads linked to games: ${added}` }

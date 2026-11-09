@@ -13,7 +13,7 @@ describe("localizeNotificationMessage", () => {
     ]) {
       const result = localizeNotificationMessage("Download Completed", message, "de", metadata);
       expect(result.content).toBe(message);
-      expect(result.language).toBe("en");
+      expect(result.language).toBe("und");
       expect(String(result.content)).not.toContain("UNRELATED PROVIDER");
     }
   });
@@ -37,7 +37,7 @@ describe("localizeNotificationMessage", () => {
     const providerMarkup = renderToStaticMarkup(<>{providerDetail.content}</>);
 
     expect(providerMarkup).toContain("Transmission: connection reset");
-    expect(providerMarkup).toContain('lang="en"');
+    expect(providerMarkup).toContain('lang="und"');
   });
 
   it.each([

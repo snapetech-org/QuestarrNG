@@ -47,13 +47,13 @@ describe("typed service message descriptors", () => {
     expect(serviceErrorValue(error)).toEqual(fragment);
   });
 
-  it("retains exact English for parameterized source fallback templates in RTL locales", () => {
+  it("translates parameterized templates while preserving provider values", () => {
     const provider = "Provider العربية: /stage/{error} – 404";
     const fragment = serviceMessage("service.nzb_sabnzbd_add_failed", { error: provider });
     const stored = serializeServiceMessageDescriptor(fragment);
     expect(fragment.message).toBe(`Failed to add NZB to SABnzbd: ${provider}`);
-    expect(localizeServiceMessage(fragment.message, stored, "ar")).toBe(fragment.message);
-    expect(localizeServiceMessage(fragment.message, stored, "fr")).toBe(fragment.message);
+    expect(localizeServiceMessage(fragment.message, stored, "ar")).toContain(provider);
+    expect(localizeServiceMessage(fragment.message, stored, "fr")).toContain(provider);
     expect(fragment.messageDetails).toBeUndefined();
   });
   it("preserves typed versus provider ownership in result and HTTP error bodies", () => {

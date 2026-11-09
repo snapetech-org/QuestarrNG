@@ -1,3 +1,4 @@
+import { expectToastText } from "./toast-text";
 /** @vitest-environment jsdom */
 import React from "react";
 import "@testing-library/jest-dom";
@@ -140,7 +141,7 @@ describe("LinkGameModal", () => {
     await waitFor(() =>
       expect(mockToast).toHaveBeenCalledWith(
         expect.objectContaining({
-          title: "Failed to Link Game",
+          title: expectToastText("Failed to Link Game"),
           description: expect.objectContaining({
             type: "span",
             props: expect.objectContaining({

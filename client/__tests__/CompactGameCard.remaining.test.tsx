@@ -1,3 +1,4 @@
+import { expectToastText } from "./toast-text";
 /** @vitest-environment jsdom */
 import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -305,7 +306,7 @@ describe("CompactGameCard remaining coverage", () => {
 
     await waitFor(() => {
       expect(mockToast).toHaveBeenCalledWith({
-        description: "Failed to add game to library before downloading",
+        description: expectToastText("Failed to add game to library before downloading"),
         variant: "destructive",
       });
     });
@@ -348,7 +349,7 @@ describe("CompactGameCard remaining coverage", () => {
     fireEvent.click(screen.getByText("Commit rating"));
     await waitFor(() => {
       expect(mockToast).toHaveBeenCalledWith({
-        description: "Failed to save your rating",
+        description: expectToastText("Failed to save your rating"),
         variant: "destructive",
       });
     });

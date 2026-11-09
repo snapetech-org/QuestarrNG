@@ -1,3 +1,4 @@
+import { expectToastText } from "./toast-text";
 /** @vitest-environment jsdom */
 import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -221,8 +222,8 @@ describe("ImportSettings", () => {
       );
       expect(mockToast).toHaveBeenCalledWith(
         expect.objectContaining({
-          title: "Settings Saved",
-          description: "RomM import configuration updated.",
+          title: expectToastText("Settings Saved"),
+          description: expectToastText("RomM import configuration updated."),
         })
       );
     });
@@ -306,8 +307,8 @@ describe("ImportSettings", () => {
     await waitFor(() => {
       expect(mockToast).toHaveBeenCalledWith(
         expect.objectContaining({
-          title: "Save Failed",
-          description: "Could not update RomM settings.",
+          title: expectToastText("Save Failed"),
+          description: expectToastText("Could not update RomM settings."),
           variant: "destructive",
         })
       );

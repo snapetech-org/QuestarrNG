@@ -1,3 +1,4 @@
+import { expectToastText } from "./toast-text";
 import { TooltipProvider } from "@/components/ui/tooltip";
 /** @vitest-environment jsdom */
 import React from "react";
@@ -563,15 +564,21 @@ describe("Downloads page", () => {
 
     expect(toastSpy).toHaveBeenCalledWith(
       expect.objectContaining({
-        title: "Downloader Error: Broken Client",
+        title: expectToastText("Downloader Error: Broken Client"),
         description: expect.objectContaining({
           props: expect.objectContaining({ source: "Indexer auth failed" }),
         }),
         variant: "destructive",
       })
     );
-    expect(toastSpy).toHaveBeenCalledWith(expect.objectContaining({ title: "Download paused" }));
-    expect(toastSpy).toHaveBeenCalledWith(expect.objectContaining({ title: "Download resumed" }));
-    expect(toastSpy).toHaveBeenCalledWith(expect.objectContaining({ title: "Download removed" }));
+    expect(toastSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ title: expectToastText("Download paused") })
+    );
+    expect(toastSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ title: expectToastText("Download resumed") })
+    );
+    expect(toastSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ title: expectToastText("Download removed") })
+    );
   });
 });

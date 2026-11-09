@@ -1,3 +1,4 @@
+import { expectToastText } from "./toast-text";
 /** @vitest-environment jsdom */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook } from "@testing-library/react";
@@ -82,7 +83,10 @@ describe("useBackgroundNotifications", () => {
 
     expect(mockToast).toHaveBeenCalledOnce();
     expect(mockToast).toHaveBeenCalledWith(
-      expect.objectContaining({ title: "Download completed", description: "Download dl-1" })
+      expect.objectContaining({
+        title: expectToastText("Download completed"),
+        description: expectToastText("Download dl-1"),
+      })
     );
   });
 
@@ -99,8 +103,8 @@ describe("useBackgroundNotifications", () => {
     expect(mockToast).toHaveBeenCalledOnce();
     expect(mockToast).toHaveBeenCalledWith(
       expect.objectContaining({
-        title: "Download error",
-        description: "Connection refused",
+        title: expectToastText("Download error"),
+        description: expectToastText("Connection refused"),
         variant: "destructive",
       })
     );
@@ -117,7 +121,7 @@ describe("useBackgroundNotifications", () => {
     rerender();
 
     expect(mockToast).toHaveBeenCalledWith(
-      expect.objectContaining({ description: "Download dl-1" })
+      expect.objectContaining({ description: expectToastText("Download dl-1") })
     );
   });
 

@@ -1,3 +1,4 @@
+import { expectToastText } from "./toast-text";
 /** @vitest-environment jsdom */
 import React from "react";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
@@ -228,13 +229,15 @@ describe("DownloadersPage", () => {
 
       fireEvent.click(await screen.findByTestId("button-delete-downloader-d1"));
       await waitFor(() =>
-        expect(toastSpy).toHaveBeenCalledWith({ title: "Downloader deleted successfully" })
+        expect(toastSpy).toHaveBeenCalledWith({
+          title: expectToastText("Downloader deleted successfully"),
+        })
       );
 
       fireEvent.click(screen.getByTestId("button-delete-downloader-d2"));
       await waitFor(() =>
         expect(toastSpy).toHaveBeenCalledWith({
-          title: "Failed to delete downloader",
+          title: expectToastText("Failed to delete downloader"),
           variant: "destructive",
         })
       );
@@ -381,7 +384,9 @@ describe("DownloadersPage", () => {
       expect(JSON.parse(body.settings)).toEqual({ initialState: "force-started" });
       expect(body.addStopped).toBe(false);
       await waitFor(() =>
-        expect(toastSpy).toHaveBeenCalledWith({ title: "Downloader updated successfully" })
+        expect(toastSpy).toHaveBeenCalledWith({
+          title: expectToastText("Downloader updated successfully"),
+        })
       );
     });
   });
@@ -482,7 +487,9 @@ describe("DownloadersPage", () => {
         enabled: true,
       });
       await waitFor(() =>
-        expect(toastSpy).toHaveBeenCalledWith({ title: "Downloader added successfully" })
+        expect(toastSpy).toHaveBeenCalledWith({
+          title: expectToastText("Downloader added successfully"),
+        })
       );
       await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
     });
@@ -516,7 +523,7 @@ describe("DownloadersPage", () => {
 
       await waitFor(() =>
         expect(toastSpy).toHaveBeenCalledWith({
-          title: "Failed to add downloader",
+          title: expectToastText("Failed to add downloader"),
           variant: "destructive",
         })
       );

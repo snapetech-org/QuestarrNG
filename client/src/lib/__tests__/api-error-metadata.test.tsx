@@ -39,7 +39,9 @@ describe("source-bound API error metadata", () => {
           fallbackSource="interface.unknown_error_ce512b43"
         />
       );
-      expect(screen.getByText(app.message)).toHaveAttribute("lang", typed ? "en" : "und");
+      expect(
+        screen.getByText(typed ? localizeServiceMessage(app.message, app, "ar") : app.message)
+      ).toHaveAttribute("lang", typed ? "ar" : "und");
     }
   );
   it("retains mutated local errors verbatim without translating an unrelated key", () => {

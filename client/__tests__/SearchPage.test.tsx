@@ -1,3 +1,4 @@
+import { expectToastText } from "./toast-text";
 /** @vitest-environment jsdom */
 import React from "react";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -436,7 +437,10 @@ describe("SearchPage", () => {
 
       await waitFor(() => {
         expect(toastSpy).toHaveBeenCalledWith(
-          expect.objectContaining({ title: "Checking qBittorrent", description: message })
+          expect.objectContaining({
+            title: expectToastText("Checking qBittorrent"),
+            description: message,
+          })
         );
       });
     });
@@ -480,7 +484,7 @@ describe("SearchPage", () => {
 
       await waitFor(() => {
         expect(toastSpy).toHaveBeenCalledWith(
-          expect.objectContaining({ title: "No compatible downloaders" })
+          expect.objectContaining({ title: expectToastText("No compatible downloaders") })
         );
       });
     });
@@ -501,7 +505,7 @@ describe("SearchPage", () => {
 
       await waitFor(() => {
         expect(toastSpy).toHaveBeenCalledWith(
-          expect.objectContaining({ title: "Game removed from library" })
+          expect.objectContaining({ title: expectToastText("Game removed from library") })
         );
       });
     });
@@ -530,7 +534,7 @@ describe("SearchPage", () => {
 
       await waitFor(() => {
         expect(toastSpy).toHaveBeenCalledWith(
-          expect.objectContaining({ title: "Failed to remove game" })
+          expect.objectContaining({ title: expectToastText("Failed to remove game") })
         );
       });
     });

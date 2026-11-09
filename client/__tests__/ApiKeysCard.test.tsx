@@ -1,3 +1,4 @@
+import { expectToastText } from "./toast-text";
 /** @vitest-environment jsdom */
 import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -181,8 +182,8 @@ describe("ApiKeysCard", () => {
 
     await waitFor(() => {
       expect(mockToast).toHaveBeenCalledWith({
-        title: "Could not create API key",
-        description: "limit reached",
+        title: expectToastText("Could not create API key"),
+        description: expectToastText("limit reached"),
         variant: "destructive",
       });
     });
@@ -236,8 +237,8 @@ describe("ApiKeysCard", () => {
     fireEvent.click(screen.getByRole("button", { name: "Copy API key" }));
     await waitFor(() => {
       expect(mockToast).toHaveBeenCalledWith({
-        title: "Copy failed",
-        description: "Select the key and copy it manually.",
+        title: expectToastText("Copy failed"),
+        description: expectToastText("Select the key and copy it manually."),
         variant: "destructive",
       });
     });
@@ -277,7 +278,7 @@ describe("ApiKeysCard", () => {
       expect(apiRequest).toHaveBeenCalledWith("DELETE", `/api/api-keys/${sampleKey.id}`);
     });
     await waitFor(() => {
-      expect(mockToast).toHaveBeenCalledWith({ title: "API key revoked" });
+      expect(mockToast).toHaveBeenCalledWith({ title: expectToastText("API key revoked") });
     });
   });
 
@@ -297,8 +298,8 @@ describe("ApiKeysCard", () => {
 
     await waitFor(() => {
       expect(mockToast).toHaveBeenCalledWith({
-        title: "Could not revoke API key",
-        description: "not found",
+        title: expectToastText("Could not revoke API key"),
+        description: expectToastText("not found"),
         variant: "destructive",
       });
     });

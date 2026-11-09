@@ -1,3 +1,4 @@
+import { expectToastText } from "./toast-text";
 /**
  * @vitest-environment jsdom
  */
@@ -617,7 +618,7 @@ describe("GameDownloadDialog", () => {
 
     await waitFor(() => {
       expect(mockToast).toHaveBeenCalledWith(
-        expect.objectContaining({ title: "Downloads sent: 1 to TestDownloader" })
+        expect.objectContaining({ title: expectToastText("Downloads sent: 1 to TestDownloader") })
       );
     });
 
@@ -869,8 +870,8 @@ describe("GameDownloadDialog", () => {
         expect.objectContaining({ method: "POST" })
       );
       expect(mockToast).toHaveBeenCalledWith({
-        title: "Download started",
-        description: "Torrent file download initiated",
+        title: expectToastText("Download started"),
+        description: expectToastText("Torrent file download initiated"),
       });
     }
   );
@@ -909,8 +910,8 @@ describe("GameDownloadDialog", () => {
       expect.objectContaining({ method: "POST" })
     );
     expect(mockToast).toHaveBeenCalledWith({
-      title: "Download started",
-      description: "Torrent file download initiated",
+      title: expectToastText("Download started"),
+      description: expectToastText("Torrent file download initiated"),
     });
   });
 
@@ -1652,7 +1653,7 @@ describe("GameDownloadDialog", () => {
         expect.objectContaining({ method: "POST" })
       );
       expect(mockToast).toHaveBeenCalledWith(
-        expect.objectContaining({ title: "Download sent to Transmission" })
+        expect.objectContaining({ title: expectToastText("Download sent to Transmission") })
       );
     });
   });
@@ -1705,7 +1706,7 @@ describe("GameDownloadDialog", () => {
       );
       expect(mockToast).toHaveBeenCalledWith(
         expect.objectContaining({
-          title: "Checking qBittorrent",
+          title: expectToastText("Checking qBittorrent"),
           description: expect.objectContaining({
             props: {
               message,
@@ -1733,7 +1734,7 @@ describe("GameDownloadDialog", () => {
 
     await waitFor(() => {
       expect(mockToast).toHaveBeenCalledWith({
-        description: "Copy failed",
+        description: expectToastText("Copy failed"),
         variant: "destructive",
       });
     });

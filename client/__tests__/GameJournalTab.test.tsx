@@ -1,3 +1,4 @@
+import { expectToastText } from "./toast-text";
 /** @vitest-environment jsdom */
 import React from "react";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
@@ -301,7 +302,7 @@ describe("GameJournalTab", () => {
 
     await waitFor(() =>
       expect(toastSpy).toHaveBeenCalledWith({
-        description: "Failed to add journal entry",
+        description: expectToastText("Failed to add journal entry"),
         variant: "destructive",
       })
     );

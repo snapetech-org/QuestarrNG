@@ -1,3 +1,4 @@
+import { expectToastText } from "./toast-text";
 /** @vitest-environment jsdom */
 import React from "react";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -227,16 +228,16 @@ describe("LogsPage remaining coverage", () => {
     fireEvent.click(screen.getByRole("button", { name: "Copy raw log line" }));
     await waitFor(() => {
       expect(toastMock).toHaveBeenCalledWith({
-        title: "Copied",
-        description: "Raw log line copied",
+        title: expectToastText("Copied"),
+        description: expectToastText("Raw log line copied"),
       });
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Copy parsed payload" }));
     await waitFor(() => {
       expect(toastMock).toHaveBeenCalledWith({
-        title: "Copied",
-        description: "Parsed payload copied",
+        title: expectToastText("Copied"),
+        description: expectToastText("Parsed payload copied"),
       });
     });
 
@@ -256,7 +257,7 @@ describe("LogsPage remaining coverage", () => {
     fireEvent.click(screen.getByRole("button", { name: "Copy log lines" }));
     await waitFor(() => {
       expect(toastMock).toHaveBeenCalledWith({
-        title: "Copied",
+        title: expectToastText("Copied"),
         description: expect.stringContaining("log lines copied to clipboard"),
       });
     });
@@ -303,16 +304,16 @@ describe("LogsPage remaining coverage", () => {
     fireEvent.click(screen.getByRole("button", { name: "Copy raw log line" }));
     await waitFor(() => {
       expect(toastMock).toHaveBeenCalledWith({
-        title: "Copied",
-        description: "Raw log line copied",
+        title: expectToastText("Copied"),
+        description: expectToastText("Raw log line copied"),
       });
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Copy parsed payload" }));
     await waitFor(() => {
       expect(toastMock).toHaveBeenCalledWith({
-        title: "Copy failed",
-        description: "Clipboard access denied",
+        title: expectToastText("Copy failed"),
+        description: expectToastText("Clipboard access denied"),
         variant: "destructive",
       });
     });
@@ -347,8 +348,8 @@ describe("LogsPage remaining coverage", () => {
     fireEvent.click(screen.getByRole("button", { name: "Copy log lines" }));
     await waitFor(() => {
       expect(toastMock).toHaveBeenCalledWith({
-        title: "Copied",
-        description: "205 log lines copied to clipboard",
+        title: expectToastText("Copied"),
+        description: expectToastText("205 log lines copied to clipboard"),
       });
     });
   });
