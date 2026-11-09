@@ -1,4 +1,5 @@
 import { test, expect, type Locator, type Page } from "@playwright/test";
+import { routePaths } from "../../client/src/lib/routes";
 
 const game = {
   id: "test-game-id-123",
@@ -1013,7 +1014,7 @@ test("keeps the RTL import-history table and task sheet accessible", async ({ pa
     });
   });
 
-  await page.goto("/import-history");
+  await page.goto(routePaths.importHistory);
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
   const table = page.getByRole("table");
   await expect(table).toBeVisible();
