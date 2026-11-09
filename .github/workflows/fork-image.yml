@@ -930,8 +930,8 @@ jobs:
             'any(.artifacts[]; .name == $name and (.expired | not))' \
             <<< "$artifacts_json" > /dev/null
           gh run view "$run_id" --repo "$GITHUB_REPOSITORY" --job "$release_job_id" --log-failed > release-failure.log
-          grep -Fq "Changelog is missing the section for version ${version}." release-failure.log || {
-            echo "The previous $TAG release-note failure does not match the known missing-section error." >&2
+          grep -Fq 'RELEASE_SHA: unbound variable' release-failure.log || {
+            echo "The previous $TAG release-note failure does not match the known missing RELEASE_SHA error." >&2
             exit 1
           }
 
