@@ -18,6 +18,20 @@ const successfulChecks = () =>
   }));
 
 describe("release security gate", () => {
+  it("declares every job whose results or outputs a publishing job consumes", () => {
+    const workflow = load(readFileSync(resolve(cwd(), ".github/workflows/fork-image.yml"), "utf8"));
+    for (const [name, job] of Object.entries(workflow.jobs)) {
+      const dependencies = Array.isArray(job.needs) ? job.needs : [job.needs];
+      const references = JSON.stringify(job).matchAll(/needs(?:\.([\w-]+)|\[['"]([\w-]+)['"]\])/gu);
+      for (const reference of references) {
+        expect(
+          dependencies,
+          `${name} consumes undeclared job ${reference[1] ?? reference[2]}`
+        ).toContain(reference[1] ?? reference[2]);
+      }
+    }
+  });
+
   it("grants every publishing gate the fallback token's required API read permissions", () => {
     const workflow = load(readFileSync(resolve(cwd(), ".github/workflows/fork-image.yml"), "utf8"));
     const gates = Object.entries(workflow.jobs).filter(([, job]) =>

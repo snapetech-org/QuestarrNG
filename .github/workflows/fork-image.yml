@@ -589,7 +589,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ inputs.release_tag }}
-          RELEASE_SHA: ${{ needs.release-security.outputs.release_sha }}
+          RELEASE_SHA: ${{ needs.publish.outputs.release_sha }}
         run: |
           set -euo pipefail
           VERSION="${TAG#v}"
@@ -930,10 +930,13 @@ jobs:
             'any(.artifacts[]; .name == $name and (.expired | not))' \
             <<< "$artifacts_json" > /dev/null
           gh run view "$run_id" --repo "$GITHUB_REPOSITORY" --job "$release_job_id" --log-failed > release-failure.log
-          grep -Fq 'RELEASE_SHA: unbound variable' release-failure.log || {
+          if ! grep -Fq 'RELEASE_SHA: unbound variable' release-failure.log && ! {
+            grep -Eq 'RELEASE_SHA:[[:space:]]*$' release-failure.log &&
+            grep -Fq "fatal: ambiguous argument ''" release-failure.log
+          }; then
             echo "The previous $TAG release-note failure does not match the known missing RELEASE_SHA error." >&2
             exit 1
-          }
+          fi
 
           image="ghcr.io/${GITHUB_REPOSITORY,,}"
           package_api="orgs/${GITHUB_REPOSITORY_OWNER}/packages/container/questarrng/versions?per_page=100"
