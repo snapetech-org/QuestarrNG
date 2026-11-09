@@ -162,8 +162,8 @@
     "@types/supertest": "^7.2.1",
     "@types/three": "^0.187.0",
     "@vitejs/plugin-react": "^6.2.1",
-    "@vitest/coverage-v8": "5.0.5",
-    "@vitest/ui": "5.0.5",
+    "@vitest/coverage-v8": "5.1.0",
+    "@vitest/ui": "5.1.0",
     "autoprefixer": "10.6.2",
     "cross-env": "^10.1.0",
     "drizzle-kit": "^0.31.11",
@@ -186,7 +186,7 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "8.72.1",
     "vite": "8.3.5",
-    "vitest": "5.0.5"
+    "vitest": "5.1.0"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
