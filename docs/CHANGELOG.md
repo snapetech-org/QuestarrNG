@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.1.6] - 2026-11-09
+
+### Release infrastructure
+
+- Restore tag-triggered CI, Semgrep, end-to-end, DAST, Scorecard, and dependency scans on compatible GitHub-hosted runners so the release security gate receives its required exact-source checks.
+
 ## [2.1.5] - 2026-11-09
 
 ### Upstream source attribution

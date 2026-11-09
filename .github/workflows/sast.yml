@@ -4,6 +4,8 @@ name: SAST
 run-name: ${{ format('action:{0}:pool:{1}', inputs.action, inputs.runner_pool) }}
 
 on:
+  push:
+    tags: ["v*"]
   workflow_dispatch:
 
     inputs:
