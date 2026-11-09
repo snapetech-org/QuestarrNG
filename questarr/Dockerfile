@@ -1,6 +1,6 @@
 # Build a small Alpine helper whose only elevated operation is correcting ownership
 # inside Home Assistant's writable /data mount.
-ARG QUESTARR_IMAGE=ghcr.io/snapetech-org/questarrng:2.1.1@sha256:0910618315c0899b64aff82e836e820a8610833045ac3c36fd8a4da51e4250c2
+ARG QUESTARR_IMAGE=ghcr.io/snapetech-org/questarrng:2.2.2@sha256:a9429efca6007331ed6c519f212b0356c31137c701b2985bb411a8f2bddc07ea
 FROM node:26.12.1-alpine@sha256:40cd011b55415bc894e45b02fdd5a5dfde056921b7d23a64c74f80497af48797 AS data-owner-builder
 RUN apk add --no-cache build-base
 COPY fix-data-owner.c /tmp/fix-data-owner.c

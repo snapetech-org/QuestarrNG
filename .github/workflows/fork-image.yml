@@ -841,7 +841,6 @@ jobs:
       release_date: ${{ steps.validate.outputs.release_date }}
       version: ${{ steps.validate.outputs.version }}
       source_run_id: ${{ steps.validate.outputs.source_run_id }}
-      image: ${{ steps.validate.outputs.image }}
       release_image_digest: ${{ steps.validate.outputs.release_image_digest }}
     steps:
       - name: Harden the runner (Audit all outbound calls)
@@ -938,7 +937,6 @@ jobs:
             exit 1
           fi
 
-          image="ghcr.io/${GITHUB_REPOSITORY,,}"
           package_api="orgs/${GITHUB_REPOSITORY_OWNER}/packages/container/questarrng/versions?per_page=100"
           source_tag="sha-${release_sha}"
           image_digest="$(gh api --paginate "$package_api" \
@@ -955,7 +953,6 @@ jobs:
             echo "release_date=$release_date"
             echo "version=$version"
             echo "source_run_id=$run_id"
-            echo "image=$image"
             echo "release_image_digest=$image_digest"
           } >> "$GITHUB_OUTPUT"
 
@@ -1213,7 +1210,8 @@ jobs:
     permissions:
       contents: write
     env:
-      IMAGE: ${{ needs['finalize-release'].outputs.image }}
+      # Registry login masking can suppress this public name as a job output.
+      IMAGE: ghcr.io/snapetech-org/questarrng
       IMAGE_DIGEST: ${{ needs['finalize-release'].outputs.release_image_digest }}
       TAG: ${{ inputs.finalize_release_tag }}
       RELEASE_SHA: ${{ needs['finalize-release'].outputs.release_sha }}
