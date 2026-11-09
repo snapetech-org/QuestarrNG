@@ -120,6 +120,8 @@ jobs:
       - name: Require clean security before building versioned images
         env:
           GH_TOKEN: ${{ secrets.SECURITY_READ_TOKEN || github.token }}
+          RELEASE_SHA: ${{ steps.validate.outputs.release_sha }}
+          RELEASE_REF: refs/tags/${{ inputs.release_tag }}
         run: node scripts/check-release-security.mjs
 
   build-source-image:
