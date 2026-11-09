@@ -241,6 +241,7 @@ export default function Header({
               <Suspense
                 fallback={
                   <Button
+                    disabled
                     variant="default"
                     size="sm"
                     aria-label={t("interface.add_game_75fb4616")}
