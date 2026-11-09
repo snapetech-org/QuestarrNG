@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [2.1.3] - 2026-11-09
+## [2.1.4] - 2026-11-09
 
 ### Upstream source attribution
 
