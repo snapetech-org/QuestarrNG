@@ -1,4 +1,4 @@
-# ng-runner-policy: private-jit-only-v1
+# ng-runner-policy: hosted-compatible-v1
 name: Create Release
 
 
@@ -15,7 +15,7 @@ on:
       runner_pool:
         description: Private ephemeral JIT runner pool
         type: choice
-        options: [private]
+        options: [public]
         required: true
       release_tag:
         description: Exact version tag to publish as a draft release
@@ -27,8 +27,8 @@ permissions:
 
 jobs:
   create-release:
-    if: github.repository == 'snapetech-org/QuestarrNG' && github.ref == 'refs/heads/main' && github.actor == 'snapetech' && inputs.action == 'release' && inputs.runner_pool == 'private' && inputs.release_tag != ''
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-create-release"]}}', github.run_id)) }}
+    if: github.repository == 'snapetech-org/QuestarrNG' && github.ref == 'refs/heads/main' && github.actor == 'snapetech' && inputs.action == 'release' && inputs.runner_pool == 'public' && inputs.release_tag != ''
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
 

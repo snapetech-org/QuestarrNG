@@ -89,7 +89,7 @@ npm run test:e2e
 #### Running tests in CI
 
 `.github/workflows/ci.yml` is manually dispatched from `main` with
-`action=ci` and `runner_pool=private`. It currently has no push or pull-request
+`action=ci` and `runner_pool=public`. It currently has no push or pull-request
 trigger. The jobs cover dependency and secret scanning, Windows service
 publishing, unit tests, linting, type checking, application builds, and Docker
 image builds:

@@ -1,5 +1,4 @@
-# packer-windows-jit-v1
-# ng-runner-policy: private-jit-only-v1
+# ng-runner-policy: hosted-compatible-v1
 name: Build Windows and Helm assets
 
 on:
@@ -23,7 +22,7 @@ jobs:
   build:
     name: Build Windows x64 installer
     if: github.repository_id == '1388297896' && (github.event_name != 'workflow_dispatch' || inputs.release_tag == '' || github.ref == 'refs/heads/main')
-    runs-on: ${{ fromJSON(format('{{"group":"packer-windows","labels":["self-hosted","Windows","X64","on-demand","packer-windows","QuestarrNG","gha-{0}-build"]}}', github.run_id)) }}
+    runs-on: windows-2025
     permissions:
       contents: read
     outputs:

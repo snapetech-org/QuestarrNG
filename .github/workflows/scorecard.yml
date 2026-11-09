@@ -1,4 +1,4 @@
-# ng-runner-policy: private-jit-only-v1
+# ng-runner-policy: hosted-compatible-v1
 # This workflow uses actions that are not certified by GitHub. They are provided
 # by a third-party and are governed by separate terms of service, privacy
 # policy, and support documentation.
@@ -7,11 +7,11 @@ name: Scorecard supply-chain security
 
 run-name: >-
   ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') &&
-      format('action:ci:pool:private:tag:{0}', github.ref_name) ||
+      format('action:ci:pool:public:tag:{0}', github.ref_name) ||
       github.event_name == 'workflow_dispatch' && startsWith(github.ref, 'refs/tags/') &&
-      format('action:{0}:pool:{1}:tag:{2}', inputs.action || 'ci', inputs.runner_pool || 'private', github.ref_name) ||
+      format('action:{0}:pool:{1}:tag:{2}', inputs.action || 'ci', inputs.runner_pool || 'public', github.ref_name) ||
       github.event_name == 'workflow_dispatch' &&
-      format('action:{0}:pool:{1}', inputs.action || 'ci', inputs.runner_pool || 'private') || format('action:ci:pool:private') }}
+      format('action:{0}:pool:{1}', inputs.action || 'ci', inputs.runner_pool || 'public') || format('action:ci:pool:public') }}
 on:
   branch_protection_rule:
   workflow_dispatch:
@@ -22,9 +22,9 @@ on:
         options: [ci]
         required: true
       runner_pool:
-        description: Required private JIT runner pool
+        description: Compatible hosted runner pool
         type: choice
-        options: [private]
+        options: [public]
         required: true
   # To guarantee Maintained check is occasionally updated. See
   # https://github.com/ossf/scorecard/blob/main/docs/checks.md#maintained
@@ -41,7 +41,7 @@ jobs:
     name: Scorecard analysis
     # The Scorecard action runs in a Docker container; the repository-scoped JIT
     # runner used by other main-branch jobs does not provide Docker.
-    runs-on: ${{ fromJSON(format('{{"group":"ng-shared-main-jit","labels":["self-hosted","linux","x64","ng-shared-main-questarrng","ng-main-run-{0}","gha-{0}-analysis"]}}', github.run_id)) }}
+    runs-on: ubuntu-24.04
     # `publish_results: true` only works when run from the default branch. conditional can be removed if disabled.
     if: >-
       (
@@ -49,7 +49,7 @@ jobs:
         (
           github.ref == 'refs/heads/main' &&
           inputs.action == 'ci' &&
-          inputs.runner_pool == 'private'
+          inputs.runner_pool == 'public'
         )
       ) &&
       (

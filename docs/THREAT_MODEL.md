@@ -103,8 +103,7 @@ Eight named trust boundaries:
    operators should keep the configured daemon on a trusted network.
 8. **GitHub Actions ↔ candidate source** — pull-request code, lockfiles, and generated
    reports are untrusted. Build, test, scan, package, and release jobs use compatible
-   private ephemeral JIT runners with read-only permissions where possible; no hosted
-   runner fallback is allowed. Public-fork code uses the isolated disposable `public-fork-jit`
+   hosted runners with read-only permissions where possible. Public-fork code uses the isolated disposable `public-fork-jit`
    group without secrets. The current CI workflow is manually dispatched from `main`.
    Codecov reports are uploaded by a default-branch `workflow_run` job only for a
    non-cancelled, same-repository manual CI dispatch from `main`, behind the

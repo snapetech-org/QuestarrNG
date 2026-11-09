@@ -11,8 +11,7 @@ describe("Trivy workflow action policy", () => {
     const job = workflow.jobs.trivy;
     const setup = job.steps.find((step) => step.name === "Install the latest Trivy release");
 
-    expect(job["runs-on"]).toContain("ng-shared-main-jit");
-    expect(job["runs-on"]).toContain("ng-main-run-{0}");
+    expect(job["runs-on"]).toBe("ubuntu-24.04");
     expect(setup.uses).toBe("aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514");
     expect(setup.with.version).toBe("latest");
     expect(setup.with.token).toBe("${{ github.token }}");

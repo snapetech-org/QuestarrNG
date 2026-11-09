@@ -61,8 +61,8 @@ Evidence: [`ci.yml`](../.github/workflows/ci.yml),
 
 [`dast.yml`](../.github/workflows/dast.yml) builds and starts the production
 server, waits for its health endpoint, and runs the OWASP ZAP baseline scan
-against that live instance. It is manually dispatched from `main` on the
-private JIT pool; it does not run on pushes or a schedule. `fail_action: true`
+against that live instance. It is manually dispatched from `main` on a
+compatible hosted runner; it does not run on pushes or a schedule. `fail_action: true`
 makes unignored scan alerts fail the workflow; accepted rule IDs and their rationale are recorded in
 [`.zap/rules.tsv`](../.zap/rules.tsv).
 

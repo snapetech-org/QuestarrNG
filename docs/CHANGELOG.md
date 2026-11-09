@@ -6,11 +6,11 @@ All notable changes to this project will be documented in this file.
 
 ### Upstream source attribution
 
-- Publicly credit 920 reviewed Questarr issues and pull requests whose upstream code, reports, suggestions, or superseded ideas are verified, implemented pending verification, or retained as provenance in QuestarrNG. The [source ledger](../UPSTREAM_ATTRIBUTION.md) links every originating record and upstream author while making clear that those people contributed to Questarr, not directly to this fork.
+- Publicly credit all 1,163 Questarr issues and pull requests captured by the fork audit. The [source ledger](../UPSTREAM_ATTRIBUTION.md) links every originating record and upstream author, separates verified, implementation-pending-verification, superseded, unreviewed, and not-applicable dispositions, and makes clear that those people contributed to Questarr, not directly to this fork.
 
 ### Security
 
-- CodeQL workflows and CodeQL Action SARIF uploads are disabled by organization policy. Private-JIT Semgrep, Trivy, and Scorecard workflows remain available through their configured dispatches; SARIF reports stay as workflow artifacts, and the release gate no longer waits for CodeQL analyses.
+- CodeQL workflows and CodeQL Action SARIF uploads are disabled by organization policy. Semgrep, Trivy, and Scorecard workflows remain available through their configured runner routes; SARIF reports stay as workflow artifacts, and the release gate no longer waits for CodeQL analyses.
 
 User-facing pull requests add validated fragments under [`release-notes/`](../release-notes/).
 The release workflow adds those fragments to the versioned release notes and

@@ -6,4 +6,4 @@ action: none
 breaking: false
 ---
 
-QuestarrNG now publicly links and credits 920 reviewed upstream Questarr sources whose behavior or superseded ideas remain part of the fork’s provenance, without implying direct contributions.
+QuestarrNG now publicly links and credits all 1,163 upstream Questarr sources captured by its fork audit. The ledger distinguishes verified, implementation-pending-verification, superseded, unreviewed, and not-applicable records without implying direct contributions.

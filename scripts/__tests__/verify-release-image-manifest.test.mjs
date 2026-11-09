@@ -103,7 +103,7 @@ describe("release image manifest verification", () => {
     expect(platformBuild.needs).toBe("release-security");
     expect(nativeRunners).toContain("linux-x64");
     expect(nativeRunners).toContain("linux-arm64");
-    expect(platformBuild["runs-on"]).toContain("ng-shared-main-jit");
+    expect(platformBuild["runs-on"]).toContain("ubuntu-24.04-arm");
     expect(
       platformBuild.steps.some((step) => step.uses?.startsWith("step-security/setup-qemu-action@"))
     ).toBe(false);
