@@ -27,7 +27,7 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
       DISCORD_ANNOUNCEMENT_WEBHOOK: ${{ secrets.DISCORD_ANNOUNCEMENT_WEBHOOK }}
-      ANNOUNCEMENT_RECEIPT: ${{ runner.temp }}/discord-release-receipt.json
+      ANNOUNCEMENT_RECEIPT: discord-release-receipt.json
       TAG: ${{ github.event.workflow_run.head_branch }}
     steps:
       - name: Checkout trusted default-branch release tooling
@@ -50,6 +50,6 @@ jobs:
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: discord-release-receipt
-          path: ${{ runner.temp }}/discord-release-receipt.json
+          path: discord-release-receipt.json
           if-no-files-found: ignore
           retention-days: 90
