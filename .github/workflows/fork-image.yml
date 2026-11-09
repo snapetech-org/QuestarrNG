@@ -892,10 +892,9 @@ jobs:
           fi
           release_date="$(git show -s --format=%cs "$release_sha")"
 
-          if ! git diff --quiet "$release_sha" origin/main -- release-notes; then
-            echo 'Release-note fragments changed after the tagged source; refusing to assemble notes from a different source.' >&2
-            exit 1
-          fi
+          # Later main commits may add fragments for later releases. Assembly
+          # is pinned to release_sha below, so only fragments reachable from
+          # the recovered tag can enter this release body.
           if release_status="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}" 2>&1)"; then
             echo "A GitHub release already exists for $TAG; refusing to replace it." >&2
             exit 1
