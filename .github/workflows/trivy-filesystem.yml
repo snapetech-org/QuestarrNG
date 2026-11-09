@@ -41,7 +41,7 @@ jobs:
           persist-credentials: false
 
       - name: Install the latest Trivy release
-        uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514 # full SHA required by organization action policy
+        uses: aquasecurity/setup-trivy@81e514348e19b6112ce2a7e3ecbafe19c1e1f567 # full SHA required by organization action policy
         with:
           version: latest
           token: ${{ github.token }}
