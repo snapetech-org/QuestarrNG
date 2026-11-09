@@ -18,6 +18,28 @@ const { fsMock, downloadersMock } = vi.hoisted(() => ({
   },
 }));
 
+vi.mock("node:fs/promises", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("node:fs/promises")>()),
+  opendir: vi.fn(async (dir: string) => ({
+    async *[Symbol.asyncIterator]() {
+      for (const entry of await fsMock.readdir(dir)) {
+        if (typeof entry === "string")
+          yield {
+            name: entry,
+            isDirectory: () => false,
+            isFile: () => true,
+            isSymbolicLink: () => false,
+          };
+        else
+          yield {
+            ...entry,
+            isSymbolicLink: () => entry.isSymbolicLink?.() ?? false,
+            isFile: () => !entry.isDirectory(),
+          };
+      }
+    },
+  })),
+}));
 vi.mock("fs-extra", () => ({
   default: fsMock,
 }));
@@ -85,7 +107,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await manager.processImport("dl-1", "/remote/path");
@@ -104,7 +127,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     const first = manager.processImport("dl-1", "/remote/path");
@@ -138,7 +162,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await manager.processImport("dl-1", "/remote/path");
@@ -169,7 +194,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await manager.processImport("dl-1", "/remote/path");
@@ -197,7 +223,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     // MAX_PATH_RETRY = 5: first 4 calls set status back to "downloading"; 5th triggers manual_review_required
@@ -227,7 +254,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await manager.processImport("dl-1", "/remote/path");
@@ -248,7 +276,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await expect(
@@ -262,7 +291,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await expect(manager.confirmImport("dl-1")).rejects.toThrow("Confirmation requires a plan");
@@ -283,7 +313,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await expect(
@@ -314,7 +345,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await expect(
@@ -343,7 +375,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await expect(
@@ -371,7 +404,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await manager.confirmImport("dl-1", {
@@ -416,7 +450,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await manager.confirmImport("dl-1", {
@@ -448,7 +483,8 @@ describe("ImportManager", () => {
         storage as never, // NOSONAR
         pathService as never, // NOSONAR
         platformService as never, // NOSONAR
-        archiveService as never // NOSONAR
+        archiveService as never,
+        { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
       );
 
       await manager.confirmImport("dl-1", {
@@ -487,7 +523,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await manager.processImport("dl-1", "/remote/path");
@@ -522,7 +559,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await manager.processImport("dl-1", "/remote/path");
@@ -556,7 +594,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await expect(
@@ -589,7 +628,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await expect(
@@ -632,7 +672,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await manager.processImport("dl-1", "/remote/path");
@@ -676,7 +717,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await manager.confirmImport("dl-1", {
@@ -717,7 +759,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await expect(
@@ -765,7 +808,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await manager.confirmImport("dl-1", {
@@ -822,7 +866,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     try {
@@ -878,7 +923,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await manager.confirmImport("dl-1", {
@@ -934,7 +980,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await manager.confirmImport("dl-1", {
@@ -973,7 +1020,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await expect(
@@ -1034,7 +1082,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
   }
 
@@ -1144,7 +1193,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await manager.processImport("dl-1", "/downloads/game.zip");
@@ -1176,7 +1226,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await manager.processImport("dl-1", "/downloads/game.zip");
@@ -1225,7 +1276,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await manager.processImport("dl-1", "/remote/downloads/game.zip");
@@ -1281,7 +1333,8 @@ describe("ImportManager", () => {
         storage as never, // NOSONAR
         pathService as never, // NOSONAR
         platformService as never, // NOSONAR
-        archiveService as never // NOSONAR
+        archiveService as never,
+        { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
       );
 
       await manager.processImport("dl-1", "/remote/downloads/game.wux");
@@ -1342,7 +1395,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await manager.processImport("dl-1", "/remote/downloads/Test Game.iso");
@@ -1387,7 +1441,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await manager.processImport("dl-1", "/remote/path");
@@ -1432,7 +1487,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
 
     await manager.processImport("dl-1", "/remote/path");
@@ -1478,7 +1534,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
     await manager.processImport("dl-1", "/remote/path");
 
@@ -1496,7 +1553,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
     await manager.processImport("dl-1", "/remote/path");
 
@@ -1514,7 +1572,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
     await manager.processImport("dl-1", "/remote/path");
 
@@ -1528,7 +1587,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
     await manager.processImport("dl-1", "/remote/path");
 
@@ -1559,7 +1619,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
     await manager.processImport("dl-1", "/remote/path");
 
@@ -1577,7 +1638,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
     await manager.processImport("dl-1", "/remote/path");
 
@@ -1597,7 +1659,8 @@ describe("ImportManager", () => {
       storage as never, // NOSONAR
       pathService as never, // NOSONAR
       platformService as never, // NOSONAR
-      archiveService as never // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
     );
     await manager.processImport("dl-1", "/remote/path");
 
@@ -1970,7 +2033,8 @@ describe("ImportManager", () => {
         storage as never, // NOSONAR
         pathService as never, // NOSONAR
         platformService as never, // NOSONAR
-        archiveService as never // NOSONAR
+        archiveService as never,
+        { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
       );
 
       await manager.processImport("dl-1", "/remote/path");
@@ -1990,7 +2054,8 @@ describe("ImportManager", () => {
         storage as never, // NOSONAR
         pathService as never, // NOSONAR
         platformService as never, // NOSONAR
-        archiveService as never // NOSONAR
+        archiveService as never,
+        { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
       );
 
       await expect(

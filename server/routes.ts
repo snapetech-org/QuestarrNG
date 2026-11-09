@@ -2523,6 +2523,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     "/api/games/bulk-discovery",
     authenticateToken,
     sensitiveEndpointLimiter,
+    validate(bulkDiscoveryRequestSchema),
     async (req: Request, res: Response) => {
       const parsed = bulkDiscoveryRequestSchema.safeParse(req.body);
       if (!parsed.success) {
@@ -2634,6 +2635,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     "/api/games/import/preview",
     authenticateToken,
     sensitiveEndpointLimiter,
+    validate(libraryCatalogSchema),
     async (req, res) => {
       const parsed = libraryCatalogSchema.safeParse(req.body);
       if (!parsed.success) {
@@ -2670,46 +2672,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   );
 
-  app.post("/api/games/import", authenticateToken, sensitiveEndpointLimiter, async (req, res) => {
-    const parsed = libraryCatalogSchema.safeParse(req.body);
-    if (!parsed.success) {
-      return res.status(400).json({
-        error: "Invalid QuestarrNG library catalog",
-        details: parsed.error.issues,
-      });
-    }
-    try {
-      const existingGames = await storage.getUserGames(req.user!.id, true);
-      const seen = catalogIdentitySet(existingGames);
-      let addedCount = 0;
-      let skippedCount = 0;
-      let errorCount = 0;
-      for (const game of parsed.data.games) {
-        const keys = catalogIdentityKeys(game);
-        if (keys.some((key) => seen.has(key))) {
-          skippedCount += 1;
-          continue;
-        }
-        try {
-          const insert = insertGameSchema.parse({
-            ...game,
-            userId: req.user!.id,
-            source: "manual",
-          });
-          await storage.addGame(insert);
-          keys.forEach((key) => seen.add(key));
-          addedCount += 1;
-        } catch (error) {
-          errorCount += 1;
-          routesLogger.warn({ error, title: game.title }, "skipping invalid imported game");
-        }
+  app.post(
+    "/api/games/import",
+    authenticateToken,
+    sensitiveEndpointLimiter,
+    validate(libraryCatalogSchema),
+    async (req, res) => {
+      const parsed = libraryCatalogSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({
+          error: "Invalid QuestarrNG library catalog",
+          details: parsed.error.issues,
+        });
       }
-      return res.json({ success: errorCount === 0, addedCount, skippedCount, errorCount });
-    } catch (error) {
-      routesLogger.error({ error }, "error importing game library");
-      return res.status(500).json({ error: "Failed to import game library" });
+      try {
+        const existingGames = await storage.getUserGames(req.user!.id, true);
+        const seen = catalogIdentitySet(existingGames);
+        let addedCount = 0;
+        let skippedCount = 0;
+        let errorCount = 0;
+        for (const game of parsed.data.games) {
+          const keys = catalogIdentityKeys(game);
+          if (keys.some((key) => seen.has(key))) {
+            skippedCount += 1;
+            continue;
+          }
+          try {
+            const insert = insertGameSchema.parse({
+              ...game,
+              userId: req.user!.id,
+              source: "manual",
+            });
+            await storage.addGame(insert);
+            keys.forEach((key) => seen.add(key));
+            addedCount += 1;
+          } catch (error) {
+            errorCount += 1;
+            routesLogger.warn({ error, title: game.title }, "skipping invalid imported game");
+          }
+        }
+        return res.json({ success: errorCount === 0, addedCount, skippedCount, errorCount });
+      } catch (error) {
+        routesLogger.error({ error }, "error importing game library");
+        return res.status(500).json({ error: "Failed to import game library" });
+      }
     }
-  });
+  );
 
   // Refresh metadata for all games
   app.post("/api/games/refresh-metadata", igdbRateLimiter, async (req, res) => {

@@ -16,6 +16,28 @@ const { fsMock, downloadersMock } = vi.hoisted(() => ({
   },
 }));
 
+vi.mock("node:fs/promises", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("node:fs/promises")>()),
+  opendir: vi.fn(async (dir: string) => ({
+    async *[Symbol.asyncIterator]() {
+      for (const entry of await fsMock.readdir(dir)) {
+        if (typeof entry === "string")
+          yield {
+            name: entry,
+            isDirectory: () => false,
+            isFile: () => true,
+            isSymbolicLink: () => false,
+          };
+        else
+          yield {
+            ...entry,
+            isSymbolicLink: () => entry.isSymbolicLink?.() ?? false,
+            isFile: () => !entry.isDirectory(),
+          };
+      }
+    },
+  })),
+}));
 vi.mock("fs-extra", () => ({ default: fsMock }));
 vi.mock("../downloaders.js", () => ({ DownloaderManager: downloadersMock }));
 
@@ -80,7 +102,8 @@ function makeManager(
     storage as never, // NOSONAR
     pathService as never, // NOSONAR
     platformService as never, // NOSONAR
-    archiveService as never // NOSONAR
+    archiveService as never,
+    { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
   );
 }
 

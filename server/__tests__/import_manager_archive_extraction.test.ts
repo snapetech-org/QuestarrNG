@@ -71,7 +71,8 @@ function createManager(
     storage as never, // NOSONAR
     pathService as never, // NOSONAR
     platformService as never, // NOSONAR
-    archiveService
+    archiveService,
+    { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) }
   );
 }
 

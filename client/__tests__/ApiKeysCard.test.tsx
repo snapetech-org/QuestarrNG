@@ -16,7 +16,8 @@ vi.mock("@/hooks/use-toast", () => ({
 }));
 
 const apiRequest = vi.fn();
-vi.mock("@/lib/queryClient", () => ({
+vi.mock("@/lib/queryClient", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/queryClient")>()),
   apiRequest: (...args: unknown[]) => apiRequest(...args),
 }));
 

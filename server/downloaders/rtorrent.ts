@@ -112,7 +112,7 @@ export class RTorrentClient implements DownloaderClient {
         success: false,
         ...serviceMessage("service.connection_failed", {
           client: "rTorrent",
-          error: safeError,
+          error: safeError === errorMessage ? serviceErrorValue(error) : safeError,
         }),
       };
     }

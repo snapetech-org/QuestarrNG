@@ -175,7 +175,7 @@ export default function AppSidebar({ activeItem = "/", onNavigate }: Readonly<Ap
 
   return (
     // Sidebar positions itself at the logical start edge, including RTL.
-    <Sidebar data-testid="sidebar-main">
+    <Sidebar side={language === "ar" ? "right" : "left"} data-testid="sidebar-main">
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 flex items-center justify-center">

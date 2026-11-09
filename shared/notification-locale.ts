@@ -539,6 +539,7 @@ export function getNotificationLabel(source: string, language: NotificationLangu
 }
 
 export function getNotificationTitle(source: string, language: NotificationLanguage): string {
+  if (language === "en") return source;
   const securityAlert = getLocalizedSecurityAlertTitleParts(source, language);
   if (securityAlert) {
     return `${securityAlert.prefix} ${isolateBidirectionalValue(securityAlert.provider)}`;

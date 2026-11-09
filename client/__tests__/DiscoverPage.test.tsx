@@ -22,8 +22,9 @@ const carouselRenderLog = vi.hoisted(
 );
 const mockHiddenMutate = vi.hoisted(() => vi.fn());
 
+const stableToast = vi.fn();
 vi.mock("@/hooks/use-toast", () => ({
-  useToast: () => ({ toast: vi.fn() }),
+  useToast: () => ({ toast: stableToast }),
 }));
 
 vi.mock("@/hooks/use-hidden-mutation", () => ({

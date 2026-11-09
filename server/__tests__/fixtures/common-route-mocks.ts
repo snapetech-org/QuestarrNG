@@ -410,6 +410,7 @@ export function createConfigLoaderMock() {
 
 export function createSocketMock() {
   return {
+    disconnectUserSockets: vi.fn(),
     notifyUser: vi.fn(),
   };
 }

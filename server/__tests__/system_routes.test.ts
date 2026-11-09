@@ -209,7 +209,7 @@ describe("systemRouter /browse", () => {
     expect(response.body.parent).toBe("/roms");
   });
 
-  it("returns 500 when path contains a null byte", async () => {
+  it("rejects a path containing a null byte", async () => {
     // Node rejects paths with embedded null bytes with ERR_INVALID_ARG_VALUE,
     // which the route catch block translates to 500.
     fsMock.pathExists.mockRejectedValue(
@@ -218,7 +218,7 @@ describe("systemRouter /browse", () => {
     const app = createApp();
 
     const response = await request(app).get("/api/system/browse?path=roms%00evil");
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(403);
   });
 
   it("strips leading slashes from path param and browses normally", async () => {

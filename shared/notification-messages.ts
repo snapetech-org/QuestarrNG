@@ -627,9 +627,9 @@ export function localizeOutboundNotification(
                 ? value
                 : new Intl.NumberFormat(language).format(Number(value))
               : key === "error" && value === "unknown error" && language !== "en"
-                ? MESSAGES.unknownError[getNotificationCatalogIndex(language)] ?? value
+                ? (MESSAGES.unknownError[getNotificationCatalogIndex(language)] ?? value)
                 : value;
-          return isolateBidirectionalValue(interpolated);
+          return language === "en" ? interpolated : isolateBidirectionalValue(interpolated);
         })
       : message;
   return { title: getNotificationTitle(title, language), message: translatedMessage };

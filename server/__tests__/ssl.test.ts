@@ -22,6 +22,7 @@ vi.mock("fs", () => ({
     existsSync: mocks.existsSync,
     promises: {
       mkdir: mocks.mkdir,
+      chmod: vi.fn().mockResolvedValue(undefined),
       writeFile: mocks.writeFile,
       readFile: mocks.readFile,
     },

@@ -4,6 +4,7 @@ import type { Indexer } from "../../shared/schema";
 import { DatabaseStorage } from "../storage";
 
 vi.mock("../credential-crypto", () => ({
+  getCredentialsEncryptionKey: vi.fn().mockResolvedValue(Buffer.alloc(32)),
   encryptCredential: vi.fn(async (value) => value),
   decryptCredential: vi.fn(async (value) => value),
 }));
