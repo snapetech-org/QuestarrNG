@@ -36,7 +36,9 @@ describe("stored JWT secret migration", () => {
 
     const tokens = await Promise.all([generateToken(user), generateToken(user)]);
 
-    expect(mocks.getSystemConfig).toHaveBeenCalledTimes(1);
+    expect(mocks.getSystemConfig.mock.calls.filter(([key]) => key === "jwt_secret")).toHaveLength(
+      1
+    );
     expect(mocks.setSystemConfig).toHaveBeenCalledTimes(1);
     const replacement = mocks.setSystemConfig.mock.calls[0]?.[1] as string;
     for (const token of tokens) {

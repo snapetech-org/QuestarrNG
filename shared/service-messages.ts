@@ -276,7 +276,7 @@ export function localizeServiceMessage(
           ? new Intl.NumberFormat(language).format(raw)
           : String(raw)
         : String(raw);
-    return isolateBidirectionalValue(value);
+    return language === "en" ? value : isolateBidirectionalValue(value);
   });
   return localized;
 }

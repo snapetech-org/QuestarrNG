@@ -621,7 +621,6 @@ export async function matchUnmatchedFolder(
  * available via `getScanProgress` / `getAllUnmatched` while it runs.
  */
 export async function scanRootFolderById(rootFolderId: string, userId: string): Promise<void> {
-  await hydrateScanState();
   // Guard before the first await so two near-simultaneous requests for the
   // same root folder can't both pass this check and race on shared
   // progress/unmatched state or duplicate filesystem/IGDB work.
@@ -632,6 +631,7 @@ export async function scanRootFolderById(rootFolderId: string, userId: string): 
   activeScans.add(rootFolderId);
 
   try {
+    await hydrateScanState();
     const rootFolder = await storage.getRootFolder(rootFolderId);
     if (!rootFolder) throw new ServiceMessageError("service.root_folder_missing", {});
     if (!rootFolder.enabled) {

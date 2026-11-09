@@ -73,7 +73,7 @@ describe("default-deny API auth boundary", () => {
   });
 
   function tokenFor(id: string) {
-    return jwt.sign({ id, username: "testuser" }, JWT_SECRET);
+    return jwt.sign({ sessionVersion: "0", id, username: "testuser" }, JWT_SECRET);
   }
 
   describe("previously-public routes still work with no token", () => {

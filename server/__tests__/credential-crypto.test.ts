@@ -22,7 +22,7 @@ describe("credential-crypto", () => {
     // Fresh module registry so the in-memory encryption key cache resets per test.
     vi.resetModules();
     vi.doMock("../config-loader.js", () => ({
-      configLoader: { getConfigDir: () => keyDirectory },
+      configLoader: { getConfigDir: () => keyDirectory, getSslConfig: () => ({ enabled: false }) },
     }));
 
     const dbModule = await import("../db.js");
@@ -101,7 +101,7 @@ describe("credential-crypto", () => {
     const ciphertext = await encryptCredential("stored-key-value");
     vi.resetModules();
     vi.doMock("../config-loader.js", () => ({
-      configLoader: { getConfigDir: () => keyDirectory },
+      configLoader: { getConfigDir: () => keyDirectory, getSslConfig: () => ({ enabled: false }) },
     }));
     const reloadedDbModule = await import("../db.js");
     await migrate(reloadedDbModule.db, { migrationsFolder: "migrations" });

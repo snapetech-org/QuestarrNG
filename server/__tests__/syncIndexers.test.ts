@@ -3,6 +3,11 @@ import type { Indexer } from "../../shared/schema";
 // We need to access the class directly to test it, or test via interface if we mock db
 import { DatabaseStorage } from "../storage";
 
+vi.mock("../credential-crypto", () => ({
+  encryptCredential: vi.fn(async (value) => value),
+  decryptCredential: vi.fn(async (value) => value),
+}));
+
 // Mock db.ts
 vi.mock("../db", () => ({
   dialect: "sqlite",

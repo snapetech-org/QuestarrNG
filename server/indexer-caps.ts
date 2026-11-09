@@ -105,7 +105,7 @@ export function withheldApiKeyHint(
 export function formatIndexerHttpError(
   indexer: Pick<Indexer, "url" | "apiKey" | "allowInsecureLan">,
   status: number,
-  statusText: string
+  statusText = ""
 ): string {
   const message = `HTTP ${status}: ${statusText}`;
   const withheldHint = withheldApiKeyHint(indexer, status);
@@ -120,7 +120,7 @@ export function formatIndexerHttpError(
 export function indexerHttpErrorMessage(
   indexer: Pick<Indexer, "url" | "apiKey" | "allowInsecureLan">,
   status: number,
-  statusText: string
+  statusText = ""
 ): ServiceMessageFragment {
   const key = withheldApiKeyHint(indexer, status)
     ? "service.indexer_http_key_withheld"

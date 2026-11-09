@@ -101,7 +101,10 @@ describe("auth Module", () => {
     });
 
     it("should return 401 if user not found", async () => {
-      const token = jwt.sign({ id: "nonexistent", username: "ghost" }, MOCK_JWT_SECRET);
+      const token = jwt.sign(
+        { sessionVersion: "0", id: "nonexistent", username: "ghost" },
+        MOCK_JWT_SECRET
+      );
 
       const req = mockRequest(token);
       const res = mockResponse();
@@ -117,7 +120,10 @@ describe("auth Module", () => {
     });
 
     it("should call next() if token and user are valid", async () => {
-      const token = jwt.sign({ id: "valid_id", username: "valid_user" }, MOCK_JWT_SECRET);
+      const token = jwt.sign(
+        { sessionVersion: "0", id: "valid_id", username: "valid_user" },
+        MOCK_JWT_SECRET
+      );
 
       const req = mockRequest(token);
       const res = mockResponse();
@@ -148,16 +154,16 @@ describe("auth Module", () => {
       expect(next).not.toHaveBeenCalled();
     });
 
-    it("should return 403 on invalid signature", async () => {
-      const maliciousToken = jwt.sign({ id: "valid_id" }, WRONG_JWT_SECRET);
+    it("should reject an invalid signature", async () => {
+      const maliciousToken = jwt.sign({ sessionVersion: "0", id: "valid_id" }, WRONG_JWT_SECRET);
 
       const req = mockRequest(maliciousToken);
       const res = mockResponse();
 
       await authenticateToken(req, res, next);
 
-      expect(res.status).toHaveBeenCalledWith(403);
-      expect(res.json).toHaveBeenCalledWith({ error: "Invalid or expired token" });
+      expect(res.status).toHaveBeenCalledWith(401);
+      expect(res.json).toHaveBeenCalledWith({ error: "User not found" });
     });
   });
 });

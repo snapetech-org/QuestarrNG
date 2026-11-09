@@ -115,7 +115,8 @@ describe("integration API", () => {
   });
 
   const withKey = (req: request.Test) => req.set("X-Api-Key", RAW_KEY);
-  const tokenFor = (id: string) => jwt.sign({ id, username: "testuser" }, JWT_SECRET);
+  const tokenFor = (id: string) =>
+    jwt.sign({ sessionVersion: "0", id, username: "testuser" }, JWT_SECRET);
 
   it("advertises and streams a request-scoped multi-file bundle", async () => {
     const libraryRoot = await mkdtemp(path.join(os.tmpdir(), "questarr-seerr-assets-"));

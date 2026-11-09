@@ -219,6 +219,7 @@ export async function createAuthMock() {
       next();
     },
     generateToken: vi.fn().mockResolvedValue("mock-token"),
+    revokeUserSessions: vi.fn().mockResolvedValue(undefined),
     comparePassword: vi.fn().mockResolvedValue(true),
     hashPassword: vi.fn().mockResolvedValue("hashed-password"),
   };

@@ -31,6 +31,7 @@ const {
 
 vi.mock("fs-extra", () => ({
   default: {
+    access: vi.fn().mockResolvedValue(undefined),
     ensureDir: ensureDirMock,
     move: moveMock,
     readdir: readdirMock,
@@ -40,6 +41,12 @@ vi.mock("fs-extra", () => ({
     rmdir: vi.fn().mockResolvedValue(undefined),
     remove: removeMock,
   },
+}));
+
+vi.mock("node:fs/promises", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("node:fs/promises")>()),
+  statfs: vi.fn().mockResolvedValue({ bavail: 100n * 1024n ** 3n, bsize: 1n }),
+  opendir: vi.fn(async () => ({ async *[Symbol.asyncIterator]() {} })),
 }));
 
 vi.mock("../logger.js", () => ({

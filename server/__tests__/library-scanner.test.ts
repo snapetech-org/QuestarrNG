@@ -32,6 +32,8 @@ const mockRootFolder: RootFolder = {
 
 vi.mock("../storage.js", () => ({
   storage: {
+    getSystemConfig: vi.fn().mockResolvedValue(undefined),
+    setSystemConfig: vi.fn().mockResolvedValue(undefined),
     getRootFolder: vi.fn(),
     getEnabledRootFolders: vi.fn().mockResolvedValue([]),
     touchRootFolderScanned: vi.fn().mockResolvedValue(undefined),

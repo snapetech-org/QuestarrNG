@@ -48,7 +48,7 @@ const TEST_USER = { id: "user-1", username: "testuser" };
 const TEST_PASSWORD = "correct horse battery staple";
 
 function tokenFor(id: string) {
-  return jwt.sign({ id, username: TEST_USER.username }, JWT_SECRET);
+  return jwt.sign({ sessionVersion: "0", id, username: TEST_USER.username }, JWT_SECRET);
 }
 
 /** Parse `Set-Cookie` response headers into a name -> {value, attrs} map for assertions. */

@@ -62,7 +62,13 @@ describe("ImportStrategies", () => {
       path.join(source, ".questarr-extract-data", "level.pak")
     );
     await new PCImportStrategy().executeImport(
-      { needsReview: false, originalPath: source, proposedPath: destination, strategy: "pc" },
+      {
+        needsReview: false,
+        originalPath: source,
+        proposedPath: destination,
+        targetRoot: path.dirname(destination),
+        strategy: "pc",
+      },
       "move"
     );
 
@@ -77,12 +83,7 @@ describe("ImportStrategies", () => {
     const loop = path.join(source, "loop");
     await fs.symlink(source, loop, "dir");
 
-    const files = await gatherFiles(source);
-
-    expect(files).toContain(path.join(source, "game.rom"));
-    expect(files).toContain(loop);
-    expect(files).not.toContain(path.join(loop, "game.rom"));
-    expect(files).toHaveLength(2);
+    await expect(gatherFiles(source)).rejects.toThrow(/symbolic link/);
   });
 
   it.each(["EXDEV", "EPERM", "EACCES", "ENOTSUP", "EOPNOTSUPP"])(
@@ -103,6 +104,7 @@ describe("ImportStrategies", () => {
           needsReview: false,
           originalPath: source,
           proposedPath: destination,
+          targetRoot: path.dirname(destination),
           strategy: "pc",
         },
         "hardlink"
@@ -132,6 +134,7 @@ describe("ImportStrategies", () => {
           needsReview: false,
           originalPath: source,
           proposedPath: destination,
+          targetRoot: path.dirname(destination),
           strategy: "pc",
         },
         "copy"
@@ -155,6 +158,7 @@ describe("ImportStrategies", () => {
           needsReview: false,
           originalPath: sourceDir,
           proposedPath: destination,
+          targetRoot: path.dirname(destination),
           strategy: "pc",
         },
         "copy"
@@ -185,6 +189,7 @@ describe("ImportStrategies", () => {
           needsReview: false,
           originalPath: sourceDir,
           proposedPath: destination,
+          targetRoot: path.dirname(destination),
           strategy: "pc",
         },
         "hardlink"
@@ -220,6 +225,7 @@ describe("ImportStrategies", () => {
             needsReview: false,
             originalPath: sourceDir,
             proposedPath: destination,
+            targetRoot: path.dirname(destination),
             strategy: "pc",
           },
           "hardlink"
@@ -246,6 +252,7 @@ describe("ImportStrategies", () => {
             needsReview: false,
             originalPath: sourceDir,
             proposedPath: destination,
+            targetRoot: path.dirname(destination),
             strategy: "pc",
           },
           "hardlink"
@@ -310,6 +317,7 @@ describe("ImportStrategies", () => {
             needsReview: false,
             originalPath: source,
             proposedPath: destination,
+            targetRoot: path.dirname(destination),
             strategy: "pc",
           },
           "copy"
@@ -422,6 +430,7 @@ describe("ImportStrategies", () => {
             needsReview: false,
             originalPath: sourceDir,
             proposedPath: destination,
+            targetRoot: path.dirname(destination),
             strategy: "pc",
             fileCategories: [
               { name: "Game DLC Pack.nsp", category: "dlc" },
@@ -452,6 +461,7 @@ describe("ImportStrategies", () => {
             needsReview: false,
             originalPath: sourceDir,
             proposedPath: destination,
+            targetRoot: path.dirname(destination),
             strategy: "pc",
             fileCategories: [{ name: "readme.nfo", category: "extra" }],
           },
@@ -488,6 +498,7 @@ describe("ImportStrategies", () => {
           needsReview: false,
           originalPath: sourceDir,
           proposedPath: destination,
+          targetRoot: path.dirname(destination),
           strategy: "pc",
           fileCategories: [
             { name: "game.exe", category: "main" },
@@ -601,7 +612,13 @@ describe("ImportStrategies", () => {
 
       const strategy = new PCImportStrategy();
       const result = await strategy.executeImport(
-        { needsReview: false, originalPath: sourceDir, proposedPath: destination, strategy: "pc" },
+        {
+          needsReview: false,
+          originalPath: sourceDir,
+          proposedPath: destination,
+          targetRoot: path.dirname(destination),
+          strategy: "pc",
+        },
         "move",
         excludePaths
       );
@@ -621,7 +638,13 @@ describe("ImportStrategies", () => {
 
       const strategy = new PCImportStrategy();
       const result = await strategy.executeImport(
-        { needsReview: false, originalPath: sourceDir, proposedPath: destination, strategy: "pc" },
+        {
+          needsReview: false,
+          originalPath: sourceDir,
+          proposedPath: destination,
+          targetRoot: path.dirname(destination),
+          strategy: "pc",
+        },
         "hardlink",
         excludePaths
       );
@@ -646,6 +669,7 @@ describe("ImportStrategies", () => {
             needsReview: false,
             originalPath: sourceDir,
             proposedPath: destination,
+            targetRoot: path.dirname(destination),
             strategy: "pc",
           },
           "copy",
@@ -668,6 +692,7 @@ describe("ImportStrategies", () => {
             needsReview: false,
             originalPath: sourceDir,
             proposedPath: destination,
+            targetRoot: path.dirname(destination),
             strategy: "pc",
             fileCategories: [{ name: "game.zip", category: "main" }],
           },
@@ -696,6 +721,7 @@ describe("ImportStrategies", () => {
             needsReview: false,
             originalPath: sourceDir,
             proposedPath: destination,
+            targetRoot: path.dirname(destination),
             strategy: "pc",
           },
           "copy",
@@ -720,6 +746,7 @@ describe("ImportStrategies", () => {
           needsReview: false,
           originalPath: sourceDir,
           proposedPath: destination,
+          targetRoot: path.dirname(destination),
           strategy: "pc",
           fileCategories: [
             { name: "game.zip", category: "main" },
@@ -754,6 +781,7 @@ describe("ImportStrategies", () => {
             needsReview: false,
             originalPath: sourceDir,
             proposedPath: destination,
+            targetRoot: path.dirname(destination),
             strategy: "pc",
             fileCategories: [{ name: "game.rom", category: "main" }],
           },
@@ -790,6 +818,7 @@ describe("ImportStrategies", () => {
             needsReview: false,
             originalPath: sourceDir,
             proposedPath: destination,
+            targetRoot: path.dirname(destination),
             strategy: "pc",
           },
           "copy",

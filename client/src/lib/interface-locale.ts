@@ -236,7 +236,11 @@ export function formatInterfaceMessage(
     const value = values[name];
     if (value === undefined) return placeholder;
     const text = String(value);
-    return text ? `\u2068${text}\u2069` : text;
+    return text &&
+      (getInterfaceTextDirection(reference, language) === "rtl" ||
+        /[\u0590-\u08ff\u202a-\u202e\u2066-\u2069]/u.test(text))
+      ? `\u2068${text}\u2069`
+      : text;
   });
 }
 

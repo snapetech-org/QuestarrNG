@@ -284,7 +284,7 @@ describe("OIDC authentication routes", () => {
   });
 
   it("limits concurrent sign-ins and removes expired transactions before admitting another", async () => {
-    for (let index = 0; index < 16; index += 1) {
+    for (let index = 0; index < 4; index += 1) {
       expect((await beginLogin()).status).toBe(302);
     }
     const limited = await beginLogin();
