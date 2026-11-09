@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+- Integrate localization and RTL foundations from [PR #155](https://github.com/snapetech-org/QuestarrNG/pull/155), with English fallback and native-language review still outstanding.
+- Integrate metadata-only library interchange, restartable scans, discovery bulk selection, explicit qBittorrent API-key authentication, and redacted rTorrent diagnostics from [PR #156](https://github.com/snapetech-org/QuestarrNG/pull/156).
+- Update npm, Python, GitHub Actions, and Windows service dependencies.
+
 ## [2.1.12] - 2026-11-09
 
 ### Release infrastructure

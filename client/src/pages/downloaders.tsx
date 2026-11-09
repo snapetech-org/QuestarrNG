@@ -148,6 +148,20 @@ export function setArchivePasswordInSettings(
   return JSON.stringify(settings);
 }
 
+function getQBittorrentAuthMode(settingsJson: string | undefined | null): "session" | "api_key" {
+  return parseJsonObject(settingsJson).authMode === "api_key" ? "api_key" : "session";
+}
+
+function setQBittorrentAuthMode(
+  settingsJson: string | undefined | null,
+  mode: "session" | "api_key"
+): string {
+  const settings = parseJsonObject(settingsJson);
+  if (mode === "api_key") settings.authMode = mode;
+  else delete settings.authMode;
+  return Object.keys(settings).length > 0 ? JSON.stringify(settings) : "";
+}
+
 interface ArchivePasswordFieldProps {
   readonly form: UseFormReturn<InsertDownloader>;
 }
@@ -483,6 +497,9 @@ export default function DownloadersPage() {
     },
   });
   const isRealDebrid = form.watch("type") === "realdebrid";
+  const isQBittorrentApiKeyAuth =
+    form.watch("type") === "qbittorrent" &&
+    getQBittorrentAuthMode(form.watch("settings")) === "api_key";
   const isRealDebridConnected = Boolean(
     (editingDownloader?.type === "realdebrid" && editingDownloader.password) ||
     (editingDownloader && connectedRealDebridId === editingDownloader.id)
@@ -1127,7 +1144,7 @@ export default function DownloadersPage() {
                   control={form.control}
                   name="username"
                   render={({ field }) => (
-                    <FormItem className={cn(isRealDebrid && "hidden")}>
+                    <FormItem className={cn((isRealDebrid || isQBittorrentApiKeyAuth) && "hidden")}>
                       <RequiredFormLabel
                         required={
                           form.watch("type") === "sabnzbd" || form.watch("type") === "synology"
@@ -1206,7 +1223,13 @@ export default function DownloadersPage() {
                         form.watch("type") === "transmission" ||
                         form.watch("type") === "nzbget" ||
                         form.watch("type") === "synology" ? (
-                          <InterfaceText source="interface.password_2cc30838" />
+                          <InterfaceText
+                            source={
+                              form.watch("type") === "qbittorrent" && isQBittorrentApiKeyAuth
+                                ? "interface.api_key_4ef4c78c"
+                                : "interface.password_2cc30838"
+                            }
+                          />
                         ) : (
                           <InterfaceText source={"Password (Optional)"} />
                         )}
@@ -1214,7 +1237,11 @@ export default function DownloadersPage() {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="Enter password"
+                          placeholder={
+                            form.watch("type") === "qbittorrent" && isQBittorrentApiKeyAuth
+                              ? "Enter qBittorrent API key"
+                              : "Enter password"
+                          }
                           {...field}
                           value={field.value || ""}
                           data-testid="input-downloader-password"
@@ -1226,7 +1253,13 @@ export default function DownloadersPage() {
                         form.watch("type") === "nzbget" ||
                         form.watch("type") === "synology") && (
                         <FormDescription className="text-xs">
-                          {form.watch("type") === "synology" ? (
+                          {form.watch("type") === "qbittorrent" && isQBittorrentApiKeyAuth ? (
+                            <InterfaceText
+                              source={
+                                "Requires qBittorrent 5.2.0 / Web API 2.14.1+. Invalid keys fail without falling back to a password session."
+                              }
+                            />
+                          ) : form.watch("type") === "synology" ? (
                             <InterfaceText source={"Required for DSM login."} />
                           ) : (
                             <InterfaceText
@@ -1422,6 +1455,36 @@ export default function DownloadersPage() {
                 />
                 {(form.watch("type") === "sabnzbd" || form.watch("type") === "nzbget") && (
                   <ArchivePasswordField form={form} />
+                )}
+                {form.watch("type") === "qbittorrent" && (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-2">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-sm">
+                        <InterfaceText source={"Use Bearer API key"} />
+                      </FormLabel>
+                      <FormDescription className="text-xs">
+                        <InterfaceText
+                          source={
+                            "For qBittorrent 5.2.0 / Web API 2.14.1+. When enabled, the Password field is treated as the API key."
+                          }
+                        />
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Checkbox
+                        checked={isQBittorrentApiKeyAuth}
+                        onCheckedChange={(checked) => {
+                          const nextMode = checked ? "api_key" : "session";
+                          form.setValue(
+                            "settings",
+                            setQBittorrentAuthMode(form.getValues("settings"), nextMode),
+                            { shouldDirty: true }
+                          );
+                        }}
+                        data-testid="checkbox-qbittorrent-api-key-auth"
+                      />
+                    </FormControl>
+                  </FormItem>
                 )}
                 {form.watch("type") === "qbittorrent" && (
                   <FormField
