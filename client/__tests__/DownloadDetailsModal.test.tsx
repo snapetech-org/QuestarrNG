@@ -149,6 +149,29 @@ describe("DownloadDetailsModal info tab", () => {
 });
 
 describe("DownloadDetailsModal trackers tab", () => {
+  it("distinguishes tagged tracker-count fallbacks from identical provider text", async () => {
+    const error = "3 tracker request(s) failed";
+    renderModal({
+      ...baseDetails,
+      trackers: [
+        {
+          url: "udp://app.example.invalid",
+          tier: 0,
+          status: "error",
+          error,
+          errorI18n: { messageKey: "service.tracker_requests_failed", messageValues: { count: 3 } },
+        },
+        { url: "udp://provider.example.invalid", tier: 1, status: "error", error },
+      ],
+    });
+    const app = await screen.findByTestId("tracker-0");
+    const provider = screen.getByTestId("tracker-1");
+    expect(app).toHaveTextContent(error);
+    expect(provider).toHaveTextContent(error);
+    expect(app.querySelector("bdi")).toHaveAttribute("lang", "en");
+    expect(provider.querySelector("bdi")).toHaveAttribute("lang", "und");
+  });
+
   it("shows a no-trackers message when there are none", async () => {
     renderModal(baseDetails);
     expect(await screen.findByTestId("no-trackers")).toHaveTextContent(

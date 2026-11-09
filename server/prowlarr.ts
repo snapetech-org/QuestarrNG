@@ -190,13 +190,20 @@ export class ProwlarrClient {
     apiKey: string,
     allowInsecureLan = false
   ): Promise<{
-    management: { success: boolean; status?: number; version?: string; error?: string };
+    management: {
+      success: boolean;
+      status?: number;
+      version?: string;
+      error?: string;
+      errorSource?: string | null;
+    };
     indexers: {
       id: number;
       name: string;
       success: boolean;
       status?: number;
       error?: string;
+      errorSource?: string | null;
       layer: "indexer-feed";
     }[];
   }> {
@@ -210,6 +217,8 @@ export class ProwlarrClient {
         management: {
           success: false,
           error:
+            "Prowlarr uses plain HTTP; enable the insecure LAN option only on a trusted network.",
+          errorSource:
             "Prowlarr uses plain HTTP; enable the insecure LAN option only on a trusted network.",
         },
         indexers: [],
@@ -234,6 +243,7 @@ export class ProwlarrClient {
             success: false,
             status,
             error: `Prowlarr management API returned HTTP ${status}.`,
+            errorSource: `Prowlarr management API returned HTTP ${status}.`,
           },
           indexers: [],
         };
@@ -248,6 +258,7 @@ export class ProwlarrClient {
             success: false,
             status,
             error: `Prowlarr indexer inventory returned HTTP ${status}.`,
+            errorSource: `Prowlarr indexer inventory returned HTTP ${status}.`,
           },
           indexers: [],
         };
@@ -259,6 +270,7 @@ export class ProwlarrClient {
             success: false,
             status,
             error: "Prowlarr returned an invalid indexer inventory.",
+            errorSource: "Prowlarr returned an invalid indexer inventory.",
           },
           indexers: [],
         };
@@ -270,6 +282,9 @@ export class ProwlarrClient {
           success: false,
           ...(status !== undefined ? { status } : {}),
           error: status
+            ? `Prowlarr management API failed after HTTP ${status}.`
+            : "Prowlarr management API could not be reached.",
+          errorSource: status
             ? `Prowlarr management API failed after HTTP ${status}.`
             : "Prowlarr management API could not be reached.",
         },
@@ -291,6 +306,7 @@ export class ProwlarrClient {
       success: boolean;
       status?: number;
       error?: string;
+      errorSource?: string | null;
       layer: "indexer-feed";
     }[] = [];
     let cursor = 0;
@@ -320,12 +336,13 @@ export class ProwlarrClient {
                   ? "Prowlarr feed returned an HTML page instead of an indexer response."
                   : `Prowlarr feed returned HTTP ${responseStatus}.`)
               : undefined;
+            const errorSource = failed && !description ? (error ?? null) : null;
             results.push({
               id: indexer.id,
               name,
               success: !failed,
               status: responseStatus,
-              ...(error ? { error } : {}),
+              ...(error ? { error, errorSource } : {}),
               layer: "indexer-feed",
             });
           } catch {
@@ -334,6 +351,7 @@ export class ProwlarrClient {
               name,
               success: false,
               error: "Prowlarr feed could not be reached.",
+              errorSource: "Prowlarr feed could not be reached.",
               layer: "indexer-feed",
             });
           }

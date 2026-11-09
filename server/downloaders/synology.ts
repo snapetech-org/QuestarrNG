@@ -1,3 +1,10 @@
+import {
+  parseServiceMessageDescriptor,
+  serviceErrorValue,
+  serviceMessage,
+  ServiceMessageError,
+  type ServiceMessageFragment,
+} from "../../shared/service-messages.js";
 import type {
   Downloader,
   DownloadStatus,
@@ -157,15 +164,29 @@ interface SynologyFileStationResponse extends SynologyApiResponse {
   };
 }
 
+/** Retains exact legacy wire text alongside explicit app-owned metadata. */
+class SynologyMessageError extends ServiceMessageError {
+  constructor(fragment: ServiceMessageFragment) {
+    const values = Object.fromEntries(
+      Object.entries(fragment.messageValues).map(([name, value]) => {
+        const nested = fragment.messageDetails?.[name];
+        return [name, nested ? { message: String(value), ...nested } : value];
+      })
+    );
+    super(fragment.messageKey, values);
+    this.message = fragment.message;
+  }
+}
 /**
  * Thrown only when Synology itself responded with `success: false` (an explicit API-level
  * rejection, e.g. "invalid parameter" or "destination not found"). Transport-level failures
- * (timeouts, non-2xx HTTP, JSON parse errors) surface as plain `Error`s instead, so callers can
+ * (timeouts, non-2xx HTTP, JSON parse errors) never use this retry marker, so callers can
  * tell "the NAS understood the request and rejected it" apart from "we don't know what happened."
  * This matters for createUrlTask's DS2 variant fallback: retrying after a transport failure risks
  * creating a duplicate task if the NAS actually received and processed the first request.
  */
-class SynologyApiError extends Error {}
+// Only requestApi's explicit success:false branches use this retry marker.
+class SynologyApiError extends SynologyMessageError {}
 
 export class SynologyDownloadStationClient implements DownloaderClient {
   private downloader: Downloader;
@@ -221,14 +242,14 @@ export class SynologyDownloadStationClient implements DownloaderClient {
   private getApiDescriptor(apiName: string): SynologyApiDescriptor {
     const descriptor = this.apiInfo?.[apiName];
     if (!descriptor) {
-      throw new Error(`Synology API ${apiName} is not available on this server`);
+      throw new ServiceMessageError("service.synology_api_unavailable", { api: apiName });
     }
     return descriptor;
   }
 
   private getTaskApiDescriptor(): { apiName: string; descriptor: SynologyApiDescriptor } {
     if (!this.apiInfo) {
-      throw new Error("Synology API information has not been loaded");
+      throw new ServiceMessageError("service.synology_api_info_missing", {});
     }
 
     if (this.apiInfo["SYNO.DownloadStation2.Task"]) {
@@ -245,7 +266,7 @@ export class SynologyDownloadStationClient implements DownloaderClient {
       };
     }
 
-    throw new Error("Synology Download Station Task API is not available on this server");
+    throw new ServiceMessageError("service.synology_task_api_unavailable", {});
   }
 
   private buildSynologyErrorMessage(
@@ -284,13 +305,57 @@ export class SynologyDownloadStationClient implements DownloaderClient {
     }
   }
 
+  private buildSynologyError(
+    error: SynologyErrorResponse | undefined,
+    fallback: ServiceMessageFragment
+  ): ServiceMessageFragment {
+    const code = error?.code;
+    const details = error?.errors
+      ?.filter((d) => d.name || d.reason)
+      .map((d) => [d.name, d.reason].filter(Boolean).join(": "))
+      .join(", ");
+    let fragment: ServiceMessageFragment;
+    if (details)
+      fragment = serviceMessage("service.synology_error_fields", {
+        context: fallback,
+        code: String(code),
+        details,
+      });
+    else {
+      const key =
+        code === 101
+          ? "service.synology_parameters_rejected"
+          : code === 105
+            ? "service.synology_permission_denied"
+            : code === 106
+              ? "service.synology_session_expired"
+              : code === 120
+                ? "service.synology_destination_required"
+                : code === 400
+                  ? "service.synology_authentication_failed"
+                  : code === 401
+                    ? "service.synology_task_limit"
+                    : code === 402
+                      ? "service.synology_destination_denied"
+                      : code === 403
+                        ? "service.synology_destination_not_found"
+                        : undefined;
+      fragment = key
+        ? serviceMessage(key, {})
+        : code
+          ? serviceMessage("service.synology_error_code", { context: fallback, code })
+          : fallback;
+    }
+    return { ...fragment, message: this.buildSynologyErrorMessage(error, fallback.message) };
+  }
+
   private async fetchJson<T extends SynologyApiResponse>(
     url: string,
     init: RequestInit,
-    context: string
+    context: string | ServiceMessageFragment
   ): Promise<T> {
     if (!(await isSafeUrl(url))) {
-      throw new Error("Unsafe URL blocked");
+      throw new ServiceMessageError("service.unsafe_url_blocked_without_url", {});
     }
 
     // Synology's login carries the password (and every later call the session `_sid`)
@@ -311,8 +376,15 @@ export class SynologyDownloadStationClient implements DownloaderClient {
     await logDownloaderDebugResponse("Synology", init.method ?? "GET", url, response);
 
     if (!response.ok) {
-      const errorText = await response.text().catch(() => "No error details available");
-      throw new Error(`${context}: HTTP ${response.status} ${response.statusText} - ${errorText}`);
+      const errorText = await response
+        .text()
+        .catch(() => serviceMessage("service.no_error_details_available", {}));
+      throw new ServiceMessageError("service.synology_http_error", {
+        context,
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText,
+      });
     }
 
     return (await response.json()) as T;
@@ -345,13 +417,15 @@ export class SynologyDownloadStationClient implements DownloaderClient {
     const response = await this.fetchJson<SynologyApiInfoResponse>(
       url,
       { method: "GET" },
-      "Failed to query Synology APIs"
+      serviceMessage("service.synology_query_apis_failed", {})
     );
 
     if (!response.success || !response.data) {
-      throw new Error(
-        this.buildSynologyErrorMessage(response.error, "Failed to query Synology APIs")
+      const fragment = this.buildSynologyError(
+        response.error,
+        serviceMessage("service.synology_query_apis_failed", {})
       );
+      throw new SynologyMessageError(fragment);
     }
 
     this.apiInfo = response.data;
@@ -371,7 +445,7 @@ export class SynologyDownloadStationClient implements DownloaderClient {
     }
 
     if (!this.downloader.username || !this.downloader.password) {
-      throw new Error("Synology Download Station requires a username and password");
+      throw new ServiceMessageError("service.synology_credentials_required", {});
     }
 
     const { origin } = this.getBaseUrlParts();
@@ -394,14 +468,14 @@ export class SynologyDownloadStationClient implements DownloaderClient {
     const response = await this.fetchJson<SynologyAuthResponse>(
       url,
       { method: "GET" },
-      "Failed to authenticate with Synology Download Station"
+      serviceMessage("service.synology_authenticate_failed", {})
     );
 
     if (!response.success || !response.data?.sid) {
-      throw new Error(
-        this.buildSynologyErrorMessage(
+      throw new SynologyMessageError(
+        this.buildSynologyError(
           response.error,
-          "Failed to authenticate with Synology Download Station"
+          serviceMessage("service.synology_authenticate_failed", {})
         )
       );
     }
@@ -429,7 +503,7 @@ export class SynologyDownloadStationClient implements DownloaderClient {
       await this.fetchJson<SynologyApiResponse>(
         url,
         { method: "GET" },
-        "Failed to log out from Synology Download Station"
+        serviceMessage("service.synology_logout_failed", {})
       );
     } catch (error) {
       downloadersLogger.debug({ error }, "Synology logout failed");
@@ -496,7 +570,7 @@ export class SynologyDownloadStationClient implements DownloaderClient {
       const response = await this.fetchJson<T>(
         requestUrl,
         { method: "GET" },
-        `Synology ${apiName}.${methodName} failed`
+        serviceMessage("service.synology_method_failed", { api: apiName, method: methodName })
       );
 
       if (!response.success && response.error?.code === 106 && requiresAuth && retryOnAuthFailure) {
@@ -510,7 +584,10 @@ export class SynologyDownloadStationClient implements DownloaderClient {
 
       if (!response.success) {
         throw new SynologyApiError(
-          this.buildSynologyErrorMessage(response.error, `Synology ${apiName}.${methodName} failed`)
+          this.buildSynologyError(
+            response.error,
+            serviceMessage("service.synology_method_failed", { api: apiName, method: methodName })
+          )
         );
       }
 
@@ -533,7 +610,7 @@ export class SynologyDownloadStationClient implements DownloaderClient {
     const response = await this.fetchJson<T>(
       postUrl,
       { method: httpMethod, body, headers },
-      `Synology ${apiName}.${methodName} failed`
+      serviceMessage("service.synology_method_failed", { api: apiName, method: methodName })
     );
 
     if (!response.success && response.error?.code === 106 && requiresAuth && retryOnAuthFailure) {
@@ -552,7 +629,10 @@ export class SynologyDownloadStationClient implements DownloaderClient {
 
     if (!response.success) {
       throw new SynologyApiError(
-        this.buildSynologyErrorMessage(response.error, `Synology ${apiName}.${methodName} failed`)
+        this.buildSynologyError(
+          response.error,
+          serviceMessage("service.synology_method_failed", { api: apiName, method: methodName })
+        )
       );
     }
 
@@ -658,6 +738,10 @@ export class SynologyDownloadStationClient implements DownloaderClient {
         ? transfer.size_uploaded / transfer.size_downloaded
         : undefined;
     const trackerSwarmCounts = this.getTrackerSwarmCounts(task.additional?.tracker);
+    const error =
+      task.status === "error"
+        ? serviceMessage("service.client_reported_error", { client: "Synology Download Station" })
+        : undefined;
 
     return {
       id: task.id,
@@ -675,7 +759,7 @@ export class SynologyDownloadStationClient implements DownloaderClient {
       seeders: trackerSwarmCounts.seeders,
       leechers: trackerSwarmCounts.leechers,
       ratio,
-      error: task.status === "error" ? "Synology Download Station reported an error" : undefined,
+      ...(error ? { error: error.message, errorI18n: parseServiceMessageDescriptor(error) } : {}),
     };
   }
 
@@ -919,19 +1003,26 @@ export class SynologyDownloadStationClient implements DownloaderClient {
 
     throw lastError instanceof Error
       ? lastError
-      : new Error("All Synology DS2 create-task variants failed");
+      : new ServiceMessageError("service.synology_all_create_variants_failed", {});
   }
 
   async testConnection(): Promise<{ success: boolean; message: string }> {
     try {
       await this.authenticate();
       await this.logout();
-      return { success: true, message: "Connected successfully to Synology Download Station" };
+      return {
+        success: true,
+        ...serviceMessage("service.connected_successfully", {
+          client: "Synology Download Station",
+        }),
+      };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       return {
         success: false,
-        message: `Failed to connect to Synology Download Station: ${errorMessage}`,
+        ...serviceMessage("service.connection_failed", {
+          client: "Synology Download Station",
+          error: serviceErrorValue(error),
+        }),
       };
     }
   }
@@ -962,7 +1053,7 @@ export class SynologyDownloadStationClient implements DownloaderClient {
   ): Promise<{ success: boolean; id?: string | undefined; message: string }> {
     try {
       if (!request.url) {
-        return { success: false, message: "Download URL is required" };
+        return { success: false, ...serviceMessage("service.download_url_required", {}) };
       }
 
       await this.ensureApiInfo();
@@ -971,9 +1062,7 @@ export class SynologyDownloadStationClient implements DownloaderClient {
       if (!destination?.trim()) {
         return {
           success: false,
-          message:
-            "No download destination configured. Set a Download Path for this downloader in " +
-            "Questarr, or configure a default destination in Synology Download Station settings.",
+          ...serviceMessage("service.synology_destination_unconfigured", {}),
         };
       }
       const isMagnet = request.url.startsWith("magnet:");
@@ -986,7 +1075,7 @@ export class SynologyDownloadStationClient implements DownloaderClient {
         return {
           success: true,
           id,
-          message: "Download added successfully",
+          ...serviceMessage("service.download_added", {}),
         };
       };
 
@@ -995,7 +1084,7 @@ export class SynologyDownloadStationClient implements DownloaderClient {
       }
 
       if (!(await isSafeUrl(request.url))) {
-        return { success: false, message: "Unsafe URL blocked" };
+        return { success: false, ...serviceMessage("service.unsafe_url_blocked_without_url", {}) };
       }
 
       const fetchResult = await fetchWithMagnetDetection(request.url);
@@ -1006,16 +1095,21 @@ export class SynologyDownloadStationClient implements DownloaderClient {
       if (!fetchResult.response?.ok) {
         return {
           success: false,
-          message: `Failed to fetch download: ${fetchResult.response?.statusText || "Unknown error"}`,
+          ...serviceMessage("service.download_fetch_failed", {
+            error:
+              fetchResult.response?.statusText ||
+              serviceMessage("interface.unknown_error_ce512b43", {}),
+          }),
         };
       }
 
       return this.addFileUpload(request, destination, apiName, fetchResult.response);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       return {
         success: false,
-        message: `Failed to add download to Synology Download Station: ${errorMessage}`,
+        ...serviceMessage("service.synology_download_add_failed", {
+          error: serviceErrorValue(error),
+        }),
       };
     }
   }
@@ -1074,7 +1168,7 @@ export class SynologyDownloadStationClient implements DownloaderClient {
     return {
       success: true,
       id: uploadResponse.data?.task_id?.[0],
-      message: "Download added successfully",
+      ...serviceMessage("service.download_added", {}),
     };
   }
 
@@ -1159,10 +1253,12 @@ export class SynologyDownloadStationClient implements DownloaderClient {
         httpMethod: "GET",
         params: { id },
       });
-      return { success: true, message: "Download paused successfully" };
+      return { success: true, ...serviceMessage("service.download_paused", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to pause download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_pause_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
@@ -1172,10 +1268,12 @@ export class SynologyDownloadStationClient implements DownloaderClient {
         httpMethod: "GET",
         params: { id },
       });
-      return { success: true, message: "Download resumed successfully" };
+      return { success: true, ...serviceMessage("service.download_resumed", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to resume download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_resume_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 
@@ -1192,10 +1290,12 @@ export class SynologyDownloadStationClient implements DownloaderClient {
           force_complete: deleteFiles,
         },
       });
-      return { success: true, message: "Download removed successfully" };
+      return { success: true, ...serviceMessage("service.download_removed", {}) };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      return { success: false, message: `Failed to remove download: ${errorMessage}` };
+      return {
+        success: false,
+        ...serviceMessage("service.download_remove_failed", { error: serviceErrorValue(error) }),
+      };
     }
   }
 

@@ -24,6 +24,7 @@ import { PathMappingSettings } from "./PathMappingSettings";
 import { FileBrowser } from "./FileBrowser";
 import SecurityScanSettings from "./SecurityScanSettings";
 import { InterfaceText } from "@/components/InterfaceText";
+import { LocalizedCodeList } from "@/components/LocalizedCodeList";
 import { formatInterfaceMessage } from "@/lib/interface-locale";
 
 const IMPORT_PIPELINE_STEP_TEXT = [
@@ -458,8 +459,7 @@ export default function ImportSettings() {
                                 "For directory imports, place detected DLC, updates, and extras in"
                               }
                             />{" "}
-                            <code>dlc/</code>, <code>update/</code>
-                            <InterfaceText source={", and"} /> <code>extra/</code>{" "}
+                            <LocalizedCodeList values={["dlc/", "update/", "extra/"]} />{" "}
                             <InterfaceText
                               source={
                                 "subfolders inside the game folder. Single-file imports keep their existing layout."
@@ -533,7 +533,7 @@ export default function ImportSettings() {
                   disabled={updateConfigMutation.isPending}
                 >
                   {updateConfigMutation.isPending && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="me-2 h-4 w-4 animate-spin" />
                   )}
                   <InterfaceText source={"Save Changes"} />
                 </Button>
@@ -812,7 +812,7 @@ export default function ImportSettings() {
                           </span>
                           <Input
                             aria-label={formatInterfaceMessage(
-                              "RomM slug for platform {igdbPlatformId}",
+                              "interface.romm_slug_for_platform_igdbplatfor_657a40cd",
                               { igdbPlatformId: String(mapping.igdbPlatformId ?? "") }
                             )}
                             defaultValue={mapping.rommPlatformSlug ?? ""}
@@ -920,7 +920,9 @@ export default function ImportSettings() {
                       when: "Use when you do not care about seeding after import, or when disk space is tight.",
                     },
                     {
-                      icon: <ArrowRight className="h-4 w-4 text-purple-500 shrink-0 mt-0.5" />,
+                      icon: (
+                        <ArrowRight className="h-4 w-4 text-purple-500 shrink-0 mt-0.5 rtl:rotate-180" />
+                      ),
                       label: "Symlink",
                       desc: "Creates a symbolic link at the destination pointing back to the original file in your download folder. The file is not duplicated or moved.",
                       when: "Use when you want your library to reflect downloads without copying files. The torrent keeps seeding.",
@@ -933,10 +935,10 @@ export default function ImportSettings() {
                           <InterfaceText source={label} />
                         </span>
                       </div>
-                      <p className="text-muted-foreground pl-6">
+                      <p className="text-muted-foreground ps-6">
                         <InterfaceText source={desc} />
                       </p>
-                      <p className="text-xs text-muted-foreground pl-6">
+                      <p className="text-xs text-muted-foreground ps-6">
                         <span className="font-medium text-foreground">
                           <InterfaceText source={"When to use:"} />{" "}
                         </span>
@@ -1075,7 +1077,7 @@ export default function ImportSettings() {
                         <Folder className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                         <InterfaceText source={title} />
                       </p>
-                      <ol className="space-y-1 pl-1">
+                      <ol className="space-y-1 ps-1">
                         {steps.map((step, i) => (
                           <li key={step} className="flex gap-2 text-muted-foreground">
                             <span className="text-xs font-semibold text-primary mt-0.5 shrink-0">

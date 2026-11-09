@@ -117,7 +117,7 @@ export default function InstalledVersionField({
           maxLength={64}
           placeholder="Unknown (e.g. v1.2.3)"
           autoComplete="off"
-          className="h-10 pr-9 sm:h-9"
+          className="h-10 pe-9 sm:h-9"
           onChange={(e) => setDraft(e.target.value)}
           onBlur={() => save(draft)}
           onKeyDown={(e) => {
@@ -135,7 +135,7 @@ export default function InstalledVersionField({
           data-i18n-placeholder={"Unknown (e.g. v1.2.3)"}
         />
         <span
-          className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-muted-foreground"
+          className="pointer-events-none absolute inset-y-0 end-3 flex items-center text-muted-foreground"
           aria-live="polite"
         >
           {mutation.isPending && (
@@ -166,9 +166,12 @@ export default function InstalledVersionField({
               variant="outline"
               size="sm"
               className="h-8 px-2.5 text-xs"
-              aria-label={formatInterfaceMessage("Set installed version to {version}", {
-                version: String(version ?? ""),
-              })}
+              aria-label={formatInterfaceMessage(
+                "interface.set_installed_version_to_version_b6f4ba58",
+                {
+                  version: String(version ?? ""),
+                }
+              )}
               disabled={mutation.isPending}
               // Keep focus in the input: its blur would otherwise save the typed draft and
               // disable these buttons before the click lands.

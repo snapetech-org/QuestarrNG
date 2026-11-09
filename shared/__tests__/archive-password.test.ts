@@ -68,6 +68,11 @@ describe("resolveArchivePassword", () => {
     const result = resolveArchivePassword("404", undefined, "http://example.com", "NZBGet");
     expect(result.password).toBeUndefined();
     expect(result.error).toContain("NZBGet");
+    expect(result.errorI18n).toEqual({
+      messageKey: "service.archive_password_https",
+      messageValues: { client: "NZBGet" },
+    });
+    expect(JSON.stringify(result)).not.toContain("404");
   });
 
   it("allows a plain-HTTP connection when no password is being sent", () => {

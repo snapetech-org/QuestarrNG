@@ -1,3 +1,8 @@
+import {
+  serviceMessage,
+  ServiceMessageError,
+  serviceErrorResult,
+} from "../shared/service-messages.js";
 import { createHmac, randomBytes } from "node:crypto";
 import { z } from "zod";
 import { safeFetch } from "./ssrf.js";
@@ -53,7 +58,7 @@ function cacheKey(url: URL): string {
 
 async function queueRequest<T>(request: () => Promise<T>): Promise<T> {
   if (pendingRequests >= MAX_PENDING_REQUESTS) {
-    throw new Error("RAWG is busy; try again shortly");
+    throw new ServiceMessageError("service.rawg_busy", {});
   }
   pendingRequests += 1;
   const queued = requestTail.then(async () => {
@@ -102,15 +107,15 @@ async function requestGames(
     } catch {
       // Fetch errors can embed the request URL. RAWG authenticates with a
       // query parameter, so do not propagate upstream error text or URLs.
-      throw new Error("Could not connect to RAWG");
+      throw new ServiceMessageError("service.rawg_connect_failed", {});
     }
     if (!response.ok || !response.body) {
       await response.body?.cancel();
       if (response.status === 401 || response.status === 403) {
-        throw new Error("RAWG rejected the API key. Check the key in Settings.");
+        throw new ServiceMessageError("service.rawg_key_rejected", {});
       }
-      if (response.status === 429) throw new Error("RAWG rate limit reached. Try again shortly.");
-      throw new Error(`RAWG returned HTTP ${response.status}`);
+      if (response.status === 429) throw new ServiceMessageError("service.rawg_rate_limit", {});
+      throw new ServiceMessageError("service.rawg_http_error", { status: response.status });
     }
     const reader = response.body.getReader();
     const chunks: Uint8Array[] = [];
@@ -120,7 +125,7 @@ async function requestGames(
         const { done, value } = await reader.read();
         if (done) break;
         size += value.byteLength;
-        if (size > MAX_RESPONSE_BYTES) throw new Error("RAWG response exceeded the size limit");
+        if (size > MAX_RESPONSE_BYTES) throw new ServiceMessageError("service.rawg_size_limit", {});
         chunks.push(value);
       }
     } finally {
@@ -130,7 +135,7 @@ async function requestGames(
     try {
       games = listSchema.parse(JSON.parse(Buffer.concat(chunks).toString("utf8"))).results;
     } catch {
-      throw new Error("RAWG returned an invalid game list");
+      throw new ServiceMessageError("service.rawg_list_invalid", {});
     }
     if (cache.size >= 200) cache.delete(cache.keys().next().value!);
     cache.set(key, { expiresAt: Date.now() + CACHE_TTL_MS, games });
@@ -180,12 +185,9 @@ export const rawgClient = {
   async testCredentials(apiKey: string): Promise<{ success: boolean; message: string }> {
     try {
       await requestGames(apiKey, { page_size: 1 });
-      return { success: true, message: "RAWG API key is valid" };
+      return { success: true, ...serviceMessage("interface.rawg_api_key_is_valid_5d4211bd", {}) };
     } catch (error) {
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : "RAWG request failed",
-      };
+      return serviceErrorResult(error, serviceMessage("service.rawg_request_failed", {}));
     }
   },
   async search(apiKey: string, query: string, limit = 20) {

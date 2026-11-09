@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Downloader } from "../../shared/schema.js";
+import { ServiceMessageError, serviceErrorMetadata } from "../../shared/service-messages.js";
 
 const mocks = vi.hoisted(() => ({
   safeFetch: vi.fn(),
@@ -16,6 +17,59 @@ import {
 } from "./realdebrid-auth.js";
 
 describe("Real-Debrid account authorization", () => {
+  it("tags the fixed missing-account condition without changing its English text", async () => {
+    const error = await getRealDebridAccessToken({
+      id: "rd-typed-missing-account",
+      password: null,
+    } as Downloader).catch((value) => value);
+    expect(error).toBeInstanceOf(ServiceMessageError);
+    expect(error.message).toBe(
+      "Connect a Real-Debrid account in Downloaders before using this client."
+    );
+    expect(serviceErrorMetadata(error)).toEqual({
+      messageKey: "service.realdebrid_connect_account_required",
+      messageValues: {},
+    });
+  });
+
+  it.each([true, false])("keeps OAuth provider error ownership distinct: %s", async (provider) => {
+    const id = `rd-provider-ownership-${provider}`;
+    const text = "Real-Debrid did not return a refresh token.";
+    mocks.safeFetch
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            device_code: "device-code",
+            user_code: "USER-CODE",
+            verification_url: "https://real-debrid.com/device",
+            interval: 5,
+            expires_in: 1800,
+          })
+        )
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ client_id: "client", client_secret: "secret" }))
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(provider ? { error: text } : {}), { status: 400 })
+      );
+    const authorization = await startRealDebridDeviceAuth(id);
+    const error = await pollRealDebridDeviceAuth({ id } as Downloader, authorization.handle).catch(
+      (value) => value
+    );
+    expect(error).toBeInstanceOf(Error);
+    if (provider) {
+      expect(error).not.toBeInstanceOf(ServiceMessageError);
+      expect(error.message).toBe(text);
+      expect(serviceErrorMetadata(error)).toEqual({});
+    } else {
+      expect(error).toBeInstanceOf(ServiceMessageError);
+      expect(error.message).toBe("Real-Debrid authorization failed.");
+      expect(serviceErrorMetadata(error)).toMatchObject({
+        messageKey: "service.realdebrid_authorization_failed",
+      });
+    }
+  });
   beforeEach(() => {
     vi.resetAllMocks();
     mocks.updateDownloader.mockResolvedValue({ id: "rd-auth-test" });

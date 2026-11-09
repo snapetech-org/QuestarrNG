@@ -1,3 +1,8 @@
+import {
+  localizeServiceMessage,
+  serviceMessage,
+  serializeServiceMessageDescriptor,
+} from "../../shared/service-messages.js";
 // @vitest-environment node
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
@@ -749,13 +754,14 @@ describe("Cron - checkDownloadStatus", () => {
     expect(mockUpdateGameDownloadStatus).toHaveBeenCalledWith(
       torrentDownload.id,
       "downloading",
-      "Tracker: connection timed out"
+      "Tracker: connection timed out",
+      null
     );
-    expect(mockUpdateGameDownloadStatus).not.toHaveBeenCalledWith(
-      torrentDownload.id,
-      "failed",
-      expect.anything()
-    );
+    expect(
+      mockUpdateGameDownloadStatus.mock.calls
+        .filter((call) => call[0] === torrentDownload.id)
+        .map((call) => call[1])
+    ).not.toContain("failed");
     expect(statusWritesFor(torrentDownload.gameId)).not.toContainEqual({ status: "wanted" });
     expect(mockAddNotification).not.toHaveBeenCalled();
 
@@ -771,6 +777,7 @@ describe("Cron - checkDownloadStatus", () => {
     expect(mockUpdateGameDownloadStatus).toHaveBeenCalledWith(
       torrentDownload.id,
       "downloading",
+      null,
       null
     );
   });
@@ -807,11 +814,11 @@ describe("Cron - checkDownloadStatus", () => {
         remoteTorrent({ status: "error", error: "Torrent error" }),
       ]);
       await checkDownloadStatus();
-      expect(mockUpdateGameDownloadStatus).not.toHaveBeenCalledWith(
-        torrentDownload.id,
-        "failed",
-        expect.anything()
-      );
+      expect(
+        mockUpdateGameDownloadStatus.mock.calls
+          .filter((call) => call[0] === torrentDownload.id)
+          .map((call) => call[1])
+      ).not.toContain("failed");
 
       vi.setSystemTime(new Date("2026-10-11T12:31:00Z"));
       await checkDownloadStatus();
@@ -819,7 +826,8 @@ describe("Cron - checkDownloadStatus", () => {
       expect(mockUpdateGameDownloadStatus).toHaveBeenCalledWith(
         torrentDownload.id,
         "failed",
-        "Torrent error"
+        "Torrent error",
+        null
       );
       expect(mockUpdateGameStatus).toHaveBeenCalledWith(
         torrentDownload.gameId,
@@ -829,6 +837,40 @@ describe("Cron - checkDownloadStatus", () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it("persists typed app errors and explicit notification values without parsing user/provider text", async () => {
+    const title = 'A Game ": Provider: /a/path العربية';
+    const error = serviceMessage("service.client_reported_error", {
+      client: "Synology Download Station",
+    });
+    mockGetDownloadingGameDownloads.mockResolvedValue([baseDownload]);
+    mockGetDownloader.mockResolvedValue(baseDownloader);
+    mockGetGame.mockResolvedValue({ id: baseDownload.gameId, title, userId: "user-1" });
+    mockGetAllDownloads.mockResolvedValue([
+      {
+        id: baseDownload.downloadHash,
+        name: title,
+        status: "error",
+        progress: 0,
+        downloadType: "usenet",
+        error: error.message,
+        errorI18n: error,
+      },
+    ]);
+    await checkDownloadStatus();
+    expect(mockUpdateGameDownloadStatus).toHaveBeenCalledWith(
+      baseDownload.id,
+      "failed",
+      error.message,
+      serializeServiceMessageDescriptor(error)
+    );
+    const inserted = mockAddNotification.mock.calls[0]?.[0];
+    expect(inserted.message).toBe(`Download aborted for "${title}": ${error.message}`);
+    const translated = localizeServiceMessage(inserted.message, inserted.messageI18n, "es");
+    expect(translated).toContain(title);
+    expect(translated).toContain("informó");
+    expect(translated).not.toContain("reported an error");
   });
 
   it("fails a usenet download as soon as the client reports it failed", async () => {
@@ -850,7 +892,8 @@ describe("Cron - checkDownloadStatus", () => {
     expect(mockUpdateGameDownloadStatus).toHaveBeenCalledWith(
       baseDownload.id,
       "failed",
-      "Repair failed, not enough repair blocks"
+      "Repair failed, not enough repair blocks",
+      null
     );
   });
 
@@ -872,11 +915,11 @@ describe("Cron - checkDownloadStatus", () => {
       "manual_review_required",
       expect.stringContaining("removed this download once it finished")
     );
-    expect(mockUpdateGameDownloadStatus).not.toHaveBeenCalledWith(
-      torrentDownload.id,
-      "failed",
-      expect.anything()
-    );
+    expect(
+      mockUpdateGameDownloadStatus.mock.calls
+        .filter((call) => call[0] === torrentDownload.id)
+        .map((call) => call[1])
+    ).not.toContain("failed");
     expect(statusWritesFor(torrentDownload.gameId)).not.toContainEqual({ status: "wanted" });
     expect(mockAddNotification).toHaveBeenCalledWith(
       expect.objectContaining({ title: "Import needs attention", type: "warning" })

@@ -1,3 +1,4 @@
+import { parseServiceMessageDescriptor } from "../../shared/service-messages.js";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import express from "express";
 import request from "supertest";
@@ -53,6 +54,7 @@ import * as ssrfModule from "../ssrf.js";
 import fsExtra from "fs-extra";
 import { normalizeTitle } from "../../shared/title-utils.js";
 import { DEFAULT_RELEASE_PROFILE } from "../../shared/release-scoring.js";
+import { serviceMessage } from "../../shared/service-messages.js";
 
 const safeFetchMock = vi.hoisted(() => vi.fn());
 const isSafeUrlMock = vi.hoisted(() => vi.fn().mockResolvedValue(true));
@@ -2160,6 +2162,28 @@ describe("API Routes - Extended Coverage", () => {
         expect(response.status).toBe(200);
       });
 
+      it.each([
+        ["pauseDownload", "pause", "download_pause_failed"],
+        ["resumeDownload", "resume", "download_resume_failed"],
+        ["removeDownload", "remove", "download_remove_failed"],
+      ] as const)(
+        "preserves exact action metadata from %s through HTTP JSON",
+        async (method, action, key) => {
+          vi.mocked(storage.getDownloader).mockResolvedValue({ id: "dl-1" } as Downloader);
+          const result = {
+            success: false,
+            ...serviceMessage(`service.${key}`, { error: 'Provider / لعبة "A"' }),
+          };
+          vi.mocked(DownloaderManager[method]).mockResolvedValue(result);
+          const response =
+            action === "remove"
+              ? await request(app).delete("/api/downloaders/dl-1/downloads/d-1")
+              : await request(app).post(`/api/downloaders/dl-1/downloads/d-1/${action}`);
+          expect(response.status).toBe(200);
+          expect(response.body).toEqual(result);
+        }
+      );
+
       it("should return 404 for missing downloader", async () => {
         vi.mocked(storage.getDownloader).mockResolvedValue(null as any);
         const response = await request(app).post(
@@ -3052,6 +3076,8 @@ describe("API Routes - Extended Coverage", () => {
         expect(response.body).toEqual({
           success: true,
           message: "Connected to SABnzbd v4.4.0",
+          messageKey: "service.connected_version",
+          messageValues: { client: "SABnzbd", version: "4.4.0" },
         });
         expect(safeFetch).toHaveBeenCalledTimes(1);
         const [requestUrl] = safeFetch.mock.calls[0] as [string];
@@ -4230,6 +4256,98 @@ describe("API Routes - Extended Coverage", () => {
       safeFetchMock.mockReset();
     });
 
+    const statsHeading = () => serviceMessage("interface.my_questarr_library_stats_6f07559d", {});
+    const sentContent = () => {
+      const init = safeFetchMock.mock.calls.at(-1)?.[1] as RequestInit;
+      return (init.body as FormData).get("content");
+    };
+
+    it.each([
+      ["ar", "📊 إحصاءات مكتبة Questarr الخاصة بي"],
+      ["de", "📊 Statistiken meiner Questarr-Bibliothek"],
+      ["es-419", "📊 Estadísticas de mi biblioteca de Questarr"],
+      ["fr-CA", "📊 Statistiques de ma bibliothèque Questarr"],
+      ["en", "📊 My Questarr library stats"],
+      ["unsupported", "📊 My Questarr library stats"],
+    ])(
+      "uses the saved notification language %s for the tagged app heading",
+      async (language, expected) => {
+        vi.mocked(storage.getSystemConfig).mockResolvedValue(
+          "https://discord.com/api/webhooks/123/abc"
+        );
+        vi.mocked(storage.getUserSettings).mockResolvedValue({
+          notificationPreferences: JSON.stringify({ language }),
+        } as Awaited<ReturnType<typeof storage.getUserSettings>>);
+        safeFetchMock.mockResolvedValue({ ok: true });
+        const response = await request(app)
+          .post("/api/stats/discord-share")
+          .send({
+            image: validImageDataUrl,
+            ...statsHeading(),
+          });
+        expect(response.status).toBe(200);
+        expect(storage.getUserSettings).toHaveBeenCalledWith("user-1");
+        expect(sentContent()).toBe(expected);
+      }
+    );
+
+    it.each([null, "not-json", JSON.stringify({}), JSON.stringify({ language: null })])(
+      "keeps legacy English when the saved preference is %s",
+      async (notificationPreferences) => {
+        vi.mocked(storage.getSystemConfig).mockResolvedValue(
+          "https://discord.com/api/webhooks/123/abc"
+        );
+        vi.mocked(storage.getUserSettings).mockResolvedValue({ notificationPreferences } as Awaited<
+          ReturnType<typeof storage.getUserSettings>
+        >);
+        safeFetchMock.mockResolvedValue({ ok: true });
+        const response = await request(app)
+          .post("/api/stats/discord-share")
+          .send({ image: validImageDataUrl, ...statsHeading() });
+        expect(response.status).toBe(200);
+        expect(sentContent()).toBe(statsHeading().message);
+      }
+    );
+
+    it("keeps English when the notification preference lookup fails", async () => {
+      vi.mocked(storage.getSystemConfig).mockResolvedValue(
+        "https://discord.com/api/webhooks/123/abc"
+      );
+      vi.mocked(storage.getUserSettings).mockRejectedValue(new Error("lookup failed"));
+      safeFetchMock.mockResolvedValue({ ok: true });
+      const response = await request(app)
+        .post("/api/stats/discord-share")
+        .send({ image: validImageDataUrl, ...statsHeading() });
+      expect(response.status).toBe(200);
+      expect(sentContent()).toBe(statsHeading().message);
+    });
+
+    it.each([
+      { message: "📊 My Questarr library stats" },
+      {
+        message: 'Settings — مستخدم "علي" / C:\\Games\\A',
+        messageKey: "unknown",
+        messageValues: {},
+      },
+      { ...statsHeading(), message: "User-owned custom heading" },
+      { ...statsHeading(), messageValues: null },
+      serviceMessage("service.connected_named", { name: "Provider: Settings" }),
+    ])("preserves arbitrary, untagged, mismatched, or unrelated messages: %j", async (payload) => {
+      vi.mocked(storage.getSystemConfig).mockResolvedValue(
+        "https://discord.com/api/webhooks/123/abc"
+      );
+      vi.mocked(storage.getUserSettings).mockResolvedValue({
+        notificationPreferences: JSON.stringify({ language: "ar" }),
+      } as Awaited<ReturnType<typeof storage.getUserSettings>>);
+      safeFetchMock.mockResolvedValue({ ok: true });
+      const response = await request(app)
+        .post("/api/stats/discord-share")
+        .send({ image: validImageDataUrl, ...payload });
+      expect(response.status).toBe(200);
+      expect(sentContent()).toBe(payload.message);
+      expect(storage.getUserSettings).not.toHaveBeenCalled();
+    });
+
     it("should return 400 when no webhook is configured", async () => {
       vi.mocked(storage.getSystemConfig).mockResolvedValue(null);
       const response = await request(app)
@@ -4826,6 +4944,21 @@ describe("API Routes - Extended Coverage", () => {
       expect(response.body.success).toBe(true);
     });
 
+    it("retains a provider ping reply that matches app timeout wording without metadata", async () => {
+      securityScanState["security.clamav.host"] = "clamav";
+      netTestState.nextReply = "Connection to ClamAV timed out";
+      vi.spyOn(ssrfModule, "resolveSafeAddress").mockResolvedValue({
+        address: "10.0.0.5",
+        family: 4,
+      });
+      const response = await request(app)
+        .post("/api/settings/security-scan/test")
+        .send({ provider: "clamav" });
+      expect(response.status).toBe(502);
+      expect(response.body.error).toBe(netTestState.nextReply);
+      expect(response.body.errorI18n).toBeNull();
+    });
+
     it("reports a failed ClamAV ping", async () => {
       securityScanState["security.clamav.host"] = "clamav";
       netTestState.nextReply = "";
@@ -4839,6 +4972,9 @@ describe("API Routes - Extended Coverage", () => {
         .send({ provider: "clamav" });
 
       expect(response.status).toBe(502);
+      expect(parseServiceMessageDescriptor(response.body.errorI18n)?.messageKey).toBe(
+        "service.clamav_ping_reply_missing"
+      );
     });
 
     it.each([

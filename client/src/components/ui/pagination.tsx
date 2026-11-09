@@ -11,9 +11,9 @@ const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => {
   return (
     <nav
       role="navigation"
-      aria-label={t("Pagination")}
-      lang={languageFor("Pagination")}
-      dir={directionFor("Pagination")}
+      aria-label={t("interface.pagination_79fe6ce9")}
+      lang={languageFor("interface.pagination_79fe6ce9")}
+      dir={directionFor("interface.pagination_79fe6ce9")}
       className={cn("mx-auto flex w-full justify-center", className)}
       {...props}
     />
@@ -60,16 +60,19 @@ const PaginationPrevious = ({
   const { t, languageFor, directionFor } = useInterfaceLanguage();
   return (
     <PaginationLink
-      aria-label={t("Previous page")}
-      lang={languageFor("Previous page")}
-      dir={directionFor("Previous page")}
+      aria-label={t("interface.previous_page_b3aa23a3")}
+      lang={languageFor("interface.previous_page_b3aa23a3")}
+      dir={directionFor("interface.previous_page_b3aa23a3")}
       size="default"
-      className={cn("gap-1 pl-2.5", className)}
+      className={cn("gap-1 ps-2.5", className)}
       {...props}
     >
-      <ChevronLeft className="h-4 w-4" />
-      <span lang={languageFor("Previous")} dir={directionFor("Previous")}>
-        {t("Previous")}
+      <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
+      <span
+        lang={languageFor("interface.previous_ead1fb48")}
+        dir={directionFor("interface.previous_ead1fb48")}
+      >
+        {t("interface.previous_ead1fb48")}
       </span>
     </PaginationLink>
   );
@@ -80,17 +83,20 @@ const PaginationNext = ({ className, ...props }: React.ComponentProps<typeof Pag
   const { t, languageFor, directionFor } = useInterfaceLanguage();
   return (
     <PaginationLink
-      aria-label={t("Next page")}
-      lang={languageFor("Next page")}
-      dir={directionFor("Next page")}
+      aria-label={t("interface.next_page_6f88c1e3")}
+      lang={languageFor("interface.next_page_6f88c1e3")}
+      dir={directionFor("interface.next_page_6f88c1e3")}
       size="default"
-      className={cn("gap-1 pr-2.5", className)}
+      className={cn("gap-1 pe-2.5", className)}
       {...props}
     >
-      <span lang={languageFor("Next")} dir={directionFor("Next")}>
-        {t("Next")}
+      <span
+        lang={languageFor("interface.next_dce2da08")}
+        dir={directionFor("interface.next_dce2da08")}
+      >
+        {t("interface.next_dce2da08")}
       </span>
-      <ChevronRight className="h-4 w-4" />
+      <ChevronRight className="h-4 w-4 rtl:rotate-180" />
     </PaginationLink>
   );
 };

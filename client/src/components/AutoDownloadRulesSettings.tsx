@@ -18,6 +18,7 @@ import { apiRequest } from "@/lib/queryClient";
 import type { DownloadRules } from "@shared/schema";
 import type { DownloadCategory } from "@shared/download-categorizer";
 import { InterfaceText } from "@/components/InterfaceText";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 
 interface AutoDownloadRulesSettingsProps {
   rules: DownloadRules | null;
@@ -96,7 +97,7 @@ export default function AutoDownloadRulesSettings({
     onError: (error: Error) => {
       toast({
         title: "Save Failed",
-        description: error.message,
+        description: <ApiErrorDescription error={error} />,
         variant: "destructive",
       });
     },

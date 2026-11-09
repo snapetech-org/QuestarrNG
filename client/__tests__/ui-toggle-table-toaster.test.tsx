@@ -1,8 +1,8 @@
 /** @vitest-environment jsdom */
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Toggle } from "../src/components/ui/toggle";
 import {
@@ -16,6 +16,9 @@ import {
   TableRow,
 } from "../src/components/ui/table";
 import { Toaster } from "../src/components/ui/toaster";
+import { setInterfaceLanguage } from "../src/lib/interface-locale";
+import { ServiceMessageText } from "../src/components/ServiceMessageText";
+import { serviceMessage } from "../../shared/service-messages";
 
 const mockToasts = vi.hoisted(() => ({ current: [] as unknown[] }));
 vi.mock("@/hooks/use-toast", () => ({
@@ -82,6 +85,11 @@ describe("Table", () => {
 });
 
 describe("Toaster", () => {
+  afterEach(() => {
+    act(() => setInterfaceLanguage("en"));
+    mockToasts.current = [];
+  });
+
   it("renders nothing when there are no toasts", () => {
     mockToasts.current = [];
     const { container } = render(<Toaster />);
@@ -109,5 +117,33 @@ describe("Toaster", () => {
     const { container } = render(<Toaster />);
     expect(container.querySelector(".font-semibold")).not.toBeInTheDocument();
     expect(document.body.textContent).not.toContain("undefined");
+  });
+
+  it("updates the toast controls and tagged content with the interface language, preserving provider text", async () => {
+    const result = serviceMessage("service.connected_named", { name: "Settings" });
+    mockToasts.current = [
+      {
+        id: "localized",
+        title: <ServiceMessageText message="Settings" />,
+        description: <ServiceMessageText message={result.message} metadata={result} />,
+        open: true,
+        duration: Infinity,
+      },
+    ];
+    act(() => setInterfaceLanguage("ar"));
+    const { container } = render(<Toaster />);
+    expect(screen.getByRole("region", { name: "الإشعارات (F8)" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "إغلاق" })).toBeInTheDocument();
+    const raw = container.querySelector('bdi[lang="und"]');
+    expect(raw).toHaveTextContent("Settings");
+    expect(raw).toHaveAttribute("dir", "auto");
+    expect(container.querySelector('bdi[lang="ar"]')).toHaveTextContent(/Settings/);
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("إشعار"));
+
+    act(() => setInterfaceLanguage("en"));
+    expect(screen.getByRole("region", { name: "Notifications (F8)" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Dismiss" })).toBeInTheDocument();
+    expect(container.querySelector('bdi[lang="en"]')).toHaveTextContent(result.message);
+    expect(raw).toHaveTextContent("Settings");
   });
 });

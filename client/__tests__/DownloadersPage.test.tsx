@@ -271,7 +271,15 @@ describe("DownloadersPage", () => {
 
       fireEvent.click(await screen.findByRole("button", { name: "Test connection for qBit" }));
 
-      await waitFor(() => expect(toastSpy).toHaveBeenCalledWith(toast));
+      await waitFor(() => expect(toastSpy).toHaveBeenCalled());
+      const actual = toastSpy.mock.calls.at(-1)?.[0];
+      expect(actual).toEqual({ ...toast, description: expect.anything() });
+      const description = render(<>{actual.description}</>);
+      expect(description.container).toHaveTextContent(toast.description);
+      if (response.ok) {
+        expect(description.container.querySelector("bdi")).toHaveAttribute("lang", "und");
+      }
+      description.unmount();
       expect(requestsTo("POST", "/api/downloaders/d1/test")).toHaveLength(1);
     });
   });
@@ -455,10 +463,15 @@ describe("DownloadersPage", () => {
           "Test Connection"
         )
       );
-      expect(toastSpy).toHaveBeenCalledWith({
+      const connectionToast = toastSpy.mock.calls.at(-1)?.[0];
+      expect(connectionToast).toEqual({
         title: "Connection successful",
-        description: "Transmission 4.0",
+        description: expect.anything(),
       });
+      const description = render(<>{connectionToast.description}</>);
+      expect(description.container).toHaveTextContent("Transmission 4.0");
+      expect(description.container.querySelector("bdi")).toHaveAttribute("lang", "und");
+      description.unmount();
 
       fireEvent.click(dialog.getByTestId("button-save-downloader"));
       await waitFor(() => expect(requestsTo("POST", "/api/downloaders")).toHaveLength(1));

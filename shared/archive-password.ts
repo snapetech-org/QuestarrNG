@@ -1,3 +1,4 @@
+import { serviceMessage, type ServiceMessageDescriptor } from "./service-messages.js";
 import { parseJsonObject } from "./json-object-utils.js";
 
 /**
@@ -25,14 +26,13 @@ export function resolveArchivePassword(
   settings: string | null | undefined,
   baseUrl: string,
   downloaderTypeLabel: string
-): { password?: string | undefined; error?: string } {
+): { password?: string | undefined; error?: string; errorI18n?: ServiceMessageDescriptor } {
   const password = requestPassword || getArchivePasswordSetting(settings);
   if (password && !baseUrl.startsWith("https://")) {
-    return {
-      error:
-        `Refusing to send the archive password over an insecure connection. ` +
-        `Enable SSL for this ${downloaderTypeLabel} downloader, or remove the archive password.`,
-    };
+    const { message, ...errorI18n } = serviceMessage("service.archive_password_https", {
+      client: downloaderTypeLabel,
+    });
+    return { error: message, errorI18n };
   }
   return { password };
 }

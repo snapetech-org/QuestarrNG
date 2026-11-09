@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, ApiError } from "@/lib/queryClient";
 import { buildGitHubIssueUrl } from "@/lib/send-logs";
 import { copyToClipboard } from "@/lib/utils";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 import { InterfaceText } from "@/components/InterfaceText";
 import { formatInterfaceMessage } from "@/lib/interface-locale";
 
@@ -55,7 +56,7 @@ export default function SendErrorReportDialog({
   const queryClient = useQueryClient();
   const [step, setStep] = useState<Step>("consent");
   const [result, setResult] = useState<SendSuccess | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [sendError, setSendError] = useState<unknown | null>(null);
 
   const {
     data: meta,
@@ -78,7 +79,7 @@ export default function SendErrorReportDialog({
   const reset = useCallback(() => {
     setStep("consent");
     setResult(null);
-    setErrorMessage(null);
+    setSendError(null);
   }, []);
 
   const handleOpenChange = useCallback(
@@ -98,7 +99,7 @@ export default function SendErrorReportDialog({
       setResult(data);
       setStep("success");
     } catch (err) {
-      setErrorMessage(err instanceof ApiError ? err.message : "Failed to send diagnostic report.");
+      setSendError(err);
       setStep("error");
     } finally {
       queryClient.invalidateQueries({ queryKey: ["/api/telemetry/pending", reportId] });
@@ -111,9 +112,12 @@ export default function SendErrorReportDialog({
       if (succeeded) {
         toast({
           title: "Copied",
-          description: formatInterfaceMessage("Code {code} copied to clipboard", {
-            code: String(result.code ?? ""),
-          }),
+          description: (language) =>
+            formatInterfaceMessage(
+              "interface.code_code_copied_to_clipboard_b1632d0c",
+              { code: String(result.code ?? "") },
+              language
+            ),
         });
       } else {
         toast({
@@ -167,11 +171,10 @@ export default function SendErrorReportDialog({
                 <InterfaceText source={"Couldn't load report"} />
               </DialogTitle>
               <DialogDescription>
-                {metaError instanceof ApiError ? (
-                  metaError.message
-                ) : (
-                  <InterfaceText source={"Something went wrong loading this report."} />
-                )}
+                <ApiErrorDescription
+                  error={metaError}
+                  fallbackSource="interface.unknown_error_ce512b43"
+                />
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
@@ -280,7 +283,7 @@ export default function SendErrorReportDialog({
                 <InterfaceText source={"Dismiss"} />
               </Button>
               <Button onClick={handleSend}>
-                <Send className="mr-2 h-4 w-4" />
+                <Send className="me-2 h-4 w-4" />
                 <InterfaceText source={"Send report"} />
               </Button>
             </DialogFooter>
@@ -327,7 +330,7 @@ export default function SendErrorReportDialog({
               <div className="flex items-center gap-3 rounded-xl border border-border bg-zinc-900 px-4 py-3">
                 <span
                   className="flex-1 text-center font-mono text-3xl font-bold tracking-[0.3em] text-primary"
-                  aria-label={formatInterfaceMessage("Support code: {code}", {
+                  aria-label={formatInterfaceMessage("interface.support_code_code_a1b3e83c", {
                     code: String(result.code ?? ""),
                   })}
                   data-i18n-aria-label={"Support code: {code}"}
@@ -351,14 +354,14 @@ export default function SendErrorReportDialog({
               <Button
                 variant="outline"
                 onClick={() => handleOpenChange(false)}
-                className="sm:mr-auto"
+                className="sm:me-auto"
               >
                 <InterfaceText source={"Close"} />
               </Button>
               {issueUrl && (
                 <Button asChild>
                   <a href={issueUrl} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="mr-2 h-4 w-4" />
+                    <ExternalLink className="me-2 h-4 w-4" />
                     <InterfaceText source={"Create GitHub issue"} />
                   </a>
                 </Button>
@@ -379,7 +382,9 @@ export default function SendErrorReportDialog({
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-3 py-2">
-              <p className="text-sm text-muted-foreground">{errorMessage}</p>
+              <p className="text-sm text-muted-foreground">
+                <ApiErrorDescription error={sendError} />
+              </p>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={reset}>

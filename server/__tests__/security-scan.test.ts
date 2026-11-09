@@ -1,3 +1,4 @@
+import { parseServiceMessageDescriptor } from "../../shared/service-messages.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import fs from "node:fs";
 import fsExtra from "fs-extra";
@@ -221,12 +222,16 @@ describe("checkVirusTotalHash", () => {
     vi.mocked(safeFetch).mockResolvedValue({ status: 500, ok: false } as never);
     const result = await checkVirusTotalHash("hash", "key");
     expect(result.status).toBe("error");
+    if (result.status === "error")
+      expect(parseServiceMessageDescriptor(result.errorI18n)?.messageKey).toBe(
+        "service.virustotal_http_error"
+      );
   });
 
   it("returns 'error' when the request throws (timeout/network failure)", async () => {
     vi.mocked(safeFetch).mockRejectedValue(new Error("timed out"));
     const result = await checkVirusTotalHash("hash", "key");
-    expect(result).toEqual({ status: "error", error: "timed out" });
+    expect(result).toEqual({ status: "error", error: "timed out", errorI18n: null });
   });
 
   it("passes a 10s timeout and requireHttps to safeFetch", async () => {

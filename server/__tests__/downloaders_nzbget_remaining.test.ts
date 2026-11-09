@@ -1,5 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import {
+  serviceMessage,
+  ServiceMessageError,
+  serializeServiceMessageDescriptor,
+  localizeServiceMessage,
+} from "../../shared/service-messages.js";
 import type { Downloader } from "../../shared/schema.js";
 import { NZBGetClient } from "../downloaders/nzbget.js";
 
@@ -59,6 +65,35 @@ const createDownloader = (overrides: Partial<Downloader> = {}): Downloader => {
 };
 
 describe("NZBGet remaining coverage", () => {
+  it.each([
+    ["pauseDownload", "service.nzb_paused"],
+    ["resumeDownload", "service.nzb_resumed"],
+    ["removeDownload", "service.nzb_removed"],
+  ] as const)("tags app-owned %s results and retains provider lookalikes", async (method, key) => {
+    const client = new NZBGetClient(createDownloader());
+    const rpc = vi.spyOn(client as unknown as NZBGetClientInternals, "makeXMLRPCRequest");
+    rpc.mockResolvedValueOnce(true);
+    const success = await client[method]("item:العربية");
+    expect(success).toEqual({ success: true, ...serviceMessage(key, {}) });
+    const descriptor = serializeServiceMessageDescriptor(success);
+    expect(descriptor).not.toBeNull();
+    expect(localizeServiceMessage(success.message, descriptor, "ar")).toBe(success.message);
+    const typed = new ServiceMessageError("service.unsafe_url_blocked", {
+      url: "https://example.invalid/user/العربية",
+    });
+    rpc.mockRejectedValueOnce(typed);
+    const tagged = await client[method]("item");
+    expect(tagged).toMatchObject({
+      success: false,
+      message: typed.message,
+      messageKey: typed.messageKey,
+    });
+    rpc.mockRejectedValueOnce(new Error(typed.message));
+    const provider = await client[method]("item");
+    expect(provider).toEqual({ success: false, message: typed.message });
+    expect(serializeServiceMessageDescriptor(provider)).toBeNull();
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(isSafeUrl).mockResolvedValue(true);
@@ -442,6 +477,8 @@ describe("NZBGet remaining coverage", () => {
       success: false,
       message:
         "Refusing to send the archive password over an insecure connection. Enable SSL for this NZBGet downloader, or remove the archive password.",
+      messageKey: "service.archive_password_https",
+      messageValues: { client: "NZBGet" },
     });
     expect(rpcSpy).not.toHaveBeenCalled();
   });

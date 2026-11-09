@@ -112,6 +112,33 @@ async function expectSeparatedDownloadAccessibleName(
 }
 
 test.describe("Game download interface language", () => {
+  test("accepts localized digits in the release-year filter and sends a canonical API value", async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("questarr.interface-language", "ar");
+      localStorage.setItem("questarrng.regional-format", "ar");
+    });
+    await page.route("**/api/config", async (route) =>
+      route.fulfill({ json: { igdb: { configured: true } } })
+    );
+    await page.route("**/api/games*", async (route) => route.fulfill({ json: [] }));
+    await page.route("**/api/igdb/platforms", async (route) => route.fulfill({ json: [] }));
+    await page.route("**/api/settings", async (route) => route.fulfill({ json: {} }));
+    let requestedYear: string | null | undefined;
+    await page.route("**/api/igdb/search?*", async (route) => {
+      requestedYear = new URL(route.request().url()).searchParams.get("year");
+      await route.fulfill({ json: [] });
+    });
+
+    await page.goto("/");
+    await page.getByTestId("button-add-game").click();
+    await page.getByTestId("input-game-search").fill("zelda");
+    await page.getByRole("textbox", { name: "تصفية سنة الإصدار" }).fill("٢٠٢٤");
+
+    await expect.poll(() => requestedYear).toBe("2024");
+  });
+
   test("formats sidebar badges with the selected regional digits", async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.setItem("questarr.interface-language", "ar");
@@ -199,12 +226,25 @@ test.describe("Game download interface language", () => {
     });
     await expect(regionalArabicOption.locator('[lang="ar"][dir="rtl"]')).toHaveText("العربية");
     await expect(regionalArabicOption.locator('[lang="en"][dir="ltr"]')).toContainText("Arabic");
+    await expect(
+      page.getByRole("option", { name: "English — English", exact: true })
+    ).toBeVisible();
+    const regionalRussianOption = page.getByRole("option", {
+      name: "Русский — Russian",
+      exact: true,
+    });
+    await expect(regionalRussianOption).toBeVisible();
     if (process.env.PR47_VISUAL_EVIDENCE_DIR) {
       await page.screenshot({
         path: `${process.env.PR47_VISUAL_EVIDENCE_DIR}/pr47-bilingual-locale-options-ar.png`,
         fullPage: true,
       });
     }
+    await regionalRussianOption.click();
+    await expect(regionalFormat).toContainText("Русский");
+    await expect
+      .poll(() => page.evaluate(() => localStorage.getItem("questarrng.regional-format")))
+      .toBe("ru");
   });
 
   test("marks translated calendar labels and release counts with their language", async ({
@@ -894,4 +934,182 @@ test.describe("Game download interface language", () => {
     const failureToast = page.getByRole("status").filter({ hasText: "وفشلت" });
     await expect(failureToast).toContainText(regionalTwo);
   });
+});
+
+test("keeps a long mixed-direction game title accessible at 200% text scaling", async ({
+  page,
+}) => {
+  const longMixedTitle =
+    "لعبة استراتيجية طويلة — Space Questarr: Remastered / Edition 2026 — 日本語";
+  const downloadButton = await openLocalizedBundle(page, 1, "ar", undefined, longMixedTitle);
+
+  await expectSeparatedDownloadAccessibleName(page, downloadButton, "تنزيل", longMixedTitle);
+
+  await page.setViewportSize({ width: 640, height: 512 });
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = "200%";
+  });
+
+  await expect(downloadButton).toBeVisible();
+  await expect(downloadButton).toHaveAccessibleName("تنزيل " + longMixedTitle + " Full");
+  const hasDocumentOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+  );
+  expect(hasDocumentOverflow).toBe(false);
+
+  await page.keyboard.press("Tab");
+  const keyboardFocusRemainsInDialog = await page.evaluate(() =>
+    Boolean(document.activeElement?.closest('[role="dialog"]'))
+  );
+  expect(keyboardFocusRemainsInDialog).toBe(true);
+});
+
+test("keeps the RTL import-history table and task sheet accessible", async ({ page }) => {
+  const longMixedTitle = "لعبة استراتيجية طويلة — Questarr Import Review / Edition 2026 — 日本語";
+  const task = {
+    id: "rtl-import-task-1",
+    taskType: "file_import",
+    triggeredBy: "manual",
+    status: "completed",
+    createdAt: Date.now() - 60_000,
+    startedAt: Date.now() - 55_000,
+    completedAt: Date.now() - 10_000,
+    totalItems: 1,
+    addedItems: 1,
+    skippedItems: 0,
+    failedItems: 0,
+    errorMessage: null,
+  };
+
+  await page.addInitScript(() => {
+    localStorage.setItem("questarr.interface-language", "ar");
+    localStorage.setItem("questarrng.regional-format", "ar");
+  });
+  await page.route("**/api/games*", async (route) => route.fulfill({ json: [] }));
+  await page.route("**/api/downloads*", async (route) =>
+    route.fulfill({ json: { downloads: [], errors: [] } })
+  );
+  await page.route("**/api/config", async (route) =>
+    route.fulfill({ json: { igdb: { configured: true } } })
+  );
+  await page.route("**/api/import-tasks*", async (route) => {
+    const pathname = new URL(route.request().url()).pathname;
+    if (pathname.endsWith("/api/import-tasks")) {
+      await route.fulfill({ json: [task] });
+      return;
+    }
+    await route.fulfill({
+      json: {
+        ...task,
+        items: [
+          {
+            id: "rtl-import-item-1",
+            itemName: longMixedTitle,
+            gameTitle: longMixedTitle,
+            errorMessage: null,
+          },
+        ],
+      },
+    });
+  });
+
+  await page.goto("/import-history");
+  await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+  const table = page.getByRole("table");
+  await expect(table).toBeVisible();
+  const firstHeader = table.getByRole("columnheader").first();
+  await expect(firstHeader).toContainText("النوع");
+  await expect(firstHeader.locator("span")).toHaveAttribute("lang", "ar");
+  await expect(firstHeader).toHaveCSS("text-align", "right");
+
+  const taskRow = table.locator("tbody tr").first();
+  await taskRow.focus();
+  await page.keyboard.press("Enter");
+
+  const taskSheet = page.getByRole("dialog", { name: "استيراد الملفات" });
+  await expect(taskSheet).toBeVisible();
+  await expect(taskSheet).toHaveCSS("direction", "rtl");
+  const title = taskSheet.getByText(longMixedTitle, { exact: true });
+  await expect(title).toHaveAttribute("lang", "und");
+  await expect(title).toHaveAttribute("dir", "auto");
+  await expect(title).toBeVisible();
+
+  await page.keyboard.press("Escape");
+  await expect(taskSheet).not.toBeVisible();
+});
+
+test("localizes the RTL manual-import form while preserving game names and paths", async ({
+  page,
+}) => {
+  const gameTitle = "لعبة استراتيجية طويلة — Questarr 2026 / 日本語";
+  const downloadTitle = gameTitle + ".zip";
+
+  await page.addInitScript(() => {
+    localStorage.setItem("questarr.interface-language", "ar");
+    localStorage.setItem("questarrng.regional-format", "ar");
+  });
+  await page.route("**/api/games*", async (route) => route.fulfill({ json: [] }));
+  await page.route("**/api/downloads*", async (route) =>
+    route.fulfill({ json: { downloads: [], errors: [] } })
+  );
+  await page.route("**/api/config", async (route) =>
+    route.fulfill({ json: { igdb: { configured: true } } })
+  );
+  await page.route("**/api/settings", async (route) => route.fulfill({ json: {} }));
+  await page.route("**/api/igdb/platforms", async (route) => route.fulfill({ json: [] }));
+  await page.route("**/api/imports/pending", async (route) =>
+    route.fulfill({
+      json: [
+        {
+          id: "rtl-pending-import-1",
+          gameTitle,
+          downloadTitle,
+          status: "failed",
+          createdAt: "2026-10-28T00:00:00.000Z",
+        },
+      ],
+    })
+  );
+  await page.route("**/api/imports/config", async (route) =>
+    route.fulfill({ json: { libraryRoot: "/library/games", transferMode: "move" } })
+  );
+  await page.route("**/api/imports/romm", async (route) => route.fulfill({ json: {} }));
+  await page.route("**/api/imports/rtl-pending-import-1/plan*", async (route) =>
+    route.fulfill({
+      json: {
+        originalPath: "/downloads/لعبة Questarr.zip",
+        proposedPath: "/library/games/لعبة Questarr",
+        files: [{ name: downloadTitle, isArchive: true }],
+        hasArchive: true,
+        totalCount: 1,
+      },
+    })
+  );
+
+  await page.goto("/");
+  await page.getByRole("button", { name: "مراجعة", exact: true }).click();
+
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toHaveCSS("direction", "rtl");
+  const sourceLabel = dialog.locator('label[for="import-review-source-path"]');
+  await expect(sourceLabel).toHaveAttribute("lang", "ar");
+  await expect(sourceLabel).toHaveAttribute("dir", "rtl");
+
+  const sourcePath = dialog.locator("#import-review-source-path");
+  await expect(sourcePath).toHaveAttribute("lang", "und");
+  await expect(sourcePath).toHaveAttribute("dir", "auto");
+  await expect(sourcePath).toHaveValue("/downloads/لعبة Questarr.zip");
+
+  const destinationPath = dialog.locator("#import-review-destination-path");
+  await expect(destinationPath).toHaveAttribute("lang", "und");
+  await expect(destinationPath).toHaveAttribute("dir", "auto");
+  await expect(destinationPath).toHaveValue("/library/games/لعبة Questarr");
+
+  await sourcePath.fill("/downloads/مجلد Questarr 日本語");
+  await expect(sourcePath).toHaveValue("/downloads/مجلد Questarr 日本語");
+  await expect(dialog.getByRole("button", { name: "تأكيد الاستيراد" })).toBeVisible();
+
+  await page.keyboard.press("Escape");
+  await expect(dialog).not.toBeVisible();
 });

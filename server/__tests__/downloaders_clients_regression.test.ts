@@ -1236,12 +1236,16 @@ describe("downloader client regression coverage", () => {
     await expect(client.testConnection()).resolves.toEqual({
       success: true,
       message: "Connected successfully to qBittorrent 4.6.5",
+      messageKey: "service.connected_successfully_version",
+      messageValues: { client: "qBittorrent", version: "4.6.5" },
     });
 
     authenticateSpy.mockRejectedValueOnce(new Error("auth boom"));
     await expect(client.testConnection()).resolves.toEqual({
       success: false,
       message: "Failed to connect to qBittorrent: auth boom",
+      messageKey: "service.connection_failed",
+      messageValues: { client: "qBittorrent", error: "auth boom" },
     });
 
     await expect(client.addDownload({ url: "", title: "No URL" })).resolves.toEqual({
@@ -1327,6 +1331,8 @@ describe("downloader client regression coverage", () => {
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully",
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     makeRequestSpy.mockReset();
@@ -1361,6 +1367,8 @@ describe("downloader client regression coverage", () => {
       success: true,
       id: "recent-hash",
       message: "Download already exists (qBittorrent)",
+      messageKey: "service.download_already_exists",
+      messageValues: { client: "qBittorrent" },
     });
 
     vi.useRealTimers();
@@ -1383,6 +1391,8 @@ describe("downloader client regression coverage", () => {
     await expect(client.testConnection()).resolves.toEqual({
       success: true,
       message: "Connected successfully to Transmission",
+      messageKey: "service.connected_successfully",
+      messageValues: { client: "Transmission" },
     });
 
     makeRequestSpy.mockRejectedValueOnce(
@@ -1397,6 +1407,8 @@ describe("downloader client regression coverage", () => {
     await expect(client.testConnection()).resolves.toEqual({
       success: false,
       message: "Failed to connect to Transmission: network boom",
+      messageKey: "service.connection_failed",
+      messageValues: { client: "Transmission", error: "network boom" },
     });
 
     vi.mocked(isSafeUrl).mockResolvedValueOnce(false);
@@ -1425,6 +1437,8 @@ describe("downloader client regression coverage", () => {
       success: true,
       id: "dup-hash",
       message: "Download already exists (Transmission)",
+      messageKey: "service.download_already_exists",
+      messageValues: { client: "Transmission" },
     });
   });
 
@@ -1472,6 +1486,8 @@ describe("downloader client regression coverage", () => {
       success: true,
       id: "magnet-hash",
       message: "Download added successfully",
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     fetchMock
@@ -1500,6 +1516,8 @@ describe("downloader client regression coverage", () => {
     ).resolves.toEqual({
       success: false,
       message: "Failed to add download: tracker offline",
+      messageKey: "service.download_add_failed",
+      messageValues: { error: "tracker offline" },
     });
   });
 
@@ -1516,6 +1534,8 @@ describe("downloader client regression coverage", () => {
     await expect(client.testConnection()).resolves.toEqual({
       success: true,
       message: "Connected to rTorrent v0.9.8",
+      messageKey: "service.connected_version",
+      messageValues: { client: "rTorrent", version: "0.9.8" },
     });
 
     rpcSpy.mockRejectedValueOnce(new Error("Authentication failed: bad credentials"));
@@ -1528,6 +1548,8 @@ describe("downloader client regression coverage", () => {
     await expect(client.testConnection()).resolves.toEqual({
       success: false,
       message: "Failed to connect to rTorrent: rpc down",
+      messageKey: "service.connection_failed",
+      messageValues: { client: "rTorrent", error: "rpc down" },
     });
 
     await expect(client.addDownload({ url: "", title: "No URL" })).resolves.toEqual({
@@ -1553,6 +1575,8 @@ describe("downloader client regression coverage", () => {
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully",
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     rpcSpy.mockResolvedValueOnce(5);
@@ -1594,6 +1618,8 @@ describe("downloader client regression coverage", () => {
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully (stopped)",
+      messageKey: "service.download_added_stopped",
+      messageValues: {},
     });
 
     fetchMock.mockResolvedValueOnce({
@@ -1625,6 +1651,8 @@ describe("downloader client regression coverage", () => {
     await expect(client.testConnection()).resolves.toEqual({
       success: true,
       message: "Connected to SABnzbd v4.3.2",
+      messageKey: "service.connected_version",
+      messageValues: { client: "SABnzbd", version: "4.3.2" },
     });
 
     fetchWithFallbackSpy.mockResolvedValueOnce({
@@ -1646,12 +1674,20 @@ describe("downloader client regression coverage", () => {
       success: false,
       message:
         "Failed to connect to SABnzbd at http://localhost:8080: HTTP 500: Boom - server error",
+      messageKey: "service.connection_failed_at",
+      messageValues: {
+        client: "SABnzbd",
+        url: "http://localhost:8080",
+        error: "HTTP 500: Boom - server error",
+      },
     });
 
     fetchWithFallbackSpy.mockRejectedValueOnce(new Error("connect boom"));
     await expect(client.testConnection()).resolves.toEqual({
       success: false,
       message: expect.stringContaining("Failed to connect to SABnzbd"),
+      messageKey: "service.connection_failed_at",
+      messageValues: { client: "SABnzbd", url: "http://localhost:8080", error: "connect boom" },
     });
 
     vi.mocked(isSafeUrl).mockResolvedValueOnce(false);
@@ -1740,6 +1776,8 @@ describe("downloader client regression coverage", () => {
     await expect(client.testConnection()).resolves.toEqual({
       success: true,
       message: "Connected to NZBGet v23.0",
+      messageKey: "service.connected_version",
+      messageValues: { client: "NZBGet", version: "23.0" },
     });
 
     vi.mocked(isSafeUrl).mockResolvedValueOnce(false);
@@ -1866,12 +1904,16 @@ describe("downloader client regression coverage", () => {
     await expect(client.testConnection()).resolves.toEqual({
       success: true,
       message: "Connected successfully to Synology Download Station",
+      messageKey: "service.connected_successfully",
+      messageValues: { client: "Synology Download Station" },
     });
 
     vi.spyOn(privateClient, "authenticate").mockRejectedValueOnce(new Error("auth boom"));
     await expect(client.testConnection()).resolves.toEqual({
       success: false,
       message: "Failed to connect to Synology Download Station: auth boom",
+      messageKey: "service.connection_failed",
+      messageValues: { client: "Synology Download Station", error: "auth boom" },
     });
 
     vi.spyOn(privateClient, "ensureApiInfo").mockResolvedValue(undefined);
@@ -1901,6 +1943,8 @@ describe("downloader client regression coverage", () => {
       success: true,
       id: "task-1",
       message: "Download added successfully",
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     vi.spyOn(privateClient, "getTask").mockRejectedValue(new Error("status boom"));
@@ -1913,16 +1957,22 @@ describe("downloader client regression coverage", () => {
     await expect(client.pauseDownload("task-1")).resolves.toEqual({
       success: false,
       message: "Failed to pause download: pause boom",
+      messageKey: "service.download_pause_failed",
+      messageValues: { error: "pause boom" },
     });
     requestTaskApiSpy.mockRejectedValueOnce(new Error("resume boom"));
     await expect(client.resumeDownload("task-1")).resolves.toEqual({
       success: false,
       message: "Failed to resume download: resume boom",
+      messageKey: "service.download_resume_failed",
+      messageValues: { error: "resume boom" },
     });
     requestTaskApiSpy.mockRejectedValueOnce(new Error("remove boom"));
     await expect(client.removeDownload("task-1", true)).resolves.toEqual({
       success: false,
       message: "Failed to remove download: remove boom",
+      messageKey: "service.download_remove_failed",
+      messageValues: { error: "remove boom" },
     });
 
     privateClient.apiInfo = null;
@@ -1998,6 +2048,8 @@ describe("downloader client regression coverage", () => {
       success: true,
       id: "task-upload",
       message: "Download added successfully",
+      messageKey: "service.download_added",
+      messageValues: {},
     });
 
     requestTaskApiSpy.mockResolvedValueOnce({

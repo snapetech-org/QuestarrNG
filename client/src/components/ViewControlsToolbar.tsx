@@ -46,10 +46,10 @@ export default function ViewControlsToolbar({
             </TooltipTrigger>
             <TooltipContent>
               <span
-                lang={languageFor("Switch to {density}")}
-                dir={directionFor("Switch to {density}")}
+                lang={languageFor("interface.switch_to_density_59bd29b0")}
+                dir={directionFor("interface.switch_to_density_59bd29b0")}
               >
-                {formatInterfaceMessage("Switch to {density}", {
+                {formatInterfaceMessage("interface.switch_to_density_59bd29b0", {
                   density: t(listDensity === "comfortable" ? "Compact" : "Comfortable"),
                 })}
               </span>
@@ -64,17 +64,17 @@ export default function ViewControlsToolbar({
       >
         <ToggleGroupItem
           value="grid"
-          aria-label={t("Grid View")}
-          lang={languageFor("Grid View")}
-          dir={directionFor("Grid View")}
+          aria-label={t("interface.grid_view_6a1dec06")}
+          lang={languageFor("interface.grid_view_6a1dec06")}
+          dir={directionFor("interface.grid_view_6a1dec06")}
         >
           <LayoutGrid className="h-4 w-4" />
         </ToggleGroupItem>
         <ToggleGroupItem
           value="list"
-          aria-label={t("List View")}
-          lang={languageFor("List View")}
-          dir={directionFor("List View")}
+          aria-label={t("interface.list_view_23b8e256")}
+          lang={languageFor("interface.list_view_23b8e256")}
+          dir={directionFor("interface.list_view_23b8e256")}
         >
           <List className="h-4 w-4" />
         </ToggleGroupItem>

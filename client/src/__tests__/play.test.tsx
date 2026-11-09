@@ -3,6 +3,7 @@ import "@testing-library/jest-dom";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import PlayPage from "@/pages/play";
+import { setInterfaceLanguage } from "@/lib/interface-locale";
 
 const mockState = vi.hoisted(() => ({
   callbacks: null as null | {
@@ -35,12 +36,6 @@ vi.mock("wouter", () => ({ useLocation: () => ["/play", mockState.navigate] }));
 vi.mock("@/hooks/use-toast", () => ({ useToast: () => ({ toast: mockState.toast }) }));
 vi.mock("@/hooks/use-local-storage-state", () => ({
   useLocalStorageState: () => [false, mockState.setGhostUnlocked],
-}));
-vi.mock("@/lib/interface-locale", () => ({
-  useInterfaceLanguage: () => ({ t: (value: string) => value }),
-}));
-vi.mock("@/components/InterfaceText", () => ({
-  InterfaceText: ({ source }: { source: string }) => <>{source}</>,
 }));
 vi.mock("@/game/infiltration-game", () => ({
   InfiltrationGame: class MockInfiltrationGame {
@@ -84,6 +79,7 @@ function setUrl(url: string) {
 describe("PlayPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    setInterfaceLanguage("en");
     mockState.callbacks = null;
     mockState.seed = undefined;
     vi.stubGlobal("crypto", {

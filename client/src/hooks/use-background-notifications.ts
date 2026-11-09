@@ -1,3 +1,5 @@
+import { createElement } from "react";
+import { ServiceMessageText } from "@/components/ServiceMessageText";
 import { useEffect, useRef, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
@@ -47,7 +49,7 @@ export function useBackgroundNotifications() {
       if (previous.status !== "completed" && download.status === "completed") {
         toast({
           title: "Download completed",
-          description: download.name,
+          description: createElement(ServiceMessageText, { message: download.name }),
         });
       }
 
@@ -55,7 +57,10 @@ export function useBackgroundNotifications() {
       if (previous.status !== "error" && download.status === "error") {
         toast({
           title: "Download error",
-          description: download.error || download.name,
+          description: createElement(ServiceMessageText, {
+            message: download.error || download.name,
+            metadata: download.error ? download.errorI18n : undefined,
+          }),
           variant: "destructive",
         });
       }

@@ -1,3 +1,8 @@
+import {
+  ServiceMessageError,
+  serviceMessage,
+  parseServiceMessageDescriptor,
+} from "../../shared/service-messages.js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Indexer } from "../../shared/schema.js";
 import { insertIndexerSchema } from "../../shared/schema.js";
@@ -23,6 +28,19 @@ const catalog = (
 ) => Response.json({ name: "Catalog", downloads });
 
 describe("JSON download catalogs", () => {
+  it.each([true, false])(
+    "distinguishes typed catalog errors from identical provider text: %s",
+    async (typed) => {
+      const app = new ServiceMessageError("service.json_catalog_size_limit", {});
+      safeFetch.mockRejectedValueOnce(typed ? app : new Error(app.message));
+      const result = await jsonCatalogClient.testConnection(source());
+      expect(result).toMatchObject({ success: false, message: app.message });
+      expect(parseServiceMessageDescriptor(result)?.messageKey).toBe(
+        typed ? app.messageKey : undefined
+      );
+    }
+  );
+
   beforeEach(() => safeFetch.mockReset());
 
   it("accepts a public catalog without an API key while existing protocols still require keys", () => {
@@ -58,7 +76,11 @@ describe("JSON download catalogs", () => {
     });
     expect(safeFetch).toHaveBeenCalledTimes(1);
     safeFetch.mockResolvedValueOnce(catalog([]));
-    expect(await jsonCatalogClient.testConnection(indexer)).toMatchObject({ success: true });
+    expect(await jsonCatalogClient.testConnection(indexer)).toMatchObject({
+      success: true,
+      messageKey: "service.json_catalog_valid",
+      messageValues: { count: 0 },
+    });
     expect(await jsonCatalogClient.search(indexer, { query: "Example" })).toMatchObject({
       total: 0,
     });
@@ -119,7 +141,7 @@ describe("JSON download catalogs", () => {
     safeFetch.mockResolvedValueOnce(new Response(new Uint8Array(10 * 1024 * 1024 + 1)));
     expect(await jsonCatalogClient.testConnection(source())).toEqual({
       success: false,
-      message: "Catalog exceeds the 10 MiB limit",
+      ...serviceMessage("service.json_catalog_size_limit", {}),
     });
   });
 

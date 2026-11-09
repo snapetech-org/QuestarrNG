@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 import React from "react";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createTestQueryClient } from "./test-utils";
 import FileCategorySelect from "@/components/FileCategorySelect";
 import type { ScannedGameFile } from "@shared/schema";
+import { setInterfaceLanguage } from "@/lib/interface-locale";
 
 const mockToast = vi.fn();
 vi.mock("@/hooks/use-toast", () => ({
@@ -27,12 +28,12 @@ const file: ScannedGameFile = {
   size: 10,
 };
 
-function renderSelect() {
+function renderSelect(selectedFile: ScannedGameFile = file) {
   const client = createTestQueryClient();
-  client.setQueryData([`/api/games/${gameId}/files`], [file]);
+  client.setQueryData([`/api/games/${gameId}/files`], [selectedFile]);
   render(
     <QueryClientProvider client={client}>
-      <FileCategorySelect gameId={gameId} file={file} />
+      <FileCategorySelect gameId={gameId} file={selectedFile} />
     </QueryClientProvider>
   );
   return client;
@@ -47,16 +48,47 @@ async function pick(label: string) {
 describe("FileCategorySelect", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    act(() => setInterfaceLanguage("en"));
   });
 
   afterEach(() => {
     cleanup();
+    act(() => setInterfaceLanguage("en"));
   });
 
   it("shows the scanned category", () => {
     renderSelect();
     expect(screen.getByRole("combobox", { name: `Category for ${file.name}` })).toHaveTextContent(
-      "Update"
+      "Updates"
+    );
+  });
+
+  it.each([
+    ["de", "Updates"],
+    ["es", "Actualizaciones"],
+    ["hi", "अपडेट"],
+    ["pt-BR", "Atualizações"],
+    ["ar", "التحديثات"],
+  ] as const)("uses a content-category noun in %s", (language, label) => {
+    act(() => setInterfaceLanguage(language));
+    renderSelect();
+    expect(screen.getByRole("combobox")).toHaveTextContent(label);
+  });
+
+  it("preserves the update enum when selecting the German noun label", async () => {
+    act(() => setInterfaceLanguage("de"));
+    apiRequest.mockResolvedValue({ json: async () => ({ path: file.path, category: "update" }) });
+    const client = renderSelect({ ...file, category: "main" });
+    fireEvent.click(screen.getByRole("combobox"));
+    fireEvent.click(await screen.findByRole("option", { name: "Updates" }));
+    await waitFor(() =>
+      expect(apiRequest).toHaveBeenCalledWith("PATCH", `/api/games/${gameId}/files/category`, {
+        path: file.path,
+        category: "update",
+      })
+    );
+    await waitFor(() =>
+      expect(client.getQueryData([`/api/games/${gameId}/files`])).toEqual([file])
     );
   });
 

@@ -1,3 +1,12 @@
+import {
+  parseServiceMessageDescriptor,
+  serviceErrorValue,
+  serviceErrorResult,
+  ServiceMessageError,
+  type ServiceMessageDescriptor,
+  type ServiceMessageFragment,
+  serviceMessage,
+} from "../../shared/service-messages.js";
 import { constants as fsConstants } from "node:fs";
 import * as fs from "node:fs/promises";
 import { createWriteStream } from "node:fs";
@@ -79,6 +88,7 @@ interface StagingTask {
   lastSampleAt: number;
   lastSampleBytes: number;
   error?: string;
+  errorI18n?: ServiceMessageDescriptor | undefined;
   controller: AbortController;
 }
 
@@ -89,11 +99,11 @@ const recentTorrentCache = new Map<
 >();
 const TORRENT_STATUS_CACHE_MS = 90 * 1000;
 const MAX_STAGING_FILES = 100;
-const TERMINAL_ERRORS = new Map<string, string>([
-  ["magnet_error", "Real-Debrid could not read this magnet link."],
-  ["error", "Real-Debrid could not complete this torrent."],
-  ["virus", "Real-Debrid blocked this torrent as unsafe."],
-  ["dead", "Real-Debrid marked this torrent as unavailable."],
+const TERMINAL_ERRORS = new Map<string, ServiceMessageFragment>([
+  ["magnet_error", serviceMessage("service.realdebrid_magnet_unreadable", {})],
+  ["error", serviceMessage("service.realdebrid_torrent_incomplete", {})],
+  ["virus", serviceMessage("service.realdebrid_torrent_unsafe", {})],
+  ["dead", serviceMessage("service.realdebrid_torrent_unavailable", {})],
 ]);
 
 const taskKey = (downloaderId: string, torrentId: string) => `${downloaderId}:${torrentId}`;
@@ -151,16 +161,16 @@ export class RealDebridClient implements DownloaderClient {
       requireHttps: true,
     });
     if (!response.ok) {
-      let reason = "Real-Debrid request failed.";
+      let reason = serviceMessage("service.realdebrid_request_failed", {});
       try {
         const payload = (await response.json()) as { error?: unknown; error_code?: unknown };
         if (typeof payload.error === "string" && payload.error.length < 160) {
-          reason = `Real-Debrid: ${payload.error}`;
+          reason = serviceMessage("service.realdebrid_provider_error", { error: payload.error });
         }
       } catch {
         // Keep the generic message for non-JSON API errors.
       }
-      throw new Error(reason);
+      throw new ServiceMessageError(reason.messageKey, reason.messageValues);
     }
     if (response.status === 204) return undefined as T;
     const text = await response.text();
@@ -182,20 +192,24 @@ export class RealDebridClient implements DownloaderClient {
     if (!this.downloader.downloadPath || !path.isAbsolute(this.downloader.downloadPath)) {
       return {
         success: false,
-        message: "Set an absolute local staging path that QuestarrNG can write to.",
+        ...serviceMessage("service.realdebrid_local_staging_path_required", {}),
       };
     }
     try {
       const user = await this.request<{ username?: string; type?: string }>("/user");
       return {
         success: true,
-        message: `Connected to Real-Debrid${user.username ? ` as ${user.username}` : ""}. Downloads will be copied into QuestarrNG at ${this.downloader.downloadPath}.`,
+        ...(user.username
+          ? serviceMessage("service.realdebrid_connected_user", {
+              username: user.username,
+              path: String(this.downloader.downloadPath),
+            })
+          : serviceMessage("service.realdebrid_connected", {
+              path: String(this.downloader.downloadPath),
+            })),
       };
     } catch (error) {
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : "Could not connect to Real-Debrid.",
-      };
+      return serviceErrorResult(error, serviceMessage("service.realdebrid_connect_failed", {}));
     }
   }
 
@@ -218,7 +232,7 @@ export class RealDebridClient implements DownloaderClient {
     if (!this.downloader.downloadPath || !path.isAbsolute(this.downloader.downloadPath)) {
       return {
         success: false,
-        message: "Set an absolute QuestarrNG local staging path before adding downloads.",
+        ...serviceMessage("service.realdebrid_local_staging_path_add_required", {}),
       };
     }
     try {
@@ -240,22 +254,18 @@ export class RealDebridClient implements DownloaderClient {
         } else {
           return {
             success: false,
-            message: "The indexer result was not a usable magnet link or torrent file.",
+            ...serviceMessage("service.realdebrid_indexer_result_unusable", {}),
           };
         }
       }
-      if (!added?.id) throw new Error("Real-Debrid did not return a torrent ID.");
+      if (!added?.id) throw new ServiceMessageError("service.realdebrid_remote_id_missing", {});
       const info = await this.getTorrent(added.id).catch(() => null);
       if (info?.status === "waiting_files_selection") {
         await this.selectAllFiles(added.id);
       }
-      return { success: true, id: added.id, message: "Torrent sent to Real-Debrid." };
+      return { success: true, id: added.id, ...serviceMessage("service.realdebrid_sent", {}) };
     } catch (error) {
-      return {
-        success: false,
-        message:
-          error instanceof Error ? error.message : "Could not add this magnet to Real-Debrid.",
-      };
+      return serviceErrorResult(error, serviceMessage("service.realdebrid_add_failed", {}));
     }
   }
 
@@ -263,7 +273,7 @@ export class RealDebridClient implements DownloaderClient {
     const announcedSize = Number(response.headers.get("content-length"));
     const maxTorrentFileBytes = 10 * 1024 * 1024;
     if (Number.isFinite(announcedSize) && announcedSize > maxTorrentFileBytes) {
-      throw new Error("The indexer torrent file is larger than 10 MB.");
+      throw new ServiceMessageError("service.realdebrid_indexer_torrent_too_large", {});
     }
     const reader = response.body!.getReader();
     const chunks: Uint8Array[] = [];
@@ -275,7 +285,7 @@ export class RealDebridClient implements DownloaderClient {
       totalBytes += value.byteLength;
       if (totalBytes > maxTorrentFileBytes) {
         await reader.cancel();
-        throw new Error("The indexer torrent file is larger than 10 MB.");
+        throw new ServiceMessageError("service.realdebrid_indexer_torrent_too_large", {});
       }
       chunks.push(value);
     }
@@ -297,7 +307,7 @@ export class RealDebridClient implements DownloaderClient {
       requireHttps: true,
     });
     if (!upload.ok) {
-      throw new Error("Real-Debrid could not accept the indexer torrent file.");
+      throw new ServiceMessageError("service.realdebrid_indexer_torrent_rejected", {});
     }
     return (await upload.json()) as { id: string };
   }
@@ -328,13 +338,15 @@ export class RealDebridClient implements DownloaderClient {
       };
     }
     if (task?.state === "failed") {
+      const fallback = serviceMessage("service.realdebrid_files_copy_failed", {});
       return {
         id: torrent.id,
         name: torrent.original_filename || torrent.filename || "Real-Debrid download",
         downloadType: "torrent",
         status: "error",
         progress: Number(torrent.progress) || 0,
-        error: task.error || "Real-Debrid files could not be copied to QuestarrNG.",
+        error: task.error || fallback.message,
+        errorI18n: task.error ? task.errorI18n : parseServiceMessageDescriptor(fallback),
         category: this.downloader.category ?? undefined,
         trackedByQuestarr: true,
       };
@@ -354,6 +366,7 @@ export class RealDebridClient implements DownloaderClient {
         trackedByQuestarr: true,
       };
     }
+    const terminalError = TERMINAL_ERRORS.get(torrent.status);
     return {
       id: torrent.id,
       name: torrent.original_filename || torrent.filename || `Real-Debrid torrent ${torrent.id}`,
@@ -368,7 +381,8 @@ export class RealDebridClient implements DownloaderClient {
       downloadSpeed: Number(torrent.speed) || 0,
       size: Number(torrent.bytes) || undefined,
       seeders: Number(torrent.seeders) || undefined,
-      error: TERMINAL_ERRORS.get(torrent.status),
+      error: terminalError?.message,
+      errorI18n: parseServiceMessageDescriptor(terminalError),
       category: this.downloader.category ?? undefined,
     };
   }
@@ -469,14 +483,14 @@ export class RealDebridClient implements DownloaderClient {
   async pauseDownload(_id: string): Promise<DownloaderActionResult> {
     return {
       success: false,
-      message: "Real-Debrid does not support pausing torrents through its API.",
+      ...serviceMessage("service.realdebrid_pause_unsupported", {}),
     };
   }
 
   async resumeDownload(_id: string): Promise<DownloaderActionResult> {
     return {
       success: false,
-      message: "Real-Debrid starts torrents automatically and does not expose a resume action.",
+      ...serviceMessage("service.realdebrid_resume_unsupported", {}),
     };
   }
 
@@ -501,19 +515,17 @@ export class RealDebridClient implements DownloaderClient {
       if (deleteFiles && stagingDirectory && this.downloader.downloadPath) {
         const stageInfo = await fs.lstat(stagingDirectory).catch(() => null);
         if (stageInfo?.isSymbolicLink()) {
-          throw new Error(
-            "The QuestarrNG staging directory is a symbolic link and was not removed."
-          );
+          throw new ServiceMessageError("service.realdebrid_staging_symlink_removal_refused", {});
         }
         if (stageInfo) {
           const rootDirectory = path.resolve(this.downloader.downloadPath);
           if (path.dirname(stagingDirectory) !== rootDirectory) {
-            throw new Error("The QuestarrNG staging directory is outside the configured path.");
+            throw new ServiceMessageError("service.realdebrid_staging_outside_configured_path", {});
           }
           const rootRealPath = await fs.realpath(rootDirectory);
           const stagingRealPath = await fs.realpath(stagingDirectory);
           if (!isContained(stagingRealPath, rootRealPath)) {
-            throw new Error("The QuestarrNG staging directory is outside the configured path.");
+            throw new ServiceMessageError("service.realdebrid_staging_outside_configured_path", {});
           }
           await fs.rm(stagingRealPath, { recursive: true, force: true });
         }
@@ -522,27 +534,28 @@ export class RealDebridClient implements DownloaderClient {
       recentTorrentCache.delete(key);
       return {
         success: true,
-        message:
-          deleteFiles && stagingDirectory
-            ? "Real-Debrid torrent and QuestarrNG staged files removed."
-            : "Real-Debrid torrent removed. QuestarrNG staged files were kept.",
+        ...(deleteFiles && stagingDirectory
+          ? serviceMessage("service.realdebrid_removed_with_staged_files", {})
+          : serviceMessage("service.realdebrid_removed_staged_files_kept", {})),
       };
     } catch (error) {
       if (task) {
         task.state = "failed";
-        task.error = remoteRemoved
-          ? "The torrent was removed but its local staging directory needs cleanup."
-          : "The local copy stopped when torrent removal was requested.";
+        const stopped = remoteRemoved
+          ? serviceMessage("service.realdebrid_local_cleanup_needed", {})
+          : serviceMessage("service.realdebrid_local_copy_stopped", {});
+        task.error = stopped.message;
+        task.errorI18n = parseServiceMessageDescriptor(stopped);
       }
+      if (!remoteRemoved)
+        return serviceErrorResult(error, serviceMessage("service.realdebrid_remove_failed", {}));
       return {
         success: false,
-        message: remoteRemoved
-          ? error instanceof Error
-            ? `The Real-Debrid torrent was removed, but its staged files could not be removed: ${error.message}`
-            : "The Real-Debrid torrent was removed, but its staged files could not be removed."
-          : error instanceof Error
-            ? error.message
-            : "Could not remove the Real-Debrid torrent.",
+        ...(error instanceof Error
+          ? serviceMessage("service.realdebrid_removed_staged_removal_failed_detail", {
+              error: serviceErrorValue(error),
+            })
+          : serviceMessage("service.realdebrid_removed_staged_removal_failed", {})),
       };
     }
   }
@@ -587,7 +600,12 @@ export class RealDebridClient implements DownloaderClient {
     void this.stageTorrent(torrent, task).catch((error: unknown) => {
       if (task.controller.signal.aborted) return;
       task.state = "failed";
-      task.error = error instanceof Error ? error.message : "Real-Debrid staging failed.";
+      const value =
+        error instanceof Error
+          ? serviceErrorValue(error)
+          : serviceMessage("service.realdebrid_staging_failed", {});
+      task.error = typeof value === "string" ? value : value.message;
+      task.errorI18n = typeof value === "string" ? undefined : parseServiceMessageDescriptor(value);
       downloadersLogger.error(
         { downloaderId: this.downloader.id, torrentId: torrent.id, error },
         "Could not copy Real-Debrid torrent into the local import staging area"
@@ -599,10 +617,12 @@ export class RealDebridClient implements DownloaderClient {
     const files = (torrent.files ?? []).filter((file) => file.selected === 1);
     const links = torrent.links ?? [];
     if (files.length === 0 || links.length !== files.length) {
-      throw new Error("Real-Debrid did not provide selected files and matching download links.");
+      throw new ServiceMessageError("service.realdebrid_selected_files_missing", {});
     }
     if (files.length > MAX_STAGING_FILES) {
-      throw new Error(`This torrent has more than ${MAX_STAGING_FILES} selected files.`);
+      throw new ServiceMessageError("service.realdebrid_selected_files_limit", {
+        limit: MAX_STAGING_FILES,
+      });
     }
 
     await fs.mkdir(task.rootDirectory, { recursive: true });
@@ -610,11 +630,11 @@ export class RealDebridClient implements DownloaderClient {
     await fs.mkdir(task.stagingDirectory, { recursive: true });
     const stagingInfo = await fs.lstat(task.stagingDirectory);
     if (stagingInfo.isSymbolicLink() || !stagingInfo.isDirectory()) {
-      throw new Error("The Real-Debrid staging directory is not a safe local directory.");
+      throw new ServiceMessageError("service.realdebrid_staging_directory_unsafe", {});
     }
     const stagingRealPath = await fs.realpath(task.stagingDirectory);
     if (!isContained(stagingRealPath, rootRealPath)) {
-      throw new Error("The Real-Debrid staging directory escaped its configured local path.");
+      throw new ServiceMessageError("service.realdebrid_staging_directory_escaped", {});
     }
 
     task.total = files.reduce((sum, file) => sum + Math.max(0, Number(file.bytes) || 0), 0);
@@ -623,16 +643,16 @@ export class RealDebridClient implements DownloaderClient {
     for (let index = 0; index < files.length; index++) {
       const file = files[index]!;
       const link = links[index];
-      if (!link) throw new Error("Real-Debrid returned an incomplete file link list.");
+      if (!link) throw new ServiceMessageError("service.realdebrid_file_link_list_incomplete", {});
       const relativeName = this.safeTorrentRelativePath(file.path);
       const destination = path.resolve(stagingRealPath, relativeName);
       if (!isContained(destination, stagingRealPath)) {
-        throw new Error("A Real-Debrid file path escaped the staging directory.");
+        throw new ServiceMessageError("service.realdebrid_file_path_escaped", {});
       }
       await fs.mkdir(path.dirname(destination), { recursive: true });
       const parentRealPath = await fs.realpath(path.dirname(destination));
       if (!isContained(parentRealPath, stagingRealPath)) {
-        throw new Error("A torrent directory escaped the QuestarrNG staging directory.");
+        throw new ServiceMessageError("service.realdebrid_directory_escaped", {});
       }
       const unrestricted = await this.request<RealDebridUnrestrictedLink>("/unrestrict/link", {
         method: "POST",
@@ -642,7 +662,9 @@ export class RealDebridClient implements DownloaderClient {
       await this.copyFile(unrestricted.download, destination, size, task);
       const stat = await fs.stat(destination);
       if (!stat.isFile() || (size > 0 && stat.size !== size)) {
-        throw new Error(`The copied file ${path.basename(destination)} has an unexpected size.`);
+        throw new ServiceMessageError("service.realdebrid_copied_file_unexpected_size", {
+          file: path.basename(destination),
+        });
       }
       task.files.push({ name: relativeName, size: stat.size, path: destination });
     }
@@ -656,7 +678,7 @@ export class RealDebridClient implements DownloaderClient {
     const relative = normalized.replace(/^\/+/, "");
     const segments = relative.split("/");
     if (!relative || segments.some((segment) => !segment || segment === ".." || segment === ".")) {
-      throw new Error("Real-Debrid returned an unsafe torrent file path.");
+      throw new ServiceMessageError("service.realdebrid_unsafe_torrent_file_path", {});
     }
     return segments.map((segment) => safePathSegment(segment)).join(path.sep);
   }
@@ -668,11 +690,13 @@ export class RealDebridClient implements DownloaderClient {
     task: StagingTask
   ): Promise<void> {
     const url = new URL(rawUrl);
-    if (url.protocol !== "https:") throw new Error("Real-Debrid returned a non-HTTPS file URL.");
+    if (url.protocol !== "https:")
+      throw new ServiceMessageError("service.realdebrid_file_url_not_https", {});
     const finalStat = await fs.lstat(destination).catch(() => null);
-    if (finalStat?.isSymbolicLink()) throw new Error("A staged file path is a symbolic link.");
+    if (finalStat?.isSymbolicLink())
+      throw new ServiceMessageError("service.realdebrid_staged_file_symlink", {});
     if (finalStat && !finalStat.isFile())
-      throw new Error("A staged file path is not a regular file.");
+      throw new ServiceMessageError("service.realdebrid_staged_file_not_regular", {});
     if (finalStat?.isFile() && expectedSize > 0 && finalStat.size === expectedSize) {
       task.downloaded += finalStat.size;
       return;
@@ -680,7 +704,8 @@ export class RealDebridClient implements DownloaderClient {
 
     const partialPath = `${destination}.part`;
     const partialStat = await fs.lstat(partialPath).catch(() => null);
-    if (partialStat?.isSymbolicLink()) throw new Error("A partial staged file is a symbolic link.");
+    if (partialStat?.isSymbolicLink())
+      throw new ServiceMessageError("service.realdebrid_partial_staged_file_symlink", {});
     let offset = partialStat?.isFile() ? partialStat.size : 0;
     if (expectedSize > 0 && offset >= expectedSize) {
       await fs.rm(partialPath, { force: true });
@@ -694,7 +719,7 @@ export class RealDebridClient implements DownloaderClient {
       signal: task.controller.signal,
     });
     if (!response.ok || !response.body) {
-      throw new Error("Real-Debrid could not stream a completed file into QuestarrNG.");
+      throw new ServiceMessageError("service.realdebrid_file_stream_failed", {});
     }
     const append = offset > 0 && response.status === 206;
     if (!append) {
@@ -737,7 +762,10 @@ export class RealDebridClient implements DownloaderClient {
     }
     const partialAfter = await fs.stat(partialPath);
     if (expectedSize > 0 && partialAfter.size !== expectedSize) {
-      throw new Error(`Real-Debrid copied ${partialAfter.size} of ${expectedSize} bytes.`);
+      throw new ServiceMessageError("service.realdebrid_copied_bytes", {
+        actual: partialAfter.size,
+        expected: expectedSize,
+      });
     }
     await fs.rename(partialPath, destination);
     task.downloaded = before + partialAfter.size;

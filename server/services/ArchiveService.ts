@@ -1,3 +1,11 @@
+import {
+  serviceMessage,
+  ServiceMessageError,
+  serviceMessageValue,
+  serviceErrorMetadata,
+  tagServiceMessageError,
+  type ServiceMessageFragment,
+} from "../../shared/service-messages.js";
 import { execFile } from "node:child_process";
 import { accessSync, constants as fsConstants } from "node:fs";
 import { opendir, statfs } from "node:fs/promises";
@@ -57,7 +65,12 @@ function delay(ms: number): Promise<void> {
 // Marks errors that retrying can never fix (missing binary, unsupported format) so the
 // integrity-test retry loop below can fail fast on them instead of burning several seconds
 // re-running a check that will deterministically fail the same way every time.
-class NonRetryableArchiveError extends Error {}
+class NonRetryableArchiveError extends Error {
+  constructor(message: string | ServiceMessageFragment = "", options?: ErrorOptions) {
+    super(typeof message === "string" ? message : message.message, options);
+    if (typeof message !== "string") tagServiceMessageError(this, message);
+  }
+}
 
 // A password-protected archive fails the exact same way every attempt — retrying it burns
 // the same ~11s of delay as a genuinely corrupt archive for no benefit, and the generic
@@ -65,7 +78,12 @@ class NonRetryableArchiveError extends Error {}
 // is actively wrong for this case (the archive is fine, it's just encrypted). Callers
 // (ImportManager) catch this specifically to route the download to manual review with a
 // password prompt instead of the generic failure message.
-export class ArchivePasswordRequiredError extends Error {}
+export class ArchivePasswordRequiredError extends Error {
+  constructor(message: string | ServiceMessageFragment = "", options?: ErrorOptions) {
+    super(typeof message === "string" ? message : message.message, options);
+    if (typeof message !== "string") tagServiceMessageError(this, message);
+  }
+}
 
 // Both unrar and 7-Zip mention "password" in every message they produce for an encrypted
 // archive they can't read (unrar: e.g. a prompt-refusal or "wrong password" notice; 7-Zip:
@@ -158,7 +176,9 @@ function runTool(
             return;
           }
           const detail = (stderr || stdout || error.message).trim().slice(0, 500);
-          reject(new Error(`${toolLabel} failed: ${detail}`));
+          reject(
+            new ServiceMessageError("service.archive_tool_failed", { tool: toolLabel, detail })
+          );
           return;
         }
         resolve({ stdout, stderr });
@@ -171,9 +191,7 @@ function runSevenZip(args: string[], signal?: AbortSignal): Promise<ExecFileResu
   const binary = resolveSevenZipBinary();
   if (!binary) {
     return Promise.reject(
-      new NonRetryableArchiveError(
-        "Archive extraction requires 7-Zip but no binary was found. Install the `7zip` apk package or set SEVENZIP_PATH."
-      )
+      new NonRetryableArchiveError(serviceMessage("service.archive_seven_zip_missing", {}))
     );
   }
   return runTool(binary, args, "7-Zip", signal);
@@ -183,9 +201,7 @@ function runUnrar(args: string[], signal?: AbortSignal): Promise<ExecFileResult>
   const binary = resolveUnrarBinary();
   if (!binary) {
     return Promise.reject(
-      new NonRetryableArchiveError(
-        "RAR archive detected but no unrar binary was found. Install it (see Dockerfile) or set UNRAR_PATH."
-      )
+      new NonRetryableArchiveError(serviceMessage("service.archive_unrar_missing", {}))
     );
   }
   return runTool(binary, args, "unrar", signal);
@@ -296,14 +312,16 @@ function safeEntrySegments(name: string): string[] {
     segments.includes("..") ||
     segments.length > MAX_ARCHIVE_PATH_DEPTH
   ) {
-    throw new Error("Archive contains an unsafe file path.");
+    throw new ServiceMessageError("service.archive_unsafe_entry_path", {});
   }
   return segments;
 }
 
 function validateArchiveEntries(entries: ArchiveEntry[], outputDir: string): number {
   if (entries.length > ARCHIVE_MAX_ENTRIES) {
-    throw new Error(`Archive contains too many entries (limit: ${ARCHIVE_MAX_ENTRIES}).`);
+    throw new ServiceMessageError("service.archive_too_many_entries", {
+      limit: ARCHIVE_MAX_ENTRIES,
+    });
   }
 
   const root = path.resolve(outputDir);
@@ -312,23 +330,23 @@ function validateArchiveEntries(entries: ArchiveEntry[], outputDir: string): num
 
   for (const entry of entries) {
     if (!Number.isSafeInteger(entry.size) || entry.size < 0) {
-      throw new Error("Archive contains an entry with an invalid uncompressed size.");
+      throw new ServiceMessageError("service.archive_invalid_entry_size", {});
     }
     if (entry.isLink) {
-      throw new Error("Archive contains a symbolic or hard link, which is not extracted.");
+      throw new ServiceMessageError("service.archive_link_entry_refused", {});
     }
 
     const segments = safeEntrySegments(entry.name);
     const resolvedEntry = path.resolve(root, ...segments);
     // An explicit "." or "./" entry (tar -cf archive.tar .) names the root itself.
     if (resolvedEntry !== root && !resolvedEntry.startsWith(rootPrefix)) {
-      throw new Error("Archive contains a file path outside the extraction directory.");
+      throw new ServiceMessageError("service.archive_entry_outside_directory", {});
     }
 
     if (entry.size > ARCHIVE_MAX_EXPANDED_BYTES - expandedBytes) {
-      throw new Error(
-        `Archive expands beyond the configured size limit (${ARCHIVE_MAX_EXPANDED_BYTES} bytes).`
-      );
+      throw new ServiceMessageError("service.archive_expanded_limit_exceeded", {
+        bytes: ARCHIVE_MAX_EXPANDED_BYTES,
+      });
     }
     expandedBytes += entry.size;
   }
@@ -575,9 +593,12 @@ export class ArchiveService {
     }
     if (err instanceof Error && isPasswordProtectedError(err.message)) {
       throw new ArchivePasswordRequiredError(
-        password
-          ? "The provided password was rejected — it may be incorrect."
-          : "This archive is password-protected — a password is required to extract it."
+        serviceMessage(
+          password
+            ? "service.api_archive_password_rejected"
+            : "service.api_archive_password_required",
+          {}
+        )
       );
     }
   }
@@ -615,9 +636,9 @@ export class ArchiveService {
     // ruled out — whatever's left genuinely can't be extracted (corrupt, truncated, or an
     // unsupported variant). Surface that plainly instead of the bare tool error text.
     const detail = lastErr instanceof Error ? lastErr.message : String(lastErr);
-    throw new Error(
-      `${detail} (the archive is corrupt or incomplete — re-download the release, extraction cannot recover this file)`
-    );
+    throw new ServiceMessageError("service.archive_corrupt_or_incomplete", {
+      detail: serviceMessageValue(detail, serviceErrorMetadata(lastErr)),
+    });
   }
 
   /**
@@ -680,29 +701,29 @@ export class ArchiveService {
         const srcPath = path.join(srcDir, entry.name);
         const targetPath = path.join(targetDir, entry.name);
         if (srcDir === stagingDir && entry.name.startsWith(EXTRACT_STAGING_PREFIX)) {
-          throw new Error(
-            `Archive contains "${entry.name}", a name reserved for Questarr's extraction staging directory`
-          );
+          throw new ServiceMessageError("service.archive_reserved_staging_name", {
+            name: entry.name,
+          });
         }
         const existing = await fs.lstat(targetPath).catch(() => undefined);
         if (entry.isDirectory()) {
           if (existing?.isSymbolicLink()) {
-            throw new Error(
-              `Cannot extract into ${targetPath}: it is a symbolic link — replace it with a real directory and retry`
-            );
+            throw new ServiceMessageError("service.archive_destination_symlink", {
+              path: targetPath,
+            });
           }
           if (existing && !existing.isDirectory()) {
-            throw new Error(
-              `Cannot extract directory over existing file ${targetPath} — move or delete it and retry`
-            );
+            throw new ServiceMessageError("service.archive_directory_over_file", {
+              path: targetPath,
+            });
           }
           if (!existing) dirsToCreate.push(targetPath);
           await plan(srcPath, targetPath, depth + 1);
         } else {
           if (existing?.isDirectory()) {
-            throw new Error(
-              `Cannot extract file over existing directory ${targetPath} — move or delete it and retry`
-            );
+            throw new ServiceMessageError("service.archive_file_over_directory", {
+              path: targetPath,
+            });
           }
           // A symlink at a file's path is replaced by the rename itself, never followed.
           filesToMove.push({ from: srcPath, to: targetPath, replaces: !!existing });
@@ -757,15 +778,37 @@ export class ArchiveService {
       }
       if (unrestored > 0 || leftovers.length > 0) {
         const detail = err instanceof Error ? err.message : String(err);
-        const problems = [
-          unrestored > 0 &&
-            `${unrestored} original file(s) that could not be restored are kept in ${backupDir}`,
-          leftovers.length > 0 &&
-            `extracted file(s) that could not be removed: ${leftovers.join(", ")}`,
-        ].filter(Boolean);
-        throw new Error(`${detail} (rollback incomplete: ${problems.join("; ")})`, {
-          cause: err,
-        });
+        const problems: ServiceMessageFragment[] = [];
+        if (unrestored > 0) {
+          problems.push(
+            serviceMessage("service.archive_rollback_originals_retained", {
+              count: unrestored,
+              path: backupDir,
+            })
+          );
+        }
+        if (leftovers.length > 0) {
+          problems.push(
+            serviceMessage("service.archive_rollback_extracted_remaining", {
+              paths: leftovers.join(", "),
+            })
+          );
+        }
+        // The branch guarantees at least one problem; keep child ownership through the join.
+        const problemMessage = problems
+          .slice(1)
+          .reduce(
+            (left, right) => serviceMessage("service.joined_errors", { left, right }),
+            problems[0]!
+          );
+        throw new ServiceMessageError(
+          "service.archive_rollback_incomplete",
+          {
+            detail: serviceMessageValue(detail, serviceErrorMetadata(err)),
+            problems: problemMessage,
+          },
+          { cause: err }
+        );
       }
       throw err;
     }

@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Loader2, ShieldCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { InterfaceText } from "@/components/InterfaceText";
+import { ApiErrorDescription } from "@/components/ApiErrorDescription";
 
 const REDACTED_PLACEHOLDER = "********";
 
@@ -46,14 +47,21 @@ export default function SecurityScanSettings() {
       await apiRequest("POST", "/api/settings/security-scan", data);
     },
     onSuccess: () => {
-      toast({ title: "Settings Saved", description: "Security scan configuration updated." });
+      toast({
+        title: <InterfaceText source="interface.settings_saved_def3ff63" />,
+        description: (
+          <InterfaceText source="interface.security_scan_configuration_update_8f7246b1" />
+        ),
+      });
       queryClient.invalidateQueries({ queryKey: ["/api/settings/security-scan"] });
     },
     onError: () => {
       if (settings) setLocal(settings);
       toast({
-        title: "Save Failed",
-        description: "Could not update security scan settings.",
+        title: <InterfaceText source="interface.save_failed_4c98b2ad" />,
+        description: (
+          <InterfaceText source="interface.could_not_update_security_scan_set_dd061326" />
+        ),
         variant: "destructive",
       });
     },
@@ -65,17 +73,23 @@ export default function SecurityScanSettings() {
     },
     onSuccess: (_data, provider) => {
       toast({
-        title: "Test Successful",
+        title: <InterfaceText source="interface.test_successful_346dec55" />,
         description:
-          provider === "virustotal"
-            ? "VirusTotal API key is valid."
-            : "Successfully connected to ClamAV.",
+          provider === "virustotal" ? (
+            <InterfaceText source="interface.virustotal_api_key_is_valid_779c8347" />
+          ) : (
+            <InterfaceText source="interface.successfully_connected_to_clamav_6d0986a8" />
+          ),
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Test Failed",
-        description: error.message || "Could not reach the provider.",
+        title: <InterfaceText source="interface.test_failed_938cf28a" />,
+        description: error.message ? (
+          <ApiErrorDescription error={error} fallbackSource="Unknown error" />
+        ) : (
+          <InterfaceText source="interface.could_not_reach_the_provider_e93d694a" />
+        ),
         variant: "destructive",
       });
     },
@@ -249,7 +263,7 @@ export default function SecurityScanSettings() {
                   />
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  <InterfaceText source="Downloads ClamAV cannot fully scan (because clamd is unavailable or a file exceeds its size limits) wait in Pending Manual Imports. Increase StreamMaxLength, MaxFileSize, and MaxScanSize in clamd.conf to scan larger game files." />
+                  <InterfaceText source="interface.downloads_clamav_cannot_fully_scan_e84e5a81" />
                 </p>
               </div>
               <Switch
@@ -316,7 +330,7 @@ export default function SecurityScanSettings() {
 
           <div className="flex justify-end pt-2">
             <Button onClick={() => saveMutation.mutate(local)} disabled={saveMutation.isPending}>
-              {saveMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {saveMutation.isPending && <Loader2 className="h-4 w-4 me-2 animate-spin" />}
               <InterfaceText source={"Save Changes"} />
             </Button>
           </div>

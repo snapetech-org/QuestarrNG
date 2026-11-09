@@ -1,0 +1,17 @@
+{
+  "expectedHead": "1ab1c680fda2da8c4933fa78b529ef29e29ffc90",
+  "expectedTree": "bf909d8b3057a480f455a9ba916e6c55c52f8833",
+  "headCommitTree": "bf909d8b3057a480f455a9ba916e6c55c52f8833",
+  "matched": true,
+  "pullRequest": {
+    "baseRefName": "main",
+    "baseRefOid": "e188cd0c74c73071c94b04915e1babac2d2bf386",
+    "headRefName": "codex/localization-foundations-20261028",
+    "headRefOid": "1ab1c680fda2da8c4933fa78b529ef29e29ffc90",
+    "isDraft": false,
+    "number": 155,
+    "state": "OPEN",
+    "url": "https://github.com/snapetech-org/QuestarrNG/pull/155"
+  },
+  "verifiedAtUtc": "2026-11-02T14:46:06.773394+00:00"
+}

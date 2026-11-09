@@ -379,6 +379,20 @@
       "when": 1791890613558,
       "tag": "0053_integration_request_selection",
       "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "6",
+      "when": 1793474780609,
+      "tag": "0054_localized_error_metadata",
+      "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "6",
+      "when": 1793493408492,
+      "tag": "0055_persisted_ui_error_metadata",
+      "breakpoints": true
     }
   ]
 }

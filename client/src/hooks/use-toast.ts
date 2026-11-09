@@ -1,17 +1,22 @@
 import * as React from "react";
 
 import type { ToastActionElement, ToastProps } from "@/components/ui/toast";
-import { translateInterfaceLabel } from "@/lib/interface-locale";
+import type { InterfaceLanguage } from "@/lib/interface-locale";
 
 const TOAST_LIMIT = 1;
 const TOAST_REMOVE_DELAY = 1000000;
 
 type ToasterToast = Omit<ToastProps, "title" | "description"> & {
   id: string;
-  title?: React.ReactNode;
-  description?: React.ReactNode;
+  title?: ToastContent;
+  description?: ToastContent;
   action?: ToastActionElement;
 };
+
+/** Renderers keep localized toast copy responsive to interface-language changes. */
+export type ToastContent =
+  | React.ReactNode
+  | ((language: InterfaceLanguage, regionalPreference: string) => React.ReactNode);
 
 // Used as type reference in TypeScript
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -138,10 +143,6 @@ function dispatch(action: Action) {
 type Toast = Omit<ToasterToast, "id">;
 
 function toast({ ...props }: Toast) {
-  if (typeof props.title === "string") props.title = translateInterfaceLabel(props.title);
-  if (typeof props.description === "string") {
-    props.description = translateInterfaceLabel(props.description);
-  }
   const id = genId();
 
   const update = (props: ToasterToast) =>

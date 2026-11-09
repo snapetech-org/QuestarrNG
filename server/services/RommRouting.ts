@@ -1,3 +1,4 @@
+import { ServiceMessageError } from "../../shared/service-messages.js";
 import path from "node:path";
 import type { RomMBindingMissingBehavior, RomMPlatformRoutingMode } from "../../shared/schema.js";
 
@@ -17,21 +18,21 @@ function ensureInsideRoot(root: string, candidate: string): void {
   const inside =
     resolvedCandidate === resolvedRoot || resolvedCandidate.startsWith(resolvedRoot + path.sep);
   if (!inside) {
-    throw new Error("Resolved RomM platform directory escapes library root");
+    throw new ServiceMessageError("service.romm_platform_outside_library", {});
   }
 }
 
 export function validateRommSlug(fsSlug: string): string {
   const normalized = fsSlug.trim().toLowerCase();
-  if (!normalized) throw new Error("RomM fs_slug is required");
+  if (!normalized) throw new ServiceMessageError("service.romm_slug_required", {});
   if (normalized.includes("/") || normalized.includes("\\")) {
-    throw new Error("RomM fs_slug must not contain path separators");
+    throw new ServiceMessageError("service.romm_slug_path_separators", {});
   }
   if (normalized.includes("..")) {
-    throw new Error("RomM fs_slug must not contain traversal segments");
+    throw new ServiceMessageError("service.romm_slug_traversal", {});
   }
   if (!SLUG_PATTERN.test(normalized)) {
-    throw new Error("RomM fs_slug contains invalid characters");
+    throw new ServiceMessageError("service.romm_slug_invalid_characters", {});
   }
   return normalized;
 }
@@ -51,7 +52,7 @@ export function resolveRommPlatformDir(options: ResolveRommPlatformDirOptions): 
     }
 
     if (bindingMissingBehavior === "error") {
-      throw new Error(`No RomM binding configured for slug '${safeSlug}'`);
+      throw new ServiceMessageError("service.romm_binding_missing", { slug: safeSlug });
     }
   }
 

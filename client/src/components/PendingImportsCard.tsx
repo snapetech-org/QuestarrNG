@@ -12,7 +12,12 @@ import { RegionalRelativeTime } from "./RegionalRelativeTime";
 import { InterfaceText } from "@/components/InterfaceText";
 import { ApiErrorDetailText } from "@/components/ApiErrorDetailText";
 import { useInterfaceLanguage } from "@/lib/interface-locale";
-import { getLocalizedApiErrorDetail } from "@/lib/api-error-locale";
+import {
+  serviceMessage,
+  serviceMessageValue,
+  localizeServiceMessage,
+  type ServiceMessageFragment,
+} from "@shared/service-messages";
 
 interface PendingImport {
   id: string;
@@ -21,24 +26,38 @@ interface PendingImport {
   status: string;
   createdAt: string;
   errorMessage?: string | null;
+  errorMessageI18n?: string | null;
   passwordRequired?: boolean;
 }
 
-function describeImportError(item: PendingImport): string | undefined {
-  if (!item.errorMessage) return undefined;
-  const source =
+function describeImportError(item: PendingImport): string | ServiceMessageFragment {
+  const error = serviceMessageValue(item.errorMessage ?? "", item.errorMessageI18n);
+  if (item.status === GAME_LINK_REQUIRED_STATUS) return error;
+  return serviceMessage(
     item.status === QUARANTINED_STATUS
-      ? "Security alert: " + item.errorMessage
-      : item.status === GAME_LINK_REQUIRED_STATUS
-        ? item.errorMessage
-        : item.passwordRequired
-          ? "Password required: " + item.errorMessage
-          : "Import failed: " + item.errorMessage;
-  return source;
+      ? "service.pending_security_error"
+      : item.passwordRequired
+        ? "service.pending_password_error"
+        : "service.pending_import_error",
+    { error }
+  );
+}
+function PendingImportError({ item }: { item: PendingImport }) {
+  const { language } = useInterfaceLanguage();
+  const value = describeImportError(item);
+  const message = typeof value === "string" ? value : value.message;
+  const metadata = typeof value === "string" ? null : value;
+  return (
+    <p
+      className="text-xs text-destructive truncate max-w-[300px]"
+      title={localizeServiceMessage(message, metadata, language)}
+    >
+      <ApiErrorDetailText source={message} metadata={metadata} legacyApiFallback={false} />
+    </p>
+  );
 }
 
 export default function PendingImportsCard() {
-  const { language } = useInterfaceLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -83,7 +102,7 @@ export default function PendingImportsCard() {
               <CardTitle className="text-lg">
                 {multiple ? (
                   <InterfaceText
-                    source="Pending manual imports: {count}"
+                    source="interface.pending_manual_imports_count_2435af85"
                     values={{ count: pendingImports.length }}
                   />
                 ) : (
@@ -130,7 +149,7 @@ export default function PendingImportsCard() {
         </CardHeader>
         {!collapsed && (
           <CardContent>
-            <div className="space-y-4 max-h-96 overflow-y-auto pr-1">
+            <div className="space-y-4 max-h-96 overflow-y-auto pe-1">
               {pendingImports.map((item) => (
                 <div
                   key={item.id}
@@ -153,17 +172,7 @@ export default function PendingImportsCard() {
                           );
                         })()}
                     </p>
-                    {item.errorMessage && (
-                      <p
-                        className="text-xs text-destructive truncate max-w-[300px]"
-                        title={
-                          getLocalizedApiErrorDetail(describeImportError(item) ?? "", language) ??
-                          describeImportError(item)
-                        }
-                      >
-                        <ApiErrorDetailText source={describeImportError(item) ?? ""} />
-                      </p>
-                    )}
+                    {item.errorMessage && <PendingImportError item={item} />}
                   </div>
                   <div className="flex gap-2">
                     <Button
@@ -182,12 +191,12 @@ export default function PendingImportsCard() {
                       <Button size="sm" onClick={() => setSelectedImport(item)}>
                         {(() => {
                           if (item.status === GAME_LINK_REQUIRED_STATUS) {
-                            return <InterfaceText source="Link Game" />;
+                            return <InterfaceText source="interface.link_game_167e02e9" />;
                           }
                           if (item.passwordRequired) {
-                            return <InterfaceText source="Enter Password" />;
+                            return <InterfaceText source="interface.enter_password_8063209e" />;
                           }
-                          return <InterfaceText source="Review" />;
+                          return <InterfaceText source="interface.review_6ae55601" />;
                         })()}
                       </Button>
                     )}

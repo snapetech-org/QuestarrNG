@@ -1,0 +1,2059 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import path from "node:path";
+
+const { fsMock, downloadersMock } = vi.hoisted(() => ({
+  fsMock: {
+    ensureDir: vi.fn().mockResolvedValue(undefined),
+    move: vi.fn().mockResolvedValue(undefined),
+    copy: vi.fn().mockResolvedValue(undefined),
+    remove: vi.fn().mockResolvedValue(undefined),
+    pathExists: vi.fn().mockResolvedValue(true),
+    realpath: vi.fn(async (input: string) => input),
+    stat: vi.fn().mockResolvedValue({ isDirectory: () => false }),
+    readdir: vi.fn().mockResolvedValue([]),
+  },
+  downloadersMock: {
+    removeDownload: vi.fn().mockResolvedValue({ success: true, message: "ok" }),
+    getDownloadDetails: vi.fn(),
+  },
+}));
+
+vi.mock("fs-extra", () => ({
+  default: fsMock,
+}));
+
+vi.mock("../downloaders.js", () => ({
+  DownloaderManager: downloadersMock,
+}));
+
+import { ImportManager, IncompleteScanError } from "../services/ImportManager.js";
+import { makeGame, makeImportConfig, makeRomMConfig } from "./helpers/import-test-helpers.js";
+
+describe("ImportManager", () => {
+  const storage = {
+    getGameDownload: vi.fn(),
+    getGame: vi.fn(),
+    getImportConfig: vi.fn(),
+    getRomMConfig: vi.fn().mockResolvedValue(makeRomMConfig()),
+    getPlatformMapping: vi.fn(),
+    getDownloader: vi.fn(),
+    updateGameDownloadStatus: vi.fn(),
+    updateGameStatus: vi.fn(),
+    updateGame: vi.fn(),
+    replaceGameInstalledVersion: vi.fn(),
+    addNotification: vi.fn().mockResolvedValue(undefined),
+    getUserSettings: vi.fn().mockResolvedValue(undefined),
+  };
+
+  const pathService = {
+    translatePath: vi.fn(),
+    // This suite focuses on ImportManager orchestration. A configured filesystem
+    // root lets its explicit path overrides pass the production containment guard.
+    getConfiguredRoots: vi.fn().mockResolvedValue(["/"]),
+  };
+
+  const platformService = {
+    getSourcePlatform: vi.fn(),
+  };
+
+  const archiveService = {
+    isArchive: vi.fn(),
+    extract: vi.fn(),
+  };
+
+  const baseConfig = makeImportConfig({ overwriteExisting: true });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    downloadersMock.getDownloadDetails.mockReset();
+    storage.getDownloader.mockReset();
+    pathService.getConfiguredRoots.mockResolvedValue(["/"]);
+    fsMock.pathExists.mockResolvedValue(true);
+    fsMock.realpath.mockImplementation(async (input) => input);
+    pathService.translatePath.mockResolvedValue("/data/downloads/file.iso");
+    archiveService.isArchive.mockReturnValue(false);
+    storage.getImportConfig.mockResolvedValue(baseConfig);
+    storage.getRomMConfig.mockResolvedValue(makeRomMConfig());
+    storage.getPlatformMapping.mockResolvedValue(undefined);
+    storage.addNotification.mockResolvedValue(undefined);
+    downloadersMock.removeDownload.mockResolvedValue({ success: true, message: "ok" });
+  });
+
+  it("returns early when download cannot be found", async () => {
+    storage.getGameDownload.mockResolvedValue(undefined);
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await manager.processImport("dl-1", "/remote/path");
+
+    expect(storage.updateGameDownloadStatus).not.toHaveBeenCalled();
+  });
+
+  it("reports an import as in flight until it finishes and ignores a second start", async () => {
+    let releaseDownload!: (value: unknown) => void;
+    storage.getGameDownload.mockReturnValueOnce(
+      new Promise((resolve) => {
+        releaseDownload = resolve;
+      })
+    );
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    const first = manager.processImport("dl-1", "/remote/path");
+    expect(manager.isImportInFlight("dl-1")).toBe(true);
+    expect(manager.isImportInFlight("dl-2")).toBe(false);
+
+    await manager.processImport("dl-1", "/remote/path");
+    expect(storage.getGameDownload).toHaveBeenCalledTimes(1);
+
+    releaseDownload(undefined);
+    await first;
+    expect(manager.isImportInFlight("dl-1")).toBe(false);
+  });
+
+  it("marks download game_link_required when game is missing", async () => {
+    // Not "error": that status is never re-polled (getDownloadingGameDownloads
+    // only selects "downloading") and never shown in the UI's pending-imports
+    // list, so it would leave the download invisible and stuck forever even if
+    // the missing game was a transient/momentary condition.
+    //
+    // Also not "manual_review_required": that flow only ever asks the user to
+    // confirm source/destination paths for an existing game and has no way to
+    // recover when there's no game to import into at all.
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+    });
+    storage.getGame.mockResolvedValue(undefined);
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await manager.processImport("dl-1", "/remote/path");
+
+    expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
+      "dl-1",
+      "game_link_required",
+      "This download's linked game could not be found — select a game to continue importing it."
+    );
+  });
+
+  it("marks download completed when post-processing is disabled", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue({ ...baseConfig, enablePostProcessing: false });
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await manager.processImport("dl-1", "/remote/path");
+
+    expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith("dl-1", "completed");
+  });
+
+  it("flags manual review when download path is not accessible", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getDownloader.mockResolvedValue({ id: "d1", name: "qBit", url: "http://qbit:8080" });
+    fsMock.pathExists.mockResolvedValue(false);
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    // MAX_PATH_RETRY = 5: first 4 calls set status back to "downloading"; 5th triggers manual_review_required
+    for (let i = 0; i < 5; i++) {
+      await manager.processImport("dl-1", "/remote/path");
+    }
+
+    expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith("dl-1", "manual_review_required");
+  });
+
+  it("flags manual review (not a terminal error) when processing throws, so it can be re-attempted", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    pathService.translatePath.mockRejectedValue(new Error("translate failure"));
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await manager.processImport("dl-1", "/remote/path");
+
+    expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith("dl-1", "unpacking");
+    expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
+      "dl-1",
+      "manual_review_required",
+      "translate failure"
+    );
+    expect(storage.updateGameDownloadStatus).not.toHaveBeenCalledWith("dl-1", "error");
+  });
+
+  it("throws when confirmImport download is missing", async () => {
+    storage.getGameDownload.mockResolvedValue(undefined);
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await expect(
+      manager.confirmImport("dl-1", { strategy: "pc" } as never) // NOSONAR
+    ).rejects.toThrow("Download dl-1 not found");
+  });
+
+  it("throws when confirmImport is called without a plan", async () => {
+    storage.getGameDownload.mockResolvedValue({ id: "dl-1", gameId: "g1" });
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await expect(manager.confirmImport("dl-1")).rejects.toThrow("Confirmation requires a plan");
+  });
+
+  it("blocks confirmImport when proposed path is outside library root", async () => {
+    storage.getGameDownload.mockResolvedValue({ id: "dl-1", gameId: "g1", downloaderId: "d1" });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue({ ...baseConfig, libraryRoot: "/safe/root" });
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await expect(
+      manager.confirmImport("dl-1", {
+        strategy: "pc",
+        originalPath: "/src/game",
+        proposedPath: "/other/root/game",
+        needsReview: false,
+      })
+    ).rejects.toThrow("Proposed path is outside configured library root");
+  });
+
+  it("blocks confirmImport when a proposed path escapes the library through a symlink", async () => {
+    storage.getGameDownload.mockResolvedValue({ id: "dl-1", gameId: "g1", downloaderId: "d1" });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue({ ...baseConfig, libraryRoot: "/safe/root" });
+    fsMock.realpath.mockImplementation(async (input) =>
+      input === "/safe/root/shortcut/escape" ? "/outside/secret" : input
+    );
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await expect(
+      manager.confirmImport("dl-1", {
+        strategy: "pc",
+        originalPath: "/downloads/source",
+        proposedPath: "/safe/root/shortcut/escape",
+        needsReview: false,
+      })
+    ).rejects.toThrow("Proposed path is outside configured library root");
+  });
+
+  it("confirmImport: source path no longer exists on disk → throws a descriptive error", async () => {
+    storage.getGameDownload.mockResolvedValue({ id: "dl-1", gameId: "g1", downloaderId: "d1" });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue({ ...baseConfig, libraryRoot: "/safe/root" });
+    fsMock.pathExists.mockResolvedValueOnce(false);
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await expect(
+      manager.confirmImport("dl-1", {
+        strategy: "pc",
+        originalPath: "/downloads/vanished-folder",
+        proposedPath: "/safe/root/PC/Game",
+        needsReview: false,
+      })
+    ).rejects.toThrow("Source path not found: /downloads/vanished-folder");
+  });
+
+  it("executes confirmImport for pc strategy and updates statuses", async () => {
+    storage.getGameDownload.mockResolvedValue({ id: "dl-1", gameId: "g1", downloaderId: "d1" });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue({ ...baseConfig, libraryRoot: "/safe/root" });
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await manager.confirmImport("dl-1", {
+      strategy: "pc",
+      originalPath: "/downloads/source-folder",
+      proposedPath: "/safe/root/PC/My Game",
+      needsReview: false,
+      transferMode: "move",
+      fileCategories: [{ name: "../../escape.bin", category: "dlc" }],
+    });
+
+    expect(fsMock.ensureDir).toHaveBeenCalled();
+    expect(fsMock.move).toHaveBeenCalledWith("/downloads/source-folder", "/safe/root/PC/My Game", {
+      overwrite: true,
+    });
+    expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith("dl-1", "imported");
+    expect(storage.updateGameStatus).toHaveBeenCalledWith(
+      "g1",
+      { status: "owned" },
+      { preserveCurated: true }
+    );
+  });
+
+  it("records the release's version on the game once the import is finalized", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: "My.Game.Update.v1.2-RUNE",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "owned",
+      platforms: [6],
+      installedVersion: "v1.1",
+    });
+    storage.getImportConfig.mockResolvedValue({ ...baseConfig, libraryRoot: "/safe/root" });
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await manager.confirmImport("dl-1", {
+      strategy: "pc",
+      originalPath: "/downloads/source-folder",
+      proposedPath: "/safe/root/PC/My Game",
+      needsReview: false,
+      transferMode: "move",
+    });
+
+    expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith("dl-1", "imported");
+    expect(storage.replaceGameInstalledVersion).toHaveBeenCalledWith("g1", "v1.1", "v1.2");
+  });
+
+  it.each(["playing", "shelved", "completed"])(
+    "keeps a %s game's status when an import finishes for it",
+    async (status) => {
+      storage.getGameDownload.mockResolvedValue({ id: "dl-1", gameId: "g1", downloaderId: "d1" });
+      storage.getGame.mockResolvedValue({
+        id: "g1",
+        title: "My Game",
+        userId: "u1",
+        status,
+        platforms: [6],
+      });
+      storage.getImportConfig.mockResolvedValue({ ...baseConfig, libraryRoot: "/safe/root" });
+
+      const manager = new ImportManager(
+        storage as never, // NOSONAR
+        pathService as never, // NOSONAR
+        platformService as never, // NOSONAR
+        archiveService as never // NOSONAR
+      );
+
+      await manager.confirmImport("dl-1", {
+        strategy: "pc",
+        originalPath: "/downloads/source-folder",
+        proposedPath: "/safe/root/PC/My Game",
+        needsReview: false,
+        transferMode: "move",
+      });
+
+      expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith("dl-1", "imported");
+      expect(storage.updateGameStatus).not.toHaveBeenCalled();
+    }
+  );
+
+  it("extracts archives before import when autoUnpack is enabled", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: "Game.zip",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "Archive Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue({ ...baseConfig, autoUnpack: true });
+    archiveService.isArchive.mockReturnValue(true);
+    archiveService.extract.mockResolvedValue(["/data/PC/Archive Game/game.rom"]);
+    pathService.translatePath.mockResolvedValue("/data/downloads/file.zip");
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await manager.processImport("dl-1", "/remote/path");
+
+    // move mode relocates the raw archive into the library first (file.zip's basename,
+    // under the computed destination), then extracts it in place there — not in a
+    // downloader-side "_extracted" directory.
+    expect(archiveService.extract).toHaveBeenCalledWith(
+      "/data/PC/Archive Game/file.zip",
+      "/data/PC/Archive Game",
+      undefined
+    );
+  });
+
+  it("import config libraryRoot is used as the library root for PC imports", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: "",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "PC Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/games/pc" }));
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await manager.processImport("dl-1", "/remote/path");
+
+    expect(fsMock.ensureDir).toHaveBeenCalledWith("/games/pc");
+  });
+
+  // ─── confirmImport error paths ───────────────────────────────────────────────
+
+  it("confirmImport: originalPath provided but executeImport throws → flags manual review and re-throws", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/safe/root" }));
+
+    const { PCImportStrategy } = await import("../services/ImportStrategies.js");
+    vi.spyOn(PCImportStrategy.prototype, "executeImport").mockRejectedValue(
+      new Error("Source file not found")
+    );
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await expect(
+      manager.confirmImport("dl-1", {
+        strategy: "pc",
+        originalPath: "/downloads/source-folder",
+        proposedPath: "/safe/root/PC/My Game",
+        needsReview: false,
+        transferMode: "move",
+      })
+    ).rejects.toThrow("Source file not found");
+
+    expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
+      "dl-1",
+      "manual_review_required",
+      "Source file not found"
+    );
+    expect(storage.updateGameDownloadStatus).not.toHaveBeenCalledWith("dl-1", "error");
+  });
+
+  it("confirmImport: game not found for download → throws with descriptive message", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g-missing",
+      downloaderId: "d1",
+    });
+    storage.getGame.mockResolvedValue(undefined);
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await expect(
+      manager.confirmImport("dl-1", {
+        strategy: "pc",
+        originalPath: "/downloads/source",
+        proposedPath: "/data/PC/My Game",
+        needsReview: false,
+      })
+    ).rejects.toThrow("Game not found for download dl-1");
+  });
+
+  // ─── processImport additional paths ─────────────────────────────────────────
+
+  it("processImport: archive extracted but folder empty → import proceeds without crash", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: "Game.zip",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "Archive Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    // overwriteExisting: true so the plan doesn't need review (fsMock.pathExists
+    // defaults to true) — extraction is now deferred until after that check passes, so a
+    // plan needing review would never reach archiveService.extract at all.
+    storage.getImportConfig.mockResolvedValue(
+      makeImportConfig({ autoUnpack: true, overwriteExisting: true })
+    );
+    archiveService.isArchive.mockReturnValue(true);
+    archiveService.extract.mockResolvedValue([]);
+    pathService.translatePath.mockResolvedValue("/data/downloads/file.zip");
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await manager.processImport("dl-1", "/remote/path");
+
+    expect(archiveService.extract).toHaveBeenCalledWith(
+      "/data/PC/Archive Game/file.zip",
+      "/data/PC/Archive Game",
+      undefined
+    );
+    expect(storage.updateGameDownloadStatus).toHaveBeenCalled();
+  });
+
+  // ─── confirmImport override plan paths ──────────────────────────────────────
+
+  it("confirmImport: overridePlan.originalPath provided → strategy receives the override path", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: "",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/safe/root" }));
+    fsMock.pathExists.mockResolvedValue(true);
+
+    const { PCImportStrategy } = await import("../services/ImportStrategies.js");
+    const execSpy = vi.spyOn(PCImportStrategy.prototype, "executeImport").mockResolvedValue({
+      destDir: "/safe/root/PC/My Game",
+      filesPlaced: ["/safe/root/PC/My Game/game.exe"],
+      modeUsed: "move",
+      conflictsResolved: [],
+    });
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await manager.confirmImport("dl-1", {
+      strategy: "pc",
+      originalPath: "/override/source/path",
+      proposedPath: "/safe/root/PC/My Game",
+      needsReview: false,
+      transferMode: "move",
+    });
+
+    expect(execSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ originalPath: "/override/source/path" }),
+      "move",
+      undefined
+    );
+
+    execSpy.mockRestore();
+  });
+
+  it("rejects a mapped source path that is a parent of the tracked download folder", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadHash: "release-hash",
+      downloadTitle: "Release",
+    });
+    storage.getDownloader.mockResolvedValue({ url: "http://sabnzbd.local" });
+    downloadersMock.getDownloadDetails.mockResolvedValue({
+      name: "Release",
+      downloadDir: "/remote/complete/Release",
+      files: [],
+    });
+    pathService.getConfiguredRoots.mockResolvedValue(["/data/downloads"]);
+    pathService.translatePath.mockResolvedValue("/data/downloads/complete/Release");
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await expect(
+      manager.confirmImport("dl-1", {
+        strategy: "pc",
+        originalPath: "/data/downloads/complete",
+        proposedPath: "/safe/root/PC/Release",
+        needsReview: false,
+        transferMode: "move",
+      })
+    ).rejects.toThrow("Source path cannot be a parent of this download's folder");
+
+    expect(downloadersMock.getDownloadDetails).toHaveBeenCalledWith(
+      { url: "http://sabnzbd.local" },
+      "release-hash"
+    );
+    expect(fsMock.pathExists).not.toHaveBeenCalled();
+  });
+
+  it("confirmImport: overridePlan.proposedPath provided → strategy receives the override proposedPath", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: "",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/safe/root" }));
+
+    const { PCImportStrategy } = await import("../services/ImportStrategies.js");
+    const execSpy = vi.spyOn(PCImportStrategy.prototype, "executeImport").mockResolvedValue({
+      destDir: "/safe/root/PC/Custom Folder",
+      filesPlaced: ["/safe/root/PC/Custom Folder/game.exe"],
+      modeUsed: "move",
+      conflictsResolved: [],
+    });
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await manager.confirmImport("dl-1", {
+      strategy: "pc",
+      originalPath: "/downloads/game",
+      proposedPath: "/safe/root/PC/Custom Folder",
+      needsReview: false,
+      transferMode: "move",
+    });
+
+    expect(execSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ proposedPath: "/safe/root/PC/Custom Folder" }),
+      "move",
+      undefined
+    );
+
+    execSpy.mockRestore();
+  });
+
+  it("confirmImport: recomputes category placement server-side when sorting is enabled", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: "My Game",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue(
+      makeImportConfig({ libraryRoot: "/safe/root", sortExtras: true })
+    );
+
+    const { PCImportStrategy } = await import("../services/ImportStrategies.js");
+    const planSpy = vi.spyOn(PCImportStrategy.prototype, "planImport").mockResolvedValue({
+      needsReview: false,
+      originalPath: "/downloads/game",
+      proposedPath: "/safe/root/PC/My Game",
+      strategy: "pc",
+      fileCategories: [{ name: "Game Update v1.nsp", category: "update" }],
+    });
+    const execSpy = vi.spyOn(PCImportStrategy.prototype, "executeImport").mockResolvedValue({
+      destDir: "/safe/root/PC/My Game",
+      filesPlaced: ["/safe/root/PC/My Game/update/Game Update v1.nsp"],
+      modeUsed: "move",
+      conflictsResolved: [],
+    });
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    try {
+      await manager.confirmImport("dl-1", {
+        strategy: "pc",
+        originalPath: "/downloads/game",
+        proposedPath: "/safe/root/PC/My Game",
+        needsReview: false,
+        transferMode: "move",
+      });
+
+      expect(execSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          proposedPath: "/safe/root/PC/My Game",
+          fileCategories: [{ name: "Game Update v1.nsp", category: "update" }],
+        }),
+        "move",
+        undefined
+      );
+    } finally {
+      planSpy.mockRestore();
+      execSpy.mockRestore();
+    }
+  });
+
+  it("confirmImport: overridePlan.unpack = true → archiveService.extract is called", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: "",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/safe/root" }));
+    archiveService.isArchive.mockReturnValue(true);
+    archiveService.extract.mockResolvedValue(["/safe/root/PC/My Game/game.exe"]);
+
+    const { PCImportStrategy } = await import("../services/ImportStrategies.js");
+    const execSpy = vi.spyOn(PCImportStrategy.prototype, "executeImport").mockResolvedValue({
+      destDir: "/safe/root/PC/My Game",
+      filesPlaced: ["/safe/root/PC/My Game/game.exe"],
+      modeUsed: "move",
+      conflictsResolved: [],
+    });
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await manager.confirmImport("dl-1", {
+      strategy: "pc",
+      originalPath: "/downloads/game.zip",
+      proposedPath: "/safe/root/PC/My Game",
+      needsReview: false,
+      transferMode: "move",
+      unpack: true,
+    });
+
+    // An explicit unpack request is the one path allowed to extract disc images.
+    expect(archiveService.isArchive).toHaveBeenCalledWith(expect.any(String), {
+      includeDiscImages: true,
+    });
+    // move mode relocates the raw archive into the library first (game.zip's basename,
+    // under the confirmed proposedPath), then extracts it in place there.
+    expect(archiveService.extract).toHaveBeenCalledWith(
+      "/safe/root/PC/My Game/game.zip",
+      "/safe/root/PC/My Game",
+      undefined
+    );
+
+    execSpy.mockRestore();
+  });
+
+  it("confirmImport: overridePlan.unpack = false → archiveService.extract is NOT called", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: "",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/safe/root" }));
+    archiveService.isArchive.mockReturnValue(true);
+
+    const { PCImportStrategy } = await import("../services/ImportStrategies.js");
+    const execSpy = vi.spyOn(PCImportStrategy.prototype, "executeImport").mockResolvedValue({
+      destDir: "/safe/root/PC/My Game",
+      filesPlaced: ["/safe/root/PC/My Game/game.exe"],
+      modeUsed: "move",
+      conflictsResolved: [],
+    });
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await manager.confirmImport("dl-1", {
+      strategy: "pc",
+      originalPath: "/downloads/game.zip",
+      proposedPath: "/safe/root/PC/My Game",
+      needsReview: false,
+      transferMode: "move",
+      unpack: false,
+    });
+
+    expect(archiveService.extract).not.toHaveBeenCalled();
+
+    execSpy.mockRestore();
+  });
+
+  it("confirmImport: extraction failure (unpack=true) sets manual_review_required status and rejects — extraction runs inside the try block", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: "",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue(makeImportConfig({ libraryRoot: "/safe/root" }));
+    archiveService.isArchive.mockReturnValue(true);
+    archiveService.extract.mockRejectedValue(new Error("archive is corrupt"));
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await expect(
+      manager.confirmImport("dl-1", {
+        strategy: "pc",
+        originalPath: "/downloads/broken.zip",
+        proposedPath: "/safe/root/PC/My Game",
+        needsReview: false,
+        transferMode: "move",
+        unpack: true,
+      })
+    ).rejects.toThrow("archive is corrupt");
+
+    expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
+      "dl-1",
+      "manual_review_required",
+      "archive is corrupt"
+    );
+    expect(storage.updateGameDownloadStatus).not.toHaveBeenCalledWith("dl-1", "error");
+  });
+
+  // ─── Password-protected archive handling ─────────────────────────────────────
+
+  // Shared by the password tests below to keep each test's own body focused on
+  // what it's actually asserting (SonarCloud flagged the un-factored version as
+  // duplicated new code — see c9aabda for the same fix applied to an earlier
+  // near-identical test group in this file).
+  function mockRarDownload(
+    options: {
+      downloadTitle?: string;
+      gameTitle?: string;
+      libraryRoot?: string;
+      translatedPath?: string;
+    } = {}
+  ): void {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: options.downloadTitle ?? "",
+    });
+    storage.getGame.mockResolvedValue(
+      makeGame({ title: options.gameTitle ?? "Archive Game", platforms: [6] })
+    );
+    storage.getImportConfig.mockResolvedValue(
+      options.libraryRoot
+        ? makeImportConfig({ libraryRoot: options.libraryRoot })
+        : { ...baseConfig, autoUnpack: true }
+    );
+    archiveService.isArchive.mockReturnValue(true);
+    if (options.translatedPath) {
+      pathService.translatePath.mockResolvedValue(options.translatedPath);
+    }
+  }
+
+  function createManager(): ImportManager {
+    return new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+  }
+
+  it("processImport: ArchivePasswordRequiredError → manual review with the marker-prefixed message", async () => {
+    const { ArchivePasswordRequiredError } = await import("../services/ArchiveService.js");
+    mockRarDownload({ downloadTitle: "Game.rar", translatedPath: "/data/downloads/file.rar" });
+    archiveService.extract.mockRejectedValue(
+      new ArchivePasswordRequiredError(
+        "This archive is password-protected — a password is required to extract it."
+      )
+    );
+
+    await createManager().processImport("dl-1", "/remote/path");
+
+    expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
+      "dl-1",
+      "manual_review_required",
+      "ARCHIVE_PASSWORD_REQUIRED:This archive is password-protected — a password is required to extract it."
+    );
+    expect(storage.updateGameDownloadStatus).not.toHaveBeenCalledWith("dl-1", "error");
+  });
+
+  it("processImport: passes the given password through to archiveService.extract", async () => {
+    mockRarDownload({ downloadTitle: "Game.rar", translatedPath: "/data/downloads/file.rar" });
+    archiveService.extract.mockResolvedValue(["/data/downloads/file_extracted/game.rom"]);
+
+    await createManager().processImport("dl-1", "/remote/path", "hunter2");
+
+    expect(archiveService.extract).toHaveBeenCalledWith(
+      "/data/PC/Archive Game/file.rar",
+      "/data/PC/Archive Game",
+      "hunter2"
+    );
+  });
+
+  it("confirmImport: passes overridePlan.password through to archiveService.extract when unpack=true", async () => {
+    mockRarDownload({ gameTitle: "My Game", libraryRoot: "/safe/root" });
+    archiveService.extract.mockResolvedValue(["/downloads/game.rom"]);
+
+    await createManager().confirmImport("dl-1", {
+      strategy: "pc",
+      originalPath: "/downloads/game.rar",
+      proposedPath: "/safe/root/PC/My Game",
+      needsReview: false,
+      transferMode: "move",
+      unpack: true,
+      password: "hunter2",
+    });
+
+    expect(archiveService.extract).toHaveBeenCalledWith(
+      "/safe/root/PC/My Game/game.rar",
+      "/safe/root/PC/My Game",
+      "hunter2"
+    );
+  });
+
+  it("confirmImport: wrong retry password still surfaces as manual_review_required with the marker prefix", async () => {
+    const { ArchivePasswordRequiredError } = await import("../services/ArchiveService.js");
+    mockRarDownload({ gameTitle: "My Game", libraryRoot: "/safe/root" });
+    archiveService.extract.mockRejectedValue(
+      new ArchivePasswordRequiredError("The provided password was rejected — it may be incorrect.")
+    );
+
+    await expect(
+      createManager().confirmImport("dl-1", {
+        strategy: "pc",
+        originalPath: "/downloads/game.rar",
+        proposedPath: "/safe/root/PC/My Game",
+        needsReview: false,
+        transferMode: "move",
+        unpack: true,
+        password: "wrongpass",
+      })
+    ).rejects.toThrow(ArchivePasswordRequiredError);
+
+    expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
+      "dl-1",
+      "manual_review_required",
+      "ARCHIVE_PASSWORD_REQUIRED:The provided password was rejected — it may be incorrect."
+    );
+  });
+
+  // ─── extractRemoteHost edge cases (via resolveLocalPath → processImport) ────
+
+  it("extractRemoteHost: URL with port → hostname extracted without port", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: "",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getDownloader.mockResolvedValue({
+      id: "d1",
+      name: "NAS",
+      url: "http://nas.local:8080",
+    });
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await manager.processImport("dl-1", "/downloads/game.zip");
+
+    expect(pathService.translatePath).toHaveBeenCalledWith("/downloads/game.zip", "nas.local");
+  });
+
+  it("extractRemoteHost: downloader URL without a scheme still yields a host", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: "",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getDownloader.mockResolvedValue({
+      id: "d1",
+      name: "NAS",
+      url: "nas.local/downloads",
+    });
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await manager.processImport("dl-1", "/downloads/game.zip");
+
+    expect(pathService.translatePath).toHaveBeenCalledWith("/downloads/game.zip", "nas.local");
+  });
+
+  // ─── processImport: path goes through path mapping ──────────────────────────
+
+  it("processImport: remote path is translated via PathMappingService before strategy receives it", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: "",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getDownloader.mockResolvedValue({
+      id: "d1",
+      name: "Downloader",
+      url: "http://remote:9091",
+    });
+    pathService.translatePath.mockResolvedValue("/local/downloads/game.zip");
+
+    const { PCImportStrategy } = await import("../services/ImportStrategies.js");
+    const planSpy = vi.spyOn(PCImportStrategy.prototype, "planImport").mockResolvedValue({
+      needsReview: false,
+      originalPath: "/local/downloads/game.zip",
+      proposedPath: "/data/PC/Game",
+      strategy: "pc",
+    });
+    const execSpy = vi.spyOn(PCImportStrategy.prototype, "executeImport").mockResolvedValue({
+      destDir: "/data/PC/Game",
+      filesPlaced: ["/data/PC/Game/game.exe"],
+      modeUsed: "move",
+      conflictsResolved: [],
+    });
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await manager.processImport("dl-1", "/remote/downloads/game.zip");
+
+    expect(planSpy).toHaveBeenCalledWith(
+      "/local/downloads/game.zip",
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+      "PC",
+      undefined
+    );
+
+    planSpy.mockRestore();
+    execSpy.mockRestore();
+  });
+
+  it.each([
+    ["release title", "Some Game (2013) [Wii U / Multi-Language]", [6]],
+    ["IGDB platform", "", [41]],
+  ])(
+    "processImport: Wii U detected from %s goes to the Wii U folder",
+    async (_, title, platforms) => {
+      storage.getGameDownload.mockResolvedValue({
+        id: "dl-1",
+        gameId: "g1",
+        downloaderId: "d1",
+        downloadTitle: title,
+      });
+      storage.getGame.mockResolvedValue({
+        id: "g1",
+        title: "Some Game",
+        userId: "u1",
+        status: "wanted",
+        platforms,
+      });
+      storage.getDownloader.mockResolvedValue({
+        id: "d1",
+        name: "Downloader",
+        url: "http://remote:9091",
+      });
+      pathService.translatePath.mockResolvedValue("/local/downloads/game.wux");
+
+      const { PCImportStrategy } = await import("../services/ImportStrategies.js");
+      const planSpy = vi.spyOn(PCImportStrategy.prototype, "planImport").mockResolvedValue({
+        needsReview: true,
+        originalPath: "/local/downloads/game.wux",
+        proposedPath: "/data/Wii U/Some Game",
+        strategy: "pc",
+      });
+
+      const manager = new ImportManager(
+        storage as never, // NOSONAR
+        pathService as never, // NOSONAR
+        platformService as never, // NOSONAR
+        archiveService as never // NOSONAR
+      );
+
+      await manager.processImport("dl-1", "/remote/downloads/game.wux");
+
+      expect(planSpy).toHaveBeenCalledWith(
+        "/local/downloads/game.wux",
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        "Wii U",
+        undefined
+      );
+
+      planSpy.mockRestore();
+    }
+  );
+
+  it("overwrites a RomM root-level single file without removing its platform directory", async () => {
+    const sourcePath = "/local/downloads/Test Game.iso";
+    const platformDirectory = "/romm/library/switch";
+    const fileDestination = path.join(platformDirectory, "Test Game.iso");
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: "Test Game",
+      status: "completed",
+    });
+    storage.getGame.mockResolvedValue(
+      makeGame({ id: "g1", title: "Test Game", userId: "u1", platforms: [42] })
+    );
+    storage.getDownloader.mockResolvedValue({
+      id: "d1",
+      name: "Downloader",
+      url: "http://remote:9091",
+    });
+    storage.getRomMConfig.mockResolvedValue(
+      makeRomMConfig({
+        enabled: true,
+        libraryRoot: "/romm/library",
+        conflictPolicy: "overwrite",
+        singleFilePlacement: "root",
+      })
+    );
+    storage.getPlatformMapping.mockResolvedValue({ rommPlatformSlug: "switch" });
+    pathService.translatePath.mockResolvedValue(sourcePath);
+
+    const { PCImportStrategy } = await import("../services/ImportStrategies.js");
+    const executeSpy = vi
+      .spyOn(PCImportStrategy.prototype, "executeImport")
+      .mockImplementation(async (plan) => ({
+        destDir: path.dirname(plan.proposedPath),
+        filesPlaced: [plan.proposedPath],
+        modeUsed: "move",
+        conflictsResolved: [],
+      }));
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await manager.processImport("dl-1", "/remote/downloads/Test Game.iso");
+
+    expect(fsMock.remove).toHaveBeenCalledWith(fileDestination);
+    expect(fsMock.remove).not.toHaveBeenCalledWith(platformDirectory);
+    expect(executeSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ strategy: "romm", proposedPath: fileDestination }),
+      "move",
+      undefined
+    );
+    executeSpy.mockRestore();
+  });
+
+  // ─── processImport: needsReview → manual_review_required ────────────────────
+
+  it("processImport: strategy returns needsReview true → status set to manual_review_required", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: "",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+
+    const { PCImportStrategy } = await import("../services/ImportStrategies.js");
+    const planSpy = vi.spyOn(PCImportStrategy.prototype, "planImport").mockResolvedValue({
+      needsReview: true,
+      reviewReason: "Multiple files found, cannot determine primary",
+      originalPath: "/data/downloads/file.iso",
+      proposedPath: undefined,
+      strategy: "pc",
+    });
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await manager.processImport("dl-1", "/remote/path");
+
+    expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith("dl-1", "manual_review_required");
+
+    planSpy.mockRestore();
+  });
+
+  it("processImport: needsReview with autoUnpack → flags review without extracting anything", async () => {
+    // Archive resolution/extraction now happens at transfer time, inside
+    // transferWithUnpack, which only runs once planImport says the plan doesn't need
+    // review — so a plan that needsReview should short-circuit before archiveService.extract
+    // is ever called, leaving the raw archive untouched at its original downloader path.
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadTitle: "",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue(makeImportConfig({ autoUnpack: true }));
+    pathService.translatePath.mockResolvedValue("/data/downloads/game.zip");
+    archiveService.isArchive.mockReturnValue(true);
+
+    const { PCImportStrategy } = await import("../services/ImportStrategies.js");
+    const planSpy = vi.spyOn(PCImportStrategy.prototype, "planImport").mockResolvedValue({
+      needsReview: true,
+      reviewReason: "Destination already exists",
+      originalPath: "/data/downloads/game.zip",
+      proposedPath: undefined,
+      strategy: "pc",
+    });
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+
+    await manager.processImport("dl-1", "/remote/path");
+
+    expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith("dl-1", "manual_review_required");
+    expect(archiveService.extract).not.toHaveBeenCalled();
+    expect(fsMock.remove).not.toHaveBeenCalled();
+
+    planSpy.mockRestore();
+  });
+
+  // ─── autoDeleteAfterImport ────────────────────────────────────────────────────
+
+  function setupSuccessfulImport(transferMode: string, autoDeleteAfterImport = true) {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadHash: "abc123",
+      downloadTitle: "Game",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getDownloader.mockResolvedValue({ id: "d1", name: "qBit", url: "http://localhost" });
+    storage.getImportConfig.mockResolvedValue(
+      makeImportConfig({
+        transferMode: transferMode as never, // NOSONAR
+        autoDeleteAfterImport,
+        overwriteExisting: true,
+      })
+    );
+  }
+
+  it("autoDeleteAfterImport: calls removeDownload for copy mode", async () => {
+    setupSuccessfulImport("copy");
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+    await manager.processImport("dl-1", "/remote/path");
+
+    expect(downloadersMock.removeDownload).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "d1" }),
+      "abc123",
+      true
+    );
+  });
+
+  it("autoDeleteAfterImport: calls removeDownload for move mode", async () => {
+    setupSuccessfulImport("move");
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+    await manager.processImport("dl-1", "/remote/path");
+
+    expect(downloadersMock.removeDownload).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "d1" }),
+      "abc123",
+      true
+    );
+  });
+
+  it("autoDeleteAfterImport: does NOT call removeDownload for hardlink mode", async () => {
+    setupSuccessfulImport("hardlink");
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+    await manager.processImport("dl-1", "/remote/path");
+
+    expect(downloadersMock.removeDownload).not.toHaveBeenCalled();
+  });
+
+  it("autoDeleteAfterImport: does NOT call removeDownload for symlink mode", async () => {
+    setupSuccessfulImport("symlink");
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+    await manager.processImport("dl-1", "/remote/path");
+
+    expect(downloadersMock.removeDownload).not.toHaveBeenCalled();
+  });
+
+  it("autoDeleteAfterImport: does NOT call removeDownload when import fails", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+      downloadHash: "abc123",
+      downloadTitle: "Game",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "My Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getImportConfig.mockResolvedValue(
+      makeImportConfig({ transferMode: "copy", autoDeleteAfterImport: true })
+    );
+    fsMock.pathExists.mockResolvedValue(false); // force retry/path-inaccessible path
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+    await manager.processImport("dl-1", "/remote/path");
+
+    expect(downloadersMock.removeDownload).not.toHaveBeenCalled();
+  });
+
+  it("autoDeleteAfterImport: creates notification when removeDownload fails", async () => {
+    setupSuccessfulImport("copy");
+    downloadersMock.removeDownload.mockResolvedValue({
+      success: false,
+      message: "Torrent not found",
+    });
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+    await manager.processImport("dl-1", "/remote/path");
+
+    expect(storage.addNotification).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "warning",
+        title: "Auto-delete failed",
+      })
+    );
+  });
+
+  it("autoDeleteAfterImport: keeps status 'imported' when removeDownload throws instead of demoting to manual_review_required", async () => {
+    setupSuccessfulImport("copy");
+    downloadersMock.removeDownload.mockRejectedValue(new Error("downloader unreachable"));
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never // NOSONAR
+    );
+    await manager.processImport("dl-1", "/remote/path");
+
+    // The import itself already succeeded and finalized before auto-delete ran —
+    // a post-finalization auto-delete failure must not re-route an
+    // already-completed download back into the retryable review flow, which
+    // would risk a duplicate transfer if the user clicks Confirm Import again.
+    expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith("dl-1", "imported");
+    expect(storage.updateGameDownloadStatus).not.toHaveBeenCalledWith(
+      "dl-1",
+      "manual_review_required",
+      expect.anything()
+    );
+  });
+
+  describe("security scan quarantine", () => {
+    it("quarantines the download instead of importing it when the scan blocks", async () => {
+      storage.getGameDownload.mockResolvedValue({
+        id: "dl-1",
+        gameId: "g1",
+        downloaderId: "d1",
+      });
+      storage.getGame.mockResolvedValue({
+        id: "g1",
+        title: "Flagged Game",
+        userId: "u1",
+        status: "wanted",
+        platforms: [6],
+      });
+      storage.getImportConfig.mockResolvedValue({ ...baseConfig, libraryRoot: "/data/library" });
+
+      const securityScanService = {
+        scan: vi.fn().mockResolvedValue({
+          blocked: true,
+          source: "virustotal",
+          reason: "VirusTotal detected 10 engine(s) flagging this file (threshold: 2)",
+        }),
+      };
+
+      const manager = new ImportManager(
+        storage as never, // NOSONAR
+        pathService as never, // NOSONAR
+        platformService as never, // NOSONAR
+        archiveService as never, // NOSONAR
+        securityScanService as never // NOSONAR
+      );
+
+      await manager.processImport("dl-1", "/remote/path");
+
+      expect(securityScanService.scan).toHaveBeenCalledWith("/data/downloads/file.iso");
+      expect(fsMock.move).toHaveBeenCalledWith(
+        "/data/downloads/file.iso",
+        expect.stringContaining(`${path.sep}.questarr-quarantine${path.sep}dl-1${path.sep}`),
+        { overwrite: true }
+      );
+      expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
+        "dl-1",
+        "quarantined",
+        "VirusTotal detected 10 engine(s) flagging this file (threshold: 2)"
+      );
+      expect(storage.addNotification).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: "u1",
+          type: "error",
+          title: expect.stringContaining("VirusTotal"),
+        })
+      );
+      // The import must never proceed past quarantine. Checked by scanning all
+      // calls for this (id, status) pair regardless of any trailing argument,
+      // rather than toHaveBeenCalledWith("dl-1", "imported") — which only
+      // matches an exact-arity call and would silently pass if the status
+      // were ever set alongside an error message or other third argument.
+      expect(
+        storage.updateGameDownloadStatus.mock.calls.some(
+          ([id, status]) => id === "dl-1" && status === "imported"
+        )
+      ).toBe(false);
+    });
+
+    it("holds an incompletely scanned download for review without quarantining it", async () => {
+      storage.getGameDownload.mockResolvedValue({
+        id: "dl-1",
+        gameId: "g1",
+        downloaderId: "d1",
+      });
+      storage.getGame.mockResolvedValue({
+        id: "g1",
+        title: "Huge Game",
+        userId: "u1",
+        status: "wanted",
+        platforms: [6],
+      });
+      storage.getImportConfig.mockResolvedValue({ ...baseConfig, libraryRoot: "/data/library" });
+
+      const reason = "ClamAV did not scan this download: it has more than 10000 files.";
+      const securityScanService = {
+        scan: vi.fn().mockResolvedValue({
+          blocked: false,
+          incomplete: true,
+          source: "clamav",
+          reason,
+        }),
+      };
+
+      const manager = new ImportManager(
+        storage as never, // NOSONAR
+        pathService as never, // NOSONAR
+        platformService as never, // NOSONAR
+        archiveService as never, // NOSONAR
+        securityScanService as never // NOSONAR
+      );
+
+      await manager.processImport("dl-1", "/remote/path");
+
+      // The files stay in the client's folder so the torrent keeps seeding.
+      expect(fsMock.move).not.toHaveBeenCalled();
+      expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
+        "dl-1",
+        "manual_review_required",
+        reason
+      );
+      expect(
+        storage.updateGameDownloadStatus.mock.calls.some(
+          ([id, status]) => id === "dl-1" && (status === "quarantined" || status === "imported")
+        )
+      ).toBe(false);
+      expect(storage.addNotification).not.toHaveBeenCalled();
+    });
+
+    it("stops a first confirmation of an incompletely scanned download to show the reason", async () => {
+      storage.getGameDownload.mockResolvedValue({
+        id: "dl-1",
+        gameId: "g1",
+        downloaderId: "d1",
+        status: "game_link_required",
+      });
+      storage.getGame.mockResolvedValue({
+        id: "g1",
+        title: "Huge Game",
+        userId: "u1",
+        status: "wanted",
+        platforms: [6],
+      });
+      storage.getImportConfig.mockResolvedValue({ ...baseConfig, libraryRoot: "/safe/root" });
+
+      const securityScanService = {
+        scan: vi.fn().mockResolvedValue({
+          blocked: false,
+          incomplete: true,
+          source: "clamav",
+          reason: "not fully scanned",
+        }),
+      };
+
+      const manager = new ImportManager(
+        storage as never, // NOSONAR
+        pathService as never, // NOSONAR
+        platformService as never, // NOSONAR
+        archiveService as never, // NOSONAR
+        securityScanService as never // NOSONAR
+      );
+
+      await expect(
+        manager.confirmImport("dl-1", {
+          strategy: "pc",
+          originalPath: "/downloads/source-folder",
+          proposedPath: "/safe/root/PC/Huge Game",
+          needsReview: false,
+          transferMode: "move",
+        })
+      ).rejects.toThrow(IncompleteScanError);
+
+      expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
+        "dl-1",
+        "manual_review_required",
+        "not fully scanned"
+      );
+      expect(fsMock.move).not.toHaveBeenCalled();
+    });
+
+    it("lets the user confirm the import of an incompletely scanned download", async () => {
+      storage.getGameDownload.mockResolvedValue({
+        id: "dl-1",
+        gameId: "g1",
+        downloaderId: "d1",
+        status: "manual_review_required",
+        errorMessage: "not fully scanned",
+      });
+      storage.getGame.mockResolvedValue({
+        id: "g1",
+        title: "Huge Game",
+        userId: "u1",
+        status: "wanted",
+        platforms: [6],
+      });
+      storage.getImportConfig.mockResolvedValue({ ...baseConfig, libraryRoot: "/safe/root" });
+
+      const securityScanService = {
+        scan: vi.fn().mockResolvedValue({
+          blocked: false,
+          incomplete: true,
+          source: "clamav",
+          reason: "not fully scanned",
+        }),
+      };
+
+      const manager = new ImportManager(
+        storage as never, // NOSONAR
+        pathService as never, // NOSONAR
+        platformService as never, // NOSONAR
+        archiveService as never, // NOSONAR
+        securityScanService as never // NOSONAR
+      );
+
+      await manager.confirmImport("dl-1", {
+        strategy: "pc",
+        originalPath: "/downloads/source-folder",
+        proposedPath: "/safe/root/PC/Huge Game",
+        needsReview: false,
+        transferMode: "move",
+      });
+
+      expect(securityScanService.scan).toHaveBeenCalled();
+      expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith("dl-1", "imported");
+    });
+
+    it("does not create a notification when the securityAlert.inApp preference is disabled", async () => {
+      storage.getGameDownload.mockResolvedValue({
+        id: "dl-1",
+        gameId: "g1",
+        downloaderId: "d1",
+      });
+      storage.getGame.mockResolvedValue({
+        id: "g1",
+        title: "Flagged Game",
+        userId: "u1",
+        status: "wanted",
+        platforms: [6],
+      });
+      storage.getImportConfig.mockResolvedValue({ ...baseConfig, libraryRoot: "/data/library" });
+      storage.getUserSettings.mockResolvedValue({
+        notificationPreferences: JSON.stringify({
+          securityAlert: { inApp: false, apprise: true },
+        }),
+      });
+
+      const securityScanService = {
+        scan: vi.fn().mockResolvedValue({ blocked: true, source: "clamav", reason: "infected" }),
+      };
+
+      const manager = new ImportManager(
+        storage as never, // NOSONAR
+        pathService as never, // NOSONAR
+        platformService as never, // NOSONAR
+        archiveService as never, // NOSONAR
+        securityScanService as never // NOSONAR
+      );
+
+      await manager.processImport("dl-1", "/remote/path");
+
+      expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
+        "dl-1",
+        "quarantined",
+        "infected"
+      );
+      expect(storage.addNotification).not.toHaveBeenCalled();
+    });
+
+    it("does not mark the download quarantined when the move to quarantine fails", async () => {
+      storage.getGameDownload.mockResolvedValue({
+        id: "dl-1",
+        gameId: "g1",
+        downloaderId: "d1",
+      });
+      storage.getGame.mockResolvedValue({
+        id: "g1",
+        title: "Flagged Game",
+        userId: "u1",
+        status: "wanted",
+        platforms: [6],
+      });
+      storage.getImportConfig.mockResolvedValue({ ...baseConfig, libraryRoot: "/data/library" });
+      fsMock.move.mockRejectedValueOnce(new Error("disk full"));
+
+      const securityScanService = {
+        scan: vi.fn().mockResolvedValue({ blocked: true, source: "clamav", reason: "infected" }),
+      };
+
+      const manager = new ImportManager(
+        storage as never, // NOSONAR
+        pathService as never, // NOSONAR
+        platformService as never, // NOSONAR
+        archiveService as never, // NOSONAR
+        securityScanService as never // NOSONAR
+      );
+
+      await manager.processImport("dl-1", "/remote/path");
+
+      // A failed move must never be swallowed into a false "quarantined" status —
+      // the file is still sitting at its original, unquarantined path.
+      expect(
+        storage.updateGameDownloadStatus.mock.calls.some(
+          ([id, status]) => id === "dl-1" && status === "quarantined"
+        )
+      ).toBe(false);
+      expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
+        "dl-1",
+        "manual_review_required",
+        expect.stringContaining("disk full")
+      );
+    });
+
+    it("proceeds with the import when the scan does not block", async () => {
+      storage.getGameDownload.mockResolvedValue({
+        id: "dl-1",
+        gameId: "g1",
+        downloaderId: "d1",
+      });
+      storage.getGame.mockResolvedValue({
+        id: "g1",
+        title: "Clean Game",
+        userId: "u1",
+        status: "wanted",
+        platforms: [6],
+      });
+      storage.getImportConfig.mockResolvedValue({ ...baseConfig, libraryRoot: "/safe/root" });
+
+      const securityScanService = { scan: vi.fn().mockResolvedValue({ blocked: false }) };
+
+      const manager = new ImportManager(
+        storage as never, // NOSONAR
+        pathService as never, // NOSONAR
+        platformService as never, // NOSONAR
+        archiveService as never, // NOSONAR
+        securityScanService as never // NOSONAR
+      );
+
+      await manager.processImport("dl-1", "/remote/path");
+
+      expect(securityScanService.scan).toHaveBeenCalled();
+      expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith("dl-1", "imported");
+      expect(storage.updateGameDownloadStatus).not.toHaveBeenCalledWith(
+        "dl-1",
+        "quarantined",
+        expect.anything()
+      );
+    });
+
+    it("defaults to a pass-through scan when no securityScanService is provided", async () => {
+      storage.getGameDownload.mockResolvedValue({
+        id: "dl-1",
+        gameId: "g1",
+        downloaderId: "d1",
+      });
+      storage.getGame.mockResolvedValue({
+        id: "g1",
+        title: "Legacy Caller Game",
+        userId: "u1",
+        status: "wanted",
+        platforms: [6],
+      });
+      storage.getImportConfig.mockResolvedValue({ ...baseConfig, libraryRoot: "/safe/root" });
+
+      const manager = new ImportManager(
+        storage as never, // NOSONAR
+        pathService as never, // NOSONAR
+        platformService as never, // NOSONAR
+        archiveService as never // NOSONAR
+      );
+
+      await manager.processImport("dl-1", "/remote/path");
+
+      expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith("dl-1", "imported");
+    });
+
+    it("confirmImport rejects a download that is already quarantined", async () => {
+      storage.getGameDownload.mockResolvedValue({
+        id: "dl-1",
+        gameId: "g1",
+        downloaderId: "d1",
+        status: "quarantined",
+      });
+
+      const manager = new ImportManager(
+        storage as never, // NOSONAR
+        pathService as never, // NOSONAR
+        platformService as never, // NOSONAR
+        archiveService as never // NOSONAR
+      );
+
+      await expect(
+        manager.confirmImport("dl-1", {
+          strategy: "pc",
+          originalPath: "/downloads/source-folder",
+          proposedPath: "/safe/root/PC/Game",
+          needsReview: false,
+        })
+      ).rejects.toThrow("flagged by the security scan");
+      expect(fsMock.move).not.toHaveBeenCalled();
+    });
+
+    it("confirmImport quarantines and refuses to transfer when the scan blocks", async () => {
+      storage.getGameDownload.mockResolvedValue({
+        id: "dl-1",
+        gameId: "g1",
+        downloaderId: "d1",
+        status: "manual_review_required",
+      });
+      storage.getGame.mockResolvedValue({
+        id: "g1",
+        title: "Manually Confirmed Game",
+        userId: "u1",
+        status: "wanted",
+        platforms: [6],
+      });
+      storage.getImportConfig.mockResolvedValue({ ...baseConfig, libraryRoot: "/safe/root" });
+
+      const securityScanService = {
+        scan: vi.fn().mockResolvedValue({
+          blocked: true,
+          source: "clamav",
+          reason: "ClamAV detected Eicar-Test-Signature",
+        }),
+      };
+
+      const manager = new ImportManager(
+        storage as never, // NOSONAR
+        pathService as never, // NOSONAR
+        platformService as never, // NOSONAR
+        archiveService as never, // NOSONAR
+        securityScanService as never // NOSONAR
+      );
+
+      await expect(
+        manager.confirmImport("dl-1", {
+          strategy: "pc",
+          originalPath: "/downloads/source-folder",
+          proposedPath: "/safe/root/PC/Game",
+          needsReview: false,
+        })
+      ).rejects.toThrow("ClamAV detected Eicar-Test-Signature");
+
+      expect(securityScanService.scan).toHaveBeenCalledWith("/downloads/source-folder");
+      expect(fsMock.move).toHaveBeenCalledWith(
+        "/downloads/source-folder",
+        expect.stringContaining(`${path.sep}.questarr-quarantine${path.sep}dl-1${path.sep}`),
+        { overwrite: true }
+      );
+      expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
+        "dl-1",
+        "quarantined",
+        "ClamAV detected Eicar-Test-Signature"
+      );
+      expect(
+        storage.updateGameDownloadStatus.mock.calls.some(
+          ([id, status]) => id === "dl-1" && status === "imported"
+        )
+      ).toBe(false);
+    });
+  });
+});
