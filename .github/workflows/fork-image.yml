@@ -1260,7 +1260,7 @@ jobs:
 
   announce-release:
     name: Announce release to Discord
-    needs: [release, finalize-release, sync-finalized-metadata]
+    needs: [release, sync-release-metadata, finalize-release, sync-finalized-metadata]
     if: >-
       (
         github.event_name != 'workflow_dispatch' ||
@@ -1271,7 +1271,12 @@ jobs:
         )
       ) &&
       (
-        always() && github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && ((inputs.finalize_release_tag == '' && inputs.announce_release_tag != '') || (inputs.finalize_release_tag != '' && needs['finalize-release'].result == 'success' && needs['sync-finalized-metadata'].result == 'success'))
+        always() && github.repository_id == '1388297896' && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' &&
+        (
+          (inputs.release_tag == '' && inputs.finalize_release_tag == '' && inputs.announce_release_tag != '') ||
+          (inputs.release_tag != '' && needs.release.result == 'success' && needs['sync-release-metadata'].result == 'success') ||
+          (inputs.finalize_release_tag != '' && needs['finalize-release'].result == 'success' && needs['sync-finalized-metadata'].result == 'success')
+        )
       )
     runs-on: ubuntu-24.04
     environment:

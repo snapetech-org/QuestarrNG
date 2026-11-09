@@ -55,6 +55,14 @@ function fixture({ existing = false, failSecondChunk = false, wrongRelease = fal
 }
 
 describe("linked Discord release announcements", () => {
+  it("automatically announces normal releases after publication and metadata sync succeed", () => {
+    const workflow = load(readFileSync(".github/workflows/fork-image.yml", "utf8"));
+    const job = workflow.jobs["announce-release"];
+    expect(job.needs).toContain("sync-release-metadata");
+    expect(job.if).toContain("inputs.release_tag != '' && needs.release.result == 'success'");
+    expect(job.if).toContain("needs['sync-release-metadata'].result == 'success'");
+  });
+
   it("delivers every changelog chunk before posting its first message link to the other channel", async () => {
     const { options, fetchImpl, receipts } = fixture();
     const receipt = await announceDiscordRelease(options);
