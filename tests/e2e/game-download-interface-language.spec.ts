@@ -993,7 +993,7 @@ test("keeps the RTL import-history table and task sheet accessible", async ({ pa
   await page.route("**/api/config", async (route) =>
     route.fulfill({ json: { igdb: { configured: true } } })
   );
-  await page.route("**/api/import-tasks*", async (route) => {
+  await page.route("**/api/import-tasks**", async (route) => {
     const pathname = new URL(route.request().url()).pathname;
     if (pathname.endsWith("/api/import-tasks")) {
       await route.fulfill({ json: [task] });

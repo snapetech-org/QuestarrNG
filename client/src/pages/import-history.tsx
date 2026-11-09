@@ -262,7 +262,12 @@ export default function ImportHistoryPage() {
                     className="border-b border-[#374151]/30 last:border-0 hover:bg-[#1F2937]/60 cursor-pointer transition-colors"
                     onClick={() => setSelectedTaskId(task.id)}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") setSelectedTaskId(task.id);
+                      if (e.key === "Enter" || e.key === " ") {
+                        // Focus moves into the sheet; suppress the key's native
+                        // activation so it cannot immediately click Close.
+                        e.preventDefault();
+                        setSelectedTaskId(task.id);
+                      }
                     }}
                   >
                     <td className="px-4 py-3 text-white font-medium">
