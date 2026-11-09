@@ -26,6 +26,8 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      DISCORD_ANNOUNCEMENT_WEBHOOK: ${{ secrets.DISCORD_ANNOUNCEMENT_WEBHOOK }}
+      ANNOUNCEMENT_RECEIPT: ${{ runner.temp }}/discord-release-receipt.json
       TAG: ${{ github.event.workflow_run.head_branch }}
     steps:
       - name: Checkout trusted default-branch release tooling
@@ -40,78 +42,14 @@ jobs:
           node-version: 26.x
           package-manager-cache: false
 
-      - name: Send release announcement
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo 'Release announcement tag must use vMAJOR.MINOR.PATCH.' >&2
-            exit 1
-          fi
-          test -n "$DISCORD_WEBHOOK" || {
-            echo 'DISCORD_WEBHOOK is required in the discord-release environment.' >&2
-            exit 1
-          }
+      - name: Post changelog notes and linked channel announcement
+        run: node scripts/announce-discord-release.mjs
 
-          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" \
-            --json body,isDraft,isPrerelease,tagName,url > release.json
-          jq -e --arg tag "$TAG" \
-            '.tagName == $tag and .isDraft == false and .isPrerelease == false and (.body | type == "string" and length > 0)' \
-            release.json > /dev/null
-          version="${TAG#v}"
-          printf '%s' "$(jq -r '.body' release.json)" \
-            | node scripts/discord-release-notes.mjs --split > chunks.json
-          chunk_count="$(jq 'length' chunks.json)"
-          (( chunk_count > 0 )) || {
-            echo 'The published release notes are empty.' >&2
-            exit 1
-          }
-
-          webhook_url="$DISCORD_WEBHOOK"
-          if [[ "$webhook_url" == *'?'* ]]; then
-            webhook_url+='&wait=true'
-          else
-            webhook_url+='?wait=true'
-          fi
-
-          for ((index = 0; index < chunk_count; index += 1)); do
-            description="$(jq -r --argjson index "$index" '.[$index]' chunks.json)"
-            number=$((index + 1))
-            title="QuestarrNG ${TAG} release notes (${number}/${chunk_count})"
-            jq -n \
-              --arg username 'QuestarrNG Releases' \
-              --arg title "$title" \
-              --arg url "$(jq -r '.url' release.json)" \
-              --arg description "$description" \
-              --arg image "ghcr.io/${GITHUB_REPOSITORY,,}:${version}" \
-              --arg run_url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" \
-              --argjson first "$index" \
-              '{
-                username: $username,
-                embeds: [{
-                  title: $title,
-                  url: $url,
-                  description: $description,
-                  color: 5814783,
-                  fields: (if $first == 0 then [
-                    { name: "Image", value: $image, inline: false },
-                    { name: "Workflow", value: $run_url, inline: false }
-                  ] else [] end)
-                }]
-              }' > payload.json
-
-            http_status="$(curl --fail --silent --show-error \
-              --output /dev/null \
-              --write-out '%{http_code}' \
-              -H 'Content-Type: application/json' \
-              -X POST \
-              --data @payload.json \
-              "$webhook_url")"
-            if [[ ! "$http_status" =~ ^2[0-9]{2}$ ]]; then
-              echo "Discord webhook returned unexpected HTTP status $http_status." >&2
-              exit 1
-            fi
-            if (( number < chunk_count )); then
-              sleep 1
-            fi
-          done
+      - name: Retain Discord message links
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: discord-release-receipt
+          path: ${{ runner.temp }}/discord-release-receipt.json
+          if-no-files-found: ignore
+          retention-days: 90
