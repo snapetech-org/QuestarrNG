@@ -236,7 +236,8 @@ describe("ImportManager", () => {
     expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
       "dl-1",
       "manual_review_required",
-      "translate failure"
+      "translate failure",
+      expect.toSatisfy((metadata) => metadata === null || typeof metadata === "object")
     );
     expect(storage.updateGameDownloadStatus).not.toHaveBeenCalledWith("dl-1", "error");
   });
@@ -1051,7 +1052,8 @@ describe("ImportManager", () => {
     expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
       "dl-1",
       "manual_review_required",
-      "ARCHIVE_PASSWORD_REQUIRED:This archive is password-protected — a password is required to extract it."
+      "ARCHIVE_PASSWORD_REQUIRED:This archive is password-protected — a password is required to extract it.",
+      expect.toSatisfy((metadata) => metadata === null || typeof metadata === "object")
     );
     expect(storage.updateGameDownloadStatus).not.toHaveBeenCalledWith("dl-1", "error");
   });
@@ -1654,7 +1656,8 @@ describe("ImportManager", () => {
       expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
         "dl-1",
         "quarantined",
-        "VirusTotal detected 10 engine(s) flagging this file (threshold: 2)"
+        "VirusTotal detected 10 engine(s) flagging this file (threshold: 2)",
+        expect.toSatisfy((metadata) => metadata === null || typeof metadata === "object")
       );
       expect(storage.addNotification).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -1715,7 +1718,8 @@ describe("ImportManager", () => {
       expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
         "dl-1",
         "manual_review_required",
-        reason
+        reason,
+        expect.toSatisfy((metadata) => metadata === null || typeof metadata === "object")
       );
       expect(
         storage.updateGameDownloadStatus.mock.calls.some(
@@ -1771,7 +1775,8 @@ describe("ImportManager", () => {
       expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
         "dl-1",
         "manual_review_required",
-        "not fully scanned"
+        "not fully scanned",
+        expect.toSatisfy((metadata) => metadata === null || typeof metadata === "object")
       );
       expect(fsMock.move).not.toHaveBeenCalled();
     });
@@ -1859,7 +1864,8 @@ describe("ImportManager", () => {
       expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
         "dl-1",
         "quarantined",
-        "infected"
+        "infected",
+        expect.toSatisfy((metadata) => metadata === null || typeof metadata === "object")
       );
       expect(storage.addNotification).not.toHaveBeenCalled();
     });
@@ -1904,7 +1910,8 @@ describe("ImportManager", () => {
       expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
         "dl-1",
         "manual_review_required",
-        expect.stringContaining("disk full")
+        expect.stringContaining("disk full"),
+        expect.toSatisfy((metadata) => metadata === null || typeof metadata === "object")
       );
     });
 
@@ -2047,7 +2054,8 @@ describe("ImportManager", () => {
       expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
         "dl-1",
         "quarantined",
-        "ClamAV detected Eicar-Test-Signature"
+        "ClamAV detected Eicar-Test-Signature",
+        expect.toSatisfy((metadata) => metadata === null || typeof metadata === "object")
       );
       expect(
         storage.updateGameDownloadStatus.mock.calls.some(

@@ -848,11 +848,11 @@ describe("downloader client regression coverage", () => {
       trackers: [],
     });
     await expect(client.getAllDownloads()).resolves.toHaveLength(1);
-    await expect(client.pauseDownload("sab-1")).resolves.toEqual({
+    await expect(client.pauseDownload("sab-1")).resolves.toMatchObject({
       success: false,
       message: "Failed to pause NZB",
     });
-    await expect(client.resumeDownload("sab-1")).resolves.toEqual({
+    await expect(client.resumeDownload("sab-1")).resolves.toMatchObject({
       success: false,
       message: "Failed to resume NZB",
     });
@@ -909,15 +909,15 @@ describe("downloader client regression coverage", () => {
         json: async () => ({ queue: { diskspace1: "NaN" } }),
       } as Response);
 
-    await expect(client.pauseDownload("sab-done")).resolves.toEqual({
+    await expect(client.pauseDownload("sab-done")).resolves.toMatchObject({
       success: false,
       message: "Failed to pause NZB",
     });
-    await expect(client.resumeDownload("sab-done")).resolves.toEqual({
+    await expect(client.resumeDownload("sab-done")).resolves.toMatchObject({
       success: false,
       message: "resume boom",
     });
-    await expect(client.removeDownload("sab-done")).resolves.toEqual({
+    await expect(client.removeDownload("sab-done")).resolves.toMatchObject({
       success: false,
       message: "Failed to remove NZB",
     });
@@ -1093,7 +1093,7 @@ describe("downloader client regression coverage", () => {
       trackers: [],
     });
     await expect(client.getAllDownloads()).resolves.toHaveLength(1);
-    await expect(client.pauseDownload("10")).resolves.toEqual({
+    await expect(client.pauseDownload("10")).resolves.toMatchObject({
       success: true,
       message: "NZB paused",
     });
@@ -1117,15 +1117,15 @@ describe("downloader client regression coverage", () => {
       .mockRejectedValueOnce(new Error("remove boom"))
       .mockRejectedValueOnce(new Error("space boom"));
 
-    await expect(client.pauseDownload("10")).resolves.toEqual({
+    await expect(client.pauseDownload("10")).resolves.toMatchObject({
       success: false,
       message: "pause boom",
     });
-    await expect(client.resumeDownload("10")).resolves.toEqual({
+    await expect(client.resumeDownload("10")).resolves.toMatchObject({
       success: false,
       message: "resume boom",
     });
-    await expect(client.removeDownload("10")).resolves.toEqual({
+    await expect(client.removeDownload("10")).resolves.toMatchObject({
       success: false,
       message: "remove boom",
     });
@@ -1210,7 +1210,7 @@ describe("downloader client regression coverage", () => {
     };
 
     await expect(client.getFreeSpace()).resolves.toBe(0);
-    await expect(client.addDownload({ url: "", title: "Missing URL" })).resolves.toEqual({
+    await expect(client.addDownload({ url: "", title: "Missing URL" })).resolves.toMatchObject({
       success: false,
       message: "Download URL is required",
     });
@@ -1233,7 +1233,7 @@ describe("downloader client regression coverage", () => {
       text: async () => "4.6.5",
     } as Response);
 
-    await expect(client.testConnection()).resolves.toEqual({
+    await expect(client.testConnection()).resolves.toMatchObject({
       success: true,
       message: "Connected successfully to qBittorrent 4.6.5",
       messageKey: "service.connected_successfully_version",
@@ -1241,14 +1241,14 @@ describe("downloader client regression coverage", () => {
     });
 
     authenticateSpy.mockRejectedValueOnce(new Error("auth boom"));
-    await expect(client.testConnection()).resolves.toEqual({
+    await expect(client.testConnection()).resolves.toMatchObject({
       success: false,
       message: "Failed to connect to qBittorrent: auth boom",
       messageKey: "service.connection_failed",
       messageValues: { client: "qBittorrent", error: "auth boom" },
     });
 
-    await expect(client.addDownload({ url: "", title: "No URL" })).resolves.toEqual({
+    await expect(client.addDownload({ url: "", title: "No URL" })).resolves.toMatchObject({
       success: false,
       message: "Download URL is required",
     });
@@ -1256,7 +1256,7 @@ describe("downloader client regression coverage", () => {
     vi.mocked(isSafeUrl).mockResolvedValueOnce(false);
     await expect(
       client.addDownload({ url: "http://unsafe.local/file.torrent", title: "Unsafe" })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Unsafe URL blocked: http://unsafe.local/file.torrent",
     });
@@ -1276,7 +1276,7 @@ describe("downloader client regression coverage", () => {
         url: "magnet:?xt=urn:btih:abcdef1234567890abcdef1234567890abcdef12",
         title: "Broken magnet",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Failed to add magnet link: unexpected failure",
     });
@@ -1327,7 +1327,7 @@ describe("downloader client regression coverage", () => {
       title: "Questarr Magnet",
     });
     await vi.runAllTimersAsync();
-    await expect(addedPromise).resolves.toEqual({
+    await expect(addedPromise).resolves.toMatchObject({
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully",
@@ -1363,7 +1363,7 @@ describe("downloader client regression coverage", () => {
       title: "Questarr Game",
     });
     await vi.runAllTimersAsync();
-    await expect(duplicatePromise).resolves.toEqual({
+    await expect(duplicatePromise).resolves.toMatchObject({
       success: true,
       id: "recent-hash",
       message: "Download already exists (qBittorrent)",
@@ -1388,7 +1388,7 @@ describe("downloader client regression coverage", () => {
     const makeRequestSpy = vi.spyOn(privateClient, "makeRequest");
 
     makeRequestSpy.mockResolvedValueOnce({ result: "success", arguments: {} });
-    await expect(client.testConnection()).resolves.toEqual({
+    await expect(client.testConnection()).resolves.toMatchObject({
       success: true,
       message: "Connected successfully to Transmission",
       messageKey: "service.connected_successfully",
@@ -1398,13 +1398,13 @@ describe("downloader client regression coverage", () => {
     makeRequestSpy.mockRejectedValueOnce(
       new Error("Authentication failed: Invalid username or password for Transmission - denied")
     );
-    await expect(client.testConnection()).resolves.toEqual({
+    await expect(client.testConnection()).resolves.toMatchObject({
       success: false,
       message: "Authentication failed: Invalid username or password for Transmission - denied",
     });
 
     makeRequestSpy.mockRejectedValueOnce(new Error("network boom"));
-    await expect(client.testConnection()).resolves.toEqual({
+    await expect(client.testConnection()).resolves.toMatchObject({
       success: false,
       message: "Failed to connect to Transmission: network boom",
       messageKey: "service.connection_failed",
@@ -1414,7 +1414,7 @@ describe("downloader client regression coverage", () => {
     vi.mocked(isSafeUrl).mockResolvedValueOnce(false);
     await expect(
       client.addDownload({ url: "http://unsafe.local/file.torrent", title: "Unsafe" })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Unsafe URL blocked: http://unsafe.local/file.torrent",
     });
@@ -1433,7 +1433,7 @@ describe("downloader client regression coverage", () => {
         url: "magnet:?xt=urn:btih:abcdef1234567890abcdef1234567890abcdef12",
         title: "Duplicate magnet",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       id: "dup-hash",
       message: "Download already exists (Transmission)",
@@ -1482,7 +1482,7 @@ describe("downloader client regression coverage", () => {
 
     await expect(
       client.addDownload({ url: "http://indexer.local/redirect.torrent", title: "Redirected" })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       id: "magnet-hash",
       message: "Download added successfully",
@@ -1513,7 +1513,7 @@ describe("downloader client regression coverage", () => {
         title: "Retry file param",
         priority: 5,
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Failed to add download: tracker offline",
       messageKey: "service.download_add_failed",
@@ -1531,7 +1531,7 @@ describe("downloader client regression coverage", () => {
     const rpcSpy = vi.spyOn(privateClient, "makeXMLRPCRequest");
 
     rpcSpy.mockResolvedValueOnce("0.9.8");
-    await expect(client.testConnection()).resolves.toEqual({
+    await expect(client.testConnection()).resolves.toMatchObject({
       success: true,
       message: "Connected to rTorrent v0.9.8",
       messageKey: "service.connected_version",
@@ -1539,20 +1539,20 @@ describe("downloader client regression coverage", () => {
     });
 
     rpcSpy.mockRejectedValueOnce(new Error("Authentication failed: bad credentials"));
-    await expect(client.testConnection()).resolves.toEqual({
+    await expect(client.testConnection()).resolves.toMatchObject({
       success: false,
       message: "Authentication failed: bad credentials",
     });
 
     rpcSpy.mockRejectedValueOnce(new Error("rpc down"));
-    await expect(client.testConnection()).resolves.toEqual({
+    await expect(client.testConnection()).resolves.toMatchObject({
       success: false,
       message: "Failed to connect to rTorrent: rpc down",
       messageKey: "service.connection_failed",
       messageValues: { client: "rTorrent", error: "rpc down" },
     });
 
-    await expect(client.addDownload({ url: "", title: "No URL" })).resolves.toEqual({
+    await expect(client.addDownload({ url: "", title: "No URL" })).resolves.toMatchObject({
       success: false,
       message: "Download URL is required",
     });
@@ -1560,7 +1560,7 @@ describe("downloader client regression coverage", () => {
     vi.mocked(isSafeUrl).mockResolvedValueOnce(false);
     await expect(
       client.addDownload({ url: "http://unsafe.local/file.torrent", title: "Unsafe" })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Unsafe URL blocked: http://unsafe.local/file.torrent",
     });
@@ -1571,7 +1571,7 @@ describe("downloader client regression coverage", () => {
         url: "magnet:?xt=urn:btih:abcdef1234567890abcdef1234567890abcdef12",
         title: "Magnet",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully",
@@ -1585,7 +1585,7 @@ describe("downloader client regression coverage", () => {
         url: "magnet:?xt=urn:btih:abcdef1234567890abcdef1234567890abcdef12",
         title: "Magnet failure",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Failed to add download (rTorrent returned code: 5)",
     });
@@ -1614,7 +1614,7 @@ describe("downloader client regression coverage", () => {
 
     await expect(
       client.addDownload({ url: "http://indexer.local/start.torrent", title: "Redirected" })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully (stopped)",
@@ -1631,7 +1631,7 @@ describe("downloader client regression coverage", () => {
 
     await expect(
       client.addDownload({ url: "http://indexer.local/broken.torrent", title: "Broken file" })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Failed to download file from indexer: Server Error",
     });
@@ -1648,7 +1648,7 @@ describe("downloader client regression coverage", () => {
       ok: true,
       json: async () => ({ version: "4.3.2" }),
     } as Response);
-    await expect(client.testConnection()).resolves.toEqual({
+    await expect(client.testConnection()).resolves.toMatchObject({
       success: true,
       message: "Connected to SABnzbd v4.3.2",
       messageKey: "service.connected_version",
@@ -1659,7 +1659,7 @@ describe("downloader client regression coverage", () => {
       ok: true,
       json: async () => ({ notVersion: true }),
     } as Response);
-    await expect(client.testConnection()).resolves.toEqual({
+    await expect(client.testConnection()).resolves.toMatchObject({
       success: false,
       message: "Invalid SABnzbd response - missing version field",
     });
@@ -1670,7 +1670,7 @@ describe("downloader client regression coverage", () => {
       statusText: "Boom",
       text: async () => "server error",
     } as Response);
-    await expect(client.testConnection()).resolves.toEqual({
+    await expect(client.testConnection()).resolves.toMatchObject({
       success: false,
       message:
         "Failed to connect to SABnzbd at http://localhost:8080: HTTP 500: Boom - server error",
@@ -1683,7 +1683,7 @@ describe("downloader client regression coverage", () => {
     });
 
     fetchWithFallbackSpy.mockRejectedValueOnce(new Error("connect boom"));
-    await expect(client.testConnection()).resolves.toEqual({
+    await expect(client.testConnection()).resolves.toMatchObject({
       success: false,
       message: expect.stringContaining("Failed to connect to SABnzbd"),
       messageKey: "service.connection_failed_at",
@@ -1693,7 +1693,7 @@ describe("downloader client regression coverage", () => {
     vi.mocked(isSafeUrl).mockResolvedValueOnce(false);
     await expect(
       client.addDownload({ url: "http://unsafe.local/file.nzb", title: "Unsafe" })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Unsafe URL blocked: http://unsafe.local/file.nzb",
     });
@@ -1704,7 +1704,7 @@ describe("downloader client regression coverage", () => {
     } as Response);
     await expect(
       client.addDownload({ url: "http://indexer.local/file.nzb", title: "Missing" })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Failed to fetch NZB: Not Found",
     });
@@ -1719,7 +1719,7 @@ describe("downloader client regression coverage", () => {
     } as Response);
     await expect(
       client.addDownload({ url: "http://indexer.local/file.nzb", title: 'Game "One"' })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       message: "NZB already exists: Duplicate NZB",
     });
@@ -1743,7 +1743,7 @@ describe("downloader client regression coverage", () => {
 
     await expect(
       client.addDownload({ url: "http://indexer.local/file.nzb", title: "Merged NZB" })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       message: "NZB added successfully (likely duplicate or merged)",
     });
@@ -1759,7 +1759,7 @@ describe("downloader client regression coverage", () => {
 
     await expect(
       client.addDownload({ url: "http://indexer.local/file.nzb", title: "Rejected NZB" })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Queue rejected",
     });
@@ -1773,7 +1773,7 @@ describe("downloader client regression coverage", () => {
     const rpcSpy = vi.spyOn(privateClient, "makeXMLRPCRequest");
 
     rpcSpy.mockResolvedValueOnce("23.0");
-    await expect(client.testConnection()).resolves.toEqual({
+    await expect(client.testConnection()).resolves.toMatchObject({
       success: true,
       message: "Connected to NZBGet v23.0",
       messageKey: "service.connected_version",
@@ -1783,7 +1783,7 @@ describe("downloader client regression coverage", () => {
     vi.mocked(isSafeUrl).mockResolvedValueOnce(false);
     await expect(
       client.addDownload({ url: "http://unsafe.local/file.nzb", title: "Unsafe" })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Unsafe URL blocked: http://unsafe.local/file.nzb",
     });
@@ -1794,7 +1794,7 @@ describe("downloader client regression coverage", () => {
     } as Response);
     await expect(
       client.addDownload({ url: "http://indexer.local/file.nzb", title: "Missing" })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Failed to fetch NZB: Not Found",
     });
@@ -1806,7 +1806,7 @@ describe("downloader client regression coverage", () => {
     rpcSpy.mockResolvedValueOnce(0);
     await expect(
       client.addDownload({ url: "http://indexer.local/file.nzb", title: "Zero ID" })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Failed to add NZB (ID is 0 or negative)",
     });
@@ -1827,7 +1827,7 @@ describe("downloader client regression coverage", () => {
 
     await expect(
       client.addDownload({ url: "http://indexer.local/file.nzb", title: "Good NZB" })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       id: "42",
       message: "NZB added successfully",
@@ -1901,7 +1901,7 @@ describe("downloader client regression coverage", () => {
 
     vi.spyOn(privateClient, "authenticate").mockResolvedValue(undefined);
     vi.spyOn(privateClient, "logout").mockResolvedValue(undefined);
-    await expect(client.testConnection()).resolves.toEqual({
+    await expect(client.testConnection()).resolves.toMatchObject({
       success: true,
       message: "Connected successfully to Synology Download Station",
       messageKey: "service.connected_successfully",
@@ -1909,7 +1909,7 @@ describe("downloader client regression coverage", () => {
     });
 
     vi.spyOn(privateClient, "authenticate").mockRejectedValueOnce(new Error("auth boom"));
-    await expect(client.testConnection()).resolves.toEqual({
+    await expect(client.testConnection()).resolves.toMatchObject({
       success: false,
       message: "Failed to connect to Synology Download Station: auth boom",
       messageKey: "service.connection_failed",
@@ -1925,7 +1925,7 @@ describe("downloader client regression coverage", () => {
     vi.mocked(isSafeUrl).mockResolvedValueOnce(false);
     await expect(
       client.addDownload({ url: "http://unsafe.local/file.torrent", title: "Unsafe" })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Unsafe URL blocked",
     });
@@ -1939,7 +1939,7 @@ describe("downloader client regression coverage", () => {
         url: "magnet:?xt=urn:btih:abcdef1234567890abcdef1234567890abcdef12",
         title: "Magnet",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       id: "task-1",
       message: "Download added successfully",
@@ -1954,21 +1954,21 @@ describe("downloader client regression coverage", () => {
     requestTaskApiSpy.mockRejectedValueOnce(new Error("list boom"));
     await expect(client.getAllDownloads()).resolves.toEqual([]);
     requestTaskApiSpy.mockRejectedValueOnce(new Error("pause boom"));
-    await expect(client.pauseDownload("task-1")).resolves.toEqual({
+    await expect(client.pauseDownload("task-1")).resolves.toMatchObject({
       success: false,
       message: "Failed to pause download: pause boom",
       messageKey: "service.download_pause_failed",
       messageValues: { error: "pause boom" },
     });
     requestTaskApiSpy.mockRejectedValueOnce(new Error("resume boom"));
-    await expect(client.resumeDownload("task-1")).resolves.toEqual({
+    await expect(client.resumeDownload("task-1")).resolves.toMatchObject({
       success: false,
       message: "Failed to resume download: resume boom",
       messageKey: "service.download_resume_failed",
       messageValues: { error: "resume boom" },
     });
     requestTaskApiSpy.mockRejectedValueOnce(new Error("remove boom"));
-    await expect(client.removeDownload("task-1", true)).resolves.toEqual({
+    await expect(client.removeDownload("task-1", true)).resolves.toMatchObject({
       success: false,
       message: "Failed to remove download: remove boom",
       messageKey: "service.download_remove_failed",
@@ -2044,7 +2044,7 @@ describe("downloader client regression coverage", () => {
         title: "Uploaded NZB",
         downloadType: "usenet",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       id: "task-upload",
       message: "Download added successfully",

@@ -75,13 +75,7 @@ const GameCard = ({
     getRegionalLocale(regionalPreference) ?? Intl.DateTimeFormat().resolvedOptions().locale;
   const regionalDirection = getRegionalDirection(regionalLocale);
   const formatGameCardAttribute = (source: string, values: Record<string, string | number>) => {
-    const attributeValues =
-      directionFor(source) === "rtl"
-        ? values
-        : Object.fromEntries(
-            Object.entries(values).map(([name, value]) => [name, `\u2068${String(value)}\u2069`])
-          );
-    return formatInterfaceMessage(source, attributeValues, language);
+    return formatInterfaceMessage(source, values, language);
   };
 
   // Keep track of the resolved game object (either original or newly added)

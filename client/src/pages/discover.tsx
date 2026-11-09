@@ -534,7 +534,7 @@ export default function DiscoverPage() {
       if (result.errorCount === 0) setBulkSelection(new Map());
       toast({
         description: formatInterfaceMessage(
-          "Bulk add finished: {added} added, {duplicates} already in your library, {errors} failed.",
+          "interface.bulk_add_finished_added_added_duplic_1a7a95d7",
           {
             added: result.addedCount,
             duplicates: result.duplicateCount,
@@ -546,7 +546,7 @@ export default function DiscoverPage() {
     },
     onError: (error) => {
       toast({
-        description: error.message || t("Failed to add selected games"),
+        description: error.message || t("interface.failed_to_add_selected_games_b875e5bc"),
         variant: "destructive",
       });
     },
@@ -857,10 +857,12 @@ export default function DiscoverPage() {
             <div className="flex flex-col gap-3 rounded-lg border bg-card p-3 sm:flex-row sm:items-center sm:justify-between">
               <p
                 className="text-sm font-medium"
-                lang={languageFor("{count} games selected")}
-                dir={directionFor("{count} games selected")}
+                lang={languageFor("interface.count_games_selected_850a42bc")}
+                dir={directionFor("interface.count_games_selected_850a42bc")}
               >
-                {formatInterfaceMessage("{count} games selected", { count: bulkSelection.size })}
+                {formatInterfaceMessage("interface.count_games_selected_850a42bc", {
+                  count: bulkSelection.size,
+                })}
               </p>
               <div className="flex gap-2">
                 <Button
@@ -868,14 +870,14 @@ export default function DiscoverPage() {
                   onClick={() => setBulkConfirmOpen(true)}
                   disabled={bulkAddMutation.isPending}
                 >
-                  <InterfaceText source="Add selected to Wanted" />
+                  <InterfaceText source="interface.add_selected_to_wanted_9ff97dbd" />
                 </Button>
                 <Button
                   variant="ghost"
                   onClick={() => setBulkSelection(new Map())}
                   disabled={bulkAddMutation.isPending}
                 >
-                  <InterfaceText source="Clear selection" />
+                  <InterfaceText source="interface.clear_selection_50a6b1e0" />
                 </Button>
               </div>
             </div>
@@ -885,10 +887,10 @@ export default function DiscoverPage() {
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>
-                  <InterfaceText source="Add selected games to Wanted?" />
+                  <InterfaceText source="interface.add_selected_games_to_wanted_53ad2097" />
                 </DialogTitle>
                 <DialogDescription>
-                  <InterfaceText source="This adds the selected games to Wanted and will not start downloads." />
+                  <InterfaceText source="interface.this_adds_the_selected_games_to_want_e430b3e9" />
                 </DialogDescription>
               </DialogHeader>
               <ul className="max-h-48 space-y-1 overflow-y-auto rounded-md border p-3 text-sm">
@@ -899,7 +901,9 @@ export default function DiscoverPage() {
                 ))}
                 {bulkSelection.size > 10 && (
                   <li className="text-muted-foreground">
-                    {formatInterfaceMessage("and {count} more", { count: bulkSelection.size - 10 })}
+                    {formatInterfaceMessage("interface.and_count_more_bdb1ff6a", {
+                      count: bulkSelection.size - 10,
+                    })}
                   </li>
                 )}
               </ul>
@@ -921,7 +925,7 @@ export default function DiscoverPage() {
                       <InterfaceText source="interface.adding_2de56c1a" />
                     </>
                   ) : (
-                    <InterfaceText source="Add selected" />
+                    <InterfaceText source="interface.add_selected_1d8f8b75" />
                   )}
                 </Button>
               </DialogFooter>

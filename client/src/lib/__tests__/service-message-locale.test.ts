@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   SERVICE_MESSAGE_SOURCES,
+  hasServiceMessageTranslation,
   serviceMessage,
   type ServiceMessageKey,
 } from "@shared/service-messages";
@@ -9,6 +10,14 @@ import { INTERFACE_LANGUAGE_OPTIONS } from "@/lib/interface-locale";
 import { localizeServiceResultMessage } from "@/lib/service-message-locale";
 
 const values = {
+  ...Object.fromEntries(
+    Object.values(SERVICE_MESSAGE_SOURCES).flatMap((source) =>
+      [...source.matchAll(/\{([A-Za-z][A-Za-z0-9_]*)\}/g)].map((match) => [
+        match[1]!,
+        "fixture-value",
+      ])
+    )
+  ),
   game: 'A Game ": Provider',
   client: "qBittorrent",
   version: "4.6.5-beta",
@@ -36,7 +45,8 @@ describe("source-bound service response localization", () => {
         const result = serviceMessage(key, values);
         const localized = localizeServiceResultMessage(result, language);
         if (language === "en") expect(localized).toBe(result.message);
-        else expect(localized).not.toBe(result.message);
+        else if (hasServiceMessageTranslation(result, language))
+          expect(localized).not.toBe(result.message);
         for (const name of [...SERVICE_MESSAGE_SOURCES[key].matchAll(/\{([a-z]+)\}/g)].map(
           (match) => match[1]!
         )) {

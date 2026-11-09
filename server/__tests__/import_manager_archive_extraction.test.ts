@@ -254,7 +254,8 @@ describe("ImportManager archive extraction (library-side)", () => {
     expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
       "dl-1",
       "manual_review_required",
-      expect.stringContaining("disk full")
+      expect.stringContaining("disk full"),
+      expect.toSatisfy((metadata) => metadata === null || typeof metadata === "object")
     );
 
     copySpy.mockRestore();

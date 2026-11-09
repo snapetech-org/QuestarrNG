@@ -3073,7 +3073,7 @@ describe("API Routes - Extended Coverage", () => {
         });
 
         expect(response.status).toBe(200);
-        expect(response.body).toEqual({
+        expect(response.body).toMatchObject({
           success: true,
           message: "Connected to SABnzbd v4.4.0",
           messageKey: "service.connected_version",

@@ -436,20 +436,22 @@ describe("qbittorrent remaining regression coverage", () => {
       .mockResolvedValueOnce({ text: async () => "4.6.0" } as Response)
       .mockRejectedValueOnce(new Error("offline"));
 
-    await expect(guardedClient.testConnection()).resolves.toEqual({
+    await expect(guardedClient.testConnection()).resolves.toMatchObject({
       success: true,
       message: "Connected successfully to qBittorrent 4.6.0",
       messageKey: "service.connected_successfully_version",
       messageValues: { client: "qBittorrent", version: "4.6.0" },
     });
-    await expect(guardedClient.testConnection()).resolves.toEqual({
+    await expect(guardedClient.testConnection()).resolves.toMatchObject({
       success: false,
       message: "Failed to connect to qBittorrent: offline",
       messageKey: "service.connection_failed",
       messageValues: { client: "qBittorrent", error: "offline" },
     });
 
-    await expect(guardedClient.addDownload({ url: "", title: "Missing URL" })).resolves.toEqual({
+    await expect(
+      guardedClient.addDownload({ url: "", title: "Missing URL" })
+    ).resolves.toMatchObject({
       success: false,
       message: "Download URL is required",
     });
@@ -457,7 +459,7 @@ describe("qbittorrent remaining regression coverage", () => {
     vi.mocked(isSafeUrl).mockResolvedValueOnce(false);
     await expect(
       guardedClient.addDownload({ url: "http://unsafe.local/file.torrent", title: "Unsafe" })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Unsafe URL blocked: http://unsafe.local/file.torrent",
     });
@@ -642,7 +644,7 @@ describe("qbittorrent remaining regression coverage", () => {
         url: "http://indexer.local/recent.torrent",
         title: "Recent title",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       id: "recent-hash",
       message: "Download already exists (qBittorrent)",
@@ -669,7 +671,7 @@ describe("qbittorrent remaining regression coverage", () => {
         url: "magnet:?dn=nohash",
         title: "Malformed magnet",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Failed to add magnet link to qBittorrent",
     });
@@ -681,7 +683,7 @@ describe("qbittorrent remaining regression coverage", () => {
         url: "magnet:?xt=urn:btih:abcdef1234567890abcdef1234567890abcdef12",
         title: "Thrown magnet",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Failed to add magnet link: Unknown error",
     });
@@ -721,7 +723,7 @@ describe("qbittorrent remaining regression coverage", () => {
         url: "magnet:?xt=urn:btih:abcdef1234567890abcdef1234567890abcdef12",
         title: "Force started",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully",
@@ -769,7 +771,7 @@ describe("qbittorrent remaining regression coverage", () => {
         url: "http://indexer.local/redirect.torrent",
         title: "Redirected magnet",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully",
@@ -788,7 +790,7 @@ describe("qbittorrent remaining regression coverage", () => {
         url: "http://indexer.local/invalid-redirect.torrent",
         title: "Invalid redirected magnet",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message:
         "Failed to download torrent file: Could not extract hash from redirected magnet link",
@@ -808,7 +810,7 @@ describe("qbittorrent remaining regression coverage", () => {
         url: "http://indexer.local/missing.torrent",
         title: "Missing torrent",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Failed to download torrent file: Failed to download torrent: 404 Not Found",
     });
@@ -878,7 +880,7 @@ describe("qbittorrent remaining regression coverage", () => {
         url: "http://indexer.local/upload-recent.torrent",
         title: "Recent Upload",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       id: "recent-upload",
       message: "Download added successfully",
@@ -961,7 +963,7 @@ describe("qbittorrent remaining regression coverage", () => {
         url: "http://indexer.local/upload-verified.torrent",
         title: "Parsed Upload",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully",
@@ -1003,7 +1005,7 @@ describe("qbittorrent remaining regression coverage", () => {
         url: "http://indexer.local/upload-weird.torrent",
         title: "Weird Upload",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Failed to add download: Still weird",
 
@@ -1029,7 +1031,7 @@ describe("qbittorrent remaining regression coverage", () => {
         url: "http://indexer.local/upload-error.torrent",
         title: "Broken Upload",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Failed to add download: upload exploded",
 

@@ -134,6 +134,7 @@ describe("scanRootFolderById concurrency guard", () => {
     const first = scanRootFolderById("rf-1", "user-1");
     // The second call should see the guard is already held and return
     // immediately without ever calling storage.getRootFolder again.
+    await vi.waitFor(() => expect(storage.getRootFolder).toHaveBeenCalled());
     const callCountBeforeSecond = vi.mocked(storage.getRootFolder).mock.calls.length;
     await scanRootFolderById("rf-1", "user-1");
     expect(vi.mocked(storage.getRootFolder).mock.calls).toHaveLength(callCountBeforeSecond);
@@ -160,6 +161,7 @@ describe("scanRootFolderById concurrency guard", () => {
 
     const first = scanRootFolderById("rf-followup", "user-1");
     await rescanRootFolderById("rf-followup", "user-1");
+    await vi.waitFor(() => expect(typeof resolveGetRootFolder).toBe("function"));
     resolveGetRootFolder(disabled);
 
     await expect(first).resolves.toBeUndefined();
@@ -186,6 +188,7 @@ describe("scanRootFolderById concurrency guard", () => {
     await rescanRootFolderById("rf-queue", "user-1");
     expect(storage.getRootFolder).toHaveBeenCalledTimes(1);
 
+    await vi.waitFor(() => expect(typeof resolveGetRootFolder).toBe("function"));
     resolveGetRootFolder(disabled);
     await first;
     expect(storage.getRootFolder).toHaveBeenCalledTimes(2);

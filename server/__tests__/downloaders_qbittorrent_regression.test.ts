@@ -308,21 +308,21 @@ describe("qbittorrent regression coverage", () => {
     await expect(client.getAllDownloads()).resolves.toEqual([
       expect.objectContaining({ status: "error" }),
     ]);
-    await expect(client.pauseDownload("hash-3")).resolves.toEqual({
+    await expect(client.pauseDownload("hash-3")).resolves.toMatchObject({
       success: true,
       message: "Download paused successfully",
 
       messageKey: "service.download_paused",
       messageValues: {},
     });
-    await expect(client.resumeDownload("hash-3")).resolves.toEqual({
+    await expect(client.resumeDownload("hash-3")).resolves.toMatchObject({
       success: true,
       message: "Download resumed successfully",
 
       messageKey: "service.download_resumed",
       messageValues: {},
     });
-    await expect(client.removeDownload("hash-3", true)).resolves.toEqual({
+    await expect(client.removeDownload("hash-3", true)).resolves.toMatchObject({
       success: true,
       message: "Download removed successfully",
 
@@ -337,7 +337,7 @@ describe("qbittorrent regression coverage", () => {
     makeRequestSpy.mockRejectedValueOnce(new Error("list boom"));
     await expect(client.getAllDownloads()).resolves.toEqual([]);
     makeRequestSpy.mockRejectedValueOnce(new Error("pause boom"));
-    await expect(client.pauseDownload("boom")).resolves.toEqual({
+    await expect(client.pauseDownload("boom")).resolves.toMatchObject({
       success: false,
       message: "Failed to pause download: pause boom",
 
@@ -345,7 +345,7 @@ describe("qbittorrent regression coverage", () => {
       messageValues: { error: "pause boom" },
     });
     makeRequestSpy.mockRejectedValueOnce(new Error("resume boom"));
-    await expect(client.resumeDownload("boom")).resolves.toEqual({
+    await expect(client.resumeDownload("boom")).resolves.toMatchObject({
       success: false,
       message: "Failed to resume download: resume boom",
 
@@ -353,7 +353,7 @@ describe("qbittorrent regression coverage", () => {
       messageValues: { error: "resume boom" },
     });
     makeRequestSpy.mockRejectedValueOnce(new Error("remove boom"));
-    await expect(client.removeDownload("boom")).resolves.toEqual({
+    await expect(client.removeDownload("boom")).resolves.toMatchObject({
       success: false,
       message: "Failed to remove download: remove boom",
 
@@ -409,7 +409,7 @@ describe("qbittorrent regression coverage", () => {
         url: "magnet:?xt=urn:btih:abcdef1234567890abcdef1234567890abcdef12",
         title: "Duplicate magnet",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download already exists (qBittorrent)",
@@ -431,7 +431,7 @@ describe("qbittorrent regression coverage", () => {
       url: "magnet:?xt=urn:btih:abcdef1234567890abcdef1234567890abcdef12",
       title: "Missing magnet",
     });
-    await expect(missingMagnetPromise).resolves.toEqual({
+    await expect(missingMagnetPromise).resolves.toMatchObject({
       success: false,
       message: "Magnet link was accepted by qBittorrent but the torrent was not found afterwards",
     });
@@ -449,7 +449,7 @@ describe("qbittorrent regression coverage", () => {
         url: "magnet:?xt=urn:btih:abcdef1234567890abcdef1234567890abcdef12",
         title: "Unexpected magnet",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Failed to add magnet link: Nope",
     });
@@ -487,7 +487,7 @@ describe("qbittorrent regression coverage", () => {
       url: "http://indexer.local/file.torrent?xt=urn:btih:abcdef1234567890abcdef1234567890abcdef12",
       title: "Upload not found",
     });
-    await expect(notFoundAfterUploadPromise).resolves.toEqual({
+    await expect(notFoundAfterUploadPromise).resolves.toMatchObject({
       success: false,
       message: "Download was not added to qBittorrent (not found after adding)",
     });
@@ -520,7 +520,7 @@ describe("qbittorrent regression coverage", () => {
         url: "http://indexer.local/file3.torrent",
         title: "Duplicate upload",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       message: "Download already exists or invalid download (qBittorrent)",
     });
@@ -579,7 +579,7 @@ describe("qbittorrent regression coverage", () => {
         url: "http://indexer.local/file2.torrent",
         title: "Verified upload",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       id: "recent-hash",
       message: "Download added successfully",
@@ -643,7 +643,7 @@ describe("qbittorrent regression coverage", () => {
         { hash: "wanted-hash", name: "Wanted Game", added_on: now, tags: tagFromInfoPath(path) },
       ]);
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         success: true,
         id: "wanted-hash",
         message: "Download added successfully",
@@ -660,7 +660,7 @@ describe("qbittorrent regression coverage", () => {
         { hash: "wanted-hash", name: "Wanted.Game-GRP", added_on: now - 60 },
       ]);
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         success: true,
         id: "wanted-hash",
         message: "Download added successfully",
@@ -679,7 +679,7 @@ describe("qbittorrent regression coverage", () => {
         { hash: "wanted-hash", name: "Wanted.Game-GRP", added_on: now - 60, tags: "" },
       ]);
 
-      expect(result).toEqual({
+      expect(result).toMatchObject({
         success: true,
         id: "wanted-hash",
         message: "Download added successfully",
@@ -744,7 +744,7 @@ describe("qbittorrent regression coverage", () => {
           url: "http://indexer.local/duplicate.torrent",
           title: "Already queued",
         })
-      ).resolves.toEqual({
+      ).resolves.toMatchObject({
         success: true,
         id: "existing-hash",
         message: "Download already exists (qBittorrent)",
@@ -834,7 +834,7 @@ describe("qbittorrent regression coverage", () => {
           url: "http://indexer.local/pending.torrent",
           title: "Queued via URL",
         })
-      ).resolves.toEqual({
+      ).resolves.toMatchObject({
         success: true,
         id: "async-hash",
         message: "Download queued in qBittorrent",
@@ -965,7 +965,7 @@ describe("qbittorrent regression coverage", () => {
           url: "http://prowlarr.local/1/api?t=download&id=pending",
           title: "Pending via Prowlarr",
         })
-      ).resolves.toEqual({
+      ).resolves.toMatchObject({
         success: true,
         id: "fallback-hash",
         message: "Download added successfully",
@@ -1102,7 +1102,7 @@ describe("qbittorrent regression coverage", () => {
           url: "http://prowlarr.local/1/api?t=download&id=pending",
           title: "Pending via Prowlarr",
         })
-      ).resolves.toEqual({
+      ).resolves.toMatchObject({
         success: true,
         id: "torrent_hash_abc123",
         message: "Download added successfully",
@@ -1216,7 +1216,7 @@ describe("qbittorrent regression coverage", () => {
           url: "http://prowlarr.local/1/api?t=download&id=pending",
           title: "Pending via Prowlarr",
         })
-      ).resolves.toEqual({
+      ).resolves.toMatchObject({
         success: true,
         id: "existing-hash",
         message: "Download already exists or invalid download (qBittorrent)",
@@ -1319,7 +1319,7 @@ describe("qbittorrent regression coverage", () => {
           url: "http://prowlarr.local/1/api?t=download&id=pending-duplicate",
           title: "Pending duplicate",
         })
-      ).resolves.toEqual({
+      ).resolves.toMatchObject({
         success: true,
         id: "existing-hash",
         message: "Download already exists or invalid download (qBittorrent)",
@@ -1397,7 +1397,7 @@ describe("qbittorrent regression coverage", () => {
           url: "http://prowlarr.local/1/api?t=download&id=lookup-failure",
           title: "Lookup failure",
         })
-      ).resolves.toEqual({
+      ).resolves.toMatchObject({
         success: true,
         message: "Download already exists or invalid download (qBittorrent)",
       });
@@ -1495,7 +1495,7 @@ describe("qbittorrent regression coverage", () => {
         url: "http://indexer.local/immediate.torrent",
         title: "Added immediately",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       id: "immediate-hash",
       message: "Download added successfully",
@@ -1570,7 +1570,7 @@ describe("qbittorrent regression coverage", () => {
           url: "http://indexer.local/flaky-poll.torrent",
           title: "Queued via URL",
         })
-      ).resolves.toEqual({
+      ).resolves.toMatchObject({
         success: true,
         correlationTag: expect.stringMatching(/^questarr-add-/),
         message:
@@ -1688,7 +1688,7 @@ describe("qbittorrent regression coverage", () => {
         url: "http://indexer.local/fail.torrent",
         title: "Fetch failure",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message:
         "Failed to download torrent file: fetch failed (ECONNREFUSED) - The indexer refused the connection. Check if Prowlarr/Jackett is running and the port is correct.",

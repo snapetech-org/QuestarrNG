@@ -3110,6 +3110,57 @@ export const STABLE_INTERFACE_MESSAGES = {
   "service.telemetry_report_unavailable": "This report is no longer available.",
   "service.notification_telemetry_failed":
     "Questarr detected an error but could not send the automatic diagnostic report ({detail}).",
+  "interface.remove_title_from_bulk_selection_f1fed14f": "Remove {title} from bulk selection",
+  "interface.select_title_for_bulk_add_0d91687d": "Select {title} for bulk add",
+  "interface.export_failed_b55b9c48": "Export failed",
+  "interface.failed_to_export_game_library_4b336e3a": "Failed to export game library",
+  "interface.catalog_is_too_large_21f71c31": "Catalog is too large",
+  "interface.choose_a_questarrng_library_export_s_770b0a36":
+    "Choose a QuestarrNG library export smaller than 4 MB.",
+  "interface.could_not_preview_catalog_e6b80188": "Could not preview catalog",
+  "interface.choose_a_valid_questarrng_library_ex_1f955936":
+    "Choose a valid QuestarrNG library export.",
+  "interface.import_finished_with_errors_2faef4d1": "Import finished with errors",
+  "interface.import_complete_5d213773": "Import complete",
+  "interface.import_failed_9ffdaa11": "Import failed",
+  "interface.failed_to_import_game_library_69bc6263": "Failed to import game library",
+  "interface.questarrng_library_json_110d6252": "QuestarrNG library JSON",
+  "interface.move_your_tracked_game_collection_be_215ab4d0":
+    "Move your tracked game collection between QuestarrNG installs. The export contains game metadata and your status and rating; it does not contain files, server paths, downloads, or credentials.",
+  "interface.export_library_8b979f34": "Export library",
+  "interface.import_a_questarrng_library_json_fil_79fa1c10":
+    "Import a QuestarrNG library JSON file",
+  "interface.import_adds_new_games_only_existing__90fa4e6e":
+    "Import adds new games only. Existing entries are detected by provider ID or normalized title and release date; downloads are never started.",
+  "interface.working_c08b976a": "Working…",
+  "interface.total_entries_d34a593d": "Total entries",
+  "interface.new_games_to_add_c5c984d4": "New games to add",
+  "interface.duplicates_to_skip_a0f1db2b": "Duplicates to skip",
+  "interface.will_add_20dd8562": "Will add",
+  "interface.will_skip_as_duplicates_8ea1219a": "Will skip as duplicates",
+  "interface.import_new_games_60bdb9d5": "Import new games",
+  "interface.library_interchange_ca5462ae": "Library Interchange",
+  "interface.bulk_add_finished_added_added_duplic_1a7a95d7":
+    "Bulk add finished: {added} added, {duplicates} already in your library, {errors} failed.",
+  "interface.failed_to_add_selected_games_b875e5bc": "Failed to add selected games",
+  "interface.count_games_selected_850a42bc": "{count} games selected",
+  "interface.add_selected_to_wanted_9ff97dbd": "Add selected to Wanted",
+  "interface.clear_selection_50a6b1e0": "Clear selection",
+  "interface.add_selected_games_to_wanted_53ad2097": "Add selected games to Wanted?",
+  "interface.this_adds_the_selected_games_to_want_e430b3e9":
+    "This adds the selected games to Wanted and will not start downloads.",
+  "interface.and_count_more_bdb1ff6a": "and {count} more",
+  "interface.add_selected_1d8f8b75": "Add selected",
+  "interface.enter_qbittorrent_api_key_2cbb2d8e": "Enter qBittorrent API key",
+  "interface.requires_qbittorrent_5_2_0_web_api_2_dec750e2":
+    "Requires qBittorrent 5.2.0 / Web API 2.14.1+. Invalid keys fail without falling back to a password session.",
+  "interface.use_bearer_api_key_ed2d6926": "Use Bearer API key",
+  "interface.for_qbittorrent_5_2_0_web_api_2_14_1_f59cbb0f":
+    "For qBittorrent 5.2.0 / Web API 2.14.1+. When enabled, the Password field is treated as the API key.",
+  "interface.fill_missing_game_details_from_igdb__21c3c8df":
+    "Fill missing game details from IGDB. Existing metadata is preserved unless you enable overwrite.",
+  "interface.replace_existing_metadata_c5d447c5": "Replace existing metadata",
+  "interface.groups_ready_to_link_count_29cbe906": "Groups ready to link: {count}",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

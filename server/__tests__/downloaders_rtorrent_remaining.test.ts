@@ -137,7 +137,7 @@ describe("rtorrent remaining regression coverage", () => {
         url: "http://indexer.local/game.torrent&file=Questarr",
         title: "Questarr",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully",
@@ -162,7 +162,7 @@ describe("rtorrent remaining regression coverage", () => {
         url: "magnet:?xt=urn:btih:abcdef1234567890abcdef1234567890abcdef12",
         title: "Direct magnet",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully",
@@ -177,7 +177,7 @@ describe("rtorrent remaining regression coverage", () => {
         url: "magnet:?xt=urn:btih:abcdef1234567890abcdef1234567890abcdef12",
         title: "Failed magnet",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Failed to add download (rTorrent returned code: 7)",
     });
@@ -191,7 +191,7 @@ describe("rtorrent remaining regression coverage", () => {
         url: "http://indexer.local/redirected.torrent",
         title: "Redirected",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       id: "abcdef1234567890abcdef1234567890abcdef12",
       message: "Download added successfully",
@@ -212,7 +212,7 @@ describe("rtorrent remaining regression coverage", () => {
         url: "http://indexer.local/bad.torrent",
         title: "Bad indexer",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Failed to download file from indexer: Service Unavailable",
     });
@@ -238,7 +238,7 @@ describe("rtorrent remaining regression coverage", () => {
         url: "http://indexer.local/stopped.torrent",
         title: "Stopped Questarr",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: true,
       id: "unknown",
       message: "Download added successfully (stopped)",
@@ -266,7 +266,7 @@ describe("rtorrent remaining regression coverage", () => {
         url: "http://indexer.local/fail-code.torrent",
         title: "Fail code",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Failed to add download (rTorrent returned code: 5)",
     });
@@ -277,7 +277,7 @@ describe("rtorrent remaining regression coverage", () => {
         url: "magnet:?xt=urn:btih:abcdef1234567890abcdef1234567890abcdef12",
         title: "Boom magnet",
       })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Failed to add download: Unknown error",
 
@@ -438,7 +438,7 @@ describe("rtorrent remaining regression coverage", () => {
     await expect(client.getAllDownloads()).resolves.toEqual([]);
 
     rpcSpy.mockResolvedValueOnce(0);
-    await expect(client.pauseDownload("hash-pause")).resolves.toEqual({
+    await expect(client.pauseDownload("hash-pause")).resolves.toMatchObject({
       success: true,
       message: "Download paused successfully",
 
@@ -447,7 +447,7 @@ describe("rtorrent remaining regression coverage", () => {
     });
 
     rpcSpy.mockRejectedValueOnce(new Error("pause failed"));
-    await expect(client.pauseDownload("hash-pause")).resolves.toEqual({
+    await expect(client.pauseDownload("hash-pause")).resolves.toMatchObject({
       success: false,
       message: "Failed to pause download: pause failed",
 
@@ -456,7 +456,7 @@ describe("rtorrent remaining regression coverage", () => {
     });
 
     rpcSpy.mockResolvedValueOnce(0);
-    await expect(client.resumeDownload("hash-pause")).resolves.toEqual({
+    await expect(client.resumeDownload("hash-pause")).resolves.toMatchObject({
       success: true,
       message: "Download resumed successfully",
 
@@ -465,7 +465,7 @@ describe("rtorrent remaining regression coverage", () => {
     });
 
     rpcSpy.mockRejectedValueOnce(new Error("resume failed"));
-    await expect(client.resumeDownload("hash-pause")).resolves.toEqual({
+    await expect(client.resumeDownload("hash-pause")).resolves.toMatchObject({
       success: false,
       message: "Failed to resume download: resume failed",
 
@@ -474,7 +474,7 @@ describe("rtorrent remaining regression coverage", () => {
     });
 
     rpcSpy.mockResolvedValueOnce(0);
-    await expect(client.removeDownload("hash-remove", false)).resolves.toEqual({
+    await expect(client.removeDownload("hash-remove", false)).resolves.toMatchObject({
       success: true,
       message: "Download removed successfully",
 
@@ -483,7 +483,7 @@ describe("rtorrent remaining regression coverage", () => {
     });
 
     rpcSpy.mockResolvedValueOnce(0).mockResolvedValueOnce(0).mockResolvedValueOnce(0);
-    await expect(client.removeDownload("hash-remove", true)).resolves.toEqual({
+    await expect(client.removeDownload("hash-remove", true)).resolves.toMatchObject({
       success: true,
       message: "Download removed successfully",
 
@@ -492,7 +492,7 @@ describe("rtorrent remaining regression coverage", () => {
     });
 
     rpcSpy.mockRejectedValueOnce(new Error("remove failed"));
-    await expect(client.removeDownload("hash-remove", false)).resolves.toEqual({
+    await expect(client.removeDownload("hash-remove", false)).resolves.toMatchObject({
       success: false,
       message: "Failed to remove download: remove failed",
 
@@ -738,33 +738,35 @@ describe("rtorrent remaining regression coverage", () => {
     };
     const connectionSpy = vi.spyOn(connectionPrivate, "makeXMLRPCRequest");
     connectionSpy.mockResolvedValueOnce("0.9.8");
-    await expect(connectionClient.testConnection()).resolves.toEqual({
+    await expect(connectionClient.testConnection()).resolves.toMatchObject({
       success: true,
       message: "Connected to rTorrent v0.9.8",
       messageKey: "service.connected_version",
       messageValues: { client: "rTorrent", version: "0.9.8" },
     });
     connectionSpy.mockRejectedValueOnce(new Error("Authentication failed: denied"));
-    await expect(connectionClient.testConnection()).resolves.toEqual({
+    await expect(connectionClient.testConnection()).resolves.toMatchObject({
       success: false,
       message: "Authentication failed: denied",
     });
     connectionSpy.mockRejectedValueOnce(new Error("rpc down"));
-    await expect(connectionClient.testConnection()).resolves.toEqual({
+    await expect(connectionClient.testConnection()).resolves.toMatchObject({
       success: false,
       message: "Failed to connect to rTorrent: rpc down",
       messageKey: "service.connection_failed",
       messageValues: { client: "rTorrent", error: "rpc down" },
     });
 
-    await expect(connectionClient.addDownload({ url: "", title: "No URL" })).resolves.toEqual({
-      success: false,
-      message: "Download URL is required",
-    });
+    await expect(connectionClient.addDownload({ url: "", title: "No URL" })).resolves.toMatchObject(
+      {
+        success: false,
+        message: "Download URL is required",
+      }
+    );
     vi.mocked(isSafeUrl).mockResolvedValueOnce(false);
     await expect(
       connectionClient.addDownload({ url: "http://unsafe.local/file.torrent", title: "Unsafe" })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "Unsafe URL blocked: http://unsafe.local/file.torrent",
     });

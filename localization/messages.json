@@ -49227,6 +49227,785 @@
         "vi": "Questarr đã phát hiện lỗi nhưng không thể gửi báo cáo chẩn đoán tự động ({detail}).",
         "id": "Questarr mendeteksi kesalahan tetapi tidak dapat mengirim laporan diagnostik otomatis ({detail})."
       }
+    },
+    "interface.remove_title_from_bulk_selection_f1fed14f": {
+      "source": "Remove {title} from bulk selection",
+      "translations": {
+        "es": "Remove {title} from bulk selection",
+        "es-419": "Remove {title} from bulk selection",
+        "zh-Hans": "Remove {title} from bulk selection",
+        "hi": "Remove {title} from bulk selection",
+        "de": "Remove {title} from bulk selection",
+        "ja": "Remove {title} from bulk selection",
+        "fr": "Remove {title} from bulk selection",
+        "fr-CA": "Remove {title} from bulk selection",
+        "pt-BR": "Remove {title} from bulk selection",
+        "ar": "Remove {title} from bulk selection",
+        "ko": "Remove {title} from bulk selection",
+        "zh-Hant": "Remove {title} from bulk selection",
+        "vi": "Remove {title} from bulk selection",
+        "id": "Remove {title} from bulk selection"
+      }
+    },
+    "interface.select_title_for_bulk_add_0d91687d": {
+      "source": "Select {title} for bulk add",
+      "translations": {
+        "es": "Select {title} for bulk add",
+        "es-419": "Select {title} for bulk add",
+        "zh-Hans": "Select {title} for bulk add",
+        "hi": "Select {title} for bulk add",
+        "de": "Select {title} for bulk add",
+        "ja": "Select {title} for bulk add",
+        "fr": "Select {title} for bulk add",
+        "fr-CA": "Select {title} for bulk add",
+        "pt-BR": "Select {title} for bulk add",
+        "ar": "Select {title} for bulk add",
+        "ko": "Select {title} for bulk add",
+        "zh-Hant": "Select {title} for bulk add",
+        "vi": "Select {title} for bulk add",
+        "id": "Select {title} for bulk add"
+      }
+    },
+    "interface.export_failed_b55b9c48": {
+      "source": "Export failed",
+      "translations": {
+        "es": "Export failed",
+        "es-419": "Export failed",
+        "zh-Hans": "Export failed",
+        "hi": "Export failed",
+        "de": "Export failed",
+        "ja": "Export failed",
+        "fr": "Export failed",
+        "fr-CA": "Export failed",
+        "pt-BR": "Export failed",
+        "ar": "Export failed",
+        "ko": "Export failed",
+        "zh-Hant": "Export failed",
+        "vi": "Export failed",
+        "id": "Export failed"
+      }
+    },
+    "interface.failed_to_export_game_library_4b336e3a": {
+      "source": "Failed to export game library",
+      "translations": {
+        "es": "Failed to export game library",
+        "es-419": "Failed to export game library",
+        "zh-Hans": "Failed to export game library",
+        "hi": "Failed to export game library",
+        "de": "Failed to export game library",
+        "ja": "Failed to export game library",
+        "fr": "Failed to export game library",
+        "fr-CA": "Failed to export game library",
+        "pt-BR": "Failed to export game library",
+        "ar": "Failed to export game library",
+        "ko": "Failed to export game library",
+        "zh-Hant": "Failed to export game library",
+        "vi": "Failed to export game library",
+        "id": "Failed to export game library"
+      }
+    },
+    "interface.catalog_is_too_large_21f71c31": {
+      "source": "Catalog is too large",
+      "translations": {
+        "es": "Catalog is too large",
+        "es-419": "Catalog is too large",
+        "zh-Hans": "Catalog is too large",
+        "hi": "Catalog is too large",
+        "de": "Catalog is too large",
+        "ja": "Catalog is too large",
+        "fr": "Catalog is too large",
+        "fr-CA": "Catalog is too large",
+        "pt-BR": "Catalog is too large",
+        "ar": "Catalog is too large",
+        "ko": "Catalog is too large",
+        "zh-Hant": "Catalog is too large",
+        "vi": "Catalog is too large",
+        "id": "Catalog is too large"
+      }
+    },
+    "interface.choose_a_questarrng_library_export_s_770b0a36": {
+      "source": "Choose a QuestarrNG library export smaller than 4 MB.",
+      "translations": {
+        "es": "Choose a QuestarrNG library export smaller than 4 MB.",
+        "es-419": "Choose a QuestarrNG library export smaller than 4 MB.",
+        "zh-Hans": "Choose a QuestarrNG library export smaller than 4 MB.",
+        "hi": "Choose a QuestarrNG library export smaller than 4 MB.",
+        "de": "Choose a QuestarrNG library export smaller than 4 MB.",
+        "ja": "Choose a QuestarrNG library export smaller than 4 MB.",
+        "fr": "Choose a QuestarrNG library export smaller than 4 MB.",
+        "fr-CA": "Choose a QuestarrNG library export smaller than 4 MB.",
+        "pt-BR": "Choose a QuestarrNG library export smaller than 4 MB.",
+        "ar": "Choose a QuestarrNG library export smaller than 4 MB.",
+        "ko": "Choose a QuestarrNG library export smaller than 4 MB.",
+        "zh-Hant": "Choose a QuestarrNG library export smaller than 4 MB.",
+        "vi": "Choose a QuestarrNG library export smaller than 4 MB.",
+        "id": "Choose a QuestarrNG library export smaller than 4 MB."
+      }
+    },
+    "interface.could_not_preview_catalog_e6b80188": {
+      "source": "Could not preview catalog",
+      "translations": {
+        "es": "Could not preview catalog",
+        "es-419": "Could not preview catalog",
+        "zh-Hans": "Could not preview catalog",
+        "hi": "Could not preview catalog",
+        "de": "Could not preview catalog",
+        "ja": "Could not preview catalog",
+        "fr": "Could not preview catalog",
+        "fr-CA": "Could not preview catalog",
+        "pt-BR": "Could not preview catalog",
+        "ar": "Could not preview catalog",
+        "ko": "Could not preview catalog",
+        "zh-Hant": "Could not preview catalog",
+        "vi": "Could not preview catalog",
+        "id": "Could not preview catalog"
+      }
+    },
+    "interface.choose_a_valid_questarrng_library_ex_1f955936": {
+      "source": "Choose a valid QuestarrNG library export.",
+      "translations": {
+        "es": "Choose a valid QuestarrNG library export.",
+        "es-419": "Choose a valid QuestarrNG library export.",
+        "zh-Hans": "Choose a valid QuestarrNG library export.",
+        "hi": "Choose a valid QuestarrNG library export.",
+        "de": "Choose a valid QuestarrNG library export.",
+        "ja": "Choose a valid QuestarrNG library export.",
+        "fr": "Choose a valid QuestarrNG library export.",
+        "fr-CA": "Choose a valid QuestarrNG library export.",
+        "pt-BR": "Choose a valid QuestarrNG library export.",
+        "ar": "Choose a valid QuestarrNG library export.",
+        "ko": "Choose a valid QuestarrNG library export.",
+        "zh-Hant": "Choose a valid QuestarrNG library export.",
+        "vi": "Choose a valid QuestarrNG library export.",
+        "id": "Choose a valid QuestarrNG library export."
+      }
+    },
+    "interface.import_finished_with_errors_2faef4d1": {
+      "source": "Import finished with errors",
+      "translations": {
+        "es": "Import finished with errors",
+        "es-419": "Import finished with errors",
+        "zh-Hans": "Import finished with errors",
+        "hi": "Import finished with errors",
+        "de": "Import finished with errors",
+        "ja": "Import finished with errors",
+        "fr": "Import finished with errors",
+        "fr-CA": "Import finished with errors",
+        "pt-BR": "Import finished with errors",
+        "ar": "Import finished with errors",
+        "ko": "Import finished with errors",
+        "zh-Hant": "Import finished with errors",
+        "vi": "Import finished with errors",
+        "id": "Import finished with errors"
+      }
+    },
+    "interface.import_complete_5d213773": {
+      "source": "Import complete",
+      "translations": {
+        "es": "Import complete",
+        "es-419": "Import complete",
+        "zh-Hans": "Import complete",
+        "hi": "Import complete",
+        "de": "Import complete",
+        "ja": "Import complete",
+        "fr": "Import complete",
+        "fr-CA": "Import complete",
+        "pt-BR": "Import complete",
+        "ar": "Import complete",
+        "ko": "Import complete",
+        "zh-Hant": "Import complete",
+        "vi": "Import complete",
+        "id": "Import complete"
+      }
+    },
+    "interface.import_failed_9ffdaa11": {
+      "source": "Import failed",
+      "translations": {
+        "es": "Import failed",
+        "es-419": "Import failed",
+        "zh-Hans": "Import failed",
+        "hi": "Import failed",
+        "de": "Import failed",
+        "ja": "Import failed",
+        "fr": "Import failed",
+        "fr-CA": "Import failed",
+        "pt-BR": "Import failed",
+        "ar": "Import failed",
+        "ko": "Import failed",
+        "zh-Hant": "Import failed",
+        "vi": "Import failed",
+        "id": "Import failed"
+      }
+    },
+    "interface.failed_to_import_game_library_69bc6263": {
+      "source": "Failed to import game library",
+      "translations": {
+        "es": "Failed to import game library",
+        "es-419": "Failed to import game library",
+        "zh-Hans": "Failed to import game library",
+        "hi": "Failed to import game library",
+        "de": "Failed to import game library",
+        "ja": "Failed to import game library",
+        "fr": "Failed to import game library",
+        "fr-CA": "Failed to import game library",
+        "pt-BR": "Failed to import game library",
+        "ar": "Failed to import game library",
+        "ko": "Failed to import game library",
+        "zh-Hant": "Failed to import game library",
+        "vi": "Failed to import game library",
+        "id": "Failed to import game library"
+      }
+    },
+    "interface.questarrng_library_json_110d6252": {
+      "source": "QuestarrNG library JSON",
+      "translations": {
+        "es": "QuestarrNG library JSON",
+        "es-419": "QuestarrNG library JSON",
+        "zh-Hans": "QuestarrNG library JSON",
+        "hi": "QuestarrNG library JSON",
+        "de": "QuestarrNG library JSON",
+        "ja": "QuestarrNG library JSON",
+        "fr": "QuestarrNG library JSON",
+        "fr-CA": "QuestarrNG library JSON",
+        "pt-BR": "QuestarrNG library JSON",
+        "ar": "QuestarrNG library JSON",
+        "ko": "QuestarrNG library JSON",
+        "zh-Hant": "QuestarrNG library JSON",
+        "vi": "QuestarrNG library JSON",
+        "id": "QuestarrNG library JSON"
+      }
+    },
+    "interface.move_your_tracked_game_collection_be_215ab4d0": {
+      "source": "Move your tracked game collection between QuestarrNG installs. The export contains game metadata and your status and rating; it does not contain files, server paths, downloads, or credentials.",
+      "translations": {
+        "es": "Move your tracked game collection between QuestarrNG installs. The export contains game metadata and your status and rating; it does not contain files, server paths, downloads, or credentials.",
+        "es-419": "Move your tracked game collection between QuestarrNG installs. The export contains game metadata and your status and rating; it does not contain files, server paths, downloads, or credentials.",
+        "zh-Hans": "Move your tracked game collection between QuestarrNG installs. The export contains game metadata and your status and rating; it does not contain files, server paths, downloads, or credentials.",
+        "hi": "Move your tracked game collection between QuestarrNG installs. The export contains game metadata and your status and rating; it does not contain files, server paths, downloads, or credentials.",
+        "de": "Move your tracked game collection between QuestarrNG installs. The export contains game metadata and your status and rating; it does not contain files, server paths, downloads, or credentials.",
+        "ja": "Move your tracked game collection between QuestarrNG installs. The export contains game metadata and your status and rating; it does not contain files, server paths, downloads, or credentials.",
+        "fr": "Move your tracked game collection between QuestarrNG installs. The export contains game metadata and your status and rating; it does not contain files, server paths, downloads, or credentials.",
+        "fr-CA": "Move your tracked game collection between QuestarrNG installs. The export contains game metadata and your status and rating; it does not contain files, server paths, downloads, or credentials.",
+        "pt-BR": "Move your tracked game collection between QuestarrNG installs. The export contains game metadata and your status and rating; it does not contain files, server paths, downloads, or credentials.",
+        "ar": "Move your tracked game collection between QuestarrNG installs. The export contains game metadata and your status and rating; it does not contain files, server paths, downloads, or credentials.",
+        "ko": "Move your tracked game collection between QuestarrNG installs. The export contains game metadata and your status and rating; it does not contain files, server paths, downloads, or credentials.",
+        "zh-Hant": "Move your tracked game collection between QuestarrNG installs. The export contains game metadata and your status and rating; it does not contain files, server paths, downloads, or credentials.",
+        "vi": "Move your tracked game collection between QuestarrNG installs. The export contains game metadata and your status and rating; it does not contain files, server paths, downloads, or credentials.",
+        "id": "Move your tracked game collection between QuestarrNG installs. The export contains game metadata and your status and rating; it does not contain files, server paths, downloads, or credentials."
+      }
+    },
+    "interface.export_library_8b979f34": {
+      "source": "Export library",
+      "translations": {
+        "es": "Export library",
+        "es-419": "Export library",
+        "zh-Hans": "Export library",
+        "hi": "Export library",
+        "de": "Export library",
+        "ja": "Export library",
+        "fr": "Export library",
+        "fr-CA": "Export library",
+        "pt-BR": "Export library",
+        "ar": "Export library",
+        "ko": "Export library",
+        "zh-Hant": "Export library",
+        "vi": "Export library",
+        "id": "Export library"
+      }
+    },
+    "interface.import_a_questarrng_library_json_fil_79fa1c10": {
+      "source": "Import a QuestarrNG library JSON file",
+      "translations": {
+        "es": "Import a QuestarrNG library JSON file",
+        "es-419": "Import a QuestarrNG library JSON file",
+        "zh-Hans": "Import a QuestarrNG library JSON file",
+        "hi": "Import a QuestarrNG library JSON file",
+        "de": "Import a QuestarrNG library JSON file",
+        "ja": "Import a QuestarrNG library JSON file",
+        "fr": "Import a QuestarrNG library JSON file",
+        "fr-CA": "Import a QuestarrNG library JSON file",
+        "pt-BR": "Import a QuestarrNG library JSON file",
+        "ar": "Import a QuestarrNG library JSON file",
+        "ko": "Import a QuestarrNG library JSON file",
+        "zh-Hant": "Import a QuestarrNG library JSON file",
+        "vi": "Import a QuestarrNG library JSON file",
+        "id": "Import a QuestarrNG library JSON file"
+      }
+    },
+    "interface.import_adds_new_games_only_existing__90fa4e6e": {
+      "source": "Import adds new games only. Existing entries are detected by provider ID or normalized title and release date; downloads are never started.",
+      "translations": {
+        "es": "Import adds new games only. Existing entries are detected by provider ID or normalized title and release date; downloads are never started.",
+        "es-419": "Import adds new games only. Existing entries are detected by provider ID or normalized title and release date; downloads are never started.",
+        "zh-Hans": "Import adds new games only. Existing entries are detected by provider ID or normalized title and release date; downloads are never started.",
+        "hi": "Import adds new games only. Existing entries are detected by provider ID or normalized title and release date; downloads are never started.",
+        "de": "Import adds new games only. Existing entries are detected by provider ID or normalized title and release date; downloads are never started.",
+        "ja": "Import adds new games only. Existing entries are detected by provider ID or normalized title and release date; downloads are never started.",
+        "fr": "Import adds new games only. Existing entries are detected by provider ID or normalized title and release date; downloads are never started.",
+        "fr-CA": "Import adds new games only. Existing entries are detected by provider ID or normalized title and release date; downloads are never started.",
+        "pt-BR": "Import adds new games only. Existing entries are detected by provider ID or normalized title and release date; downloads are never started.",
+        "ar": "Import adds new games only. Existing entries are detected by provider ID or normalized title and release date; downloads are never started.",
+        "ko": "Import adds new games only. Existing entries are detected by provider ID or normalized title and release date; downloads are never started.",
+        "zh-Hant": "Import adds new games only. Existing entries are detected by provider ID or normalized title and release date; downloads are never started.",
+        "vi": "Import adds new games only. Existing entries are detected by provider ID or normalized title and release date; downloads are never started.",
+        "id": "Import adds new games only. Existing entries are detected by provider ID or normalized title and release date; downloads are never started."
+      }
+    },
+    "interface.working_c08b976a": {
+      "source": "Working…",
+      "translations": {
+        "es": "Working…",
+        "es-419": "Working…",
+        "zh-Hans": "Working…",
+        "hi": "Working…",
+        "de": "Working…",
+        "ja": "Working…",
+        "fr": "Working…",
+        "fr-CA": "Working…",
+        "pt-BR": "Working…",
+        "ar": "Working…",
+        "ko": "Working…",
+        "zh-Hant": "Working…",
+        "vi": "Working…",
+        "id": "Working…"
+      }
+    },
+    "interface.total_entries_d34a593d": {
+      "source": "Total entries",
+      "translations": {
+        "es": "Total entries",
+        "es-419": "Total entries",
+        "zh-Hans": "Total entries",
+        "hi": "Total entries",
+        "de": "Total entries",
+        "ja": "Total entries",
+        "fr": "Total entries",
+        "fr-CA": "Total entries",
+        "pt-BR": "Total entries",
+        "ar": "Total entries",
+        "ko": "Total entries",
+        "zh-Hant": "Total entries",
+        "vi": "Total entries",
+        "id": "Total entries"
+      }
+    },
+    "interface.new_games_to_add_c5c984d4": {
+      "source": "New games to add",
+      "translations": {
+        "es": "New games to add",
+        "es-419": "New games to add",
+        "zh-Hans": "New games to add",
+        "hi": "New games to add",
+        "de": "New games to add",
+        "ja": "New games to add",
+        "fr": "New games to add",
+        "fr-CA": "New games to add",
+        "pt-BR": "New games to add",
+        "ar": "New games to add",
+        "ko": "New games to add",
+        "zh-Hant": "New games to add",
+        "vi": "New games to add",
+        "id": "New games to add"
+      }
+    },
+    "interface.duplicates_to_skip_a0f1db2b": {
+      "source": "Duplicates to skip",
+      "translations": {
+        "es": "Duplicates to skip",
+        "es-419": "Duplicates to skip",
+        "zh-Hans": "Duplicates to skip",
+        "hi": "Duplicates to skip",
+        "de": "Duplicates to skip",
+        "ja": "Duplicates to skip",
+        "fr": "Duplicates to skip",
+        "fr-CA": "Duplicates to skip",
+        "pt-BR": "Duplicates to skip",
+        "ar": "Duplicates to skip",
+        "ko": "Duplicates to skip",
+        "zh-Hant": "Duplicates to skip",
+        "vi": "Duplicates to skip",
+        "id": "Duplicates to skip"
+      }
+    },
+    "interface.will_add_20dd8562": {
+      "source": "Will add",
+      "translations": {
+        "es": "Will add",
+        "es-419": "Will add",
+        "zh-Hans": "Will add",
+        "hi": "Will add",
+        "de": "Will add",
+        "ja": "Will add",
+        "fr": "Will add",
+        "fr-CA": "Will add",
+        "pt-BR": "Will add",
+        "ar": "Will add",
+        "ko": "Will add",
+        "zh-Hant": "Will add",
+        "vi": "Will add",
+        "id": "Will add"
+      }
+    },
+    "interface.will_skip_as_duplicates_8ea1219a": {
+      "source": "Will skip as duplicates",
+      "translations": {
+        "es": "Will skip as duplicates",
+        "es-419": "Will skip as duplicates",
+        "zh-Hans": "Will skip as duplicates",
+        "hi": "Will skip as duplicates",
+        "de": "Will skip as duplicates",
+        "ja": "Will skip as duplicates",
+        "fr": "Will skip as duplicates",
+        "fr-CA": "Will skip as duplicates",
+        "pt-BR": "Will skip as duplicates",
+        "ar": "Will skip as duplicates",
+        "ko": "Will skip as duplicates",
+        "zh-Hant": "Will skip as duplicates",
+        "vi": "Will skip as duplicates",
+        "id": "Will skip as duplicates"
+      }
+    },
+    "interface.import_new_games_60bdb9d5": {
+      "source": "Import new games",
+      "translations": {
+        "es": "Import new games",
+        "es-419": "Import new games",
+        "zh-Hans": "Import new games",
+        "hi": "Import new games",
+        "de": "Import new games",
+        "ja": "Import new games",
+        "fr": "Import new games",
+        "fr-CA": "Import new games",
+        "pt-BR": "Import new games",
+        "ar": "Import new games",
+        "ko": "Import new games",
+        "zh-Hant": "Import new games",
+        "vi": "Import new games",
+        "id": "Import new games"
+      }
+    },
+    "interface.library_interchange_ca5462ae": {
+      "source": "Library Interchange",
+      "translations": {
+        "es": "Library Interchange",
+        "es-419": "Library Interchange",
+        "zh-Hans": "Library Interchange",
+        "hi": "Library Interchange",
+        "de": "Library Interchange",
+        "ja": "Library Interchange",
+        "fr": "Library Interchange",
+        "fr-CA": "Library Interchange",
+        "pt-BR": "Library Interchange",
+        "ar": "Library Interchange",
+        "ko": "Library Interchange",
+        "zh-Hant": "Library Interchange",
+        "vi": "Library Interchange",
+        "id": "Library Interchange"
+      }
+    },
+    "interface.bulk_add_finished_added_added_duplic_1a7a95d7": {
+      "source": "Bulk add finished: {added} added, {duplicates} already in your library, {errors} failed.",
+      "translations": {
+        "es": "Bulk add finished: {added} added, {duplicates} already in your library, {errors} failed.",
+        "es-419": "Bulk add finished: {added} added, {duplicates} already in your library, {errors} failed.",
+        "zh-Hans": "Bulk add finished: {added} added, {duplicates} already in your library, {errors} failed.",
+        "hi": "Bulk add finished: {added} added, {duplicates} already in your library, {errors} failed.",
+        "de": "Bulk add finished: {added} added, {duplicates} already in your library, {errors} failed.",
+        "ja": "Bulk add finished: {added} added, {duplicates} already in your library, {errors} failed.",
+        "fr": "Bulk add finished: {added} added, {duplicates} already in your library, {errors} failed.",
+        "fr-CA": "Bulk add finished: {added} added, {duplicates} already in your library, {errors} failed.",
+        "pt-BR": "Bulk add finished: {added} added, {duplicates} already in your library, {errors} failed.",
+        "ar": "Bulk add finished: {added} added, {duplicates} already in your library, {errors} failed.",
+        "ko": "Bulk add finished: {added} added, {duplicates} already in your library, {errors} failed.",
+        "zh-Hant": "Bulk add finished: {added} added, {duplicates} already in your library, {errors} failed.",
+        "vi": "Bulk add finished: {added} added, {duplicates} already in your library, {errors} failed.",
+        "id": "Bulk add finished: {added} added, {duplicates} already in your library, {errors} failed."
+      }
+    },
+    "interface.failed_to_add_selected_games_b875e5bc": {
+      "source": "Failed to add selected games",
+      "translations": {
+        "es": "Failed to add selected games",
+        "es-419": "Failed to add selected games",
+        "zh-Hans": "Failed to add selected games",
+        "hi": "Failed to add selected games",
+        "de": "Failed to add selected games",
+        "ja": "Failed to add selected games",
+        "fr": "Failed to add selected games",
+        "fr-CA": "Failed to add selected games",
+        "pt-BR": "Failed to add selected games",
+        "ar": "Failed to add selected games",
+        "ko": "Failed to add selected games",
+        "zh-Hant": "Failed to add selected games",
+        "vi": "Failed to add selected games",
+        "id": "Failed to add selected games"
+      }
+    },
+    "interface.count_games_selected_850a42bc": {
+      "source": "{count} games selected",
+      "translations": {
+        "es": "{count} games selected",
+        "es-419": "{count} games selected",
+        "zh-Hans": "{count} games selected",
+        "hi": "{count} games selected",
+        "de": "{count} games selected",
+        "ja": "{count} games selected",
+        "fr": "{count} games selected",
+        "fr-CA": "{count} games selected",
+        "pt-BR": "{count} games selected",
+        "ar": "{count} games selected",
+        "ko": "{count} games selected",
+        "zh-Hant": "{count} games selected",
+        "vi": "{count} games selected",
+        "id": "{count} games selected"
+      }
+    },
+    "interface.add_selected_to_wanted_9ff97dbd": {
+      "source": "Add selected to Wanted",
+      "translations": {
+        "es": "Add selected to Wanted",
+        "es-419": "Add selected to Wanted",
+        "zh-Hans": "Add selected to Wanted",
+        "hi": "Add selected to Wanted",
+        "de": "Add selected to Wanted",
+        "ja": "Add selected to Wanted",
+        "fr": "Add selected to Wanted",
+        "fr-CA": "Add selected to Wanted",
+        "pt-BR": "Add selected to Wanted",
+        "ar": "Add selected to Wanted",
+        "ko": "Add selected to Wanted",
+        "zh-Hant": "Add selected to Wanted",
+        "vi": "Add selected to Wanted",
+        "id": "Add selected to Wanted"
+      }
+    },
+    "interface.clear_selection_50a6b1e0": {
+      "source": "Clear selection",
+      "translations": {
+        "es": "Clear selection",
+        "es-419": "Clear selection",
+        "zh-Hans": "Clear selection",
+        "hi": "Clear selection",
+        "de": "Clear selection",
+        "ja": "Clear selection",
+        "fr": "Clear selection",
+        "fr-CA": "Clear selection",
+        "pt-BR": "Clear selection",
+        "ar": "Clear selection",
+        "ko": "Clear selection",
+        "zh-Hant": "Clear selection",
+        "vi": "Clear selection",
+        "id": "Clear selection"
+      }
+    },
+    "interface.add_selected_games_to_wanted_53ad2097": {
+      "source": "Add selected games to Wanted?",
+      "translations": {
+        "es": "Add selected games to Wanted?",
+        "es-419": "Add selected games to Wanted?",
+        "zh-Hans": "Add selected games to Wanted?",
+        "hi": "Add selected games to Wanted?",
+        "de": "Add selected games to Wanted?",
+        "ja": "Add selected games to Wanted?",
+        "fr": "Add selected games to Wanted?",
+        "fr-CA": "Add selected games to Wanted?",
+        "pt-BR": "Add selected games to Wanted?",
+        "ar": "Add selected games to Wanted?",
+        "ko": "Add selected games to Wanted?",
+        "zh-Hant": "Add selected games to Wanted?",
+        "vi": "Add selected games to Wanted?",
+        "id": "Add selected games to Wanted?"
+      }
+    },
+    "interface.this_adds_the_selected_games_to_want_e430b3e9": {
+      "source": "This adds the selected games to Wanted and will not start downloads.",
+      "translations": {
+        "es": "This adds the selected games to Wanted and will not start downloads.",
+        "es-419": "This adds the selected games to Wanted and will not start downloads.",
+        "zh-Hans": "This adds the selected games to Wanted and will not start downloads.",
+        "hi": "This adds the selected games to Wanted and will not start downloads.",
+        "de": "This adds the selected games to Wanted and will not start downloads.",
+        "ja": "This adds the selected games to Wanted and will not start downloads.",
+        "fr": "This adds the selected games to Wanted and will not start downloads.",
+        "fr-CA": "This adds the selected games to Wanted and will not start downloads.",
+        "pt-BR": "This adds the selected games to Wanted and will not start downloads.",
+        "ar": "This adds the selected games to Wanted and will not start downloads.",
+        "ko": "This adds the selected games to Wanted and will not start downloads.",
+        "zh-Hant": "This adds the selected games to Wanted and will not start downloads.",
+        "vi": "This adds the selected games to Wanted and will not start downloads.",
+        "id": "This adds the selected games to Wanted and will not start downloads."
+      }
+    },
+    "interface.and_count_more_bdb1ff6a": {
+      "source": "and {count} more",
+      "translations": {
+        "es": "and {count} more",
+        "es-419": "and {count} more",
+        "zh-Hans": "and {count} more",
+        "hi": "and {count} more",
+        "de": "and {count} more",
+        "ja": "and {count} more",
+        "fr": "and {count} more",
+        "fr-CA": "and {count} more",
+        "pt-BR": "and {count} more",
+        "ar": "and {count} more",
+        "ko": "and {count} more",
+        "zh-Hant": "and {count} more",
+        "vi": "and {count} more",
+        "id": "and {count} more"
+      }
+    },
+    "interface.add_selected_1d8f8b75": {
+      "source": "Add selected",
+      "translations": {
+        "es": "Add selected",
+        "es-419": "Add selected",
+        "zh-Hans": "Add selected",
+        "hi": "Add selected",
+        "de": "Add selected",
+        "ja": "Add selected",
+        "fr": "Add selected",
+        "fr-CA": "Add selected",
+        "pt-BR": "Add selected",
+        "ar": "Add selected",
+        "ko": "Add selected",
+        "zh-Hant": "Add selected",
+        "vi": "Add selected",
+        "id": "Add selected"
+      }
+    },
+    "interface.enter_qbittorrent_api_key_2cbb2d8e": {
+      "source": "Enter qBittorrent API key",
+      "translations": {
+        "es": "Enter qBittorrent API key",
+        "es-419": "Enter qBittorrent API key",
+        "zh-Hans": "Enter qBittorrent API key",
+        "hi": "Enter qBittorrent API key",
+        "de": "Enter qBittorrent API key",
+        "ja": "Enter qBittorrent API key",
+        "fr": "Enter qBittorrent API key",
+        "fr-CA": "Enter qBittorrent API key",
+        "pt-BR": "Enter qBittorrent API key",
+        "ar": "Enter qBittorrent API key",
+        "ko": "Enter qBittorrent API key",
+        "zh-Hant": "Enter qBittorrent API key",
+        "vi": "Enter qBittorrent API key",
+        "id": "Enter qBittorrent API key"
+      }
+    },
+    "interface.requires_qbittorrent_5_2_0_web_api_2_dec750e2": {
+      "source": "Requires qBittorrent 5.2.0 / Web API 2.14.1+. Invalid keys fail without falling back to a password session.",
+      "translations": {
+        "es": "Requires qBittorrent 5.2.0 / Web API 2.14.1+. Invalid keys fail without falling back to a password session.",
+        "es-419": "Requires qBittorrent 5.2.0 / Web API 2.14.1+. Invalid keys fail without falling back to a password session.",
+        "zh-Hans": "Requires qBittorrent 5.2.0 / Web API 2.14.1+. Invalid keys fail without falling back to a password session.",
+        "hi": "Requires qBittorrent 5.2.0 / Web API 2.14.1+. Invalid keys fail without falling back to a password session.",
+        "de": "Requires qBittorrent 5.2.0 / Web API 2.14.1+. Invalid keys fail without falling back to a password session.",
+        "ja": "Requires qBittorrent 5.2.0 / Web API 2.14.1+. Invalid keys fail without falling back to a password session.",
+        "fr": "Requires qBittorrent 5.2.0 / Web API 2.14.1+. Invalid keys fail without falling back to a password session.",
+        "fr-CA": "Requires qBittorrent 5.2.0 / Web API 2.14.1+. Invalid keys fail without falling back to a password session.",
+        "pt-BR": "Requires qBittorrent 5.2.0 / Web API 2.14.1+. Invalid keys fail without falling back to a password session.",
+        "ar": "Requires qBittorrent 5.2.0 / Web API 2.14.1+. Invalid keys fail without falling back to a password session.",
+        "ko": "Requires qBittorrent 5.2.0 / Web API 2.14.1+. Invalid keys fail without falling back to a password session.",
+        "zh-Hant": "Requires qBittorrent 5.2.0 / Web API 2.14.1+. Invalid keys fail without falling back to a password session.",
+        "vi": "Requires qBittorrent 5.2.0 / Web API 2.14.1+. Invalid keys fail without falling back to a password session.",
+        "id": "Requires qBittorrent 5.2.0 / Web API 2.14.1+. Invalid keys fail without falling back to a password session."
+      }
+    },
+    "interface.use_bearer_api_key_ed2d6926": {
+      "source": "Use Bearer API key",
+      "translations": {
+        "es": "Use Bearer API key",
+        "es-419": "Use Bearer API key",
+        "zh-Hans": "Use Bearer API key",
+        "hi": "Use Bearer API key",
+        "de": "Use Bearer API key",
+        "ja": "Use Bearer API key",
+        "fr": "Use Bearer API key",
+        "fr-CA": "Use Bearer API key",
+        "pt-BR": "Use Bearer API key",
+        "ar": "Use Bearer API key",
+        "ko": "Use Bearer API key",
+        "zh-Hant": "Use Bearer API key",
+        "vi": "Use Bearer API key",
+        "id": "Use Bearer API key"
+      }
+    },
+    "interface.for_qbittorrent_5_2_0_web_api_2_14_1_f59cbb0f": {
+      "source": "For qBittorrent 5.2.0 / Web API 2.14.1+. When enabled, the Password field is treated as the API key.",
+      "translations": {
+        "es": "For qBittorrent 5.2.0 / Web API 2.14.1+. When enabled, the Password field is treated as the API key.",
+        "es-419": "For qBittorrent 5.2.0 / Web API 2.14.1+. When enabled, the Password field is treated as the API key.",
+        "zh-Hans": "For qBittorrent 5.2.0 / Web API 2.14.1+. When enabled, the Password field is treated as the API key.",
+        "hi": "For qBittorrent 5.2.0 / Web API 2.14.1+. When enabled, the Password field is treated as the API key.",
+        "de": "For qBittorrent 5.2.0 / Web API 2.14.1+. When enabled, the Password field is treated as the API key.",
+        "ja": "For qBittorrent 5.2.0 / Web API 2.14.1+. When enabled, the Password field is treated as the API key.",
+        "fr": "For qBittorrent 5.2.0 / Web API 2.14.1+. When enabled, the Password field is treated as the API key.",
+        "fr-CA": "For qBittorrent 5.2.0 / Web API 2.14.1+. When enabled, the Password field is treated as the API key.",
+        "pt-BR": "For qBittorrent 5.2.0 / Web API 2.14.1+. When enabled, the Password field is treated as the API key.",
+        "ar": "For qBittorrent 5.2.0 / Web API 2.14.1+. When enabled, the Password field is treated as the API key.",
+        "ko": "For qBittorrent 5.2.0 / Web API 2.14.1+. When enabled, the Password field is treated as the API key.",
+        "zh-Hant": "For qBittorrent 5.2.0 / Web API 2.14.1+. When enabled, the Password field is treated as the API key.",
+        "vi": "For qBittorrent 5.2.0 / Web API 2.14.1+. When enabled, the Password field is treated as the API key.",
+        "id": "For qBittorrent 5.2.0 / Web API 2.14.1+. When enabled, the Password field is treated as the API key."
+      }
+    },
+    "interface.fill_missing_game_details_from_igdb__21c3c8df": {
+      "source": "Fill missing game details from IGDB. Existing metadata is preserved unless you enable overwrite.",
+      "translations": {
+        "es": "Fill missing game details from IGDB. Existing metadata is preserved unless you enable overwrite.",
+        "es-419": "Fill missing game details from IGDB. Existing metadata is preserved unless you enable overwrite.",
+        "zh-Hans": "Fill missing game details from IGDB. Existing metadata is preserved unless you enable overwrite.",
+        "hi": "Fill missing game details from IGDB. Existing metadata is preserved unless you enable overwrite.",
+        "de": "Fill missing game details from IGDB. Existing metadata is preserved unless you enable overwrite.",
+        "ja": "Fill missing game details from IGDB. Existing metadata is preserved unless you enable overwrite.",
+        "fr": "Fill missing game details from IGDB. Existing metadata is preserved unless you enable overwrite.",
+        "fr-CA": "Fill missing game details from IGDB. Existing metadata is preserved unless you enable overwrite.",
+        "pt-BR": "Fill missing game details from IGDB. Existing metadata is preserved unless you enable overwrite.",
+        "ar": "Fill missing game details from IGDB. Existing metadata is preserved unless you enable overwrite.",
+        "ko": "Fill missing game details from IGDB. Existing metadata is preserved unless you enable overwrite.",
+        "zh-Hant": "Fill missing game details from IGDB. Existing metadata is preserved unless you enable overwrite.",
+        "vi": "Fill missing game details from IGDB. Existing metadata is preserved unless you enable overwrite.",
+        "id": "Fill missing game details from IGDB. Existing metadata is preserved unless you enable overwrite."
+      }
+    },
+    "interface.replace_existing_metadata_c5d447c5": {
+      "source": "Replace existing metadata",
+      "translations": {
+        "es": "Replace existing metadata",
+        "es-419": "Replace existing metadata",
+        "zh-Hans": "Replace existing metadata",
+        "hi": "Replace existing metadata",
+        "de": "Replace existing metadata",
+        "ja": "Replace existing metadata",
+        "fr": "Replace existing metadata",
+        "fr-CA": "Replace existing metadata",
+        "pt-BR": "Replace existing metadata",
+        "ar": "Replace existing metadata",
+        "ko": "Replace existing metadata",
+        "zh-Hant": "Replace existing metadata",
+        "vi": "Replace existing metadata",
+        "id": "Replace existing metadata"
+      }
+    },
+    "interface.groups_ready_to_link_count_29cbe906": {
+      "source": "Groups ready to link: {count}",
+      "translations": {
+        "es": "Groups ready to link: {count}",
+        "es-419": "Groups ready to link: {count}",
+        "zh-Hans": "Groups ready to link: {count}",
+        "hi": "Groups ready to link: {count}",
+        "de": "Groups ready to link: {count}",
+        "ja": "Groups ready to link: {count}",
+        "fr": "Groups ready to link: {count}",
+        "fr-CA": "Groups ready to link: {count}",
+        "pt-BR": "Groups ready to link: {count}",
+        "ar": "Groups ready to link: {count}",
+        "ko": "Groups ready to link: {count}",
+        "zh-Hant": "Groups ready to link: {count}",
+        "vi": "Groups ready to link: {count}",
+        "id": "Groups ready to link: {count}"
+      }
     }
   }
 }

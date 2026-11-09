@@ -13,7 +13,9 @@ const {
   statMock,
   removeMock,
   loggerMocks,
+  directoryEntries,
 } = vi.hoisted(() => ({
+  directoryEntries: new Map<string, unknown[]>(),
   ensureDirMock: vi.fn().mockResolvedValue(undefined),
   moveMock: vi.fn().mockResolvedValue(undefined),
   lstatMock: vi.fn(),
@@ -36,7 +38,8 @@ vi.mock("fs-extra", () => ({
     move: moveMock,
     readdir: readdirMock,
     stat: statMock,
-    lstat: lstatMock,
+    lstat: (file: string, options?: { bigint?: boolean }) =>
+      options?.bigint ? Promise.resolve({ isFile: () => true, size: 0n }) : lstatMock(file),
     mkdtemp: mkdtempMock,
     rmdir: vi.fn().mockResolvedValue(undefined),
     remove: removeMock,
@@ -46,7 +49,17 @@ vi.mock("fs-extra", () => ({
 vi.mock("node:fs/promises", async (importOriginal) => ({
   ...(await importOriginal<typeof import("node:fs/promises")>()),
   statfs: vi.fn().mockResolvedValue({ bavail: 100n * 1024n ** 3n, bsize: 1n }),
-  opendir: vi.fn(async () => ({ async *[Symbol.asyncIterator]() {} })),
+  opendir: vi.fn(async (dir: string) => {
+    if (!directoryEntries.has(dir)) directoryEntries.set(dir, await readdirMock(dir));
+    return {
+      async *[Symbol.asyncIterator]() {
+        for (const entry of directoryEntries.get(dir) ?? []) {
+          const value = entry as { name: string; isDirectory(): boolean };
+          yield { ...value, isSymbolicLink: () => false, isFile: () => !value.isDirectory() };
+        }
+      },
+    };
+  }),
 }));
 
 vi.mock("../logger.js", () => ({
@@ -173,6 +186,7 @@ describe("ArchiveService", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    directoryEntries.clear();
     ensureDirMock.mockResolvedValue(undefined);
     moveMock.mockResolvedValue(undefined);
     // Nothing exists at the merge destination unless a test says otherwise.

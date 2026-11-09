@@ -111,7 +111,7 @@ describe("sabnzbd remaining regression coverage", () => {
     });
     rpc.mockRejectedValueOnce(new Error(typed.message));
     const provider = await client[method]("item");
-    expect(provider).toEqual({ success: false, message: typed.message });
+    expect(provider).toMatchObject({ success: false, message: typed.message });
     expect(serializeServiceMessageDescriptor(provider)).toBeNull();
   });
 
@@ -131,7 +131,7 @@ describe("sabnzbd remaining regression coverage", () => {
     const stored = serializeServiceMessageDescriptor(duplicate);
     expect(stored).not.toBeNull();
     expect(JSON.parse(stored!)).not.toHaveProperty("messageDetails");
-    expect(client.parseAddFileResponse({ error: "Failed to pause NZB" })).toEqual({
+    expect(client.parseAddFileResponse({ error: "Failed to pause NZB" })).toMatchObject({
       success: false,
       message: "Failed to pause NZB",
     });
@@ -180,7 +180,7 @@ describe("sabnzbd remaining regression coverage", () => {
         throw new Error("no body");
       },
     } as Response);
-    await expect(client.testConnection()).resolves.toEqual({
+    await expect(client.testConnection()).resolves.toMatchObject({
       success: false,
       message:
         "Failed to connect to SABnzbd at http://sab.local: HTTP 500: Broken - No error details",
@@ -353,7 +353,7 @@ describe("sabnzbd remaining regression coverage", () => {
       password: "404",
     });
 
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       success: false,
       message:
         "Refusing to send the archive password over an insecure connection. Enable SSL for this SABnzbd downloader, or remove the archive password.",

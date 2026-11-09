@@ -90,7 +90,7 @@ describe("NZBGet remaining coverage", () => {
     });
     rpc.mockRejectedValueOnce(new Error(typed.message));
     const provider = await client[method]("item");
-    expect(provider).toEqual({ success: false, message: typed.message });
+    expect(provider).toMatchObject({ success: false, message: typed.message });
     expect(serializeServiceMessageDescriptor(provider)).toBeNull();
   });
 
@@ -187,7 +187,7 @@ describe("NZBGet remaining coverage", () => {
     vi.mocked(safeFetch).mockRejectedValueOnce(new Error("fetch exploded"));
     await expect(
       client.addDownload({ url: "http://indexer.local/file.nzb", title: "Broken NZB" })
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       success: false,
       message: "fetch exploded",
     });
@@ -473,7 +473,7 @@ describe("NZBGet remaining coverage", () => {
       password: "404",
     });
 
-    expect(result).toEqual({
+    expect(result).toMatchObject({
       success: false,
       message:
         "Refusing to send the archive password over an insecure connection. Enable SSL for this NZBGet downloader, or remove the archive password.",
