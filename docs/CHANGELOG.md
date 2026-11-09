@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.1.3] - 2026-11-09
+
 ### Upstream source attribution
 
 - Publicly credit all 1,163 Questarr issues and pull requests captured by the fork audit. The [source ledger](../UPSTREAM_ATTRIBUTION.md) links every originating record and upstream author, separates verified, implementation-pending-verification, superseded, unreviewed, and not-applicable dispositions, and makes clear that those people contributed to Questarr, not directly to this fork.
