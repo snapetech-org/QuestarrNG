@@ -5,11 +5,12 @@
 # SQLite install to Postgres does not move your data on its own -- run
 # scripts/sqlite-to-pg.ts to bring your library across. See docs/DATABASE.md.
 #
-# POSTGRES_PASSWORD must be safe to embed in a connection URL: stick to
-# letters, digits, and avoid @ / : % # ? &. A hex string from
-# `openssl rand -hex 32` is always safe.
+# `scripts/deploy-postgres.sh` creates a URL-safe password once, stores it in
+# the git-ignored .env.postgres file, and reuses it for later deploys/restarts.
 #
-#   POSTGRES_PASSWORD=<something> docker compose -f docker-compose.postgres.yml up -d
+#   ./scripts/deploy-postgres.sh
+#   ./scripts/deploy-postgres.sh pull
+#   ./scripts/deploy-postgres.sh up -d
 #
 # Questarr automatically creates and persists its credentials-encryption key
 # under ./data/secrets/credentials.key. Keep ./data mounted and backed up.

@@ -37,6 +37,7 @@ const ARCHIVE_MAX_EXPANDED_BYTES = configuredLimit(
   "ARCHIVE_MAX_EXPANDED_BYTES",
   DEFAULT_ARCHIVE_MAX_EXPANDED_BYTES
 );
+const MAX_PENDING_EXTRACTIONS = configuredLimit("ARCHIVE_MAX_PENDING_EXTRACTIONS", 16);
 
 // A download client marking a transfer "complete" doesn't guarantee the file is fully
 // synced/renamed into its final location yet — e.g. NFS/SMB write-back lag between the
@@ -133,7 +134,12 @@ function resolveTool(filePath: string): ArchiveTool {
   return path.extname(filePath).toLowerCase() === ".rar" ? "unrar" : "7zip";
 }
 
-function runTool(binary: string, args: string[], toolLabel: string): Promise<ExecFileResult> {
+function runTool(
+  binary: string,
+  args: string[],
+  toolLabel: string,
+  signal?: AbortSignal
+): Promise<ExecFileResult> {
   return new Promise((resolve, reject) => {
     execFile(
       binary,
@@ -143,9 +149,14 @@ function runTool(binary: string, args: string[], toolLabel: string): Promise<Exe
         timeout: EXEC_TIMEOUT_MS,
         windowsHide: true,
         maxBuffer: EXEC_MAX_BUFFER,
+        ...(signal ? { signal } : {}),
       },
       (error, stdout, stderr) => {
         if (error) {
+          if (signal?.aborted && signal.reason instanceof Error) {
+            reject(signal.reason);
+            return;
+          }
           const detail = (stderr || stdout || error.message).trim().slice(0, 500);
           reject(new Error(`${toolLabel} failed: ${detail}`));
           return;
@@ -156,7 +167,7 @@ function runTool(binary: string, args: string[], toolLabel: string): Promise<Exe
   });
 }
 
-function runSevenZip(args: string[]): Promise<ExecFileResult> {
+function runSevenZip(args: string[], signal?: AbortSignal): Promise<ExecFileResult> {
   const binary = resolveSevenZipBinary();
   if (!binary) {
     return Promise.reject(
@@ -165,10 +176,10 @@ function runSevenZip(args: string[]): Promise<ExecFileResult> {
       )
     );
   }
-  return runTool(binary, args, "7-Zip");
+  return runTool(binary, args, "7-Zip", signal);
 }
 
-function runUnrar(args: string[]): Promise<ExecFileResult> {
+function runUnrar(args: string[], signal?: AbortSignal): Promise<ExecFileResult> {
   const binary = resolveUnrarBinary();
   if (!binary) {
     return Promise.reject(
@@ -177,7 +188,7 @@ function runUnrar(args: string[]): Promise<ExecFileResult> {
       )
     );
   }
-  return runTool(binary, args, "unrar");
+  return runTool(binary, args, "unrar", signal);
 }
 
 // Splits one listing block into its "key<separator>value" fields.
@@ -324,7 +335,15 @@ function validateArchiveEntries(entries: ArchiveEntry[], outputDir: string): num
   return expandedBytes;
 }
 
-async function assertAvailableDiskSpace(outputDir: string, expandedBytes: number): Promise<void> {
+interface DiskSpaceBudget {
+  filesystemPath: string;
+  reserveBytes: bigint;
+}
+
+async function assertAvailableDiskSpace(
+  outputDir: string,
+  expandedBytes: number
+): Promise<DiskSpaceBudget> {
   let filesystemPath = path.resolve(outputDir);
   while (true) {
     try {
@@ -359,16 +378,141 @@ async function assertAvailableDiskSpace(outputDir: string, expandedBytes: number
       `Archive needs ${expandedBytes} bytes but the destination filesystem does not have enough free space while preserving a safety reserve.`
     );
   }
+  return { filesystemPath, reserveBytes };
 }
 
-// Merges into the library run one at a time, process-wide: each is a quick series of
-// renames, and serializing them means a merge's rollback can never overwrite or remove
-// what a concurrent import into the same (or an overlapping) folder just placed.
-let mergeQueue: Promise<unknown> = Promise.resolve();
-function serializeMerge<T>(fn: () => Promise<T>): Promise<T> {
-  const run = mergeQueue.then(fn, fn);
-  mergeQueue = run.catch(() => undefined);
-  return run;
+// Archive operations run one at a time, process-wide. This makes the preflight space
+// check meaningful across imports and limits aggregate disk/CPU use from simultaneous
+// untrusted archives. It also ensures merge rollback cannot race another import.
+let extractionQueue: Promise<unknown> = Promise.resolve();
+let pendingExtractions = 0;
+function serializeExtraction<T>(fn: () => Promise<T>): Promise<T> {
+  if (pendingExtractions >= MAX_PENDING_EXTRACTIONS) {
+    return Promise.reject(
+      new Error(
+        `Archive extraction queue is full (limit: ${MAX_PENDING_EXTRACTIONS} active and queued requests).`
+      )
+    );
+  }
+  pendingExtractions += 1;
+  const run = extractionQueue.then(fn, fn);
+  const trackedRun = run.finally(() => {
+    pendingExtractions -= 1;
+  });
+  extractionQueue = trackedRun.catch(() => undefined);
+  return trackedRun;
+}
+
+const DISK_SPACE_POLL_INTERVAL_MS = 250;
+
+async function runWithDiskSpaceGuard<T>(
+  budget: DiskSpaceBudget,
+  run: (signal: AbortSignal) => Promise<T>
+): Promise<T> {
+  const controller = new AbortController();
+  const task = run(controller.signal);
+  // Convert rejection to a value so a task failure is observed even while a statfs
+  // request is in flight.
+  const observedTask = task.then(
+    (value) => ({ state: "resolved" as const, value }),
+    (error: unknown) => ({ state: "rejected" as const, error })
+  );
+
+  try {
+    while (true) {
+      const outcome = await Promise.race([
+        observedTask,
+        delay(DISK_SPACE_POLL_INTERVAL_MS).then(() => ({ state: "poll" as const })),
+      ]);
+      if (outcome.state === "resolved") {
+        const info = await statfs(budget.filesystemPath, { bigint: true });
+        const freeBytes = info.bavail * info.bsize;
+        if (freeBytes <= budget.reserveBytes) {
+          throw new Error(
+            "Archive extraction stopped because it reached the filesystem safety reserve."
+          );
+        }
+        return outcome.value;
+      }
+      if (outcome.state === "rejected") throw outcome.error;
+
+      let freeBytes: bigint;
+      try {
+        const info = await statfs(budget.filesystemPath, { bigint: true });
+        freeBytes = info.bavail * info.bsize;
+      } catch (error) {
+        throw new Error("Could not monitor available disk space during archive extraction", {
+          cause: error,
+        });
+      }
+
+      if (freeBytes <= budget.reserveBytes) {
+        throw new Error(
+          "Archive extraction stopped because it reached the filesystem safety reserve."
+        );
+      }
+    }
+  } catch (error) {
+    // execFile honors this signal and settles its callback after the child exits. Wait
+    // for that settlement before the caller removes the staging directory.
+    controller.abort(error);
+    await task.catch(() => undefined);
+    throw error;
+  }
+}
+
+async function measureExtractedOutput(stagingDir: string): Promise<bigint> {
+  const startedAt = Date.now();
+  let visitedEntries = 0;
+  let expandedBytes = 0n;
+
+  const walk = async (directoryPath: string, depth = 0): Promise<void> => {
+    if (depth > MAX_MERGE_DEPTH) {
+      throw new Error(`Archive extraction exceeded directory depth ${MAX_MERGE_DEPTH}`);
+    }
+    if (Date.now() - startedAt > MAX_MERGE_WALK_MS) {
+      throw new Error(`Archive output validation exceeded ${MAX_MERGE_WALK_MS} ms`);
+    }
+    const directory = await opendir(directoryPath);
+    for await (const entry of directory) {
+      if (Date.now() - startedAt > MAX_MERGE_WALK_MS) {
+        throw new Error(`Archive output validation exceeded ${MAX_MERGE_WALK_MS} ms`);
+      }
+      visitedEntries += 1;
+      if (visitedEntries > ARCHIVE_MAX_ENTRIES) {
+        throw new Error(`Archive extraction exceeded ${ARCHIVE_MAX_ENTRIES} entries`);
+      }
+      if (entry.isSymbolicLink()) {
+        throw new Error(`Archive extraction produced a symbolic link: ${entry.name}`);
+      }
+      if (entry.isDirectory()) {
+        await walk(path.join(directoryPath, entry.name), depth + 1);
+        continue;
+      }
+      if (!entry.isFile()) {
+        throw new Error(
+          `Archive extraction produced an unsupported filesystem entry: ${entry.name}`
+        );
+      }
+
+      const filePath = path.join(directoryPath, entry.name);
+      const info = await fs.lstat(filePath, { bigint: true });
+      if (!info.isFile()) {
+        throw new Error(
+          `Archive extraction produced an unsupported filesystem entry: ${entry.name}`
+        );
+      }
+      expandedBytes += info.size;
+      if (expandedBytes > BigInt(ARCHIVE_MAX_EXPANDED_BYTES)) {
+        throw new Error(
+          `Archive output exceeds the configured size limit (${ARCHIVE_MAX_EXPANDED_BYTES} bytes).`
+        );
+      }
+    }
+  };
+
+  await walk(stagingDir);
+  return expandedBytes;
 }
 
 export class ArchiveService {
@@ -620,40 +764,40 @@ export class ArchiveService {
   private async extractWithUnrar(
     filePath: string,
     outputDir: string,
-    password?: string
+    password?: string,
+    signal?: AbortSignal
   ): Promise<void> {
     // Trailing separator tells unrar the operand is a destination directory. -idq suppresses
     // the per-file "Extracting..." progress output — without it, a large multi-file archive
     // can exceed execFile's maxBuffer and fail with ERR_CHILD_PROCESS_STDIO_MAXBUFFER after
     // extraction has already started.
-    await runUnrar([
-      "x",
-      "-idq",
-      "-y",
-      password ? `-p${password}` : "-p-",
-      "--",
-      filePath,
-      outputDir + path.sep,
-    ]);
+    await runUnrar(
+      ["x", "-idq", "-y", password ? `-p${password}` : "-p-", "--", filePath, outputDir + path.sep],
+      signal
+    );
   }
 
   private async extractWith7zip(
     filePath: string,
     outputDir: string,
-    password?: string
+    password?: string,
+    signal?: AbortSignal
   ): Promise<void> {
     // -bso0/-bsp0 silence 7-Zip's normal output and progress streams for the same
     // maxBuffer-overflow reason as unrar's -idq above.
-    await runSevenZip([
-      "x",
-      "-bso0",
-      "-bsp0",
-      "-y",
-      ...(password ? [`-p${password}`] : []),
-      `-o${outputDir}`,
-      "--",
-      filePath,
-    ]);
+    await runSevenZip(
+      [
+        "x",
+        "-bso0",
+        "-bsp0",
+        "-y",
+        ...(password ? [`-p${password}`] : []),
+        `-o${outputDir}`,
+        "--",
+        filePath,
+      ],
+      signal
+    );
   }
 
   /**
@@ -666,6 +810,14 @@ export class ArchiveService {
    * @returns Paths of files reported as extracted.
    */
   async extract(filePath: string, outputDir: string, password?: string): Promise<string[]> {
+    return serializeExtraction(() => this.extractExclusive(filePath, outputDir, password));
+  }
+
+  private async extractExclusive(
+    filePath: string,
+    outputDir: string,
+    password?: string
+  ): Promise<string[]> {
     const tool = resolveTool(filePath);
     logger.debug({ filePath, outputDir, tool, hasPassword: !!password }, "Extracting archive");
 
@@ -674,7 +826,7 @@ export class ArchiveService {
     // failing/unsupported archive never leaves behind an empty output directory.
     const entries = await this.listEntriesForExtraction(filePath, password);
     const expandedBytes = validateArchiveEntries(entries, outputDir);
-    await assertAvailableDiskSpace(outputDir, expandedBytes);
+    const diskBudget = await assertAvailableDiskSpace(outputDir, expandedBytes);
     await this.testArchive(filePath, tool, password);
 
     // Extract into a private staging directory inside outputDir, then merge the result
@@ -694,14 +846,13 @@ export class ArchiveService {
     let extractedFiles: string[];
     let merged = false;
     try {
-      if (tool === "unrar") {
-        await this.extractWithUnrar(filePath, stagingDir, password);
-      } else {
-        await this.extractWith7zip(filePath, stagingDir, password);
-      }
-      extractedFiles = await serializeMerge(() =>
-        this.mergeExtracted(stagingDir, outputDir, backupDir)
+      await runWithDiskSpaceGuard(diskBudget, (signal) =>
+        tool === "unrar"
+          ? this.extractWithUnrar(filePath, stagingDir, password, signal)
+          : this.extractWith7zip(filePath, stagingDir, password, signal)
       );
+      await measureExtractedOutput(stagingDir);
+      extractedFiles = await this.mergeExtracted(stagingDir, outputDir, backupDir);
       merged = true;
     } catch (err) {
       logger.error({ err, filePath, tool }, "Extraction failed");

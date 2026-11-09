@@ -18,6 +18,8 @@ graphify-out/
 
 # Environment and secrets
 .env
+.env.postgres
+.env.postgres.tmp.*
 gha-creds-*.json
 .sofa/
 

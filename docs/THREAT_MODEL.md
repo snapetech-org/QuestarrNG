@@ -99,8 +99,9 @@ Eight named trust boundaries:
    QuestarrNG account that owns the key.
 6. **Downloaded archive ↔ filesystem** — release archives are untrusted even when fetched
    through an administrator-configured indexer. Before extraction, QuestarrNG checks listed
-   paths, links, declared expanded size, and total entry count; extraction also has a 30-minute
-   process timeout and bounded listing output.
+   paths, links, declared expanded size, and total entry count. Extraction is serialized,
+   has a bounded active/queued request count, checks live free space, measures actual staged
+   output before merge, and has a 30-minute process timeout and bounded listing output.
 7. **Server ↔ optional scanners** — VirusTotal receives only a SHA-256 hash over HTTPS; the
    configured API key stays server-side. ClamAV receives scanned file contents over its
    INSTREAM TCP protocol at a DNS-validated address. That connection is not encrypted, so
@@ -204,10 +205,13 @@ integrity check → 7-Zip or unrar extraction into the import destination.
 Mitigations in `server/services/ArchiveService.ts` reject absolute and parent-traversal
 paths, symbolic/hard links, paths deeper than 64 components, more than 50,000 archive entries,
 and declared expansion beyond 250 GiB by default. Operators can lower or raise the byte/entry
-limits with `ARCHIVE_MAX_EXPANDED_BYTES` and `ARCHIVE_MAX_ENTRIES`. Archive tool output is
-capped at 10 MiB and each tool invocation times out after 30 minutes. These metadata
-preflight limits reduce path escape and decompression-bomb risk, but do not impose an OS
-filesystem quota if an archive lies about its declared sizes.
+limits with `ARCHIVE_MAX_EXPANDED_BYTES` and `ARCHIVE_MAX_ENTRIES`; pending work is capped at
+16 by default and configurable with `ARCHIVE_MAX_PENDING_EXTRACTIONS`. Extraction runs one
+archive at a time per process, monitors free space and aborts at a reserve of at least 1 GiB or
+10% of the pre-extraction free space, and checks actual staged bytes and entries before merge.
+Archive tool output is capped at 10 MiB and each tool invocation times out after 30 minutes.
+The live disk guard is best-effort rather than an OS quota, so another process writing to the
+same filesystem can still consume space.
 
 ### 4.5 Optional pre-import security scan
 

@@ -24,10 +24,16 @@ For root-folder discovery, import history, and download recovery, see the
    and library are on separate volumes.
 
 For archive safety, QuestarrNG validates paths and links before extraction and
-limits the default archive to 50,000 entries and 250 GiB of declared expanded
-data. Set `ARCHIVE_MAX_ENTRIES` or `ARCHIVE_MAX_EXPANDED_BYTES` in the server
-environment to change these limits. Each archive tool invocation has a
-30-minute timeout. These checks do not replace filesystem quotas.
+limits the default archive to 50,000 entries and 250 GiB of expanded data. Set
+`ARCHIVE_MAX_ENTRIES` or `ARCHIVE_MAX_EXPANDED_BYTES` in the server environment
+to change these limits. Archive work runs one at a time per process, with at
+most 16 active or queued requests by default; configure
+`ARCHIVE_MAX_PENDING_EXTRACTIONS` to change that queue limit. During extraction,
+QuestarrNG monitors free space, stops before the filesystem safety reserve is
+used, and measures staged output before importing it. Each archive tool
+invocation has a 30-minute timeout. The runtime disk guard is not an OS-level
+quota and cannot reserve space against unrelated processes writing to the same
+filesystem.
 
 Downloads that need a destination choice, archive password, or other review
 appear in the **Pending Imports** card on the Library page. Use **Review** to

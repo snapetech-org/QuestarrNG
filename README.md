@@ -269,12 +269,13 @@ the app as the configured `PUID:PGID` directly, so prepare the bind-mounted
    would rather run it against Postgres, use the bundled compose file:
 
    ```bash
-   POSTGRES_PASSWORD=$(openssl rand -hex 32) docker compose -f docker-compose.postgres.yml up -d
+   ./scripts/deploy-postgres.sh
    ```
 
-   Keep whatever password you pick — the same value must be supplied on every
-   restart, and it must be safe to embed in a connection URL (a hex string
-   from `openssl rand -hex 32` always is).
+   The helper creates a URL-safe password on first run, saves it privately in
+   the git-ignored `.env.postgres` file, and reuses it on later deploys. The
+   database is created by Compose and Questarr applies schema migrations during
+   startup, so no manual migration step is needed for normal installs/upgrades.
 
    Questarr automatically creates and persists its credentials-encryption key
    under `./data/secrets/credentials.key`; the bundled Compose setup does not

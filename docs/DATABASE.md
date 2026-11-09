@@ -32,21 +32,28 @@ on upgrade.
 
 ## Running on Postgres
 
-With Docker Compose:
+With Docker Compose, use the deployment helper:
 
 ```bash
-POSTGRES_PASSWORD=$(openssl rand -hex 32) docker compose -f docker-compose.postgres.yml up -d
+./scripts/deploy-postgres.sh
 ```
 
-Keep whatever password you pick — the same value must be supplied on every
-restart. It's interpolated directly into a connection URL with no encoding, so
-it must be safe to embed in one; a hex string from `openssl rand -hex 32`
-always is.
+On first run, the helper generates a URL-safe password and persists it with
+owner-only permissions in the git-ignored `.env.postgres` file. Later deploys
+reuse that value, so an update does not accidentally rotate the password while
+the existing PostgreSQL volume still has the old one. Keep `.env.postgres` with
+the deployment backups and do not commit it. To deploy an existing installation
+for the first time, the helper imports `POSTGRES_PASSWORD` from the shell or the
+existing project `.env` file before generating a new one, then saves it for
+future runs. The project `.env` continues to supply other Compose settings.
 
 That file adds a `postgres:17-alpine` service with a healthcheck the app waits on,
 so the first migration cannot run against a database that is still starting. The
 `questarr` database itself is created automatically on that service's first start,
 via its `POSTGRES_DB` environment variable -- nothing to do on a fresh install.
+Questarr applies pending PostgreSQL migrations automatically before it starts
+accepting requests. The helper does not require a separate `npm run db:migrate`
+step for normal fresh installs or upgrades.
 
 The app also generates its credentials-encryption key on first startup and saves
 it to `./data/secrets/credentials.key`; the Compose file already mounts `./data`
@@ -58,15 +65,18 @@ persistent key file into each instance. A one-way key fingerprint in the databas
 makes an instance fail startup if its key differs, preventing it from writing
 credentials that other instances cannot decrypt.
 
-Manually, against a Postgres you already run:
+Against a PostgreSQL server you already run, create the database and start
+Questarr with its connection settings:
 
 ```bash
-createdb questarr                     # the database must exist; Questarr will not create it
-export DB_DIALECT=postgres
-export DATABASE_URL=postgres://questarr:password@localhost:5432/questarr
-npm run db:migrate                    # applies migrations-pg/
-npm start
+createdb questarr
+DB_DIALECT=postgres \
+  DATABASE_URL=postgres://questarr:password@localhost:5432/questarr \
+  npm start
 ```
+
+Questarr applies pending migrations during startup in this mode as well; the
+external database and role must already exist.
 
 If your password contains characters with reserved meaning in a URL (`@ / :
 % # ? &`), percent-encode them in `DATABASE_URL` -- `pass@word` becomes

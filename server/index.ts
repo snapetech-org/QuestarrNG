@@ -132,17 +132,17 @@ void (async () => {
     const { port, host } = config.server;
     const { ssl } = config;
 
-    // When HTTP-to-HTTPS redirect is requested, validate and bind HTTPS before
-    // exposing the HTTP listener. A broken certificate or port conflict must
-    // not leave the app unexpectedly available over plaintext.
-    if (ssl.enabled && ssl.redirectHttp) {
+    // An enabled TLS listener is a startup requirement. Validate and bind HTTPS
+    // before exposing HTTP so a bad certificate or occupied TLS port cannot
+    // silently downgrade an installation to HTTP-only service.
+    if (ssl.enabled) {
       if (!ssl.certPath || !ssl.keyPath) {
-        throw new Error("HTTPS redirect is enabled but certificate/key paths are missing");
+        throw new Error("HTTPS is enabled but certificate/key paths are missing");
       }
       const { createHttpsServerOptions, validateCertFiles } = await import("./ssl.js");
       const { valid, error } = await validateCertFiles(ssl.certPath, ssl.keyPath);
       if (!valid) {
-        throw new Error(`HTTPS redirect is enabled but TLS configuration is invalid: ${error}`);
+        throw new Error(`HTTPS is enabled but TLS configuration is invalid: ${error}`);
       }
 
       const httpsOptions = createHttpsServerOptions(
@@ -162,31 +162,8 @@ void (async () => {
       httpsServer.on("error", (error) => {
         log("HTTPS server error: " + String(error));
       });
-      httpsRedirectPort = ssl.port;
+      if (ssl.redirectHttp) httpsRedirectPort = ssl.port;
       log(`HTTPS server serving on ${host}:${ssl.port}`);
-    } else if (ssl.enabled && ssl.certPath && ssl.keyPath) {
-      try {
-        const { createHttpsServerOptions, validateCertFiles } = await import("./ssl.js");
-        const { valid, error } = await validateCertFiles(ssl.certPath, ssl.keyPath);
-        if (!valid) {
-          log(`SSL Configuration Invalid: ${error}. HTTPS was not started.`);
-        } else {
-          const httpsOptions = createHttpsServerOptions(
-            await fs.promises.readFile(ssl.keyPath),
-            await fs.promises.readFile(ssl.certPath)
-          );
-          const httpsServer = https.createServer(httpsOptions, rootRequestHandler ?? app);
-          setupSocketIO(httpsServer);
-          httpsServer.on("error", (error) => {
-            log("Failed to start HTTPS server: " + String(error));
-          });
-          httpsServer.listen(ssl.port, host, () => {
-            log(`HTTPS server serving on ${host}:${ssl.port}`);
-          });
-        }
-      } catch (error) {
-        log("Failed to start HTTPS server: " + String(error));
-      }
     }
 
     server.listen(port, host, () => {
