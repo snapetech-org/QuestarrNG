@@ -298,6 +298,27 @@ describe("ImportManager", () => {
     await expect(manager.confirmImport("dl-1")).rejects.toThrow("Confirmation requires a plan");
   });
 
+  it("requires explicit review when no security scanner is configured", async () => {
+    storage.getGameDownload.mockResolvedValue({ id: "dl-1", gameId: "g1", downloaderId: "d1" });
+    storage.getGame.mockResolvedValue(makeGame({ id: "g1", userId: "u1" }));
+    const manager = new ImportManager(
+      storage as never,
+      pathService as never,
+      platformService as never,
+      archiveService as never
+    );
+    await expect(
+      manager.confirmImport("dl-1", {
+        strategy: "pc",
+        originalPath: "/src/game",
+        proposedPath: "/data/PC/Game",
+        needsReview: false,
+      })
+    ).rejects.toThrow(/Security scanner is not configured/);
+    expect(fsMock.move).not.toHaveBeenCalled();
+    expect(fsMock.copy).not.toHaveBeenCalled();
+  });
+
   it("blocks confirmImport when proposed path is outside library root", async () => {
     storage.getGameDownload.mockResolvedValue({ id: "dl-1", gameId: "g1", downloaderId: "d1" });
     storage.getGame.mockResolvedValue({

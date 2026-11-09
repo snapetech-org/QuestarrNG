@@ -106,8 +106,13 @@ describe("SSL Module", () => {
 
       const result = await generateSelfSignedCert();
 
-      expect(result.keyPath).toContain("server.key");
-      expect(result.certPath).toContain("server.crt");
+      expect(result.keyPath).toMatch(/server-[0-9a-f-]{36}\.key$/);
+      expect(result.certPath).toMatch(/server-[0-9a-f-]{36}\.crt$/);
+      expect((await import("fs")).default.promises.open).toHaveBeenCalledWith(
+        result.keyPath,
+        "wx",
+        0o600
+      );
       expect(forge.pki.rsa.generateKeyPair).toHaveBeenCalledWith(2048);
       expect(mocks.writeFile).toHaveBeenCalledTimes(2); // Key and Cert
     });

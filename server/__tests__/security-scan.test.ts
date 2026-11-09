@@ -560,7 +560,9 @@ describe("SecurityScanService.scan", () => {
     fs.mkdirSync(lockedDir);
     fs.writeFileSync(path.join(lockedDir, "hidden.exe"), "x");
 
-    const originalReaddir = fsPromises.opendir;
+    const originalReaddir = (
+      await vi.importActual<typeof import("node:fs/promises")>("node:fs/promises")
+    ).opendir;
     const readdirSpy = vi
       .spyOn(fsPromises, "opendir")
       .mockImplementation(async (dirPath: fs.PathLike, options?: unknown) => {
