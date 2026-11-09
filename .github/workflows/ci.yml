@@ -177,7 +177,7 @@ jobs:
         env:
           DOTNET_INSTALL_DIR: ${{ runner.temp }}/questarrng-dotnet-${{ github.run_id }}-${{ github.run_attempt }}
         with:
-          dotnet-version: "10.0.402"
+          dotnet-version: "10.0.403"
 
       - name: Verify selected .NET SDK
         run: '"$RUNNER_TEMP/questarrng-dotnet-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/dotnet" --version'

@@ -6,7 +6,6 @@ import { param } from "express-validator";
 import { createServer, type Server } from "http";
 import { storage, type IStorage } from "./storage.js";
 import { stripUndefined } from "./object-utils.js";
-import { normalizeTitle } from "../shared/title-utils.js";
 import { normalizeDownloadHash, normalizeTrackedKey } from "./download-hash.js";
 import { checkDownloadStatus, withGameOperationLock } from "./cron.js";
 import { igdbClient } from "./igdb.js";

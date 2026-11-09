@@ -300,7 +300,7 @@ const GameCarouselSection = ({
                   onTrackGame={onTrackGame}
                   onToggleHidden={onToggleHidden}
                   isDiscovery={isDiscovery}
-                  isBulkSelected={selectedGameIds?.has(game.id)}
+                  isBulkSelected={selectedGameIds?.has(game.id) ?? false}
                   bulkSelectionDisabled={canBulkSelect ? !canBulkSelect(game) : false}
                   onToggleBulkSelection={onToggleBulkSelection}
                 />
