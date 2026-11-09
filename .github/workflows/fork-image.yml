@@ -360,7 +360,7 @@ jobs:
       - name: Smoke test published image and SeerrNG route
         shell: bash
         env:
-          IMAGE: ${{ steps.image.outputs.name }}:sha-${{ needs.publish.outputs.release_sha }}
+          IMAGE: ${{ steps.image.outputs.name }}:sha-${{ needs.release-security.outputs.release_sha }}
         run: |
           set -euo pipefail
           docker volume create questarrng-smoke-data
