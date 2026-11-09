@@ -10,6 +10,9 @@
 # `openssl rand -hex 32` is always safe.
 #
 #   POSTGRES_PASSWORD=<something> docker compose -f docker-compose.postgres.yml up -d
+#
+# Questarr automatically creates and persists its credentials-encryption key
+# under ./data/secrets/credentials.key. Keep ./data mounted and backed up.
 
 services:
   app:

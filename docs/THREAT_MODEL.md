@@ -132,7 +132,9 @@ Eight named trust boundaries:
 - **Credentials:** user password hashes, the JWT signing secret, indexer API keys,
   download-client passwords, NexusMods and VirusTotal API keys. The encryption key for
   indexer/downloader credentials is stored outside the database by default, or supplied
-  through the environment. See
+  through the environment. PostgreSQL app instances must share that key file or receive
+  the same environment key; a one-way database fingerprint makes mismatched instances
+  fail startup. See
   [`docs/SECRETS.md`](./SECRETS.md) for the authoritative inventory of where each of these
   lives and how it's protected.
 - **Library/download metadata:** game collections, download history — low sensitivity, but

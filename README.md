@@ -276,6 +276,12 @@ the app as the configured `PUID:PGID` directly, so prepare the bind-mounted
    restart, and it must be safe to embed in a connection URL (a hex string
    from `openssl rand -hex 32` always is).
 
+   Questarr automatically creates and persists its credentials-encryption key
+   under `./data/secrets/credentials.key`; the bundled Compose setup does not
+   need a separate key value. Keep `./data` mounted and include that key file in
+   protected backups. See [docs/DATABASE.md](docs/DATABASE.md) for multi-instance
+   PostgreSQL setups.
+
    Switching an existing SQLite install to Postgres does not move your data —
    run `scripts/sqlite-to-pg.ts` to bring your library across. See
    [docs/DATABASE.md](docs/DATABASE.md).

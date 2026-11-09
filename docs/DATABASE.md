@@ -48,6 +48,16 @@ so the first migration cannot run against a database that is still starting. The
 `questarr` database itself is created automatically on that service's first start,
 via its `POSTGRES_DB` environment variable -- nothing to do on a fresh install.
 
+The app also generates its credentials-encryption key on first startup and saves
+it to `./data/secrets/credentials.key`; the Compose file already mounts `./data`
+persistently, so no `CREDENTIALS_ENCRYPTION_KEY` setup is needed for this
+single-app deployment. Keep that file in protected backups with the database.
+If you run multiple Questarr app instances against the same PostgreSQL database,
+give every instance the same `CREDENTIALS_ENCRYPTION_KEY` or mount the same
+persistent key file into each instance. A one-way key fingerprint in the database
+makes an instance fail startup if its key differs, preventing it from writing
+credentials that other instances cannot decrypt.
+
 Manually, against a Postgres you already run:
 
 ```bash
@@ -64,6 +74,11 @@ If your password contains characters with reserved meaning in a URL (`@ / :
 
 Questarr applies migrations at startup, so `db:migrate` is only needed if you want
 to run them ahead of time.
+
+For one app process, the default config directory stores the generated key across
+restarts. For multiple app processes, configure one shared key with
+`CREDENTIALS_ENCRYPTION_KEY` or share the persistent config key file as described
+above. A mismatched instance fails startup after checking the database fingerprint.
 
 ## Migrating an existing SQLite library to Postgres
 

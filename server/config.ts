@@ -63,9 +63,9 @@ const envSchema = z
     // section in the game details Journal tab — player wishlist sync does not need it)
     STEAM_API_KEY: z.string().optional(),
 
-    // Encryption key for indexer/downloader credentials at rest. SQLite can
-    // generate a private key file when unset; PostgreSQL requires one shared
-    // key across app instances. Must be 64-char hex when provided.
+    // Encryption key for indexer/downloader credentials at rest. A private
+    // key file is generated when unset. PostgreSQL app instances must share
+    // that file or use the same env key. Must be 64-char hex when provided.
     CREDENTIALS_ENCRYPTION_KEY: z
       .string()
       .optional()

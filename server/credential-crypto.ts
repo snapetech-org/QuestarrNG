@@ -15,11 +15,13 @@ const ENCRYPTED_PREFIX = "enc:v1:";
 const IV_LENGTH = 12;
 const AUTH_TAG_LENGTH = 16;
 // Keep generated key material outside the database so a database-only dump does
-// not contain both credentials and the key needed to decrypt them. Deployments
-// sharing a PostgreSQL database must provide one common env key on every node.
+// not contain both credentials and the key needed to decrypt them. The config
+// directory must be persistent; PostgreSQL instances must share this file or
+// provide the same environment key.
 const ENCRYPTION_KEY_DIRECTORY = path.join(configLoader.getConfigDir(), "secrets");
 const ENCRYPTION_KEY_FILE = path.join(ENCRYPTION_KEY_DIRECTORY, "credentials.key");
 const LEGACY_ENCRYPTION_MATERIAL_ENTRY_NAME = "app_encryption_material";
+const ENCRYPTION_KEY_FINGERPRINT_ENTRY_NAME = "app_credentials_encryption_key_fingerprint";
 
 // Cache the resolved key in memory to avoid a DB round-trip on every call.
 let cachedKey: Buffer | null = null;
@@ -27,9 +29,9 @@ let keyInitialization: Promise<Buffer> | null = null;
 
 /**
  * Resolve the AES-256 key used to encrypt indexer/downloader credentials at
- * rest. The environment key takes priority. SQLite deployments otherwise use
- * a private key file and migrate the legacy database key; PostgreSQL requires
- * one shared environment key for every application instance.
+ * rest. The environment key takes priority and is persisted to the private
+ * key file when possible. Any backend without an environment key uses that file,
+ * migrating the legacy database key or generating one on first startup.
  */
 export async function getCredentialsEncryptionKey(): Promise<Buffer> {
   if (cachedKey) {
@@ -48,26 +50,55 @@ async function initializeCredentialsEncryptionKey(): Promise<Buffer> {
       throw new Error("CREDENTIALS_ENCRYPTION_KEY must be exactly 32 bytes of hexadecimal data");
     }
     const envKey = Buffer.from(config.credentials.encryptionKey, "hex");
+    let keyFileKey = await readKeyFile();
     const legacyKey = await readLegacyDatabaseKey();
+    if (keyFileKey && !crypto.timingSafeEqual(keyFileKey, envKey)) {
+      throw new Error(
+        "CREDENTIALS_ENCRYPTION_KEY does not match the persisted key file; restore the matching key before starting"
+      );
+    }
     if (legacyKey && !crypto.timingSafeEqual(legacyKey, envKey)) {
       throw new Error(
         "CREDENTIALS_ENCRYPTION_KEY does not match the legacy database key; restore the matching key before starting"
       );
     }
+
+    // Migrate environment-provided keys to the private file automatically.
+    // This lets existing PostgreSQL installs keep their key if they later move
+    // key management to the persistent config volume. The environment key still
+    // works when the config directory is intentionally read-only.
+    if (!keyFileKey) {
+      try {
+        await ensureKeyDirectory();
+        keyFileKey = await createKeyFileIfMissing(envKey);
+      } catch (error) {
+        cryptoLogger.warn(
+          { error },
+          "Could not persist the environment credentials key; keep CREDENTIALS_ENCRYPTION_KEY configured"
+        );
+      }
+      if (keyFileKey && !crypto.timingSafeEqual(keyFileKey, envKey)) {
+        throw new Error(
+          "CREDENTIALS_ENCRYPTION_KEY does not match the persisted key file; restore the matching key before starting"
+        );
+      }
+    }
     if (legacyKey) await deleteLegacyDatabaseKey();
+    await verifyDatabaseKeyFingerprint(envKey);
     cachedKey = envKey;
     return cachedKey;
-  }
-
-  if (config.database.dialect === "postgres" || config.database.dialect === "postgresql") {
-    throw new Error(
-      "CREDENTIALS_ENCRYPTION_KEY is required when using PostgreSQL so every app instance shares the same key"
-    );
   }
 
   await ensureKeyDirectory();
   const keyFileKey = await readKeyFile();
   if (keyFileKey) {
+    const legacyKey = await readLegacyDatabaseKey();
+    if (legacyKey && !crypto.timingSafeEqual(legacyKey, keyFileKey)) {
+      throw new Error(
+        "Persisted credentials key file does not match the legacy database key; restore the matching key before starting"
+      );
+    }
+    await verifyDatabaseKeyFingerprint(keyFileKey);
     cachedKey = keyFileKey;
     await deleteLegacyDatabaseKey();
     return keyFileKey;
@@ -76,6 +107,12 @@ async function initializeCredentialsEncryptionKey(): Promise<Buffer> {
   const legacyKey = await readLegacyDatabaseKey();
   const candidate = legacyKey ?? crypto.randomBytes(32);
   const persistedKey = await createKeyFileIfMissing(candidate);
+  if (legacyKey && !crypto.timingSafeEqual(legacyKey, persistedKey)) {
+    throw new Error(
+      "Persisted credentials key file does not match the legacy database key; restore the matching key before starting"
+    );
+  }
+  await verifyDatabaseKeyFingerprint(persistedKey);
   if (legacyKey) await deleteLegacyDatabaseKey();
   cachedKey = persistedKey;
   cryptoLogger.info("Loaded or initialized the private credentials encryption key file");
@@ -94,6 +131,20 @@ async function ensureKeyDirectory(): Promise<void> {
 }
 
 async function readKeyFile(): Promise<Buffer | null> {
+  let directoryStat: Awaited<ReturnType<typeof lstat>>;
+  try {
+    directoryStat = await lstat(ENCRYPTION_KEY_DIRECTORY);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
+    throw new Error("Failed to inspect credentials encryption key directory", { cause: error });
+  }
+  if (directoryStat.isSymbolicLink() || !directoryStat.isDirectory()) {
+    throw new Error("Credentials encryption key directory must be a real directory");
+  }
+  if (process.platform !== "win32" && (directoryStat.mode & 0o077) !== 0) {
+    await chmod(ENCRYPTION_KEY_DIRECTORY, 0o700);
+  }
+
   let fileStat: Awaited<ReturnType<typeof lstat>>;
   try {
     fileStat = await lstat(ENCRYPTION_KEY_FILE);
@@ -166,6 +217,37 @@ async function deleteLegacyDatabaseKey(): Promise<void> {
   } catch (error) {
     cryptoLogger.error({ error }, "Failed to remove the legacy database encryption key");
     throw new Error("Failed to remove the legacy database encryption key", { cause: error });
+  }
+}
+
+/**
+ * Record a one-way key fingerprint so app instances sharing a database fail
+ * startup if they resolve different keys. The database never stores the key.
+ */
+async function verifyDatabaseKeyFingerprint(key: Buffer): Promise<void> {
+  const fingerprint = crypto
+    .createHash("sha256")
+    .update("questarrng:credentials-encryption-key:v1\0", "utf8")
+    .update(key)
+    .digest("hex");
+  await db
+    .insert(systemConfig)
+    .values({ key: ENCRYPTION_KEY_FINGERPRINT_ENTRY_NAME, value: fingerprint })
+    .onConflictDoNothing();
+
+  const [row] = await db
+    .select()
+    .from(systemConfig)
+    .where(eq(systemConfig.key, ENCRYPTION_KEY_FINGERPRINT_ENTRY_NAME));
+  if (!row?.value || !/^[a-f0-9]{64}$/i.test(row.value)) {
+    throw new Error("Credentials encryption key fingerprint is missing or invalid");
+  }
+  const storedFingerprint = Buffer.from(row.value, "hex");
+  const expectedFingerprint = Buffer.from(fingerprint, "hex");
+  if (!crypto.timingSafeEqual(storedFingerprint, expectedFingerprint)) {
+    throw new Error(
+      "Credentials encryption key does not match this database; all app instances must use the same key"
+    );
   }
 }
 
