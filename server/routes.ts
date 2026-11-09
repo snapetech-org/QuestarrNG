@@ -902,15 +902,17 @@ function registerIgdbParamListRoute(
  * @param app - The Express application to configure
  * @returns The configured HTTP server
  */
-const publicCreateGameSchema = insertGameSchema
-  .omit({
-    seerrExternalRequestId: true,
-    seerrVariant: true,
-    seerrCancelled: true,
-    seerrDispatching: true,
-    seerrRecoveryRequired: true,
-  })
-  .safeExtend({ userId: z.string().optional() });
+const publicCreateGameSchema = insertGameSchema.safeExtend({
+  // Preserve insertGameSchema's cross-field refinements while rejecting the
+  // internal Seerr lifecycle fields at the public API boundary. Zod 4 cannot
+  // call .omit() after .superRefine(), but safeExtend() retains refinements.
+  seerrExternalRequestId: z.never().optional(),
+  seerrVariant: z.never().optional(),
+  seerrCancelled: z.never().optional(),
+  seerrDispatching: z.never().optional(),
+  seerrRecoveryRequired: z.never().optional(),
+  userId: z.string().optional(),
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // 🛡️ Sentinel: Add security headers with Helmet
