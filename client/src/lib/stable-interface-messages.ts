@@ -3161,6 +3161,14 @@ export const STABLE_INTERFACE_MESSAGES = {
     "Fill missing game details from IGDB. Existing metadata is preserved unless you enable overwrite.",
   "interface.replace_existing_metadata_c5d447c5": "Replace existing metadata",
   "interface.groups_ready_to_link_count_29cbe906": "Groups ready to link: {count}",
+  "interface.session_could_not_be_revoked_sign_in_48c5ee05":
+    "Session could not be revoked; sign in again later",
+  "interface.certificate_and_key_paths_cannot_be__23a350b7":
+    "Certificate and key paths cannot be empty",
+  "interface.invalid_discovery_batch_0d2225e2": "Invalid discovery batch",
+  "interface.invalid_questarrng_library_catalog_b1e1cb72": "Invalid QuestarrNG library catalog",
+  "interface.failed_to_preview_game_library_impor_a9fa82d7":
+    "Failed to preview game library import",
 } as const;
 
 export type StableInterfaceMessageId = keyof typeof STABLE_INTERFACE_MESSAGES;

@@ -50006,6 +50006,101 @@
         "vi": "Groups ready to link: {count}",
         "id": "Groups ready to link: {count}"
       }
+    },
+    "interface.session_could_not_be_revoked_sign_in_48c5ee05": {
+      "source": "Session could not be revoked; sign in again later",
+      "translations": {
+        "es": "Session could not be revoked; sign in again later",
+        "es-419": "Session could not be revoked; sign in again later",
+        "zh-Hans": "Session could not be revoked; sign in again later",
+        "hi": "Session could not be revoked; sign in again later",
+        "de": "Session could not be revoked; sign in again later",
+        "ja": "Session could not be revoked; sign in again later",
+        "fr": "Session could not be revoked; sign in again later",
+        "fr-CA": "Session could not be revoked; sign in again later",
+        "pt-BR": "Session could not be revoked; sign in again later",
+        "ar": "Session could not be revoked; sign in again later",
+        "ko": "Session could not be revoked; sign in again later",
+        "zh-Hant": "Session could not be revoked; sign in again later",
+        "vi": "Session could not be revoked; sign in again later",
+        "id": "Session could not be revoked; sign in again later"
+      }
+    },
+    "interface.certificate_and_key_paths_cannot_be__23a350b7": {
+      "source": "Certificate and key paths cannot be empty",
+      "translations": {
+        "es": "Certificate and key paths cannot be empty",
+        "es-419": "Certificate and key paths cannot be empty",
+        "zh-Hans": "Certificate and key paths cannot be empty",
+        "hi": "Certificate and key paths cannot be empty",
+        "de": "Certificate and key paths cannot be empty",
+        "ja": "Certificate and key paths cannot be empty",
+        "fr": "Certificate and key paths cannot be empty",
+        "fr-CA": "Certificate and key paths cannot be empty",
+        "pt-BR": "Certificate and key paths cannot be empty",
+        "ar": "Certificate and key paths cannot be empty",
+        "ko": "Certificate and key paths cannot be empty",
+        "zh-Hant": "Certificate and key paths cannot be empty",
+        "vi": "Certificate and key paths cannot be empty",
+        "id": "Certificate and key paths cannot be empty"
+      }
+    },
+    "interface.invalid_discovery_batch_0d2225e2": {
+      "source": "Invalid discovery batch",
+      "translations": {
+        "es": "Invalid discovery batch",
+        "es-419": "Invalid discovery batch",
+        "zh-Hans": "Invalid discovery batch",
+        "hi": "Invalid discovery batch",
+        "de": "Invalid discovery batch",
+        "ja": "Invalid discovery batch",
+        "fr": "Invalid discovery batch",
+        "fr-CA": "Invalid discovery batch",
+        "pt-BR": "Invalid discovery batch",
+        "ar": "Invalid discovery batch",
+        "ko": "Invalid discovery batch",
+        "zh-Hant": "Invalid discovery batch",
+        "vi": "Invalid discovery batch",
+        "id": "Invalid discovery batch"
+      }
+    },
+    "interface.invalid_questarrng_library_catalog_b1e1cb72": {
+      "source": "Invalid QuestarrNG library catalog",
+      "translations": {
+        "es": "Invalid QuestarrNG library catalog",
+        "es-419": "Invalid QuestarrNG library catalog",
+        "zh-Hans": "Invalid QuestarrNG library catalog",
+        "hi": "Invalid QuestarrNG library catalog",
+        "de": "Invalid QuestarrNG library catalog",
+        "ja": "Invalid QuestarrNG library catalog",
+        "fr": "Invalid QuestarrNG library catalog",
+        "fr-CA": "Invalid QuestarrNG library catalog",
+        "pt-BR": "Invalid QuestarrNG library catalog",
+        "ar": "Invalid QuestarrNG library catalog",
+        "ko": "Invalid QuestarrNG library catalog",
+        "zh-Hant": "Invalid QuestarrNG library catalog",
+        "vi": "Invalid QuestarrNG library catalog",
+        "id": "Invalid QuestarrNG library catalog"
+      }
+    },
+    "interface.failed_to_preview_game_library_impor_a9fa82d7": {
+      "source": "Failed to preview game library import",
+      "translations": {
+        "es": "Failed to preview game library import",
+        "es-419": "Failed to preview game library import",
+        "zh-Hans": "Failed to preview game library import",
+        "hi": "Failed to preview game library import",
+        "de": "Failed to preview game library import",
+        "ja": "Failed to preview game library import",
+        "fr": "Failed to preview game library import",
+        "fr-CA": "Failed to preview game library import",
+        "pt-BR": "Failed to preview game library import",
+        "ar": "Failed to preview game library import",
+        "ko": "Failed to preview game library import",
+        "zh-Hant": "Failed to preview game library import",
+        "vi": "Failed to preview game library import",
+        "id": "Failed to preview game library import"
+      }
     }
   }
 }

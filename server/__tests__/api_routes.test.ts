@@ -1434,6 +1434,9 @@ describe("API Routes - Extended Coverage", () => {
       vi.mocked(storage.removeGame).mockResolvedValue(true);
       vi.mocked(fsExtra.remove).mockResolvedValue(undefined as never);
 
+      const realpathSpy = vi
+        .spyOn(fsExtra, "realpath")
+        .mockImplementation(async (value) => path.resolve(String(value)) as never);
       const response = await request(app).delete(`/api/games/${gameId}?deleteFiles=true`);
 
       expect(response.status).toBe(200);
@@ -1442,6 +1445,7 @@ describe("API Routes - Extended Coverage", () => {
         fileDeletion: { deleted: true, path: "/mnt/old-library/MyGame" },
       });
       expect(fsExtra.remove).toHaveBeenCalledWith(path.resolve("/mnt/old-library/MyGame"));
+      realpathSpy.mockRestore();
     });
 
     it("should still skip deleting library files outside the library root when their root folder has allowDelete off", async () => {
@@ -5136,7 +5140,12 @@ describe("API Routes - Extended Coverage", () => {
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual(candidates);
-      expect(searchUnmatchedFolder).toHaveBeenCalledWith("rf-1", "Some Game", "Real Name");
+      expect(searchUnmatchedFolder).toHaveBeenCalledWith(
+        "rf-1",
+        "Some Game",
+        "Real Name",
+        "user-1"
+      );
     });
 
     it("rejects an empty search", async () => {

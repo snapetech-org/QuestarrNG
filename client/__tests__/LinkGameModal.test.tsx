@@ -142,14 +142,7 @@ describe("LinkGameModal", () => {
       expect(mockToast).toHaveBeenCalledWith(
         expect.objectContaining({
           title: expectToastText("Failed to Link Game"),
-          description: expect.objectContaining({
-            type: "span",
-            props: expect.objectContaining({
-              lang: "und",
-              dir: "auto",
-              children: "Download not found",
-            }),
-          }),
+          description: expectToastText("Download not found"),
           variant: "destructive",
         })
       )

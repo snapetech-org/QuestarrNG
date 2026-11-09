@@ -1,3 +1,4 @@
+import * as fsPromises from "node:fs/promises";
 import { parseServiceMessageDescriptor } from "../../shared/service-messages.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import fs from "node:fs";
@@ -554,9 +555,9 @@ describe("SecurityScanService.scan", () => {
     fs.mkdirSync(lockedDir);
     fs.writeFileSync(path.join(lockedDir, "hidden.exe"), "x");
 
-    const originalReaddir = fsExtra.readdir.bind(fsExtra);
+    const originalReaddir = fsPromises.opendir;
     const readdirSpy = vi
-      .spyOn(fsExtra, "readdir")
+      .spyOn(fsPromises, "opendir")
       .mockImplementation(async (dirPath: fs.PathLike, options?: unknown) => {
         if (dirPath === lockedDir) {
           const error = new Error("EACCES: permission denied") as NodeJS.ErrnoException;

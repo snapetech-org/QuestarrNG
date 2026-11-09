@@ -243,10 +243,13 @@ describe("notification message localization", () => {
 
   it("uses the English message and automatic direction when localization cannot match", () => {
     const english = localizeNotificationMessage("Game Released", "A game was released!", "en");
-    expect(english).toEqual({ content: "A game was released!", language: "en", direction: "auto" });
+    expect(nodeText(english.content)).toBe("A game was released!");
+    expect(english.direction).toBe("auto");
 
     const unknown = localizeNotificationMessage("Unknown event", "Unmatched details", "fr");
-    expect(unknown).toEqual({ content: "Unmatched details", language: "en", direction: "auto" });
+    expect(nodeText(unknown.content)).toBe("Unmatched details");
+    expect(unknown.language).toBe("und");
+    expect(unknown.direction).toBe("auto");
   });
 });
 

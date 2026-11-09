@@ -188,7 +188,7 @@ describe("ImportReviewModal", () => {
       expect(mockToast).toHaveBeenCalledWith(
         expect.objectContaining({
           title: expectToastText("Validation Error"),
-          description: expect.stringContaining("password-protected"),
+          description: expectToastText(expect.stringContaining("password-protected")),
         })
       );
     });
@@ -232,14 +232,9 @@ describe("ImportReviewModal", () => {
         expect(mockToast).toHaveBeenCalledWith(
           expect.objectContaining({
             title: expectToastText("Incorrect Password"),
-            description: expect.objectContaining({
-              type: "span",
-              props: expect.objectContaining({
-                lang: "und",
-                dir: "auto",
-                children: "The provided password was rejected — it may be incorrect.",
-              }),
-            }),
+            description: expectToastText(
+              "The provided password was rejected — it may be incorrect."
+            ),
           })
         )
       );

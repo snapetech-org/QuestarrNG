@@ -3,7 +3,11 @@ import { act, cleanup, render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import LoginPage from "@/pages/auth/login";
-import { setInterfaceLanguage, translateInterfaceLabel } from "@/lib/interface-locale";
+import {
+  setInterfaceLanguage,
+  translateInterfaceLabel,
+  formatInterfaceMessage,
+} from "@/lib/interface-locale";
 
 vi.mock("@/lib/auth", () => ({ useAuth: () => ({ login: vi.fn(), isLoading: false }) }));
 vi.mock("@/components/GitHubVersionLink", () => ({ GitHubVersionLink: () => null }));
@@ -30,10 +34,14 @@ describe("OIDC setup-guide accessible label", () => {
       act(() => setInterfaceLanguage(locale));
       expect(link).toHaveAttribute(
         "aria-label",
-        `${translateInterfaceLabel("identity provider", locale)} setup guide (opens in a new tab)`
+        formatInterfaceMessage(
+          "auth.provider_setup_guide_label",
+          { provider: translateInterfaceLabel("identity provider", locale) },
+          locale
+        )
       );
       expect(link).toHaveAttribute("href", url);
-      expect(link).toHaveAttribute("lang", "en");
+      expect(link).toHaveAttribute("lang", locale);
       expect(link.firstElementChild).toHaveTextContent(
         translateInterfaceLabel("interface.provider_setup_guide_9f61fa39", locale)
       );

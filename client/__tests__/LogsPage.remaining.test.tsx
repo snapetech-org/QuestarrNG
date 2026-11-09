@@ -258,7 +258,7 @@ describe("LogsPage remaining coverage", () => {
     await waitFor(() => {
       expect(toastMock).toHaveBeenCalledWith({
         title: expectToastText("Copied"),
-        description: expect.stringContaining("log lines copied to clipboard"),
+        description: expectToastText(expect.stringContaining("log lines copied to clipboard")),
       });
     });
 

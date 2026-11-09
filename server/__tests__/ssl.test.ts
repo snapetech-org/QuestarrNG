@@ -23,6 +23,11 @@ vi.mock("fs", () => ({
     promises: {
       mkdir: mocks.mkdir,
       chmod: vi.fn().mockResolvedValue(undefined),
+      open: vi.fn().mockResolvedValue({
+        writeFile: mocks.writeFile,
+        chmod: vi.fn().mockResolvedValue(undefined),
+        close: vi.fn().mockResolvedValue(undefined),
+      }),
       writeFile: mocks.writeFile,
       readFile: mocks.readFile,
     },

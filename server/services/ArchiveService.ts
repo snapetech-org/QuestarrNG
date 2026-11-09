@@ -731,6 +731,8 @@ export class ArchiveService {
       }
     };
     await plan(stagingDir, destDir);
+    // Directory iteration order differs by filesystem; keep replacement and rollback order reproducible.
+    filesToMove.sort((left, right) => (left.to < right.to ? -1 : left.to > right.to ? 1 : 0));
 
     // A replaced file is backed up by hard link (a copy when the filesystem has none),
     // then the new version is renamed over it in one atomic step: the installed file is

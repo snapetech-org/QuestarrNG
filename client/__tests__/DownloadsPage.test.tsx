@@ -565,9 +565,7 @@ describe("Downloads page", () => {
     expect(toastSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         title: expectToastText("Downloader Error: Broken Client"),
-        description: expect.objectContaining({
-          props: expect.objectContaining({ source: "Indexer auth failed" }),
-        }),
+        description: expectToastText("Indexer auth failed"),
         variant: "destructive",
       })
     );

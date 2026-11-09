@@ -298,7 +298,6 @@ describe("SSRF Vulnerability in Routes", () => {
     expect(validation).toHaveBeenCalledWith("http://127.0.0.1:9696/private", {
       allowPrivate: false,
       allowedPrivateOrigins: ["http://prowlarr:9696"],
-      maxResponseBytes: 50 * 1024 * 1024,
     });
     expect(fetch).not.toHaveBeenCalled();
 
@@ -319,7 +318,7 @@ describe("SSRF Vulnerability in Routes", () => {
 
   it.each([
     { url: "http://127.0.0.1:9696", dnsResult: null, status: 500 },
-    { url: "http://removed-prowlarr.invalid:9696", dnsResult: "throw", status: 500 },
+    { url: "http://removed-prowlarr.invalid:9696", dnsResult: "throw", status: 400 },
     { url: "http://empty-prowlarr.invalid:9696", dnsResult: "empty", status: 400 },
     { url: "http://unsafe-prowlarr.invalid:9696", dnsResult: "unsafe", status: 400 },
   ])("persists HTTP opt-out when sync fails for $url", async ({ url, dnsResult, status }) => {

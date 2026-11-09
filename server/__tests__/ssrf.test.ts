@@ -479,10 +479,10 @@ describe("safeFetch", () => {
     );
   });
 
-  it("should allow private IPs by default for HTTPS", async () => {
+  it("allows private HTTPS addresses only with explicit permission", async () => {
     // Direct IP URL (no DNS lookup needed)
     vi.mocked(fetch).mockResolvedValueOnce(new Response("ok"));
-    await safeFetch("https://192.168.1.1:8080/api");
+    await safeFetch("https://192.168.1.1:8080/api", { allowPrivate: true });
     expect(fetch).toHaveBeenCalledWith("https://192.168.1.1:8080/api", expect.any(Object));
   });
 
@@ -542,7 +542,7 @@ describe("resolveSafeAddress", () => {
   });
 
   it("returns address and family for a safe IP", async () => {
-    const result = await resolveSafeAddress("192.168.1.1");
+    const result = await resolveSafeAddress("192.168.1.1", true);
     expect(result).toEqual({ address: "192.168.1.1", family: 4 });
   });
 

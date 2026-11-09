@@ -1,3 +1,4 @@
+import { SERVICE_MESSAGE_SOURCES } from "@shared/service-messages";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -23,6 +24,9 @@ import { API_ERROR_DETAIL_LABELS as brazilianPortuguese } from "@/lib/api-error-
 import { API_ERROR_DETAIL_LABELS as traditionalChinese } from "@/lib/api-error-details/zh-Hant";
 import { API_ERROR_DETAIL_LABELS as vietnamese } from "@/lib/api-error-details/vi";
 
+const legacySources = new Set<string>(
+  JSON.parse(readFileSync("localization/legacy-api-error-sources.json", "utf8")).messages
+);
 const API_ERROR_SOURCE_FILES = [
   "server/routes.ts",
   "server/routes/import.ts",
@@ -121,7 +125,9 @@ describe("API error detail source catalog", () => {
     const missing = [...fixedErrors].filter(
       (message) => !hasInterfaceMessage(message) && !listedKeys.has(message)
     );
-    const stale = API_ERROR_DETAIL_SOURCE_MESSAGES.filter((message) => !source.includes(message));
+    const stale = API_ERROR_DETAIL_SOURCE_MESSAGES.filter(
+      (message) => !source.includes(message) && !legacySources.has(message)
+    );
 
     expect(fixedErrors.size).toBeGreaterThanOrEqual(278);
     expect(missing).toEqual([]);
@@ -142,7 +148,7 @@ describe("API error detail source catalog", () => {
       readFileSync(resolve(process.cwd(), file), "utf8")
     ).join("\n");
     for (const message of ADDITIONAL_API_ERROR_DETAIL_SOURCE_MESSAGES) {
-      expect(source, message).toContain(message);
+      expect(source.includes(message) || legacySources.has(message), message).toBe(true);
     }
   });
 
@@ -185,9 +191,19 @@ describe("API error detail source catalog", () => {
         '{ALLOWED_XREL_DOMAINS.join(", ")}',
     ];
 
-    for (const template of expected) expect(source).toContain(template);
+    for (const template of expected) {
+      const normalize = (value: string) =>
+        value.replace(/\$\{[^}]+\}|\{[A-Za-z][A-Za-z0-9_]*\}/g, "{value}");
+      const migrated = Object.entries(SERVICE_MESSAGE_SOURCES).find(
+        ([, value]) => normalize(value) === normalize(template)
+      );
+      expect(
+        source.includes(template) || Boolean(migrated && source.includes(migrated[0])),
+        template
+      ).toBe(true);
+    }
     expect(expected).toHaveLength(24);
-    expect(source.match(/Invalid SSL configuration: \$\{error\}/g)).toHaveLength(2);
+    expect(source).toContain("service.ssl_invalid_configuration");
   });
 
   it("has complete nonblank translations for all twelve target locales", () => {

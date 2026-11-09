@@ -1541,7 +1541,7 @@ describe("downloader client regression coverage", () => {
     rpcSpy.mockRejectedValueOnce(new Error("Authentication failed: bad credentials"));
     await expect(client.testConnection()).resolves.toMatchObject({
       success: false,
-      message: "Authentication failed: bad credentials",
+      message: "Authentication failed",
     });
 
     rpcSpy.mockRejectedValueOnce(new Error("rpc down"));

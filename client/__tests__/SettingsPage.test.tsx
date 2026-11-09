@@ -419,23 +419,18 @@ describe("SettingsPage", () => {
     async (typed) => {
       const { apiRequest, ApiError } = await import("@/lib/queryClient");
       const fragment = serviceMessage("service.apprise_cli_not_found", {});
-      vi.mocked(apiRequest).mockRejectedValueOnce(
-        new ApiError(502, fragment.message, {
-          error: fragment.message,
-          errorI18n: typed ? fragment : null,
-        })
-      );
-      vi.mocked(globalThis.fetch).mockImplementation(async (input) => {
-        const url =
-          typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
-        if (url.includes("/api/settings/apprise"))
-          return Response.json({
-            configured: true,
-            mode: "api",
-            apiUrl: "http://apprise:8000",
-            key: "***",
+      vi.mocked(apiRequest).mockImplementation(async (method, url) => {
+        if (method === "POST")
+          throw new ApiError(502, fragment.message, {
+            error: fragment.message,
+            errorI18n: typed ? fragment : null,
           });
-        return defaultFetch(input);
+        return Response.json({
+          configured: true,
+          mode: "api",
+          apiUrl: "http://apprise:8000",
+          key: "***",
+        });
       });
       render(
         <QueryClientProvider client={createTestQueryClient()}>

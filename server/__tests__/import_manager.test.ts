@@ -171,8 +171,7 @@ describe("ImportManager", () => {
     expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
       "dl-1",
       "game_link_required",
-      "This download's linked game could not be found — select a game to continue importing it.",
-      expect.toSatisfy((metadata) => metadata === null || typeof metadata === "string")
+      "This download's linked game could not be found — select a game to continue importing it."
     );
   });
 

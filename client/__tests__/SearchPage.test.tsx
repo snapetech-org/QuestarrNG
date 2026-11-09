@@ -439,7 +439,7 @@ describe("SearchPage", () => {
         expect(toastSpy).toHaveBeenCalledWith(
           expect.objectContaining({
             title: expectToastText("Checking qBittorrent"),
-            description: message,
+            description: expectToastText(message),
           })
         );
       });

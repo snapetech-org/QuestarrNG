@@ -87,7 +87,10 @@ describe("RssService", () => {
     await rssService.refreshFeeds();
 
     expect(storage.getAllRssFeeds).toHaveBeenCalled();
-    expect(mocks.safeFetch).toHaveBeenCalledWith(mockFeed.url);
+    expect(mocks.safeFetch).toHaveBeenCalledWith(mockFeed.url, {
+      allowPrivate: true,
+      maxResponseBytes: 10 * 1024 * 1024,
+    });
     expect(mocks.parseString).toHaveBeenCalledWith("<xml></xml>");
 
     // 1. Check immediate insertion (should have null matches)

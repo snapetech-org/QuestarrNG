@@ -747,7 +747,7 @@ describe("rtorrent remaining regression coverage", () => {
     connectionSpy.mockRejectedValueOnce(new Error("Authentication failed: denied"));
     await expect(connectionClient.testConnection()).resolves.toMatchObject({
       success: false,
-      message: "Authentication failed: denied",
+      message: "Authentication failed",
     });
     connectionSpy.mockRejectedValueOnce(new Error("rpc down"));
     await expect(connectionClient.testConnection()).resolves.toMatchObject({

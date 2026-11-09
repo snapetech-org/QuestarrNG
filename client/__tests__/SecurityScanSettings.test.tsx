@@ -6,7 +6,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createTestQueryClient, getRequestUrl } from "./test-utils";
-import { serviceMessage } from "@shared/service-messages";
+import { serviceMessage, ServiceMessageError } from "@shared/service-messages";
 import SecurityScanSettings from "../src/components/SecurityScanSettings";
 import { setInterfaceLanguage } from "../src/lib/interface-locale";
 
@@ -207,7 +207,9 @@ describe("SecurityScanSettings", () => {
 
   it("localizes a fixed ClamAV test error and keeps dynamic provider errors unchanged", async () => {
     const { apiRequest } = await import("@/lib/queryClient");
-    vi.mocked(apiRequest).mockRejectedValueOnce(new Error("Connection to ClamAV timed out"));
+    vi.mocked(apiRequest).mockRejectedValueOnce(
+      new ServiceMessageError("service.clamav_ping_timeout", {})
+    );
     renderComponent();
     await screen.findByText("Local ClamAV (Deep Scan)");
     act(() => setInterfaceLanguage("es"));
