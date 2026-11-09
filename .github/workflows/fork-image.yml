@@ -937,8 +937,9 @@ jobs:
 
           image="ghcr.io/${GITHUB_REPOSITORY,,}"
           package_api="orgs/${GITHUB_REPOSITORY_OWNER}/packages/container/questarrng/versions?per_page=100"
+          source_tag="sha-${release_sha}"
           image_digest="$(gh api --paginate "$package_api" \
-            --jq ".[] | select((.metadata.container.tags // []) | index(\"${version}\")) | .name" \
+            --jq ".[] | select((.metadata.container.tags // []) | index(\"${source_tag}\")) | .name" \
             | tail -n 1)"
           if [[ ! "$image_digest" =~ ^sha256:[a-f0-9]{64}$ ]]; then
             echo "Could not resolve the immutable GHCR digest for $TAG." >&2
