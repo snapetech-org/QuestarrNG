@@ -1,8 +1,8 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Authentication Flow", () => {
-  // This test runs as part of the 'e2e' project which depends on 'setup'.
-  // It inherits the storage state (authenticated as admin).
+  // The auth project runs after other journeys because logout revokes their
+  // shared setup session. It inherits the storage state authenticated as admin.
 
   test("should allow logout and login", async ({ page }) => {
     await page.goto("/");

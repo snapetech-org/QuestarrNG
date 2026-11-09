@@ -19,8 +19,18 @@ export default defineConfig({
     {
       name: "e2e",
       testMatch: /.*\.spec\.ts/,
-      testIgnore: /setup\.spec\.ts/,
+      testIgnore: /(?:setup|auth)\.spec\.ts/,
       dependencies: ["setup"],
+      use: {
+        storageState: "playwright/.auth/user.json",
+      },
+    },
+    {
+      // Logout revokes every saved session for this user. Run it only after
+      // journeys that reuse the setup project's authenticated storage state.
+      name: "auth",
+      testMatch: /auth\.spec\.ts/,
+      dependencies: ["e2e"],
       use: {
         storageState: "playwright/.auth/user.json",
       },
