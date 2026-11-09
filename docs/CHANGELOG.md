@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Upstream source attribution
+
+- Publicly credit 920 reviewed Questarr issues and pull requests whose upstream code, reports, suggestions, or superseded ideas are verified, implemented pending verification, or retained as provenance in QuestarrNG. The [source ledger](../UPSTREAM_ATTRIBUTION.md) links every originating record and upstream author while making clear that those people contributed to Questarr, not directly to this fork.
+
 ### Security
 
 - CodeQL workflows and CodeQL Action SARIF uploads are disabled by organization policy. Private-JIT Semgrep, Trivy, and Scorecard workflows remain available through their configured dispatches; SARIF reports stay as workflow artifacts, and the release gate no longer waits for CodeQL analyses.
