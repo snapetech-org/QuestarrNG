@@ -9,7 +9,7 @@ RUN cc -Os -Wall -Wextra -Werror -static -o /questarr-fix-data-owner /tmp/fix-da
 FROM ${QUESTARR_IMAGE}
 USER root
 ARG BUILD_ARCH=amd64
-ARG QUESTARR_VERSION=2.1.9
+ARG QUESTARR_VERSION=2.1.10
 
 LABEL \
     io.hass.name="Questarr" \

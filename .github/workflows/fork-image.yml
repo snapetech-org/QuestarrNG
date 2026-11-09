@@ -589,6 +589,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ inputs.release_tag }}
+          RELEASE_SHA: ${{ needs.release-security.outputs.release_sha }}
         run: |
           set -euo pipefail
           VERSION="${TAG#v}"
