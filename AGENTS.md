@@ -1,24 +1,18 @@
 ## Runner policy — owner directive, 2026-11-03
 
-GitHub-hosted runner minutes are available again. Use compatible GitHub-hosted
-runners for build, test, scan, packaging and release jobs when their operating
-system and architecture requirements are met. Preserve native OS and
-architecture. Use private ephemeral JIT runners when a job needs private
-network access, special hardware or storage, or explicit JIT validation. Do not
-require private JIT solely because of the former organization-wide policy, and
-do not treat missing private capacity as a blocker when a compatible hosted
-runner is available.
-
-Keep untrusted pull-request code isolated in a disposable environment without
-secrets, with minimal permissions and restricted egress. Do not widen trusted
-runner-group access to make untrusted code run. Preserve active builds and other
-agents' work. Do not restart the broker while it owns running guests. Select a
-runner route that fits the workload and trust requirements; rerunning an old
-run uses its original workflow revision.
-
-The shared inventory continues to govern private JIT jobs. For a private route,
-verify source routing, broker policy, runner-group access and live capacity
-before relying on it.
+Use compatible public GitHub-hosted runners by default, preserving each job's
+required OS and architecture. Use private ephemeral JIT runners only when a
+task requires private hardware, network, files, or other task-specific private
+resources. Public pull-request code must run without secrets and with minimal
+permissions; use disposable isolated execution when the task requires tighter
+egress or environment controls. Preserve active builds and other agents' work.
+Do not restart the broker while it owns running guests. Validate each workflow
+revision on the runner class it selects; rerunning an old run uses its old
+revision.
+The shared JIT inventory lives in
+`snapetech-org/packer/scripts/shared-jit-runner-pool/`. Check source routing,
+runner-group access, deployed broker policy, and live capacity when a task
+needs a private JIT route.
 
 ## Upstream source attribution
 
@@ -41,4 +35,3 @@ Also record upstream ideas that are planned, referenced, incomplete, rejected,
 withdrawn, superseded, not applicable, or not yet reviewed. Put them in a
 clearly labelled non-shipped section with an explicit disposition; never imply
 that attribution means the behavior is implemented.
-
