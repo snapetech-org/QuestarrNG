@@ -5236,6 +5236,86 @@ describe("API Routes - Extended Coverage", () => {
       });
     });
   });
+  describe("metadata-only library interchange", () => {
+    const catalog = {
+      format: "questarrng-library",
+      version: 1,
+      games: [{ title: "Portable Game", igdbId: 123 }],
+    };
+    beforeEach(() => vi.mocked(storage.getUserGames).mockResolvedValue([]));
+    it("exports only the current user's portable metadata", async () => {
+      vi.mocked(storage.getUserGames).mockResolvedValue([
+        {
+          id: "g1",
+          userId: "user-1",
+          title: "Portable Game",
+          igdbId: 123,
+          status: "owned",
+          libraryPath: "/private/library",
+          coverUrl: "http://insecure.invalid/image",
+          screenshots: ["https://example.invalid/image", "http://insecure.invalid/image"],
+        } as Game,
+      ]);
+      const response = await request(app).get("/api/games/export");
+      expect(response.status).toBe(200);
+      expect(storage.getUserGames).toHaveBeenCalledWith("user-1", true);
+      expect(response.headers["cache-control"]).toBe("no-store");
+      expect(response.body).toMatchObject({ format: "questarrng-library", version: 1 });
+      expect(response.body.games[0]).toMatchObject({
+        title: "Portable Game",
+        coverUrl: null,
+        screenshots: ["https://example.invalid/image"],
+      });
+      for (const key of ["id", "userId", "libraryPath", "password", "downloads"])
+        expect(response.body.games[0]).not.toHaveProperty(key);
+    });
+    it("previews duplicates without writing records", async () => {
+      vi.mocked(storage.getUserGames).mockResolvedValue([
+        { title: "Existing", igdbId: 123 },
+      ] as Game[]);
+      const response = await request(app).post("/api/games/import/preview").send(catalog);
+      expect(response.status).toBe(200);
+      expect(response.body).toMatchObject({
+        addCount: 0,
+        duplicateCount: 1,
+        duplicateTitles: ["Portable Game"],
+      });
+      expect(storage.addGame).not.toHaveBeenCalled();
+    });
+    it("adds new records for the authenticated owner and skips duplicates within the file", async () => {
+      vi.mocked(storage.addGame).mockResolvedValue({ id: "new" } as Game);
+      const response = await request(app)
+        .post("/api/games/import")
+        .send({ ...catalog, games: [...catalog.games, ...catalog.games] });
+      expect(response.status).toBe(200);
+      expect(response.body).toMatchObject({ addedCount: 1, skippedCount: 1, errorCount: 0 });
+      expect(storage.addGame).toHaveBeenCalledExactlyOnceWith(
+        expect.objectContaining({ title: "Portable Game", userId: "user-1", source: "manual" })
+      );
+    });
+    it("rejects server paths, owner overrides, and oversized catalogs before writing", async () => {
+      for (const payload of [
+        { ...catalog, games: [{ ...catalog.games[0], userId: "other" }] },
+        { ...catalog, games: [{ ...catalog.games[0], libraryPath: "/outside" }] },
+        { ...catalog, games: Array.from({ length: 1001 }, () => catalog.games[0]) },
+      ]) {
+        const response = await request(app).post("/api/games/import").send(payload);
+        expect(response.status).toBe(400);
+      }
+      expect(storage.addGame).not.toHaveBeenCalled();
+    });
+    it("bulk discovery forces wanted status and does not start a download", async () => {
+      vi.mocked(storage.addGame).mockResolvedValue({ id: "new" } as Game);
+      const response = await request(app)
+        .post("/api/games/bulk-discovery")
+        .send({ games: [{ ...catalog.games[0], status: "owned", hidden: true }] });
+      expect(response.status).toBe(200);
+      expect(response.body).toMatchObject({ addedCount: 1, duplicateCount: 0, errorCount: 0 });
+      expect(storage.addGame).toHaveBeenCalledExactlyOnceWith(
+        expect.objectContaining({ status: "wanted", hidden: false, userId: "user-1" })
+      );
+    });
+  });
 });
 
 describe("QUESTARR_BASE_PATH subdirectory mounting", () => {

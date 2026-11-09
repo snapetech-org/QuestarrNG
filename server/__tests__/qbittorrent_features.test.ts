@@ -1,3 +1,4 @@
+import { QBittorrentClient } from "../downloaders/qbittorrent.js";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { DownloaderManager } from "../downloaders";
 import type { Downloader } from "../../shared/schema";
@@ -164,6 +165,47 @@ describe("QBittorrentClient - Advanced Features", () => {
     expect(result.id).toBe("aaaaaaaaaabbbbbbbbbbccccccccccdddddddddd");
   });
 
+  it("uses explicit API-key authentication without a password login or redirects", async () => {
+    fetchMock.mockResolvedValue(new Response("v5.2.0"));
+    const client = new QBittorrentClient(
+      createTestDownloader({
+        url: "https://qbit.example.invalid",
+        settings: JSON.stringify({ authMode: "api_key" }),
+        password: "fixture-api-key",
+      })
+    );
+    expect(await client.testConnection()).toMatchObject({ success: true });
+    expect(fetchMock).toHaveBeenCalledExactlyOnceWith(
+      "https://qbit.example.invalid/api/v2/app/version",
+      expect.objectContaining({
+        redirect: "manual",
+        headers: expect.objectContaining({ Authorization: "Bearer fixture-api-key" }),
+      })
+    );
+  });
+  it("does not fall back to a password session when an API key is rejected", async () => {
+    fetchMock.mockResolvedValue(new Response("Forbidden", { status: 403 }));
+    const client = new QBittorrentClient(
+      createTestDownloader({
+        settings: JSON.stringify({ authMode: "api_key" }),
+        password: "fixture-api-key",
+      })
+    );
+    expect(await client.testConnection()).toMatchObject({ success: false });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(String(fetchMock.mock.calls[0]?.[0])).not.toContain("/auth/login");
+  });
+  it("does not send an API key over HTTP without the explicit LAN opt-in", async () => {
+    const client = new QBittorrentClient(
+      createTestDownloader({
+        allowInsecureLan: false,
+        settings: JSON.stringify({ authMode: "api_key" }),
+        password: "fixture-api-key",
+      })
+    );
+    expect(await client.testConnection()).toMatchObject({ success: false });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
   it("should support force-started mode via settings", async () => {
     vi.useFakeTimers();
     const testDownloader = createTestDownloader({
