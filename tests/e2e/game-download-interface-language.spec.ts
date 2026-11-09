@@ -1021,7 +1021,8 @@ test("keeps the RTL import-history table and task sheet accessible", async ({ pa
   const firstHeader = table.getByRole("columnheader").first();
   await expect(firstHeader).toContainText("النوع");
   await expect(firstHeader.locator("span")).toHaveAttribute("lang", "ar");
-  await expect(firstHeader).toHaveCSS("text-align", "right");
+  await expect(firstHeader).toHaveCSS("text-align", "start");
+  await expect(firstHeader).toHaveCSS("direction", "rtl");
 
   const taskRow = table.locator("tbody tr").first();
   await taskRow.focus();
