@@ -16,7 +16,6 @@ export const REQUIRED_CHECKS = [
   "semgrep",
   "Playwright e2e",
   "OWASP ZAP baseline scan",
-  "Scorecard analysis",
   "npm-audit",
   "image-scan",
 ];

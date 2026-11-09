@@ -4,11 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [2.1.7] - 2026-11-09
+## [2.1.8] - 2026-11-09
 
 ### Release infrastructure
 
-- Restore tag-triggered CI, Semgrep, end-to-end, DAST, Scorecard, and dependency scans on compatible GitHub-hosted runners so the release security gate receives its required exact-source checks. The gate uses the successful exact-source Semgrep check because organization policy retains SARIF as an artifact instead of uploading it through CodeQL's SARIF action.
+- Restore tag-triggered CI, Semgrep, end-to-end, DAST, and dependency scans on compatible GitHub-hosted runners so the release security gate receives its required exact-source checks. The gate uses the successful exact-source Semgrep check because organization policy retains SARIF as an artifact instead of uploading it through CodeQL's SARIF action. OpenSSF Scorecard remains a default-branch repository assessment because the action does not support tag refs.
 
 ## [2.1.5] - 2026-11-09
 
