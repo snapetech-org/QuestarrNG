@@ -103,13 +103,19 @@ describe("refreshAllRootFoldersHealth", () => {
 });
 
 describe("isWithinDeletableRootFolder", () => {
-  it("allows a path inside a root folder that has allowDelete on", async () => {
+  it("allows an existing path inside a root folder that has allowDelete on", async () => {
     const { storage } = await import("../storage.js");
-    vi.mocked(storage.getAllRootFolders).mockResolvedValue([
-      { id: "rf-1", path: "/mnt/old-library", allowDelete: true } as unknown as RootFolder,
-    ]);
-
-    expect(await isWithinDeletableRootFolder("/mnt/old-library/SomeGame")).toBe(true);
+    const root = await fs.promises.mkdtemp(path.join(os.tmpdir(), "questarr-delete-root-"));
+    const game = path.join(root, "SomeGame");
+    try {
+      await fs.promises.mkdir(game);
+      vi.mocked(storage.getAllRootFolders).mockResolvedValue([
+        { id: "rf-1", path: root, allowDelete: true } as RootFolder,
+      ]);
+      expect(await isWithinDeletableRootFolder(game)).toBe(true);
+    } finally {
+      await fs.promises.rm(root, { recursive: true, force: true });
+    }
   });
 
   it.each([

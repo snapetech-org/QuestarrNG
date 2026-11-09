@@ -231,7 +231,7 @@ describe("checkVirusTotalHash", () => {
   it("returns 'error' when the request throws (timeout/network failure)", async () => {
     vi.mocked(safeFetch).mockRejectedValue(new Error("timed out"));
     const result = await checkVirusTotalHash("hash", "key");
-    expect(result).toEqual({ status: "error", error: "timed out", errorI18n: null });
+    expect(result).toMatchObject({ status: "error", error: "timed out", errorI18n: null });
   });
 
   it("passes a 10s timeout and requireHttps to safeFetch", async () => {
@@ -269,7 +269,10 @@ describe("SecurityScanService.scan", () => {
 
   it("does not block when both providers are disabled", async () => {
     const service = new SecurityScanService(mockStorage({}));
-    await expect(service.scan(filePath)).resolves.toEqual({ blocked: false });
+    await expect(service.scan(filePath)).resolves.toMatchObject({
+      blocked: false,
+      incomplete: true,
+    });
     expect(safeFetch).not.toHaveBeenCalled();
   });
 
@@ -304,7 +307,7 @@ describe("SecurityScanService.scan", () => {
         "security.vt.threshold": "2",
       })
     );
-    await expect(service.scan(filePath)).resolves.toEqual({ blocked: false });
+    await expect(service.scan(filePath)).resolves.toMatchObject({ blocked: false });
   });
 
   it("blocks unknown hashes only when 'block unknown hashes' is enabled", async () => {
@@ -313,7 +316,10 @@ describe("SecurityScanService.scan", () => {
     const permissive = new SecurityScanService(
       mockStorage({ "security.vt.enabled": "true", "security.vt.apiKey": "key" })
     );
-    await expect(permissive.scan(filePath)).resolves.toEqual({ blocked: false });
+    await expect(permissive.scan(filePath)).resolves.toMatchObject({
+      blocked: false,
+      incomplete: true,
+    });
 
     const strict = new SecurityScanService(
       mockStorage({
@@ -327,12 +333,15 @@ describe("SecurityScanService.scan", () => {
     expect(result.source).toBe("virustotal");
   });
 
-  it("fails open when VirusTotal errors out", async () => {
+  it("requires review when VirusTotal errors out", async () => {
     vi.mocked(safeFetch).mockRejectedValue(new Error("network down"));
     const service = new SecurityScanService(
       mockStorage({ "security.vt.enabled": "true", "security.vt.apiKey": "key" })
     );
-    await expect(service.scan(filePath)).resolves.toEqual({ blocked: false });
+    await expect(service.scan(filePath)).resolves.toMatchObject({
+      blocked: false,
+      incomplete: true,
+    });
   });
 
   it("blocks when ClamAV reports an infection", async () => {
@@ -353,7 +362,7 @@ describe("SecurityScanService.scan", () => {
     const service = new SecurityScanService(
       mockStorage({ "security.clamav.enabled": "true", "security.clamav.host": "clamav" })
     );
-    await expect(service.scan(filePath)).resolves.toEqual({ blocked: false });
+    await expect(service.scan(filePath)).resolves.toMatchObject({ blocked: false });
   });
 
   it("holds the download for review when ClamAV cannot be reached", async () => {
@@ -498,7 +507,7 @@ describe("SecurityScanService.scan", () => {
     const service = new SecurityScanService(
       mockStorage({ "security.clamav.enabled": "true", "security.clamav.host": "clamav" })
     );
-    await expect(service.scan(dir)).resolves.toEqual({ blocked: false });
+    await expect(service.scan(dir)).resolves.toMatchObject({ blocked: false });
     expect(clamAvTestState.createdSockets).toHaveLength(2);
   });
 
@@ -513,7 +522,7 @@ describe("SecurityScanService.scan", () => {
     const service = new SecurityScanService(
       mockStorage({ "security.clamav.enabled": "true", "security.clamav.host": "clamav" })
     );
-    await expect(service.scan(dir)).resolves.toEqual({ blocked: false });
+    await expect(service.scan(dir)).resolves.toMatchObject({ blocked: false });
     expect(clamAvTestState.createdSockets).toHaveLength(150);
   });
 

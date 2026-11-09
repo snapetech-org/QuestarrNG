@@ -62,10 +62,7 @@ export function NotificationCenter() {
     const handleNotification = (notification: Notification) => {
       toast({
         title: (currentLanguage) => {
-          const titleLanguage = getNotificationTitleLanguage(
-            notification.title,
-            currentLanguage
-          );
+          const titleLanguage = getNotificationTitleLanguage(notification.title, currentLanguage);
           const securityAlertTitle = getLocalizedSecurityAlertTitleParts(
             notification.title,
             currentLanguage

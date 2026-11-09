@@ -101,8 +101,8 @@ describe("source-bound API error metadata", () => {
     );
     const fragment = serviceMessage("service.realdebrid_authorization_code_expired", {});
     const error = await reject({ error: fragment.message, errorI18n: fragment });
-    expect(error.message).toBe(fragment.message);
+    expect(error.message).toBe(localizeServiceMessage(fragment.message, fragment, "es"));
     render(<ApiErrorDescription error={error} fallbackSource="Try again." />);
-    expect(screen.getByText(fragment.message)).toHaveAttribute("lang", "en");
+    expect(screen.getByText(error.message)).toHaveAttribute("lang", "es");
   });
 });

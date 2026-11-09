@@ -199,7 +199,9 @@ export default function AddGameModal({ children, initialQuery }: AddGameModalPro
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/games"] });
       toast({
-        description: <InterfaceText source="interface.game_added_to_collection_successfu_0b0de90f" />,
+        description: (
+          <InterfaceText source="interface.game_added_to_collection_successfu_0b0de90f" />
+        ),
       });
     },
     onError: (error: Error) => {

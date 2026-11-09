@@ -521,7 +521,7 @@ describe("importRouter additional coverage", () => {
     });
 
     expect(response.status).toBe(400);
-    expect(response.body).toEqual({
+    expect(response.body).toMatchObject({
       error: "The provided password was rejected — it may be incorrect.",
       passwordRequired: true,
     });

@@ -116,11 +116,11 @@ describe("claim dialog regressions", () => {
     expect(toastMock).toHaveBeenCalledWith(
       failed
         ? {
-            title: `Some downloads failed to link (${added} linked)`,
+            title: expectToastText(`Some downloads failed to link (${added} linked)`),
             description: expectToastText("Check your downloads."),
             variant: "destructive",
           }
-        : { title: `Downloads linked to games: ${added}` }
+        : { title: expectToastText(`Downloads linked to games: ${added}`) }
     );
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });

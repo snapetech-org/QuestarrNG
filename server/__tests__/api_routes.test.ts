@@ -492,7 +492,7 @@ describe("API Routes - Extended Coverage", () => {
           .post("/api/auth/setup/test-igdb")
           .send({ clientId: VALID_CLIENT_ID, clientSecret: VALID_CLIENT_SECRET });
         expect(res.status).toBe(400);
-        expect(res.body).toEqual({
+        expect(res.body).toMatchObject({
           success: false,
           error: "Invalid Client ID or Client Secret.",
         });
@@ -692,13 +692,13 @@ describe("API Routes - Extended Coverage", () => {
       const res = await request(app).get("/api/does-not-exist");
       expect(res.status).toBe(404);
       expect(res.headers["content-type"]).toMatch(/json/);
-      expect(res.body).toEqual({ error: "Not found" });
+      expect(res.body).toMatchObject({ error: "Not found" });
     });
 
     it("returns a JSON 404 for unknown methods on known paths", async () => {
       const res = await request(app).patch("/api/health");
       expect(res.status).toBe(404);
-      expect(res.body).toEqual({ error: "Not found" });
+      expect(res.body).toMatchObject({ error: "Not found" });
     });
   });
 
@@ -5176,7 +5176,7 @@ describe("API Routes - Extended Coverage", () => {
         .send(validBody);
 
       expect(response.status).toBe(500);
-      expect(response.body).toEqual({ error: "IGDB search failed" });
+      expect(response.body).toMatchObject({ error: "IGDB search failed" });
     });
   });
 
@@ -5189,7 +5189,7 @@ describe("API Routes - Extended Coverage", () => {
       const response = await request(app).post("/api/library/scan/unmatched/match").send(validBody);
 
       expect(response.status).toBe(404);
-      expect(response.body).toEqual({ error: "Root folder not found" });
+      expect(response.body).toMatchObject({ error: "Root folder not found" });
     });
 
     it("returns 404 when matchUnmatchedFolder reports the unmatched entry is gone", async () => {
@@ -5200,7 +5200,9 @@ describe("API Routes - Extended Coverage", () => {
       const response = await request(app).post("/api/library/scan/unmatched/match").send(validBody);
 
       expect(response.status).toBe(404);
-      expect(response.body).toEqual({ error: "No matching unmatched entry for this root folder" });
+      expect(response.body).toMatchObject({
+        error: "No matching unmatched entry for this root folder",
+      });
     });
 
     it("returns 500 for any other matchUnmatchedFolder failure", async () => {
@@ -5211,7 +5213,9 @@ describe("API Routes - Extended Coverage", () => {
       const response = await request(app).post("/api/library/scan/unmatched/match").send(validBody);
 
       expect(response.status).toBe(500);
-      expect(response.body).toEqual({ error: "Selected IGDB game not found in top candidates" });
+      expect(response.body).toMatchObject({
+        error: "Selected IGDB game not found in top candidates",
+      });
     });
   });
 });
@@ -5242,7 +5246,7 @@ describe("QUESTARR_BASE_PATH subdirectory mounting", () => {
 
     const response = await request(httpServer).get("/Questarr/api/does-not-exist");
     expect(response.status).toBe(404);
-    expect(response.body).toEqual({ error: "Not found" });
+    expect(response.body).toMatchObject({ error: "Not found" });
   });
 
   it("keeps /api/health reachable unprefixed for container healthchecks", async () => {

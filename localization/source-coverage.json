@@ -8,12 +8,8 @@
       "key": "claims.downloads_linked",
       "source": "Downloads linked to games: {count}",
       "kind": "interface count/status",
-      "owners": [
-        "client/src/components/ClaimBatchModal.tsx"
-      ],
-      "coverage": [
-        "client/__tests__/ClaimModals.test.tsx"
-      ],
+      "owners": ["client/src/components/ClaimBatchModal.tsx"],
+      "coverage": ["client/__tests__/ClaimModals.test.tsx"],
       "codeStatus": "implemented; download-item count with independent group selection count",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -27,12 +23,8 @@
       "key": "claims.some_downloads_failed",
       "source": "Some downloads failed to link ({count} linked)",
       "kind": "interface count/status",
-      "owners": [
-        "client/src/components/ClaimBatchModal.tsx"
-      ],
-      "coverage": [
-        "client/__tests__/ClaimModals.test.tsx"
-      ],
+      "owners": ["client/src/components/ClaimBatchModal.tsx"],
+      "coverage": ["client/__tests__/ClaimModals.test.tsx"],
       "codeStatus": "implemented; download-item count with independent group selection count",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -46,9 +38,7 @@
       "key": "service.realdebrid_connect_account_required",
       "source": "Connect a Real-Debrid account in Downloaders before using this client.",
       "kind": "app-owned auth/service",
-      "owners": [
-        "server/downloaders/realdebrid-auth.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
       "coverage": [
         "server/downloaders/realdebrid-auth.test.ts",
         "server/downloaders/realdebrid.test.ts",
@@ -69,9 +59,7 @@
       "key": "service.realdebrid_authorization_expired",
       "source": "Real-Debrid authorization expired. Reconnect the account in Downloaders.",
       "kind": "app-owned auth/service",
-      "owners": [
-        "server/downloaders/realdebrid-auth.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
       "coverage": [
         "server/downloaders/realdebrid-auth.test.ts",
         "server/downloaders/realdebrid.test.ts",
@@ -92,9 +80,7 @@
       "key": "service.realdebrid_access_token_missing",
       "source": "Real-Debrid did not return a usable access token.",
       "kind": "app-owned auth/service",
-      "owners": [
-        "server/downloaders/realdebrid-auth.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
       "coverage": [
         "server/downloaders/realdebrid-auth.test.ts",
         "server/downloaders/realdebrid.test.ts",
@@ -115,9 +101,7 @@
       "key": "service.realdebrid_account_save_failed",
       "source": "Real-Debrid account settings could not be saved.",
       "kind": "app-owned auth/service",
-      "owners": [
-        "server/downloaders/realdebrid-auth.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
       "coverage": [
         "server/downloaders/realdebrid-auth.test.ts",
         "server/downloaders/realdebrid.test.ts",
@@ -138,9 +122,7 @@
       "key": "service.realdebrid_authorization_start_failed",
       "source": "Real-Debrid could not start account authorization.",
       "kind": "app-owned auth/service",
-      "owners": [
-        "server/downloaders/realdebrid-auth.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
       "coverage": [
         "server/downloaders/realdebrid-auth.test.ts",
         "server/downloaders/realdebrid.test.ts",
@@ -161,9 +143,7 @@
       "key": "service.realdebrid_authorization_details_incomplete",
       "source": "Real-Debrid returned incomplete account authorization details.",
       "kind": "app-owned auth/service",
-      "owners": [
-        "server/downloaders/realdebrid-auth.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
       "coverage": [
         "server/downloaders/realdebrid-auth.test.ts",
         "server/downloaders/realdebrid.test.ts",
@@ -184,9 +164,7 @@
       "key": "service.realdebrid_authorization_session_expired",
       "source": "Real-Debrid authorization session expired. Start again.",
       "kind": "app-owned auth/service",
-      "owners": [
-        "server/downloaders/realdebrid-auth.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
       "coverage": [
         "server/downloaders/realdebrid-auth.test.ts",
         "server/downloaders/realdebrid.test.ts",
@@ -207,9 +185,7 @@
       "key": "service.realdebrid_authorization_code_expired",
       "source": "Real-Debrid authorization code expired. Start again.",
       "kind": "app-owned auth/service",
-      "owners": [
-        "server/downloaders/realdebrid-auth.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
       "coverage": [
         "server/downloaders/realdebrid-auth.test.ts",
         "server/downloaders/realdebrid.test.ts",
@@ -230,9 +206,7 @@
       "key": "service.realdebrid_authorization_check_failed",
       "source": "Real-Debrid account authorization could not be checked.",
       "kind": "app-owned auth/service",
-      "owners": [
-        "server/downloaders/realdebrid-auth.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
       "coverage": [
         "server/downloaders/realdebrid-auth.test.ts",
         "server/downloaders/realdebrid.test.ts",
@@ -253,9 +227,7 @@
       "key": "service.realdebrid_credentials_missing",
       "source": "Real-Debrid did not issue account credentials.",
       "kind": "app-owned auth/service",
-      "owners": [
-        "server/downloaders/realdebrid-auth.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
       "coverage": [
         "server/downloaders/realdebrid-auth.test.ts",
         "server/downloaders/realdebrid.test.ts",
@@ -276,9 +248,7 @@
       "key": "service.realdebrid_refresh_token_missing",
       "source": "Real-Debrid did not return a refresh token.",
       "kind": "app-owned auth/service",
-      "owners": [
-        "server/downloaders/realdebrid-auth.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
       "coverage": [
         "server/downloaders/realdebrid-auth.test.ts",
         "server/downloaders/realdebrid.test.ts",
@@ -299,9 +269,7 @@
       "key": "service.realdebrid_credentials_save_failed",
       "source": "Real-Debrid credentials could not be saved.",
       "kind": "app-owned auth/service",
-      "owners": [
-        "server/downloaders/realdebrid-auth.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
       "coverage": [
         "server/downloaders/realdebrid-auth.test.ts",
         "server/downloaders/realdebrid.test.ts",
@@ -322,9 +290,7 @@
       "key": "service.realdebrid_authorization_failed",
       "source": "Real-Debrid authorization failed.",
       "kind": "app-owned auth/service",
-      "owners": [
-        "server/downloaders/realdebrid-auth.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid-auth.ts"],
       "coverage": [
         "server/downloaders/realdebrid-auth.test.ts",
         "server/downloaders/realdebrid.test.ts",
@@ -345,9 +311,7 @@
       "key": "service.realdebrid_link_start_failed",
       "source": "Real-Debrid account linking could not be started.",
       "kind": "app-owned auth/service",
-      "owners": [
-        "server/routes.ts"
-      ],
+      "owners": ["server/routes.ts"],
       "coverage": [
         "server/downloaders/realdebrid-auth.test.ts",
         "server/downloaders/realdebrid.test.ts",
@@ -368,9 +332,7 @@
       "key": "service.realdebrid_connect_failed",
       "source": "Could not connect to Real-Debrid.",
       "kind": "app-owned auth/service",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid-auth.test.ts",
         "server/downloaders/realdebrid.test.ts",
@@ -391,9 +353,7 @@
       "key": "service.realdebrid_add_failed",
       "source": "Could not add this magnet to Real-Debrid.",
       "kind": "app-owned auth/service",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid-auth.test.ts",
         "server/downloaders/realdebrid.test.ts",
@@ -414,12 +374,8 @@
       "key": "auth.provider_setup_guide_label",
       "source": "{provider} setup guide (opens in a new tab)",
       "kind": "interface accessible label",
-      "owners": [
-        "client/src/pages/auth/login.tsx"
-      ],
-      "coverage": [
-        "client/__tests__/LoginSetupGuide.test.tsx"
-      ],
+      "owners": ["client/src/pages/auth/login.tsx"],
+      "coverage": ["client/__tests__/LoginSetupGuide.test.tsx"],
       "codeStatus": "implemented; focused producer/client/route checks passed",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -433,10 +389,7 @@
       "key": "service.nzb_added",
       "source": "NZB added successfully",
       "kind": "app-owned NZB/service",
-      "owners": [
-        "server/downloaders/nzbget.ts",
-        "server/downloaders/sabnzbd.ts"
-      ],
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
       "coverage": [
         "server/__tests__/downloaders_nzbget_remaining.test.ts",
         "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
@@ -456,10 +409,7 @@
       "key": "service.nzb_added_duplicate_or_merged",
       "source": "NZB added successfully (likely duplicate or merged)",
       "kind": "app-owned NZB/service",
-      "owners": [
-        "server/downloaders/nzbget.ts",
-        "server/downloaders/sabnzbd.ts"
-      ],
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
       "coverage": [
         "server/__tests__/downloaders_nzbget_remaining.test.ts",
         "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
@@ -479,10 +429,7 @@
       "key": "service.nzb_already_exists",
       "source": "NZB already exists: {error}",
       "kind": "app-owned NZB/service",
-      "owners": [
-        "server/downloaders/nzbget.ts",
-        "server/downloaders/sabnzbd.ts"
-      ],
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
       "coverage": [
         "server/__tests__/downloaders_nzbget_remaining.test.ts",
         "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
@@ -502,10 +449,7 @@
       "key": "service.nzb_add_rejected",
       "source": "Failed to add NZB - SABnzbd returned success:false",
       "kind": "app-owned NZB/service",
-      "owners": [
-        "server/downloaders/nzbget.ts",
-        "server/downloaders/sabnzbd.ts"
-      ],
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
       "coverage": [
         "server/__tests__/downloaders_nzbget_remaining.test.ts",
         "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
@@ -525,10 +469,7 @@
       "key": "service.nzb_add_invalid_id",
       "source": "Failed to add NZB (ID is 0 or negative)",
       "kind": "app-owned NZB/service",
-      "owners": [
-        "server/downloaders/nzbget.ts",
-        "server/downloaders/sabnzbd.ts"
-      ],
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
       "coverage": [
         "server/__tests__/downloaders_nzbget_remaining.test.ts",
         "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
@@ -548,10 +489,7 @@
       "key": "service.nzb_paused",
       "source": "NZB paused",
       "kind": "app-owned NZB/service",
-      "owners": [
-        "server/downloaders/nzbget.ts",
-        "server/downloaders/sabnzbd.ts"
-      ],
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
       "coverage": [
         "server/__tests__/downloaders_nzbget_remaining.test.ts",
         "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
@@ -571,10 +509,7 @@
       "key": "service.nzb_resumed",
       "source": "NZB resumed",
       "kind": "app-owned NZB/service",
-      "owners": [
-        "server/downloaders/nzbget.ts",
-        "server/downloaders/sabnzbd.ts"
-      ],
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
       "coverage": [
         "server/__tests__/downloaders_nzbget_remaining.test.ts",
         "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
@@ -594,10 +529,7 @@
       "key": "service.nzb_removed",
       "source": "NZB removed",
       "kind": "app-owned NZB/service",
-      "owners": [
-        "server/downloaders/nzbget.ts",
-        "server/downloaders/sabnzbd.ts"
-      ],
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
       "coverage": [
         "server/__tests__/downloaders_nzbget_remaining.test.ts",
         "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
@@ -617,10 +549,7 @@
       "key": "service.nzb_pause_failed",
       "source": "Failed to pause NZB",
       "kind": "app-owned NZB/service",
-      "owners": [
-        "server/downloaders/nzbget.ts",
-        "server/downloaders/sabnzbd.ts"
-      ],
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
       "coverage": [
         "server/__tests__/downloaders_nzbget_remaining.test.ts",
         "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
@@ -640,10 +569,7 @@
       "key": "service.nzb_resume_failed",
       "source": "Failed to resume NZB",
       "kind": "app-owned NZB/service",
-      "owners": [
-        "server/downloaders/nzbget.ts",
-        "server/downloaders/sabnzbd.ts"
-      ],
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
       "coverage": [
         "server/__tests__/downloaders_nzbget_remaining.test.ts",
         "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
@@ -663,10 +589,7 @@
       "key": "service.nzb_remove_failed",
       "source": "Failed to remove NZB",
       "kind": "app-owned NZB/service",
-      "owners": [
-        "server/downloaders/nzbget.ts",
-        "server/downloaders/sabnzbd.ts"
-      ],
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
       "coverage": [
         "server/__tests__/downloaders_nzbget_remaining.test.ts",
         "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
@@ -686,10 +609,7 @@
       "key": "service.nzb_fetch_failed",
       "source": "Failed to fetch NZB: {error}",
       "kind": "app-owned NZB/service",
-      "owners": [
-        "server/downloaders/nzbget.ts",
-        "server/downloaders/sabnzbd.ts"
-      ],
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
       "coverage": [
         "server/__tests__/downloaders_nzbget_remaining.test.ts",
         "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
@@ -709,10 +629,7 @@
       "key": "service.nzb_sabnzbd_add_failed",
       "source": "Failed to add NZB to SABnzbd: {error}",
       "kind": "app-owned NZB/service",
-      "owners": [
-        "server/downloaders/nzbget.ts",
-        "server/downloaders/sabnzbd.ts"
-      ],
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
       "coverage": [
         "server/__tests__/downloaders_nzbget_remaining.test.ts",
         "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
@@ -732,10 +649,7 @@
       "key": "service.sabnzbd_version_missing",
       "source": "Invalid SABnzbd response - missing version field",
       "kind": "app-owned NZB/service",
-      "owners": [
-        "server/downloaders/nzbget.ts",
-        "server/downloaders/sabnzbd.ts"
-      ],
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
       "coverage": [
         "server/__tests__/downloaders_nzbget_remaining.test.ts",
         "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
@@ -755,10 +669,7 @@
       "key": "service.unsafe_url_blocked",
       "source": "Unsafe URL blocked: {url}",
       "kind": "app-owned NZB/service",
-      "owners": [
-        "server/downloaders/nzbget.ts",
-        "server/downloaders/sabnzbd.ts"
-      ],
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
       "coverage": [
         "server/__tests__/downloaders_nzbget_remaining.test.ts",
         "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
@@ -778,10 +689,7 @@
       "key": "service.http_error",
       "source": "HTTP {status}: {error}",
       "kind": "app-owned NZB/service",
-      "owners": [
-        "server/downloaders/nzbget.ts",
-        "server/downloaders/sabnzbd.ts"
-      ],
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
       "coverage": [
         "server/__tests__/downloaders_nzbget_remaining.test.ts",
         "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
@@ -801,10 +709,7 @@
       "key": "service.http_error_status",
       "source": "HTTP {status}: {statusText} - {error}",
       "kind": "app-owned NZB/service",
-      "owners": [
-        "server/downloaders/nzbget.ts",
-        "server/downloaders/sabnzbd.ts"
-      ],
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
       "coverage": [
         "server/__tests__/downloaders_nzbget_remaining.test.ts",
         "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
@@ -824,10 +729,7 @@
       "key": "service.no_error_details",
       "source": "No error details",
       "kind": "app-owned NZB/service",
-      "owners": [
-        "server/downloaders/nzbget.ts",
-        "server/downloaders/sabnzbd.ts"
-      ],
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
       "coverage": [
         "server/__tests__/downloaders_nzbget_remaining.test.ts",
         "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
@@ -847,10 +749,7 @@
       "key": "service.nzbget_fault",
       "source": "NZBGet Fault: {error} ({code})",
       "kind": "app-owned NZB/service",
-      "owners": [
-        "server/downloaders/nzbget.ts",
-        "server/downloaders/sabnzbd.ts"
-      ],
+      "owners": ["server/downloaders/nzbget.ts", "server/downloaders/sabnzbd.ts"],
       "coverage": [
         "server/__tests__/downloaders_nzbget_remaining.test.ts",
         "server/__tests__/downloaders_sabnzbd_remaining.test.ts",
@@ -894,9 +793,7 @@
       "key": "service.realdebrid_local_staging_path_required",
       "source": "Set an absolute local staging path that QuestarrNG can write to.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -914,9 +811,7 @@
       "key": "service.realdebrid_local_staging_path_add_required",
       "source": "Set an absolute QuestarrNG local staging path before adding downloads.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -934,9 +829,7 @@
       "key": "service.realdebrid_indexer_result_unusable",
       "source": "The indexer result was not a usable magnet link or torrent file.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -954,9 +847,7 @@
       "key": "service.realdebrid_remote_id_missing",
       "source": "Real-Debrid did not return a torrent ID.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -974,9 +865,7 @@
       "key": "service.realdebrid_sent",
       "source": "Torrent sent to Real-Debrid.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -994,9 +883,7 @@
       "key": "service.realdebrid_indexer_torrent_too_large",
       "source": "The indexer torrent file is larger than 10 MB.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1014,9 +901,7 @@
       "key": "service.realdebrid_indexer_torrent_rejected",
       "source": "Real-Debrid could not accept the indexer torrent file.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1034,9 +919,7 @@
       "key": "service.realdebrid_pause_unsupported",
       "source": "Real-Debrid does not support pausing torrents through its API.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1054,9 +937,7 @@
       "key": "service.realdebrid_resume_unsupported",
       "source": "Real-Debrid starts torrents automatically and does not expose a resume action.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1074,9 +955,7 @@
       "key": "service.realdebrid_staging_symlink_removal_refused",
       "source": "The QuestarrNG staging directory is a symbolic link and was not removed.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1094,9 +973,7 @@
       "key": "service.realdebrid_staging_outside_configured_path",
       "source": "The QuestarrNG staging directory is outside the configured path.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1114,9 +991,7 @@
       "key": "service.realdebrid_removed_with_staged_files",
       "source": "Real-Debrid torrent and QuestarrNG staged files removed.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1134,9 +1009,7 @@
       "key": "service.realdebrid_removed_staged_files_kept",
       "source": "Real-Debrid torrent removed. QuestarrNG staged files were kept.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1154,9 +1027,7 @@
       "key": "service.realdebrid_local_cleanup_needed",
       "source": "The torrent was removed but its local staging directory needs cleanup.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1174,9 +1045,7 @@
       "key": "service.realdebrid_local_copy_stopped",
       "source": "The local copy stopped when torrent removal was requested.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1194,9 +1063,7 @@
       "key": "service.realdebrid_removed_staged_removal_failed",
       "source": "The Real-Debrid torrent was removed, but its staged files could not be removed.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1214,9 +1081,7 @@
       "key": "service.realdebrid_remove_failed",
       "source": "Could not remove the Real-Debrid torrent.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1234,9 +1099,7 @@
       "key": "service.realdebrid_selected_files_missing",
       "source": "Real-Debrid did not provide selected files and matching download links.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1254,9 +1117,7 @@
       "key": "service.realdebrid_staging_directory_unsafe",
       "source": "The Real-Debrid staging directory is not a safe local directory.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1274,9 +1135,7 @@
       "key": "service.realdebrid_staging_directory_escaped",
       "source": "The Real-Debrid staging directory escaped its configured local path.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1294,9 +1153,7 @@
       "key": "service.realdebrid_file_link_list_incomplete",
       "source": "Real-Debrid returned an incomplete file link list.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1314,9 +1171,7 @@
       "key": "service.realdebrid_file_path_escaped",
       "source": "A Real-Debrid file path escaped the staging directory.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1334,9 +1189,7 @@
       "key": "service.realdebrid_directory_escaped",
       "source": "A torrent directory escaped the QuestarrNG staging directory.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1354,9 +1207,7 @@
       "key": "service.realdebrid_unsafe_torrent_file_path",
       "source": "Real-Debrid returned an unsafe torrent file path.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1374,9 +1225,7 @@
       "key": "service.realdebrid_file_url_not_https",
       "source": "Real-Debrid returned a non-HTTPS file URL.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1394,9 +1243,7 @@
       "key": "service.realdebrid_staged_file_symlink",
       "source": "A staged file path is a symbolic link.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1414,9 +1261,7 @@
       "key": "service.realdebrid_staged_file_not_regular",
       "source": "A staged file path is not a regular file.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1434,9 +1279,7 @@
       "key": "service.realdebrid_partial_staged_file_symlink",
       "source": "A partial staged file is a symbolic link.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1454,9 +1297,7 @@
       "key": "service.realdebrid_file_stream_failed",
       "source": "Real-Debrid could not stream a completed file into QuestarrNG.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1474,9 +1315,7 @@
       "key": "service.realdebrid_request_failed",
       "source": "Real-Debrid request failed.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1494,9 +1333,7 @@
       "key": "service.realdebrid_provider_error",
       "source": "Real-Debrid: {error}",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1514,9 +1351,7 @@
       "key": "service.realdebrid_removed_staged_removal_failed_detail",
       "source": "The Real-Debrid torrent was removed, but its staged files could not be removed: {error}",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1534,9 +1369,7 @@
       "key": "service.realdebrid_selected_files_limit",
       "source": "This torrent has more than {limit} selected files.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1554,9 +1387,7 @@
       "key": "service.realdebrid_copied_file_unexpected_size",
       "source": "The copied file {file} has an unexpected size.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1574,9 +1405,7 @@
       "key": "service.realdebrid_copied_bytes",
       "source": "Real-Debrid copied {actual} of {expected} bytes.",
       "kind": "app-owned Real-Debrid service/staging",
-      "owners": [
-        "server/downloaders/realdebrid.ts"
-      ],
+      "owners": ["server/downloaders/realdebrid.ts"],
       "coverage": [
         "server/downloaders/realdebrid.test.ts",
         "shared/__tests__/service-message-descriptor.test.ts"
@@ -1594,9 +1423,7 @@
       "key": "service.credentials_http_refused",
       "source": "{client}: refusing to send credentials over unencrypted HTTP. QuestarrNG received Allow insecure LAN as disabled for this request. Enable SSL or turn on 'Allow insecure LAN' in the downloader settings or current test form.",
       "kind": "app-owned downloader utility/manager",
-      "owners": [
-        "server/downloaders/utils.ts"
-      ],
+      "owners": ["server/downloaders/utils.ts"],
       "coverage": [
         "server/__tests__/downloaders_utils_manager.test.ts",
         "server/__tests__/downloaders_insecure_lan_policy.test.ts",
@@ -1615,9 +1442,7 @@
       "key": "service.password_http_refused",
       "source": "{client}: refusing to send password over unencrypted HTTP. QuestarrNG received Allow insecure LAN as disabled for this request. Enable SSL or turn on 'Allow insecure LAN' in the downloader settings or current test form.",
       "kind": "app-owned downloader utility/manager",
-      "owners": [
-        "server/downloaders/utils.ts"
-      ],
+      "owners": ["server/downloaders/utils.ts"],
       "coverage": [
         "server/__tests__/downloaders_utils_manager.test.ts",
         "server/__tests__/downloaders_insecure_lan_policy.test.ts",
@@ -1636,9 +1461,7 @@
       "key": "service.api_key_http_refused",
       "source": "{client}: refusing to send API key over unencrypted HTTP. QuestarrNG received Allow insecure LAN as disabled for this request. Enable SSL or turn on 'Allow insecure LAN' in the downloader settings or current test form.",
       "kind": "app-owned downloader utility/manager",
-      "owners": [
-        "server/downloaders/utils.ts"
-      ],
+      "owners": ["server/downloaders/utils.ts"],
       "coverage": [
         "server/__tests__/downloaders_utils_manager.test.ts",
         "server/__tests__/downloaders_insecure_lan_policy.test.ts",
@@ -1657,9 +1480,7 @@
       "key": "service.credential_kind_http_refused",
       "source": "{client}: refusing to send {credentialKind} over unencrypted HTTP. QuestarrNG received Allow insecure LAN as disabled for this request. Enable SSL or turn on 'Allow insecure LAN' in the downloader settings or current test form.",
       "kind": "app-owned downloader utility/manager",
-      "owners": [
-        "server/downloaders/utils.ts"
-      ],
+      "owners": ["server/downloaders/utils.ts"],
       "coverage": [
         "server/__tests__/downloaders_utils_manager.test.ts",
         "server/__tests__/downloaders_insecure_lan_policy.test.ts",
@@ -1678,9 +1499,7 @@
       "key": "service.redirect_limit",
       "source": "Too many redirects (max {limit})",
       "kind": "app-owned downloader utility/manager",
-      "owners": [
-        "server/downloaders/utils.ts"
-      ],
+      "owners": ["server/downloaders/utils.ts"],
       "coverage": [
         "server/__tests__/downloaders_utils_manager.test.ts",
         "server/__tests__/downloaders_insecure_lan_policy.test.ts",
@@ -1699,9 +1518,7 @@
       "key": "service.download_path_relative_required",
       "source": "Download path must be relative to its download directory",
       "kind": "app-owned downloader utility/manager",
-      "owners": [
-        "server/downloaders/utils.ts"
-      ],
+      "owners": ["server/downloaders/utils.ts"],
       "coverage": [
         "server/__tests__/downloaders_utils_manager.test.ts",
         "server/__tests__/downloaders_insecure_lan_policy.test.ts",
@@ -1720,9 +1537,7 @@
       "key": "service.download_path_escapes_directory",
       "source": "Download path escapes its download directory",
       "kind": "app-owned downloader utility/manager",
-      "owners": [
-        "server/downloaders/utils.ts"
-      ],
+      "owners": ["server/downloaders/utils.ts"],
       "coverage": [
         "server/__tests__/downloaders_utils_manager.test.ts",
         "server/__tests__/downloaders_insecure_lan_policy.test.ts",
@@ -1741,9 +1556,7 @@
       "key": "service.downloader_type_unsupported",
       "source": "Unsupported downloader type: {type}",
       "kind": "app-owned downloader utility/manager",
-      "owners": [
-        "server/downloaders/manager.ts"
-      ],
+      "owners": ["server/downloaders/manager.ts"],
       "coverage": [
         "server/__tests__/downloaders_utils_manager.test.ts",
         "server/__tests__/downloaders_insecure_lan_policy.test.ts",
@@ -1762,9 +1575,7 @@
       "key": "service.no_downloaders_available",
       "source": "No downloaders available",
       "kind": "app-owned downloader utility/manager",
-      "owners": [
-        "server/downloaders/manager.ts"
-      ],
+      "owners": ["server/downloaders/manager.ts"],
       "coverage": [
         "server/__tests__/downloaders_utils_manager.test.ts",
         "server/__tests__/downloaders_insecure_lan_policy.test.ts",
@@ -1783,9 +1594,7 @@
       "key": "service.no_compatible_downloaders",
       "source": "No compatible downloaders found for type: {type}",
       "kind": "app-owned downloader utility/manager",
-      "owners": [
-        "server/downloaders/manager.ts"
-      ],
+      "owners": ["server/downloaders/manager.ts"],
       "coverage": [
         "server/__tests__/downloaders_utils_manager.test.ts",
         "server/__tests__/downloaders_insecure_lan_policy.test.ts",
@@ -1804,9 +1613,7 @@
       "key": "service.all_downloaders_failed",
       "source": "All downloaders failed. Errors: {errors}",
       "kind": "app-owned downloader utility/manager",
-      "owners": [
-        "server/downloaders/manager.ts"
-      ],
+      "owners": ["server/downloaders/manager.ts"],
       "coverage": [
         "server/__tests__/downloaders_utils_manager.test.ts",
         "server/__tests__/downloaders_insecure_lan_policy.test.ts",
@@ -1825,9 +1632,7 @@
       "key": "service.downloader_named_error",
       "source": "{client}: {error}",
       "kind": "app-owned downloader utility/manager",
-      "owners": [
-        "server/downloaders/manager.ts"
-      ],
+      "owners": ["server/downloaders/manager.ts"],
       "coverage": [
         "server/__tests__/downloaders_utils_manager.test.ts",
         "server/__tests__/downloaders_insecure_lan_policy.test.ts",
@@ -1846,9 +1651,7 @@
       "key": "service.joined_errors",
       "source": "{left}; {right}",
       "kind": "app-owned downloader utility/manager",
-      "owners": [
-        "server/downloaders/manager.ts"
-      ],
+      "owners": ["server/downloaders/manager.ts"],
       "coverage": [
         "server/__tests__/downloaders_utils_manager.test.ts",
         "server/__tests__/downloaders_insecure_lan_policy.test.ts",
@@ -1891,10 +1694,7 @@
       "key": "service.invalid_relative_download_path",
       "source": "Invalid download path: use a relative path without parent-directory segments",
       "kind": "app-owned downloader utility/manager",
-      "owners": [
-        "server/downloaders/rtorrent.ts",
-        "server/downloaders/transmission.ts"
-      ],
+      "owners": ["server/downloaders/rtorrent.ts", "server/downloaders/transmission.ts"],
       "coverage": [
         "server/__tests__/downloaders_utils_manager.test.ts",
         "server/__tests__/downloaders_insecure_lan_policy.test.ts",
@@ -1940,10 +1740,7 @@
       "key": "service.download_torrent_failed",
       "source": "Failed to download torrent: {status} {statusText}",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/deluge.ts",
-        "server/downloaders/qbittorrent.ts"
-      ],
+      "owners": ["server/downloaders/deluge.ts", "server/downloaders/qbittorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -1965,9 +1762,7 @@
       "key": "service.magnet_add_failed",
       "source": "Failed to add magnet link: {error}",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/qbittorrent.ts"
-      ],
+      "owners": ["server/downloaders/qbittorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -1989,9 +1784,7 @@
       "key": "service.download_torrent_file_failed",
       "source": "Failed to download torrent file: {error}",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/qbittorrent.ts"
-      ],
+      "owners": ["server/downloaders/qbittorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2013,9 +1806,7 @@
       "key": "service.deluge_invalid_password",
       "source": "Deluge authentication failed: Invalid password",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/deluge.ts"
-      ],
+      "owners": ["server/downloaders/deluge.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2037,9 +1828,7 @@
       "key": "service.deluge_unexpected_auth_response",
       "source": "Deluge authentication failed: Unexpected response",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/deluge.ts"
-      ],
+      "owners": ["server/downloaders/deluge.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2061,9 +1850,7 @@
       "key": "service.deluge_no_daemon_hosts",
       "source": "No Deluge daemon hosts configured in Web UI",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/deluge.ts"
-      ],
+      "owners": ["server/downloaders/deluge.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2085,9 +1872,7 @@
       "key": "service.deluge_daemon_connect_failed",
       "source": "Failed to connect Deluge Web UI to daemon",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/deluge.ts"
-      ],
+      "owners": ["server/downloaders/deluge.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2109,9 +1894,7 @@
       "key": "service.deluge_magnet_add_failed",
       "source": "Failed to add magnet link to Deluge",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/deluge.ts"
-      ],
+      "owners": ["server/downloaders/deluge.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2133,9 +1916,7 @@
       "key": "service.deluge_download_add_failed",
       "source": "Failed to add download to Deluge",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/deluge.ts"
-      ],
+      "owners": ["server/downloaders/deluge.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2157,9 +1938,7 @@
       "key": "service.deluge_authentication_failed",
       "source": "Authentication failed: Invalid password for Deluge - {error}",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/deluge.ts"
-      ],
+      "owners": ["server/downloaders/deluge.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2181,9 +1960,7 @@
       "key": "service.deluge_invalid_json",
       "source": "Invalid JSON response from Deluge",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/deluge.ts"
-      ],
+      "owners": ["server/downloaders/deluge.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2205,9 +1982,7 @@
       "key": "service.deluge_rpc_error",
       "source": "Deluge RPC error: {error}",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/deluge.ts"
-      ],
+      "owners": ["server/downloaders/deluge.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2229,9 +2004,7 @@
       "key": "service.deluge_rpc_error_without_details",
       "source": "Deluge RPC error: Deluge RPC error",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/deluge.ts"
-      ],
+      "owners": ["server/downloaders/deluge.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2253,9 +2026,7 @@
       "key": "service.rtorrent_add_return_code",
       "source": "Failed to add download (rTorrent returned code: {code})",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/rtorrent.ts"
-      ],
+      "owners": ["server/downloaders/rtorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2277,9 +2048,7 @@
       "key": "service.indexer_download_failed",
       "source": "Failed to download file from indexer: {error}",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/rtorrent.ts"
-      ],
+      "owners": ["server/downloaders/rtorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2301,9 +2070,7 @@
       "key": "service.rtorrent_digest_algorithm_unsupported",
       "source": "Unsupported rTorrent Digest algorithm: {algorithm}. Configure rTorrent to advertise SHA-256.",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/rtorrent.ts"
-      ],
+      "owners": ["server/downloaders/rtorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2325,9 +2092,7 @@
       "key": "service.rtorrent_digest_auth_failed",
       "source": "Digest Authentication failed (wrong credentials)",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/rtorrent.ts"
-      ],
+      "owners": ["server/downloaders/rtorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2349,9 +2114,7 @@
       "key": "service.rtorrent_digest_http_auth_failed",
       "source": "Digest Authentication failed (wrong credentials, or server may have switched to HTTPS)",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/rtorrent.ts"
-      ],
+      "owners": ["server/downloaders/rtorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2373,9 +2136,7 @@
       "key": "service.rtorrent_digest_auth_error",
       "source": "Digest Auth Error: {error}",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/rtorrent.ts"
-      ],
+      "owners": ["server/downloaders/rtorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2397,9 +2158,7 @@
       "key": "service.rtorrent_authentication_failed",
       "source": "Authentication failed: Invalid credentials or web server authentication not configured for rTorrent - {error}",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/rtorrent.ts"
-      ],
+      "owners": ["server/downloaders/rtorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2421,9 +2180,7 @@
       "key": "service.xml_rpc_fault",
       "source": "XML-RPC Fault: {error}",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/rtorrent.ts"
-      ],
+      "owners": ["server/downloaders/rtorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2445,9 +2202,7 @@
       "key": "service.xml_rpc_fault_without_details",
       "source": "XML-RPC Fault occurred",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/rtorrent.ts"
-      ],
+      "owners": ["server/downloaders/rtorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2469,9 +2224,7 @@
       "key": "service.transmission_authentication_failed",
       "source": "Authentication failed: Invalid username or password for Transmission - {error}",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/transmission.ts"
-      ],
+      "owners": ["server/downloaders/transmission.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2493,9 +2246,7 @@
       "key": "service.authentication_http_failed",
       "source": "Authentication failed: {status} {statusText} - {error}",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/qbittorrent.ts"
-      ],
+      "owners": ["server/downloaders/qbittorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2517,9 +2268,7 @@
       "key": "service.authentication_failed",
       "source": "Authentication failed: {error}",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/qbittorrent.ts"
-      ],
+      "owners": ["server/downloaders/qbittorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2541,9 +2290,7 @@
       "key": "service.qbittorrent_magnet_not_found",
       "source": "Magnet link was accepted by qBittorrent but the torrent was not found afterwards",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/qbittorrent.ts"
-      ],
+      "owners": ["server/downloaders/qbittorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2565,9 +2312,7 @@
       "key": "service.qbittorrent_magnet_add_failed",
       "source": "Failed to add magnet link to qBittorrent",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/qbittorrent.ts"
-      ],
+      "owners": ["server/downloaders/qbittorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2589,9 +2334,7 @@
       "key": "service.redirected_magnet_hash_missing",
       "source": "Could not extract hash from redirected magnet link",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/qbittorrent.ts"
-      ],
+      "owners": ["server/downloaders/qbittorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2613,9 +2356,7 @@
       "key": "service.qbittorrent_download_not_added",
       "source": "Download was not added to qBittorrent (not found after adding)",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/qbittorrent.ts"
-      ],
+      "owners": ["server/downloaders/qbittorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2637,9 +2378,7 @@
       "key": "service.qbittorrent_download_exists_or_invalid",
       "source": "Download already exists or invalid download (qBittorrent)",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/qbittorrent.ts"
-      ],
+      "owners": ["server/downloaders/qbittorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2661,9 +2400,7 @@
       "key": "service.unknown_cause",
       "source": "Unknown cause",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/qbittorrent.ts"
-      ],
+      "owners": ["server/downloaders/qbittorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2685,9 +2422,7 @@
       "key": "service.fetch_failed_cause",
       "source": "{error} ({cause})",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/qbittorrent.ts"
-      ],
+      "owners": ["server/downloaders/qbittorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2709,9 +2444,7 @@
       "key": "service.indexer_connection_refused_error",
       "source": "{error} - The indexer refused the connection. Check if Prowlarr/Jackett is running and the port is correct.",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/qbittorrent.ts"
-      ],
+      "owners": ["server/downloaders/qbittorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2733,9 +2466,7 @@
       "key": "service.torrent_error",
       "source": "Torrent error",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/qbittorrent.ts"
-      ],
+      "owners": ["server/downloaders/qbittorrent.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_deluge_remaining.test.ts",
@@ -2757,9 +2488,7 @@
       "key": "service.download_added_via_url",
       "source": "Download added successfully (via URL)",
       "kind": "app-owned torrent client transport/action",
-      "owners": [
-        "server/downloaders/deluge.ts"
-      ],
+      "owners": ["server/downloaders/deluge.ts"],
       "coverage": [
         "server/__tests__/downloaders_typed_messages.test.ts",
         "server/__tests__/downloaders_typed_messages.test.ts"
@@ -2777,9 +2506,7 @@
       "key": "service.synology_api_unavailable",
       "source": "Synology API {api} is not available on this server",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -2798,9 +2525,7 @@
       "key": "service.synology_api_info_missing",
       "source": "Synology API information has not been loaded",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -2819,9 +2544,7 @@
       "key": "service.synology_task_api_unavailable",
       "source": "Synology Download Station Task API is not available on this server",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -2840,9 +2563,7 @@
       "key": "service.synology_parameters_rejected",
       "source": "Synology rejected the request parameters",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -2861,9 +2582,7 @@
       "key": "service.synology_permission_denied",
       "source": "Synology permission denied",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -2882,9 +2601,7 @@
       "key": "service.synology_session_expired",
       "source": "Synology session expired",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -2903,9 +2620,7 @@
       "key": "service.synology_destination_required",
       "source": "Synology rejected the request — a destination folder is required",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -2924,9 +2639,7 @@
       "key": "service.synology_authentication_failed",
       "source": "Synology authentication failed",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -2945,9 +2658,7 @@
       "key": "service.synology_task_limit",
       "source": "Synology maximum task limit reached",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -2966,9 +2677,7 @@
       "key": "service.synology_destination_denied",
       "source": "Synology destination access denied",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -2987,9 +2696,7 @@
       "key": "service.synology_destination_not_found",
       "source": "Synology destination was not found",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -3008,9 +2715,7 @@
       "key": "service.synology_error_fields",
       "source": "{context} (code {code}): {details}",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -3029,9 +2734,7 @@
       "key": "service.synology_error_code",
       "source": "{context} (code {code})",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -3050,9 +2753,7 @@
       "key": "service.unsafe_url_blocked_without_url",
       "source": "Unsafe URL blocked",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -3071,9 +2772,7 @@
       "key": "service.synology_http_error",
       "source": "{context}: HTTP {status} {statusText} - {error}",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -3092,9 +2791,7 @@
       "key": "service.synology_query_apis_failed",
       "source": "Failed to query Synology APIs",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -3113,9 +2810,7 @@
       "key": "service.synology_credentials_required",
       "source": "Synology Download Station requires a username and password",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -3134,9 +2829,7 @@
       "key": "service.synology_authenticate_failed",
       "source": "Failed to authenticate with Synology Download Station",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -3155,9 +2848,7 @@
       "key": "service.synology_logout_failed",
       "source": "Failed to log out from Synology Download Station",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -3176,9 +2867,7 @@
       "key": "service.synology_method_failed",
       "source": "Synology {api}.{method} failed",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -3197,9 +2886,7 @@
       "key": "service.synology_all_create_variants_failed",
       "source": "All Synology DS2 create-task variants failed",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -3218,9 +2905,7 @@
       "key": "service.synology_destination_unconfigured",
       "source": "No download destination configured. Set a Download Path for this downloader in Questarr, or configure a default destination in Synology Download Station settings.",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -3239,9 +2924,7 @@
       "key": "service.download_fetch_failed",
       "source": "Failed to fetch download: {error}",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -3260,9 +2943,7 @@
       "key": "service.synology_download_add_failed",
       "source": "Failed to add download to Synology Download Station: {error}",
       "kind": "app-owned Synology API/service",
-      "owners": [
-        "server/downloaders/synology.ts"
-      ],
+      "owners": ["server/downloaders/synology.ts"],
       "coverage": [
         "server/__tests__/downloaders_synology_remaining.test.ts",
         "server/__tests__/downloaders_clients_regression.test.ts",
@@ -3329,9 +3010,7 @@
       "key": "service.twitch_unreachable",
       "source": "Could not reach Twitch — check your network connection.",
       "kind": "app-owned IGDB/JSON catalog service",
-      "owners": [
-        "server/igdb.ts"
-      ],
+      "owners": ["server/igdb.ts"],
       "coverage": [
         "server/__tests__/igdb.test.ts",
         "server/__tests__/json-catalog.test.ts",
@@ -3351,9 +3030,7 @@
       "key": "service.igdb_credentials_invalid",
       "source": "Invalid Client ID or Client Secret.",
       "kind": "app-owned IGDB/JSON catalog service",
-      "owners": [
-        "server/igdb.ts"
-      ],
+      "owners": ["server/igdb.ts"],
       "coverage": [
         "server/__tests__/igdb.test.ts",
         "server/__tests__/json-catalog.test.ts",
@@ -3373,9 +3050,7 @@
       "key": "service.twitch_unexpected_status",
       "source": "Twitch returned an unexpected error (status {status}).",
       "kind": "app-owned IGDB/JSON catalog service",
-      "owners": [
-        "server/igdb.ts"
-      ],
+      "owners": ["server/igdb.ts"],
       "coverage": [
         "server/__tests__/igdb.test.ts",
         "server/__tests__/json-catalog.test.ts",
@@ -3395,9 +3070,7 @@
       "key": "service.igdb_unreachable",
       "source": "Could not reach IGDB — check your network connection.",
       "kind": "app-owned IGDB/JSON catalog service",
-      "owners": [
-        "server/igdb.ts"
-      ],
+      "owners": ["server/igdb.ts"],
       "coverage": [
         "server/__tests__/igdb.test.ts",
         "server/__tests__/json-catalog.test.ts",
@@ -3417,9 +3090,7 @@
       "key": "service.igdb_request_rejected",
       "source": "IGDB rejected the request (status {status}).",
       "kind": "app-owned IGDB/JSON catalog service",
-      "owners": [
-        "server/igdb.ts"
-      ],
+      "owners": ["server/igdb.ts"],
       "coverage": [
         "server/__tests__/igdb.test.ts",
         "server/__tests__/json-catalog.test.ts",
@@ -3439,9 +3110,7 @@
       "key": "service.igdb_credentials_unconfigured",
       "source": "IGDB credentials not configured",
       "kind": "app-owned IGDB/JSON catalog service",
-      "owners": [
-        "server/igdb.ts"
-      ],
+      "owners": ["server/igdb.ts"],
       "coverage": [
         "server/__tests__/igdb.test.ts",
         "server/__tests__/json-catalog.test.ts",
@@ -3461,9 +3130,7 @@
       "key": "service.igdb_authentication_failed",
       "source": "IGDB authentication failed: {status}",
       "kind": "app-owned IGDB/JSON catalog service",
-      "owners": [
-        "server/igdb.ts"
-      ],
+      "owners": ["server/igdb.ts"],
       "coverage": [
         "server/__tests__/igdb.test.ts",
         "server/__tests__/json-catalog.test.ts",
@@ -3483,9 +3150,7 @@
       "key": "service.igdb_api_error",
       "source": "IGDB API error: {status}",
       "kind": "app-owned IGDB/JSON catalog service",
-      "owners": [
-        "server/igdb.ts"
-      ],
+      "owners": ["server/igdb.ts"],
       "coverage": [
         "server/__tests__/igdb.test.ts",
         "server/__tests__/json-catalog.test.ts",
@@ -3505,9 +3170,7 @@
       "key": "service.igdb_game_platform_required",
       "source": "A valid IGDB game and platform ID are required.",
       "kind": "app-owned IGDB/JSON catalog service",
-      "owners": [
-        "server/igdb.ts"
-      ],
+      "owners": ["server/igdb.ts"],
       "coverage": [
         "server/__tests__/igdb.test.ts",
         "server/__tests__/json-catalog.test.ts",
@@ -3527,9 +3190,7 @@
       "key": "service.igdb_credentials_test_failed",
       "source": "Failed to test IGDB credentials",
       "kind": "app-owned IGDB/JSON catalog service",
-      "owners": [
-        "server/routes.ts"
-      ],
+      "owners": ["server/routes.ts"],
       "coverage": [
         "server/__tests__/igdb.test.ts",
         "server/__tests__/json-catalog.test.ts",
@@ -3549,9 +3210,7 @@
       "key": "service.json_catalog_https_required",
       "source": "JSON catalogs require a public HTTPS URL without embedded credentials",
       "kind": "app-owned IGDB/JSON catalog service",
-      "owners": [
-        "server/json-catalog.ts"
-      ],
+      "owners": ["server/json-catalog.ts"],
       "coverage": [
         "server/__tests__/igdb.test.ts",
         "server/__tests__/json-catalog.test.ts",
@@ -3571,9 +3230,7 @@
       "key": "service.json_catalog_http_error",
       "source": "Catalog returned HTTP {status}",
       "kind": "app-owned IGDB/JSON catalog service",
-      "owners": [
-        "server/json-catalog.ts"
-      ],
+      "owners": ["server/json-catalog.ts"],
       "coverage": [
         "server/__tests__/igdb.test.ts",
         "server/__tests__/json-catalog.test.ts",
@@ -3593,9 +3250,7 @@
       "key": "service.json_catalog_size_limit",
       "source": "Catalog exceeds the 10 MiB limit",
       "kind": "app-owned IGDB/JSON catalog service",
-      "owners": [
-        "server/json-catalog.ts"
-      ],
+      "owners": ["server/json-catalog.ts"],
       "coverage": [
         "server/__tests__/igdb.test.ts",
         "server/__tests__/json-catalog.test.ts",
@@ -3615,9 +3270,7 @@
       "key": "service.json_catalog_format_invalid",
       "source": "Invalid JSON catalog: expected downloads with titles and URI lists",
       "kind": "app-owned IGDB/JSON catalog service",
-      "owners": [
-        "server/json-catalog.ts"
-      ],
+      "owners": ["server/json-catalog.ts"],
       "coverage": [
         "server/__tests__/igdb.test.ts",
         "server/__tests__/json-catalog.test.ts",
@@ -3637,9 +3290,7 @@
       "key": "service.json_catalog_request_failed",
       "source": "Catalog request failed",
       "kind": "app-owned IGDB/JSON catalog service",
-      "owners": [
-        "server/json-catalog.ts"
-      ],
+      "owners": ["server/json-catalog.ts"],
       "coverage": [
         "server/__tests__/igdb.test.ts",
         "server/__tests__/json-catalog.test.ts",
@@ -3659,9 +3310,7 @@
       "key": "service.apprise_unconfigured",
       "source": "Apprise is not configured",
       "kind": "app-owned Apprise test/CLI service",
-      "owners": [
-        "server/apprise.ts"
-      ],
+      "owners": ["server/apprise.ts"],
       "coverage": [
         "server/__tests__/apprise.test.ts",
         "server/__tests__/api_routes.test.ts",
@@ -3680,9 +3329,7 @@
       "key": "service.apprise_notification_urls_missing",
       "source": "No notification URLs provided",
       "kind": "app-owned Apprise test/CLI service",
-      "owners": [
-        "server/apprise.ts"
-      ],
+      "owners": ["server/apprise.ts"],
       "coverage": [
         "server/__tests__/apprise.test.ts",
         "server/__tests__/api_routes.test.ts",
@@ -3701,9 +3348,7 @@
       "key": "service.apprise_config_or_urls_missing",
       "source": "No config key or notification URLs provided",
       "kind": "app-owned Apprise test/CLI service",
-      "owners": [
-        "server/apprise.ts"
-      ],
+      "owners": ["server/apprise.ts"],
       "coverage": [
         "server/__tests__/apprise.test.ts",
         "server/__tests__/api_routes.test.ts",
@@ -3722,9 +3367,7 @@
       "key": "service.apprise_cli_not_found",
       "source": "Apprise CLI not found",
       "kind": "app-owned Apprise test/CLI service",
-      "owners": [
-        "server/apprise.ts"
-      ],
+      "owners": ["server/apprise.ts"],
       "coverage": [
         "server/__tests__/apprise.test.ts",
         "server/__tests__/api_routes.test.ts",
@@ -3743,9 +3386,7 @@
       "key": "service.apprise_cli_timeout",
       "source": "Apprise CLI timed out",
       "kind": "app-owned Apprise test/CLI service",
-      "owners": [
-        "server/apprise.ts"
-      ],
+      "owners": ["server/apprise.ts"],
       "coverage": [
         "server/__tests__/apprise.test.ts",
         "server/__tests__/api_routes.test.ts",
@@ -3764,9 +3405,7 @@
       "key": "service.apprise_server_responded",
       "source": "Server responded with {status}: {error}",
       "kind": "app-owned Apprise test/CLI service",
-      "owners": [
-        "server/apprise.ts"
-      ],
+      "owners": ["server/apprise.ts"],
       "coverage": [
         "server/__tests__/apprise.test.ts",
         "server/__tests__/api_routes.test.ts",
@@ -3785,10 +3424,7 @@
       "key": "service.apprise_reach_failed",
       "source": "Failed to reach Apprise server",
       "kind": "app-owned Apprise test/CLI service",
-      "owners": [
-        "server/apprise.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/apprise.ts", "server/routes.ts"],
       "coverage": [
         "server/__tests__/apprise.test.ts",
         "server/__tests__/api_routes.test.ts",
@@ -3807,10 +3443,7 @@
       "key": "service.apprise_test_failed",
       "source": "Apprise test failed",
       "kind": "app-owned Apprise test/CLI service",
-      "owners": [
-        "server/routes.ts",
-        "client/src/pages/settings.tsx"
-      ],
+      "owners": ["server/routes.ts", "client/src/pages/settings.tsx"],
       "coverage": [
         "server/__tests__/apprise.test.ts",
         "server/__tests__/api_routes.test.ts",
@@ -3829,9 +3462,7 @@
       "key": "service.indexer_http_error",
       "source": "HTTP {status}: {statusText}",
       "kind": "app-owned indexer/search service",
-      "owners": [
-        "server/indexer-caps.ts"
-      ],
+      "owners": ["server/indexer-caps.ts"],
       "coverage": [
         "server/__tests__/indexer-caps.test.ts",
         "server/__tests__/search.test.ts",
@@ -3851,9 +3482,7 @@
       "key": "service.indexer_http_key_withheld",
       "source": "HTTP {status}: {statusText} (API key withheld for this HTTP feed; it was not sent because this indexer uses plain HTTP: enable 'Allow insecure LAN connection' on the indexer, or switch it to HTTPS)",
       "kind": "app-owned indexer/search service",
-      "owners": [
-        "server/indexer-caps.ts"
-      ],
+      "owners": ["server/indexer-caps.ts"],
       "coverage": [
         "server/__tests__/indexer-caps.test.ts",
         "server/__tests__/search.test.ts",
@@ -3873,9 +3502,7 @@
       "key": "service.indexer_http_key_check",
       "source": "HTTP {status}: {statusText} (check the indexer API key; re-sync from Prowlarr if its key changed).",
       "kind": "app-owned indexer/search service",
-      "owners": [
-        "server/indexer-caps.ts"
-      ],
+      "owners": ["server/indexer-caps.ts"],
       "coverage": [
         "server/__tests__/indexer-caps.test.ts",
         "server/__tests__/search.test.ts",
@@ -3895,9 +3522,7 @@
       "key": "service.indexer_http_body",
       "source": "{statusMessage} - {error}",
       "kind": "app-owned indexer/search service",
-      "owners": [
-        "server/torznab.ts"
-      ],
+      "owners": ["server/torznab.ts"],
       "coverage": [
         "server/__tests__/indexer-caps.test.ts",
         "server/__tests__/search.test.ts",
@@ -3917,9 +3542,7 @@
       "key": "service.indexer_disabled",
       "source": "Indexer {indexer} is disabled",
       "kind": "app-owned indexer/search service",
-      "owners": [
-        "server/torznab.ts"
-      ],
+      "owners": ["server/torznab.ts"],
       "coverage": [
         "server/__tests__/indexer-caps.test.ts",
         "server/__tests__/search.test.ts",
@@ -3939,9 +3562,7 @@
       "key": "service.indexer_search_failed",
       "source": "Failed to search indexer {indexer}: {error}",
       "kind": "app-owned indexer/search service",
-      "owners": [
-        "server/torznab.ts"
-      ],
+      "owners": ["server/torznab.ts"],
       "coverage": [
         "server/__tests__/indexer-caps.test.ts",
         "server/__tests__/search.test.ts",
@@ -3961,9 +3582,7 @@
       "key": "service.no_enabled_indexers",
       "source": "No enabled indexers available",
       "kind": "app-owned indexer/search service",
-      "owners": [
-        "server/torznab.ts"
-      ],
+      "owners": ["server/torznab.ts"],
       "coverage": [
         "server/__tests__/indexer-caps.test.ts",
         "server/__tests__/search.test.ts",
@@ -3983,10 +3602,7 @@
       "key": "service.unsafe_url_detected",
       "source": "Unsafe URL detected: {url}",
       "kind": "app-owned indexer/search service",
-      "owners": [
-        "server/newznab.ts",
-        "server/torznab.ts"
-      ],
+      "owners": ["server/newznab.ts", "server/torznab.ts"],
       "coverage": [
         "server/__tests__/indexer-caps.test.ts",
         "server/__tests__/search.test.ts",
@@ -4006,10 +3622,7 @@
       "key": "service.unsafe_url_detected_without_url",
       "source": "Unsafe URL detected",
       "kind": "app-owned indexer/search service",
-      "owners": [
-        "server/newznab.ts",
-        "server/torznab.ts"
-      ],
+      "owners": ["server/newznab.ts", "server/torznab.ts"],
       "coverage": [
         "server/__tests__/indexer-caps.test.ts",
         "server/__tests__/search.test.ts",
@@ -4029,9 +3642,7 @@
       "key": "service.torznab_response_invalid",
       "source": "Invalid Torznab response format",
       "kind": "app-owned indexer/search service",
-      "owners": [
-        "server/torznab.ts"
-      ],
+      "owners": ["server/torznab.ts"],
       "coverage": [
         "server/__tests__/indexer-caps.test.ts",
         "server/__tests__/search.test.ts",
@@ -4051,9 +3662,7 @@
       "key": "service.indexer_response_parse_failed",
       "source": "Failed to parse response: {error}",
       "kind": "app-owned indexer/search service",
-      "owners": [
-        "server/torznab.ts"
-      ],
+      "owners": ["server/torznab.ts"],
       "coverage": [
         "server/__tests__/indexer-caps.test.ts",
         "server/__tests__/search.test.ts",
@@ -4073,9 +3682,7 @@
       "key": "service.newznab_search_failed",
       "source": "Newznab search failed for {indexer}: {error}",
       "kind": "app-owned indexer/search service",
-      "owners": [
-        "server/newznab.ts"
-      ],
+      "owners": ["server/newznab.ts"],
       "coverage": [
         "server/__tests__/indexer-caps.test.ts",
         "server/__tests__/search.test.ts",
@@ -4095,9 +3702,7 @@
       "key": "service.newznab_connection_failed",
       "source": "Connection failed: {error}",
       "kind": "app-owned indexer/search service",
-      "owners": [
-        "server/newznab.ts"
-      ],
+      "owners": ["server/newznab.ts"],
       "coverage": [
         "server/__tests__/indexer-caps.test.ts",
         "server/__tests__/search.test.ts",
@@ -4117,9 +3722,7 @@
       "key": "service.newznab_response_invalid",
       "source": "Invalid Newznab response",
       "kind": "app-owned indexer/search service",
-      "owners": [
-        "server/newznab.ts"
-      ],
+      "owners": ["server/newznab.ts"],
       "coverage": [
         "server/__tests__/indexer-caps.test.ts",
         "server/__tests__/search.test.ts",
@@ -4139,9 +3742,7 @@
       "key": "service.unknown_error_reason",
       "source": "Unknown error: {reason}",
       "kind": "app-owned indexer/search service",
-      "owners": [
-        "server/torznab.ts"
-      ],
+      "owners": ["server/torznab.ts"],
       "coverage": [
         "server/__tests__/indexer-caps.test.ts",
         "server/__tests__/search.test.ts",
@@ -4161,9 +3762,7 @@
       "key": "service.no_indexers_configured",
       "source": "No indexers configured",
       "kind": "app-owned indexer/search service",
-      "owners": [
-        "server/search.ts"
-      ],
+      "owners": ["server/search.ts"],
       "coverage": [
         "server/__tests__/indexer-caps.test.ts",
         "server/__tests__/search.test.ts",
@@ -4183,9 +3782,7 @@
       "key": "service.json_catalog_search_failed",
       "source": "{indexer}: JSON catalog search failed; use Test Connection for details",
       "kind": "app-owned indexer/search service",
-      "owners": [
-        "server/search.ts"
-      ],
+      "owners": ["server/search.ts"],
       "coverage": [
         "server/__tests__/indexer-caps.test.ts",
         "server/__tests__/search.test.ts",
@@ -4205,12 +3802,8 @@
       "key": "service.connection_test_server_unreachable",
       "source": "Could not reach the server to test the connection.",
       "kind": "app-owned indexer/search service",
-      "owners": [
-        "client/src/components/IgdbCredentialsHelper.tsx"
-      ],
-      "coverage": [
-        "client/src/__tests__/IgdbCredentialsHelper.test.tsx"
-      ],
+      "owners": ["client/src/components/IgdbCredentialsHelper.tsx"],
+      "coverage": ["client/src/__tests__/IgdbCredentialsHelper.test.tsx"],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -4224,10 +3817,7 @@
       "key": "service.rawg_busy",
       "source": "RAWG is busy; try again shortly",
       "kind": "app-owned RAWG/security/provider test",
-      "owners": [
-        "server/rawg.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/rawg.ts", "server/routes.ts"],
       "coverage": [
         "server/__tests__/rawg.test.ts",
         "server/__tests__/security-scan.test.ts",
@@ -4248,10 +3838,7 @@
       "key": "service.rawg_connect_failed",
       "source": "Could not connect to RAWG",
       "kind": "app-owned RAWG/security/provider test",
-      "owners": [
-        "server/rawg.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/rawg.ts", "server/routes.ts"],
       "coverage": [
         "server/__tests__/rawg.test.ts",
         "server/__tests__/security-scan.test.ts",
@@ -4272,10 +3859,7 @@
       "key": "service.rawg_key_rejected",
       "source": "RAWG rejected the API key. Check the key in Settings.",
       "kind": "app-owned RAWG/security/provider test",
-      "owners": [
-        "server/rawg.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/rawg.ts", "server/routes.ts"],
       "coverage": [
         "server/__tests__/rawg.test.ts",
         "server/__tests__/security-scan.test.ts",
@@ -4296,10 +3880,7 @@
       "key": "service.rawg_rate_limit",
       "source": "RAWG rate limit reached. Try again shortly.",
       "kind": "app-owned RAWG/security/provider test",
-      "owners": [
-        "server/rawg.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/rawg.ts", "server/routes.ts"],
       "coverage": [
         "server/__tests__/rawg.test.ts",
         "server/__tests__/security-scan.test.ts",
@@ -4320,10 +3901,7 @@
       "key": "service.rawg_http_error",
       "source": "RAWG returned HTTP {status}",
       "kind": "app-owned RAWG/security/provider test",
-      "owners": [
-        "server/rawg.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/rawg.ts", "server/routes.ts"],
       "coverage": [
         "server/__tests__/rawg.test.ts",
         "server/__tests__/security-scan.test.ts",
@@ -4344,10 +3922,7 @@
       "key": "service.rawg_size_limit",
       "source": "RAWG response exceeded the size limit",
       "kind": "app-owned RAWG/security/provider test",
-      "owners": [
-        "server/rawg.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/rawg.ts", "server/routes.ts"],
       "coverage": [
         "server/__tests__/rawg.test.ts",
         "server/__tests__/security-scan.test.ts",
@@ -4368,10 +3943,7 @@
       "key": "service.rawg_list_invalid",
       "source": "RAWG returned an invalid game list",
       "kind": "app-owned RAWG/security/provider test",
-      "owners": [
-        "server/rawg.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/rawg.ts", "server/routes.ts"],
       "coverage": [
         "server/__tests__/rawg.test.ts",
         "server/__tests__/security-scan.test.ts",
@@ -4392,10 +3964,7 @@
       "key": "service.rawg_request_failed",
       "source": "RAWG request failed",
       "kind": "app-owned RAWG/security/provider test",
-      "owners": [
-        "server/rawg.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/rawg.ts", "server/routes.ts"],
       "coverage": [
         "server/__tests__/rawg.test.ts",
         "server/__tests__/security-scan.test.ts",
@@ -4416,9 +3985,7 @@
       "key": "service.rawg_search_failed",
       "source": "RAWG search failed",
       "kind": "app-owned RAWG/security/provider test",
-      "owners": [
-        "server/routes.ts"
-      ],
+      "owners": ["server/routes.ts"],
       "coverage": [
         "server/__tests__/rawg.test.ts",
         "server/__tests__/security-scan.test.ts",
@@ -4439,9 +4006,7 @@
       "key": "service.rawg_test_failed",
       "source": "Failed to test RAWG API key",
       "kind": "app-owned RAWG/security/provider test",
-      "owners": [
-        "server/routes.ts"
-      ],
+      "owners": ["server/routes.ts"],
       "coverage": [
         "server/__tests__/rawg.test.ts",
         "server/__tests__/security-scan.test.ts",
@@ -4462,9 +4027,7 @@
       "key": "service.rawg_key_required",
       "source": "RAWG API key is required",
       "kind": "app-owned RAWG/security/provider test",
-      "owners": [
-        "server/routes.ts"
-      ],
+      "owners": ["server/routes.ts"],
       "coverage": [
         "server/__tests__/rawg.test.ts",
         "server/__tests__/security-scan.test.ts",
@@ -4485,9 +4048,7 @@
       "key": "service.rawg_configuration_required",
       "source": "Configure RAWG in Settings first",
       "kind": "app-owned RAWG/security/provider test",
-      "owners": [
-        "server/routes.ts"
-      ],
+      "owners": ["server/routes.ts"],
       "coverage": [
         "server/__tests__/rawg.test.ts",
         "server/__tests__/security-scan.test.ts",
@@ -4508,9 +4069,7 @@
       "key": "service.clamav_ping_timeout",
       "source": "Connection to ClamAV timed out",
       "kind": "app-owned RAWG/security/provider test",
-      "owners": [
-        "server/routes.ts"
-      ],
+      "owners": ["server/routes.ts"],
       "coverage": [
         "server/__tests__/rawg.test.ts",
         "server/__tests__/security-scan.test.ts",
@@ -4531,9 +4090,7 @@
       "key": "service.clamav_ping_reply_missing",
       "source": "No PONG reply from ClamAV",
       "kind": "app-owned RAWG/security/provider test",
-      "owners": [
-        "server/routes.ts"
-      ],
+      "owners": ["server/routes.ts"],
       "coverage": [
         "server/__tests__/rawg.test.ts",
         "server/__tests__/security-scan.test.ts",
@@ -4554,9 +4111,7 @@
       "key": "service.clamav_test_failed",
       "source": "ClamAV test failed",
       "kind": "app-owned RAWG/security/provider test",
-      "owners": [
-        "server/routes.ts"
-      ],
+      "owners": ["server/routes.ts"],
       "coverage": [
         "server/__tests__/rawg.test.ts",
         "server/__tests__/security-scan.test.ts",
@@ -4577,9 +4132,7 @@
       "key": "service.clamav_host_unconfigured",
       "source": "No ClamAV host configured",
       "kind": "app-owned RAWG/security/provider test",
-      "owners": [
-        "server/routes.ts"
-      ],
+      "owners": ["server/routes.ts"],
       "coverage": [
         "server/__tests__/rawg.test.ts",
         "server/__tests__/security-scan.test.ts",
@@ -4600,10 +4153,7 @@
       "key": "service.virustotal_http_error",
       "source": "VirusTotal responded with {status}",
       "kind": "app-owned RAWG/security/provider test",
-      "owners": [
-        "server/security-scan.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/security-scan.ts", "server/routes.ts"],
       "coverage": [
         "server/__tests__/rawg.test.ts",
         "server/__tests__/security-scan.test.ts",
@@ -4624,9 +4174,7 @@
       "key": "service.virustotal_key_unconfigured",
       "source": "No VirusTotal API key configured",
       "kind": "app-owned RAWG/security/provider test",
-      "owners": [
-        "server/routes.ts"
-      ],
+      "owners": ["server/routes.ts"],
       "coverage": [
         "server/__tests__/rawg.test.ts",
         "server/__tests__/security-scan.test.ts",
@@ -4647,9 +4195,7 @@
       "key": "service.security_provider_unknown",
       "source": "Unknown provider",
       "kind": "app-owned RAWG/security/provider test",
-      "owners": [
-        "server/routes.ts"
-      ],
+      "owners": ["server/routes.ts"],
       "coverage": [
         "server/__tests__/rawg.test.ts",
         "server/__tests__/security-scan.test.ts",
@@ -4670,9 +4216,7 @@
       "key": "service.security_provider_test_failed",
       "source": "Security scan provider test failed",
       "kind": "app-owned RAWG/security/provider test",
-      "owners": [
-        "server/routes.ts"
-      ],
+      "owners": ["server/routes.ts"],
       "coverage": [
         "server/__tests__/rawg.test.ts",
         "server/__tests__/security-scan.test.ts",
@@ -4693,10 +4237,7 @@
       "key": "service.client_test_input_required",
       "source": "Either {id} or {formData} must be provided",
       "kind": "app-owned reachable client error",
-      "owners": [
-        "client/src/pages/downloaders.tsx",
-        "client/src/pages/indexers.tsx"
-      ],
+      "owners": ["client/src/pages/downloaders.tsx", "client/src/pages/indexers.tsx"],
       "coverage": [
         "client/src/lib/__tests__/api-error-metadata.test.tsx",
         "client/__tests__/SettingsPage.test.tsx",
@@ -4716,9 +4257,7 @@
       "key": "service.both_certificate_files_required",
       "source": "Please select both files",
       "kind": "app-owned reachable client error",
-      "owners": [
-        "client/src/pages/settings.tsx"
-      ],
+      "owners": ["client/src/pages/settings.tsx"],
       "coverage": [
         "client/src/lib/__tests__/api-error-metadata.test.tsx",
         "client/__tests__/SettingsPage.test.tsx",
@@ -4738,9 +4277,7 @@
       "key": "service.api_route_missing_restart",
       "source": "API route not found. Please restart the server to apply changes.",
       "kind": "app-owned reachable client error",
-      "owners": [
-        "client/src/pages/settings.tsx"
-      ],
+      "owners": ["client/src/pages/settings.tsx"],
       "coverage": [
         "client/src/lib/__tests__/api-error-metadata.test.tsx",
         "client/__tests__/SettingsPage.test.tsx",
@@ -4760,9 +4297,7 @@
       "key": "service.claim_game_required",
       "source": "No game selected",
       "kind": "app-owned reachable client error",
-      "owners": [
-        "client/src/components/ClaimDownloadModal.tsx"
-      ],
+      "owners": ["client/src/components/ClaimDownloadModal.tsx"],
       "coverage": [
         "client/src/lib/__tests__/api-error-metadata.test.tsx",
         "client/__tests__/SettingsPage.test.tsx",
@@ -4870,10 +4405,7 @@
       "key": "service.pending_security_error",
       "source": "Security alert: {error}",
       "kind": "source-owned discovery and persisted import/feed diagnostic",
-      "owners": [
-        "client/src/components/PendingImportsCard.tsx",
-        "server/routes/import.ts"
-      ],
+      "owners": ["client/src/components/PendingImportsCard.tsx", "server/routes/import.ts"],
       "coverage": [
         "server/__tests__/library-scanner.test.ts",
         "server/__tests__/localized-error-persistence.test.ts"
@@ -4891,10 +4423,7 @@
       "key": "service.pending_password_error",
       "source": "Password required: {error}",
       "kind": "source-owned discovery and persisted import/feed diagnostic",
-      "owners": [
-        "client/src/components/PendingImportsCard.tsx",
-        "server/routes/import.ts"
-      ],
+      "owners": ["client/src/components/PendingImportsCard.tsx", "server/routes/import.ts"],
       "coverage": [
         "server/__tests__/library-scanner.test.ts",
         "server/__tests__/localized-error-persistence.test.ts"
@@ -4912,10 +4441,7 @@
       "key": "service.pending_import_error",
       "source": "Import failed: {error}",
       "kind": "source-owned discovery and persisted import/feed diagnostic",
-      "owners": [
-        "client/src/components/PendingImportsCard.tsx",
-        "server/routes/import.ts"
-      ],
+      "owners": ["client/src/components/PendingImportsCard.tsx", "server/routes/import.ts"],
       "coverage": [
         "server/__tests__/library-scanner.test.ts",
         "server/__tests__/localized-error-persistence.test.ts"
@@ -4933,11 +4459,7 @@
       "key": "service.rss_fetch_failed",
       "source": "Failed to fetch feed: {status}",
       "kind": "source-owned discovery and persisted import/feed diagnostic",
-      "owners": [
-        "server/rss.ts",
-        "server/storage.ts",
-        "client/src/components/RssSettings.tsx"
-      ],
+      "owners": ["server/rss.ts", "server/storage.ts", "client/src/components/RssSettings.tsx"],
       "coverage": [
         "server/__tests__/library-scanner.test.ts",
         "server/__tests__/localized-error-persistence.test.ts"
@@ -5070,14 +4592,8 @@
       "key": "service.api_key_limit_reached",
       "source": "You can have at most {count} API keys. Revoke one first.",
       "kind": "source-owned UI-consumed route/API error",
-      "owners": [
-        "server/routes/api-keys.ts",
-        "server/routes/import.ts",
-        "server/routes.ts"
-      ],
-      "coverage": [
-        "server/__tests__/integration_api.test.ts"
-      ],
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": ["server/__tests__/integration_api.test.ts"],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5091,14 +4607,8 @@
       "key": "service.api_failed_to_create_api_key",
       "source": "Failed to create API key",
       "kind": "source-owned UI-consumed route/API error",
-      "owners": [
-        "server/routes/api-keys.ts",
-        "server/routes/import.ts",
-        "server/routes.ts"
-      ],
-      "coverage": [
-        "server/__tests__/integration_api.test.ts"
-      ],
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": ["server/__tests__/integration_api.test.ts"],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5112,14 +4622,8 @@
       "key": "service.api_api_key_not_found",
       "source": "API key not found",
       "kind": "source-owned UI-consumed route/API error",
-      "owners": [
-        "server/routes/api-keys.ts",
-        "server/routes/import.ts",
-        "server/routes.ts"
-      ],
-      "coverage": [
-        "server/__tests__/integration_api.test.ts"
-      ],
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": ["server/__tests__/integration_api.test.ts"],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5133,14 +4637,8 @@
       "key": "service.api_failed_to_revoke_api_key",
       "source": "Failed to revoke API key",
       "kind": "source-owned UI-consumed route/API error",
-      "owners": [
-        "server/routes/api-keys.ts",
-        "server/routes/import.ts",
-        "server/routes.ts"
-      ],
-      "coverage": [
-        "server/__tests__/integration_api.test.ts"
-      ],
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": ["server/__tests__/integration_api.test.ts"],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5154,14 +4652,8 @@
       "key": "service.api_failed_to_create_path_mapping",
       "source": "Failed to create path mapping",
       "kind": "source-owned UI-consumed route/API error",
-      "owners": [
-        "server/routes/api-keys.ts",
-        "server/routes/import.ts",
-        "server/routes.ts"
-      ],
-      "coverage": [
-        "server/__tests__/import_routes_coverage.test.ts"
-      ],
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": ["server/__tests__/import_routes_coverage.test.ts"],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5175,11 +4667,7 @@
       "key": "service.api_mapping_not_found",
       "source": "Mapping not found",
       "kind": "source-owned UI-consumed route/API error",
-      "owners": [
-        "server/routes/api-keys.ts",
-        "server/routes/import.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
       "coverage": [
         "server/__tests__/import_routes_coverage.test.ts",
         "server/__tests__/import_routes_additional.test.ts"
@@ -5197,11 +4685,7 @@
       "key": "service.api_failed_to_update_path_mapping",
       "source": "Failed to update path mapping",
       "kind": "source-owned UI-consumed route/API error",
-      "owners": [
-        "server/routes/api-keys.ts",
-        "server/routes/import.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
       "coverage": [],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
@@ -5216,14 +4700,8 @@
       "key": "service.api_failed_to_delete_path_mapping",
       "source": "Failed to delete path mapping",
       "kind": "source-owned UI-consumed route/API error",
-      "owners": [
-        "server/routes/api-keys.ts",
-        "server/routes/import.ts",
-        "server/routes.ts"
-      ],
-      "coverage": [
-        "server/__tests__/import_routes_coverage.test.ts"
-      ],
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": ["server/__tests__/import_routes_coverage.test.ts"],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5237,11 +4715,7 @@
       "key": "service.api_download_not_found",
       "source": "Download not found",
       "kind": "source-owned UI-consumed route/API error",
-      "owners": [
-        "server/routes/api-keys.ts",
-        "server/routes/import.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
       "coverage": [
         "server/__tests__/import_routes_coverage.test.ts",
         "server/__tests__/import_routes_additional.test.ts"
@@ -5259,14 +4733,8 @@
       "key": "service.api_download_was_linked_to_a_game_before_it_could_be_skipped",
       "source": "Download was linked to a game before it could be skipped",
       "kind": "source-owned UI-consumed route/API error",
-      "owners": [
-        "server/routes/api-keys.ts",
-        "server/routes/import.ts",
-        "server/routes.ts"
-      ],
-      "coverage": [
-        "server/__tests__/import_routes_coverage.test.ts"
-      ],
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": ["server/__tests__/import_routes_coverage.test.ts"],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5280,11 +4748,7 @@
       "key": "service.api_internal_server_error",
       "source": "Internal server error",
       "kind": "source-owned UI-consumed route/API error",
-      "owners": [
-        "server/routes/api-keys.ts",
-        "server/routes/import.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
       "coverage": [
         "server/__tests__/import_routes_coverage.test.ts",
         "server/__tests__/import_routes_additional.test.ts"
@@ -5302,14 +4766,8 @@
       "key": "service.api_this_download_does_not_need_to_be_linked_to_a_game",
       "source": "This download does not need to be linked to a game",
       "kind": "source-owned UI-consumed route/API error",
-      "owners": [
-        "server/routes/api-keys.ts",
-        "server/routes/import.ts",
-        "server/routes.ts"
-      ],
-      "coverage": [
-        "server/__tests__/import_routes_additional.test.ts"
-      ],
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": ["server/__tests__/import_routes_additional.test.ts"],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5323,14 +4781,8 @@
       "key": "service.api_this_download_was_already_linked_to_a_game_by_another_request",
       "source": "This download was already linked to a game by another request",
       "kind": "source-owned UI-consumed route/API error",
-      "owners": [
-        "server/routes/api-keys.ts",
-        "server/routes/import.ts",
-        "server/routes.ts"
-      ],
-      "coverage": [
-        "server/__tests__/import_routes_additional.test.ts"
-      ],
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": ["server/__tests__/import_routes_additional.test.ts"],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5344,11 +4796,7 @@
       "key": "service.api_romm_imports_are_disabled",
       "source": "RomM imports are disabled",
       "kind": "source-owned UI-consumed route/API error",
-      "owners": [
-        "server/routes/api-keys.ts",
-        "server/routes/import.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
       "coverage": [],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
@@ -5363,14 +4811,8 @@
       "key": "service.api_igdb_search_failed",
       "source": "IGDB search failed",
       "kind": "source-owned UI-consumed route/API error",
-      "owners": [
-        "server/routes/api-keys.ts",
-        "server/routes/import.ts",
-        "server/routes.ts"
-      ],
-      "coverage": [
-        "server/__tests__/api_routes.test.ts"
-      ],
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
+      "coverage": ["server/__tests__/api_routes.test.ts"],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5384,11 +4826,7 @@
       "key": "service.api_invalid_proposed_path",
       "source": "Invalid proposed path",
       "kind": "source-owned UI-consumed route/API error",
-      "owners": [
-        "server/routes/api-keys.ts",
-        "server/routes/import.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/routes/api-keys.ts", "server/routes/import.ts", "server/routes.ts"],
       "coverage": [
         "server/__tests__/import_routes_security.test.ts",
         "server/__tests__/import_routes_additional.test.ts"
@@ -5406,13 +4844,8 @@
       "key": "service.api_archive_password_rejected",
       "source": "The provided password was rejected — it may be incorrect.",
       "kind": "source-owned import/archive API error producer",
-      "owners": [
-        "server/services/ArchiveService.ts",
-        "server/services/ImportManager.ts"
-      ],
-      "coverage": [
-        "server/__tests__/archive_service.test.ts"
-      ],
+      "owners": ["server/services/ArchiveService.ts", "server/services/ImportManager.ts"],
+      "coverage": ["server/__tests__/archive_service.test.ts"],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5426,13 +4859,8 @@
       "key": "service.api_archive_password_required",
       "source": "This archive is password-protected — a password is required to extract it.",
       "kind": "source-owned import/archive API error producer",
-      "owners": [
-        "server/services/ArchiveService.ts",
-        "server/services/ImportManager.ts"
-      ],
-      "coverage": [
-        "server/__tests__/archive_service.test.ts"
-      ],
+      "owners": ["server/services/ArchiveService.ts", "server/services/ImportManager.ts"],
+      "coverage": ["server/__tests__/archive_service.test.ts"],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5446,13 +4874,8 @@
       "key": "service.api_import_incomplete_scan_confirmation",
       "source": "{reason} Confirm again to import it anyway.",
       "kind": "source-owned import/archive API error producer",
-      "owners": [
-        "server/services/ArchiveService.ts",
-        "server/services/ImportManager.ts"
-      ],
-      "coverage": [
-        "server/__tests__/import_manager.test.ts"
-      ],
+      "owners": ["server/services/ArchiveService.ts", "server/services/ImportManager.ts"],
+      "coverage": ["server/__tests__/import_manager.test.ts"],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5466,13 +4889,8 @@
       "key": "service.api_import_source_path_unresolved",
       "source": "Source path could not be resolved — the download may no longer be tracked by the download client. Please specify the source path manually.",
       "kind": "source-owned import/archive API error producer",
-      "owners": [
-        "server/services/ArchiveService.ts",
-        "server/services/ImportManager.ts"
-      ],
-      "coverage": [
-        "server/__tests__/import_manager_additional.test.ts"
-      ],
+      "owners": ["server/services/ArchiveService.ts", "server/services/ImportManager.ts"],
+      "coverage": ["server/__tests__/import_manager_additional.test.ts"],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5486,13 +4904,8 @@
       "key": "service.api_import_download_missing",
       "source": "Download {downloadId} not found",
       "kind": "source-owned import/archive API error producer",
-      "owners": [
-        "server/services/ArchiveService.ts",
-        "server/services/ImportManager.ts"
-      ],
-      "coverage": [
-        "server/__tests__/import_manager_additional.test.ts"
-      ],
+      "owners": ["server/services/ArchiveService.ts", "server/services/ImportManager.ts"],
+      "coverage": ["server/__tests__/import_manager_additional.test.ts"],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -5506,10 +4919,7 @@
       "key": "service.api_import_game_for_download_missing",
       "source": "Game not found for download {downloadId}",
       "kind": "source-owned import/archive API error producer",
-      "owners": [
-        "server/services/ArchiveService.ts",
-        "server/services/ImportManager.ts"
-      ],
+      "owners": ["server/services/ArchiveService.ts", "server/services/ImportManager.ts"],
       "coverage": [
         "server/__tests__/import_manager_additional.test.ts",
         "server/__tests__/import_manager.test.ts"
@@ -5527,13 +4937,8 @@
       "key": "service.api_import_source_path_missing",
       "source": "Source path not found: {path}",
       "kind": "source-owned import/archive API error producer",
-      "owners": [
-        "server/services/ArchiveService.ts",
-        "server/services/ImportManager.ts"
-      ],
-      "coverage": [
-        "server/__tests__/import_manager.test.ts"
-      ],
+      "owners": ["server/services/ArchiveService.ts", "server/services/ImportManager.ts"],
+      "coverage": ["server/__tests__/import_manager.test.ts"],
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
       "directTargetCells": 12,
@@ -6774,9 +6179,7 @@
       "key": "service.import_interrupted",
       "source": "The import was interrupted before it finished (Questarr was probably restarted). Review it to run the import again.",
       "kind": "persisted import recovery status",
-      "owners": [
-        "server/cron.ts"
-      ],
+      "owners": ["server/cron.ts"],
       "coverage": "Recovery status is persisted in game_downloads and returned by pending API to PendingImportsCard; preserve exact English restart/removed-on-completion behavior.",
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
@@ -6791,9 +6194,7 @@
       "key": "service.import_removed_before_locating",
       "source": "The download client removed this download once it finished, so its files could not be located automatically. Review it and point the import at the downloaded files.",
       "kind": "persisted import recovery status",
-      "owners": [
-        "server/cron.ts"
-      ],
+      "owners": ["server/cron.ts"],
       "coverage": "Recovery status is persisted in game_downloads and returned by pending API to PendingImportsCard; preserve exact English restart/removed-on-completion behavior.",
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
@@ -6808,11 +6209,7 @@
       "key": "service.ssl_certificate_missing",
       "source": "Certificate file missing",
       "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
-      "owners": [
-        "server/ssl.ts",
-        "server/error-telemetry.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
       "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
@@ -6827,11 +6224,7 @@
       "key": "service.ssl_private_key_missing",
       "source": "Private key file missing",
       "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
-      "owners": [
-        "server/ssl.ts",
-        "server/error-telemetry.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
       "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
@@ -6846,11 +6239,7 @@
       "key": "service.ssl_certificate_format_invalid",
       "source": "Invalid certificate format (PEM expected)",
       "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
-      "owners": [
-        "server/ssl.ts",
-        "server/error-telemetry.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
       "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
@@ -6865,11 +6254,7 @@
       "key": "service.ssl_private_key_format_invalid",
       "source": "Invalid private key format (PEM expected)",
       "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
-      "owners": [
-        "server/ssl.ts",
-        "server/error-telemetry.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
       "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
@@ -6884,11 +6269,7 @@
       "key": "service.ssl_certificate_content_invalid",
       "source": "Failed to parse certificate content",
       "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
-      "owners": [
-        "server/ssl.ts",
-        "server/error-telemetry.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
       "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
@@ -6903,11 +6284,7 @@
       "key": "service.ssl_certificate_expired",
       "source": "Certificate expired on {date}",
       "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
-      "owners": [
-        "server/ssl.ts",
-        "server/error-telemetry.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
       "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
@@ -6922,11 +6299,7 @@
       "key": "service.ssl_certificate_key_invalid",
       "source": "Certificate and key do not match or are invalid: {detail}",
       "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
-      "owners": [
-        "server/ssl.ts",
-        "server/error-telemetry.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
       "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
@@ -6941,11 +6314,7 @@
       "key": "service.ssl_unknown_validation_error",
       "source": "Unknown validation error",
       "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
-      "owners": [
-        "server/ssl.ts",
-        "server/error-telemetry.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
       "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
@@ -6960,11 +6329,7 @@
       "key": "service.ssl_invalid_configuration",
       "source": "Invalid SSL configuration: {detail}",
       "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
-      "owners": [
-        "server/ssl.ts",
-        "server/error-telemetry.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
       "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
@@ -6979,11 +6344,7 @@
       "key": "service.ssl_uploaded_invalid",
       "source": "Uploaded certificate/key are invalid: {detail}",
       "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
-      "owners": [
-        "server/ssl.ts",
-        "server/error-telemetry.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
       "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
@@ -6998,11 +6359,7 @@
       "key": "service.telemetry_worker_http_error",
       "source": "Telemetry worker returned HTTP {status}",
       "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
-      "owners": [
-        "server/ssl.ts",
-        "server/error-telemetry.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
       "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
@@ -7017,11 +6374,7 @@
       "key": "service.telemetry_network_error",
       "source": "Network error while sending telemetry report",
       "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
-      "owners": [
-        "server/ssl.ts",
-        "server/error-telemetry.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
       "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
@@ -7036,11 +6389,7 @@
       "key": "service.telemetry_report_unavailable",
       "source": "This report is no longer available.",
       "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
-      "owners": [
-        "server/ssl.ts",
-        "server/error-telemetry.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
       "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
@@ -7055,11 +6404,7 @@
       "key": "service.notification_telemetry_failed",
       "source": "Questarr detected an error but could not send the automatic diagnostic report ({detail}).",
       "kind": "source-bound nested SSL and telemetry UI errors/outbound failures",
-      "owners": [
-        "server/ssl.ts",
-        "server/error-telemetry.ts",
-        "server/routes.ts"
-      ],
+      "owners": ["server/ssl.ts", "server/error-telemetry.ts", "server/routes.ts"],
       "coverage": "Actual SSL settings and telemetry send consumers render the helper-owned result and nested app wrapper; provider/OS/TLS details remain raw. Non-rendered path guards and certificate-info errors are explicitly excluded.",
       "codeStatus": "implemented; compatible private ephemeral JIT validation pending",
       "targetStatus": "machine-draft",
@@ -7092,29 +6437,16 @@
     },
     {
       "name": "Newznab caps success result",
-      "owners": [
-        "server/newznab.ts"
-      ],
-      "keys": [
-        "interface.connection_successful_515fb6d9"
-      ],
-      "coverage": [
-        "server/__tests__/newznab.test.ts"
-      ],
+      "owners": ["server/newznab.ts"],
+      "keys": ["interface.connection_successful_515fb6d9"],
+      "coverage": ["server/__tests__/newznab.test.ts"],
       "codeStatus": "implemented; reuses existing translated source ID; private JIT validation pending"
     },
     {
       "name": "Storage error ownership through cached API DTO and Header tooltip",
-      "owners": [
-        "server/routes.ts",
-        "client/src/components/Header.tsx"
-      ],
-      "keys": [
-        "service.internal_server_error"
-      ],
-      "coverage": [
-        "client/__tests__/Header.accessibility.test.tsx"
-      ],
+      "owners": ["server/routes.ts", "client/src/components/Header.tsx"],
+      "keys": ["service.internal_server_error"],
+      "coverage": ["client/__tests__/Header.accessibility.test.tsx"],
       "codeStatus": "implemented; private JIT validation pending"
     },
     {
@@ -7136,10 +6468,7 @@
     {
       "key": "interface.apprise_test_failed_error_da0c79c6",
       "formerOwner": "client/src/pages/settings.tsx",
-      "replacedBy": [
-        "service.apprise_test_failed",
-        "typed ApiErrorDescription body"
-      ],
+      "replacedBy": ["service.apprise_test_failed", "typed ApiErrorDescription body"],
       "reason": "Error moved from flattened title interpolation to a reactive owned/raw description; retire only after frozen input is finished and all consumers are checked."
     }
   ],

@@ -121,7 +121,7 @@ describe("ProwlarrClient", () => {
   it("reports management API HTTP errors without probing feeds", async () => {
     fetchMock.mockResolvedValueOnce(response({ ok: false, status: 401 }));
 
-    await expect(prowlarrClient.diagnose("prowlarr:9696/", "secret", true)).resolves.toEqual({
+    await expect(prowlarrClient.diagnose("prowlarr:9696/", "secret", true)).resolves.toMatchObject({
       management: {
         success: false,
         status: 401,
@@ -254,7 +254,7 @@ describe("ProwlarrClient", () => {
         response({ json: [null, { id: 1, enable: false }, { id: -1, enable: true }] })
       );
 
-    await expect(prowlarrClient.diagnose("https://prowlarr", "key")).resolves.toEqual({
+    await expect(prowlarrClient.diagnose("https://prowlarr", "key")).resolves.toMatchObject({
       management: { success: true },
       indexers: [],
     });

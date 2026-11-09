@@ -38,9 +38,7 @@ function formatTemplate(
     return (
       <bdi
         key={`${name}-${index}`}
-        lang={
-          name === "count" ? language : isUnknownError ? templateLanguage : "und"
-        }
+        lang={name === "count" ? language : isUnknownError ? templateLanguage : "und"}
         dir="auto"
       >
         {name === "count"
@@ -88,7 +86,11 @@ export function localizeNotificationMessage(
     };
   }
   return {
-    content: <bdi lang="und" dir="auto">{message}</bdi>,
+    content: (
+      <bdi lang="und" dir="auto">
+        {message}
+      </bdi>
+    ),
     language: "und",
     direction: "auto",
   };

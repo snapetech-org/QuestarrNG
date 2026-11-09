@@ -256,7 +256,7 @@ describe("ImportManager archive extraction (library-side)", () => {
       "dl-1",
       "manual_review_required",
       expect.stringContaining("disk full"),
-      expect.toSatisfy((metadata) => metadata === null || typeof metadata === "object")
+      expect.toSatisfy((metadata) => metadata === null || typeof metadata === "string")
     );
 
     copySpy.mockRestore();
@@ -281,7 +281,8 @@ describe("ImportManager archive extraction (library-side)", () => {
     expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
       "dl-1",
       "manual_review_required",
-      expect.stringContaining("Refusing to process a path outside the configured downloader roots")
+      expect.stringContaining("Refusing to process a path outside the configured downloader roots"),
+      expect.toSatisfy((metadata) => metadata === null || typeof metadata === "string")
     );
     // Nothing was read or transferred out of the rejected source.
     expect(await fs.pathExists(sourceDir)).toBe(true);
@@ -453,7 +454,8 @@ describe("ImportManager archive extraction (library-side)", () => {
     expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
       "dl-1",
       "manual_review_required",
-      expect.stringContaining("corrupt archive")
+      expect.stringContaining("corrupt archive"),
+      expect.toSatisfy((metadata) => metadata === null || typeof metadata === "string")
     );
   });
 });

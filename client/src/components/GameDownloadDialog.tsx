@@ -894,11 +894,7 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
             ? formatInterfaceMessage(
                 "interface.downloads_sent_count_to_downloader_b84ab382",
                 {
-                  count: formatRegionalNumber(
-                    successCount,
-                    undefined,
-                    currentRegionalPreference
-                  ),
+                  count: formatRegionalNumber(successCount, undefined, currentRegionalPreference),
                   downloaderName: downloaderNames[0]!,
                 },
                 language
@@ -906,11 +902,7 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
             : formatInterfaceMessage(
                 "interface.downloads_sent_count_9e81f8d5",
                 {
-                  count: formatRegionalNumber(
-                    successCount,
-                    undefined,
-                    currentRegionalPreference
-                  ),
+                  count: formatRegionalNumber(successCount, undefined, currentRegionalPreference),
                 },
                 language
               ),
@@ -919,16 +911,8 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
             ? formatInterfaceMessage(
                 "interface.added_count_of_total_downloads_d4f77de2",
                 {
-                  count: formatRegionalNumber(
-                    successCount,
-                    undefined,
-                    currentRegionalPreference
-                  ),
-                  total: formatRegionalNumber(
-                    results.length,
-                    undefined,
-                    currentRegionalPreference
-                  ),
+                  count: formatRegionalNumber(successCount, undefined, currentRegionalPreference),
+                  total: formatRegionalNumber(results.length, undefined, currentRegionalPreference),
                 },
                 language
               )
@@ -950,7 +934,9 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
             ),
           description: failedResults.map(({ download }, index) => (
             <span key={`${download.title}-${index}`}>
-              <bdi lang="und" dir="auto">{download.title}</bdi>
+              <bdi lang="und" dir="auto">
+                {download.title}
+              </bdi>
               {index < failedResults.length - 1 ? ", " : ""}
             </span>
           )),
@@ -1179,11 +1165,7 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
             formatInterfaceMessage(
               "interface.zip_file_item_count_count_cc5cd1a3",
               {
-                count: formatRegionalNumber(
-                  downloads.length,
-                  undefined,
-                  currentRegionalPreference
-                ),
+                count: formatRegionalNumber(downloads.length, undefined, currentRegionalPreference),
               },
               language
             ),
@@ -1197,9 +1179,7 @@ export default function GameDownloadDialog({ game, open, onOpenChange }: GameDow
       }
     } else {
       if (downloadFile(selectedMainDownload)) {
-        const fileType = isUsenetItem(selectedMainDownload)
-          ? "NZB"
-          : "interface.torrent_eb9280a5";
+        const fileType = isUsenetItem(selectedMainDownload) ? "NZB" : "interface.torrent_eb9280a5";
         toast({
           title: "Download started",
           description: (language) =>

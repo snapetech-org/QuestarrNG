@@ -198,9 +198,14 @@ export default function ClaimBatchModal({ open, onOpenChange }: ClaimBatchModalP
       const { count, hadErrors } = result ?? { count: 0, hadErrors: false };
       if (hadErrors) {
         toast({
-          title: (language) => formatInterfaceMessage("claims.some_downloads_failed", {
-            count: String(count),
-          }, language),
+          title: (language) =>
+            formatInterfaceMessage(
+              "claims.some_downloads_failed",
+              {
+                count: String(count),
+              },
+              language
+            ),
           description: "Check your downloads.",
           variant: "destructive",
         });

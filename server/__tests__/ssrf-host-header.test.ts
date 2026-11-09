@@ -30,7 +30,10 @@ describe("safeFetch virtual-host routing", () => {
     }
 
     try {
-      const response = await safeFetch(`http://qbit.docker.lan:${address.port}/api/v2/app/version`);
+      const response = await safeFetch(
+        `http://qbit.docker.lan:${address.port}/api/v2/app/version`,
+        { allowPrivate: true }
+      );
 
       expect(response.status).toBe(200);
       expect(await response.text()).toBe("ok");

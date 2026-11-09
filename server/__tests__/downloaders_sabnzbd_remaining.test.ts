@@ -98,7 +98,7 @@ describe("sabnzbd remaining regression coverage", () => {
     expect(success).toEqual({ success: true, ...serviceMessage(key, {}) });
     const descriptor = serializeServiceMessageDescriptor(success);
     expect(descriptor).not.toBeNull();
-    expect(localizeServiceMessage(success.message, descriptor, "ar")).toBe(success.message);
+    expect(localizeServiceMessage(success.message, descriptor, "ar")).not.toBe(success.message);
     const typed = new ServiceMessageError("service.unsafe_url_blocked", {
       url: "https://example.invalid/user/العربية",
     });

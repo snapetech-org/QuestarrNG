@@ -1246,7 +1246,10 @@ export default function IndexersPage() {
                         {prowlarrDiagnostics.management.version && (
                           <>
                             {" "}
-                            · <bdi dir="ltr" lang="und">{prowlarrDiagnostics.management.version}</bdi>
+                            ·{" "}
+                            <bdi dir="ltr" lang="und">
+                              {prowlarrDiagnostics.management.version}
+                            </bdi>
                           </>
                         )}
                       </>
@@ -1284,7 +1287,9 @@ export default function IndexersPage() {
                       >
                         <div className="min-w-0">
                           <div className="truncate font-medium">
-                            <bdi dir="auto" lang="und">{item.name}</bdi>
+                            <bdi dir="auto" lang="und">
+                              {item.name}
+                            </bdi>
                           </div>
                           {item.error && (
                             <div className="text-muted-foreground break-words text-xs">
@@ -1303,7 +1308,10 @@ export default function IndexersPage() {
                               {item.status && (
                                 <>
                                   {" "}
-                                  · HTTP <bdi dir="ltr" lang="und">{item.status}</bdi>
+                                  · HTTP{" "}
+                                  <bdi dir="ltr" lang="und">
+                                    {item.status}
+                                  </bdi>
                                 </>
                               )}
                             </>
@@ -1313,7 +1321,10 @@ export default function IndexersPage() {
                               {item.status && (
                                 <>
                                   {" "}
-                                  · HTTP <bdi dir="ltr" lang="und">{item.status}</bdi>
+                                  · HTTP{" "}
+                                  <bdi dir="ltr" lang="und">
+                                    {item.status}
+                                  </bdi>
                                 </>
                               )}
                             </>

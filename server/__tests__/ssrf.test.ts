@@ -232,9 +232,9 @@ describe("safeFetch", () => {
 
     try {
       vi.mocked(dns.lookup as unknown as import("node:dns").LookupAddress[])
-        .mockResolvedValueOnce([{ address: "198.51.100.250", family: 4 }])
-        .mockResolvedValueOnce([{ address: "198.51.100.250", family: 4 }])
-        .mockResolvedValueOnce([{ address: "203.0.113.250", family: 4 }]);
+        .mockResolvedValueOnce([{ address: "8.8.4.4", family: 4 }])
+        .mockResolvedValueOnce([{ address: "8.8.4.4", family: 4 }])
+        .mockResolvedValueOnce([{ address: "8.8.8.8", family: 4 }]);
       vi.mocked(undiciFetch).mockImplementation(async () => new Response("ok") as never);
 
       await safeFetch("http://agent-cache.example/first", { timeoutMs: 0 });
@@ -512,7 +512,7 @@ describe("safeFetch", () => {
   it("should allow bracketed IPv6 literals for HTTPS", async () => {
     vi.mocked(fetch).mockResolvedValueOnce(new Response("ok"));
 
-    await safeFetch("https://[::1]:8080/api");
+    await safeFetch("https://[::1]:8080/api", { allowPrivate: true });
 
     expect(fetch).toHaveBeenCalledWith("https://[::1]:8080/api", expect.any(Object));
   });
@@ -520,7 +520,7 @@ describe("safeFetch", () => {
   it("should allow bracketed IPv6 literals for HTTP and preserve the original URL", async () => {
     vi.mocked(undiciFetch).mockResolvedValueOnce(new Response("ok") as never);
 
-    await safeFetch("http://[::1]:8080/api");
+    await safeFetch("http://[::1]:8080/api", { allowPrivate: true });
 
     // Original URL is preserved unchanged — the Host header comes from the URL itself.
     expect(undiciFetch).toHaveBeenCalledWith(
@@ -547,7 +547,7 @@ describe("resolveSafeAddress", () => {
   });
 
   it("strips IPv6 brackets and returns the bare address", async () => {
-    const result = await resolveSafeAddress("[::1]");
+    const result = await resolveSafeAddress("[::1]", true);
     expect(result).toEqual({ address: "::1", family: 6 });
   });
 

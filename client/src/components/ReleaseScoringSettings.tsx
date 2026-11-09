@@ -46,9 +46,7 @@ class ReleaseScoringValidationError extends Error {
   }
 }
 
-type ReleaseScoringValidationState =
-  | { kind: "profile" }
-  | { kind: "request"; error: unknown };
+type ReleaseScoringValidationState = { kind: "profile" } | { kind: "request"; error: unknown };
 
 function termsText(terms: string[]): string {
   return terms.join("\n");
@@ -87,7 +85,9 @@ export default function ReleaseScoringSettings({
   const [enabled, setEnabled] = useState(false);
   const [profile, setProfile] = useState<ReleaseProfile>(DEFAULT_RELEASE_PROFILE);
   const [formats, setFormats] = useState<CustomFormat[]>([]);
-  const [validationError, setValidationError] = useState<ReleaseScoringValidationState | null>(null);
+  const [validationError, setValidationError] = useState<ReleaseScoringValidationState | null>(
+    null
+  );
 
   useEffect(() => {
     if (!settings || initialized.current) return;
@@ -124,9 +124,7 @@ export default function ReleaseScoringSettings({
     },
     onError: (error: Error) => {
       const isProfileError = error instanceof ReleaseScoringValidationError;
-      setValidationError(
-        isProfileError ? { kind: "profile" } : { kind: "request", error }
-      );
+      setValidationError(isProfileError ? { kind: "profile" } : { kind: "request", error });
       toast({
         title: "interface.could_not_save_release_scoring_30c243e4",
         description: isProfileError ? (

@@ -298,6 +298,7 @@ describe("SSRF Vulnerability in Routes", () => {
     expect(validation).toHaveBeenCalledWith("http://127.0.0.1:9696/private", {
       allowPrivate: false,
       allowedPrivateOrigins: ["http://prowlarr:9696"],
+      maxResponseBytes: 50 * 1024 * 1024,
     });
     expect(fetch).not.toHaveBeenCalled();
 
@@ -312,6 +313,7 @@ describe("SSRF Vulnerability in Routes", () => {
     expect(fetch).toHaveBeenCalledWith("http://prowlarr:9696/5/download?file=game", {
       allowPrivate: false,
       allowedPrivateOrigins: ["http://prowlarr:9696"],
+      maxResponseBytes: 50 * 1024 * 1024,
     });
   });
 

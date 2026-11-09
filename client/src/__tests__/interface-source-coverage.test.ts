@@ -504,12 +504,14 @@ describe("interface source coverage", () => {
     const uncatalogued = [...rawToastCopy()].filter(
       (source) => !hasCatalogMessage(source) && !INTENTIONALLY_UNTRANSLATED_SOURCE_KEYS.has(source)
     );
-    const toastHook = readFileSync(resolve(CLIENT_SOURCE_ROOT, "hooks/use-toast.ts"), "utf8");
+    const toastHook = readFileSync(
+      resolve(CLIENT_SOURCE_ROOT, "components/ui/toaster.tsx"),
+      "utf8"
+    );
 
     expect(uncatalogued).toEqual([]);
-    expect(toastHook).toMatch(/props\.title\s*=\s*translateInterfaceLabel\(props\.title\)/);
-    expect(toastHook).toMatch(
-      /props\.description\s*=\s*translateInterfaceLabel\(props\.description\)/
-    );
+    expect(toastHook).toContain("translateInterfaceLabel(content, language)");
+    expect(toastHook).toContain("resolveContent(title)");
+    expect(toastHook).toContain("resolveContent(description)");
   });
 });

@@ -37,7 +37,9 @@ type ListDialogMode = "create" | "rename" | null;
 function GameStatusText({ status }: { status: string }) {
   const source = getStatusSourceLabel(status);
   return source === status ? (
-    <bdi lang="und" dir="auto">{status}</bdi>
+    <bdi lang="und" dir="auto">
+      {status}
+    </bdi>
   ) : (
     <InterfaceText source={source} />
   );
@@ -278,7 +280,9 @@ export default function GameListsPage() {
                     >
                       <Archive className="me-2 h-4 w-4 shrink-0 text-muted-foreground" />
                       <span className="truncate">
-                        <bdi lang="und" dir="auto">{list.name}</bdi>
+                        <bdi lang="und" dir="auto">
+                          {list.name}
+                        </bdi>
                       </span>
                       {list.id === selectedListId && !listGamesLoading && (
                         <span className="ms-auto ps-2 text-xs text-muted-foreground">
@@ -329,7 +333,9 @@ export default function GameListsPage() {
               <CardHeader className="flex flex-row flex-wrap items-start justify-between gap-3 space-y-0">
                 <div>
                   <CardTitle>
-                    <bdi lang="und" dir="auto">{selectedList.name}</bdi>
+                    <bdi lang="und" dir="auto">
+                      {selectedList.name}
+                    </bdi>
                   </CardTitle>
                   <CardDescription className="mt-1">
                     <InterfaceText
@@ -395,7 +401,9 @@ export default function GameListsPage() {
                         )}
                         <div className="min-w-0 flex-1">
                           <p className="truncate font-medium">
-                            <bdi lang="und" dir="auto">{game.title}</bdi>
+                            <bdi lang="und" dir="auto">
+                              {game.title}
+                            </bdi>
                           </p>
                           <p className="text-xs capitalize text-muted-foreground">
                             <GameStatusText status={game.status} />
@@ -560,9 +568,7 @@ export default function GameListsPage() {
                   const source = checked ? "Remove {game} from {list}" : "Add {game} to {list}";
                   const values = {
                     game: game.title,
-                    list:
-                      selectedList?.name ??
-                      { source: "interface.your_list_10c6b14a" },
+                    list: selectedList?.name ?? { source: "interface.your_list_10c6b14a" },
                   };
                   return (
                     <label key={game.id} className="flex cursor-pointer items-center gap-3 py-2.5">
@@ -583,7 +589,9 @@ export default function GameListsPage() {
                         </div>
                       )}
                       <span className="min-w-0 flex-1 truncate text-sm font-medium">
-                        <bdi lang="und" dir="auto">{game.title}</bdi>
+                        <bdi lang="und" dir="auto">
+                          {game.title}
+                        </bdi>
                       </span>
                       <span className="text-xs capitalize text-muted-foreground">
                         <GameStatusText status={game.status} />

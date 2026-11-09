@@ -664,52 +664,16 @@
       "path": "server/services/ImportManager.ts",
       "sha256": "c4f420aefe8698f8178a4fc079beb630929746e60063d389c8b7204f7b11819c",
       "fixedErrorConstructorLines": [
-        197,
-        209,
-        264,
-        1164,
-        1195,
-        1198,
-        1203,
-        1210,
-        1318,
-        1326,
-        1330,
-        1340,
-        1354,
-        1359,
-        1365,
-        1382,
+        197, 209, 264, 1164, 1195, 1198, 1203, 1210, 1318, 1326, 1330, 1340, 1354, 1359, 1365, 1382,
         1401
       ],
-      "userFacingMessageCandidateLines": [
-        517,
-        518,
-        687,
-        688,
-        729,
-        730,
-        819
-      ],
+      "userFacingMessageCandidateLines": [517, 518, 687, 688, 729, 730, 819],
       "status": "Candidates require bounded producer/consumer classification; log-only/provider/dynamic payloads must remain raw. Presence here does not assert every candidate is untranslated."
     },
     {
       "path": "server/services/ArchiveService.ts",
       "sha256": "7332a66aaeac3d6bfda256c9051e58deb46cffdae17f5031fdc166cdf20a8608",
-      "fixedErrorConstructorLines": [
-        284,
-        291,
-        300,
-        303,
-        310,
-        314,
-        421,
-        468,
-        475,
-        480,
-        488,
-        551
-      ],
+      "fixedErrorConstructorLines": [284, 291, 300, 303, 310, 314, 421, 468, 475, 480, 488, 551],
       "userFacingMessageCandidateLines": [],
       "status": "Candidates require bounded producer/consumer classification; log-only/provider/dynamic payloads must remain raw. Presence here does not assert every candidate is untranslated."
     },
@@ -717,19 +681,7 @@
       "path": "server/services/ImportStrategies.ts",
       "sha256": "0477ccf224994150d3ecef6e3bf80c947f99db2f65012b41d8adcfebbfbdd9cb",
       "fixedErrorConstructorLines": [
-        91,
-        220,
-        285,
-        299,
-        343,
-        461,
-        497,
-        527,
-        548,
-        579,
-        621,
-        628,
-        641
+        91, 220, 285, 299, 343, 461, 497, 527, 548, 579, 621, 628, 641
       ],
       "userFacingMessageCandidateLines": [],
       "status": "Candidates require bounded producer/consumer classification; log-only/provider/dynamic payloads must remain raw. Presence here does not assert every candidate is untranslated."
@@ -737,14 +689,7 @@
     {
       "path": "server/services/RommRouting.ts",
       "sha256": "84fe54e3d147a79b05173310535eb7d9dce3ff90d6261d81ba1249f35b2b15eb",
-      "fixedErrorConstructorLines": [
-        20,
-        26,
-        28,
-        31,
-        34,
-        54
-      ],
+      "fixedErrorConstructorLines": [20, 26, 28, 31, 34, 54],
       "userFacingMessageCandidateLines": [],
       "status": "Candidates require bounded producer/consumer classification; log-only/provider/dynamic payloads must remain raw. Presence here does not assert every candidate is untranslated."
     },
@@ -752,13 +697,7 @@
       "path": "server/security-scan.ts",
       "sha256": "a6595f83fc33b0cdca7ca5e99fb10e0ffa391ec393f564d437ef41a2acc11a54",
       "fixedErrorConstructorLines": [],
-      "userFacingMessageCandidateLines": [
-        433,
-        447,
-        517,
-        555,
-        567
-      ],
+      "userFacingMessageCandidateLines": [433, 447, 517, 555, 567],
       "status": "Candidates require bounded producer/consumer classification; log-only/provider/dynamic payloads must remain raw. Presence here does not assert every candidate is untranslated."
     },
     {
@@ -766,35 +705,8 @@
       "sha256": "002e2dfda25ba5fe10e3ab9a19fe0820d9c48a11a0ce2273778fac17469cacc7",
       "fixedErrorConstructorLines": [],
       "userFacingMessageCandidateLines": [
-        805,
-        843,
-        1197,
-        1198,
-        1247,
-        1357,
-        1523,
-        1524,
-        1573,
-        1574,
-        1635,
-        1636,
-        1869,
-        1870,
-        1935,
-        1936,
-        1970,
-        1971,
-        1983,
-        1984,
-        2069,
-        2070,
-        2081,
-        2082,
-        2194,
-        2195,
-        2338,
-        2611,
-        2612
+        805, 843, 1197, 1198, 1247, 1357, 1523, 1524, 1573, 1574, 1635, 1636, 1869, 1870, 1935,
+        1936, 1970, 1971, 1983, 1984, 2069, 2070, 2081, 2082, 2194, 2195, 2338, 2611, 2612
       ],
       "status": "Candidates require bounded producer/consumer classification; log-only/provider/dynamic payloads must remain raw. Presence here does not assert every candidate is untranslated."
     }
@@ -852,10 +764,7 @@
       "vi",
       "id"
     ],
-    "arabicViewports": [
-      "1440x1000",
-      "375x812"
-    ],
+    "arabicViewports": ["1440x1000", "375x812"],
     "finding": "Arabic product/version text reordered under RTL; fixed with LTR isolation and verified as QuestarrNG v2.1.2 at both viewport sizes.",
     "blockingFindings": 0,
     "qualifiedNativeHumanSignoff": false,

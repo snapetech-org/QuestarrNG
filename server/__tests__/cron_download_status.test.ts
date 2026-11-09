@@ -256,7 +256,8 @@ describe("Cron - checkDownloadStatus", () => {
     expect(mockUpdateGameDownloadStatus).toHaveBeenCalledWith(
       baseDownload.id,
       "failed",
-      expect.any(String)
+      expect.any(String),
+      expect.toSatisfy((metadata) => metadata === null || typeof metadata === "string")
     );
     expect(mockUpdateGameDownloadStatus).not.toHaveBeenCalledWith(baseDownload.id, "completed");
     expect(mockUpdateGameStatus).toHaveBeenCalledWith(
@@ -323,7 +324,8 @@ describe("Cron - checkDownloadStatus", () => {
     expect(mockUpdateGameDownloadStatus).not.toHaveBeenCalledWith(
       staleDownload.id,
       "failed",
-      expect.any(String)
+      expect.any(String),
+      expect.toSatisfy((metadata) => metadata === null || typeof metadata === "string")
     );
   });
 
@@ -376,12 +378,14 @@ describe("Cron - checkDownloadStatus", () => {
     expect(mockUpdateGameDownloadStatus).toHaveBeenCalledWith(
       baseDownload.id,
       "failed",
-      expect.any(String)
+      expect.any(String),
+      expect.toSatisfy((metadata) => metadata === null || typeof metadata === "string")
     );
     expect(mockUpdateGameDownloadStatus).not.toHaveBeenCalledWith(
       baseDownload.id,
       "completed",
-      null
+      null,
+      expect.toSatisfy((metadata) => metadata === null || typeof metadata === "string")
     );
     expect(statusWritesFor(baseDownload.gameId)).not.toContainEqual({ status: "owned" });
     expect(statusWritesFor(baseDownload.gameId)).not.toContainEqual({ status: "wanted" });
@@ -406,7 +410,8 @@ describe("Cron - checkDownloadStatus", () => {
     expect(mockUpdateGameDownloadStatus).toHaveBeenCalledWith(
       baseDownload.id,
       "failed",
-      expect.any(String)
+      expect.any(String),
+      expect.toSatisfy((metadata) => metadata === null || typeof metadata === "string")
     );
     expect(statusWritesFor(baseDownload.gameId)).not.toContainEqual({ status: "wanted" });
   });
@@ -642,7 +647,8 @@ describe("Cron - checkDownloadStatus", () => {
     expect(mockUpdateGameDownloadStatus).toHaveBeenCalledWith(
       baseDownload.id,
       "failed",
-      expect.any(String)
+      expect.any(String),
+      expect.toSatisfy((metadata) => metadata === null || typeof metadata === "string")
     );
     expect(mockUpdateGameStatus).not.toHaveBeenCalled();
   });
@@ -913,7 +919,8 @@ describe("Cron - checkDownloadStatus", () => {
     expect(mockUpdateGameDownloadStatus).toHaveBeenCalledWith(
       torrentDownload.id,
       "manual_review_required",
-      expect.stringContaining("removed this download once it finished")
+      expect.stringContaining("removed this download once it finished"),
+      expect.toSatisfy((metadata) => metadata === null || typeof metadata === "string")
     );
     expect(
       mockUpdateGameDownloadStatus.mock.calls
@@ -968,7 +975,8 @@ describe("Cron - checkDownloadStatus", () => {
     expect(mockUpdateGameDownloadStatus).toHaveBeenCalledWith(
       torrentDownload.id,
       "failed",
-      expect.any(String)
+      expect.any(String),
+      expect.toSatisfy((metadata) => metadata === null || typeof metadata === "string")
     );
   });
 
@@ -986,7 +994,8 @@ describe("Cron - checkDownloadStatus", () => {
       expect(mockUpdateGameDownloadStatus).toHaveBeenCalledWith(
         baseDownload.id,
         "manual_review_required",
-        expect.stringContaining("interrupted")
+        expect.stringContaining("interrupted"),
+        expect.toSatisfy((metadata) => metadata === null || typeof metadata === "string")
       );
       expect(mockProcessImport).not.toHaveBeenCalled();
       expect(mockAddNotification).toHaveBeenCalledWith(

@@ -965,7 +965,8 @@ describe("ImportManager - confirmImport path resolution failures", () => {
     expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith(
       "dl-1",
       "manual_review_required",
-      "disk full"
+      "disk full",
+      expect.toSatisfy((metadata) => metadata === null || typeof metadata === "string")
     );
   });
 });

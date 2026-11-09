@@ -203,9 +203,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       toast({
         title: "Logout failed",
         description:
-          error instanceof Error
-            ? <ApiErrorDescription error={error} />
-            : "Unable to reach the server. Please check your connection and try again.",
+          error instanceof Error ? (
+            <ApiErrorDescription error={error} />
+          ) : (
+            "Unable to reach the server. Please check your connection and try again."
+          ),
         variant: "destructive",
       });
       return;

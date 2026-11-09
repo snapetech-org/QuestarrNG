@@ -43,6 +43,12 @@ vi.mock("@/components/ui/tooltip", () => ({
   TooltipContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
+vi.mock("@/components/GameCard", () => ({
+  default: ({ game }: { game: { id: string; title: string } }) => (
+    <div data-testid={`card-game-${game.id}`}>{game.title}</div>
+  ),
+}));
+
 const games = [
   { id: "1", title: "Wanted Game", status: "wanted", searchResultsAvailable: true },
   { id: "2", title: "Shelved Game", status: "shelved", searchResultsAvailable: true },

@@ -15,8 +15,7 @@ type ToasterToast = Omit<ToastProps, "title" | "description"> & {
 
 /** Renderers keep localized toast copy responsive to interface-language changes. */
 export type ToastContent =
-  | React.ReactNode
-  | ((language: InterfaceLanguage, regionalPreference: string) => React.ReactNode);
+  React.ReactNode | ((language: InterfaceLanguage, regionalPreference: string) => React.ReactNode);
 
 // Used as type reference in TypeScript
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

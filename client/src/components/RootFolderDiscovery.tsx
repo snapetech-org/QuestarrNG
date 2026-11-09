@@ -581,13 +581,17 @@ export function RootFolderDiscovery() {
                 <div key={p.rootFolderId} className="rounded-md border p-3 space-y-2">
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-mono">
-                      <bdi dir="ltr" lang="und">{p.rootFolderPath}</bdi>
+                      <bdi dir="ltr" lang="und">
+                        {p.rootFolderPath}
+                      </bdi>
                     </span>
                     <Badge variant={badgeVariant}>
                       {scanStatusLabel ? (
                         <InterfaceText source={scanStatusLabel} />
                       ) : (
-                        <bdi lang="und" dir="auto">{p.status}</bdi>
+                        <bdi lang="und" dir="auto">
+                          {p.status}
+                        </bdi>
                       )}
                     </Badge>
                   </div>
@@ -604,7 +608,9 @@ export function RootFolderDiscovery() {
                       <>
                         {" "}
                         <InterfaceText source={"· currently:"} />{" "}
-                        <bdi dir="auto" lang="und">{p.currentCandidate}</bdi>
+                        <bdi dir="auto" lang="und">
+                          {p.currentCandidate}
+                        </bdi>
                       </>
                     )}
                   </p>
@@ -703,10 +709,14 @@ function UnmatchedEntryCard({ entry, matchPending, onMatch }: UnmatchedEntryCard
   return (
     <div className="rounded-md border p-3 space-y-2">
       <p className="text-sm font-medium">
-        <bdi dir="auto" lang="und">{entry.folderName}</bdi>
+        <bdi dir="auto" lang="und">
+          {entry.folderName}
+        </bdi>
       </p>
       <p className="text-xs text-muted-foreground font-mono">
-        <bdi dir="ltr" lang="und">{entry.absolutePath}</bdi>
+        <bdi dir="ltr" lang="und">
+          {entry.absolutePath}
+        </bdi>
       </p>
       {entry.candidates.length === 0 ? (
         <p className="text-xs text-muted-foreground">
