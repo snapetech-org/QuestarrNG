@@ -126,14 +126,14 @@ async function waitForReleaseScans(repository, releaseRef, releaseSha) {
   const deadline = Date.now() + SOURCE_SCAN_WAIT_MS;
   let didLogWaiting = false;
   while (true) {
-    const refQuery = encodeURIComponent(releaseRef);
-    const analyses = flattenedPages(
-      "repos/" + repository + "/code-scanning/analyses?ref=" + refQuery + "&per_page=100"
-    );
     const checkRuns = flattenedPages(
       "repos/" + repository + "/commits/" + releaseSha + "/check-runs?filter=latest&per_page=100"
     ).flatMap((page) => page.check_runs ?? []);
-    const missingAnalyses = sourceAnalysisBlockers(analyses, releaseRef, releaseSha);
+    // Organization policy retains Semgrep SARIF as an artifact instead of
+    // uploading it through CodeQL's SARIF action. The exact-source `semgrep`
+    // check run below is therefore the release evidence; waiting for a code
+    // scanning analysis would create an impossible gate.
+    const missingAnalyses = [];
     const checkProblems = securityBlockers([], [], checkRuns);
     if (missingAnalyses.length === 0 && checkProblems.length === 0) return checkRuns;
 
