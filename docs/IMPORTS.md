@@ -29,11 +29,11 @@ limits the default archive to 50,000 entries and 250 GiB of expanded data. Set
 to change these limits. Archive work runs one at a time per process, with at
 most 16 active or queued requests by default; configure
 `ARCHIVE_MAX_PENDING_EXTRACTIONS` to change that queue limit. During extraction,
-QuestarrNG monitors free space, stops before the filesystem safety reserve is
-used, and measures staged output before importing it. Each archive tool
-invocation has a 30-minute timeout. The runtime disk guard is not an OS-level
-quota and cannot reserve space against unrelated processes writing to the same
-filesystem.
+QuestarrNG monitors filesystem use, stops if it crosses the configured expanded
+size limit or approaches the filesystem safety reserve, and measures staged
+output before importing it. Each archive tool invocation has a 30-minute
+timeout. The runtime disk guard is not an OS-level quota; unrelated writes to
+the same filesystem can cause an early abort or consume space.
 
 Downloads that need a destination choice, archive password, or other review
 appear in the **Pending Imports** card on the Library page. Use **Review** to

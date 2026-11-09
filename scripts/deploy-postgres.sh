@@ -6,13 +6,22 @@ cd "$PROJECT_ROOT"
 
 PASSWORD_FILE="$PROJECT_ROOT/.env.postgres"
 
+read_password_from_env_file() {
+  value=$(sed -n 's/^POSTGRES_PASSWORD=//p' "$1")
+  case "$value" in
+    \"*\") value=${value#\"}; value=${value%\"} ;;
+    \'*\') value=${value#\'}; value=${value%\'} ;;
+  esac
+  printf '%s' "$value"
+}
+
 if [ -L "$PASSWORD_FILE" ]; then
   echo "ERROR: refusing to use a symlink for .env.postgres." >&2
   exit 1
 fi
 
 if [ -f "$PASSWORD_FILE" ]; then
-  SAVED_PASSWORD=$(sed -n 's/^POSTGRES_PASSWORD=//p' "$PASSWORD_FILE")
+  SAVED_PASSWORD=$(read_password_from_env_file "$PASSWORD_FILE")
   if [ -n "${POSTGRES_PASSWORD:-}" ] && [ "$POSTGRES_PASSWORD" != "$SAVED_PASSWORD" ]; then
     echo "ERROR: POSTGRES_PASSWORD differs from the value persisted in .env.postgres." >&2
     echo "Unset the environment variable or update .env.postgres intentionally before deploying." >&2
@@ -22,7 +31,7 @@ if [ -f "$PASSWORD_FILE" ]; then
 else
   POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-}
   if [ -z "$POSTGRES_PASSWORD" ] && [ -f "$PROJECT_ROOT/.env" ]; then
-    POSTGRES_PASSWORD=$(sed -n 's/^POSTGRES_PASSWORD=//p' "$PROJECT_ROOT/.env")
+    POSTGRES_PASSWORD=$(read_password_from_env_file "$PROJECT_ROOT/.env")
   fi
   if [ -z "$POSTGRES_PASSWORD" ]; then
     if ! command -v openssl >/dev/null 2>&1; then

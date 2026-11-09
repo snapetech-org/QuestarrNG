@@ -207,11 +207,12 @@ paths, symbolic/hard links, paths deeper than 64 components, more than 50,000 ar
 and declared expansion beyond 250 GiB by default. Operators can lower or raise the byte/entry
 limits with `ARCHIVE_MAX_EXPANDED_BYTES` and `ARCHIVE_MAX_ENTRIES`; pending work is capped at
 16 by default and configurable with `ARCHIVE_MAX_PENDING_EXTRACTIONS`. Extraction runs one
-archive at a time per process, monitors free space and aborts at a reserve of at least 1 GiB or
-10% of the pre-extraction free space, and checks actual staged bytes and entries before merge.
-Archive tool output is capped at 10 MiB and each tool invocation times out after 30 minutes.
-The live disk guard is best-effort rather than an OS quota, so another process writing to the
-same filesystem can still consume space.
+archive at a time per process, monitors filesystem use and aborts if additional use exceeds the
+configured expanded-size cap or free space reaches a reserve of at least 1 GiB or 10% of the
+pre-extraction free space. It then checks actual staged bytes and entries before merge. Archive
+tool output is capped at 10 MiB and each tool invocation times out after 30 minutes. The live
+disk guard is best-effort rather than an OS quota, so another process writing to the same
+filesystem can still consume space or cause an early abort.
 
 ### 4.5 Optional pre-import security scan
 

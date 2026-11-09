@@ -338,6 +338,7 @@ function validateArchiveEntries(entries: ArchiveEntry[], outputDir: string): num
 interface DiskSpaceBudget {
   filesystemPath: string;
   reserveBytes: bigint;
+  startingFreeBytes: bigint;
 }
 
 async function assertAvailableDiskSpace(
@@ -378,7 +379,7 @@ async function assertAvailableDiskSpace(
       `Archive needs ${expandedBytes} bytes but the destination filesystem does not have enough free space while preserving a safety reserve.`
     );
   }
-  return { filesystemPath, reserveBytes };
+  return { filesystemPath, reserveBytes, startingFreeBytes: freeBytes };
 }
 
 // Archive operations run one at a time, process-wide. This makes the preflight space
@@ -405,6 +406,19 @@ function serializeExtraction<T>(fn: () => Promise<T>): Promise<T> {
 
 const DISK_SPACE_POLL_INTERVAL_MS = 250;
 
+function assertDiskBudget(budget: DiskSpaceBudget, freeBytes: bigint): void {
+  if (freeBytes <= budget.reserveBytes) {
+    throw new Error("Archive extraction stopped because it reached the filesystem safety reserve.");
+  }
+  const consumedBytes =
+    budget.startingFreeBytes > freeBytes ? budget.startingFreeBytes - freeBytes : 0n;
+  if (consumedBytes > BigInt(ARCHIVE_MAX_EXPANDED_BYTES)) {
+    throw new Error(
+      `Archive extraction stopped after filesystem use exceeded the configured size limit (${ARCHIVE_MAX_EXPANDED_BYTES} bytes).`
+    );
+  }
+}
+
 async function runWithDiskSpaceGuard<T>(
   budget: DiskSpaceBudget,
   run: (signal: AbortSignal) => Promise<T>
@@ -425,13 +439,14 @@ async function runWithDiskSpaceGuard<T>(
         delay(DISK_SPACE_POLL_INTERVAL_MS).then(() => ({ state: "poll" as const })),
       ]);
       if (outcome.state === "resolved") {
-        const info = await statfs(budget.filesystemPath, { bigint: true });
-        const freeBytes = info.bavail * info.bsize;
-        if (freeBytes <= budget.reserveBytes) {
-          throw new Error(
-            "Archive extraction stopped because it reached the filesystem safety reserve."
-          );
+        let freeBytes: bigint;
+        try {
+          const info = await statfs(budget.filesystemPath, { bigint: true });
+          freeBytes = info.bavail * info.bsize;
+        } catch (error) {
+          throw new Error("Could not verify disk space after archive extraction", { cause: error });
         }
+        assertDiskBudget(budget, freeBytes);
         return outcome.value;
       }
       if (outcome.state === "rejected") throw outcome.error;
@@ -446,11 +461,7 @@ async function runWithDiskSpaceGuard<T>(
         });
       }
 
-      if (freeBytes <= budget.reserveBytes) {
-        throw new Error(
-          "Archive extraction stopped because it reached the filesystem safety reserve."
-        );
-      }
+      assertDiskBudget(budget, freeBytes);
     }
   } catch (error) {
     // execFile honors this signal and settles its callback after the child exits. Wait
@@ -826,7 +837,7 @@ export class ArchiveService {
     // failing/unsupported archive never leaves behind an empty output directory.
     const entries = await this.listEntriesForExtraction(filePath, password);
     const expandedBytes = validateArchiveEntries(entries, outputDir);
-    const diskBudget = await assertAvailableDiskSpace(outputDir, expandedBytes);
+    await assertAvailableDiskSpace(outputDir, expandedBytes);
     await this.testArchive(filePath, tool, password);
 
     // Extract into a private staging directory inside outputDir, then merge the result
@@ -846,6 +857,9 @@ export class ArchiveService {
     let extractedFiles: string[];
     let merged = false;
     try {
+      // Recheck immediately before extraction because the archive integrity scan can
+      // take a long time and other processes may have changed free space meanwhile.
+      const diskBudget = await assertAvailableDiskSpace(stagingDir, expandedBytes);
       await runWithDiskSpaceGuard(diskBudget, (signal) =>
         tool === "unrar"
           ? this.extractWithUnrar(filePath, stagingDir, password, signal)
