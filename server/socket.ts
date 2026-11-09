@@ -66,6 +66,11 @@ export function setupSocketIO(httpServer: HttpServer) {
   return io;
 }
 
+/** Close the current process's live sockets after the user's JWTs are revoked. */
+export function disconnectUserSockets(userId: string): void {
+  io?.in(`${USER_ROOM_PREFIX}${userId}`).disconnectSockets(true);
+}
+
 interface HandshakeLike {
   auth: Record<string, unknown>;
   headers: Record<string, string | string[] | undefined>;

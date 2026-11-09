@@ -1,6 +1,8 @@
 import path from "node:path";
 import { downloadersLogger } from "../logger.js";
 import { isSafeUrl, safeFetch } from "../ssrf.js";
+
+const MAX_TORRENT_RESPONSE_BYTES = 20 * 1024 * 1024;
 import { isDownloaderDebugLoggingEnabled } from "./debug-logging.js";
 import type { Downloader, DownloadFile } from "@shared/schema.js";
 
@@ -129,6 +131,7 @@ export async function fetchWithMagnetDetection(
       },
       redirect: "manual",
       signal: AbortSignal.timeout(30000),
+      maxResponseBytes: MAX_TORRENT_RESPONSE_BYTES,
     });
   };
 

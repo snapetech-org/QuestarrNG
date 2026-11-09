@@ -16,6 +16,7 @@ import { DownloaderManager } from "../downloaders.js";
 import { resolveRemoteImportPath } from "../downloaders/utils.js";
 import fs from "fs-extra";
 import path from "node:path";
+import { opendir } from "node:fs/promises";
 import { parseReleaseMetadata } from "../../shared/title-utils.js";
 import {
   GAME_LINK_REQUIRED_STATUS,
@@ -91,6 +92,8 @@ const IGDB_ID_TO_PLATFORM_KEY: Record<number, string> = Object.fromEntries(
 
 const MAX_PATH_RETRY = 5;
 const MAX_LISTED_FILES = 100;
+const MAX_IMPORT_DIRECTORY_ENTRIES = 100_000;
+const MAX_IMPORT_DIRECTORY_WALK_MS = 30_000;
 
 function isStrictPathAncestor(parentPath: string, childPath: string): boolean {
   const relative = path.relative(path.resolve(parentPath), path.resolve(childPath));
@@ -129,9 +132,8 @@ export class ImportManager {
 
   // Optional and defaulted (rather than required) so existing call sites — and
   // the many unit tests that construct an ImportManager directly — don't all
-  // need updating just because a new pre-import gate was added. A scan service
-  // that always passes is a safe default: it matches the pre-existing behavior
-  // of importing without any security scan.
+  // need updating just because a new pre-import gate was added. A missing scan
+  // service holds the import for review instead of silently treating it as clean.
   private readonly securityScanService: Pick<SecurityScanService, "scan">;
 
   constructor(
@@ -141,7 +143,13 @@ export class ImportManager {
     private readonly archiveService: ArchiveService,
     securityScanService?: Pick<SecurityScanService, "scan">
   ) {
-    this.securityScanService = securityScanService ?? { scan: async () => ({ blocked: false }) };
+    this.securityScanService = securityScanService ?? {
+      scan: async () => ({
+        blocked: false,
+        incomplete: true,
+        reason: "Security scanner is not configured. Review this download before importing it.",
+      }),
+    };
   }
 
   private extractPlatformIdFromElement(p: unknown): number | undefined {
@@ -283,7 +291,20 @@ export class ImportManager {
       };
     }
 
-    const entries = await fs.readdir(safeSourcePath);
+    const entries: string[] = [];
+    const startedAt = Date.now();
+    const directory = await opendir(safeSourcePath);
+    for await (const entry of directory) {
+      if (entries.length >= MAX_IMPORT_DIRECTORY_ENTRIES) {
+        throw new Error(
+          `Import directory listing exceeded ${MAX_IMPORT_DIRECTORY_ENTRIES} entries`
+        );
+      }
+      if (Date.now() - startedAt > MAX_IMPORT_DIRECTORY_WALK_MS) {
+        throw new Error(`Import directory listing exceeded ${MAX_IMPORT_DIRECTORY_WALK_MS} ms`);
+      }
+      entries.push(entry.name);
+    }
     const archiveEntries = entries
       .filter((name) => this.archiveService.isArchive(name, options))
       .sort();
@@ -544,7 +565,39 @@ export class ImportManager {
       const stats = await fs.stat(resolved);
       let allNames: string[];
       if (stats.isDirectory()) {
-        allNames = (await fs.readdir(resolved)).sort();
+        const directory = await opendir(resolved);
+        const boundedNames: string[] = [];
+        let totalCount = 0;
+        let hasArchive = false;
+        const startedAt = Date.now();
+        for await (const entry of directory) {
+          totalCount += 1;
+          if (totalCount > MAX_IMPORT_DIRECTORY_ENTRIES) {
+            throw new Error(
+              `Import directory listing exceeded ${MAX_IMPORT_DIRECTORY_ENTRIES} entries`
+            );
+          }
+          if (Date.now() - startedAt > MAX_IMPORT_DIRECTORY_WALK_MS) {
+            throw new Error(`Import directory listing exceeded ${MAX_IMPORT_DIRECTORY_WALK_MS} ms`);
+          }
+          hasArchive ||= this.archiveService.isArchive(entry.name);
+          let low = 0;
+          let high = boundedNames.length;
+          while (low < high) {
+            const mid = (low + high) >>> 1;
+            if (boundedNames[mid]! < entry.name) low = mid + 1;
+            else high = mid;
+          }
+          if (low < MAX_LISTED_FILES) {
+            boundedNames.splice(low, 0, entry.name);
+            if (boundedNames.length > MAX_LISTED_FILES) boundedNames.pop();
+          }
+        }
+        const files = boundedNames.map((name) => ({
+          name,
+          isArchive: this.archiveService.isArchive(name),
+        }));
+        return { files, hasArchive, totalCount };
       } else {
         allNames = [path.basename(resolved)];
       }
@@ -1453,6 +1506,7 @@ export class ImportManager {
       fileCategories: undefined,
       originalPath: safeOriginalPath,
       proposedPath,
+      targetRoot: targetRoot || "/data",
     };
 
     const strategy = new PCImportStrategy(await this.pathService.getConfiguredRoots());

@@ -11,6 +11,8 @@ type SafeFetchOptions = RequestInit & {
   /** Private network access may be limited to exact, explicitly configured origins. */
   allowedPrivateOrigins?: readonly string[];
   timeoutMs?: number;
+  /** Maximum decoded response bytes. Oversized responses are cancelled and rejected. */
+  maxResponseBytes?: number;
   maxRedirects?: number;
   // Reject the initial URL and every redirect hop that isn't HTTPS. Set this
   // whenever the request carries a credential (a password, an API key) that
@@ -77,7 +79,7 @@ export function normalizeHostname(hostname: string): string {
 /** Resolves a hostname after verifying that every returned address is permitted. */
 export async function resolveSafeAddress(
   hostname: string,
-  allowPrivate = true
+  allowPrivate = false
 ): Promise<{ address: string; family: 4 | 6 }> {
   const normalizedHostname = normalizeHostname(hostname);
   const ipVersion = isIP(normalizedHostname);
@@ -187,7 +189,7 @@ function getRedirectOptions(
 /** Resolves and validates the network target used for one safe-fetch request. */
 async function resolveSafeFetchTarget(
   url: URL,
-  allowPrivate = true,
+  allowPrivate = false,
   allowedPrivateOrigins: readonly string[] = []
 ): Promise<SafeFetchTarget> {
   const permitPrivate = allowPrivate || allowedPrivateOrigins.includes(url.origin);
@@ -243,7 +245,7 @@ async function resolveSafeFetchTarget(
 async function fetchValidatedOnce(
   url: URL,
   fetchOptions: RequestInit,
-  allowPrivate = true,
+  allowPrivate = false,
   allowedPrivateOrigins: readonly string[] = []
 ): Promise<Response> {
   const target = await resolveSafeFetchTarget(url, allowPrivate, allowedPrivateOrigins);
@@ -256,6 +258,54 @@ async function fetchValidatedOnce(
     ...fetchOptions,
     dispatcher: agent,
   } as UndiciRequestInit) as unknown as Response;
+}
+
+async function enforceResponseByteLimit(response: Response, limit: number): Promise<Response> {
+  if (!Number.isSafeInteger(limit) || limit <= 0) {
+    throw new Error("maxResponseBytes must be a positive safe integer");
+  }
+
+  const contentLength = Number(response.headers.get("content-length"));
+  if (Number.isFinite(contentLength) && contentLength > limit) {
+    await response.body?.cancel().catch(() => undefined);
+    throw new Error(`Response exceeds the ${limit}-byte limit`);
+  }
+  if (!response.body) return response;
+
+  const reader = response.body.getReader();
+  let received = 0;
+  const body = new ReadableStream<Uint8Array>({
+    async pull(controller) {
+      try {
+        const { done, value } = await reader.read();
+        if (done) {
+          controller.close();
+          return;
+        }
+        received += value.byteLength;
+        if (received > limit) {
+          await reader.cancel();
+          controller.error(new Error(`Response exceeds the ${limit}-byte limit`));
+          return;
+        }
+        controller.enqueue(value);
+      } catch (error) {
+        controller.error(error);
+      }
+    },
+    async cancel(reason) {
+      await reader.cancel(reason);
+    },
+  });
+  const headers = new Headers(response.headers);
+  // The body may be transparently decompressed by undici; do not expose the
+  // origin's compressed Content-Length as the size of this wrapped stream.
+  headers.delete("content-length");
+  return new Response(body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
 }
 
 /**
@@ -331,11 +381,9 @@ export async function isSafeUrl(
     }
     return true;
   } catch {
-    // DNS resolution failed — hostname is unresolvable from this context (e.g. a
-    // Docker service name only visible inside the container network). There is no
-    // SSRF risk because we cannot reach a host we cannot resolve; allow it so
-    // Docker / LAN aliases work in self-hosted deployments.
-    return true;
+    // Fail closed when validation cannot prove what the hostname resolves to.
+    // A hostname that cannot resolve here cannot be safely fetched here either.
+    return false;
   }
 }
 
@@ -353,28 +401,12 @@ export async function isSafeUrl(
 export function isSafeIp(ip: string, allowPrivate = true): boolean {
   const normalizedIp = ip.toLowerCase();
 
-  // Handle IPv4-mapped IPv6 addresses (::ffff:192.168.1.1 or ::ffff:a9fe:a9fe)
-  if (normalizedIp.startsWith("::ffff:")) {
-    const suffix = normalizedIp.substring(7);
-    if (isIP(suffix) === 4) {
-      return isSafeIp(suffix, allowPrivate);
-    }
-    // Handle hex version (e.g. ::ffff:a9fe:a9fe)
-    if (suffix.includes(":")) {
-      const parts = suffix.split(":");
-      const [hi, lo] = parts;
-      if (parts.length === 2 && hi !== undefined && lo !== undefined) {
-        const v4parts = [
-          parseInt(hi.substring(0, 2), 16),
-          parseInt(hi.substring(2, 4), 16),
-          parseInt(lo.substring(0, 2), 16),
-          parseInt(lo.substring(2, 4), 16),
-        ];
-        if (!v4parts.some(isNaN)) {
-          return isSafeIp(v4parts.join("."), allowPrivate);
-        }
-      }
-    }
+  // Normalize every valid IPv4-mapped IPv6 spelling before applying the IPv4
+  // policy. Hex groups may be abbreviated (for example ::ffff:7f00:1), and the
+  // complete eight-group spelling must receive the same checks too.
+  const mappedIpv4 = ipv4FromMappedIpv6(normalizedIp);
+  if (mappedIpv4) {
+    return isSafeIp(mappedIpv4, allowPrivate);
   }
 
   const lowerIp = ip.toLowerCase();
@@ -389,19 +421,8 @@ export function isSafeIp(ip: string, allowPrivate = true): boolean {
     // 0.0.0.0/8 (Broadcast)
     if (p0 === 0) return false;
 
-    if (!allowPrivate) {
-      // 127.0.0.0/8 (Loopback)
-      if (p0 === 127) return false;
-
-      // 10.0.0.0/8 (Private)
-      if (p0 === 10) return false;
-
-      // 172.16.0.0/12 (Private)
-      if (p0 === 172 && p1 !== undefined && p1 >= 16 && p1 <= 31) return false;
-
-      // 192.168.0.0/16 (Private)
-      if (p0 === 192 && p1 === 168) return false;
-    }
+    if (!allowPrivate && isNonPublicIpv4(p0 ?? -1, p1 ?? -1, Number(ip.split(".")[2])))
+      return false;
 
     return true;
   }
@@ -420,21 +441,103 @@ export function isSafeIp(ip: string, allowPrivate = true): boolean {
     // AWS IPv6 Metadata
     if (lowerIp === "fd00:ec2::254") return false;
 
-    if (!allowPrivate) {
-      // ::1 (Loopback)
-      if (lowerIp === "::1" || lowerIp === "0:0:0:0:0:0:0:1") return false;
-
-      // :: (Unspecified)
-      if (lowerIp === "::" || lowerIp === "0:0:0:0:0:0:0:0") return false;
-
-      // fc00::/7 (Unique Local)
-      if (lowerIp.startsWith("fc") || lowerIp.startsWith("fd")) return false;
-    }
+    if (!allowPrivate && !isGloballyRoutableIpv6(lowerIp)) return false;
 
     return true;
   }
 
   return false;
+}
+
+function isNonPublicIpv4(first: number, second: number, third: number): boolean {
+  return (
+    first === 0 ||
+    first === 10 ||
+    first === 127 ||
+    (first === 100 && second >= 64 && second <= 127) ||
+    (first === 169 && second === 254) ||
+    (first === 172 && second >= 16 && second <= 31) ||
+    (first === 192 && second === 168) ||
+    (first === 192 && second === 0 && third === 0) ||
+    (first === 192 && second === 0 && third === 2) ||
+    (first === 192 && second === 88 && third === 99) ||
+    (first === 198 && (second === 18 || second === 19)) ||
+    (first === 198 && second === 51 && third === 100) ||
+    (first === 203 && second === 0 && third === 113) ||
+    first >= 224
+  );
+}
+
+function ipv4FromMappedIpv6(ip: string): string | null {
+  if (isIP(ip) !== 6) return null;
+
+  let address = ip;
+  if (address.includes(".")) {
+    const lastColon = address.lastIndexOf(":");
+    const dotted = address.slice(lastColon + 1);
+    if (isIP(dotted) !== 4) return null;
+    const octets = dotted.split(".").map(Number);
+    const [a, b, c, d] = octets;
+    if (a === undefined || b === undefined || c === undefined || d === undefined) return null;
+    const high = ((a << 8) | b).toString(16);
+    const low = ((c << 8) | d).toString(16);
+    address = `${address.slice(0, lastColon + 1)}${high}:${low}`;
+  }
+
+  const halves = address.split("::");
+  if (halves.length > 2) return null;
+  const left = halves[0] ? halves[0]!.split(":") : [];
+  const right = halves.length === 2 && halves[1] ? halves[1]!.split(":") : [];
+  const missing = 8 - left.length - right.length;
+  if (missing < 0) return null;
+  const groups = halves.length === 2 ? [...left, ...Array(missing).fill("0"), ...right] : left;
+  if (groups.length !== 8 || groups.some((part) => !/^[0-9a-f]{1,4}$/i.test(part))) return null;
+  const words = groups.map((part) => Number.parseInt(part, 16));
+  if (!words.slice(0, 5).every((word) => word === 0) || words[5] !== 0xffff) return null;
+
+  const high = words[6];
+  const low = words[7];
+  if (high === undefined || low === undefined) return null;
+  return `${high >> 8}.${high & 255}.${low >> 8}.${low & 255}`;
+}
+
+function isGloballyRoutableIpv6(ip: string): boolean {
+  const groups = parseIpv6Groups(ip);
+  if (!groups) return false;
+
+  // Only global-unicast space (2000::/3) is eligible. Reject special-purpose,
+  // documentation, and transition ranges even when their first group is public.
+  const first = groups[0]!;
+  if ((first & 0xe000) !== 0x2000) return false;
+  const second = groups[1]!;
+  if (first === 0x2001 && (second < 0x0200 || second === 0x0db8)) {
+    return false;
+  }
+  if (first === 0x2002) return false; // 6to4
+  return true;
+}
+
+function parseIpv6Groups(ip: string): number[] | null {
+  let address = ip.toLowerCase();
+  if (address.includes(".")) {
+    const lastColon = address.lastIndexOf(":");
+    const dotted = address.slice(lastColon + 1);
+    if (isIP(dotted) !== 4) return null;
+    const octets = dotted.split(".").map(Number);
+    const [a, b, c, d] = octets;
+    if (a === undefined || b === undefined || c === undefined || d === undefined) return null;
+    address = `${address.slice(0, lastColon + 1)}${((a << 8) | b).toString(16)}:${((c << 8) | d).toString(16)}`;
+  }
+
+  const halves = address.split("::");
+  if (halves.length > 2) return null;
+  const left = halves[0] ? halves[0]!.split(":") : [];
+  const right = halves.length === 2 && halves[1] ? halves[1]!.split(":") : [];
+  const missing = 8 - left.length - right.length;
+  if (missing < 0 || (halves.length === 1 && missing !== 0)) return null;
+  const groups = halves.length === 2 ? [...left, ...Array(missing).fill("0"), ...right] : left;
+  if (groups.length !== 8 || groups.some((part) => !/^[0-9a-f]{1,4}$/.test(part))) return null;
+  return groups.map((part) => Number.parseInt(part, 16));
 }
 
 /**
@@ -466,9 +569,10 @@ export function isPrivateNetworkAddress(hostname: string): boolean {
  */
 export async function safeFetch(urlStr: string, options: SafeFetchOptions = {}): Promise<Response> {
   const {
-    allowPrivate,
+    allowPrivate = false,
     allowedPrivateOrigins,
     maxRedirects = DEFAULT_SAFE_FETCH_MAX_REDIRECTS,
+    maxResponseBytes,
     redirect = "follow",
     requireHttps = false,
     signal,
@@ -506,7 +610,9 @@ export async function safeFetch(urlStr: string, options: SafeFetchOptions = {}):
     );
 
     if (redirect !== "follow" || !isRedirectStatus(response.status)) {
-      return response;
+      return maxResponseBytes === undefined
+        ? response
+        : enforceResponseByteLimit(response, maxResponseBytes);
     }
 
     const location = response.headers.get("location");
@@ -515,10 +621,12 @@ export async function safeFetch(urlStr: string, options: SafeFetchOptions = {}):
     }
 
     if (redirectCount >= maxRedirects) {
+      await response.body?.cancel().catch(() => undefined);
       throw new Error(`Too many redirects (max ${maxRedirects})`);
     }
 
     const nextUrl = new URL(location, currentUrl);
+    await response.body?.cancel().catch(() => undefined);
 
     // A 307/308 redirect preserves the request body verbatim, so a credential-bearing
     // request (the NZBGet XML-RPC body, SABnzbd's addfile query string) redirected to a

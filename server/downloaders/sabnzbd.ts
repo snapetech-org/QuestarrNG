@@ -262,7 +262,7 @@ export class SABnzbdClient implements DownloaderClient {
       // Fetch the NZB in Questarr and upload via addfile so SABnzbd never needs
       // direct indexer access. Keep &file= intact — Prowlarr uses it for link validation.
       const nzbUrl = fixNzbUrlEncoding(request.url);
-      const nzbResponse = await safeFetch(nzbUrl);
+      const nzbResponse = await safeFetch(nzbUrl, { maxResponseBytes: 50 * 1024 * 1024 });
       if (!nzbResponse.ok) {
         return { success: false, message: `Failed to fetch NZB: ${nzbResponse.statusText}` };
       }

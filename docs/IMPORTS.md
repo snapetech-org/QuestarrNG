@@ -69,7 +69,7 @@ buttons test the saved configuration.
 | Scanner        | What QuestarrNG sends                                                                                                                             | Configuration and behavior                                                                                                                                                                                                          |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **VirusTotal** | A SHA-256 hash over HTTPS. The file itself is not uploaded. For a directory download, QuestarrNG checks the largest file as the primary artifact. | Enter an API key and set the detection threshold. An import is blocked when the number of malicious detections is greater than the threshold. Unknown hashes are allowed by default; enable **Block Unknown Hashes** to block them. |
-| **ClamAV**     | File contents streamed to the configured ClamAV daemon over its INSTREAM TCP protocol.                                                            | Enter the daemon host and port (default `3310`). ClamAV examines up to 10,000 files in a directory download. A partial or incomplete directory scan blocks the import.                                                              |
+| **ClamAV**     | File contents streamed to the configured ClamAV daemon over its INSTREAM TCP protocol.                                                            | Enter the daemon host and port (default `3310`). ClamAV examines up to 10,000 files in a directory download, subject to directory-entry, depth, and time limits.                                                                    |
 
 The VirusTotal API key is stored in QuestarrNG's database without encryption;
 protect the database and its backups. ClamAV's INSTREAM connection is not
@@ -77,11 +77,13 @@ encrypted, so keep the daemon on a trusted network. See
 [`SECRETS.md`](SECRETS.md) and [`THREAT_MODEL.md`](THREAT_MODEL.md) for the
 security details.
 
-Scanner network or timeout errors do not block an import. VirusTotal results
-that are unknown or below the configured threshold also continue unless
-**Block Unknown Hashes** applies. An incomplete ClamAV file listing is treated
-as a block so QuestarrNG does not report a partial scan as clean. These checks
-are optional defense in depth, not a guarantee that every file is safe.
+An import proceeds automatically only after at least one enabled scanner returns
+a complete clean verdict. With no scanner configured, when VirusTotal cannot
+check a file in non-strict mode, or when ClamAV cannot examine every file, the
+download is held for manual review. **Block Unknown Hashes** blocks unknown
+VirusTotal results and lookup failures. After reviewing the reason in Pending
+Imports, the user can confirm an incomplete scan. These checks are optional
+defense in depth, not a guarantee that every file is safe.
 
 ## When a download is flagged
 

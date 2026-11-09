@@ -32,12 +32,12 @@ reverse proxy, and configure `TRUST_PROXY` for the trusted proxy path.
 
 The app requests `openid profile email`, requires `email_verified=true`, and
 denies access by default. Exact email and domain allowlists are combined. With
-no allowlist, nobody can sign in. Set
+no allowlist, nobody can sign in. Every admitted account has the same full
+operator privileges because QuestarrNG does not have an admin/non-admin role
+split. Use an allowlist only for trusted operators, and set
 `QUESTARR_OIDC_ALLOW_ANY_VERIFIED_USER=true` only when every verified identity
-should be able to create a separate QuestarrNG user account. OIDC identities
-are keyed by `(issuer, subject)`; email does not link an identity to a local
-password account. Each OIDC account gets its own QuestarrNG data and local
-roles/ownership remain controlled by the app.
+is trusted with those privileges. OIDC identities are keyed by `(issuer,
+subject)`; email does not link an identity to a local password account.
 
 Optional settings:
 
@@ -49,8 +49,9 @@ Optional settings:
 | `QUESTARR_OIDC_ALLOW_PRIVATE_ISSUER`    | `false`                | Allows the provider issuer to use private HTTP endpoints; the browser callback must stay HTTPS. |
 
 OIDC transaction state is short-lived, consumed once, and stored in a distinct
-HttpOnly cookie for each pending sign-in. Up to 16 attempts can be active at
-once; further attempts are rejected until an earlier one completes or expires.
+HttpOnly cookie for each pending sign-in. Up to 256 attempts can be active
+globally, with a limit of four per client address; further attempts are rejected
+until an earlier one completes or expires.
 The callback accepts the normal provider GET response and Apple's URL-encoded
 POST response; reverse proxies must preserve the method and form body.
 Provider requests use bounded timeouts and response sizes and reject redirects.
@@ -83,10 +84,10 @@ provider registration must all describe the same public address.
 
 An exact email or domain allow-list admits that verified identity. With
 `QUESTARR_OIDC_ALLOW_ANY_VERIFIED_USER=true`, any provider identity with a
-verified email can create or access its own QuestarrNG account. Each account is
-keyed from `(issuer, subject)` and is separate from a password account even
-when the emails match. Review user access using QuestarrNG's local controls;
-provider groups do not assign local privileges.
+verified email can create or access its own QuestarrNG account, with the same
+full operator privileges as every other account. Each account is keyed from
+`(issuer, subject)` and is separate from a password account even when the
+emails match. Provider groups do not assign local privileges.
 
 Test with one admitted address and one denied address before allowing normal
 users to use the button. Confirm the correct QuestarrNG user is created or

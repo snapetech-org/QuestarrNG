@@ -94,12 +94,17 @@ export async function refreshAllRootFoldersHealth(): Promise<void> {
  */
 export async function isWithinDeletableRootFolder(resolvedTarget: string): Promise<boolean> {
   const folders = await storage.getAllRootFolders();
-  return folders.some((folder) => {
-    if (!folder.allowDelete) return false;
-    const resolvedFolder = path.resolve(folder.path);
-    // Strictly inside the root folder, never the root folder itself.
-    return isStrictlyInside(resolvedFolder, resolvedTarget);
-  });
+  const canonicalTarget = await fs.promises.realpath(resolvedTarget).catch(() => null);
+  if (!canonicalTarget) return false;
+
+  for (const folder of folders) {
+    if (!folder.allowDelete) continue;
+    const canonicalRoot = await fs.promises.realpath(path.resolve(folder.path)).catch(() => null);
+    // Resolve both sides through the filesystem. A lexically-contained path may
+    // descend through a symlink and otherwise authorize deletion elsewhere.
+    if (canonicalRoot && isStrictlyInside(canonicalRoot, canonicalTarget)) return true;
+  }
+  return false;
 }
 
 /**

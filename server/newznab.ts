@@ -169,6 +169,7 @@ class NewznabClient {
       const requireHttps = sendsApiKey && url.protocol === "https:";
 
       const response = await safeFetch(requestUrl, {
+        allowPrivate: true,
         headers: {
           "User-Agent": "Questarr/1.0",
         },
@@ -414,6 +415,7 @@ class NewznabClient {
       url.searchParams.set("t", "caps");
 
       const response = await safeFetch(url.toString(), {
+        allowPrivate: true,
         signal: AbortSignal.timeout(10000),
         requireHttps: sendsApiKey && url.protocol === "https:",
       });
@@ -512,6 +514,7 @@ class NewznabClient {
     }
 
     const response = await safeFetch(url.toString(), {
+      allowPrivate: true,
       signal: AbortSignal.timeout(10000),
       requireHttps: sendsApiKey && url.protocol === "https:",
     });

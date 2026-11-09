@@ -1,4 +1,5 @@
 import fs from "fs-extra";
+import fsSync from "node:fs";
 import path from "node:path";
 
 const SENSITIVE_PATH_PREFIXES = ["/proc", "/sys", "/dev", "/run/secrets", "/etc", "/root"];
@@ -7,6 +8,34 @@ const SENSITIVE_PATH_PREFIXES = ["/proc", "/sys", "/dev", "/run/secrets", "/etc"
 const SENSITIVE_PATH_REGEX = new RegExp(
   `^(?:${SENSITIVE_PATH_PREFIXES.map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})(?:/|$)`
 );
+const WINDOWS_SENSITIVE_PATH_PREFIXES = [
+  process.env.SystemRoot,
+  process.env.WINDIR,
+  process.env.ProgramFiles,
+  process.env["ProgramFiles(x86)"],
+  `${process.env.SystemDrive ?? "C:"}\\Windows`,
+]
+  .filter((value): value is string => Boolean(value))
+  .map((value) => path.win32.resolve(value).toLowerCase());
+
+function isWindowsSensitivePath(candidatePath: string): boolean {
+  const isWindowsPath =
+    process.platform === "win32" ||
+    /^[a-z]:[\\/]/i.test(candidatePath) ||
+    candidatePath.startsWith("\\\\");
+  if (!isWindowsPath) return false;
+
+  const candidate = path.win32.resolve(candidatePath).toLowerCase();
+  return WINDOWS_SENSITIVE_PATH_PREFIXES.some((root) => {
+    const relative = path.win32.relative(root, candidate);
+    return (
+      relative === "" ||
+      (relative !== ".." &&
+        !relative.startsWith(`..${path.win32.sep}`) &&
+        !path.win32.isAbsolute(relative))
+    );
+  });
+}
 
 async function canonicalizeConfiguredRoot(root: string): Promise<string> {
   let existingPath = root;
@@ -31,8 +60,34 @@ async function canonicalizeConfiguredRoot(root: string): Promise<string> {
  * Resolves the path before comparing so traversal tricks like /data/../etc are caught.
  */
 export function isSensitivePath(rawPath: string): boolean {
-  const resolved = path.resolve(rawPath).replaceAll("\\", "/");
-  return SENSITIVE_PATH_REGEX.test(resolved);
+  if (isWindowsSensitivePath(rawPath)) return true;
+  const resolved = path.resolve(rawPath);
+  const lexicalPath = resolved.replaceAll("\\", "/");
+  if (SENSITIVE_PATH_REGEX.test(lexicalPath) || isWindowsSensitivePath(resolved)) return true;
+
+  // A lexical path check misses an innocuous-looking symlink such as
+  // /downloads/credentials -> /etc/shadow. Resolve the deepest existing ancestor
+  // so paths with not-yet-created suffixes receive the same protection.
+  let existingPath = resolved;
+  const missingSegments: string[] = [];
+  while (true) {
+    try {
+      const canonical = fsSync.realpathSync.native(existingPath);
+      const canonicalCandidate = path.join(canonical, ...missingSegments).replaceAll("\\", "/");
+      return SENSITIVE_PATH_REGEX.test(canonicalCandidate) || isWindowsSensitivePath(canonical);
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException).code;
+      if (code !== "ENOENT" && code !== "ENOTDIR") {
+        // If the canonical target cannot be established, deny processing rather
+        // than assuming an inaccessible or cyclic path is harmless.
+        return true;
+      }
+      const parent = path.dirname(existingPath);
+      if (parent === existingPath) return true;
+      missingSegments.unshift(path.basename(existingPath));
+      existingPath = parent;
+    }
+  }
 }
 
 /**

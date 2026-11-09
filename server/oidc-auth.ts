@@ -11,7 +11,8 @@ import { authRateLimiter } from "./middleware.js";
 
 const STATE_COOKIE_PREFIX = "questarr_oidc_state_";
 const TRANSACTION_TTL_MS = 10 * 60 * 1000;
-const MAX_TRANSACTIONS = 16;
+const MAX_TRANSACTIONS = 256;
+const MAX_TRANSACTIONS_PER_CLIENT = 4;
 const MAX_PROVIDER_RESPONSE_BYTES = 1 << 20;
 const OIDC_PASSWORD_MARKER = "!oidc$";
 
@@ -31,6 +32,7 @@ type ActiveOidcSettings = {
 type OidcTransaction = {
   state: string;
   nonce: string;
+  clientKey: string;
   codeVerifier?: string;
   returnTo: string;
   expiresAt: number;
@@ -284,7 +286,14 @@ export function registerOidcAuthRoutes(app: Express): void {
     let pendingState: string | undefined;
     try {
       cleanExpiredTransactions();
-      if (transactions.size >= MAX_TRANSACTIONS) {
+      const clientKey = req.ip || req.socket.remoteAddress || "unknown";
+      const clientTransactions = [...transactions.values()].filter(
+        (transaction) => transaction.clientKey === clientKey
+      ).length;
+      if (
+        transactions.size >= MAX_TRANSACTIONS ||
+        clientTransactions >= MAX_TRANSACTIONS_PER_CLIENT
+      ) {
         return res.status(429).json({ error: "Too many pending sign-ins. Try again shortly." });
       }
       const state = oidc.randomState();
@@ -298,6 +307,7 @@ export function registerOidcAuthRoutes(app: Express): void {
       transactions.set(state, {
         state,
         nonce,
+        clientKey,
         ...(codeVerifier ? { codeVerifier } : {}),
         returnTo: safeReturnPath(req.query.returnTo, settings),
         expiresAt: Date.now() + TRANSACTION_TTL_MS,

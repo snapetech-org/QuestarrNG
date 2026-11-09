@@ -1,8 +1,8 @@
 # ng-runner-policy: hosted-compatible-v1
 # Dependency Review Action
 #
-# Automatic pull-request checks are disabled; manual dispatch is a no-op until
-# the reviewed release-tag validation flow invokes dependency scanning.
+# Dependency review runs automatically for pull requests targeting main. Manual
+# dispatch remains a no-op because this action requires a pull_request event.
 #
 # Source repository: https://github.com/actions/dependency-review-action
 name: "Dependency Review"
@@ -13,6 +13,9 @@ run-name: >-
       github.event_name == 'workflow_dispatch' &&
       format('action:{0}:pool:{1}', inputs.action || 'review', inputs.runner_pool || 'public') || format('action:ci:pool:public') }}
 on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
     inputs:
       action:

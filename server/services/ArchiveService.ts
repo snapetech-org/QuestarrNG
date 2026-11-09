@@ -1,5 +1,6 @@
 import { execFile } from "node:child_process";
 import { accessSync, constants as fsConstants } from "node:fs";
+import { opendir, statfs } from "node:fs/promises";
 import path from "node:path";
 import fs from "fs-extra";
 import { logger } from "../logger.js";
@@ -20,6 +21,9 @@ const EXEC_MAX_BUFFER = 10 * 1024 * 1024;
 const DEFAULT_ARCHIVE_MAX_ENTRIES = 50_000;
 const DEFAULT_ARCHIVE_MAX_EXPANDED_BYTES = 250 * 1024 ** 3;
 const MAX_ARCHIVE_PATH_DEPTH = 64;
+const MAX_MERGE_ENTRIES = 100_000;
+const MAX_MERGE_DEPTH = 128;
+const MAX_MERGE_WALK_MS = 30_000;
 
 function configuredLimit(name: string, fallback: number): number {
   const configured = process.env[name];
@@ -286,7 +290,7 @@ function safeEntrySegments(name: string): string[] {
   return segments;
 }
 
-function validateArchiveEntries(entries: ArchiveEntry[], outputDir: string): void {
+function validateArchiveEntries(entries: ArchiveEntry[], outputDir: string): number {
   if (entries.length > ARCHIVE_MAX_ENTRIES) {
     throw new Error(`Archive contains too many entries (limit: ${ARCHIVE_MAX_ENTRIES}).`);
   }
@@ -316,6 +320,44 @@ function validateArchiveEntries(entries: ArchiveEntry[], outputDir: string): voi
       );
     }
     expandedBytes += entry.size;
+  }
+  return expandedBytes;
+}
+
+async function assertAvailableDiskSpace(outputDir: string, expandedBytes: number): Promise<void> {
+  let filesystemPath = path.resolve(outputDir);
+  while (true) {
+    try {
+      await fs.access(filesystemPath);
+      break;
+    } catch {
+      const parent = path.dirname(filesystemPath);
+      if (parent === filesystemPath) {
+        throw new Error("Could not find an existing directory to check extraction disk space");
+      }
+      filesystemPath = parent;
+    }
+  }
+
+  let freeBytes: bigint;
+  try {
+    const info = await statfs(filesystemPath, { bigint: true });
+    freeBytes = info.bavail * info.bsize;
+  } catch (error) {
+    throw new Error("Could not verify available disk space before archive extraction", {
+      cause: error,
+    });
+  }
+
+  // Preserve at least 10% of currently available space, with a 1 GiB floor,
+  // so an archive cannot consume the filesystem's last free blocks.
+  const reserveBytes = [1024n ** 3n, freeBytes / 10n].reduce((largest, value) =>
+    value > largest ? value : largest
+  );
+  if (BigInt(expandedBytes) + reserveBytes > freeBytes) {
+    throw new Error(
+      `Archive needs ${expandedBytes} bytes but the destination filesystem does not have enough free space while preserving a safety reserve.`
+    );
   }
 }
 
@@ -458,10 +500,28 @@ export class ArchiveService {
   ): Promise<string[]> {
     const dirsToCreate: string[] = [];
     const filesToMove: Array<{ from: string; to: string; replaces: boolean }> = [];
+    const startedAt = Date.now();
+    let visitedEntries = 0;
 
-    const plan = async (srcDir: string, targetDir: string): Promise<void> => {
-      const entries = await fs.readdir(srcDir, { withFileTypes: true });
-      for (const entry of entries) {
+    const plan = async (srcDir: string, targetDir: string, depth = 0): Promise<void> => {
+      if (depth > MAX_MERGE_DEPTH) {
+        throw new Error(`Archive merge exceeded directory depth ${MAX_MERGE_DEPTH}`);
+      }
+      if (Date.now() - startedAt > MAX_MERGE_WALK_MS) {
+        throw new Error(`Archive merge exceeded ${MAX_MERGE_WALK_MS} ms`);
+      }
+      const directory = await opendir(srcDir);
+      for await (const entry of directory) {
+        if (Date.now() - startedAt > MAX_MERGE_WALK_MS) {
+          throw new Error(`Archive merge exceeded ${MAX_MERGE_WALK_MS} ms`);
+        }
+        visitedEntries += 1;
+        if (visitedEntries > MAX_MERGE_ENTRIES) {
+          throw new Error(`Archive merge exceeded ${MAX_MERGE_ENTRIES} entries`);
+        }
+        if (entry.isSymbolicLink() || (!entry.isDirectory() && !entry.isFile())) {
+          throw new Error(`Archive extraction produced an unsafe filesystem entry: ${entry.name}`);
+        }
         const srcPath = path.join(srcDir, entry.name);
         const targetPath = path.join(targetDir, entry.name);
         if (srcDir === stagingDir && entry.name.startsWith(EXTRACT_STAGING_PREFIX)) {
@@ -482,7 +542,7 @@ export class ArchiveService {
             );
           }
           if (!existing) dirsToCreate.push(targetPath);
-          await plan(srcPath, targetPath);
+          await plan(srcPath, targetPath, depth + 1);
         } else {
           if (existing?.isDirectory()) {
             throw new Error(
@@ -613,7 +673,8 @@ export class ArchiveService {
     // which may decompress every entry. Validate before touching the filesystem, so a
     // failing/unsupported archive never leaves behind an empty output directory.
     const entries = await this.listEntriesForExtraction(filePath, password);
-    validateArchiveEntries(entries, outputDir);
+    const expandedBytes = validateArchiveEntries(entries, outputDir);
+    await assertAvailableDiskSpace(outputDir, expandedBytes);
     await this.testArchive(filePath, tool, password);
 
     // Extract into a private staging directory inside outputDir, then merge the result

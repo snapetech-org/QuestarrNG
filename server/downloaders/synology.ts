@@ -298,6 +298,7 @@ export class SynologyDownloadStationClient implements DownloaderClient {
     // redirect whenever it started out HTTPS, so a compromised or MITM'd NAS can't
     // bounce the credential to a plaintext hop.
     const response = await safeFetch(url, {
+      allowPrivate: true,
       ...init,
       headers: {
         "User-Agent": "Questarr/1.0",

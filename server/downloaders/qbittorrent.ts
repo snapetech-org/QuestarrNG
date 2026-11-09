@@ -1423,6 +1423,7 @@ export class QBittorrentClient implements DownloaderClient {
 
     try {
       const response = await safeFetch(url, {
+        allowPrivate: true,
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -1580,6 +1581,7 @@ export class QBittorrentClient implements DownloaderClient {
     // Once authenticated, every request replays the session cookie -- require the
     // resolved URL to stay HTTPS through any redirect whenever it started out HTTPS.
     let response = await safeFetch(url, {
+      allowPrivate: true,
       method,
       headers,
       ...(requestBody !== undefined ? { body: requestBody } : {}),
@@ -1602,6 +1604,7 @@ export class QBittorrentClient implements DownloaderClient {
       }
 
       response = await safeFetch(url, {
+        allowPrivate: true,
         method,
         headers: retryHeaders,
         ...(requestBody !== undefined ? { body: requestBody } : {}),

@@ -800,6 +800,7 @@ export class RTorrentClient implements DownloaderClient {
     // URL to stay HTTPS through any redirect whenever it started out HTTPS, so a
     // compromised or MITM'd rTorrent can't bounce the credential to a plaintext hop.
     const response = await safeFetch(url, {
+      allowPrivate: true,
       method: "POST",
       headers,
       body: xmlBody,
@@ -835,6 +836,7 @@ export class RTorrentClient implements DownloaderClient {
             downloadersLogger.debug({ url }, "Retrying rTorrent request with Digest Auth");
 
             const retryResponse = await safeFetch(url, {
+              allowPrivate: true,
               method: "POST",
               headers,
               body: xmlBody,

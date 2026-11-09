@@ -130,6 +130,7 @@ export class TorznabClient {
       const requireHttps = sendsApiKey && originUrl.protocol === "https:";
 
       const response = await safeFetch(searchUrl, {
+        allowPrivate: true,
         headers: {
           "User-Agent": "Questarr/1.0",
         },
@@ -336,6 +337,7 @@ export class TorznabClient {
     }
 
     const response = await safeFetch(url.toString(), {
+      allowPrivate: true,
       headers: { "User-Agent": "Questarr/1.0" },
       signal: AbortSignal.timeout(30000),
       requireHttps: sendsApiKey && url.protocol === "https:",

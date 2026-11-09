@@ -165,13 +165,13 @@ The cited Scorecard scan completed on 2026-10-14. At that time, CodeQL,
 Dependabot, and secret-scanning alert lists were clear; the remaining Code Scanning alerts are
 Scorecard process and maturity metrics, not identified vulnerable source code.
 
-| Finding                                                                                         | Fork-specific evidence and status                                                                                                                                                                                                                                                                                                                                                                  |
-| ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Finding                                                                                         | Fork-specific evidence and status                                                                                                                                                                                                                                                                                                                                           |
+| ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [CI-Tests #149](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/149)         | [Scorecard run 38660675071](https://github.com/snapetech-org/QuestarrNG/actions/runs/38660675071) on main commit `abaf9a0ab4a69997a48b58c7696122f8c6e87b67` reports CI tests for 21 of 22 sampled merged pull requests (score 9/10). The missed sample is historical. GitHub's current repository settings, checked 2026-10-31, do not require CI status checks for merges. |
-| [SAST #148](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/148)             | The same Scorecard run reports SAST for 28 of the 30 sampled commits (score 9/10). The SAST workflow is active and passed on that main commit; the remaining score reflects its sampled history.                                                                                                                                                                                                   |
-| [CodeReviewID #10](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/10)       | Scorecard reports 0/13 approved changesets. The maintainer accepted the single-maintainer process and dismissed this historical process alert as `won't fix`. AI review is advisory and is not represented as independent human approval.                                                                              |
-| [MaintainedID #11](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/11)       | GitHub records repository creation as 2026-09-25T23:50:31Z. Scorecard requires more than 90 days of repository history, so the earliest age-based reassessment is after 2026-12-24T23:50:31Z. Releases and CI demonstrate current activity, but cannot change repository age.                                                                                                                      |
-| [CIIBestPracticesID #12](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/12) | The [OpenSSF profile](https://www.bestpractices.dev/en/projects/15269/passing) is 97% complete and still `in_progress`. The project has corrected the repository URLs and 61 stale evidence links. The remaining profile answers require an authorized owner to record current evidence and the new repository history.                                                                            |
+| [SAST #148](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/148)             | The same Scorecard run reports SAST for 28 of the 30 sampled commits (score 9/10). The SAST workflow is active and passed on that main commit; the remaining score reflects its sampled history.                                                                                                                                                                            |
+| [CodeReviewID #10](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/10)       | Scorecard reports 0/13 approved changesets. The maintainer accepted the single-maintainer process and dismissed this historical process alert as `won't fix`. AI review is advisory and is not represented as independent human approval.                                                                                                                                   |
+| [MaintainedID #11](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/11)       | GitHub records repository creation as 2026-09-25T23:50:31Z. Scorecard requires more than 90 days of repository history, so the earliest age-based reassessment is after 2026-12-24T23:50:31Z. Releases and CI demonstrate current activity, but cannot change repository age.                                                                                               |
+| [CIIBestPracticesID #12](https://github.com/snapetech-org/QuestarrNG/security/code-scanning/12) | The [OpenSSF profile](https://www.bestpractices.dev/en/projects/15269/passing) is 97% complete and still `in_progress`. The project has corrected the repository URLs and 61 stale evidence links. The remaining profile answers require an authorized owner to record current evidence and the new repository history.                                                     |
 
 ### Secure development knowledge
 
@@ -200,13 +200,13 @@ profile owner's external review.
 See [SECRETS.md](SECRETS.md#2-authentication-secret-jwt_secret) and
 `server/__tests__/config.test.ts` / `jwt-secret-rotation.test.ts`.
 
-As of 2026-10-31, GitHub reports no required status checks, pull-request review
-requirement, or repository ruleset on `main`. CI and security workflows are
-manually dispatched from `main` onto private ephemeral JIT runners; they do not
-run automatically for same-repository pull requests or branch pushes. Labeled
+As of 2026-11-09, GitHub reports no required status checks, pull-request review
+requirement, or repository ruleset on `main`. CI, E2E, and dependency review run
+automatically for pull requests targeting `main`; CI and E2E also run on pushes
+to `main`. SAST and DAST retain manual dispatch and release-time checks. Labeled
 external-fork validation is separate and uses the isolated, secret-free
-`public-fork-jit` route. The current change removes CodeQL workflow execution
-and CodeQL analysis requirements from the release gate. See [branch protection
+`public-fork-jit` route. Required-check enforcement remains a repository setting
+outside this source tree. See [branch protection
 settings](https://github.com/snapetech-org/QuestarrNG/settings/branches).
 
 The security PR also gates versioned image publication, GitHub release publication,

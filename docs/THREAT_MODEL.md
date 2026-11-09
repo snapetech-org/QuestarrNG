@@ -2,7 +2,7 @@
 
 **Version:** 1.0
 **Date:** 2026-10-04
-**Last reviewed:** 2026-10-13
+**Last reviewed:** 2026-11-09
 **Author:** Snapetech maintainers
 **Audience:** Maintainers, contributors, security reviewers
 
@@ -43,7 +43,7 @@ flowchart LR
     Gate{{"default-deny auth gate\nJWT or scoped integration key"}}
     Handlers["Route handlers"]
     DB[("SQLite / Postgres\n(Drizzle ORM)")]
-    Socket["Socket.io\n(unauthenticated broadcast)"]
+    Socket["Socket.io\n(authenticated sockets; user rooms)"]
     SSRF{{"safeFetch / isSafeUrl\nssrf.ts"}}
     Seerr["SeerrNG server\nscoped, expiring key"]
     Archives["Downloaded archives\nuntrusted release data"]
@@ -78,7 +78,11 @@ flowchart LR
 
 Eight named trust boundaries:
 
-1. **Browser ↔ Server** — JWT bearer auth (`server/auth.ts`). Once authenticated, a user has
+1. **Browser ↔ Server** — JWT bearer auth (`server/auth.ts`). The Socket.io handshake also
+   verifies the session JWT and checks the browser Origin when the ambient auth cookie is
+   used (`server/socket.ts`). User-owned events are sent to that user's room. The log stream
+   is available to every authenticated socket, consistent with the authenticated logs API.
+   Once authenticated, a user has
    full access to their own resources; there is no admin/non-admin split (see Section 8,
    "flat trust model" — an accepted design tradeoff, not a gap).
 2. **Server ↔ SQLite/Postgres** — fully trusted; all access is parameterized via Drizzle ORM.
@@ -104,7 +108,9 @@ Eight named trust boundaries:
 8. **GitHub Actions ↔ candidate source** — pull-request code, lockfiles, and generated
    reports are untrusted. Build, test, scan, package, and release jobs use compatible
    hosted runners with read-only permissions where possible. Public-fork code uses the isolated disposable `public-fork-jit`
-   group without secrets. The current CI workflow is manually dispatched from `main`.
+   group without secrets. CI, E2E, and dependency review run automatically for pull requests
+   targeting `main` and pushes to `main`; repository required-status-check enforcement is
+   managed outside this source tree.
    Codecov reports are uploaded by a default-branch `workflow_run` job only for a
    non-cancelled, same-repository manual CI dispatch from `main`, behind the
    `codecov-main` environment restricted to `main`. Coverage uploads require a successful
@@ -124,7 +130,9 @@ Eight named trust boundaries:
 ## 3. Assets
 
 - **Credentials:** user password hashes, the JWT signing secret, indexer API keys,
-  download-client passwords, NexusMods and VirusTotal API keys. See
+  download-client passwords, NexusMods and VirusTotal API keys. The encryption key for
+  indexer/downloader credentials is stored outside the database by default, or supplied
+  through the environment. See
   [`docs/SECRETS.md`](./SECRETS.md) for the authoritative inventory of where each of these
   lives and how it's protected.
 - **Library/download metadata:** game collections, download history — low sensitivity, but
@@ -206,15 +214,17 @@ When enabled, `SecurityScanService` checks a completed download before it is imp
 - **VirusTotal** computes a SHA-256 digest of the primary file and queries the fixed HTTPS
   API endpoint. The file itself is not sent. Detection threshold and whether an unknown hash
   blocks import are configurable.
-- **ClamAV** streams files through the configured daemon's INSTREAM protocol. The configured
+- **ClamAV** streams files through the configured daemon's INSTREAM protocol. A complete scan
+  covers up to 10,000 files and 100,000 directory entries, with depth and time limits. The configured
   hostname is resolved and validated before QuestarrNG connects; file contents cross that TCP
   connection, so deploy the daemon on a trusted network.
 - A detection moves the download to a sibling `.questarr-quarantine` directory, marks it
   `quarantined`, and creates a Security Alert. The normal import-review flow rejects
   quarantined downloads.
-- Scanner network and time-out errors fail open and allow processing to continue. A partially
-  enumerated or truncated ClamAV directory scan blocks import rather than claiming it was
-  clean. VirusTotal can also block unknown hashes when that option is enabled.
+- A clean result is returned only after a complete scan. With no scanner configured, with a
+  partial scan, or with a non-strict VirusTotal lookup failure, the download is held for
+  manual review; strict VirusTotal unknown-hash mode blocks unknown hashes and lookup errors.
+  The user must confirm an incomplete scan before the import proceeds.
 
 Scanning is optional defense in depth, not a guarantee that every file is safe. It should not
 replace operator review or host-level endpoint protection.
@@ -245,15 +255,16 @@ Prowlarr links.
 ### 4.8 GitHub Actions candidate validation
 
 Pull-request source, dependency lockfiles, and generated coverage/JUnit files are untrusted
-inputs. The current `CI` workflow is manually dispatched from `main`; its jobs use private
-ephemeral JIT runners with read-only permissions where possible and checkout credentials
-disabled. No GitHub-hosted runner fallback is allowed. Public-fork validation uses the
-isolated disposable `public-fork-jit` group with no secrets and minimal read access.
+inputs. CI, E2E, and dependency review run automatically for pull requests targeting `main`
+and pushes to `main`. Their jobs use compatible hosted runners with read-only permissions
+where possible and checkout credentials disabled. Public-fork validation uses the isolated
+disposable `public-fork-jit` group with no secrets and minimal read access. Repository
+required-status-check enforcement is configured outside this source tree.
 
-Coverage and JUnit reports are collected from the private-JIT CI run as an ordinary
-artifact. The Codecov upload workflow is loaded from the default branch and accepts
-reports only from the matching attempt of a non-cancelled same-repository manual CI
-dispatch from `main`, using the `codecov-main` environment. Coverage uploads require a
+Coverage and JUnit reports are collected from CI as an ordinary artifact. The Codecov
+upload workflow is loaded from the default branch and accepts reports only from the matching
+attempt of a non-cancelled same-repository manual CI dispatch from `main`, using the
+`codecov-main` environment. Coverage uploads require a
 successful run; an available JUnit report can upload after a failed run. It checks out
 only trusted default-branch code and uses the triggering run's commit SHA as Codecov's
 report override. Its event and environment restrictions prevent pull-request workflows
@@ -373,11 +384,11 @@ authentication or a narrowly-scoped, low-sensitivity response.
 
 ## 8. Residual & Accepted Risks
 
-| Risk                                                                                                                                                                                                             | Status                                    | Rationale                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Socket.io (`server/socket.ts`) has no per-connection authentication; `notifyUser()` broadcasts via plain `io.emit()` to every connected client regardless of which user owns the event                           | **Accepted risk / documented assumption** | Connections are restricted to configured origins (CORS), so this is a same-install, cross-account metadata leak (e.g. one user seeing another's download progress), not an externally exposed one. QuestarrNG is not a multi-user application (see [`docs/ARCHITECTURE.md`](ARCHITECTURE.md) §9) — the supported deployment has one trusted operator, so this is low severity by design, not a gap awaiting a fix. |
-| Path-traversal checks in `sanitizeDownloaderData`/`sanitizeIndexerData` use a `!value.includes("..")` blocklist rather than the resolve-and-prefix-check pattern `server/routes.ts`'s file-browser endpoint uses | **Recommended follow-up**                 | Downstream consumers don't currently perform direct filesystem access with these values, so risk is low; migrating to the stronger pattern is still worthwhile for consistency. File a follow-up issue.                                                                                                                                                                                                            |
-| Flat, single-tier trust model — an authenticated user has full access with no RBAC/admin split                                                                                                                   | **Accepted risk / documented assumption** | Deliberate simplicity tradeoff for a small, self-hosted app with one trusted operator per instance — QuestarrNG is not a multi-user application (see [`docs/ARCHITECTURE.md`](ARCHITECTURE.md) §9).                                                                                                                                                                                                                |
+| Risk                                                                                                                                                                                                             | Status                                    | Rationale                                                                                                                                                                                                                                                                   |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Socket.io log lines are broadcast to every authenticated socket, while application notifications use user rooms                                                                                                  | **Accepted design**                       | The authenticated logs API exposes the same process log stream to every signed-in account. Socket handshakes verify the JWT and cookie Origin; deployments that admit multiple users should treat all accounts as trusted operators because the app has a flat trust model. |
+| Path-traversal checks in `sanitizeDownloaderData`/`sanitizeIndexerData` use a `!value.includes("..")` blocklist rather than the resolve-and-prefix-check pattern `server/routes.ts`'s file-browser endpoint uses | **Recommended follow-up**                 | Downstream consumers don't currently perform direct filesystem access with these values, so risk is low; migrating to the stronger pattern is still worthwhile for consistency. File a follow-up issue.                                                                     |
+| Flat, single-tier trust model — an authenticated user has full access with no RBAC/admin split                                                                                                                   | **Accepted risk / documented assumption** | Deliberate simplicity tradeoff for a small, self-hosted app with one trusted operator per instance — QuestarrNG is not a multi-user application (see [`docs/ARCHITECTURE.md`](ARCHITECTURE.md) §9).                                                                         |
 
 ---
 

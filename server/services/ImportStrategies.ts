@@ -2,6 +2,7 @@ import { Game, ImportConfig } from "../../shared/schema.js";
 import { categorizeDownload, type DownloadCategory } from "../../shared/download-categorizer.js";
 import fs from "fs-extra";
 import path from "node:path";
+import { opendir } from "node:fs/promises";
 import { logger } from "../logger.js";
 import { isSensitivePath, assertWithinRoots } from "../path-security.js";
 import { EXTRACT_STAGING_PREFIX } from "./extract-staging.js";
@@ -26,6 +27,8 @@ export interface ImportReview {
   reviewReason?: string | undefined;
   originalPath: string;
   proposedPath: string;
+  /** Canonical containment boundary persisted with plans created by the server. */
+  targetRoot?: string;
   strategy: "pc" | "romm";
   ignoredExtensions?: string[];
   fileCategories?: FileCategoryEntry[] | undefined;
@@ -101,25 +104,47 @@ interface WalkOptions {
   skipExtractStaging?: boolean;
 }
 
+const MAX_IMPORT_WALK_ENTRIES = 100_000;
+const MAX_IMPORT_WALK_DEPTH = 128;
+const MAX_IMPORT_WALK_MS = 30_000;
+
 async function walkRelative(rootPath: string, options: WalkOptions = {}): Promise<string[]> {
   const stats = await fs.stat(rootPath);
   if (!stats.isDirectory()) return [path.basename(rootPath)];
 
   const collected: string[] = [];
-  const stack: string[] = [""];
+  const stack: Array<{ relativePath: string; depth: number }> = [{ relativePath: "", depth: 0 }];
+  let visitedEntries = 0;
+  const startedAt = Date.now();
 
   while (stack.length > 0) {
-    const rel = stack.pop() as string;
+    if (Date.now() - startedAt > MAX_IMPORT_WALK_MS) {
+      throw new Error(`Import directory walk exceeded ${MAX_IMPORT_WALK_MS} ms`);
+    }
+    const { relativePath: rel, depth } = stack.pop()!;
     const current = rel ? path.join(rootPath, rel) : rootPath;
-    const entries = await fs.readdir(current, { withFileTypes: true });
-    for (const entry of entries) {
+    const directory = await opendir(current);
+    for await (const entry of directory) {
+      if (Date.now() - startedAt > MAX_IMPORT_WALK_MS) {
+        throw new Error(`Import directory walk exceeded ${MAX_IMPORT_WALK_MS} ms`);
+      }
+      visitedEntries += 1;
+      if (visitedEntries > MAX_IMPORT_WALK_ENTRIES) {
+        throw new Error(`Import directory walk exceeded ${MAX_IMPORT_WALK_ENTRIES} entries`);
+      }
       const entryRel = rel ? path.join(rel, entry.name) : entry.name;
+      if (entry.isSymbolicLink()) {
+        throw new Error(`Refusing to import a symbolic link: ${path.join(current, entry.name)}`);
+      }
       if (entry.isDirectory()) {
         if (options.skipExtractStaging && !rel && entry.name.startsWith(EXTRACT_STAGING_PREFIX)) {
           continue;
         }
-        stack.push(entryRel);
-      } else {
+        if (depth >= MAX_IMPORT_WALK_DEPTH) {
+          throw new Error(`Import directory walk exceeded depth ${MAX_IMPORT_WALK_DEPTH}`);
+        }
+        stack.push({ relativePath: entryRel, depth: depth + 1 });
+      } else if (entry.isFile()) {
         collected.push(entryRel);
       }
     }
@@ -156,12 +181,12 @@ async function withHardlinkFallback(
     return "hardlink";
   } catch (error) {
     const code = (error as NodeJS.ErrnoException).code;
+    if (cleanup) await cleanup();
     if (!isHardlinkFallbackErrno(code)) throw error;
     logger.warn(
       { source, destination, code },
       "[ImportStrategies] Hardlink failed, falling back to copy"
     );
-    if (cleanup) await cleanup();
     await fs.copy(source, destination, { overwrite: true });
     return "copy";
   }
@@ -179,17 +204,56 @@ async function linkOrCopyFallback(
 // directory source has to be walked and linked file-by-file (mirroring what
 // `cp -al` does on the CLI), rather than handed to fs.link() as one call,
 // which would otherwise always fail for a multi-file torrent/release.
-async function hardlinkTree(source: string, destination: string): Promise<void> {
+interface HardlinkWalkBudget {
+  visitedEntries: number;
+  startedAt: number;
+}
+
+const MAX_HARDLINK_WALK_ENTRIES = 100_000;
+const MAX_HARDLINK_WALK_DEPTH = 128;
+const MAX_HARDLINK_WALK_MS = 30_000;
+
+async function hardlinkTree(
+  source: string,
+  destination: string,
+  budget: HardlinkWalkBudget = { visitedEntries: 0, startedAt: Date.now() },
+  depth = 0
+): Promise<void> {
+  if (Date.now() - budget.startedAt > MAX_HARDLINK_WALK_MS) {
+    throw new Error(`Hardlink directory walk exceeded ${MAX_HARDLINK_WALK_MS} ms`);
+  }
+  if (depth > MAX_HARDLINK_WALK_DEPTH) {
+    throw new Error(`Hardlink directory walk exceeded depth ${MAX_HARDLINK_WALK_DEPTH}`);
+  }
   const stats = await fs.lstat(source);
+  if (stats.isSymbolicLink()) {
+    throw new Error(`Refusing to hardlink a symbolic link: ${source}`);
+  }
   if (!stats.isDirectory()) {
+    if (!stats.isFile()) throw new Error(`Refusing to hardlink a non-file entry: ${source}`);
     await fs.link(source, destination);
     return;
   }
 
   await fs.ensureDir(destination);
-  const entries = await fs.readdir(source, { withFileTypes: true });
-  for (const entry of entries) {
-    await hardlinkTree(path.join(source, entry.name), path.join(destination, entry.name));
+  const directory = await opendir(source);
+  for await (const entry of directory) {
+    if (Date.now() - budget.startedAt > MAX_HARDLINK_WALK_MS) {
+      throw new Error(`Hardlink directory walk exceeded ${MAX_HARDLINK_WALK_MS} ms`);
+    }
+    budget.visitedEntries += 1;
+    if (budget.visitedEntries > MAX_HARDLINK_WALK_ENTRIES) {
+      throw new Error(`Hardlink directory walk exceeded ${MAX_HARDLINK_WALK_ENTRIES} entries`);
+    }
+    if (entry.isSymbolicLink()) {
+      throw new Error(`Refusing to hardlink a symbolic link: ${path.join(source, entry.name)}`);
+    }
+    await hardlinkTree(
+      path.join(source, entry.name),
+      path.join(destination, entry.name),
+      budget,
+      depth + 1
+    );
   }
 }
 
@@ -288,11 +352,29 @@ async function transferDirectoryPerFile(
 
   let usedCopyFallback = false;
   let transferredAny = false;
+  const attemptedMoves: Array<{ source: string; destination: string }> = [];
 
   for (const { srcFile, destFile } of plannedTransfers) {
-    const entryMode = await transferSingleFile(srcFile, destFile, mode, destination);
-    if (mode === "hardlink" && entryMode === "copy") usedCopyFallback = true;
-    transferredAny = true;
+    try {
+      const entryMode = await transferSingleFile(srcFile, destFile, mode, destination);
+      if (mode === "move") attemptedMoves.push({ source: srcFile, destination: destFile });
+      if (mode === "hardlink" && entryMode === "copy") usedCopyFallback = true;
+      transferredAny = true;
+    } catch (error) {
+      if (mode === "move") {
+        const rollbackErrors = await rollbackMovedEntries([
+          ...attemptedMoves,
+          { source: srcFile, destination: destFile },
+        ]);
+        if (rollbackErrors.length > 0) {
+          throw new Error(
+            `Move import failed and ${rollbackErrors.length} source file(s) could not be restored`,
+            { cause: error }
+          );
+        }
+      }
+      throw error;
+    }
   }
 
   if (!transferredAny) {
@@ -314,6 +396,33 @@ async function transferDirectoryPerFile(
   return mode === "hardlink" && usedCopyFallback ? "copy" : mode;
 }
 
+/** Restore files moved earlier in a multi-file import when a later transfer fails. */
+async function rollbackMovedEntries(
+  entries: Array<{ source: string; destination: string }>
+): Promise<unknown[]> {
+  const errors: unknown[] = [];
+  for (const { source, destination } of [...entries].reverse()) {
+    try {
+      const [sourceExists, destinationExists] = await Promise.all([
+        fs.pathExists(source),
+        fs.pathExists(destination),
+      ]);
+      if (!destinationExists) continue;
+      if (sourceExists) {
+        // A failed cross-device move can leave a partial destination while the
+        // complete source still exists. Preserve the source and remove the copy.
+        await fs.remove(destination);
+      } else {
+        await fs.ensureDir(path.dirname(source));
+        await fs.move(destination, source, { overwrite: false });
+      }
+    } catch (error) {
+      errors.push(error);
+    }
+  }
+  return errors;
+}
+
 async function transferFile(
   source: string,
   destination: string,
@@ -327,12 +436,17 @@ async function transferFile(
   const stats = await fs.stat(source);
   const hasExcludes = !!excludePaths && excludePaths.size > 0;
 
-  if (stats.isDirectory() && hasExcludes) {
-    return transferDirectoryPerFile(source, destination, mode, excludePaths);
-  }
-
-  if (mode === "hardlink" && stats.isDirectory()) {
-    return transferDirectoryHardlink(source, destination);
+  if (stats.isDirectory()) {
+    if (hasExcludes) {
+      return transferDirectoryPerFile(source, destination, mode, excludePaths);
+    }
+    if (mode === "hardlink") {
+      return transferDirectoryHardlink(source, destination);
+    }
+    // fs-extra's recursive copy/move modes accept symbolic links inside the
+    // source tree. Reject them and bound the preflight walk before any destination
+    // changes, so a downloaded tree cannot plant an escaping link in the library.
+    await walkRelative(source);
   }
 
   return transferSingleFile(source, destination, mode, path.dirname(destination));
@@ -547,20 +661,26 @@ export class PCImportStrategy implements ImportStrategy {
     if (relativeToRoot.startsWith("..") || path.isAbsolute(relativeToRoot)) {
       throw new Error("Computed destination escapes the configured library root");
     }
+    const safeDestination = await assertWithinRoots(
+      destination,
+      [targetRoot],
+      "Computed destination escapes the configured library root"
+    );
 
     const fileCategories =
       stats.isDirectory() && config.sortExtras
         ? await categorizeSourceFiles(safeSourcePath)
         : undefined;
 
-    const destinationExists = await fs.pathExists(destination);
+    const destinationExists = await fs.pathExists(safeDestination);
     const needsReview = destinationExists && !config.overwriteExisting;
 
     return {
       needsReview,
       reviewReason: needsReview ? "Destination already exists" : undefined,
       originalPath: safeSourcePath,
-      proposedPath: destination,
+      proposedPath: safeDestination,
+      targetRoot,
       strategy: "pc",
       fileCategories,
     };
@@ -586,6 +706,14 @@ export class PCImportStrategy implements ImportStrategy {
       review.originalPath,
       this.sourceRoots,
       "Refusing to process a path outside the configured downloader roots"
+    );
+    if (!review.targetRoot) {
+      throw new Error("Target root is required for import validation");
+    }
+    review.proposedPath = await assertWithinRoots(
+      review.proposedPath,
+      [review.targetRoot],
+      "Proposed destination escapes the configured library root"
     );
 
     if (review.fileCategories && review.fileCategories.length > 0) {
@@ -642,16 +770,36 @@ export class PCImportStrategy implements ImportStrategy {
         }
       }
 
+      const attemptedMoves: Array<{ source: string; destination: string }> = [];
       for (const { entry, sourceFile, destinationFile } of plannedTransfers) {
-        const entryMode = await transferSingleFile(
-          sourceFile,
-          destinationFile,
-          transferMode,
-          review.proposedPath
-        );
-        filesPlaced.push(destinationFile);
-        if (entryMode !== transferMode) {
-          conflictsResolved.push(`${entry.name} (mode fallback: ${entryMode})`);
+        try {
+          const entryMode = await transferSingleFile(
+            sourceFile,
+            destinationFile,
+            transferMode,
+            review.proposedPath
+          );
+          if (transferMode === "move") {
+            attemptedMoves.push({ source: sourceFile, destination: destinationFile });
+          }
+          filesPlaced.push(destinationFile);
+          if (entryMode !== transferMode) {
+            conflictsResolved.push(`${entry.name} (mode fallback: ${entryMode})`);
+          }
+        } catch (error) {
+          if (transferMode === "move") {
+            const rollbackErrors = await rollbackMovedEntries([
+              ...attemptedMoves,
+              { source: sourceFile, destination: destinationFile },
+            ]);
+            if (rollbackErrors.length > 0) {
+              throw new Error(
+                `Move import failed and ${rollbackErrors.length} source file(s) could not be restored`,
+                { cause: error }
+              );
+            }
+          }
+          throw error;
         }
       }
 

@@ -1,25 +1,40 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { migrate } from "drizzle-orm/better-sqlite3/migrator";
 import { eq } from "drizzle-orm";
 import { systemConfig } from "../../shared/schema.js";
 import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 
 describe("credential-crypto", () => {
   let db: BetterSQLite3Database<Record<string, unknown>>;
   let cryptoModule: typeof import("../credential-crypto.js");
+  let keyDirectory: string;
+  let temporaryRoot: string;
 
   beforeEach(async () => {
     process.env.SQLITE_DB_PATH = ":memory:";
     delete process.env.CREDENTIALS_ENCRYPTION_KEY;
+    temporaryRoot = await mkdtemp(path.join(os.tmpdir(), "questarr-credential-crypto-"));
+    keyDirectory = path.join(temporaryRoot, "config");
 
     // Fresh module registry so the in-memory encryption key cache resets per test.
     vi.resetModules();
+    vi.doMock("../config-loader.js", () => ({
+      configLoader: { getConfigDir: () => keyDirectory },
+    }));
 
     const dbModule = await import("../db.js");
     db = dbModule.db;
     await migrate(db, { migrationsFolder: "migrations" });
 
     cryptoModule = await import("../credential-crypto.js");
+  });
+
+  afterEach(async () => {
+    await rm(temporaryRoot, { recursive: true, force: true });
+    vi.doUnmock("../config-loader.js");
   });
 
   it("round-trips a plaintext value through encrypt/decrypt", async () => {
@@ -59,7 +74,7 @@ describe("credential-crypto", () => {
     expect(await decryptCredential(legacyPlaintextRow)).toBe(legacyPlaintextRow);
   });
 
-  it("auto-generates and persists an encryption key to system_config on first use", async () => {
+  it("auto-generates a private key file and removes the legacy database key on first use", async () => {
     const { encryptCredential } = cryptoModule;
 
     const [before] = await db
@@ -70,31 +85,35 @@ describe("credential-crypto", () => {
 
     await encryptCredential("anything");
 
+    const keyHex = await readFile(path.join(keyDirectory, "secrets", "credentials.key"), "utf8");
+    expect(keyHex).toMatch(/^[0-9a-f]{64}$/);
+
     const [after] = await db
       .select()
       .from(systemConfig)
       .where(eq(systemConfig.key, "app_encryption_material"));
-    expect(after?.value).toMatch(/^[0-9a-f]{64}$/);
+    expect(after).toBeUndefined();
   });
 
-  it("reuses the key already persisted in system_config instead of generating a new one", async () => {
-    const { encryptCredential, decryptCredential } = cryptoModule;
+  it("reuses the key file after the in-memory key cache is cleared", async () => {
+    const { encryptCredential } = cryptoModule;
 
-    // First call generates and persists the key.
     const ciphertext = await encryptCredential("stored-key-value");
-    const [row] = await db
-      .select()
-      .from(systemConfig)
-      .where(eq(systemConfig.key, "app_encryption_material"));
-    const persistedKeyHex = row?.value;
+    vi.resetModules();
+    vi.doMock("../config-loader.js", () => ({
+      configLoader: { getConfigDir: () => keyDirectory },
+    }));
+    const reloadedDbModule = await import("../db.js");
+    await migrate(reloadedDbModule.db, { migrationsFolder: "migrations" });
+    cryptoModule = await import("../credential-crypto.js");
+    const { decryptCredential: decryptAfterReload } = cryptoModule;
 
-    // A value encrypted before the in-memory cache existed should still
-    // decrypt correctly using the key read back from the DB.
-    expect(persistedKeyHex).toMatch(/^[0-9a-f]{64}$/);
-    expect(await decryptCredential(ciphertext)).toBe("stored-key-value");
+    // A fresh module instance loads the persisted key instead of generating a
+    // process-local replacement that could no longer decrypt stored values.
+    expect(await decryptAfterReload(ciphertext)).toBe("stored-key-value");
   });
 
-  it("reads a pre-existing key from system_config on first use instead of generating one", async () => {
+  it("moves a pre-existing database key into the private key file on first use", async () => {
     const preExistingKeyHex = "b".repeat(64);
     await db
       .insert(systemConfig)
@@ -107,7 +126,10 @@ describe("credential-crypto", () => {
       .select()
       .from(systemConfig)
       .where(eq(systemConfig.key, "app_encryption_material"));
-    expect(row?.value).toBe(preExistingKeyHex);
+    expect(row).toBeUndefined();
+    expect(await readFile(path.join(keyDirectory, "secrets", "credentials.key"), "utf8")).toBe(
+      preExistingKeyHex
+    );
     expect(await decryptCredential(ciphertext)).toBe("value-under-preexisting-key");
   });
 

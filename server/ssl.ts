@@ -1,6 +1,7 @@
 import forge from "node-forge";
 import fs from "fs";
 import path from "path";
+import { randomUUID } from "node:crypto";
 import { configLoader } from "./config-loader.js";
 import { assertWithinRoots } from "./path-security.js";
 
@@ -14,8 +15,18 @@ export function createHttpsServerOptions(key: Buffer, cert: Buffer) {
 const SSL_DIR = path.join(configLoader.getConfigDir(), "ssl");
 
 export async function ensureSslDir() {
-  if (!fs.existsSync(SSL_DIR)) {
-    await mkdir(SSL_DIR, { recursive: true });
+  await mkdir(SSL_DIR, { recursive: true, mode: 0o700 });
+  if (process.platform !== "win32") await fs.promises.chmod(SSL_DIR, 0o700);
+}
+
+export async function writePrivateKeyFile(keyPath: string, content: string): Promise<void> {
+  const handle = await fs.promises.open(keyPath, "wx", 0o600);
+  try {
+    await handle.writeFile(content, "utf8");
+    await handle.chmod(0o600);
+    await handle.sync();
+  } finally {
+    await handle.close();
   }
 }
 
@@ -66,11 +77,12 @@ export async function generateSelfSignedCert() {
   const pemKey = forge.pki.privateKeyToPem(keys.privateKey);
   const pemCert = forge.pki.certificateToPem(cert);
 
-  const keyPath = path.join(SSL_DIR, "server.key");
-  const certPath = path.join(SSL_DIR, "server.crt");
+  const certificateId = randomUUID();
+  const keyPath = path.join(SSL_DIR, `server-${certificateId}.key`);
+  const certPath = path.join(SSL_DIR, `server-${certificateId}.crt`);
 
-  await writeFile(keyPath, pemKey);
-  await writeFile(certPath, pemCert);
+  await writePrivateKeyFile(keyPath, pemKey);
+  await writeFile(certPath, pemCert, { flag: "wx", mode: 0o644 });
 
   return {
     keyPath,

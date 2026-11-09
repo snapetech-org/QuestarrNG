@@ -17,6 +17,7 @@ import { rssService } from "./rss.js";
 import { nexusmodsClient } from "./nexusmods.js";
 import { appriseClient, readAppriseSettings } from "./apprise.js";
 import { storage } from "./storage.js";
+import { getCredentialsEncryptionKey } from "./credential-crypto.js";
 import { platformMappingService } from "./services/index.js";
 import { reportServerError } from "./error-telemetry.js";
 import { logger } from "./logger.js";
@@ -56,6 +57,9 @@ void (async () => {
   try {
     // Ensure database is ready before starting server
     await ensureDatabase();
+    // Migrate any legacy database-stored credential key before accepting requests.
+    // This also fails startup when a shared PostgreSQL deployment lacks its common key.
+    await getCredentialsEncryptionKey();
     const recoveredSeerrOperations = await storage.recoverSeerrOperations();
     if (recoveredSeerrOperations > 0) {
       log(
@@ -128,67 +132,89 @@ void (async () => {
     const { port, host } = config.server;
     const { ssl } = config;
 
-    // Start HTTP server
-    server.listen(port, host, () => {
-      log(`HTTP server serving on ${host}:${port}`);
-    });
+    // When HTTP-to-HTTPS redirect is requested, validate and bind HTTPS before
+    // exposing the HTTP listener. A broken certificate or port conflict must
+    // not leave the app unexpectedly available over plaintext.
+    if (ssl.enabled && ssl.redirectHttp) {
+      if (!ssl.certPath || !ssl.keyPath) {
+        throw new Error("HTTPS redirect is enabled but certificate/key paths are missing");
+      }
+      const { createHttpsServerOptions, validateCertFiles } = await import("./ssl.js");
+      const { valid, error } = await validateCertFiles(ssl.certPath, ssl.keyPath);
+      if (!valid) {
+        throw new Error(`HTTPS redirect is enabled but TLS configuration is invalid: ${error}`);
+      }
 
-    // Start HTTPS server if enabled
-    if (ssl.enabled && ssl.certPath && ssl.keyPath) {
+      const httpsOptions = createHttpsServerOptions(
+        await fs.promises.readFile(ssl.keyPath),
+        await fs.promises.readFile(ssl.certPath)
+      );
+      const httpsServer = https.createServer(httpsOptions, rootRequestHandler ?? app);
+      setupSocketIO(httpsServer);
+      await new Promise<void>((resolve, reject) => {
+        const onError = (error: Error) => reject(error);
+        httpsServer.once("error", onError);
+        httpsServer.listen(ssl.port, host, () => {
+          httpsServer.off("error", onError);
+          resolve();
+        });
+      });
+      httpsServer.on("error", (error) => {
+        log("HTTPS server error: " + String(error));
+      });
+      httpsRedirectPort = ssl.port;
+      log(`HTTPS server serving on ${host}:${ssl.port}`);
+    } else if (ssl.enabled && ssl.certPath && ssl.keyPath) {
       try {
-        // Validate certs before attempting to start
         const { createHttpsServerOptions, validateCertFiles } = await import("./ssl.js");
         const { valid, error } = await validateCertFiles(ssl.certPath, ssl.keyPath);
-
         if (!valid) {
-          log(`⚠️ SSL Configuration Invalid: ${error}. Starting in HTTP-only mode.`);
-          // Skip HTTPS setup
+          log(`SSL Configuration Invalid: ${error}. HTTPS was not started.`);
         } else {
           const httpsOptions = createHttpsServerOptions(
             await fs.promises.readFile(ssl.keyPath),
             await fs.promises.readFile(ssl.certPath)
           );
-
           const httpsServer = https.createServer(httpsOptions, rootRequestHandler ?? app);
-
-          // Setup Socket.IO for HTTPS server as well
           setupSocketIO(httpsServer);
-
-          // A port clash surfaces as an async "error" event, not a throw, so
-          // the catch below never sees it. Log it and leave HTTP serving.
           httpsServer.on("error", (error) => {
             log("Failed to start HTTPS server: " + String(error));
           });
-
           httpsServer.listen(ssl.port, host, () => {
             log(`HTTPS server serving on ${host}:${ssl.port}`);
-            // Only redirect once HTTPS is actually listening, so a listener
-            // that fails to bind never locks users out of the HTTP one.
-            if (ssl.redirectHttp) {
-              httpsRedirectPort = ssl.port;
-            }
           });
         }
       } catch (error) {
         log("Failed to start HTTPS server: " + String(error));
-        // Fallback or just log error, HTTP server is already running
       }
     }
 
+    server.listen(port, host, () => {
+      log(`HTTP server serving on ${host}:${port}`);
+    });
+
     // Log non-sensitive config
     log("Server initialized with configuration:");
-    const safeConfig = { ...config };
-    // Redact sensitive info
-    if (safeConfig.auth) {
-      safeConfig.auth = { ...safeConfig.auth, jwtSecret: "***REDACTED***" };
-    }
-    if (safeConfig.igdb) {
-      safeConfig.igdb = {
-        ...safeConfig.igdb,
-        clientId: safeConfig.igdb.clientId ? "***REDACTED***" : undefined,
-        clientSecret: safeConfig.igdb.clientSecret ? "***REDACTED***" : undefined,
-      };
-    }
+    // Log only the operational fields needed to diagnose listener setup. A
+    // shallow copy of config can leak newly-added secrets (OIDC, database,
+    // credential-encryption keys) whenever the config schema grows.
+    const safeConfig = {
+      server: {
+        host: config.server.host,
+        port: config.server.port,
+        basePath: config.server.basePath,
+      },
+      ssl: {
+        enabled: config.ssl.enabled,
+        port: config.ssl.port,
+        redirectHttp: config.ssl.redirectHttp,
+      },
+      database: { dialect: config.database.dialect },
+      integrations: {
+        oidcEnabled: Boolean(config.auth.oidc.clientSecret),
+        igdbEnabled: Boolean(config.igdb.clientSecret),
+      },
+    };
     log(JSON.stringify(safeConfig, null, 2));
 
     if (ssl.enabled && ssl.redirectHttp) {

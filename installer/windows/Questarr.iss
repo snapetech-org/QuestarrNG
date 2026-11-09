@@ -49,13 +49,12 @@ CloseApplications=no
 ; default %ProgramData% ACL, which grants BUILTIN\Users Create Files/Write
 ; Data. The service reads every key out of config.env (which lives directly
 ; under {commonappdata}\Questarr) into the Node child process's environment
-; and runs as LocalSystem, so if a standard user could write that file they
-; could set e.g. NODE_OPTIONS=--require <payload> and get code execution at
-; LocalSystem privilege on the next service start. Administrators/SYSTEM
-; always get Full Control regardless of what's listed here; only the root
-; and \data directories are restricted to admins/SYSTEM-only, since neither
-; needs to be touched by a non-admin user. \logs keeps read access for
-; standard users so the "Questarr Logs" Start Menu shortcut still works.
+; and runs as the restricted LocalService account. A standard user must not
+; write config.env, since that could set NODE_OPTIONS=--require <payload> for
+; the service process. Administrators/SYSTEM keep Full Control; the service
+; receives read access to its config and modify access only to data/logs.
+; \logs keeps read access for standard users so the "Questarr Logs" shortcut
+; still works.
 Name: "{commonappdata}\Questarr"; Permissions: admins-full system-full
 Name: "{commonappdata}\Questarr\data"; Permissions: admins-full system-full
 Name: "{commonappdata}\Questarr\logs"; Permissions: admins-full system-full users-readexec
@@ -87,9 +86,13 @@ Name: "{group}\Uninstall Questarr"; Filename: "{uninstallexe}"
 ; across upgrades/repairs, where the junction from a previous install is
 ; already in place.
 Filename: "{cmd}"; Parameters: "/c if not exist ""{app}\data"" mklink /J ""{app}\data"" ""{commonappdata}\Questarr\data"""; Flags: runhidden waituntilterminated; StatusMsg: "Linking Questarr data directory..."
+Filename: "{sys}\icacls.exe"; Parameters: """{commonappdata}\Questarr"" /grant ""NT AUTHORITY\LOCAL SERVICE:(OI)(CI)(RX)"""; Flags: runhidden waituntilterminated; StatusMsg: "Granting Questarr service access to its configuration..."
+Filename: "{sys}\icacls.exe"; Parameters: """{commonappdata}\Questarr\data"" /grant ""NT AUTHORITY\LOCAL SERVICE:(OI)(CI)M"""; Flags: runhidden waituntilterminated; StatusMsg: "Granting Questarr service access to its data..."
+Filename: "{sys}\icacls.exe"; Parameters: """{commonappdata}\Questarr\logs"" /grant ""NT AUTHORITY\LOCAL SERVICE:(OI)(CI)M"""; Flags: runhidden waituntilterminated; StatusMsg: "Granting Questarr service access to its logs..."
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Questarr"""; Flags: runhidden waituntilterminated; StatusMsg: "Refreshing Windows Firewall rule..."
 Filename: "{sys}\netsh.exe"; Parameters: "advfirewall firewall add rule name=""Questarr"" dir=in action=allow program=""{app}\bin\node.exe"" enable=yes"; Flags: runhidden waituntilterminated; StatusMsg: "Adding Windows Firewall rule..."
 Filename: "{sys}\sc.exe"; Parameters: "create Questarr binPath= ""{app}\Questarr.Service.exe"" start= auto DisplayName= ""Questarr"""; Flags: runhidden waituntilterminated; StatusMsg: "Installing Questarr service..."
+Filename: "{sys}\sc.exe"; Parameters: "config Questarr obj= ""NT AUTHORITY\LocalService"" password= """""; Flags: runhidden waituntilterminated; StatusMsg: "Restricting Questarr service permissions..."
 Filename: "{sys}\sc.exe"; Parameters: "config Questarr binPath= ""{app}\Questarr.Service.exe"" start= auto"; Flags: runhidden waituntilterminated; StatusMsg: "Updating Questarr service..."
 Filename: "{sys}\sc.exe"; Parameters: "description Questarr ""Questarr video game management service"""; Flags: runhidden waituntilterminated
 Filename: "{sys}\sc.exe"; Parameters: "failure Questarr reset= 86400 actions= restart/60000/restart/60000/""""/60000"; Flags: runhidden waituntilterminated

@@ -95,6 +95,7 @@ export class ProwlarrClient {
       }
 
       const response = await safeFetch(apiUrl, {
+        allowPrivate: true,
         headers: {
           "X-Api-Key": apiKey,
           "User-Agent": "Questarr/1.0",

@@ -734,6 +734,7 @@ export class TransmissionClient implements DownloaderClient {
     // URL to stay HTTPS through any redirect whenever it started out HTTPS, so a
     // compromised or MITM'd Transmission can't bounce the credential to a plaintext hop.
     const response = await safeFetch(url, {
+      allowPrivate: true,
       method: "POST",
       headers,
       body: JSON.stringify(body),
@@ -753,6 +754,7 @@ export class TransmissionClient implements DownloaderClient {
 
         // Retry with session ID
         const retryResponse = await safeFetch(url, {
+          allowPrivate: true,
           method: "POST",
           headers,
           body: JSON.stringify(body),

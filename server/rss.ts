@@ -91,7 +91,10 @@ export class RssService {
     rssLogger.debug(`Fetching feed: ${feed.name} (${feed.url})`);
 
     // Use safeFetch instead of directly parsing the URL to prevent DNS rebinding
-    const response = await safeFetch(feed.url);
+    const response = await safeFetch(feed.url, {
+      allowPrivate: true,
+      maxResponseBytes: 10 * 1024 * 1024,
+    });
     if (!response.ok) {
       throw new Error(`Failed to fetch feed: ${response.statusText}`);
     }

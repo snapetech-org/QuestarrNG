@@ -235,6 +235,7 @@ export class NZBGetClient implements DownloaderClient {
     // MITM'd NZBGet could otherwise bounce the credential-bearing request body to a
     // plaintext endpoint mid-flight (a 307/308 redirect preserves the POST body as-is).
     const response = await safeFetch(url, {
+      allowPrivate: true,
       method: "POST",
       headers,
       body: xmlBody,
@@ -321,7 +322,7 @@ export class NZBGetClient implements DownloaderClient {
 
       // Keep &file= intact — Prowlarr uses it for link validation.
       const nzbUrl = fixNzbUrlEncoding(request.url);
-      const nzbResponse = await safeFetch(nzbUrl);
+      const nzbResponse = await safeFetch(nzbUrl, { maxResponseBytes: 50 * 1024 * 1024 });
       if (!nzbResponse.ok) {
         return { success: false, message: `Failed to fetch NZB: ${nzbResponse.statusText}` };
       }

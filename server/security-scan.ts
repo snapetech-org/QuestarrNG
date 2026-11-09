@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import net from "node:net";
+import { opendir } from "node:fs/promises";
 import path from "node:path";
 import fs from "fs-extra";
 import { logger } from "./logger.js";
@@ -24,6 +25,9 @@ export const CLAMAV_TOTAL_SCAN_BUDGET_MS = 30 * 60 * 1000;
 // normal download is always scanned in full; past it, the import is held for
 // manual review rather than quarantined.
 export const MAX_CLAMAV_SCAN_FILES = 10_000;
+const MAX_CLAMAV_SCAN_ENTRIES = 100_000;
+const MAX_CLAMAV_SCAN_DEPTH = 128;
+const CLAMAV_ENUMERATION_TIMEOUT_MS = 30_000;
 
 export interface VirusTotalSettings {
   enabled: boolean;
@@ -118,27 +122,15 @@ export async function computeFileSha256(filePath: string): Promise<string> {
  * "the downloaded archive or primary installer executable".
  */
 async function resolvePrimaryFile(localPath: string): Promise<string | null> {
-  const stat = await fs.stat(localPath).catch(() => null);
-  if (!stat) return null;
-  if (stat.isFile()) return localPath;
-  if (!stat.isDirectory()) return null;
-
+  const listing = await listAllFiles(localPath);
+  if (listing.truncated || listing.incomplete) return null;
   let largest: { file: string; size: number } | null = null;
-  const walk = async (dir: string): Promise<void> => {
-    const entries = await fs.readdir(dir, { withFileTypes: true }).catch(() => []);
-    for (const entry of entries) {
-      const entryPath = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        await walk(entryPath);
-      } else if (entry.isFile()) {
-        const entryStat = await fs.stat(entryPath).catch(() => null);
-        if (entryStat && (!largest || entryStat.size > largest.size)) {
-          largest = { file: entryPath, size: entryStat.size };
-        }
-      }
+  for (const file of listing.files) {
+    const entryStat = await fs.stat(file).catch(() => null);
+    if (entryStat && (!largest || entryStat.size > largest.size)) {
+      largest = { file, size: entryStat.size };
     }
-  };
-  await walk(localPath);
+  }
   return largest ? (largest as { file: string; size: number }).file : null;
 }
 
@@ -156,10 +148,8 @@ function isMissingPathError(error: unknown): boolean {
   return (error as NodeJS.ErrnoException | null)?.code === "ENOENT";
 }
 
-// Enumerates one file beyond the scan cap so a directory with exactly
-// MAX_CLAMAV_SCAN_FILES entries can be told apart from one that actually had
-// more — the latter must be reported as truncated so the caller can refuse to
-// treat a partially-scanned directory as clean.
+// Enumerates one file beyond the scan cap and also caps directory entries,
+// nesting, and elapsed time. Empty-directory trees count toward the budget too.
 async function listAllFiles(localPath: string): Promise<ListAllFilesResult> {
   let stat;
   try {
@@ -178,34 +168,62 @@ async function listAllFiles(localPath: string): Promise<ListAllFilesResult> {
   const enumerationLimit = MAX_CLAMAV_SCAN_FILES + 1;
   const files: string[] = [];
   let incomplete = false;
-  const walk = async (dir: string): Promise<void> => {
-    if (files.length >= enumerationLimit) return;
-    let entries;
+  let truncated = false;
+  let visitedEntries = 0;
+  const startedAt = Date.now();
+  const stack: Array<{ dir: string; depth: number }> = [{ dir: localPath, depth: 0 }];
+  while (stack.length > 0) {
+    if (Date.now() - startedAt > CLAMAV_ENUMERATION_TIMEOUT_MS) {
+      truncated = true;
+      break;
+    }
+    const { dir, depth } = stack.pop()!;
+    let directory;
     try {
-      entries = await fs.readdir(dir, { withFileTypes: true });
+      directory = await opendir(dir);
     } catch (error) {
-      if (isMissingPathError(error)) return;
+      if (isMissingPathError(error)) continue;
       securityScanLogger.warn(
         { error, dir },
         "Could not enumerate directory; treating scan as incomplete"
       );
       incomplete = true;
-      return;
+      continue;
     }
-    for (const entry of entries) {
-      if (files.length >= enumerationLimit) return;
+    for await (const entry of directory) {
+      if (Date.now() - startedAt > CLAMAV_ENUMERATION_TIMEOUT_MS) {
+        truncated = true;
+        break;
+      }
+      visitedEntries += 1;
+      if (visitedEntries > MAX_CLAMAV_SCAN_ENTRIES) {
+        truncated = true;
+        break;
+      }
+      if (files.length >= enumerationLimit) {
+        truncated = true;
+        break;
+      }
       const entryPath = path.join(dir, entry.name);
+      if (entry.isSymbolicLink()) {
+        incomplete = true;
+        continue;
+      }
       if (entry.isDirectory()) {
-        await walk(entryPath);
+        if (depth >= MAX_CLAMAV_SCAN_DEPTH) {
+          truncated = true;
+          break;
+        }
+        stack.push({ dir: entryPath, depth: depth + 1 });
       } else if (entry.isFile()) {
         files.push(entryPath);
       }
     }
-  };
-  await walk(localPath);
+    if (truncated) break;
+  }
   return {
     files: files.slice(0, MAX_CLAMAV_SCAN_FILES),
-    truncated: files.length > MAX_CLAMAV_SCAN_FILES,
+    truncated: truncated || files.length > MAX_CLAMAV_SCAN_FILES,
     incomplete,
   };
 }
@@ -374,39 +392,59 @@ export interface SecurityScanServiceDeps {
 }
 
 /**
- * Orchestrates the pre-import security scan: an optional VirusTotal hash lookup
- * followed by an optional local ClamAV deep scan. VirusTotal fails open on
- * network/timeout errors. Only an actual detection, or an unknown hash under a
- * strict "block unknown hashes" policy, blocks the import. When ClamAV cannot
- * scan every file (outage, refused file, file cap, time budget), the result is
- * incomplete: not blocked, but held for the user to review.
+ * Orchestrates the pre-import security scan. Incomplete scans are held for
+ * review, and an enabled strict VirusTotal policy blocks unknown or failed
+ * lookups. Directory downloads are not considered clean from a single VT hash;
+ * ClamAV must scan the full tree or the user must review it.
  */
 export class SecurityScanService {
   constructor(private readonly storage: SecurityScanServiceDeps) {}
 
   async scan(localPath: string): Promise<ScanResult> {
     const vtResult = await this.runVirusTotalCheck(localPath);
-    if (vtResult) return vtResult;
+    if (vtResult?.blocked) return vtResult;
 
     const clamAvResult = await this.runClamAvCheck(localPath);
-    if (clamAvResult) return clamAvResult;
+    if (clamAvResult?.blocked || clamAvResult?.incomplete) return clamAvResult;
+    if (clamAvResult) return { blocked: false, source: "clamav" };
+    if (vtResult) return vtResult;
 
-    return { blocked: false };
+    return {
+      blocked: false,
+      incomplete: true,
+      reason: "No malware scanner is enabled. Review this download before importing it.",
+    };
   }
 
-  /** Returns a blocking ScanResult, or null when VirusTotal is disabled or found nothing blocking. */
+  /** Returns a scan result, or null when VirusTotal is disabled. */
   private async runVirusTotalCheck(localPath: string): Promise<ScanResult | null> {
     const vtSettings = await readVirusTotalSettings(this.storage);
     if (!vtSettings.enabled || !vtSettings.apiKey) return null;
 
     const primaryFile = await resolvePrimaryFile(localPath);
-    if (!primaryFile) return null;
+    if (!primaryFile) {
+      return {
+        blocked: false,
+        incomplete: true,
+        source: "virustotal",
+        reason: "Could not select a file to check with VirusTotal. Review it before importing.",
+      };
+    }
 
     const hash = await computeFileSha256(primaryFile).catch((err) => {
       securityScanLogger.warn({ err, primaryFile }, "Failed to hash file for VirusTotal");
       return null;
     });
-    if (!hash) return null;
+    if (!hash) {
+      return {
+        blocked: vtSettings.blockUnknownHashes,
+        incomplete: !vtSettings.blockUnknownHashes,
+        source: "virustotal",
+        reason: vtSettings.blockUnknownHashes
+          ? "VirusTotal could not verify this file and strict unknown-hash blocking is enabled."
+          : "VirusTotal could not verify this file. Review it before importing.",
+      };
+    }
 
     const verdict = await checkVirusTotalHash(hash, vtSettings.apiKey);
     if (verdict.status === "flagged" && verdict.positives > vtSettings.threshold) {
@@ -423,14 +461,15 @@ export class SecurityScanService {
         { hash },
         "Hash not found on VirusTotal (Unknown File). Proceeding based on user security tolerance."
       );
-      if (vtSettings.blockUnknownHashes) {
-        return {
-          blocked: true,
-          source: "virustotal",
-          hash,
-          reason: "Hash not found on VirusTotal and 'Block unknown hashes' is enabled",
-        };
-      }
+      return {
+        blocked: vtSettings.blockUnknownHashes,
+        incomplete: !vtSettings.blockUnknownHashes,
+        source: "virustotal",
+        hash,
+        reason: vtSettings.blockUnknownHashes
+          ? "Hash not found on VirusTotal and 'Block unknown hashes' is enabled"
+          : "Hash not found on VirusTotal. Review it before importing.",
+      };
     }
 
     if (verdict.status === "error") {
@@ -438,9 +477,29 @@ export class SecurityScanService {
         { hash, error: verdict.error },
         "VirusTotal lookup failed, proceeding without a verdict"
       );
+      return {
+        blocked: vtSettings.blockUnknownHashes,
+        incomplete: !vtSettings.blockUnknownHashes,
+        source: "virustotal",
+        hash,
+        reason: vtSettings.blockUnknownHashes
+          ? "VirusTotal lookup failed and strict unknown-hash blocking is enabled."
+          : "VirusTotal lookup failed. Review it before importing.",
+      };
     }
 
-    return null;
+    const listing = await listAllFiles(localPath);
+    if (listing.truncated || listing.incomplete || listing.files.length > 1) {
+      return {
+        blocked: false,
+        incomplete: true,
+        source: "virustotal",
+        hash,
+        reason:
+          "VirusTotal checked only the primary file; enable ClamAV or review the remaining files before importing.",
+      };
+    }
+    return { blocked: false, source: "virustotal", hash };
   }
 
   /**
@@ -552,6 +611,6 @@ export class SecurityScanService {
       };
     }
 
-    return null;
+    return { blocked: false, source: "clamav" };
   }
 }

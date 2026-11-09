@@ -224,10 +224,10 @@ internal sealed class QuestarrWorker : BackgroundService
     // The full set of environment variables Questarr itself reads, per
     // .env.example. config.env is meant for exactly these - the service
     // otherwise copies every parsed key straight into the Node child
-    // process's environment, and it runs as LocalSystem, so an allowlist
+    // process's environment, and it runs as LocalService, so an allowlist
     // here (rather than trusting whatever keys happen to be in the file) is
     // what stops a key like NODE_OPTIONS from being used to get arbitrary
-    // code execution at LocalSystem privilege on the next service start.
+    // code execution with the service's restricted LocalService privileges.
     private static readonly HashSet<string> AllowedConfigKeys = new(StringComparer.OrdinalIgnoreCase)
     {
         "JWT_SECRET",

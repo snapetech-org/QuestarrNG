@@ -118,7 +118,9 @@ import {
   authenticateToken,
   optionalAuthenticateToken,
   authenticateApiKeyOrToken,
+  revokeUserSessions,
 } from "./auth.js";
+import { disconnectUserSockets } from "./socket.js";
 import { setAuthCookies, clearAuthCookies, csrfProtection } from "./security.js";
 import { registerOidcAuthRoutes } from "./oidc-auth.js";
 import { nexusmodsClient } from "./nexusmods.js";
@@ -149,6 +151,7 @@ const EICAR_TEST_FILE_SHA256 = "275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2
 import net from "node:net";
 import multer from "multer";
 import path from "path";
+import { randomUUID } from "node:crypto";
 import fs from "fs";
 import fsExtra from "fs-extra";
 import { getLogFilePath, readLastLogLines } from "./log-file.js";
@@ -216,9 +219,9 @@ function isIntegrationApiRequest(req: Request): boolean {
 // but should still pick up req.user/req.authSource when the token IS valid
 // (so e.g. csrfProtection still enforces the CSRF check for a cookie-backed
 // caller). Logout is the motivating case: JWTs are stateless, so the only
-// server-side effect is clearing the auth/CSRF cookies, and a user stuck
-// with an expired cookie must still be able to do that -- hard-rejecting
-// the request at the boundary would leave the stale cookies in the browser.
+// server-side effect is revoking the session and clearing the auth/CSRF
+// cookies, and a user stuck with an expired cookie must still be able to
+// clear it -- hard-rejecting the request would leave stale cookies behind.
 const SOFT_AUTH_API_ROUTES = new Set<string>(["POST /auth/logout"]);
 
 function isSoftAuthApiRequest(req: Request): boolean {
@@ -899,6 +902,16 @@ function registerIgdbParamListRoute(
  * @param app - The Express application to configure
  * @returns The configured HTTP server
  */
+const publicCreateGameSchema = insertGameSchema
+  .omit({
+    seerrExternalRequestId: true,
+    seerrVariant: true,
+    seerrCancelled: true,
+    seerrDispatching: true,
+    seerrRecoveryRequired: true,
+  })
+  .safeExtend({ userId: z.string().optional() });
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // 🛡️ Sentinel: Add security headers with Helmet
   // Configured to allow Vite/React (unsafe-inline/eval) in dev, and IGDB images everywhere
@@ -1240,17 +1253,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ id: user.id, username: user.username, steamId64: user.steamId64 });
   });
 
-  // Logout must be idempotent: an expired/invalid/missing session cookie
-  // must still be cleared, otherwise the browser keeps a stale cookie
-  // forever. It's a SOFT_AUTH_API_ROUTES entry (see requireAuthenticationForApi
-  // above), which already ran optionalAuthenticateToken for this request --
-  // req.authSource is populated when a valid cookie is present, so
-  // csrfProtection (mounted before route registration) still enforces the
-  // CSRF check for cookie-authenticated callers. JWTs are stateless, so
-  // there's nothing to invalidate server-side beyond clearing the cookies.
-  app.post("/api/auth/logout", (req, res) => {
+  // Logout remains idempotent for expired/missing cookies, but a valid token is
+  // also revoked so it cannot be replayed after the browser clears its cookie.
+  app.post("/api/auth/logout", async (req, res) => {
+    let revokeFailed = false;
+    if (req.user) {
+      try {
+        await revokeUserSessions(req.user.id);
+        disconnectUserSockets(req.user.id);
+      } catch (error) {
+        revokeFailed = true;
+        routesLogger.error({ error, userId: req.user.id }, "Failed to revoke session at logout");
+      }
+    }
     clearAuthCookies(req, res);
-    res.json({ success: true });
+    if (revokeFailed) {
+      return res.status(503).json({ error: "Session could not be revoked; sign in again later" });
+    }
+    return res.json({ success: true });
   });
 
   app.patch(
@@ -1272,6 +1292,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(401).json({ error: "Incorrect current password" });
         }
 
+        // Revoke existing JWTs before changing the password. If persistence
+        // fails, do not report a successful password change with live sessions.
+        await revokeUserSessions(userId);
+        disconnectUserSockets(userId);
         const newPasswordHash = await hashPassword(newPassword);
         await storage.updateUserPassword(userId, newPasswordHash);
 
@@ -1345,6 +1369,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     async (req, res) => {
       try {
         const { enabled, port, certPath, keyPath, redirectHttp } = req.body;
+        const current = configLoader.getSslConfig();
 
         // Basic validation
         if (typeof enabled !== "boolean")
@@ -1358,17 +1383,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ) {
           return res.status(400).json({ error: "Invalid certificate or key path" });
         }
+        if (
+          (certPath !== undefined && !certPath.trim()) ||
+          (keyPath !== undefined && !keyPath.trim())
+        ) {
+          return res.status(400).json({ error: "Certificate and key paths cannot be empty" });
+        }
 
         // Canonicalize both paths and confine them to the configured file browser
         // root or Questarr's private SSL directory.
         let resolvedCertPath: string | undefined;
         let resolvedKeyPath: string | undefined;
-        if (certPath || keyPath) {
+        if (certPath !== undefined || keyPath !== undefined) {
           const allowedSslRoots = [
             FILE_BROWSER_ROOT,
             path.join(configLoader.getConfigDir(), "ssl"),
           ];
-          if (certPath) {
+          if (certPath !== undefined) {
             try {
               resolvedCertPath = await assertWithinRoots(
                 certPath,
@@ -1379,7 +1410,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               return res.status(403).json({ error: "Access to cert path is not allowed" });
             }
           }
-          if (keyPath) {
+          if (keyPath !== undefined) {
             try {
               resolvedKeyPath = await assertWithinRoots(
                 keyPath,
@@ -1392,50 +1423,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
 
-        // Validate if enabling SSL
         if (enabled) {
-          if (certPath && keyPath) {
-            // Validate the same canonical paths that were checked above and get saved below.
-            const { validateCertFiles } = await import("./ssl.js"); // Dynamic import to avoid circular deps if any
-            const { valid, error } = await validateCertFiles(
-              resolvedCertPath ?? certPath,
-              resolvedKeyPath ?? keyPath
-            );
-            if (!valid) {
-              return res.status(400).json({ error: `Invalid SSL configuration: ${error}` });
-            }
-          } else {
-            // If enabling but paths not provided in body, check if they exist in current config or are being set?
-            // Actually, if they are undefined in body, we might be keeping existing ones.
-            // But simpler to just require them if they are changing.
-            // If they are missing in body, let's look up current config
-            const current = configLoader.getSslConfig();
-            // current.certPath/keyPath were already root-contained when they were saved,
-            // so only the newly supplied (resolved) values need the same treatment here.
-            const effectiveCert = certPath ? resolvedCertPath : current.certPath;
-            const effectiveKey = keyPath ? resolvedKeyPath : current.keyPath;
+          const effectiveCert = certPath === undefined ? current.certPath : resolvedCertPath;
+          const effectiveKey = keyPath === undefined ? current.keyPath : resolvedKeyPath;
+          if (!effectiveCert || !effectiveKey) {
+            return res
+              .status(400)
+              .json({ error: "Certificate and key paths are required to enable SSL" });
+          }
 
-            if (!effectiveCert || !effectiveKey) {
-              return res
-                .status(400)
-                .json({ error: "Certificate and key paths are required to enable SSL" });
-            }
-
-            const { validateCertFiles } = await import("./ssl.js");
-            const { valid, error } = await validateCertFiles(effectiveCert, effectiveKey);
-            if (!valid) {
-              return res.status(400).json({ error: `Invalid SSL configuration: ${error}` });
-            }
+          const { validateCertFiles } = await import("./ssl.js");
+          const { valid, error } = await validateCertFiles(effectiveCert, effectiveKey);
+          if (!valid) {
+            return res.status(400).json({ error: `Invalid SSL configuration: ${error}` });
           }
         }
 
         await configLoader.saveConfig({
           ssl: {
+            ...current,
             enabled,
             port,
-            certPath: resolvedCertPath,
-            keyPath: resolvedKeyPath,
-            redirectHttp,
+            certPath: certPath === undefined ? current.certPath : resolvedCertPath,
+            keyPath: keyPath === undefined ? current.keyPath : resolvedKeyPath,
+            redirectHttp: redirectHttp ?? current.redirectHttp,
           },
         });
 
@@ -1487,6 +1498,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       { name: "key", maxCount: 1 },
     ]),
     async (req, res) => {
+      let candidateDirectory: string | null = null;
       try {
         const files = req.files as { [fieldname: string]: Express.Multer.File[] };
         const certFile = files["cert"]?.[0];
@@ -1502,8 +1514,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await ensureSslDir();
 
         const sslDir = path.join(configLoader.getConfigDir(), "ssl");
-        const certPath = path.join(sslDir, "uploaded.crt");
-        const keyPath = path.join(sslDir, "uploaded.key");
+        candidateDirectory = await fs.promises.mkdtemp(path.join(sslDir, ".upload-"));
+        let certPath = path.join(candidateDirectory, "uploaded.crt");
+        let keyPath = path.join(candidateDirectory, "uploaded.key");
 
         // Simple validation: Check if they look like PEM files
         const certContent = certFile.buffer.toString("utf8");
@@ -1516,19 +1529,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(400).json({ error: "Invalid private key file format (PEM expected)" });
         }
 
-        await fs.promises.writeFile(certPath, certContent);
-        await fs.promises.writeFile(keyPath, keyContent);
+        await fs.promises.writeFile(certPath, certContent, { flag: "wx", mode: 0o644 });
+        const { writePrivateKeyFile } = await import("./ssl.js");
+        await writePrivateKeyFile(keyPath, keyContent);
 
         // Validate the uploaded files specifically
         const { validateCertFiles } = await import("./ssl.js");
         const { valid, error } = await validateCertFiles(certPath, keyPath);
 
         if (!valid) {
-          // Cleanup invalid files
-          await fs.promises.unlink(certPath).catch(() => {});
-          await fs.promises.unlink(keyPath).catch(() => {});
           return res.status(400).json({ error: `Uploaded certificate/key are invalid: ${error}` });
         }
+
+        // Publish an immutable, validated pair. Never overwrite the currently
+        // configured files before the new certificate and key have both passed
+        // validation, so a bad upload cannot destroy the active TLS identity.
+        const publishedDirectory = path.join(sslDir, `uploaded-${randomUUID()}`);
+        await fs.promises.rename(candidateDirectory, publishedDirectory);
+        candidateDirectory = publishedDirectory;
+        certPath = path.join(publishedDirectory, "uploaded.crt");
+        keyPath = path.join(publishedDirectory, "uploaded.key");
 
         // Update config to use uploaded files
         const currentSsl = configLoader.getSslConfig();
@@ -1539,6 +1559,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             keyPath,
           },
         });
+        candidateDirectory = null;
 
         routesLogger.info("Uploaded SSL certificate and key");
         return res.json({
@@ -1550,6 +1571,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (error) {
         routesLogger.error({ error }, "Failed to upload certificate");
         return res.status(500).json({ error: "Failed to upload certificate" });
+      } finally {
+        if (candidateDirectory) {
+          await fs.promises
+            .rm(candidateDirectory, { recursive: true, force: true })
+            .catch(() => {});
+        }
       }
     }
   );
@@ -2158,14 +2185,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     "/api/games",
     sensitiveEndpointLimiter,
     sanitizeGameData,
-    validate(insertGameSchema.safeExtend({ userId: z.string().optional() })),
+    validate(publicCreateGameSchema),
     validateRequest,
     async (req: Request, res: Response) => {
       try {
         routesLogger.debug({ body: req.body }, "received game data");
 
         const userId = req.user!.id;
-        const gameData = insertGameSchema.parse({ ...req.body, userId });
+        const gameData = publicCreateGameSchema.parse({ ...req.body, userId });
 
         const userGames = await storage.getUserGames(userId, true); // Check against all games including hidden
         const existingGame = userGames.find((g) =>
@@ -5364,7 +5391,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   return;
                 }
 
-                const response = await safeFetch(download.link, bundleFetchPolicy);
+                const response = await safeFetch(download.link, {
+                  ...bundleFetchPolicy,
+                  maxResponseBytes: 50 * 1024 * 1024,
+                });
                 if (response.ok) {
                   const buffer = await response.arrayBuffer();
                   // Try to detect if it's a usenet item based on title or link if downloadType not present

@@ -101,9 +101,22 @@ export async function comparePassword(password: string, hash: string) {
 
 export async function generateToken(user: User) {
   const secret = await getJwtSecret();
-  return jwt.sign({ id: user.id, username: user.username }, secret, {
+  const sessionVersion = (await storage.getSystemConfig(sessionVersionKey(user.id))) ?? "0";
+  return jwt.sign({ id: user.id, username: user.username, sessionVersion }, secret, {
     expiresIn: "7d",
   });
+}
+
+function sessionVersionKey(userId: string): string {
+  return `auth.session-version.${userId}`;
+}
+
+/** Revoke all JWTs issued for a user, across browser sessions and API clients. */
+export async function revokeUserSessions(userId: string): Promise<void> {
+  await storage.setSystemConfig(
+    sessionVersionKey(userId),
+    crypto.randomBytes(32).toString("base64url")
+  );
 }
 
 /**
@@ -142,7 +155,15 @@ function getRequestToken(req: Request): { token: string; source: "cookie" | "bea
 export async function verifyAuthToken(token: string): Promise<User | undefined> {
   try {
     const secret = await getJwtSecret();
-    const payload = jwt.verify(token, secret) as { id: string; username: string };
+    const payload = jwt.verify(token, secret) as {
+      id?: unknown;
+      sessionVersion?: unknown;
+    };
+    if (typeof payload.id !== "string" || typeof payload.sessionVersion !== "string") {
+      return undefined;
+    }
+    const currentVersion = (await storage.getSystemConfig(sessionVersionKey(payload.id))) ?? "0";
+    if (payload.sessionVersion !== currentVersion) return undefined;
     return await storage.getUser(payload.id);
   } catch {
     return undefined;
@@ -157,9 +178,7 @@ export async function optionalAuthenticateToken(req: Request, _res: Response, ne
   const requestToken = getRequestToken(req);
   if (requestToken) {
     try {
-      const secret = await getJwtSecret();
-      const payload = jwt.verify(requestToken.token, secret) as { id: string; username: string };
-      const user = await storage.getUser(payload.id);
+      const user = await verifyAuthToken(requestToken.token);
       if (user) {
         req.user = user;
         req.authSource = requestToken.source;
@@ -179,9 +198,7 @@ export async function authenticateToken(req: Request, res: Response, next: NextF
   }
 
   try {
-    const secret = await getJwtSecret();
-    const payload = jwt.verify(requestToken.token, secret) as { id: string; username: string };
-    const user = await storage.getUser(payload.id);
+    const user = await verifyAuthToken(requestToken.token);
 
     if (!user) {
       return res.status(401).json({ error: "User not found" });

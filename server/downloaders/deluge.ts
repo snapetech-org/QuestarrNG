@@ -811,6 +811,7 @@ export class DelugeClient implements DownloaderClient {
     // through any redirect whenever it started out HTTPS -- a compromised or MITM'd
     // Deluge could otherwise bounce the credential-bearing request to a plaintext hop.
     const response = await safeFetch(url, {
+      allowPrivate: true,
       method: "POST",
       headers,
       body: JSON.stringify(body),
