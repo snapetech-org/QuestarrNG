@@ -17,17 +17,17 @@ QuestarrNG’s audit verified that the represented behavior is present in the fo
 - [PR #5](https://github.com/Doezer/Questarr/pull/5) — “Filter client-side fields before POST to prevent sending database-generated fields,” opened upstream by [@Copilot](https://github.com/Copilot). Fork audit status: **verified**.
 - [issue #6](https://github.com/Doezer/Questarr/issues/6) — “✨ Set up Copilot instructions,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
 - [PR #7](https://github.com/Doezer/Questarr/pull/7) — “Add Copilot instructions file,” opened upstream by [@Copilot](https://github.com/Copilot). Fork audit status: **verified**.
-- [issue #8](https://github.com/Doezer/Questarr/issues/8) — “Configuration centralisÃ©e des variables dâ€™environnement,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
+- [issue #8](https://github.com/Doezer/Questarr/issues/8) — “Configuration centralisée des variables d’environnement,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
 - [issue #9](https://github.com/Doezer/Questarr/issues/9) — “Corriger/exclure composants d'exemples (erreurs tsc),” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
-- [issue #10](https://github.com/Doezer/Questarr/issues/10) — “Endpoint agrÃ©gÃ© multi-indexers,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
-- [issue #11](https://github.com/Doezer/Questarr/issues/11) — “Action Download depuis grille dÃ©couverte,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
+- [issue #10](https://github.com/Doezer/Questarr/issues/10) — “Endpoint agrégé multi-indexers,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
+- [issue #11](https://github.com/Doezer/Questarr/issues/11) — “Action Download depuis grille découverte,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
 - [issue #12](https://github.com/Doezer/Questarr/issues/12) — “Client qBittorrent minimal,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
-- [issue #13](https://github.com/Doezer/Questarr/issues/13) — “Validation centralisÃ©e req.body Zod,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
+- [issue #13](https://github.com/Doezer/Questarr/issues/13) — “Validation centralisée req.body Zod,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
 - [issue #14](https://github.com/Doezer/Questarr/issues/14) — “config.ts + validation env zod,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
 - [issue #15](https://github.com/Doezer/Questarr/issues/15) — “Middleware d'erreur global,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
 - [issue #16](https://github.com/Doezer/Questarr/issues/16) — “config.ts avec validation env,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
-- [issue #17](https://github.com/Doezer/Questarr/issues/17) — “Types DownloadStatus partagÃ©s,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
-- [issue #18](https://github.com/Doezer/Questarr/issues/18) — “Filtrer champs AddGame cÃ´tÃ© client,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
+- [issue #17](https://github.com/Doezer/Questarr/issues/17) — “Types DownloadStatus partagés,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
+- [issue #18](https://github.com/Doezer/Questarr/issues/18) — “Filtrer champs AddGame côté client,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
 - [issue #19](https://github.com/Doezer/Questarr/issues/19) — “Bouton Download sur resultats IGDB,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
 - [issue #20](https://github.com/Doezer/Questarr/issues/20) — “Details torrent (fichier, trackers),” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
 - [issue #21](https://github.com/Doezer/Questarr/issues/21) — “Historique / Completed downloads,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
@@ -50,7 +50,7 @@ QuestarrNG’s audit verified that the represented behavior is present in the fo
 - [issue #38](https://github.com/Doezer/Questarr/issues/38) — “Configuration centralisee des variables d'environnement,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
 - [issue #39](https://github.com/Doezer/Questarr/issues/39) — “Nettoyage dependances Neon/ws,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
 - [issue #40](https://github.com/Doezer/Questarr/issues/40) — “Resilience et verbosite de la recherche IGDB,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
-- [issue #41](https://github.com/Doezer/Questarr/issues/41) — “Endpoint de recherche agregÃ©e multi-indexers,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
+- [issue #41](https://github.com/Doezer/Questarr/issues/41) — “Endpoint de recherche agregée multi-indexers,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
 - [issue #42](https://github.com/Doezer/Questarr/issues/42) — “Bouton Download sur les cartes de decouverte,” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
 - [issue #43](https://github.com/Doezer/Questarr/issues/43) — “Client rtorrent/rutorrent (implementation minimale),” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
 - [issue #44](https://github.com/Doezer/Questarr/issues/44) — “Completed downloads — filtres et statuts enrichis (badges vitesse / ETA / ratio),” opened upstream by [@Doezer](https://github.com/Doezer). Fork audit status: **verified**.
