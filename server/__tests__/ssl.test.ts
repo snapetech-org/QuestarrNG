@@ -25,10 +25,12 @@ vi.mock("fs", () => ({
       chmod: vi.fn().mockResolvedValue(undefined),
       open: vi.fn().mockResolvedValue({
         writeFile: mocks.writeFile,
+        sync: vi.fn().mockResolvedValue(undefined),
         chmod: vi.fn().mockResolvedValue(undefined),
         close: vi.fn().mockResolvedValue(undefined),
       }),
       writeFile: mocks.writeFile,
+      sync: vi.fn().mockResolvedValue(undefined),
       readFile: mocks.readFile,
     },
   },

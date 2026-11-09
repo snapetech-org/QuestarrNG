@@ -112,8 +112,12 @@ async function defaultFetch(input: RequestInfo | URL): Promise<Response> {
 }
 
 describe("SettingsPage", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    const { apiRequest } = await import("@/lib/queryClient");
+    vi.mocked(apiRequest)
+      .mockReset()
+      .mockResolvedValue({ headers: { get: () => null }, json: async () => ({}) } as Response);
     setInterfaceLanguage("en");
     setRegionalPreference("system");
     globalThis.fetch = vi.fn(async (input: RequestInfo | URL) => {
@@ -444,7 +448,10 @@ describe("SettingsPage", () => {
       fireEvent.click(button);
       await waitFor(() => expect(mockToast).toHaveBeenCalled());
       const toast = mockToast.mock.calls.at(-1)?.[0];
-      expect(toast).toMatchObject({ title: "Apprise test failed", variant: "destructive" });
+      expect(toast).toMatchObject({
+        title: expectToastText("Apprise test failed"),
+        variant: "destructive",
+      });
       const detail = render(<>{toast.description}</>);
       expect(detail.container).toHaveTextContent(fragment.message);
       expect(detail.container.querySelector("bdi")).toHaveAttribute("lang", typed ? "en" : "und");

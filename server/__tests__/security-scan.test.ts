@@ -7,6 +7,11 @@ import os from "node:os";
 import path from "node:path";
 import crypto from "node:crypto";
 
+vi.mock("node:fs/promises", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:fs/promises")>();
+  return { ...actual, opendir: vi.fn(actual.opendir) };
+});
+
 vi.mock("../logger.js", () => ({
   logger: {
     child: () => ({

@@ -1,3 +1,5 @@
+import { mkdtempSync, mkdirSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { parseServiceMessageDescriptor } from "../../shared/service-messages.js";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import express from "express";
@@ -1419,33 +1421,40 @@ describe("API Routes - Extended Coverage", () => {
     });
 
     it("should delete library files outside the library root when their root folder has allowDelete on", async () => {
-      const gameId = "123e4567-e89b-12d3-a456-426614174000";
-      vi.mocked(storage.getGame).mockResolvedValue({
-        id: gameId,
-        userId: "user-1",
-        libraryPath: "/mnt/old-library/MyGame",
-      } as unknown as Game);
-      vi.mocked(storage.getImportConfig).mockResolvedValue({
-        libraryRoot: "/data/library",
-      } as any);
-      vi.mocked(storage.getAllRootFolders).mockResolvedValue([
-        makeRootFolder({ path: "/mnt/old-library", allowDelete: true }),
-      ]);
-      vi.mocked(storage.removeGame).mockResolvedValue(true);
-      vi.mocked(fsExtra.remove).mockResolvedValue(undefined as never);
+      const root = mkdtempSync(path.join(tmpdir(), "questarr-delete-api-"));
+      const gamePath = path.join(root, "MyGame");
+      mkdirSync(gamePath);
+      try {
+        const gameId = "123e4567-e89b-12d3-a456-426614174000";
+        vi.mocked(storage.getGame).mockResolvedValue({
+          id: gameId,
+          userId: "user-1",
+          libraryPath: gamePath,
+        } as unknown as Game);
+        vi.mocked(storage.getImportConfig).mockResolvedValue({
+          libraryRoot: "/data/library",
+        } as any);
+        vi.mocked(storage.getAllRootFolders).mockResolvedValue([
+          makeRootFolder({ path: root, allowDelete: true }),
+        ]);
+        vi.mocked(storage.removeGame).mockResolvedValue(true);
+        vi.mocked(fsExtra.remove).mockResolvedValue(undefined as never);
 
-      const realpathSpy = vi
-        .spyOn(fsExtra, "realpath")
-        .mockImplementation(async (value) => path.resolve(String(value)) as never);
-      const response = await request(app).delete(`/api/games/${gameId}?deleteFiles=true`);
+        const realpathSpy = vi
+          .spyOn(fsExtra, "realpath")
+          .mockImplementation(async (value) => path.resolve(String(value)) as never);
+        const response = await request(app).delete(`/api/games/${gameId}?deleteFiles=true`);
 
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual({
-        success: true,
-        fileDeletion: { deleted: true, path: "/mnt/old-library/MyGame" },
-      });
-      expect(fsExtra.remove).toHaveBeenCalledWith(path.resolve("/mnt/old-library/MyGame"));
-      realpathSpy.mockRestore();
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual({
+          success: true,
+          fileDeletion: { deleted: true, path: gamePath },
+        });
+        expect(fsExtra.remove).toHaveBeenCalledWith(path.resolve(gamePath));
+        realpathSpy.mockRestore();
+      } finally {
+        rmSync(root, { recursive: true, force: true });
+      }
     });
 
     it("should still skip deleting library files outside the library root when their root folder has allowDelete off", async () => {

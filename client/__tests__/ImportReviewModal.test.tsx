@@ -13,7 +13,8 @@ const { mockInvalidateQueries, mockToast, mockFileBrowser, mockApiRequest } = vi
   mockApiRequest: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock("@/lib/queryClient", () => ({
+vi.mock("@/lib/queryClient", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/queryClient")>()),
   apiRequest: mockApiRequest,
 }));
 
