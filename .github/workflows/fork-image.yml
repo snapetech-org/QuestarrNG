@@ -76,6 +76,12 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Set up Node.js for release validation and security checks
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26.x
+          package-manager-cache: false
+
       - name: Validate release tag
         id: validate
         shell: bash
@@ -111,12 +117,6 @@ jobs:
             exit 1
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
-
-      - name: Set up Node.js for release security checks
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 26.x
-          package-manager-cache: false
 
       - name: Require clean security before building versioned images
         env:
