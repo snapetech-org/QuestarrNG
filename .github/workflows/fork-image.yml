@@ -906,7 +906,7 @@ jobs:
           previous_tag="$(scripts/release-notes-base-tag.sh "$TAG")"
           runs_json="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs?head_sha=${release_sha}&per_page=100")"
           run_id="$(jq -r --arg tag "$TAG" \
-            '[.workflow_runs[] | select(.name == "Publish QuestarrNG image" and .event == "push" and .head_branch == $tag)] | sort_by(.run_number) | last | .id // empty' \
+            '[.workflow_runs[] | select(.event == "workflow_dispatch" and .name == ("action:release:pool:public:tag:" + $tag))] | sort_by(.run_number) | last | .id // empty' \
             <<< "$runs_json")"
           if [[ -z "$run_id" ]]; then
             echo "No prior tag workflow run found for $TAG at $release_sha." >&2
