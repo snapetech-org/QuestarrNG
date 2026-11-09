@@ -4,11 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [2.1.10] - 2026-11-09
+## [2.1.11] - 2026-11-09
 
 ### Release infrastructure
 
-- Pass the security gate's validated exact source SHA into curated release-note assembly so the hosted release job can publish the versioned changelog after all artifacts pass.
+- Pass the security gate's validated exact source SHA into curated release-note assembly and keep every deployment manifest on the same release version so the hosted release job can publish after all artifacts pass.
 
 ## [2.1.9] - 2026-11-09
 
