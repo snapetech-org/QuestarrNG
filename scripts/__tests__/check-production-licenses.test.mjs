@@ -8,6 +8,7 @@ import {
 describe("production dependency license policy", () => {
   it("accepts a license on the explicit allow-list", () => {
     expect(isLicenseExpressionAllowed("MIT")).toBe(true);
+    expect(isLicenseExpressionAllowed("PSF-2.0")).toBe(true);
     expect(isLicenseExpressionAllowed("MIT*")).toBe(true);
   });
 

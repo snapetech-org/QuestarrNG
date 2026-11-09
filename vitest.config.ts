@@ -32,6 +32,8 @@ export default defineConfig({
     },
     exclude: [
       "**/node_modules/**",
+      // Do not execute historical test copies retained as review evidence.
+      "docs/pr-evidence/**",
       "**/dist/**",
       "**/cypress/**",
       "**/.{idea,git,cache,output,temp}/**",

@@ -9,3 +9,6 @@ coverage
 .vscode
 .idea
 docs/upstream-resolution/ledger.json
+
+# Preserve historical review snapshots byte for byte.
+docs/pr-evidence/**

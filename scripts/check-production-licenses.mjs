@@ -15,6 +15,7 @@ export const allowedLicenses = new Set([
   "CC0-1.0",
   "0BSD",
   "Python-2.0",
+  "PSF-2.0",
   "BlueOak-1.0.0",
   "OFL-1.1",
   "Unlicense",

@@ -15,6 +15,8 @@ export default tseslint.config(
       "**/.omc/**",
       "**/.claude/**",
       "**/coverage/**",
+      // Historical source snapshots are review evidence, not maintained application code.
+      "docs/pr-evidence/**",
       "**/__tests__/**",
       "**/tests/**",
       "__tests__/**",

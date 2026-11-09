@@ -62,3 +62,5 @@ The official node-forge 1.4.1 release replaces the obsolete local crypto fork.
 The retained RSA DigestInfo, valid-signature, PEM and TLS regression tests pass
 against the registry package; the Docker build no longer copies a vendored
 crypto module into either stage.
+
+The production license policy includes `PSF-2.0`, used by argparse 3.x. Its [SPDX license text](https://spdx.org/licenses/PSF-2.0.html) permits redistribution with the license and copyright notice retained; the installed package license remains bundled with the dependency. Historical localization source snapshots under `docs/pr-evidence/` are retained unchanged and excluded from application formatting, lint, and test discovery.
