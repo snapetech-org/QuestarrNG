@@ -4,8 +4,8 @@ mcp==1.30.0
 # GHSA-xcq7-p3pf-p88h / CVE-2026-114603: keep the scanner's OpenTelemetry
 # packages on the patched, compatible 1.45.1 release set. Updating only
 # opentelemetry-api breaks Semgrep's pinned OTLP exporter.
-opentelemetry-api==1.45.1
-opentelemetry-sdk==1.45.1
-opentelemetry-exporter-otlp-proto-common==1.45.1
-opentelemetry-exporter-otlp-proto-http==1.45.1
-opentelemetry-proto==1.45.1
+opentelemetry-api==1.45.2
+opentelemetry-sdk==1.45.2
+opentelemetry-exporter-otlp-proto-common==1.45.2
+opentelemetry-exporter-otlp-proto-http==1.45.2
+opentelemetry-proto==1.45.2
