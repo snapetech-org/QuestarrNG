@@ -64,3 +64,12 @@ against the registry package; the Docker build no longer copies a vendored
 crypto module into either stage.
 
 The production license policy includes `PSF-2.0`, used by argparse 3.x. Its [SPDX license text](https://spdx.org/licenses/PSF-2.0.html) permits redistribution with the license and copyright notice retained; the installed package license remains bundled with the dependency. Historical localization source snapshots under `docs/pr-evidence/` are retained unchanged and excluded from application formatting, lint, and test discovery.
+
+The 2026-11-12 security refresh updates `node-forge` to 1.4.3, fixing
+[CVE-2026-125332](https://github.com/advisories/GHSA-w4xr-hqv8-ch44),
+[CVE-2026-125333](https://github.com/advisories/GHSA-6cv4-p8m7-4r25),
+[CVE-2026-125334](https://github.com/advisories/GHSA-j8rw-jp99-435v), and
+[CVE-2026-125335](https://github.com/advisories/GHSA-6889-vf6x-f3g5). It also
+updates `fast-xml-parser` to 5.12.0 for
+[CVE-2026-126066](https://github.com/advisories/GHSA-474x-hrwr-fgx4). The
+lockfile records the patched releases and their verified npm integrity hashes.

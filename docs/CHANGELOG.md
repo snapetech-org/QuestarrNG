@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.2.3] - 2026-11-12
+
+### Security
+
+- Update [node-forge](https://github.com/digitalbazaar/forge/releases/tag/v1.4.3) to 1.4.3, fixing [CVE-2026-125332](https://github.com/advisories/GHSA-w4xr-hqv8-ch44), [CVE-2026-125333](https://github.com/advisories/GHSA-6cv4-p8m7-4r25), [CVE-2026-125334](https://github.com/advisories/GHSA-j8rw-jp99-435v), and [CVE-2026-125335](https://github.com/advisories/GHSA-6889-vf6x-f3g5).
+- Update [fast-xml-parser](https://github.com/NaturalIntelligence/fast-xml-parser/releases/tag/v5.12.0) to 5.12.0, fixing [CVE-2026-126066](https://github.com/advisories/GHSA-474x-hrwr-fgx4).
+
 ## [2.2.2] - 2026-11-09
 
 - Integrate localization and RTL foundations from [PR #155](https://github.com/snapetech-org/QuestarrNG/pull/155), with English fallback and native-language review still outstanding.
