@@ -10,6 +10,8 @@
  */
 export function normalizeTitle(title: string): string {
   return title
+    .normalize("NFD")
+    .replaceAll(/[̀-ͯ]/g, "") // "Pokémon" -> "Pokemon", not "pok mon"
     .toLowerCase()
     .replaceAll(/[^a-z0-9\s]/g, " ") // Replace non-alphanumeric with space
     .replaceAll(/\s+/g, " ") // Multiple spaces to single space
@@ -244,8 +246,10 @@ export function releaseMatchesGame(releaseName: string, gameTitle: string): bool
 
   if (meaningfulWords.length === 0) return false;
 
-  const normalizedRelease = releaseName.toLowerCase().replace(/[._-]/g, " ");
-  return gameWords.every((word) => normalizedRelease.includes(word));
+  // Whole words only: a substring check let "1-2-Switch" match "Super Mario Galaxy 2 (v1.2.0)
+  // [Switch]" ("1" inside "v1") and "Luigi's Mansion 3" match "Luigi 039s Mansion 2 HD".
+  const releaseWords = new Set(normalizeTitle(releaseName).split(" "));
+  return gameWords.every((word) => releaseWords.has(word));
 }
 
 export interface ReleaseMetadata {
