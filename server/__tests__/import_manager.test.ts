@@ -235,6 +235,46 @@ describe("ImportManager", () => {
     expect(storage.updateGameDownloadStatus).toHaveBeenCalledWith("dl-1", "manual_review_required");
   });
 
+  it("keeps waiting past MAX_PATH_RETRY while the download is still being moved", async () => {
+    storage.getGameDownload.mockResolvedValue({
+      id: "dl-1",
+      gameId: "g1",
+      downloaderId: "d1",
+    });
+    storage.getGame.mockResolvedValue({
+      id: "g1",
+      title: "Game",
+      userId: "u1",
+      status: "wanted",
+      platforms: [6],
+    });
+    storage.getDownloader.mockResolvedValue({ id: "d1", name: "qBit", url: "http://qbit:8080" });
+    // The item is missing but its parent folder exists: the client is still moving it.
+    let itemPath: string | undefined;
+    fsMock.pathExists.mockImplementation(async (p: string) => {
+      itemPath ??= p;
+      return p !== itemPath;
+    });
+
+    const manager = new ImportManager(
+      storage as never, // NOSONAR
+      pathService as never, // NOSONAR
+      platformService as never, // NOSONAR
+      archiveService as never,
+      { scan: vi.fn().mockResolvedValue({ blocked: false, source: "clamav" }) } // NOSONAR
+    );
+
+    for (let i = 0; i < 5; i++) {
+      await manager.processImport("dl-1", "/remote/path");
+    }
+
+    expect(storage.updateGameDownloadStatus).not.toHaveBeenCalledWith(
+      "dl-1",
+      "manual_review_required"
+    );
+    expect(storage.updateGameDownloadStatus).toHaveBeenLastCalledWith("dl-1", "downloading");
+  });
+
   it("flags manual review (not a terminal error) when processing throws, so it can be re-attempted", async () => {
     storage.getGameDownload.mockResolvedValue({
       id: "dl-1",

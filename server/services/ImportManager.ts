@@ -102,6 +102,10 @@ const IGDB_ID_TO_PLATFORM_KEY: Record<number, string> = Object.fromEntries(
 );
 
 const MAX_PATH_RETRY = 5;
+// When the mapped download folder exists but the item doesn't yet, the client is
+// still moving it out of its incomplete dir (a cross-share copy of a 17 GB game takes
+// minutes), so wait up to ~2 hours of 1-minute cycles instead of 5.
+const MAX_MOVE_WAIT = 120;
 const MAX_LISTED_FILES = 100;
 const MAX_IMPORT_DIRECTORY_ENTRIES = 100_000;
 const MAX_IMPORT_DIRECTORY_WALK_MS = 30_000;
@@ -739,7 +743,9 @@ export class ImportManager {
       return true;
     }
     const retries = (this.pathRetryCount.get(downloadId) ?? 0) + 1;
-    if (retries < MAX_PATH_RETRY) {
+    const stillMoving = await fs.pathExists(path.dirname(localPath));
+    const maxRetry = stillMoving ? MAX_MOVE_WAIT : MAX_PATH_RETRY;
+    if (retries < maxRetry) {
       this.pathRetryCount.set(downloadId, retries);
       logger.warn(
         {
@@ -747,7 +753,8 @@ export class ImportManager {
           downloaderName: meta.downloaderName,
           remoteDownloadPath: meta.remoteDownloadPath,
           retry: retries,
-          maxRetry: MAX_PATH_RETRY,
+          maxRetry,
+          stillMoving,
         },
         "[ImportManager] Path not accessible — retrying next cycle"
       );
