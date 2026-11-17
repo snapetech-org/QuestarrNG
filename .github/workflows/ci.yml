@@ -172,12 +172,12 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Setup .NET 10 SDK
+      - name: Setup .NET 11 SDK
         uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         env:
           DOTNET_INSTALL_DIR: ${{ runner.temp }}/questarrng-dotnet-${{ github.run_id }}-${{ github.run_attempt }}
         with:
-          dotnet-version: "10.0.403"
+          dotnet-version: "11.0.100"
 
       - name: Verify selected .NET SDK
         run: '"$RUNNER_TEMP/questarrng-dotnet-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT/dotnet" --version'

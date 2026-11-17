@@ -9,7 +9,7 @@ Questarr processes running from the install directory before replacing files.
 
 After installation, open http://localhost:5000 in your browser.
 
-The installer bundles a self-contained .NET 10 LTS Windows Service host; a
+The installer bundles a self-contained .NET 11 Windows Service host; a
 separate .NET runtime installation is not required.
 
 Runtime data is stored in C:\ProgramData\Questarr (the install directory's

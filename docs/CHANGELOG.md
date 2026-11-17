@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.2.4] - 2026-11-18
+
+### Changed
+
+- Build the Windows service host on .NET 11. The installer still includes the runtime and requires no separate .NET installation.
+
 ## [2.2.3] - 2026-11-12
 
 ### Security
