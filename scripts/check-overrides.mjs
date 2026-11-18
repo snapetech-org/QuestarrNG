@@ -101,8 +101,6 @@ let anyRemovable = false;
 for (const { pkgName, safeRange, parent } of entries) {
   const label = parent ? `${parent} -> ${pkgName}` : pkgName;
 
-  const safeMin = semver.minVersion(safeRange);
-
   // Skip removability check for necessary feature overrides
   if (necessaryFeatureOverrides.has(label)) {
     console.log(
@@ -119,6 +117,28 @@ for (const { pkgName, safeRange, parent } of entries) {
     continue;
   }
 
+  if (label === "picomatch" && safeRange === "npm:@ryotsu/picomatch@4.0.7-a") {
+    const entries = Object.entries(lock.packages).filter(
+      ([location]) =>
+        location.endsWith("/node_modules/picomatch") || location === "node_modules/picomatch"
+    );
+    const matchesPatchedFork =
+      entries.length > 0 &&
+      entries.every(
+        ([, entry]) => entry.name === "@ryotsu/picomatch" && entry.version === "4.0.7-a"
+      );
+    if (!matchesPatchedFork) {
+      console.error(
+        "[invalid] picomatch: the lockfile must resolve every copy to the patched fork."
+      );
+      anyRemovable = true;
+    } else {
+      console.log("[still needed] picomatch: pinned to the patched fork for CVE-2026-112366");
+    }
+    continue;
+  }
+
+  const safeMin = semver.minVersion(safeRange);
   const unsafe = consumers.filter((c) => {
     const consumerMin = semver.minVersion(c.range);
     return !consumerMin || semver.lt(consumerMin, safeMin);
@@ -174,4 +194,6 @@ if (anyRemovable) {
   process.exit(1);
 }
 
-console.log("\nAll overrides are still required and the vendored cache fix remains covered by tests.");
+console.log(
+  "\nAll overrides are still required and the vendored cache fix remains covered by tests."
+);
