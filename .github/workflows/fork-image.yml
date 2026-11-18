@@ -936,8 +936,11 @@ jobs:
           if ! grep -Fq 'RELEASE_SHA: unbound variable' release-failure.log && ! {
             grep -Eq 'RELEASE_SHA:[[:space:]]*$' release-failure.log &&
             grep -Fq "fatal: ambiguous argument ''" release-failure.log
+          } && ! {
+            grep -Fq 'Release-note validation failed:' release-failure.log &&
+            grep -Eq 'release-notes/[^:]+: area must be a 2-32 character lowercase slug' release-failure.log
           }; then
-            echo "The previous $TAG release-note failure does not match the known missing RELEASE_SHA error." >&2
+            echo "The previous $TAG release-note failure does not match a supported recovery case." >&2
             exit 1
           fi
 
