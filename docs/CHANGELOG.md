@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.2.5] - 2026-11-18
+
+### Security
+
+- Update the Semgrep toolchain to OpenTelemetry 1.45.2 to address CVE-2026-126360.
+
+- Pin a patched Picomatch dependency for the build toolchain to address [CVE-2026-112366](https://github.com/advisories/GHSA-fc5q-39xc-vjpf).
+
+### Changed
+
+- Build the Windows service host on .NET 11. The installer still includes the runtime and requires no separate .NET installation.
+
 ## [2.2.4] - 2026-11-18
 
 ### Security
