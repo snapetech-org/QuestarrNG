@@ -1,7 +1,7 @@
 ---
 category: changed
 audience: operators
-area: windows installer
+area: windows-installer
 action: none
 breaking: false
 ---
