@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ## [2.2.4] - 2026-11-18
 
+### Security
+
+- Pin a patched Picomatch dependency for the build toolchain to address [CVE-2026-112366](https://github.com/advisories/GHSA-fc5q-39xc-vjpf).
+
 ### Changed
 
 - Build the Windows service host on .NET 11. The installer still includes the runtime and requires no separate .NET installation.
