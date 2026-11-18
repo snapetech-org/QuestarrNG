@@ -1,5 +1,5 @@
 # Build stage with shared dependencies
-FROM node:26.12.1-alpine@sha256:40cd011b55415bc894e45b02fdd5a5dfde056921b7d23a64c74f80497af48797 AS base
+FROM node:26.13.0-alpine@sha256:8996bb5821d62a8fd9bb27c1cb07462f3fdce6e47d640c6a881ead0b064ce216 AS base
 WORKDIR /app
 
 # apk upgrade picks up Alpine's latest patched packages for this branch (e.g. openssl,
@@ -46,7 +46,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:26.12.1-alpine@sha256:40cd011b55415bc894e45b02fdd5a5dfde056921b7d23a64c74f80497af48797 AS production
+FROM node:26.13.0-alpine@sha256:8996bb5821d62a8fd9bb27c1cb07462f3fdce6e47d640c6a881ead0b064ce216 AS production
 ARG QUESTARR_VERSION=dev
 
 WORKDIR /app
