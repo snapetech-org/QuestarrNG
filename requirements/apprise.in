@@ -1,4 +1,4 @@
-apprise==2.1.0
+apprise==2.2.0
 
 # Keep the TLS trust-store dependency on a patched release.
 certifi>=2026.10.23
